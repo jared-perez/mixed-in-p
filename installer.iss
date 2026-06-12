@@ -15,7 +15,10 @@ DefaultDirName={autopf}\MixedInP
 DefaultGroupName={#MyAppName}
 LicenseFile=LICENSE
 OutputDir=dist
-OutputBaseFilename=MixedInP_Setup_{#MyAppVersion}
+; Stable, version-less filename so the GitHub
+; releases/latest/download/MixedInP-Setup.exe link always resolves. The
+; version lives in the release tag (vX.Y.Z), not the filename.
+OutputBaseFilename=MixedInP-Setup
 SetupIconFile=resources\icon.ico
 UninstallDisplayIcon={app}\MixedInP.exe
 Compression=lzma2/ultra64
