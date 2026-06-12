@@ -1,0 +1,58 @@
+# Virtual environments
+venv/
+venv-intel/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+build-intel/
+build-branch/
+dist/
+dist-intel/
+dist-branch/
+*.egg-info/
+.eggs/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Working files
+resources/*.psd
+
+# Local scripts
+sync_to_usb.bat
+
+# Spitball plans and reports
+spitball/
+
+# Landing page (local working files, not part of the app)
+docs/landing-page/
+
+# Win7 standalone installer build (local artifacts + vendored 3rd-party installers)
+installer/
+
+# Audio files (don't commit test audio)
+*.flac
+*.mp3
+*.wav
+*.aiff
+*.aif
+
+.claude/

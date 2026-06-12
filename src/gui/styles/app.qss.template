@@ -1,0 +1,686 @@
+/* Mixed in P stylesheet TEMPLATE.
+   Colour placeholders are at-sign-delimited palette token names (BG_DARK,
+   NEON_YELLOW, ...). load_stylesheet() in src/gui/app.py substitutes each with
+   the active palette's colour (tokens defined in styles/theme.py).
+   Do not hardcode hex colours here — add/reuse a palette token instead. */
+
+/* ===== Global ===== */
+QWidget {
+    background-color: @BG_DARK@;
+    color: @TEXT_PRIMARY@;
+    /* NOTE: drop platform-specific font families that don't exist on the
+       build platform — Qt logs a "Populating font family aliases" warning
+       per missing name even when it's listed only as a fallback. Add
+       "Segoe UI" back here for the Windows build. */
+    font-family: "Helvetica Neue", "Arial", sans-serif;
+    font-size: 14px;
+}
+
+QMainWindow {
+    background-color: @BG_DARK@;
+}
+
+/* ===== Frames and Panels ===== */
+QFrame {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+}
+
+QFrame#headerBar {
+    background-color: @BG_MEDIUM@;
+    border: none;
+    border-bottom: 1px solid @BG_LIGHT@;
+    border-radius: 0px;
+}
+
+QFrame#sidebar {
+    background-color: @BG_MEDIUM@;
+    border: none;
+    border-right: 1px solid @BG_LIGHT@;
+    border-radius: 0px;
+}
+
+QFrame#dropZone {
+    background-color: @BG_MEDIUM@;
+    border: 2px dashed @TEXT_DISABLED@;
+    border-radius: 8px;
+}
+
+QFrame#dropZone:hover {
+    border-color: @NEON_YELLOW@;
+    background-color: @BG_LIGHT@;
+}
+
+QFrame#dropZoneActive {
+    border: 2px solid @NEON_YELLOW@;
+    background-color: @BG_LIGHT@;
+}
+
+/* ===== Labels ===== */
+QLabel {
+    background-color: transparent;
+    border: none;
+    color: @TEXT_PRIMARY@;
+}
+
+QLabel#logoLabel {
+    background: transparent;
+}
+
+QLabel#sectionTitle {
+    font-size: 28px;
+    font-weight: bold;
+    color: @CHROME@;
+    padding: 8px 0px;
+}
+
+QLabel#dropZoneLabel {
+    color: @TEXT_SECONDARY@;
+    font-size: 14px;
+}
+
+QLabel#statusQueued {
+    color: @CHROME@;
+}
+
+QLabel#statusAnalysing {
+    color: @NEON_YELLOW@;
+}
+
+QLabel#statusAnalysed {
+    color: @NEON_GREEN@;
+}
+
+QLabel#statusError {
+    color: @ERROR@;
+}
+
+/* ===== Buttons ===== */
+QPushButton {
+    background-color: @BG_LIGHT@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    padding: 8px 16px;
+    font-weight: 500;
+    min-height: 20px;
+}
+
+QPushButton:hover {
+    background-color: @BG_LIGHTER@;
+    border-color: @CHROME@;
+}
+
+QPushButton:pressed {
+    background-color: @BG_MEDIUM@;
+}
+
+QPushButton:disabled {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_DISABLED@;
+    border-color: @BG_LIGHT@;
+}
+
+/* Header Add Files / Add Folder buttons. Set here (not via an inline
+   setStyleSheet) so the larger font doesn't leak into the buttons' tooltips,
+   which would otherwise render at 16px instead of the default tooltip size. */
+QPushButton#headerActionButton {
+    font-size: 16px;
+}
+
+QPushButton#primaryButton {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+    border: none;
+    font-weight: bold;
+}
+
+QPushButton#primaryButton:hover {
+    background-color: @ACCENT_HOVER@;
+}
+
+QPushButton#primaryButton:pressed {
+    background-color: @ACCENT_PRESSED@;
+}
+
+QPushButton#primaryButton:disabled {
+    background-color: @TEXT_DISABLED@;
+    color: @BG_LIGHT@;
+}
+
+QPushButton#successButton {
+    background-color: @NEON_GREEN@;
+    color: @BG_DARK@;
+    border: none;
+    font-weight: bold;
+}
+
+QPushButton#successButton:hover {
+    background-color: @ACCENT2_HOVER@;
+}
+
+QPushButton#dangerButton {
+    background-color: @ERROR@;
+    color: @TEXT_PRIMARY@;
+    border: none;
+    font-weight: bold;
+}
+
+QPushButton#dangerButton:hover {
+    background-color: @ERROR_HOVER@;
+}
+
+/* "Auto" toggle in the Analyze panel header — mirrors the auto-analyze
+   setting. Chrome-outlined when off; fills neon yellow when on. */
+QPushButton#autoToggle {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_SECONDARY@;
+    border: 1px solid @CHROME_DARK@;
+    border-radius: 4px;
+    padding: 6px 18px;
+    font-weight: bold;
+}
+
+QPushButton#autoToggle:hover {
+    border-color: @CHROME@;
+    color: @TEXT_PRIMARY@;
+}
+
+QPushButton#autoToggle:checked {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+    border-color: @NEON_YELLOW@;
+}
+
+QPushButton#autoToggle:checked:hover {
+    background-color: @ACCENT_HOVER@;
+    border-color: @ACCENT_HOVER@;
+}
+
+QPushButton#sidebarButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    text-align: left;
+    /* Left pad halved (6px -> 3px) to pull the icon toward the edge and free up
+       horizontal room for long labels (e.g. Russian "Переименовать"). */
+    padding: 12px 6px 12px 3px;
+    font-size: 16px;
+    color: @TEXT_SECONDARY@;
+}
+
+/* Collapsed rail: icon only, centred, no label. */
+QPushButton#sidebarButton[collapsed="true"] {
+    text-align: center;
+    padding: 12px 0px;
+}
+
+/* Per-button font shrink for a single overlong translated label (set in
+   sidebar.py — currently only Russian "Rename"). Keeps every other button at
+   16px while letting one outlier fit. */
+QPushButton#sidebarButton[compactLabel="true"] {
+    font-size: 13px;
+}
+
+/* English's labels are short enough to leave the rail under-filled at 16px;
+   bump them up so they read more easily (set in sidebar.py only when
+   language == "en"). Other languages have longer words and stay at 16px. */
+QPushButton#sidebarButton[bigLabel="true"] {
+    font-size: 22px;
+}
+
+/* German labels are longer (e.g. "Einstellungen"), so they get a smaller bump
+   than English but still larger than the 16px default. Set in sidebar.py only
+   when language == "de". */
+QPushButton#sidebarButton[germanLabel="true"] {
+    font-size: 18px;
+}
+
+/* Thin divider under the collapse toggle. */
+QFrame#sidebarDivider {
+    background-color: @BG_LIGHT@;
+    border: none;
+}
+
+QPushButton#sidebarButton:hover {
+    background-color: @BG_LIGHT@;
+    color: @TEXT_PRIMARY@;
+}
+
+QPushButton#sidebarButton:checked {
+    background-color: @BG_LIGHT@;
+    color: @NEON_YELLOW@;
+    border-left: 3px solid @NEON_YELLOW@;
+}
+
+/* ===== Tables ===== */
+QTableView, QTableWidget {
+    background-color: @BG_MEDIUM@;
+    alternate-background-color: @ROW_ALT@;
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    gridline-color: @BG_LIGHT@;
+    selection-background-color: @BG_LIGHT@;
+    selection-color: @NEON_YELLOW@;
+}
+
+QTableView::item, QTableWidget::item {
+    padding: 8px;
+    border: none;
+}
+
+/* History table: trim the horizontal cell padding so timestamps/filenames sit
+   close to the column edge (they show in full and scroll rather than eliding). */
+QTableWidget#historyTable::item {
+    padding: 8px 2px;
+}
+
+QTableView::item:selected, QTableWidget::item:selected {
+    background-color: @BG_LIGHT@;
+    color: @NEON_YELLOW@;
+}
+
+QTableView::item:hover, QTableWidget::item:hover {
+    background-color: @ROW_HOVER@;
+}
+
+QHeaderView::section {
+    background-color: @BG_MEDIUM@;
+    color: @CHROME@;
+    padding: 8px;
+    border: none;
+    border-bottom: 2px solid @BG_LIGHT@;
+    font-weight: bold;
+}
+
+QHeaderView::section:hover {
+    background-color: @BG_LIGHT@;
+}
+
+/* ===== Scroll Bars ===== */
+QScrollBar:vertical {
+    background-color: @BG_MEDIUM@;
+    width: 12px;
+    border: none;
+    border-radius: 6px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: @BG_LIGHTER@;
+    border-radius: 6px;
+    min-height: 30px;
+    margin: 2px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: @TEXT_DISABLED@;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background-color: @BG_MEDIUM@;
+    height: 12px;
+    border: none;
+    border-radius: 6px;
+    margin: 0px;
+}
+
+QScrollBar::handle:horizontal {
+    background-color: @BG_LIGHTER@;
+    border-radius: 6px;
+    min-width: 30px;
+    margin: 2px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background-color: @TEXT_DISABLED@;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}
+
+/* ===== Input Fields ===== */
+QLineEdit, QTextEdit, QPlainTextEdit {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    padding: 8px;
+    selection-background-color: @NEON_YELLOW@;
+    selection-color: @BG_DARK@;
+}
+
+QLineEdit:focus, QTextEdit:focus, QPlainTextEdit:focus {
+    border-color: @NEON_YELLOW@;
+}
+
+QLineEdit:disabled, QTextEdit:disabled {
+    background-color: @BG_DARK@;
+    color: @TEXT_DISABLED@;
+}
+
+/* ===== Spin Boxes ===== */
+QSpinBox, QDoubleSpinBox {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    padding: 6px;
+    padding-right: 20px;
+}
+
+QSpinBox:focus, QDoubleSpinBox:focus {
+    border-color: @NEON_YELLOW@;
+}
+
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    width: 20px;
+    border: none;
+    background-color: @BG_LIGHT@;
+    border-top-right-radius: 4px;
+}
+
+QSpinBox::down-button, QDoubleSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    width: 20px;
+    border: none;
+    background-color: @BG_LIGHT@;
+    border-bottom-right-radius: 4px;
+}
+
+QSpinBox::up-button:hover, QDoubleSpinBox::up-button:hover,
+QSpinBox::down-button:hover, QDoubleSpinBox::down-button:hover {
+    background-color: @BG_LIGHTER@;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 6px solid @CHROME@;
+    width: 0px;
+    height: 0px;
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+    image: none;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 6px solid @CHROME@;
+    width: 0px;
+    height: 0px;
+}
+
+/* ===== Combo Box ===== */
+QComboBox {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    padding: 8px;
+    padding-right: 30px;
+}
+
+QComboBox:hover {
+    border-color: @CHROME@;
+}
+
+QComboBox:focus {
+    border-color: @NEON_YELLOW@;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 30px;
+    border: none;
+}
+
+QComboBox::down-arrow {
+    image: none;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 7px solid @CHROME@;
+    width: 0px;
+    height: 0px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @BG_LIGHTER@;
+    selection-background-color: @BG_LIGHT@;
+    selection-color: @NEON_YELLOW@;
+}
+
+/* ===== Progress Bar ===== */
+QProgressBar {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    text-align: center;
+    color: @TEXT_PRIMARY@;
+    height: 20px;
+}
+
+QProgressBar::chunk {
+    background-color: @NEON_GREEN@;
+    border-radius: 3px;
+}
+
+/* ===== Tool Tips ===== */
+QToolTip {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @NEON_YELLOW@;
+    border-radius: 4px;
+    padding: 4px 8px;
+}
+
+/* ===== Menu ===== */
+QMenu {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 8px 24px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background-color: @BG_LIGHT@;
+    color: @NEON_YELLOW@;
+}
+
+QMenu::separator {
+    height: 1px;
+    background-color: @BG_LIGHT@;
+    margin: 4px 8px;
+}
+
+/* ===== Tab Widget ===== */
+QTabWidget::pane {
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    background-color: @BG_MEDIUM@;
+}
+
+QTabBar::tab {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_SECONDARY@;
+    padding: 10px 20px;
+    border: none;
+    border-bottom: 2px solid transparent;
+}
+
+QTabBar::tab:selected {
+    color: @NEON_YELLOW@;
+    border-bottom: 2px solid @NEON_YELLOW@;
+}
+
+QTabBar::tab:hover:!selected {
+    color: @TEXT_PRIMARY@;
+}
+
+/* ===== Sliders ===== */
+QSlider::groove:horizontal {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @BG_LIGHT@;
+    height: 6px;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background-color: @CHROME@;
+    border: none;
+    width: 14px;
+    height: 14px;
+    margin: -5px 0;
+    border-radius: 7px;
+}
+
+QSlider::handle:horizontal:hover {
+    background-color: @NEON_YELLOW@;
+}
+
+QSlider::sub-page:horizontal {
+    background-color: @NEON_YELLOW@;
+    border: 1px solid @BG_LIGHT@;
+    height: 6px;
+    border-radius: 3px;
+}
+
+QSlider::add-page:horizontal {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @BG_LIGHT@;
+    height: 6px;
+    border-radius: 3px;
+}
+
+/* ===== Splitter ===== */
+QSplitter::handle {
+    background-color: @BG_LIGHT@;
+}
+
+QSplitter::handle:horizontal {
+    width: 2px;
+}
+
+QSplitter::handle:vertical {
+    height: 2px;
+}
+
+QSplitter::handle:hover {
+    background-color: @NEON_YELLOW@;
+}
+
+/* ===== Check Box ===== */
+QCheckBox {
+    spacing: 8px;
+    color: @TEXT_PRIMARY@;
+}
+
+QCheckBox::indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid @BG_LIGHTER@;
+    border-radius: 3px;
+    background-color: @BG_MEDIUM@;
+}
+
+QCheckBox::indicator:hover {
+    border-color: @CHROME@;
+}
+
+QCheckBox::indicator:checked {
+    background-color: @NEON_YELLOW@;
+    border-color: @NEON_YELLOW@;
+}
+
+QCheckBox::indicator:checked:hover {
+    background-color: @ACCENT_HOVER@;
+    border-color: @ACCENT_HOVER@;
+}
+
+/* ===== Radio Button ===== */
+QRadioButton {
+    spacing: 8px;
+    color: @TEXT_PRIMARY@;
+}
+
+QRadioButton::indicator {
+    width: 18px;
+    height: 18px;
+    border: 2px solid @BG_LIGHTER@;
+    border-radius: 10px;
+    background-color: @BG_MEDIUM@;
+}
+
+QRadioButton::indicator:hover {
+    border-color: @CHROME@;
+}
+
+QRadioButton::indicator:checked {
+    background-color: @BG_MEDIUM@;
+    border-color: @NEON_YELLOW@;
+}
+
+QRadioButton::indicator:checked::after {
+    background-color: @NEON_YELLOW@;
+}
+
+/* ===== Group Box ===== */
+QGroupBox {
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    margin-top: 12px;
+    padding-top: 8px;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 8px;
+    color: @CHROME@;
+    font-weight: bold;
+}
+
+/* ===== Status Bar ===== */
+QStatusBar {
+    background-color: @BG_MEDIUM@;
+    border-top: 1px solid @BG_LIGHT@;
+    color: @TEXT_SECONDARY@;
+}
+
+QStatusBar::item {
+    border: none;
+}
+
+/* ===== Dialog ===== */
+QDialog {
+    background-color: @BG_DARK@;
+}
+
+QDialogButtonBox QPushButton {
+    min-width: 80px;
+}
+
+/* ===== Message Box ===== */
+QMessageBox {
+    background-color: @BG_DARK@;
+}
+
+QMessageBox QLabel {
+    color: @TEXT_PRIMARY@;
+}

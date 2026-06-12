@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mixed in P — User Guide</title>
+<style>
+  :root{
+    --bg:#0a0a0c; --panel:#141418; --ink:#eaeaea; --muted:#9a9aa2;
+    --neon:#f0ff00; --line:#26262e; --green:#00ff66; --red:#ff5470;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;background:var(--bg);color:var(--ink);
+    font:16px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:var(--neon);text-decoration:none}
+  a:hover{text-decoration:underline}
+  .layout{display:grid;grid-template-columns:240px 1fr;max-width:1180px;margin:0 auto;gap:0}
+  /* Sidebar TOC */
+  nav.toc{
+    position:sticky;top:0;align-self:start;height:100vh;overflow:auto;
+    border-right:1px solid var(--line);padding:28px 18px 40px
+  }
+  nav.toc .brand{display:flex;align-items:center;gap:10px;margin-bottom:22px}
+  nav.toc .brand img{width:34px;height:34px;border-radius:8px}
+  nav.toc .brand b{font-size:15px}
+  nav.toc a{display:block;color:var(--muted);font-size:14px;padding:5px 8px;border-radius:6px}
+  nav.toc a:hover{color:var(--ink);background:var(--panel);text-decoration:none}
+  /* Content */
+  main{padding:40px 40px 80px;min-width:0}
+  header.hero{text-align:center;margin-bottom:30px}
+  header.hero img{max-width:340px;width:72%;height:auto}
+  .tagline{color:var(--neon);font-weight:700;letter-spacing:.05em;text-transform:uppercase;font-size:13px;margin:8px 0 0}
+  .lede{color:var(--muted);max-width:680px;margin:14px auto 0;font-size:17px}
+  h2{font-size:24px;margin:52px 0 6px;padding-top:8px}
+  h2 .num{color:var(--neon);font-size:15px;font-weight:800;margin-right:10px;vertical-align:middle}
+  h3{font-size:18px;margin:28px 0 6px;color:var(--neon)}
+  hr{border:none;border-top:1px solid var(--line);margin:8px 0 0}
+  p{margin:12px 0}
+  ul,ol{padding-left:22px}
+  li{margin:6px 0}
+  code{background:#000;color:var(--neon);padding:1px 6px;border-radius:5px;font-size:13.5px}
+  table{border-collapse:collapse;width:100%;margin:16px 0;font-size:14.5px}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top}
+  th{background:var(--panel);color:var(--neon);font-size:13px;letter-spacing:.03em;text-transform:uppercase}
+  tr:nth-child(even) td{background:#101014}
+  .callout{background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--neon);
+    border-radius:8px;padding:12px 16px;margin:18px 0;color:var(--muted)}
+  .callout b{color:var(--ink)}
+  .shot{background:var(--panel);border:1px dashed var(--line);border-radius:10px;
+    padding:26px;text-align:center;color:var(--muted);font-size:14px;margin:16px 0}
+  .shot::before{content:"🖼  ";opacity:.7}
+  .green{color:var(--green)} .red{color:var(--red)}
+  .mermaid{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin:18px 0}
+  footer{border-top:1px solid var(--line);margin-top:56px;padding-top:20px;color:var(--muted);font-size:14px;text-align:center}
+  @media (max-width:860px){
+    .layout{grid-template-columns:1fr}
+    nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line)}
+    main{padding:24px 20px 60px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc">
+    <div class="brand"><img src="../src/gui/assets/icon.png" alt=""><b>Mixed in P</b></div>
+    <a href="#what">1 · What is Mixed in P</a>
+    <a href="#harmonic">2 · Harmonic mixing in 60s</a>
+    <a href="#install">3 · Install &amp; first run</a>
+    <a href="#interface">4 · Interface at a glance</a>
+    <a href="#workflows">5 · Core workflows</a>
+    <a href="#routing">6 · Moving files</a>
+    <a href="#settings">7 · Settings</a>
+    <a href="#shortcuts">8 · Keyboard shortcuts</a>
+    <a href="#formats">9 · Supported formats</a>
+    <a href="#keycodes">10 · Key-code reference</a>
+    <a href="#faq">11 · FAQ &amp; troubleshooting</a>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <img src="../src/gui/assets/logo_title.png" alt="Mixed in P">
+      <p class="tagline">DJ Audio Analysis Toolkit · v1.3.0</p>
+      <p class="lede">Mixed in P analyzes your tracks for BPM, musical key, and energy, then helps you
+        organize, convert, tag, and audition your library — all in one compact desktop app built for DJs.</p>
+    </header>
+
+    <h2 id="what"><span class="num">01</span>What is Mixed in P</h2><hr>
+    <p>Mixed in P is a desktop app for DJs and producers that turns a folder of tracks into a
+      well-understood, well-organized library. Drop your files in and it detects:</p>
+    <ul>
+      <li><b>BPM</b> (tempo) with a confidence score,</li>
+      <li><b>Musical key</b>, shown as a harmonic <b>key code</b> (e.g. <code>8A</code>),</li>
+      <li><b>Energy level</b> (1–10), a quick feel for a track's intensity.</li>
+    </ul>
+    <p>From there you can batch-rename files with the tempo and key baked into the name, convert
+      between lossless formats, edit tags and artwork, and audition or slice tracks in the built-in
+      player. It runs on <b>Windows</b> and <b>macOS</b> (Apple Silicon and Intel).</p>
+    <div class="shot">Placeholder — screenshot of the main window (screenshots/overview.png)</div>
+
+    <h2 id="harmonic"><span class="num">02</span>Harmonic mixing in 60 seconds</h2><hr>
+    <p>Two tracks sound good together when their keys are compatible. Remembering raw key names
+      (F# minor, D♭ major…) is awkward, so Mixed in P uses <b>key codes</b> — a clock-face system where
+      every key gets a number (1–12) and a letter (<b>A</b> for minor, <b>B</b> for major).</p>
+    <div class="callout"><b>The rule of thumb:</b> a track mixes smoothly with any track that shares its
+      <b>number</b>, or sits <b>±1</b> on the same letter. So from <code>8A</code>, good next picks are
+      <code>8B</code>, <code>7A</code>, or <code>9A</code>.</div>
+    <p>Prefer traditional note names or Traktor's Open Key format? Switch any time in
+      <b>Settings → Notation</b>. The full mapping is in the
+      <a href="#keycodes">key-code reference</a> below.</p>
+
+    <h2 id="install"><span class="num">03</span>Install &amp; first run</h2><hr>
+    <table>
+      <tr><th>Platform</th><th>Download</th><th>Notes</th></tr>
+      <tr><td><b>Windows</b></td><td><code>.exe</code> installer</td><td>Run the installer and launch from the Start menu.</td></tr>
+      <tr><td><b>macOS (Apple Silicon)</b></td><td><code>.zip</code> (arm64)</td><td>Unzip, then drag the app to Applications.</td></tr>
+      <tr><td><b>macOS (Intel)</b></td><td><code>.zip</code> (x86_64)</td><td>Unzip, then drag the app to Applications.</td></tr>
+    </table>
+    <p>On first launch on macOS you may need to right-click the app and choose <b>Open</b> the first
+      time, to clear Gatekeeper.</p>
+    <p><b>First run, in three steps:</b></p>
+    <ol>
+      <li>Click <b>Add Files</b> or <b>Add Folder</b> in the header (or just drag files in).</li>
+      <li>Open the <b>Analysis</b> panel — your tracks analyze automatically.</li>
+      <li>Read the BPM and key code for each track, and take it from there.</li>
+    </ol>
+
+    <h2 id="interface"><span class="num">04</span>The interface at a glance</h2><hr>
+    <p>The window has three parts: a <b>header</b> (Add Files / Add Folder + About), a <b>sidebar</b>
+      that switches panels and doubles as a drag-and-drop routing target, and the <b>panel area</b>
+      with the active tool.</p>
+    <table>
+      <tr><th>Panel</th><th>What it's for</th></tr>
+      <tr><td>Queue</td><td>Staging area for files waiting to be analyzed.</td></tr>
+      <tr><td>Analysis</td><td>Detect BPM, key, and energy.</td></tr>
+      <tr><td>Convert</td><td>Convert between WAV, FLAC, AIFF, and MP3.</td></tr>
+      <tr><td>Rename</td><td>Batch-rename with live preview.</td></tr>
+      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform Loop Slicer).</td></tr>
+      <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
+      <tr><td>Keyboard</td><td>3-octave piano + harmonic reference grid.</td></tr>
+      <tr><td>Spectrum</td><td>Spek-style frequency view of a track.</td></tr>
+      <tr><td>History</td><td>Undo past rename batches.</td></tr>
+      <tr><td>Settings</td><td>Tempo range, notation, auto-rename, language, theme, and more.</td></tr>
+    </table>
+    <p>Here's how files flow between the panels:</p>
+    <pre class="mermaid">
+flowchart TD
+    files["🎵 Your audio files<br/>(drop from Finder / Explorer)"] --> sidebar
+    sidebar(["◧ Sidebar — open a panel · or drag rows onto a button to route files"])
+    subgraph organize["Organize"]
+      queue["Queue"]; rename["Rename"]; history["History"]
+    end
+    subgraph understand["Understand"]
+      analysis["Analysis"]; spectrum["Spectrum"]; keyboard["Keyboard"]
+    end
+    subgraph transform["Transform"]
+      convert["Convert"]; metadata["Metadata"]; player["Player + Slicer"]
+    end
+    sidebar --> organize; sidebar --> understand; sidebar --> transform
+    queue --> analysis
+    rename -->|Send To| analysis
+    rename -->|Send To| convert
+    analysis -->|Send To| convert
+    analysis -->|Send To| player
+    convert -->|Send To| analysis
+    convert -->|Send To| rename
+    convert -->|Send To| player
+    rename -. Undo .- history
+    </pre>
+
+    <h2 id="workflows"><span class="num">05</span>Core workflows</h2><hr>
+
+    <h3>Analyze tracks</h3>
+    <p>Drop files onto the <b>Analysis</b> panel and they analyze automatically. Each row shows
+      <b>BPM</b>, <b>key</b>, <b>key code</b>, <b>energy</b>, and confidence percentages, plus a
+      color-coded status.</p>
+    <ul>
+      <li>The <b>Auto</b> toggle controls whether dropped files analyze instantly; with it off, files
+        wait as <i>pending</i> until you press <b>Analyze</b>.</li>
+      <li>Detected BPM and key can be <b>written back to the file's tags</b> (see Settings).</li>
+      <li>Right-click a row to <b>Open File Location</b> or <b>Remove</b>; <b>Clear Results</b> empties the table.</li>
+      <li>Use <b>Send To</b> to push selected tracks to <b>Convert</b> or the <b>Player</b>.</li>
+    </ul>
+    <div class="shot">Placeholder — Analysis results table (screenshots/analysis.png)</div>
+
+    <h3>Organize &amp; batch-rename</h3>
+    <p>The <b>Rename</b> panel rewrites many filenames at once, with a live before/after preview.</p>
+    <ul>
+      <li><b>Trim</b> characters from the start and/or end of every name.</li>
+      <li><b>Prepend</b> or <b>Append</b> custom text (one or the other).</li>
+      <li><b>Remove underscores</b> replaces <code>_</code> with spaces.</li>
+      <li>Changes show in <span class="green">green</span>; <span class="red">conflicts</span>
+        (duplicate results) block <b>Apply Rename</b> until resolved.</li>
+      <li><b>Undo Last</b> reverts the most recent batch; older batches undo from <b>History</b>.</li>
+    </ul>
+    <div class="shot">Placeholder — Rename preview (screenshots/rename.png)</div>
+
+    <h3>Convert formats</h3>
+    <ul>
+      <li>Pick a <b>target format</b>: AIFF, WAV, FLAC, or MP3.</li>
+      <li>Lossless targets offer <b>sample rate</b> (96 / 48 / 44.1 / 32 kHz) and <b>bit depth</b>
+        (32 / 24 / 16 / 8-bit); MP3 offers a <b>bitrate</b> (128 / 192 / 256 / 320 kbps).</li>
+      <li>Sources must be lossless (WAV, FLAC, AIFF) — lossy files are rejected as sources.</li>
+      <li><b>Send To</b> moves output to Analyze, Rename, or the Player.</li>
+    </ul>
+    <div class="shot">Placeholder — Convert panel (screenshots/convert.png)</div>
+
+    <h3>Edit metadata &amp; artwork</h3>
+    <p>Drop a single file onto the <b>Metadata</b> panel to edit Title, Artist, Album, Label, Genre,
+      BPM, Key, Year, Track #, and Comment. Changes <b>save automatically</b> when you leave a field.
+      Add fields with <b>Add field…</b>, embed a cover image by dropping it or clicking
+      <b>Add Artwork…</b>, and unload with <b>Eject</b>. <b>Reload</b> re-reads the file from disk to
+      pick up tag changes made elsewhere — for example, edits you made inline in the Player playlist.</p>
+    <div class="shot">Placeholder — Metadata editor (screenshots/metadata.png)</div>
+
+    <h3>Play, audition &amp; lift samples</h3>
+    <ul>
+      <li>Transport: Previous / Play-Pause / Stop / Next, a click-or-drag seek bar, and volume.</li>
+      <li>The playlist shows filename, artist, title, BPM, key, comment, duration, and year.
+        Double-click to play, drag to reorder, and right-click to open the file location, reload a
+        track's tags from disk, or remove tracks; column layout is remembered.</li>
+      <li><b>Edit tags inline:</b> slow-double-click a cell — click an already-selected row again, the
+        way you rename in Finder/Explorer — to edit <b>Artist, Title, BPM, Key, Comment, or Year</b>
+        directly in the playlist; changes save straight to the file. The <b>Edit Lock</b> toggle at the
+        top-right turns inline editing on/off — it starts unlocked and remembers your choice, so you can
+        lock the list against accidental edits.</li>
+      <li>A panel shows the tags it loaded until you refresh it. <b>Right-click → Reload Metadata from
+        File</b> in the Player (or <b>Reload</b> in the Metadata panel) re-reads the file from disk —
+        handy after editing the same track in the other panel.</li>
+      <li>The next track pre-loads in the background, so <b>Next</b> is instant.</li>
+      <li><b>Waveform Loop Slicer:</b> set start/end markers, nudge them, toggle an <b>A–B loop</b>,
+        pick a format, and <b>export</b> the slice — ideal for lifting loops and samples. The waveform's
+        color is configurable in <b>Settings</b>.</li>
+    </ul>
+    <div class="shot">Placeholder — Player + Waveform Loop Slicer (screenshots/player.png)</div>
+
+    <h3>Keyboard &amp; harmonic reference</h3>
+    <p>A 3-octave piano you can play with the mouse or QWERTY keys (<b>Z / X</b> shift the octave),
+      with <b>Minor</b>/<b>Major</b> chord modes. A <b>linear key strip</b> and <b>hex grid</b> light up
+      to show a key's harmonic neighbors — click any segment to hear that key.</p>
+    <div class="shot">Placeholder — Keyboard panel (screenshots/keyboard.png)</div>
+
+    <h3>Spectrum view</h3>
+    <p>Drop a file onto the <b>Spectrum</b> panel for a Spek-style spectrogram — time across,
+      frequency up, loudness as color — with a dynamic-range slider. Handy for spotting low-quality
+      transcodes.</p>
+    <div class="shot">Placeholder — Spectrum view (screenshots/spectrum.png)</div>
+
+    <h2 id="routing"><span class="num">06</span>Moving files between panels</h2><hr>
+    <ul>
+      <li><b>Send To menus</b> — Rename → Analyze / Convert; Convert → Analyze / Rename / Player;
+        Analysis → Convert / Player.</li>
+      <li><b>Sidebar drag</b> — select rows and drop them on another panel's sidebar button. Routes
+        either <b>move</b> (remove from source) or <b>copy</b> the files; the button highlights when
+        it's a valid target.</li>
+      <li><b>From your file manager</b> — dragging files in always <i>adds</i> them.</li>
+    </ul>
+
+    <h2 id="settings"><span class="num">07</span>Settings reference</h2><hr>
+    <ul>
+      <li><b>Language</b> — many languages supported; <i>restart to apply</i>.</li>
+      <li><b>Theme</b> — choose a color scheme; <i>restart to apply</i>:
+        <ul>
+          <li><b>Neon Dark</b> (default) — the original dark look with neon-yellow accents.</li>
+          <li><b>Night Dark</b> — a softer dark scheme with muted, low-glare accents, easier on the
+            eyes during long late-night sessions.</li>
+          <li><b>Daylight</b> — a light scheme with dark text on pale surfaces, for bright rooms.</li>
+        </ul>
+      </li>
+      <li><b>Tempo range</b> — lowest/highest BPM (defaults 99–199); narrow it to avoid half/double
+        errors.</li>
+      <li><b>After analysis</b> — toggle auto-analyze, write BPM to tags, write key to tags,
+        auto-rename, and write key to comment (with energy-first option).</li>
+      <li><b>Naming format</b> — choose the prefix/suffix layout, e.g. <code>128 8A - Original_Name</code>
+        or <code>8A - Original_Name</code>. Affects auto-rename only.</li>
+      <li><b>Notation</b> — Key Codes (default), Traditional, or Traktor Open Key. Applied
+        live.</li>
+      <li><b>Waveform color</b> — the color of the full-length waveform in the Player. Pick a preset
+        or choose a custom color; applied live. The first option, <b>Default</b>, follows the active
+        theme (each theme has its own waveform color).</li>
+    </ul>
+    <p>All settings save instantly — there's no Save button.</p>
+
+    <h2 id="shortcuts"><span class="num">08</span>Keyboard shortcuts</h2><hr>
+    <table>
+      <tr><th>Keys</th><th>Action</th><th>Where</th></tr>
+      <tr><td>Space</td><td>Play / Pause</td><td>Player (when focused)</td></tr>
+      <tr><td>Delete / Backspace</td><td>Remove selected rows</td><td>Player, Rename, Analysis</td></tr>
+      <tr><td>Z / X</td><td>Shift octave down / up</td><td>Keyboard</td></tr>
+      <tr><td>A–L, ;</td><td>Play notes</td><td>Keyboard</td></tr>
+      <tr><td>W E T Y U O P</td><td>Play black-key notes</td><td>Keyboard</td></tr>
+      <tr><td>S / Q / E</td><td>Slice section controls</td><td>Player (slicer expanded)</td></tr>
+    </table>
+
+    <h2 id="formats"><span class="num">09</span>Supported formats</h2><hr>
+    <table>
+      <tr><th>Task</th><th>Formats</th></tr>
+      <tr><td>Analyze</td><td>MP3, WAV, FLAC, AIFF/AIF, M4A, OGG</td></tr>
+      <tr><td>Play / audition</td><td>MP3, WAV, FLAC, AIFF/AIF, M4A, OGG</td></tr>
+      <tr><td>Edit metadata</td><td>MP3, WAV, FLAC, AIFF/AIF, M4A, OGG</td></tr>
+      <tr><td>Convert — from</td><td>WAV, FLAC, AIFF (lossless only)</td></tr>
+      <tr><td>Convert — to</td><td>WAV, FLAC, AIFF, MP3</td></tr>
+    </table>
+    <p>Converting <i>from</i> a lossy source into a lossless format is intentionally blocked — it
+      can't restore lost quality.</p>
+
+    <h2 id="keycodes"><span class="num">10</span>Harmonic key-code reference</h2><hr>
+    <table>
+      <tr><th>Code</th><th>Open Key</th><th>Minor key</th><th>Code</th><th>Open Key</th><th>Major key</th></tr>
+      <tr><td>1A</td><td>6m</td><td>G#m / A♭m</td><td>1B</td><td>6d</td><td>B</td></tr>
+      <tr><td>2A</td><td>7m</td><td>D#m / E♭m</td><td>2B</td><td>7d</td><td>F# / G♭</td></tr>
+      <tr><td>3A</td><td>8m</td><td>A#m / B♭m</td><td>3B</td><td>8d</td><td>C# / D♭</td></tr>
+      <tr><td>4A</td><td>9m</td><td>Fm</td><td>4B</td><td>9d</td><td>G# / A♭</td></tr>
+      <tr><td>5A</td><td>10m</td><td>Cm</td><td>5B</td><td>10d</td><td>D# / E♭</td></tr>
+      <tr><td>6A</td><td>11m</td><td>Gm</td><td>6B</td><td>11d</td><td>A# / B♭</td></tr>
+      <tr><td>7A</td><td>12m</td><td>Dm</td><td>7B</td><td>12d</td><td>F</td></tr>
+      <tr><td>8A</td><td>1m</td><td>Am</td><td>8B</td><td>1d</td><td>C</td></tr>
+      <tr><td>9A</td><td>2m</td><td>Em</td><td>9B</td><td>2d</td><td>G</td></tr>
+      <tr><td>10A</td><td>3m</td><td>Bm</td><td>10B</td><td>3d</td><td>D</td></tr>
+      <tr><td>11A</td><td>4m</td><td>F#m / G♭m</td><td>11B</td><td>4d</td><td>A</td></tr>
+      <tr><td>12A</td><td>5m</td><td>C#m / D♭m</td><td>12B</td><td>5d</td><td>E</td></tr>
+    </table>
+    <p>The <b>Code</b> columns are the app's default key codes; the <b>Open Key</b> columns show the
+      same keys in Traktor Open Key notation.</p>
+    <p><b>Compatible for mixing:</b> the same number (relative major/minor), or ±1 on the same letter.</p>
+
+    <h2 id="faq"><span class="num">11</span>FAQ &amp; troubleshooting</h2><hr>
+    <p><b>A file says "Lossy not allowed" in Convert.</b> The source is MP3, M4A, or OGG. Lossless
+      conversion needs a lossless source (WAV/FLAC/AIFF). Converting <i>to</i> MP3 is fine.</p>
+    <p><b>The BPM looks half or double what I expect.</b> Set a tighter <b>tempo range</b> in Settings
+      (e.g. 90–180) so detection stays in DJ-typical territory.</p>
+    <p><b>The detected key seems off.</b> Key detection reports a <b>confidence</b> score — low
+      confidence means it's a harder call. Correct the key in the <b>Metadata</b> panel.</p>
+    <p><b>I renamed files by mistake.</b> Use <b>Undo Last</b> in the Rename panel, or open
+      <b>History</b> to undo any recent batch.</p>
+    <p><b>My language change didn't take effect.</b> Language applies on the next launch — restart the app.</p>
+
+    <footer>
+      <strong>Mixed in P</strong> · © Jared P · MIT License ·
+      <a href="https://jaredperez.com">jaredperez.com</a>
+    </footer>
+  </main>
+</div>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({
+    startOnLoad:true,
+    theme:"dark",
+    themeVariables:{
+      primaryColor:"#141418", primaryTextColor:"#eaeaea", primaryBorderColor:"#f0ff00",
+      lineColor:"#9a9aa2", fontSize:"14px"
+    }
+  });
+</script>
+</body>
+</html>
