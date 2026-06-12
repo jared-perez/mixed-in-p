@@ -76,12 +76,14 @@ class AboutDialog(QDialog):
             )
         image_layout.addWidget(self._image_page)
 
-        # Website link under the icon. Domain/brand text — left untranslated.
-        # setOpenExternalLinks routes the click to the user's default browser.
+        # Docs link under the icon. setOpenExternalLinks routes the click to the
+        # user's default browser. The label is pulled into its own tr() call
+        # because lupdate does not extract tr() nested inside an f-string field.
+        docs_label = self.tr("docs")
         link = QLabel(
-            '<a href="https://www.jaredperez.com"'
+            '<a href="https://jared-perez.github.io/mixed-in-p/docs/"'
             f' style="color: {Theme.NEON_YELLOW}; text-decoration: none;">'
-            "jaredperez.com</a>"
+            f"{docs_label}</a>"
         )
         link.setAlignment(Qt.AlignmentFlag.AlignCenter)
         link.setOpenExternalLinks(True)

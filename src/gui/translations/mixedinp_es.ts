@@ -5,17 +5,23 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../widgets/dialogs/about_dialog.py" line="73"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="110"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="105"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <source>docs</source>
+        <translatorcomment>Kept in English: ubiquitous software borrowing in a Latin-script UI (cf. sample/slicer rule).</translatorcomment>
+        <translation>docs</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="107"/>
         <source>Jared P presents</source>
         <translation>Mixed in P, por Jared P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="120"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="122"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>FIXED: &quot;Equipo&quot; means team/equipment, not toolkit; use &quot;Kit&quot; and match HeaderBar rendering</translatorcomment>
         <translation>Kit de análisis de audio para DJ</translation>
@@ -51,12 +57,12 @@ Funciones:
         <translation type="vanished">Versión 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="128"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="130"/>
         <source>Version {0}</source>
         <translation>Versión {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="138"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="140"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -82,34 +88,34 @@ Funciones:
   - Analizador de espectro</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="159"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Formatos compatibles: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="178"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="180"/>
         <source>Find Your Way Around</source>
         <translatorcomment>Header for an onboarding/help overview; rendered as a friendly idiomatic title (&apos;Orientación rápida&apos;) rather than a literal translation.</translatorcomment>
         <translation>Orientación rápida</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="191"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="193"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Arrastra tus archivos a cualquier panel para empezar.&lt;br&gt;La barra lateral no es solo para navegar: puedes&lt;br&gt;arrastrar archivos a los botones para enviarlos.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMBRAR&lt;/span&gt; — Primero limpia los nombres&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;recorta, añade prefijos y previsualiza antes de aplicar&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALIZAR&lt;/span&gt; — Detecta BPM, tonalidad y energía&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;escribe las etiquetas y renombra de una sola vez&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTIR&lt;/span&gt; — Cambia de formato&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Usa &lt;span style=&quot;color: {y};&quot;&gt;Enviar a&lt;/span&gt; para mover archivos entre paneles.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="292"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="294"/>
         <source>click for more</source>
         <translation>haz clic para ver más</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="237"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="239"/>
         <source>The Rest of the Kit</source>
         <translatorcomment>Idiomatic section header for the remaining features; &apos;El resto del kit&apos; keeps the casual tone without literal slang.</translatorcomment>
         <translation>El resto del kit</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="247"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="249"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Toma una sección de cualquier pista.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Se abre desde la ventana del Reproductor.&lt;br&gt;Define el inicio y el final con el control deslizante o marca&lt;br&gt;los límites durante la reproducción. Ajusta ±10 ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATOS&lt;/span&gt; — Suelta un archivo y edita sus etiquetas.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Se guarda automáticamente al continuar.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;TECLADO&lt;/span&gt; — Toca notas en cualquier tonalidad.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Con la tira de tonalidades armónicas a mano como referencia.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ESPECTRO&lt;/span&gt; — Analizador de espectro acústico.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Representación visual de la calidad de audio.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;AJUSTES&lt;/span&gt; — Rango de BPM, formato de tonalidad,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;reglas de renombrado automático.&lt;/span&gt;&lt;/div&gt;</translation>

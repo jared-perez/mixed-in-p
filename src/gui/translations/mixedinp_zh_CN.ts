@@ -5,18 +5,24 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../widgets/dialogs/about_dialog.py" line="73"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="110"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="105"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <source>docs</source>
+        <translatorcomment>Native script for a non-Latin UI (cf. sample/slicer rule).</translatorcomment>
+        <translation>文档</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="107"/>
         <source>Jared P presents</source>
         <translatorcomment>&apos;presents&apos; rendered as 出品 (Apple-style &apos;presented by&apos;); flag tone—could also be 呈现.</translatorcomment>
         <translation>Jared P 出品</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="120"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="122"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>DJ kept Latin (universal term); &apos;Toolkit&apos; → 工具包.</translatorcomment>
         <translation>DJ 音频分析工具包</translation>
@@ -52,12 +58,12 @@ Features:
         <translation type="vanished">版本 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="128"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="130"/>
         <source>Version {0}</source>
         <translation>版本 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="138"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="140"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -83,32 +89,32 @@ Features:
   - 频谱分析器</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="159"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>支持的格式：MP3、WAV、FLAC、AIFF、M4A、OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="178"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="180"/>
         <source>Find Your Way Around</source>
         <translation>快速上手</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="191"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="193"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;将文件拖到任意面板即可开始。&lt;br&gt;侧边栏不仅用于导航——你还可以&lt;br&gt;把文件直接拖到按钮上来进行路由。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;重命名&lt;/span&gt; — 先整理文件名&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;修剪、添加前缀，提交前预览&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;分析&lt;/span&gt; — 检测 BPM、调性和能量&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;一步自动写入标签并重命名&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;转换&lt;/span&gt; — 切换格式&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;使用&lt;span style=&quot;color: {y};&quot;&gt;发送到&lt;/span&gt;在各面板间移动文件。&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="292"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="294"/>
         <source>click for more</source>
         <translation>点击查看更多</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="237"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="239"/>
         <source>The Rest of the Kit</source>
         <translation>其余工具</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="247"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="249"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;切片&lt;/span&gt; — 从任意曲目中截取片段。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;从播放器窗口内打开。&lt;br&gt;用范围滑块设置起点/终点，或从播放中&lt;br&gt;标记边界。微调 ±10ms。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;元数据&lt;/span&gt; — 拖入文件，编辑其标签。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;切换时自动保存。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;键盘&lt;/span&gt; — 在任意调上弹奏音符。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;和声键条就在旁边供参考。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;频谱&lt;/span&gt; — 声学频谱分析器。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;音质的可视化呈现。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;设置&lt;/span&gt; — BPM 范围、调性格式、&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;自动重命名规则。&lt;/span&gt;&lt;/div&gt;</translation>
