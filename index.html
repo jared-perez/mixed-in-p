@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mixed in P — Free DJ Audio Analysis Toolkit</title>
+<meta name="description" content="Mixed in P listens to your music and tells you the BPM, key, and energy of every track — then helps you tag, rename, convert, slice, and audition it. Free for Windows & macOS.">
+<link rel="icon" href="assets/p_icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Space+Grotesk:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0d0c09;
+    --panel:#15130d;
+    --panel-2:#1b1910;
+    --line:#2a2619;
+    --yellow:#ebff00;          /* exact app waveform yellow */
+    --yellow-bright:#f6ff66;
+    --yellow-dim:#7a8500;
+    --text:#e8e4d8;
+    --muted:#9a937f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Space Grotesk',sans-serif;
+    line-height:1.6;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;height:auto;display:block}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+    padding:96px 24px 64px;
+  }
+  #wave{position:absolute;inset:0;width:100%;height:100%;z-index:0}
+  .hero-inner{position:relative;z-index:1;max-width:820px}
+  .hero-inner::before{
+    content:"";
+    position:absolute;
+    inset:-60px -90px;
+    z-index:-1;
+    background:radial-gradient(ellipse at center, rgba(13,12,9,.88) 0%, rgba(13,12,9,.55) 55%, rgba(13,12,9,0) 75%);
+    pointer-events:none;
+  }
+  .p-mark{
+    width:clamp(96px,16vw,150px);
+    margin:0 auto 18px;
+    filter:drop-shadow(0 0 34px rgba(235,255,0,.30));
+  }
+  .readout{
+    display:inline-flex;
+    gap:20px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    color:var(--yellow);
+    border:1px solid var(--line);
+    background:rgba(13,12,9,.7);
+    padding:8px 16px;
+    border-radius:4px;
+    margin-bottom:24px;
+  }
+  .readout span b{color:var(--text);font-weight:600}
+  h1{
+    font-family:'Unbounded',sans-serif;
+    font-weight:700;
+    font-size:clamp(34px,7vw,72px);
+    line-height:1.04;
+    letter-spacing:-.01em;
+    text-shadow:0 2px 40px rgba(13,12,9,.9);
+  }
+  h1 .yel{color:var(--yellow)}
+  .sub{
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(11px,1.6vw,14px);
+    letter-spacing:.28em;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin-top:10px;
+  }
+  .tagline{
+    margin:22px auto 36px;
+    max-width:560px;
+    font-size:clamp(16px,2.2vw,19px);
+    color:#c6c0ae;
+    text-shadow:0 1px 20px rgba(13,12,9,.95);
+  }
+  .tagline strong{color:#f3efe3;font-weight:500}
+  .dl-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    display:inline-flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:16px;
+    font-weight:500;
+    padding:15px 28px;
+    border-radius:6px;
+    text-decoration:none;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .btn:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
+  .btn-primary{background:var(--yellow);color:#171405}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(235,255,0,.25)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(13,12,9,.6)}
+  .btn-ghost:hover{border-color:var(--yellow-dim);transform:translateY(-2px)}
+  .hero-note{
+    margin-top:18px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.06em;
+  }
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:96px 24px}
+  .wrap{max-width:1040px;margin:0 auto}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.18em;
+    color:var(--yellow);
+    text-transform:uppercase;
+    margin-bottom:14px;
+  }
+  h2{
+    font-family:'Unbounded',sans-serif;
+    font-weight:500;
+    font-size:clamp(24px,4vw,36px);
+    line-height:1.18;
+    margin-bottom:16px;
+  }
+  .lede{color:var(--muted);max-width:640px;margin-bottom:56px;font-size:17px}
+
+  /* feature rows: screenshot + text */
+  .feature{
+    display:grid;
+    grid-template-columns:1.25fr 1fr;
+    gap:48px;
+    align-items:center;
+    margin-bottom:96px;
+  }
+  .feature:last-child{margin-bottom:0}
+  .feature.flip{grid-template-columns:1fr 1.25fr}
+  .feature.flip .shot{order:2}
+  .shot{
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--panel);
+    box-shadow:0 24px 60px rgba(0,0,0,.45);
+  }
+  .feature .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--yellow);
+    letter-spacing:.14em;
+    display:block;
+    margin-bottom:10px;
+  }
+  .feature h3{
+    font-family:'Unbounded',sans-serif;
+    font-weight:500;
+    font-size:clamp(19px,2.4vw,24px);
+    margin-bottom:12px;
+    line-height:1.25;
+  }
+  .feature p{color:var(--muted);font-size:16px}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+  .chip{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.06em;
+    color:var(--yellow);
+    border:1px solid var(--line);
+    background:var(--panel);
+    padding:5px 10px;
+    border-radius:4px;
+  }
+
+  /* more-tools grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .cell{background:var(--panel);padding:30px 26px}
+  .cell .tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--yellow);
+    letter-spacing:.1em;
+    display:block;
+    margin-bottom:12px;
+  }
+  .cell h3{font-size:18px;font-weight:500;margin-bottom:8px}
+  .cell p{font-size:14.5px;color:var(--muted)}
+
+  /* demo video */
+  .demo-frame{
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:var(--panel);
+    box-shadow:0 24px 60px rgba(0,0,0,.45);
+  }
+  .demo-frame video{display:block;width:100%;height:auto}
+
+  /* quick start */
+  .steps{counter-reset:step;max-width:680px}
+  .step{
+    display:flex;
+    gap:20px;
+    padding:22px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .step:last-child{border-bottom:none}
+  .step::before{
+    counter-increment:step;
+    content:counter(step,decimal-leading-zero);
+    font-family:'JetBrains Mono',monospace;
+    color:var(--yellow);
+    font-size:14px;
+    padding-top:3px;
+    min-width:32px;
+  }
+  .step b{display:block;font-weight:500;margin-bottom:2px}
+  .step span{color:var(--muted);font-size:15px}
+  .step code{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    padding:1px 6px;
+    border-radius:4px;
+    color:var(--yellow);
+  }
+
+  /* download cards */
+  .dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .dl-card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:28px 24px;
+    text-align:center;
+    transition:border-color .15s ease, transform .15s ease;
+  }
+  .dl-card:hover{border-color:var(--yellow-dim);transform:translateY(-3px)}
+  .dl-card .os{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    letter-spacing:.14em;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+  .dl-card h3{font-family:'Unbounded',sans-serif;font-weight:500;font-size:19px;margin:10px 0 4px}
+  .dl-card p{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+  .dl-note{
+    margin-top:26px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.04em;
+    text-align:center;
+  }
+  .dl-note a{color:var(--yellow);text-decoration:none}
+  .dl-note a:hover{text-decoration:underline}
+
+  footer{
+    padding:48px 24px 40px;
+    border-top:1px solid var(--line);
+    text-align:center;
+  }
+  footer .logo-img{width:200px;margin:0 auto 16px;opacity:.9}
+  footer p{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--muted);
+    letter-spacing:.06em;
+  }
+  footer a{color:var(--yellow);text-decoration:none}
+  footer a:hover{text-decoration:underline}
+
+  @media(max-width:820px){
+    .feature, .feature.flip{grid-template-columns:1fr;gap:24px}
+    .feature.flip .shot{order:0}
+    .feature{margin-bottom:72px}
+    .grid{grid-template-columns:1fr}
+    .dl-grid{grid-template-columns:1fr}
+    .readout{gap:12px;font-size:11px}
+  }
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .btn,.dl-card{transition:none}
+  }
+
+  /* ---------- MOBILE DOWNLOAD POPUP ---------- */
+  .modal-backdrop{
+    position:fixed;
+    inset:0;
+    z-index:50;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    background:rgba(13,12,9,.8);
+    padding:24px;
+  }
+  .modal-backdrop.open{display:flex}
+  .modal{
+    background:var(--panel-2);
+    border:1px solid var(--line);
+    border-radius:12px;
+    max-width:420px;
+    width:100%;
+    padding:30px 26px;
+    text-align:center;
+    box-shadow:0 24px 80px rgba(0,0,0,.6);
+  }
+  .modal .modal-icon{
+    font-size:30px;
+    line-height:1;
+    margin-bottom:14px;
+  }
+  .modal h3{
+    font-family:'Unbounded',sans-serif;
+    font-weight:500;
+    font-size:19px;
+    margin-bottom:10px;
+  }
+  .modal p{color:var(--muted);font-size:15px;margin-bottom:22px}
+  .modal .btn{width:100%;justify-content:center}
+  .modal .modal-alt{
+    display:block;
+    margin-top:14px;
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:.04em;
+    color:var(--muted);
+    text-decoration:none;
+  }
+  .modal .modal-alt:hover{color:var(--yellow)}
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<header class="hero">
+  <canvas id="wave" aria-hidden="true"></canvas>
+  <div class="hero-inner">
+    <img class="p-mark" src="assets/p_icon.png" alt="Mixed in P logo" width="512" height="512">
+    <div class="readout" role="presentation">
+      <span>BPM <b id="bpm">128.0</b></span>
+      <span>KEY <b>8A</b></span>
+      <span>ENERGY <b>6</b></span>
+    </div>
+    <h1>MIXED <span class="yel">IN P</span></h1>
+    <p class="sub">DJ Audio Analysis Toolkit</p>
+    <p class="tagline"><strong>Know every track. Mix harmonically.</strong> Mixed in P listens to your music and tells you the BPM, key, and energy of every track — then helps you tag, rename, convert, slice, and audition it.</p>
+    <div class="dl-row">
+      <a class="btn btn-primary" id="hero-dl" href="#download">&#8681;&nbsp; <span id="hero-dl-label">Download — Free</span></a>
+      <a class="btn btn-ghost" href="#features">See what it does</a>
+    </div>
+    <p class="hero-note">WINDOWS / MAC / LINUX · OPEN SOURCE</p>
+  </div>
+</header>
+
+<!-- ================= FEATURES ================= -->
+<section id="features">
+  <div class="wrap">
+    <p class="eyebrow">What it does</p>
+    <h2>Everything you need to read and prep a track.</h2>
+    <p class="lede">Drop in a folder. Mixed in P figures out the rest — then hands you the tools to organize it.</p>
+
+    <div class="feature">
+      <div class="shot"><img src="assets/analyze.webp" alt="Analyze panel showing BPM, key, key code, and energy for a batch of tracks" loading="lazy"></div>
+      <div>
+        <span class="tag">ANALYZE</span>
+        <h3>BPM, key &amp; energy — automatically</h3>
+        <p>Drop in a folder and every track is analyzed in seconds, with confidence scores so you know what to trust. Each song gets a harmonic key code, so compatible tracks are obvious at a glance — no guessing, no spreadsheets.</p>
+        <div class="chips"><span class="chip">136 BPM</span><span class="chip">8A</span><span class="chip">ENERGY 6</span></div>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="shot"><img src="assets/slicer.webp" alt="Waveform Loop Slicer with A–B markers on a bright yellow waveform" loading="lazy"></div>
+      <div>
+        <span class="tag">SLICE</span>
+        <h3>Lift loops &amp; samples by ear</h3>
+        <p>Audition tracks in the built-in player, then set an A–B loop right on the waveform and export a clean slice. Nudge the markers down to the millisecond, loop it until it's right, and save in any format.</p>
+        <div class="chips"><span class="chip">A–B LOOP</span><span class="chip">WAVEFORM MARKERS</span><span class="chip">EXPORT SLICE</span></div>
+      </div>
+    </div>
+
+    <div class="feature">
+      <div class="shot"><img src="assets/spectrum.webp" alt="Spectrum panel showing a full-range spectrogram of an audio file" loading="lazy"></div>
+      <div>
+        <span class="tag">SPECTRUM</span>
+        <h3>Spot bad transcodes instantly</h3>
+        <p>A full spectrogram view shows exactly where a file's frequencies stop — so you can catch a low-quality MP3 dressed up as a lossless file before it ever hits your set.</p>
+        <div class="chips"><span class="chip">FULL-RANGE VIEW</span><span class="chip">FIND FAKE LOSSLESS</span></div>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="shot"><img src="assets/rename.webp" alt="Rename panel with live preview of batch filename changes" loading="lazy"></div>
+      <div>
+        <span class="tag">RENAME</span>
+        <h3>Tidy your whole library in one pass</h3>
+        <p>Batch-rename with the BPM and key baked into the filename. A live preview shows every change before you commit, and the History panel undoes any batch in one click.</p>
+        <div class="chips"><span class="chip">128 8A - TRACK</span><span class="chip">LIVE PREVIEW</span><span class="chip">UNDO</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= MORE TOOLS ================= -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">And more</p>
+    <h2>One app, an entire toolkit.</h2>
+    <p class="lede">Six panels, zero plugins. Everything runs locally on your machine.</p>
+    <div class="grid">
+      <div class="cell">
+        <span class="tag">CONVERT</span>
+        <h3>Lossless conversion</h3>
+        <p>Move between WAV, FLAC, AIFF, and MP3. Lossy-to-lossless is blocked automatically to protect your sound.</p>
+      </div>
+      <div class="cell">
+        <span class="tag">METADATA</span>
+        <h3>Tag &amp; artwork editor</h3>
+        <p>Edit title, artist, key, BPM, label, and more — and embed cover art. Changes save straight to the file.</p>
+      </div>
+      <div class="cell">
+        <span class="tag">KEYBOARD</span>
+        <h3>Harmonic keyboard</h3>
+        <p>A 3-octave piano and key-code wheel for working out compatible keys and chords by ear.</p>
+      </div>
+      <div class="cell">
+        <span class="tag">PLAYER</span>
+        <h3>Built-in playlist player</h3>
+        <p>Queue tracks with their BPM, key, and year in view, and audition your set order without leaving the app.</p>
+      </div>
+      <div class="cell">
+        <span class="tag">HISTORY</span>
+        <h3>One-click undo</h3>
+        <p>Every batch operation is logged. Renamed 500 files and changed your mind? Roll it back in one click.</p>
+      </div>
+      <div class="cell">
+        <span class="tag">AUTO</span>
+        <h3>Hands-off mode</h3>
+        <p>Turn on Auto and dropped files are analyzed the moment they land — results update in real time.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DEMO VIDEO ================= -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">See it in action</p>
+    <h2>Fifty seconds, start to finish.</h2>
+    <p class="lede">A folder dropped in, analyzed, renamed, and sliced — the whole workflow in one take.</p>
+    <div class="demo-frame">
+      <video controls preload="none" poster="assets/video_poster.jpg" playsinline>
+        <source src="assets/demo.mp4" type="video/mp4">
+        Your browser doesn't support embedded video — <a href="assets/demo.mp4">download the demo clip</a> instead.
+      </video>
+    </div>
+  </div>
+</section>
+
+<!-- ================= QUICK START ================= -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <p class="eyebrow">Quick start</p>
+    <h2>Running in five minutes.</h2>
+    <div class="steps">
+      <div class="step"><div><b>Install</b><span>Download for your platform and launch. On macOS, right-click → <code>Open</code> the first time to get past Gatekeeper.</span></div></div>
+      <div class="step"><div><b>Add your music</b><span>Click <code>Add Folder</code>, or drag a folder of tracks straight onto the window.</span></div></div>
+      <div class="step"><div><b>Read the results</b><span>Tracks analyze automatically, showing BPM, key code, and energy with confidence scores.</span></div></div>
+      <div class="step"><div><b>Organize</b><span>Turn on auto-rename to write tempo and key into filenames, e.g. <code>128 8A - Original_Name</code>.</span></div></div>
+      <div class="step"><div><b>Play &amp; mix</b><span>Send tracks to the Player to audition, and use the key codes to line up your next song.</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DOWNLOAD ================= -->
+<section id="download" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <p class="eyebrow">Get it</p>
+    <h2>Download Mixed in P — free.</h2>
+    <p class="lede">It's a desktop app for Windows, Mac or Linux computers.</p>
+    <div class="dl-grid">
+      <div class="dl-card">
+        <span class="os">Windows</span>
+        <h3>Windows 10 / 11</h3>
+        <p>64-bit installer</p>
+        <a class="btn btn-primary" href="https://github.com/jared-perez/mixed-in-p/releases/latest">&#8681;&nbsp; Download .exe</a>
+      </div>
+      <div class="dl-card">
+        <span class="os">Mac · Apple Silicon</span>
+        <h3>M1 — M5</h3>
+        <p>Apple Silicon build</p>
+        <a class="btn btn-primary" href="https://github.com/jared-perez/mixed-in-p/releases/latest">&#8681;&nbsp; Download .zip</a>
+      </div>
+      <div class="dl-card">
+        <span class="os">Mac · Intel</span>
+        <h3>Intel Macs</h3>
+        <p>Intel build</p>
+        <a class="btn btn-primary" href="https://github.com/jared-perez/mixed-in-p/releases/latest">&#8681;&nbsp; Download .zip</a>
+      </div>
+    </div>
+    <p class="dl-note">v1.3.0 · Free &amp; open source (MIT) · <a href="https://github.com/jared-perez/mixed-in-p/releases">All versions &amp; release notes</a></p>
+  </div>
+</section>
+
+<footer>
+  <img class="logo-img" src="assets/logo_title.png" alt="Mixed in P" loading="lazy">
+  <p>DJ AUDIO ANALYSIS TOOLKIT · V1.3.0 · MIT LICENSE<br>
+  Made by <a href="https://instagram.com/jaredprez">Jared Perez</a> · <a href="https://github.com/jared-perez/mixed-in-p">GitHub</a> · <a href="https://github.com/jared-perez/mixed-in-p/issues">Report a bug</a></p>
+</footer>
+
+<script>
+/* ===========================================================
+   Animated waveform in Mixed in P's exact yellow (#EBFF00).
+   Pure canvas, ~3KB, pauses off-screen, honors reduced motion.
+   =========================================================== */
+(function(){
+  const canvas = document.getElementById('wave');
+  const ctx = canvas.getContext('2d');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let W, H, bars = [], raf = null, running = false;
+  const BAR_W = 3, GAP = 2;
+
+  function buildBars(){
+    bars = [];
+    const count = Math.ceil(W / (BAR_W + GAP));
+    for (let i = 0; i < count; i++){
+      const t = i / count;
+      const env = 0.55 + 0.45 * Math.sin(t * Math.PI);
+      const a = Math.abs(Math.sin(i * 0.32)) * 0.5
+              + Math.abs(Math.sin(i * 0.11 + 2)) * 0.35
+              + Math.random() * 0.3;
+      bars.push(Math.min(1, a * env));
+    }
+  }
+
+  function resize(){
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = canvas.clientWidth; H = canvas.clientHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    buildBars();
+    draw(performance.now());
+  }
+
+  function draw(now){
+    ctx.clearRect(0, 0, W, H);
+    const mid = H * 0.58;
+    const maxH = H * 0.28;
+    const ph = reduced ? W * 0.4 : (now * 0.06) % (W + 200) - 100;
+
+    for (let i = 0; i < bars.length; i++){
+      const x = i * (BAR_W + GAP);
+      const wob = reduced ? 0 : Math.sin(now * 0.002 + i * 0.25) * 0.08;
+      const h = Math.max(2, (bars[i] + wob) * maxH);
+      const passed = x < ph;
+      const nearPh = Math.abs(x - ph) < 30;
+
+      ctx.fillStyle = passed
+        ? (nearPh ? '#f6ff66' : '#ebff00')
+        : 'rgba(235,255,0,0.16)';
+      ctx.fillRect(x, mid - h, BAR_W, h * 2);
+    }
+
+    if (!reduced){
+      ctx.fillStyle = 'rgba(246,255,102,0.9)';
+      ctx.fillRect(ph, mid - maxH - 14, 2, maxH * 2 + 28);
+      const g = ctx.createRadialGradient(ph, mid, 0, ph, mid, 80);
+      g.addColorStop(0, 'rgba(235,255,0,0.12)');
+      g.addColorStop(1, 'rgba(235,255,0,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(ph - 80, mid - maxH - 20, 160, maxH * 2 + 40);
+    }
+
+    const fade = ctx.createLinearGradient(0, 0, 0, H);
+    fade.addColorStop(0, 'rgba(13,12,9,0.85)');
+    fade.addColorStop(0.35, 'rgba(13,12,9,0.55)');
+    fade.addColorStop(0.6, 'rgba(13,12,9,0.35)');
+    fade.addColorStop(1, 'rgba(13,12,9,0.92)');
+    ctx.fillStyle = fade;
+    ctx.fillRect(0, 0, W, H);
+  }
+
+  function loop(now){ draw(now); raf = requestAnimationFrame(loop); }
+  function start(){ if (!running && !reduced){ running = true; raf = requestAnimationFrame(loop); } }
+  function stop(){ running = false; if (raf) cancelAnimationFrame(raf); }
+
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+  new IntersectionObserver(
+    e => e[0].isIntersecting ? start() : stop(),
+    { threshold: 0.05 }
+  ).observe(canvas);
+
+  if (!reduced){
+    const bpmEl = document.getElementById('bpm');
+    setInterval(() => {
+      bpmEl.textContent = (127.8 + Math.random() * 0.4).toFixed(1);
+    }, 1800);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  start();
+})();
+</script>
+<!-- ================= MOBILE DOWNLOAD POPUP ================= -->
+<div class="modal-backdrop" id="mobile-modal" role="dialog" aria-modal="true" aria-labelledby="mobile-modal-title">
+  <div class="modal">
+    <div class="modal-icon">&#128187;</div>
+    <h3 id="mobile-modal-title">This one's for your computer</h3>
+    <p>Mixed in P is a desktop app — open this page on your Windows, Mac, or Linux computer to install it.</p>
+    <button class="btn btn-primary" id="modal-ok" type="button">Got it</button>
+    <a class="modal-alt" id="modal-continue" href="#" target="_blank" rel="noopener">Continue to GitHub anyway &rarr;</a>
+  </div>
+</div>
+
+<script>
+/* ===========================================================
+   OS detection: personalize the hero button, and on mobile
+   intercept download clicks with a friendly heads-up popup.
+   =========================================================== */
+(function(){
+  const ua = navigator.userAgent;
+  const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(ua) ||
+                   (navigator.maxTouchPoints > 1 && /Mac/.test(ua)); // iPadOS reports as Mac
+  const isMac = !isMobile && /Mac/.test(ua);
+  const isWin = !isMobile && /Win/.test(ua);
+  const isLinux = !isMobile && /Linux/.test(ua);
+
+  // Hero button label
+  const label = document.getElementById('hero-dl-label');
+  if (isMac)        label.textContent = 'Download for Mac';
+  else if (isWin)   label.textContent = 'Download for Win';
+  else if (isLinux) label.textContent = 'Download for Linux';
+  else              label.textContent = 'Download';
+
+  // Mobile: intercept download card clicks with a popup
+  if (isMobile){
+    const modal = document.getElementById('mobile-modal');
+    const continueLink = document.getElementById('modal-continue');
+
+    document.querySelectorAll('.dl-card .btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        continueLink.href = btn.href;   // let them proceed if they insist
+        modal.classList.add('open');
+      });
+    });
+
+    const close = () => modal.classList.remove('open');
+    document.getElementById('modal-ok').addEventListener('click', close);
+    document.getElementById('modal-continue').addEventListener('click', close);
+    modal.addEventListener('click', (e) => { if (e.target === modal) close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+  }
+})();
+</script>
+</body>
+</html>
