@@ -12,9 +12,11 @@
 <style>
   :root{
     --bg:#0d0c09;
-    --panel:#15130d;
-    --panel-2:#1b1910;
-    --line:#2a2619;
+    --bg-lift:#1c1913;         /* warm charcoal the page eases into below the hero */
+    --dl-card-bg:#2b2825;      /* download card background — tweak to recolor just the cards */
+    --panel:#232017;
+    --panel-2:#2a2519;
+    --line:#393320;
     --yellow:#ebff00;          /* exact app waveform yellow */
     --yellow-bright:#f6ff66;
     --yellow-dim:#7a8500;
@@ -22,9 +24,19 @@
     --muted:#9a937f;
   }
   *{margin:0;padding:0;box-sizing:border-box}
-  html{scroll-behavior:smooth}
+  html{
+    scroll-behavior:smooth;
+    background-color:var(--bg-lift);
+    /* black through the hero (first viewport), then ease into warm charcoal.
+       Set on <html> so the root background paints the full canvas edge-to-edge
+       (body's overflow-x:hidden would block background propagation). */
+    background-image:linear-gradient(to bottom,
+      var(--bg) 0,
+      var(--bg) 100svh,
+      var(--bg-lift) calc(100svh + 360px));
+    background-repeat:no-repeat;
+  }
   body{
-    background:var(--bg);
     color:var(--text);
     font-family:'Space Grotesk',sans-serif;
     line-height:1.6;
@@ -252,7 +264,7 @@
   /* download cards */
   .dl-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
   .dl-card{
-    background:var(--panel);
+    background:var(--dl-card-bg);
     border:1px solid var(--line);
     border-radius:10px;
     padding:28px 24px;
@@ -376,7 +388,7 @@
 <section id="features">
   <div class="wrap">
     <h2>Spend less time on prep,<br>more time mixing.</h2>
-    <p class="lede">Tagging, renaming, and sorting new tracks is a tedious task that is easy to skip — until messy metadata and filenames trip you up mid-set. Mixed in P puts every prep tool in one place so your tracks are always ready.</p>
+    <p class="lede">Tagging, renaming, and sorting new tracks is a tedious task that is easy to skip — until messy metadata and filenames trip you up mid-set.<br>Mixed in P puts every prep tool in one place so your tracks are always ready.</p>
 
     <div class="feature">
       <div class="shot"><img src="assets/rename.webp" alt="Rename panel with live preview of batch filename changes" loading="lazy"></div>
@@ -492,7 +504,7 @@
 </section>
 
 <!-- ================= DOWNLOAD ================= -->
-<section id="download" style="background:var(--panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+<section id="download" style="background:#2b2825;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="wrap">
     <p class="eyebrow">Get it</p>
     <h2>Download Mixed in P — free.</h2>
