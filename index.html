@@ -141,7 +141,13 @@
     line-height:1.18;
     margin-bottom:16px;
   }
-  .lede{color:var(--muted);max-width:640px;margin-bottom:56px;font-size:17px}
+  .lede{color:var(--muted);max-width:640px;margin-bottom:56px;font-size:18px}
+  .lede a{color:var(--yellow);text-decoration:none}
+  .lede a:hover{text-decoration:underline}
+  /* features section: centered intro */
+  #features > .wrap > h2,
+  #features > .wrap > .lede{text-align:center}
+  #features > .wrap > .lede{margin-left:auto;margin-right:auto}
 
   /* feature rows: screenshot + text */
   .feature{
@@ -176,7 +182,7 @@
     margin-bottom:12px;
     line-height:1.25;
   }
-  .feature p{color:var(--muted);font-size:16px}
+  .feature p{color:var(--muted);font-size:17px}
   .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
   .chip{
     font-family:'JetBrains Mono',monospace;
@@ -356,17 +362,11 @@
   <canvas id="wave" aria-hidden="true"></canvas>
   <div class="hero-inner">
     <img class="p-mark" src="assets/p_icon.png" alt="Mixed in P logo" width="512" height="512">
-    <div class="readout" role="presentation">
-      <span>BPM <b id="bpm">128.0</b></span>
-      <span>KEY <b>8A</b></span>
-      <span>ENERGY <b>6</b></span>
-    </div>
     <h1>MIXED <span class="yel">IN P</span></h1>
     <p class="sub">DJ Audio Analysis Toolkit</p>
     <p class="tagline"><strong>Know every track. Mix harmonically.</strong> Mixed in P listens to your music and tells you the BPM, key, and energy of every track — then helps you tag, rename, convert, slice, and audition it.</p>
     <div class="dl-row">
       <a class="btn btn-primary" id="hero-dl" href="#download">&#8681;&nbsp; <span id="hero-dl-label">Download — Free</span></a>
-      <a class="btn btn-ghost" href="#features">See what it does</a>
     </div>
     <p class="hero-note">WINDOWS / MAC / LINUX · OPEN SOURCE</p>
   </div>
@@ -375,31 +375,20 @@
 <!-- ================= FEATURES ================= -->
 <section id="features">
   <div class="wrap">
-    <p class="eyebrow">What it does</p>
-    <h2>Everything you need to read and prep a track.</h2>
-    <p class="lede">Drop in a folder. Mixed in P figures out the rest — then hands you the tools to organize it.</p>
+    <h2>Save time organizing files<br>So you can get back to mixing.</h2>
+    <p class="lede">The steps between track download and loading into DJ software are tedious and can feel unnecessary, until you can't find a track when you need it most! Here are the tools that help me prep my tracks all in one spot.</p>
 
     <div class="feature">
-      <div class="shot"><img src="assets/analyze.webp" alt="Analyze panel showing BPM, key, key code, and energy for a batch of tracks" loading="lazy"></div>
+      <div class="shot"><img src="assets/rename.webp" alt="Rename panel with live preview of batch filename changes" loading="lazy"></div>
       <div>
-        <span class="tag">ANALYZE</span>
-        <h3>BPM, key &amp; energy — automatically</h3>
-        <p>Drop in a folder and every track is analyzed in seconds, with confidence scores so you know what to trust. Each song gets a harmonic key code, so compatible tracks are obvious at a glance — no guessing, no spreadsheets.</p>
-        <div class="chips"><span class="chip">136 BPM</span><span class="chip">8A</span><span class="chip">ENERGY 6</span></div>
+        <span class="tag">RENAME</span>
+        <h3>Tidy your whole library in one pass</h3>
+        <p>Batch-rename with the BPM and key baked into the filename. A live preview shows every change before you commit, and the History panel undoes any batch in one click.</p>
+        <div class="chips"><span class="chip">128 Gm - TRACK</span><span class="chip">LIVE PREVIEW</span><span class="chip">UNDO</span></div>
       </div>
     </div>
 
     <div class="feature flip">
-      <div class="shot"><img src="assets/slicer.webp" alt="Waveform Loop Slicer with A–B markers on a bright yellow waveform" loading="lazy"></div>
-      <div>
-        <span class="tag">SLICE</span>
-        <h3>Lift loops &amp; samples by ear</h3>
-        <p>Audition tracks in the built-in player, then set an A–B loop right on the waveform and export a clean slice. Nudge the markers down to the millisecond, loop it until it's right, and save in any format.</p>
-        <div class="chips"><span class="chip">A–B LOOP</span><span class="chip">WAVEFORM MARKERS</span><span class="chip">EXPORT SLICE</span></div>
-      </div>
-    </div>
-
-    <div class="feature">
       <div class="shot"><img src="assets/spectrum.webp" alt="Spectrum panel showing a full-range spectrogram of an audio file" loading="lazy"></div>
       <div>
         <span class="tag">SPECTRUM</span>
@@ -409,13 +398,23 @@
       </div>
     </div>
 
-    <div class="feature flip">
-      <div class="shot"><img src="assets/rename.webp" alt="Rename panel with live preview of batch filename changes" loading="lazy"></div>
+    <div class="feature">
+      <div class="shot"><img src="assets/slicer.webp" alt="Waveform Loop Slicer with A–B markers on a bright yellow waveform" loading="lazy"></div>
       <div>
-        <span class="tag">RENAME</span>
-        <h3>Tidy your whole library in one pass</h3>
-        <p>Batch-rename with the BPM and key baked into the filename. A live preview shows every change before you commit, and the History panel undoes any batch in one click.</p>
-        <div class="chips"><span class="chip">128 8A - TRACK</span><span class="chip">LIVE PREVIEW</span><span class="chip">UNDO</span></div>
+        <span class="tag">SLICE</span>
+        <h3>Lift loops &amp; samples by ear</h3>
+        <p>Audition tracks in the built-in player, then set an A–B loop right on the waveform and export a clean slice. Nudge the markers down to the millisecond, loop it until it's right, and save in any format.</p>
+        <div class="chips"><span class="chip">A–B LOOP</span><span class="chip">WAVEFORM MARKERS</span><span class="chip">EXPORT SLICE</span></div>
+      </div>
+    </div>
+
+    <div class="feature flip">
+      <div class="shot"><img src="assets/analyze.webp" alt="Analyze panel showing BPM, key, key code, and energy for a batch of tracks" loading="lazy"></div>
+      <div>
+        <span class="tag">ANALYZE</span>
+        <h3>BPM, key &amp; energy — automatically</h3>
+        <p>Drop in a folder and every track is analyzed in seconds, with confidence scores so you know what to trust. Each song gets a harmonic key code, so compatible tracks are obvious at a glance — no guessing, no spreadsheets.</p>
+        <div class="chips"><span class="chip">136 BPM</span><span class="chip">Gm</span><span class="chip">ENERGY 6</span></div>
       </div>
     </div>
   </div>
@@ -441,7 +440,7 @@
       <div class="cell">
         <span class="tag">KEYBOARD</span>
         <h3>Harmonic keyboard</h3>
-        <p>A 3-octave piano and key-code wheel for working out compatible keys and chords by ear.</p>
+        <p>A 3-octave piano and key-code tools for working out compatible keys and chords by ear.</p>
       </div>
       <div class="cell">
         <span class="tag">PLAYER</span>
@@ -497,7 +496,7 @@
   <div class="wrap">
     <p class="eyebrow">Get it</p>
     <h2>Download Mixed in P — free.</h2>
-    <p class="lede">It's a desktop app for Windows, Mac or Linux computers.</p>
+    <p class="lede">It's a desktop app for Windows, Mac or Linux computers.<br>Read the documentation <a href="https://jared-perez.github.io/mixed-in-p/docs/">here</a>.</p>
     <div class="dl-grid">
       <div class="dl-card">
         <span class="os">Windows</span>
@@ -610,13 +609,6 @@
     e => e[0].isIntersecting ? start() : stop(),
     { threshold: 0.05 }
   ).observe(canvas);
-
-  if (!reduced){
-    const bpmEl = document.getElementById('bpm');
-    setInterval(() => {
-      bpmEl.textContent = (127.8 + Math.random() * 0.4).toFixed(1);
-    }, 1800);
-  }
 
   window.addEventListener('resize', resize);
   resize();
