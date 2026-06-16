@@ -300,8 +300,45 @@ DAYLIGHT = Palette(
     ACCENT_TEXT="#1c2026",  # near-black: the gold accent reads poorly as text on white
 )
 
+# ── Theme D: Nuevo Leon ─────────────────────────────────────────────────────
+# Midnight-navy dark theme (ported from the landing page palette): cool
+# blue-black surfaces so the neon-yellow accent reads as a sharp accent rather
+# than a darker cousin of a warm background. Waveform defaults to neon yellow.
+NUEVO_LEON = Palette(
+    name="nuevo_leon",
+    label="Nuevo Leon",
+    BG_DARK="#070a12",  # window canvas — blue-black (landing --bg)
+    BG_MEDIUM="#121a2c",  # panels/inputs (landing --panel)
+    BG_LIGHT="#1b2840",  # hover
+    BG_LIGHTER="#25334d",  # active/selected (≈ landing --line)
+    NEON_YELLOW="#ebff00",  # exact app waveform yellow (landing --yellow)
+    NEON_GREEN="#1fe98a",  # bright mint — secondary accent / success on navy
+    PLAYHEAD="#ffffff",  # white for max contrast over the waveform
+    CHROME="#9aa6bd",  # cool steel line
+    CHROME_DARK="#2c3a56",  # slate border
+    TEXT_PRIMARY="#e7ebf2",  # cool white (landing --text)
+    TEXT_SECONDARY="#8893a8",  # slate gray (landing --muted)
+    TEXT_DISABLED="#555f73",
+    ERROR="#ff5c5c",
+    WARNING="#ffb13d",
+    INFO="#4aa3ff",
+    PENDING="#6b7689",
+    ACCENT_HOVER="#d4e600",
+    ACCENT_PRESSED="#b9c900",
+    ACCENT2_HOVER="#17cf78",
+    ERROR_HOVER="#e04a4a",
+    ROW_ALT="#0d1422",
+    ROW_HOVER="#16203a",
+    TRAY_BG="#04060d",  # recessed tray, darker than the window canvas
+    WAVE_AXIS="#1c2740",  # faint navy centre line
+    WAVEFORM_DEFAULT="#ebff00",  # neon yellow, per design
+    ACCENT_TEXT="#ebff00",  # accent reads fine as text on dark navy
+)
+
 # Registry keyed by the id persisted in config. Order = picker order.
-THEMES: dict[str, Palette] = {p.name: p for p in (NEON_DARK, NIGHT_DARK, DAYLIGHT)}
+THEMES: dict[str, Palette] = {
+    p.name: p for p in (NEON_DARK, NIGHT_DARK, NUEVO_LEON, DAYLIGHT)
+}
 DEFAULT_THEME = NEON_DARK.name
 
 # Palette field names that are colour tokens (everything but the two id fields).

@@ -96,6 +96,7 @@ class SettingsPanel(QWidget):
         theme_labels = {
             "neon_dark": self.tr("Neon Dark"),
             "night_dark": self.tr("Night Dark"),
+            "nuevo_leon": self.tr("Nuevo Leon"),
             "daylight": self.tr("Daylight"),
         }
         self._theme_combo = QComboBox()

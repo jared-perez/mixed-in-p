@@ -26,7 +26,7 @@ _VALID_ENERGY_MODES = {"prepend", "append", "replace"}
 _VALID_KEY_NOTATIONS = {"keycode", "traditional", "open_key"}
 # Mirrors the palette ids in src/gui/styles/theme.py (THEMES). Kept local so
 # this utils module stays independent of the GUI layer.
-_VALID_THEMES = {"neon_dark", "night_dark", "daylight"}
+_VALID_THEMES = {"neon_dark", "night_dark", "nuevo_leon", "daylight"}
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
