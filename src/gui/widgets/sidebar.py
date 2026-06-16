@@ -150,6 +150,7 @@ class Sidebar(QFrame):
         self._labels: dict[QPushButton, str] = {}
         self._collapsed = False
         self._auto_badge: QLabel | None = None
+        self._auto_dot: QLabel | None = None
         self._auto_badge_enabled = False
         self._setup_ui()
 
@@ -308,6 +309,8 @@ class Sidebar(QFrame):
         )
         if self._auto_badge is not None:
             self._auto_badge.setVisible(self._auto_badge_enabled and not collapsed)
+        if self._auto_dot is not None:
+            self._auto_dot.setVisible(self._auto_badge_enabled and collapsed)
         self._position_auto_badge()
 
     @staticmethod
@@ -340,9 +343,22 @@ class Sidebar(QFrame):
             )
             self._auto_badge = badge
             btn.installEventFilter(self)
+        if self._auto_dot is None:
+            # Collapsed stand-in for the 'Auto' text: a small dot in the same
+            # top-right corner, since the word won't fit on the narrow button.
+            dot = QLabel(btn)
+            dot.setObjectName("autoDot")
+            dot.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
+            dot.setFixedSize(8, 8)
+            dot.setStyleSheet(
+                f"background: {Theme.NEON_YELLOW}; border-radius: 4px;"
+            )
+            self._auto_dot = dot
         self._auto_badge_enabled = enabled
-        # Hidden while collapsed: it would overlap the icon on the narrow button.
+        # In the expanded rail the 'Auto' text shows; collapsed, the dot stands
+        # in for it (the word would overlap the icon on the narrow button).
         self._auto_badge.setVisible(enabled and not self._collapsed)
+        self._auto_dot.setVisible(enabled and self._collapsed)
         self._position_auto_badge()
 
     def _position_auto_badge(self) -> None:
@@ -356,6 +372,10 @@ class Sidebar(QFrame):
         x = btn.width() - self._auto_badge.width() - 6
         self._auto_badge.move(max(0, x), 2)
         self._auto_badge.raise_()
+        if self._auto_dot is not None:
+            dot_x = btn.width() - self._auto_dot.width() - 6
+            self._auto_dot.move(max(0, dot_x), 4)
+            self._auto_dot.raise_()
 
     def eventFilter(self, obj, event) -> bool:
         if event.type() == QEvent.Type.Resize and obj is self._buttons.get("analysis"):
