@@ -77,7 +77,7 @@ from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.thread_keeper import keep_alive
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform
 from .drop_zone import AUDIO_EXTENSIONS
-from .droppable_table import SOURCE_PAGE_MIME
+from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin
 from .player_engine import PlayerEngine
 from .slice_section import SliceSection
 
@@ -276,8 +276,15 @@ class SeparatorHeaderView(QHeaderView):
         painter.restore()
 
 
-class ReorderableTableWidget(QTableWidget):
-    """QTableWidget with internal drag-drop row reordering and external file drops."""
+class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
+    """QTableWidget with internal drag-drop row reordering and external file drops.
+
+    The RubberBandSelectMixin adds drag-a-box selection from empty space (the
+    same gesture as the Rename/Convert/Analyze tables); a press on a row still
+    falls through to row reorder / drag-out untouched. Box-selecting many tracks
+    is safe for memory because selection only ever prefetch-decodes the single
+    current row (debounced, and suppressed during playback) — not every selected
+    track."""
 
     order_changed = Signal()
     files_dropped = Signal(list)

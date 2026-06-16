@@ -52,62 +52,19 @@ def start_file_drag(widget, page_id: str, paths: list[str]) -> Qt.DropAction:
     return drag.exec(Qt.DropAction.MoveAction | Qt.DropAction.CopyAction)
 
 
-class _DroppableTableMixin:
-    """Shared drag-drop logic for table views and table widgets."""
+class RubberBandSelectMixin:
+    """Drag-a-box (rubber-band) selection for an item view that has drag-out
+    enabled.
 
-    files_dropped = Signal(list)
+    ``setDragEnabled(True)`` makes a press on a row start a drag, so a box
+    select can't begin on a row. We implement it ourselves: a left-press on
+    EMPTY space drags a selection rectangle; a press on a row falls through to
+    the normal drag/selection machinery untouched. Cooperative — every
+    non-band path calls ``super()``, so it composes in front of a concrete
+    ``QTableView``/``QTableWidget`` (and the player's reorderable table)."""
 
-    _placeholder_text: str = "Drop audio files here"
-    _drag_active: bool = False
-    _placeholder_bottom_quarter: bool = False
-    _drag_page_id: str | None = None
-    _drag_data_fn = None  # () -> tuple[list[str], Callable[[], None] | None] | None
-    _rb_origin = None  # viewport-space press point when box-selecting, else None
+    _rb_origin = None  # viewport-space press point while box-selecting, else None
     _rubber_band = None  # lazily-created QRubberBand
-
-    def _init_drop(self, placeholder: str = "Drop audio files here", bottom_quarter: bool = False) -> None:
-        self._placeholder_text = placeholder
-        self._drag_active = False
-        self._placeholder_bottom_quarter = bottom_quarter
-        self.setAcceptDrops(True)
-        # Rubber-band (box) selection state — see the mouse* overrides below.
-        self._rb_origin = None
-        self._rubber_band = None
-
-    def enable_drag_out(self, page_id: str, drag_data_fn) -> None:
-        """Allow this table to start drags carrying its selected files.
-
-        `drag_data_fn` is called when a drag begins and must return
-        `(paths, remove_callback)`: `paths` are the file paths to put in the drag
-        (e.g. effective/converted output paths), and `remove_callback` (or None) is
-        invoked only if the drop is accepted as a move, to remove the dragged rows
-        from this panel. Return None / empty paths to cancel the drag.
-        """
-        self._drag_page_id = page_id
-        self._drag_data_fn = drag_data_fn
-        self.setDragEnabled(True)
-        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
-
-    def startDrag(self, supportedActions) -> None:
-        if self._drag_data_fn is None:
-            super().startDrag(supportedActions)
-            return
-        data = self._drag_data_fn()
-        if not data:
-            return
-        paths, remove_cb = data
-        if not paths:
-            return
-        result = start_file_drag(self, self._drag_page_id, paths)
-        if result == Qt.DropAction.MoveAction and remove_cb is not None:
-            remove_cb()
-
-    # ── Rubber-band (box) selection ─────────────────────────────────────────
-    # QTableView has no setSelectionRectVisible (that's QListView only), and the
-    # drag-out support (setDragEnabled) means a press on a row starts a file
-    # drag. So we implement box-select ourselves: a press that lands on EMPTY
-    # space drags a selection rectangle; a press on a row falls through to the
-    # normal drag/selection machinery untouched.
 
     def _viewport_pos(self, event):
         """Cursor position in viewport coordinates.
@@ -179,6 +136,55 @@ class _DroppableTableMixin:
             event.accept()
             return
         super().mouseReleaseEvent(event)
+
+
+class _DroppableTableMixin(RubberBandSelectMixin):
+    """Shared drag-drop logic for table views and table widgets."""
+
+    files_dropped = Signal(list)
+
+    _placeholder_text: str = "Drop audio files here"
+    _drag_active: bool = False
+    _placeholder_bottom_quarter: bool = False
+    _drag_page_id: str | None = None
+    _drag_data_fn = None  # () -> tuple[list[str], Callable[[], None] | None] | None
+
+    def _init_drop(self, placeholder: str = "Drop audio files here", bottom_quarter: bool = False) -> None:
+        self._placeholder_text = placeholder
+        self._drag_active = False
+        self._placeholder_bottom_quarter = bottom_quarter
+        self.setAcceptDrops(True)
+        # Rubber-band (box) selection state — see the mouse* overrides below.
+        self._rb_origin = None
+        self._rubber_band = None
+
+    def enable_drag_out(self, page_id: str, drag_data_fn) -> None:
+        """Allow this table to start drags carrying its selected files.
+
+        `drag_data_fn` is called when a drag begins and must return
+        `(paths, remove_callback)`: `paths` are the file paths to put in the drag
+        (e.g. effective/converted output paths), and `remove_callback` (or None) is
+        invoked only if the drop is accepted as a move, to remove the dragged rows
+        from this panel. Return None / empty paths to cancel the drag.
+        """
+        self._drag_page_id = page_id
+        self._drag_data_fn = drag_data_fn
+        self.setDragEnabled(True)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
+
+    def startDrag(self, supportedActions) -> None:
+        if self._drag_data_fn is None:
+            super().startDrag(supportedActions)
+            return
+        data = self._drag_data_fn()
+        if not data:
+            return
+        paths, remove_cb = data
+        if not paths:
+            return
+        result = start_file_drag(self, self._drag_page_id, paths)
+        if result == Qt.DropAction.MoveAction and remove_cb is not None:
+            remove_cb()
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         # A self-drag (this table is the drag source) carries our file URLs now;
