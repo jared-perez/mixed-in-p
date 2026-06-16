@@ -24,10 +24,24 @@ _VALID_NAMING_PREFS = {
 _VALID_ENERGY_FORMATS = {"number_only", "with_label"}
 _VALID_ENERGY_MODES = {"prepend", "append", "replace"}
 _VALID_KEY_NOTATIONS = {"keycode", "traditional", "open_key"}
-# Mirrors the palette ids in src/gui/styles/theme.py (THEMES). Kept local so
-# this utils module stays independent of the GUI layer.
-_VALID_THEMES = {"neon_dark", "night_dark", "nuevo_leon", "daylight"}
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+
+
+def _valid_theme_ids() -> set[str] | None:
+    """The selectable theme ids, sourced from the GUI theme registry (THEMES).
+
+    Imported lazily so this utils module — which the CLI also uses — never drags
+    the PySide6/GUI layer in at import time; the cost is paid only if theme
+    validation actually runs. Returns ``None`` if that layer isn't importable
+    (e.g. a headless context), signalling "skip theme validation" so a valid
+    stored theme is left intact rather than wrongly reset. Deriving the set here
+    means a new palette added to THEMES is accepted with no change to config.
+    """
+    try:
+        from ..gui.styles.theme import THEMES
+    except Exception:
+        return None
+    return set(THEMES)
 
 
 @dataclass
@@ -152,7 +166,8 @@ def load_config() -> AppConfig:
                 cfg.waveform_color = AppConfig.waveform_color
             if cfg.language not in LANGUAGE_CODES:
                 cfg.language = AppConfig.language
-            if cfg.theme not in _VALID_THEMES:
+            valid_themes = _valid_theme_ids()
+            if valid_themes is not None and cfg.theme not in valid_themes:
                 cfg.theme = AppConfig.theme
             return cfg
     except Exception as exc:
