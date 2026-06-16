@@ -261,12 +261,15 @@ class SeparatorHeaderView(QHeaderView):
             )
             painter.restore()
 
-        # No divider after the last column in visual order — nothing follows it.
-        if self.visualIndex(logicalIndex) >= self.count() - 1:
-            return
+        # Draw the right-edge divider on every section, including the last one in
+        # visual order: that column's right edge is still an interactive resize
+        # handle (the header doesn't stretch the last section), so the divider is
+        # a grab hint there too. Pull the last column's line 1px inward so it sits
+        # just inside the viewport edge rather than under the table's frame border.
         painter.save()
         painter.setPen(QPen(self._SEP_COLOR, 1))
-        x = rect.right()
+        is_last = self.visualIndex(logicalIndex) >= self.count() - 1
+        x = rect.right() - 1 if is_last else rect.right()
         painter.drawLine(
             x, rect.top() + self._SEP_INSET, x, rect.bottom() - self._SEP_INSET
         )
