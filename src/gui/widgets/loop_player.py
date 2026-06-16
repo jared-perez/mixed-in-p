@@ -13,9 +13,14 @@ import sys
 
 import sounddevice as sd
 
-# Audio thread block size. 1024 frames @ 44.1 kHz ≈ 23 ms — small enough for
-# responsive start/stop, large enough to stay glitch-free.
-_BLOCK = 1024
+# Audio thread block size. 2048 frames @ 44.1 kHz ≈ 46 ms — a deliberately
+# roomy buffer so the Python output callback (which must take the GIL each
+# block) can still meet its deadline when a track decode or a background
+# analysis/waveform worker is briefly contending for the GIL. The extra latency
+# vs. 1024 is imperceptible for start/stop/seek in a prep player, and it buys
+# real headroom against dropouts. Used by PlayerEngine (keyboard_panel has its
+# own smaller BLOCK_SIZE, since live key presses want lower note latency).
+_BLOCK = 2048
 # Position UI refresh interval (ms). ~30 fps for smooth playhead motion.
 _POS_TIMER_MS = 33
 

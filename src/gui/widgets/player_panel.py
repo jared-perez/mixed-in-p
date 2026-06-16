@@ -718,6 +718,14 @@ class PlayerPanel(QWidget):
         self._thread_keep: list = []
         # Speculative decode targets (selection / next track); pumped when idle.
         self._prefetch_queue: list[str] = []
+        # Debounce for selection-driven prefetch: dragging through the playlist
+        # fires itemSelectionChanged for every row it crosses. Coalesce that into
+        # a single decode once the selection settles, so browsing doesn't spawn a
+        # storm of decode workers that starve the audio callback of the GIL.
+        self._prefetch_debounce = QTimer(self)
+        self._prefetch_debounce.setSingleShot(True)
+        self._prefetch_debounce.setInterval(350)
+        self._prefetch_debounce.timeout.connect(self._on_prefetch_debounce)
         # path -> (pcm, sr), bounded LRU; lets a prefetched track start instantly.
         self._pcm_cache: dict[str, tuple] = {}
         # The track the user currently wants to hear — top decode priority, and
@@ -1682,6 +1690,21 @@ class PlayerPanel(QWidget):
 
     def _on_selection_changed(self) -> None:
         if self._rebuilding or not self.isVisible():
+            return
+        # While a track is playing, do NOT speculatively decode whatever the user
+        # browses to — decoding fights the audio callback for the GIL and is the
+        # main cause of dropouts while clicking around mid-set. The next autoplay
+        # track is already warmed by _prefetch_next(), and pressing Play decodes
+        # the chosen track immediately (the play target preempts prefetches), so
+        # nothing is lost but the contention. When stopped/paused, warm the
+        # selection — but debounced, so dragging across rows fires one decode.
+        if self._engine.is_playing():
+            return
+        self._prefetch_debounce.start()
+
+    def _on_prefetch_debounce(self) -> None:
+        """Prefetch the settled selection (debounced; only when not playing)."""
+        if self._rebuilding or not self.isVisible() or self._engine.is_playing():
             return
         row = self._table.currentRow()
         if row >= 0:
