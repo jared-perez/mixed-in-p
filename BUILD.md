@@ -5,27 +5,28 @@ This project produces three distribution artifacts per release:
 | Platform        | Artifact                  | How it's built                              |
 |-----------------|---------------------------|---------------------------------------------|
 | Windows         | `MixedInP-Setup.exe`      | PyInstaller + Inno Setup (`installer.iss`)  |
-| macOS (Apple Silicon) | `MixedInP-mac-arm64.zip`  | PyInstaller in the normal `venv/`           |
-| macOS (Intel)   | `MixedInP-mac-intel.zip`  | PyInstaller in `venv-intel/` under Rosetta  |
+| macOS (Apple Silicon) | `MixedInP-mac-arm64.dmg`  | PyInstaller (`venv/`) → signed + notarized DMG |
+| macOS (Intel)   | `MixedInP-mac-intel.dmg`  | PyInstaller (`venv-intel/`, Rosetta) → signed + notarized DMG |
 
 All three are built from the same source — only the build environment differs.
 
 ## Filenames are version-less on purpose
 
 The artifact names carry **no version number** — the version lives in the
-GitHub release _tag_ (`v1.3.0`), not the filename. This keeps the
+GitHub release _tag_ (`v1.3.1`), not the filename. This keeps the
 `releases/latest/download/` URLs stable forever, so the download buttons on the
 site (and anywhere else) never break across releases:
 
 ```
 https://github.com/jared-perez/mixed-in-p/releases/latest/download/MixedInP-Setup.exe
-https://github.com/jared-perez/mixed-in-p/releases/latest/download/MixedInP-mac-arm64.zip
-https://github.com/jared-perez/mixed-in-p/releases/latest/download/MixedInP-mac-intel.zip
+https://github.com/jared-perez/mixed-in-p/releases/latest/download/MixedInP-mac-arm64.dmg
+https://github.com/jared-perez/mixed-in-p/releases/latest/download/MixedInP-mac-intel.dmg
 ```
 
 When you cut a release, the three uploaded assets **must** be named exactly as
 above. The Windows installer name is set by `OutputBaseFilename` in
-`installer.iss`; the two mac zips are named by the `ditto` commands below.
+`installer.iss`; the two mac DMGs are named by the `create-dmg` step in the
+signing checklist (see below).
 
 ## macOS Apple Silicon build (native)
 
@@ -36,11 +37,12 @@ above. The Windows installer name is set by `OutputBaseFilename` in
 # Verify it's arm64
 file dist/MixedInP.app/Contents/MacOS/MixedInP
 # expected: Mach-O 64-bit executable arm64
-
-# Package for distribution
-ditto -c -k --sequesterRsrc --keepParent \
-  dist/MixedInP.app dist/MixedInP-mac-arm64.zip
 ```
+
+Then **sign, package into a DMG, notarize, and staple** — the full flow
+(commands, certificate setup, and the per-build loop) lives in
+`SIGNING-AND-NOTARIZATION.md`. The output is the signed, notarized
+`MixedInP-mac-arm64.dmg` you upload to the release.
 
 ## macOS Intel build (from Apple Silicon Mac)
 
@@ -81,14 +83,11 @@ file dist-intel/MixedInP.app/Contents/MacOS/MixedInP
 # expected: Mach-O 64-bit executable x86_64
 ```
 
-### Package for distribution
+### Sign, package, notarize
 
-```bash
-ditto -c -k --sequesterRsrc --keepParent \
-  dist-intel/MixedInP.app dist-intel/MixedInP-mac-intel.zip
-```
-
-Use `ditto` (not Finder's zip) — it preserves macOS metadata and extended attributes correctly, which matters for code signing and Gatekeeper.
+Same flow as Apple Silicon — sign the `.app`, build the DMG, notarize, and
+staple, per `SIGNING-AND-NOTARIZATION.md`, pointing the commands at
+`dist-intel/MixedInP.app`. The output is `MixedInP-mac-intel.dmg`.
 
 ### Test the build locally
 

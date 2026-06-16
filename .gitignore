@@ -36,6 +36,12 @@ Thumbs.db
 # Working files
 resources/*.psd
 
+# macOS release artifacts (regenerated each build; backgrounds come from scripts/make_dmg_background.py)
+*.dmg
+dmg-background.png
+dmg-background@2x.png
+dmg-background.tiff
+
 # Local scripts
 sync_to_usb.bat
 
