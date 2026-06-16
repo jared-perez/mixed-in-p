@@ -20,6 +20,7 @@ from PySide6.QtGui import (
     QDropEvent,
     QFont,
     QPainter,
+    QPixmap,
 )
 from PySide6.QtWidgets import (
     QAbstractItemView,
@@ -38,6 +39,19 @@ from .drop_zone import AUDIO_EXTENSIONS
 SOURCE_PAGE_MIME = "application/x-mixedinp-source-page"
 
 
+def blank_drag_pixmap() -> QPixmap:
+    """A 1×1 transparent pixmap used as a drag image.
+
+    Suppresses Qt's default drag rendering — the ``file:///…`` path text on a
+    white box that drifts under the cursor and looks amateurish. macOS still
+    draws its own file-count badge next to the cursor (driven by the pasteboard
+    URLs, not the Qt drag image), which is the only feedback we want.
+    """
+    pm = QPixmap(1, 1)
+    pm.fill(Qt.GlobalColor.transparent)
+    return pm
+
+
 def start_file_drag(widget, page_id: str, paths: list[str]) -> Qt.DropAction:
     """Begin a drag carrying file URLs plus a marker identifying the source panel.
 
@@ -49,6 +63,7 @@ def start_file_drag(widget, page_id: str, paths: list[str]) -> Qt.DropAction:
     mime.setData(SOURCE_PAGE_MIME, page_id.encode("utf-8"))
     drag = QDrag(widget)
     drag.setMimeData(mime)
+    drag.setPixmap(blank_drag_pixmap())
     return drag.exec(Qt.DropAction.MoveAction | Qt.DropAction.CopyAction)
 
 

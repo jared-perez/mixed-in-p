@@ -77,7 +77,7 @@ from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.thread_keeper import keep_alive
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform
 from .drop_zone import AUDIO_EXTENSIONS
-from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin
+from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin, blank_drag_pixmap
 from .player_engine import PlayerEngine
 from .slice_section import SliceSection
 
@@ -365,6 +365,9 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         mime.setData(SOURCE_PAGE_MIME, self._drag_page_id.encode("utf-8"))
         drag = QDrag(self)
         drag.setMimeData(mime)
+        # Hide Qt's default "file:///…" drag image; keep only the macOS file-count
+        # badge the OS draws next to the cursor. See blank_drag_pixmap().
+        drag.setPixmap(blank_drag_pixmap())
         result = drag.exec(Qt.DropAction.MoveAction | Qt.DropAction.CopyAction)
         if result == Qt.DropAction.MoveAction and remove_cb is not None:
             remove_cb()
