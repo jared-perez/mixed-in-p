@@ -11,17 +11,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Space+Grotesk:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#0d0c09;
-    --bg-lift:#1c1913;         /* warm charcoal the page eases into below the hero */
-    --dl-card-bg:#2b2825;      /* download card background — tweak to recolor just the cards */
-    --panel:#232017;
-    --panel-2:#2a2519;
-    --line:#393320;
+    --bg:#070a12;              /* blue-black — cool base so neon yellow reads as an accent, not a brown cousin */
+    --bg-lift:#101728;         /* midnight the page eases into below the hero */
+    --dl-card-bg:#172033;      /* download card background — tweak to recolor just the cards */
+    --panel:#121a2c;
+    --panel-2:#172132;
+    --line:#26324a;            /* slate border */
     --yellow:#ebff00;          /* exact app waveform yellow */
     --yellow-bright:#f6ff66;
     --yellow-dim:#7a8500;
-    --text:#e8e4d8;
-    --muted:#9a937f;
+    --text:#e7ebf2;            /* cool white */
+    --muted:#8893a8;           /* slate gray */
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{
@@ -62,7 +62,7 @@
     position:absolute;
     inset:-60px -90px;
     z-index:-1;
-    background:radial-gradient(ellipse at center, rgba(13,12,9,.88) 0%, rgba(13,12,9,.55) 55%, rgba(13,12,9,0) 75%);
+    background:radial-gradient(ellipse at center, rgba(7,10,18,.88) 0%, rgba(7,10,18,.55) 55%, rgba(7,10,18,0) 75%);
     pointer-events:none;
   }
   .p-mark{
@@ -78,7 +78,7 @@
     letter-spacing:.12em;
     color:var(--yellow);
     border:1px solid var(--line);
-    background:rgba(13,12,9,.7);
+    background:rgba(7,10,18,.7);
     padding:8px 16px;
     border-radius:4px;
     margin-bottom:24px;
@@ -90,7 +90,7 @@
     font-size:clamp(34px,7vw,72px);
     line-height:1.04;
     letter-spacing:-.01em;
-    text-shadow:0 2px 40px rgba(13,12,9,.9);
+    text-shadow:0 2px 40px rgba(7,10,18,.9);
   }
   h1 .yel{color:var(--yellow)}
   .sub{
@@ -105,10 +105,10 @@
     margin:22px auto 36px;
     max-width:560px;
     font-size:clamp(16px,2.2vw,19px);
-    color:#c6c0ae;
-    text-shadow:0 1px 20px rgba(13,12,9,.95);
+    color:#bcc4d4;
+    text-shadow:0 1px 20px rgba(7,10,18,.95);
   }
-  .tagline strong{color:#f3efe3;font-weight:500}
+  .tagline strong{color:#eef1f7;font-weight:500}
   .dl-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
   .btn{
     display:inline-flex;
@@ -123,9 +123,9 @@
     transition:transform .15s ease, box-shadow .15s ease;
   }
   .btn:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
-  .btn-primary{background:var(--yellow);color:#171405}
+  .btn-primary{background:var(--yellow);color:#0a0e16}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(235,255,0,.25)}
-  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(13,12,9,.6)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(7,10,18,.6)}
   .btn-ghost:hover{border-color:var(--yellow-dim);transform:translateY(-2px)}
   .hero-note{
     margin-top:18px;
@@ -328,7 +328,7 @@
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(13,12,9,.8);
+    background:rgba(7,10,18,.8);
     padding:24px;
   }
   .modal-backdrop.open{display:flex}
@@ -504,7 +504,7 @@
 </section>
 
 <!-- ================= DOWNLOAD ================= -->
-<section id="download" style="background:#2b2825;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+<section id="download" style="background:#172033;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
   <div class="wrap">
     <p class="eyebrow">Get it</p>
     <h2>Download Mixed in P — free.</h2>
@@ -604,10 +604,10 @@
     }
 
     const fade = ctx.createLinearGradient(0, 0, 0, H);
-    fade.addColorStop(0, 'rgba(13,12,9,0.85)');
-    fade.addColorStop(0.35, 'rgba(13,12,9,0.55)');
-    fade.addColorStop(0.6, 'rgba(13,12,9,0.35)');
-    fade.addColorStop(1, 'rgba(13,12,9,0.92)');
+    fade.addColorStop(0, 'rgba(7,10,18,0.85)');
+    fade.addColorStop(0.35, 'rgba(7,10,18,0.55)');
+    fade.addColorStop(0.6, 'rgba(7,10,18,0.35)');
+    fade.addColorStop(1, 'rgba(7,10,18,0.92)');
     ctx.fillStyle = fade;
     ctx.fillRect(0, 0, W, H);
   }
