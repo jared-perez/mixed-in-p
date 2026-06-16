@@ -329,7 +329,8 @@ NUEVO_LEON = Palette(
     ERROR_HOVER="#e04a4a",
     ROW_ALT="#0d1422",
     ROW_HOVER="#16203a",
-    TRAY_BG="#04060d",  # recessed tray, darker than the window canvas
+    TRAY_BG="#121a2c",  # match the panel (BG_MEDIUM) — no darker recessed box;
+    #                     the slice tray + waveform area blend into the panel blue
     WAVE_AXIS="#1c2740",  # faint navy centre line
     WAVEFORM_DEFAULT="#ebff00",  # neon yellow, per design
     ACCENT_TEXT="#ebff00",  # accent reads fine as text on dark navy
