@@ -251,6 +251,14 @@
   }
   .step b{display:block;font-weight:500;margin-bottom:2px}
   .step span{color:var(--muted);font-size:15px}
+  /* macOS / Windows install notes: big OS logo in its own left column,
+     sitting under the "01", with the paragraph to its right. */
+  .os-row{display:flex;align-items:center;gap:16px;margin-top:18px}
+  .os-ico{
+    width:40px;height:40px;
+    flex:none;
+    fill:var(--yellow);
+  }
   .step code{
     font-family:'JetBrains Mono',monospace;
     font-size:13px;
@@ -291,6 +299,23 @@
   }
   .dl-note a{color:var(--yellow);text-decoration:none}
   .dl-note a:hover{text-decoration:underline}
+  /* Big "jump to install steps" header pinned in the download box's bottom
+     padding — absolute so it never grows the box's height. */
+  .dl-install-cta{
+    position:absolute;
+    left:24px;right:24px;
+    bottom:30px;
+    text-align:center;
+    font-family:'Unbounded',sans-serif;
+    font-weight:700;
+    font-size:clamp(19px,2.4vw,24px);
+    line-height:1.1;
+    color:var(--yellow);
+    text-decoration:none;
+    transition:color .15s ease, transform .15s ease;
+  }
+  .dl-install-cta:hover{color:var(--yellow-bright);transform:translateY(3px)}
+  .dl-install-cta:focus-visible{outline:3px solid var(--yellow);outline-offset:4px;border-radius:4px}
 
   footer{
     padding:48px 24px 40px;
@@ -488,23 +513,8 @@
   </div>
 </section>
 
-<!-- ================= QUICK START ================= -->
-<section style="padding-top:0">
-  <div class="wrap">
-    <p class="eyebrow">Quick start</p>
-    <h2>Running in five minutes.</h2>
-    <div class="steps">
-      <div class="step"><div><b>Install</b><span>Download for your platform: the <code>.dmg</code> on macOS or the <code>.exe</code> installer on Windows. On macOS, drag-to-Applications in the <code>DMG</code> window. Windows runs a setup <code>wizard</code>.<br><br>On macOS, the first launch shows a “downloaded from the Internet — are you sure you want to open it?” prompt; click <code>Open</code>. The builds are signed and notarized, so it's a quick one-time confirmation.<br><br>Windows isn't code-signed yet, so Defender SmartScreen may warn —<br>click <code>More info</code> → <code>Run anyway</code> → <code>Yes</code> to proceed.</span></div></div>
-      <div class="step"><div><b>Add your music</b><span>Click <code>Add Folder</code>, or drag a folder of tracks straight onto the window.</span></div></div>
-      <div class="step"><div><b>Read the results</b><span>Tracks analyze automatically, showing BPM, key code, and energy with confidence scores.</span></div></div>
-      <div class="step"><div><b>Organize</b><span>Turn on auto-rename to write tempo and key into filenames, e.g. <code>128 8A - Original_Name</code>.</span></div></div>
-      <div class="step"><div><b>Play &amp; mix</b><span>Send tracks to the Player to audition, and use the key codes to line up your next song.</span></div></div>
-    </div>
-  </div>
-</section>
-
 <!-- ================= DOWNLOAD ================= -->
-<section id="download" style="background:#172033;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+<section id="download" style="background:#172033;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative">
   <div class="wrap">
     <p class="eyebrow">Get it</p>
     <h2>Download Mixed in P — free.</h2>
@@ -530,6 +540,31 @@
       </div>
     </div>
     <p class="dl-note">v1.3.1 · Free &amp; open source (MIT) · <a href="https://github.com/jared-perez/mixed-in-p/releases">All versions &amp; release notes</a></p>
+  </div>
+  <a class="dl-install-cta" href="#quickstart">Installation Instructions Below ⬇</a>
+</section>
+
+<!-- ================= QUICK START ================= -->
+<section id="quickstart">
+  <div class="wrap">
+    <p class="eyebrow">Quick start</p>
+    <h2>Running in five minutes.</h2>
+    <div class="steps">
+      <div class="step"><div><b>Install</b><span>Download for your platform: the <code>.dmg</code> on macOS or the <code>.exe</code> installer on Windows. On macOS, drag-to-Applications in the <code>DMG</code> window. Windows runs a setup <code>wizard</code>.</span>
+        <div class="os-row">
+          <svg class="os-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.8 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.54 4.09l.01-.01zM12.03 7.25c-.15-2.23 1.66-4.07 3.74-4.25.29 2.58-2.34 4.5-3.74 4.25z"/></svg>
+          <span>On macOS, the first launch shows a “downloaded from the Internet — are you sure you want to open it?” prompt; click <code>Open</code>. The builds are signed and notarized, so it's a quick one-time confirmation.</span>
+        </div>
+        <div class="os-row">
+          <svg class="os-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 3h8v8H3V3zm10 0h8v8h-8V3zM3 13h8v8H3v-8zm10 0h8v8h-8v-8z"/></svg>
+          <span>Windows isn't code-signed yet, so Defender SmartScreen may warn —<br>click <code>More info</code> → <code>Run anyway</code> → <code>Yes</code> to proceed.</span>
+        </div>
+      </div></div>
+      <div class="step"><div><b>Add your music</b><span>Click <code>Add Folder</code>, or drag a folder of tracks straight onto the window.</span></div></div>
+      <div class="step"><div><b>Read the results</b><span>Tracks analyze automatically, showing BPM, key code, and energy with confidence scores.</span></div></div>
+      <div class="step"><div><b>Organize</b><span>Turn on auto-rename to write tempo and key into filenames, e.g. <code>128 8A - Original_Name</code>.</span></div></div>
+      <div class="step"><div><b>Play &amp; mix</b><span>Send tracks to the Player to audition, and use the key codes to line up your next song.</span></div></div>
+    </div>
   </div>
 </section>
 
