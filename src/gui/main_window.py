@@ -705,7 +705,7 @@ class MainWindow(QMainWindow):
     def _on_spectrum_sensitivity(self, dr: float) -> None:
         """Persist the spectrum colour sensitivity when the slider is released."""
         self._config.spectrum_dynamic_range = dr
-        save_config(self._config)
+        self._persist_config()
 
     def _on_auto_analyze_toggled(self, enabled: bool) -> None:
         """Handle the Analyze panel's Auto toggle: persist and sync other views.
@@ -715,7 +715,7 @@ class MainWindow(QMainWindow):
         every view stays in agreement.
         """
         self._config.auto_analyze = enabled
-        save_config(self._config)
+        self._persist_config()
         self._settings_panel.set_auto_analyze(enabled)
         self._sidebar.set_auto_analyze_badge(enabled)
 
@@ -734,7 +734,7 @@ class MainWindow(QMainWindow):
     def _on_settings_changed(self) -> None:
         """Persist settings whenever the user changes anything in the panel."""
         self._config = self._settings_panel.get_config(self._config)
-        save_config(self._config)
+        self._persist_config()
         self._analysis_panel.set_auto_analyze(self._config.auto_analyze)
         self._analysis_panel.set_auto_write_bpm(self._config.auto_write_bpm)
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
@@ -1009,11 +1009,30 @@ class MainWindow(QMainWindow):
         if self._geometry_restored:
             self._sizer.on_resize()
 
+    def _persist_config(self) -> None:
+        """Save this window's config snapshot without clobbering fields that
+        other panels persist independently.
+
+        ``self._config`` is loaded once at startup and is the source of truth
+        for window/settings fields, but the Convert and Player panels write
+        their own fields straight to disk as the user changes them. Re-read
+        those from the latest on-disk config before saving so a wholesale write
+        here (e.g. on close) doesn't revert them to stale startup values.
+        """
+        disk = load_config()
+        self._config.convert_target_format = disk.convert_target_format
+        self._config.convert_mp3_bitrate = disk.convert_mp3_bitrate
+        self._config.convert_sample_rate = disk.convert_sample_rate
+        self._config.convert_bit_depth = disk.convert_bit_depth
+        self._config.player_edit_locked = disk.player_edit_locked
+        self._config.player_column_state = disk.player_column_state
+        save_config(self._config)
+
     def closeEvent(self, event) -> None:
         """Handle window close event."""
         # Persist the window geometry (non-keyboard) for next launch.
         self._sizer.save_geometry()
-        save_config(self._config)
+        self._persist_config()
 
         # Stop media players
         self._player_panel.stop_playback()

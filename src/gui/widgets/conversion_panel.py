@@ -317,15 +317,19 @@ class ConversionPanel(QWidget):
         """Persist current convert panel selections to config."""
         if self._loading_settings:
             return
-        self._config.convert_target_format = self._format_combo.currentText()
-        self._config.convert_mp3_bitrate = int(self._bitrate_combo.currentText())
+        # Re-load first so we only write the convert_* fields and don't clobber
+        # a setting another panel changed (mirrors player_panel's pattern).
+        cfg = load_config()
+        cfg.convert_target_format = self._format_combo.currentText()
+        cfg.convert_mp3_bitrate = int(self._bitrate_combo.currentText())
         sr = self._samplerate_combo.currentData()
         bd = self._bitdepth_combo.currentData()
         if sr is not None:
-            self._config.convert_sample_rate = int(sr)
+            cfg.convert_sample_rate = int(sr)
         if bd is not None:
-            self._config.convert_bit_depth = int(bd)
-        save_config(self._config)
+            cfg.convert_bit_depth = int(bd)
+        save_config(cfg)
+        self._config = cfg
 
     def _on_selection_changed(self) -> None:
         """Enable/disable Send To based on table selection."""
