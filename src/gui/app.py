@@ -111,7 +111,7 @@ def create_app(argv: list[str] | None = None) -> tuple[QApplication, MainWindow]
     app = QApplication(argv)
     app.setApplicationName("Mixed in P")
     app.setOrganizationName("Mixed in P")
-    app.setApplicationVersion("1.3.1")
+    app.setApplicationVersion("1.3.2")
 
     config = load_config()
 
