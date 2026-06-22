@@ -60,7 +60,8 @@ class AppConfig:
     energy_tag_format: str = "number_only"
     energy_tag_mode: str = "prepend"
     key_in_comment_enabled: bool = False
-    key_secondary_to_energy: bool = True
+    # When both key and energy are written to the comment, write energy first.
+    energy_written_first: bool = True
     convert_target_format: str = "AIFF"
     convert_mp3_bitrate: int = 320
     convert_sample_rate: int = 44100
@@ -73,7 +74,7 @@ class AppConfig:
     language: str = DEFAULT_LANGUAGE
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).
-    theme: str = "neon_dark"
+    theme: str = "nuevo_leon"
     # Base64-encoded QHeaderView.saveState() for the Player playlist columns
     # (order + widths). Empty = use the built-in default layout.
     player_column_state: str = ""
@@ -118,7 +119,11 @@ def load_config() -> AppConfig:
                 energy_tag_format=data.get("energy_tag_format", AppConfig.energy_tag_format),
                 energy_tag_mode=data.get("energy_tag_mode", AppConfig.energy_tag_mode),
                 key_in_comment_enabled=bool(data.get("key_in_comment_enabled", AppConfig.key_in_comment_enabled)),
-                key_secondary_to_energy=bool(data.get("key_secondary_to_energy", AppConfig.key_secondary_to_energy)),
+                energy_written_first=bool(
+                    # Fall back to the legacy key so existing configs migrate.
+                    data.get("energy_written_first",
+                             data.get("key_secondary_to_energy", AppConfig.energy_written_first))
+                ),
                 convert_target_format=data.get("convert_target_format", AppConfig.convert_target_format),
                 convert_mp3_bitrate=int(data.get("convert_mp3_bitrate", AppConfig.convert_mp3_bitrate)),
                 convert_sample_rate=int(data.get("convert_sample_rate", AppConfig.convert_sample_rate)),

@@ -213,14 +213,14 @@ class SettingsPanel(QWidget):
         rename_frame.setObjectName("settingsSection")
         rename_layout = QVBoxLayout(rename_frame)
         rename_layout.setContentsMargins(16, 10, 16, 10)
-        rename_layout.setSpacing(12)
+        rename_layout.setSpacing(18)
 
         self._auto_analyze_cb = QCheckBox(self.tr("Auto-analyze when dropping or sending to the Analyze panel"))
         self._auto_analyze_cb.setObjectName("circleCheckLg")
         self._auto_analyze_cb.setChecked(True)
         rename_layout.addWidget(self._auto_analyze_cb)
 
-        self._auto_write_bpm_cb = QCheckBox(self.tr("Automatically write BPM to tags after analysis"))
+        self._auto_write_bpm_cb = QCheckBox(self.tr("Automatically write BPM to metadata after analysis"))
         self._auto_write_bpm_cb.setChecked(True)
         rename_layout.addWidget(self._auto_write_bpm_cb)
 
@@ -229,7 +229,7 @@ class SettingsPanel(QWidget):
         bpm_round_hint.setWordWrap(True)
         rename_layout.addWidget(bpm_round_hint)
 
-        self._auto_write_key_cb = QCheckBox(self.tr("Automatically write the key to tags after analysis"))
+        self._auto_write_key_cb = QCheckBox(self.tr("Automatically write the key to metadata after analysis"))
         self._auto_write_key_cb.setChecked(True)
         rename_layout.addWidget(self._auto_write_key_cb)
 
@@ -244,17 +244,6 @@ class SettingsPanel(QWidget):
         self._key_in_comment_cb.setChecked(False)
         self._key_in_comment_cb.stateChanged.connect(self._emit_changed)
         rename_layout.addWidget(self._key_in_comment_cb)
-
-        # Secondary-to-energy is a modifier of "Write key to comment"; indented
-        # via its QSS margin (objectName "circleCheck") to read as a sub-option.
-        self._key_secondary_to_energy_cb = QCheckBox(self.tr("Secondary to energy"))
-        self._key_secondary_to_energy_cb.setObjectName("circleCheck")
-        self._key_secondary_to_energy_cb.setChecked(True)
-        self._key_secondary_to_energy_cb.setToolTip(
-            self.tr("When both this and the Energy Tag comment are written, put energy first and key second.")
-        )
-        self._key_secondary_to_energy_cb.stateChanged.connect(self._emit_changed)
-        rename_layout.addWidget(self._key_secondary_to_energy_cb)
 
         # Naming format sub-section
         format_label = QLabel(self.tr("Naming format:"))
@@ -299,7 +288,7 @@ class SettingsPanel(QWidget):
         notation_frame.setObjectName("settingsSection")
         notation_layout = QVBoxLayout(notation_frame)
         notation_layout.setContentsMargins(16, 10, 16, 10)
-        notation_layout.setSpacing(12)
+        notation_layout.setSpacing(18)
 
         notation_hint = QLabel(
             self.tr(
@@ -339,12 +328,24 @@ class SettingsPanel(QWidget):
         energy_frame.setObjectName("settingsSection")
         energy_layout = QVBoxLayout(energy_frame)
         energy_layout.setContentsMargins(16, 16, 16, 16)
-        energy_layout.setSpacing(12)
+        energy_layout.setSpacing(18)
 
         self._energy_enabled_cb = QCheckBox(self.tr("Write energy level to Comment tag"))
         self._energy_enabled_cb.setChecked(True)
         self._energy_enabled_cb.stateChanged.connect(self._emit_changed)
         energy_layout.addWidget(self._energy_enabled_cb)
+
+        # When both energy and key are written to the comment, this gives the
+        # energy info priority (written first). Indented via its QSS margin
+        # (objectName "circleCheck") to read as a sub-option.
+        self._energy_written_first_cb = QCheckBox(self.tr("Energy level written first"))
+        self._energy_written_first_cb.setObjectName("circleCheck")
+        self._energy_written_first_cb.setChecked(True)
+        self._energy_written_first_cb.setToolTip(
+            self.tr("When both energy and key are written to the comment, put energy first and key second.")
+        )
+        self._energy_written_first_cb.stateChanged.connect(self._emit_changed)
+        energy_layout.addWidget(self._energy_written_first_cb)
 
         # Format sub-section
         fmt_label = QLabel(self.tr("Format:"))
@@ -647,7 +648,7 @@ class SettingsPanel(QWidget):
             energy_tag_format=energy_format,
             energy_tag_mode=energy_mode,
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
-            key_secondary_to_energy=self._key_secondary_to_energy_cb.isChecked(),
+            energy_written_first=self._energy_written_first_cb.isChecked(),
             waveform_color=self._waveform_color,
         )
 
@@ -685,7 +686,6 @@ class SettingsPanel(QWidget):
             notation_radio.setChecked(True)
         self._auto_analyze_cb.setChecked(cfg.auto_analyze)
         self._key_in_comment_cb.setChecked(cfg.key_in_comment_enabled)
-        self._key_secondary_to_energy_cb.setChecked(cfg.key_secondary_to_energy)
 
         radio = self._format_radios.get(cfg.naming_preference)
         if radio:
@@ -693,6 +693,7 @@ class SettingsPanel(QWidget):
 
         # Energy tag settings
         self._energy_enabled_cb.setChecked(cfg.energy_tag_enabled)
+        self._energy_written_first_cb.setChecked(cfg.energy_written_first)
         if cfg.energy_tag_format == "with_label":
             self._radio_with_label.setChecked(True)
         else:

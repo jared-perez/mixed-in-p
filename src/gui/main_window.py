@@ -801,7 +801,7 @@ class MainWindow(QMainWindow):
                         fmt=self._config.energy_tag_format,
                         mode=self._config.energy_tag_mode,
                         key=key_value,
-                        key_secondary_to_energy=self._config.key_secondary_to_energy,
+                        energy_written_first=self._config.energy_written_first,
                     )
                 except Exception as e:
                     logger.error(f"Failed to write comment tag to {Path(result.file_path).name}: {e}")

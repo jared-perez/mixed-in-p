@@ -31,6 +31,7 @@ from PySide6.QtGui import (
     QDragMoveEvent,
     QDropEvent,
     QFont,
+    QFontMetrics,
     QIcon,
     QKeySequence,
     QMouseEvent,
@@ -234,6 +235,13 @@ class SeparatorHeaderView(QHeaderView):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(Qt.Orientation.Horizontal, parent)
 
+    def _title_font(self) -> QFont:
+        """The bold font the section labels are painted in. Single source of
+        truth so default column widths can be measured to fit the word."""
+        font = QFont(self.font())
+        font.setBold(True)
+        return font
+
     def paintSection(self, painter: QPainter, rect, logicalIndex: int) -> None:
         # Draw the section chrome (background, bottom border, hover) via the
         # style with the text blanked, then render the label ourselves so its
@@ -249,9 +257,7 @@ class SeparatorHeaderView(QHeaderView):
 
         if text:
             painter.save()
-            font = painter.font()
-            font.setBold(True)
-            painter.setFont(font)
+            painter.setFont(self._title_font())
             painter.setPen(self._TEXT_COLOR)
             text_rect = rect.adjusted(self._TEXT_PAD, 0, -self._TEXT_PAD, 0)
             painter.drawText(
@@ -909,11 +915,25 @@ class PlayerPanel(QWidget):
         self._table.setColumnWidth(1, 300)  # Filename
         self._table.setColumnWidth(2, 180)  # Artist
         self._table.setColumnWidth(3, 180)  # Title
-        self._table.setColumnWidth(4, 80)   # BPM
-        self._table.setColumnWidth(5, 80)   # Key
         self._table.setColumnWidth(6, 200)  # Comment
-        self._table.setColumnWidth(7, 80)   # Duration
-        self._table.setColumnWidth(8, 70)   # Year
+        # BPM, Key, Duration, Year default just wide enough to show the full
+        # (bold) header word — measured from the header font so translated
+        # labels fit too — rather than a fixed 70-80px that clips them. The
+        # measured width is also kept as a floor (see _restore_column_state) so
+        # these never reopen clipped, while staying Interactive for the user to
+        # widen. ensurePolished() resolves the QSS font (set app-wide before
+        # this panel is built) onto the header so the metrics match what's
+        # painted; without it the font is unresolved here and widths come short.
+        header.ensurePolished()
+        header_fm = QFontMetrics(header._title_font())
+        self._word_fit_widths: dict[int, int] = {}
+        for col in (4, 5, 7, 8):
+            label = self._table.horizontalHeaderItem(col).text()
+            # 2× the header's text pad, plus a couple px so the word never
+            # touches the right-edge divider.
+            width = header_fm.horizontalAdvance(label) + 2 * SeparatorHeaderView._TEXT_PAD + 4
+            self._word_fit_widths[col] = width
+            self._table.setColumnWidth(col, width)
 
         # No '…' in any column — the no-elide delegate is the table default; the
         # '#' column then overrides it with its current-row delegate. NoElide also
@@ -1442,14 +1462,19 @@ class PlayerPanel(QWidget):
     def _restore_column_state(self) -> None:
         """Apply the saved playlist column order/widths, if any."""
         state = load_config().player_column_state
-        if not state:
-            return
-        try:
-            self._table.horizontalHeader().restoreState(
-                QByteArray.fromBase64(state.encode("ascii"))
-            )
-        except Exception as exc:  # noqa: BLE001
-            logger.warning("Could not restore player column layout: %s", exc)
+        if state:
+            try:
+                self._table.horizontalHeader().restoreState(
+                    QByteArray.fromBase64(state.encode("ascii"))
+                )
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Could not restore player column layout: %s", exc)
+        # Floor the word-fit columns so a previously-saved (or freshly dragged)
+        # narrow width never reopens with the BPM/Key/Year/Duration header word
+        # clipped. Wider saved widths are kept; the user can still widen freely.
+        for col, min_width in self._word_fit_widths.items():
+            if self._table.columnWidth(col) < min_width:
+                self._table.setColumnWidth(col, min_width)
 
     def _schedule_column_save(self, *args) -> None:
         """Debounce saves so a drag-resize writes the config once, not per pixel."""

@@ -576,15 +576,16 @@ def update_comment_with_energy(
     fmt: str = "number_only",
     mode: str = "prepend",
     key: str | None = None,
-    key_secondary_to_energy: bool = False,
+    energy_written_first: bool = True,
 ) -> bool:
     """Write energy level and/or key into the Comment tag of an audio file.
 
     Pieces are joined with " - " (space-dash-space). If both ``key`` and
-    ``energy`` are given, the prefix is "<key> - <energy>". The prefix is
+    ``energy`` are given, the prefix is "<energy> - <key>" when
+    ``energy_written_first`` (default), else "<key> - <energy>". The prefix is
     then combined with any existing comment per ``mode``:
 
-      prepend → "<prefix> - <existing>"  (default; e.g. "8A - 6 - visit my webpage")
+      prepend → "<prefix> - <existing>"  (default; e.g. "6 - 8A - visit my webpage")
       append  → "<existing> - <prefix>"
       replace → "<prefix>"               (existing comment dropped)
 
@@ -593,7 +594,9 @@ def update_comment_with_energy(
         energy: Energy level 1-10, or None to skip.
         fmt: "number_only" → "7", "with_label" → "Energy 7".
         mode: "prepend", "append", or "replace".
-        key: Key string (e.g. "8A" or "Am") to prepend before energy, or None.
+        key: Key string (e.g. "8A" or "Am"), or None.
+        energy_written_first: When both energy and key are present, write
+            energy before key (True) or key before energy (False).
 
     Returns:
         True if successful (including the no-op case where energy and key
@@ -615,14 +618,14 @@ def update_comment_with_energy(
     suffix = path.suffix.lower()
 
     # Build the prefix (key, energy, or both joined with " - ").
-    # Default order is "<key> - <energy>". With key_secondary_to_energy
-    # the order flips to "<energy> - <key>".
+    # With energy_written_first the order is "<energy> - <key>"; otherwise
+    # the order is "<key> - <energy>".
     energy_part = (
         (f"Energy {energy}" if fmt == "with_label" else str(energy))
         if energy is not None else None
     )
     key_part = str(key) if key else None
-    if key_secondary_to_energy:
+    if energy_written_first:
         parts = [p for p in (energy_part, key_part) if p]
     else:
         parts = [p for p in (key_part, energy_part) if p]

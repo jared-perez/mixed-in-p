@@ -917,87 +917,87 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="801"/>
+        <location filename="../widgets/player_panel.py" line="822"/>
         <source>Player</source>
         <translation>Reproductor</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="817"/>
+        <location filename="../widgets/player_panel.py" line="838"/>
         <source>Edit Lock</source>
         <translation>Bloqueo de edición</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="821"/>
+        <location filename="../widgets/player_panel.py" line="842"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Bloquear la edición de metadatos en la lista de reproducción</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="834"/>
+        <location filename="../widgets/player_panel.py" line="855"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="835"/>
+        <location filename="../widgets/player_panel.py" line="856"/>
         <source>Filename</source>
         <translation>Nombre de archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="836"/>
+        <location filename="../widgets/player_panel.py" line="857"/>
         <source>Artist</source>
         <translation>Artista</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="837"/>
+        <location filename="../widgets/player_panel.py" line="858"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="838"/>
+        <location filename="../widgets/player_panel.py" line="859"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="839"/>
+        <location filename="../widgets/player_panel.py" line="860"/>
         <source>Key</source>
         <translation>Tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="840"/>
+        <location filename="../widgets/player_panel.py" line="861"/>
         <source>Comment</source>
         <translation>Comentario</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="841"/>
+        <location filename="../widgets/player_panel.py" line="862"/>
         <source>Duration</source>
         <translation>Duración</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="842"/>
+        <location filename="../widgets/player_panel.py" line="863"/>
         <source>Year</source>
         <translation>Año</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="920"/>
+        <location filename="../widgets/player_panel.py" line="941"/>
         <source>Previous</source>
         <translation>Anterior</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="931"/>
+        <location filename="../widgets/player_panel.py" line="952"/>
         <source>Play / Pause  (Space)</source>
         <translation>Reproducir / Pausar  (Espacio)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="938"/>
+        <location filename="../widgets/player_panel.py" line="959"/>
         <source>Stop</source>
         <translation>Detener</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="945"/>
+        <location filename="../widgets/player_panel.py" line="966"/>
         <source>Next</source>
         <translation>Siguiente</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="985"/>
+        <location filename="../widgets/player_panel.py" line="1006"/>
         <source>Vol</source>
         <translation>Vol</translation>
     </message>
@@ -1006,37 +1006,37 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Eliminar seleccionados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1005"/>
+        <location filename="../widgets/player_panel.py" line="1026"/>
         <source>Clear Playlist</source>
         <translation>Vaciar lista</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1413"/>
+        <location filename="../widgets/player_panel.py" line="1434"/>
         <source>{0} track</source>
         <translation>{0} pista</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1415"/>
+        <location filename="../widgets/player_panel.py" line="1436"/>
         <source>{0} tracks</source>
         <translation>{0} pistas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1968"/>
+        <location filename="../widgets/player_panel.py" line="2004"/>
         <source>Open File Location</source>
         <translation>Abrir ubicación del archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1969"/>
+        <location filename="../widgets/player_panel.py" line="2005"/>
         <source>Open in Metadata Panel</source>
         <translation>Abrir en el panel de metadatos</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1970"/>
+        <location filename="../widgets/player_panel.py" line="2006"/>
         <source>Reload Metadata from File</source>
         <translation>Recargar metadatos del archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1972"/>
+        <location filename="../widgets/player_panel.py" line="2008"/>
         <source>Remove from Playlist</source>
         <translation>Quitar de la lista de reproducción</translation>
     </message>
@@ -1284,7 +1284,7 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="286"/>
+        <location filename="../widgets/player_panel.py" line="296"/>
         <source>Drop audio files here</source>
         <translation>Suelta archivos de audio aquí</translation>
     </message>
@@ -1389,7 +1389,7 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="223"/>
-        <source>Automatically write BPM to tags after analysis</source>
+        <source>Automatically write BPM to metadata after analysis</source>
         <translation>Escribir automáticamente el BPM en las etiquetas tras el análisis</translation>
     </message>
     <message>
@@ -1399,7 +1399,7 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="232"/>
-        <source>Automatically write the key to tags after analysis</source>
+        <source>Automatically write the key to metadata after analysis</source>
         <translation>Escribir automáticamente la tonalidad en las etiquetas tras el análisis</translation>
     </message>
     <message>
@@ -1413,162 +1413,170 @@ o haz clic en “Añadir carátula…”</translation>
         <translation>Escribir la tonalidad en el comentario</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="250"/>
         <source>Secondary to energy</source>
         <translatorcomment>Settings toggle meaning the key is written after the energy value; rendered &apos;Después de la energía&apos; for clarity over a literal &apos;Secundario&apos;.</translatorcomment>
-        <translation>Después de la energía</translation>
+        <translation type="vanished">Después de la energía</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="254"/>
         <source>When both this and the Energy Tag comment are written, put energy first and key second.</source>
-        <translation>Cuando se escriban tanto esto como el comentario de la etiqueta de energía, coloca primero la energía y después la tonalidad.</translation>
+        <translation type="vanished">Cuando se escriban tanto esto como el comentario de la etiqueta de energía, coloca primero la energía y después la tonalidad.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="260"/>
+        <location filename="../widgets/settings_panel.py" line="249"/>
         <source>Naming format:</source>
         <translation>Formato de nombre:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="258"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Example string: kept &apos;128&apos;, &apos;8A&apos; and &apos; - &apos; separators; translated placeholder filename to &apos;Nombre_Del_Archivo&apos; (underscores preserved), used consistently across all naming-format examples.</translatorcomment>
         <translation>128 8A - Nombre_Del_Archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="258"/>
         <source>BPM + Key prefix</source>
         <translation>Prefijo BPM + tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="270"/>
+        <location filename="../widgets/settings_panel.py" line="259"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - Nombre_Del_Archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="270"/>
+        <location filename="../widgets/settings_panel.py" line="259"/>
         <source>Key + BPM prefix</source>
         <translation>Prefijo tonalidad + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="271"/>
+        <location filename="../widgets/settings_panel.py" line="260"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - Nombre_Del_Archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="271"/>
+        <location filename="../widgets/settings_panel.py" line="260"/>
         <source>Key prefix only</source>
         <translation>Solo prefijo de tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="272"/>
+        <location filename="../widgets/settings_panel.py" line="261"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>Nombre_Del_Archivo - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="272"/>
+        <location filename="../widgets/settings_panel.py" line="261"/>
         <source>suffix: Key + BPM</source>
         <translation>sufijo: tonalidad + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="273"/>
+        <location filename="../widgets/settings_panel.py" line="262"/>
         <source>Original_File_Name - 8A</source>
         <translation>Nombre_Del_Archivo - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="273"/>
+        <location filename="../widgets/settings_panel.py" line="262"/>
         <source>suffix: Key only</source>
         <translation>sufijo: solo tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="296"/>
+        <location filename="../widgets/settings_panel.py" line="285"/>
         <source>Notation</source>
         <translation>Notación</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="306"/>
+        <location filename="../widgets/settings_panel.py" line="295"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translation>Solo puede haber una notación activa a la vez. Se aplica a la tonalidad escrita en las etiquetas y los nombres de archivo durante el análisis y a las etiquetas de tonalidad del panel Teclado.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="318"/>
+        <location filename="../widgets/settings_panel.py" line="307"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translation>👑 Códigos de tonalidad  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="319"/>
+        <location filename="../widgets/settings_panel.py" line="308"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>Notación tradicional de tonalidad  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="320"/>
+        <location filename="../widgets/settings_panel.py" line="309"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>&apos;Traktor Open Key&apos; is a proprietary notation/product name kept in English; its codes (1m, 10m, 9d) are data tokens left as-is.</translatorcomment>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="336"/>
+        <location filename="../widgets/settings_panel.py" line="325"/>
         <source>Energy Tag</source>
         <translation>Etiqueta de energía</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="344"/>
+        <location filename="../widgets/settings_panel.py" line="333"/>
         <source>Write energy level to Comment tag</source>
         <translation>Escribir el nivel de energía en la etiqueta de comentario</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="350"/>
+        <location filename="../widgets/settings_panel.py" line="341"/>
+        <source>Energy level written first</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="345"/>
+        <source>When both energy and key are written to the comment, put energy first and key second.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="351"/>
         <source>Format:</source>
         <translation>Formato:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="358"/>
+        <location filename="../widgets/settings_panel.py" line="359"/>
         <source>Number only  (7)</source>
         <translation>Solo número  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="359"/>
+        <location filename="../widgets/settings_panel.py" line="360"/>
         <source>With label  (Energy 7)</source>
         <translatorcomment>Parenthetical &apos;(Energy 7)&apos; is a literal output example showing the exact tag text written, so &apos;Energy&apos; is left untranslated to match real app output.</translatorcomment>
         <translation>Con etiqueta  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="368"/>
+        <location filename="../widgets/settings_panel.py" line="369"/>
         <source>Write mode:</source>
         <translation>Modo de escritura:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="376"/>
+        <location filename="../widgets/settings_panel.py" line="377"/>
         <source>Prepend to existing comment</source>
         <translation>Anteponer al comentario existente</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="377"/>
+        <location filename="../widgets/settings_panel.py" line="378"/>
         <source>Append to existing comment</source>
         <translation>Añadir al final del comentario existente</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="378"/>
+        <location filename="../widgets/settings_panel.py" line="379"/>
         <source>Replace existing comment</source>
         <translation>Reemplazar el comentario existente</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="538"/>
+        <location filename="../widgets/settings_panel.py" line="539"/>
         <source>Waveform color</source>
         <translation>Color de la forma de onda</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="570"/>
-        <location filename="../widgets/settings_panel.py" line="583"/>
+        <location filename="../widgets/settings_panel.py" line="571"/>
+        <location filename="../widgets/settings_panel.py" line="584"/>
         <source>Restart required</source>
         <translation>Reinicio necesario</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="572"/>
+        <location filename="../widgets/settings_panel.py" line="573"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>El cambio de idioma se aplicará la próxima vez que reinicies Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="585"/>
+        <location filename="../widgets/settings_panel.py" line="586"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation type="unfinished"></translation>
     </message>

@@ -340,7 +340,7 @@ NUEVO_LEON = Palette(
 THEMES: dict[str, Palette] = {
     p.name: p for p in (NEON_DARK, NIGHT_DARK, NUEVO_LEON, DAYLIGHT)
 }
-DEFAULT_THEME = NEON_DARK.name
+DEFAULT_THEME = NUEVO_LEON.name
 
 # Palette field names that are colour tokens (everything but the two id fields).
 _COLOR_TOKENS = tuple(
