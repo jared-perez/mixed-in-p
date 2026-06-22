@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QComboBox,
     QGroupBox,
@@ -42,6 +43,7 @@ class ConversionPanel(QWidget):
         self._store = store
         self._file_paths: list[str] = []  # local file list, independent of TrackStore
         self._converted_outputs: dict[str, str] = {}  # source path -> converted output path
+        self._converting: set[str] = set()  # source paths currently mid-conversion
         self._file_info_cache: dict[str, str] = {}
         self._config = load_config()
         self._loading_settings = True
@@ -554,15 +556,88 @@ class ConversionPanel(QWidget):
         """Get the progress panel widget."""
         return self._progress_panel
 
-    def mark_converted(self, results: list[ConversionResult]) -> None:
-        """Update Status column after conversion completes."""
-        # Build lookup from source path to result
-        result_map = {r.source_path: r for r in results}
-
-        lossless_paths = [
+    def _lossless_paths(self) -> list[str]:
+        """The file list filtered to lossless paths, matching table row order."""
+        return [
             p for p in self._file_paths
             if Path(p).suffix.lower() in LOSSLESS_EXTENSIONS
         ]
+
+    def _set_text_status(self, row: int, text: str, color) -> None:
+        """Put a plain coloured-text status (e.g. Ready/Converting) in a row.
+
+        Removes any bar-style cell widget first so a row can revert from a
+        Done/Error bar back to text."""
+        self._file_table.removeCellWidget(row, 3)
+        item = QTableWidgetItem(text)
+        item.setForeground(color)
+        item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+        item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._file_table.setItem(row, 3, item)
+
+    def _set_bar_status(self, row: int, text: str, bg: str, tooltip: str | None = None) -> None:
+        """Put a filled status bar (Done/Error) in a row."""
+        # Drop any underlying text item first, else its centered text (e.g. the
+        # yellow "Converting" item) peeks out from behind the bar widget.
+        self._file_table.takeItem(row, 3)
+        label = QLabel(text)
+        label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        label.setStyleSheet(
+            f"background-color: {bg};"
+            " color: #000000;"
+            " font-weight: bold;"
+        )
+        if tooltip:
+            label.setToolTip(tooltip)
+        self._file_table.setCellWidget(row, 3, label)
+
+    def mark_converting(self, file_paths: list[str]) -> None:
+        """Flag every row about to be converted with a yellow 'Converting'
+        status, shown the moment the batch starts."""
+        self._converting = set(file_paths)
+        lossless_paths = self._lossless_paths()
+        for row in range(self._file_table.rowCount()):
+            if row >= len(lossless_paths):
+                break
+            if lossless_paths[row] in self._converting:
+                self._set_text_status(row, self.tr("Converting"), QColor(Theme.NEON_YELLOW))
+
+    def mark_file_result(self, result: ConversionResult | None) -> None:
+        """Update a single row as soon as its file finishes, so each flips to
+        Done/Error independently rather than all at the end."""
+        if result is None:
+            return
+        lossless_paths = self._lossless_paths()
+        for row in range(self._file_table.rowCount()):
+            if row >= len(lossless_paths):
+                break
+            if lossless_paths[row] == result.source_path:
+                self._apply_result_to_row(row, result)
+                self._converting.discard(result.source_path)
+                return
+
+    def _apply_result_to_row(self, row: int, result: ConversionResult) -> None:
+        """Render one conversion result into its Status cell."""
+        if result.error:
+            self._set_bar_status(
+                row,
+                self.tr("Incomplete") if result.incomplete else self.tr("Error"),
+                Theme.ERROR,
+                tooltip=result.error,
+            )
+        elif result.skipped:
+            # Nothing was converted; restore the resting "Ready" status (a
+            # skipped file was never sent unless something changed under us).
+            self._set_text_status(row, self.tr("Ready"), QColor(Qt.GlobalColor.green))
+        else:
+            self._converted_outputs[result.source_path] = result.output_path
+            self._set_bar_status(row, self.tr("Done"), Theme.NEON_GREEN)
+
+    def mark_converted(self, results: list[ConversionResult]) -> None:
+        """Final sweep after the batch finishes: apply every result and revert
+        any row that never ran (e.g. a cancelled batch) back to 'Ready'."""
+        result_map = {r.source_path: r for r in results}
+        lossless_paths = self._lossless_paths()
 
         for row in range(self._file_table.rowCount()):
             name_item = self._file_table.item(row, 0)
@@ -572,29 +647,12 @@ class ConversionPanel(QWidget):
             if row >= len(lossless_paths):
                 break
 
-            result = result_map.get(lossless_paths[row])
-            if result is None:
-                continue
+            path = lossless_paths[row]
+            result = result_map.get(path)
+            if result is not None:
+                self._apply_result_to_row(row, result)
+            elif path in self._converting:
+                # Marked Converting but never completed (cancelled mid-batch).
+                self._set_text_status(row, self.tr("Ready"), QColor(Qt.GlobalColor.green))
 
-            if result.error:
-                label = QLabel(self.tr("Incomplete") if result.incomplete else self.tr("Error"))
-                label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                label.setStyleSheet(
-                    f"background-color: {Theme.ERROR};"
-                    " color: #000000;"
-                    " font-weight: bold;"
-                )
-                label.setToolTip(result.error)
-                self._file_table.setCellWidget(row, 3, label)
-            elif result.skipped:
-                pass  # Leave as "Same format"
-            else:
-                self._converted_outputs[result.source_path] = result.output_path
-                label = QLabel(self.tr("Done"))
-                label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                label.setStyleSheet(
-                    f"background-color: {Theme.NEON_GREEN};"
-                    " color: #000000;"
-                    " font-weight: bold;"
-                )
-                self._file_table.setCellWidget(row, 3, label)
+        self._converting.clear()

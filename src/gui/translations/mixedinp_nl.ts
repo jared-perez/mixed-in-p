@@ -281,109 +281,109 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="64"/>
-        <location filename="../widgets/conversion_panel.py" line="174"/>
+        <location filename="../widgets/conversion_panel.py" line="66"/>
+        <location filename="../widgets/conversion_panel.py" line="176"/>
         <source>Convert</source>
         <translation>Converteren</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="67"/>
+        <location filename="../widgets/conversion_panel.py" line="69"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>Converteer audiobestanden tussen formaten (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="73"/>
+        <location filename="../widgets/conversion_panel.py" line="75"/>
         <source>Target Format:</source>
         <translation>Doelformaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="80"/>
+        <location filename="../widgets/conversion_panel.py" line="82"/>
         <source>Sample Rate:</source>
         <translation>Samplefrequentie:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="83"/>
+        <location filename="../widgets/conversion_panel.py" line="85"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="84"/>
+        <location filename="../widgets/conversion_panel.py" line="86"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="85"/>
+        <location filename="../widgets/conversion_panel.py" line="87"/>
         <source>44.1 kHz (CD)</source>
         <translation>44,1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="86"/>
+        <location filename="../widgets/conversion_panel.py" line="88"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="96"/>
+        <location filename="../widgets/conversion_panel.py" line="98"/>
         <source>Bit Depth:</source>
         <translation>Bitdiepte:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="99"/>
+        <location filename="../widgets/conversion_panel.py" line="101"/>
         <source>32 bit</source>
         <translation>32-bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="100"/>
+        <location filename="../widgets/conversion_panel.py" line="102"/>
         <source>24 bit (DVD)</source>
         <translation>24-bit (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="101"/>
+        <location filename="../widgets/conversion_panel.py" line="103"/>
         <source>16 bit (CD)</source>
         <translation>16-bit (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="102"/>
+        <location filename="../widgets/conversion_panel.py" line="104"/>
         <source>8 bit</source>
         <translation>8-bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="112"/>
+        <location filename="../widgets/conversion_panel.py" line="114"/>
         <source>Bitrate:</source>
         <translation>Bitrate:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="132"/>
+        <location filename="../widgets/conversion_panel.py" line="134"/>
         <source>Files</source>
         <translation>Bestanden</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="135"/>
+        <location filename="../widgets/conversion_panel.py" line="137"/>
         <source>Drop audio files here to add them</source>
         <translation>Sleep audiobestanden hierheen om ze toe te voegen</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="138"/>
+        <location filename="../widgets/conversion_panel.py" line="140"/>
         <source>Filename</source>
         <translation>Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="139"/>
+        <location filename="../widgets/conversion_panel.py" line="141"/>
         <source>From</source>
         <translation>Van</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="140"/>
+        <location filename="../widgets/conversion_panel.py" line="142"/>
         <source>To</source>
         <translation>Naar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="143"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="168"/>
-        <location filename="../widgets/conversion_panel.py" line="479"/>
+        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="485"/>
         <source>No files</source>
         <translation>Geen bestanden</translation>
     </message>
@@ -392,84 +392,91 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Selectie verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="181"/>
+        <location filename="../widgets/conversion_panel.py" line="183"/>
         <source>Send To</source>
         <translation>Sturen naar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="185"/>
         <source>Select at least one file to send.</source>
         <translation>Selecteer minstens één bestand om te versturen.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="187"/>
         <source>Analyze</source>
         <translation>Analyseren</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="186"/>
+        <location filename="../widgets/conversion_panel.py" line="188"/>
         <source>Rename</source>
         <translation>Hernoemen</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="189"/>
         <source>Player</source>
         <translation>Speler</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="196"/>
+        <location filename="../widgets/conversion_panel.py" line="198"/>
         <source>Lossy files not allowed</source>
         <translation>Lossy-bestanden niet toegestaan</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="367"/>
+        <location filename="../widgets/conversion_panel.py" line="373"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="369"/>
+        <location filename="../widgets/conversion_panel.py" line="375"/>
         <source>Remove</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="447"/>
-        <location filename="../widgets/conversion_panel.py" line="593"/>
+        <location filename="../widgets/conversion_panel.py" line="453"/>
+        <location filename="../widgets/conversion_panel.py" line="638"/>
         <source>Done</source>
         <translation>Klaar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="456"/>
+        <location filename="../widgets/conversion_panel.py" line="462"/>
         <source>Same format</source>
         <translation>Zelfde formaat</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="463"/>
+        <location filename="../widgets/conversion_panel.py" line="469"/>
+        <location filename="../widgets/conversion_panel.py" line="635"/>
+        <location filename="../widgets/conversion_panel.py" line="660"/>
         <source>Ready</source>
         <translation>Gereed</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="474"/>
+        <location filename="../widgets/conversion_panel.py" line="480"/>
         <source>{count} files</source>
         <translation>{count} bestanden</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="476"/>
+        <location filename="../widgets/conversion_panel.py" line="482"/>
         <source>{count} to convert</source>
         <translation>{count} te converteren</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="478"/>
+        <location filename="../widgets/conversion_panel.py" line="484"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Kept &apos;lossy&apos; English; standard audio-engineering term in NL.</translatorcomment>
         <translation>({count} lossy overgeslagen)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="607"/>
+        <source>Converting</source>
+        <translation>Converteren</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="628"/>
         <source>Incomplete</source>
         <translation>Onvolledig</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="628"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
@@ -742,72 +749,72 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Er loopt al een conversie. Wacht even.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="671"/>
+        <location filename="../main_window.py" line="674"/>
         <source>Converting...</source>
         <translation>Converteren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="685"/>
+        <location filename="../main_window.py" line="690"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Voltooid: {0} geconverteerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="689"/>
+        <location filename="../main_window.py" line="694"/>
         <source>Complete: {0} files converted</source>
         <translation>Voltooid: {0} bestanden geconverteerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="816"/>
+        <location filename="../main_window.py" line="821"/>
         <source>Rename in Progress</source>
         <translation>Hernoemen bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="817"/>
+        <location filename="../main_window.py" line="822"/>
         <source>A rename operation is already running.</source>
         <translation>Er loopt al een hernoembewerking.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="839"/>
+        <location filename="../main_window.py" line="844"/>
         <source>Renaming files...</source>
         <translation>Bestanden hernoemen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="851"/>
+        <location filename="../main_window.py" line="856"/>
         <source>Renamed {0} files</source>
         <translation>{0} bestanden hernoemd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="879"/>
+        <location filename="../main_window.py" line="884"/>
         <source>No Session</source>
         <translation>Geen sessie</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="879"/>
+        <location filename="../main_window.py" line="884"/>
         <source>No rename session to undo.</source>
         <translation>Geen hernoemsessie om te herstellen.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="888"/>
+        <location filename="../main_window.py" line="893"/>
         <source>Confirm Undo</source>
         <translation>Herstel bevestigen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="889"/>
+        <location filename="../main_window.py" line="894"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Hernoemen van {0} bestanden herstellen?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="898"/>
+        <location filename="../main_window.py" line="903"/>
         <source>Undoing rename...</source>
         <translation>Hernoemen herstellen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="915"/>
+        <location filename="../main_window.py" line="920"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Hersteld: {0} bestanden, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="919"/>
+        <location filename="../main_window.py" line="924"/>
         <source>Undone {0} files</source>
         <translation>{0} bestanden hersteld</translation>
     </message>
@@ -916,88 +923,88 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="822"/>
+        <location filename="../widgets/player_panel.py" line="828"/>
         <source>Player</source>
         <translation>Speler</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="838"/>
+        <location filename="../widgets/player_panel.py" line="844"/>
         <source>Edit Lock</source>
         <translation>Bewerkingsvergrendeling</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="842"/>
+        <location filename="../widgets/player_panel.py" line="848"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Metadata bewerken in de afspeellijst vergrendelen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="855"/>
+        <location filename="../widgets/player_panel.py" line="861"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="856"/>
+        <location filename="../widgets/player_panel.py" line="862"/>
         <source>Filename</source>
         <translation>Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="857"/>
+        <location filename="../widgets/player_panel.py" line="863"/>
         <source>Artist</source>
         <translation>Artiest</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="858"/>
+        <location filename="../widgets/player_panel.py" line="864"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="859"/>
+        <location filename="../widgets/player_panel.py" line="865"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="860"/>
+        <location filename="../widgets/player_panel.py" line="866"/>
         <source>Key</source>
         <translatorcomment>Translated as &apos;Toonsoort&apos; (musical key), per glossary — not &apos;sleutel&apos;/&apos;toets&apos;.</translatorcomment>
         <translation>Toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="861"/>
+        <location filename="../widgets/player_panel.py" line="867"/>
         <source>Comment</source>
         <translation>Opmerking</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="862"/>
+        <location filename="../widgets/player_panel.py" line="868"/>
         <source>Duration</source>
         <translation>Duur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="863"/>
+        <location filename="../widgets/player_panel.py" line="869"/>
         <source>Year</source>
         <translation>Jaar</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="941"/>
+        <location filename="../widgets/player_panel.py" line="961"/>
         <source>Previous</source>
         <translation>Vorige</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="952"/>
+        <location filename="../widgets/player_panel.py" line="972"/>
         <source>Play / Pause  (Space)</source>
         <translation>Afspelen / Pauze  (Spatie)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="959"/>
+        <location filename="../widgets/player_panel.py" line="979"/>
         <source>Stop</source>
         <translation>Stoppen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="966"/>
+        <location filename="../widgets/player_panel.py" line="986"/>
         <source>Next</source>
         <translation>Volgende</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1006"/>
+        <location filename="../widgets/player_panel.py" line="1026"/>
         <source>Vol</source>
         <translatorcomment>Kept &apos;Vol&apos; (volume abbreviation); identical short form works in NL.</translatorcomment>
         <translation>Vol</translation>
@@ -1007,38 +1014,38 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Selectie verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1026"/>
+        <location filename="../widgets/player_panel.py" line="1046"/>
         <source>Clear Playlist</source>
         <translation>Playlist wissen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1434"/>
+        <location filename="../widgets/player_panel.py" line="1454"/>
         <source>{0} track</source>
         <translation>{0} track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1436"/>
+        <location filename="../widgets/player_panel.py" line="1456"/>
         <source>{0} tracks</source>
         <translation>{0} tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2004"/>
+        <location filename="../widgets/player_panel.py" line="2029"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2005"/>
+        <location filename="../widgets/player_panel.py" line="2030"/>
         <source>Open in Metadata Panel</source>
         <translatorcomment>Reviewed (nl pass): no article surfaces here; &apos;paneel&apos; is het - confirmed.</translatorcomment>
         <translation>Openen in Metadata-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2006"/>
+        <location filename="../widgets/player_panel.py" line="2031"/>
         <source>Reload Metadata from File</source>
         <translation>Metadata opnieuw laden uit bestand</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2008"/>
+        <location filename="../widgets/player_panel.py" line="2033"/>
         <source>Remove from Playlist</source>
         <translation>Uit playlist verwijderen</translation>
     </message>
@@ -1286,7 +1293,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="296"/>
+        <location filename="../widgets/player_panel.py" line="302"/>
         <source>Drop audio files here</source>
         <translation>Sleep audiobestanden hierheen</translation>
     </message>

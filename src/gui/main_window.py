@@ -650,6 +650,9 @@ class MainWindow(QMainWindow):
 
         # Start progress
         self._conversion_panel.progress_panel.start(len(file_paths))
+        # Flag every queued row "Converting" up front; each flips to Done as
+        # its per-file progress event arrives.
+        self._conversion_panel.mark_converting(file_paths)
 
         # Create and start conversion thread
         self._conversion_thread = ConversionThread(
@@ -674,6 +677,8 @@ class MainWindow(QMainWindow):
         """Handle conversion progress update."""
         self._conversion_panel.progress_panel.set_progress(progress.completed, progress.total)
         self._conversion_panel.progress_panel.set_current_file(progress.current_file)
+        # Flip the just-finished file's row to Done/Error immediately.
+        self._conversion_panel.mark_file_result(progress.result)
 
     def _on_conversion_finished(self, results: list) -> None:
         """Handle conversion finished."""

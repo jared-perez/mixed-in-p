@@ -283,113 +283,113 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="64"/>
-        <location filename="../widgets/conversion_panel.py" line="174"/>
+        <location filename="../widgets/conversion_panel.py" line="66"/>
+        <location filename="../widgets/conversion_panel.py" line="176"/>
         <source>Convert</source>
         <translation>Converter</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="67"/>
+        <location filename="../widgets/conversion_panel.py" line="69"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>Converta arquivos de áudio entre formatos (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="73"/>
+        <location filename="../widgets/conversion_panel.py" line="75"/>
         <source>Target Format:</source>
         <translation>Formato de destino:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="80"/>
+        <location filename="../widgets/conversion_panel.py" line="82"/>
         <source>Sample Rate:</source>
         <translation>Taxa de amostragem:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="83"/>
+        <location filename="../widgets/conversion_panel.py" line="85"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="84"/>
+        <location filename="../widgets/conversion_panel.py" line="86"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="85"/>
+        <location filename="../widgets/conversion_panel.py" line="87"/>
         <source>44.1 kHz (CD)</source>
         <translatorcomment>pt_BR decimal comma: &apos;44,1 kHz&apos;.</translatorcomment>
         <translation>44,1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="86"/>
+        <location filename="../widgets/conversion_panel.py" line="88"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="96"/>
+        <location filename="../widgets/conversion_panel.py" line="98"/>
         <source>Bit Depth:</source>
         <translation>Profundidade de bits:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="99"/>
+        <location filename="../widgets/conversion_panel.py" line="101"/>
         <source>32 bit</source>
         <translatorcomment>pt_BR pluralizes the unit: &apos;32 bits&apos; (and 24/16/8 bits).</translatorcomment>
         <translation>32 bits</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="100"/>
+        <location filename="../widgets/conversion_panel.py" line="102"/>
         <source>24 bit (DVD)</source>
         <translation>24 bits (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="101"/>
+        <location filename="../widgets/conversion_panel.py" line="103"/>
         <source>16 bit (CD)</source>
         <translation>16 bits (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="102"/>
+        <location filename="../widgets/conversion_panel.py" line="104"/>
         <source>8 bit</source>
         <translation>8 bits</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="112"/>
+        <location filename="../widgets/conversion_panel.py" line="114"/>
         <source>Bitrate:</source>
         <translatorcomment>Kept &apos;Bitrate&apos; — widely used untranslated in pt_BR audio context; consistent with BPM/dB unit-style retention.</translatorcomment>
         <translation>Bitrate:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="132"/>
+        <location filename="../widgets/conversion_panel.py" line="134"/>
         <source>Files</source>
         <translation>Arquivos</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="135"/>
+        <location filename="../widgets/conversion_panel.py" line="137"/>
         <source>Drop audio files here to add them</source>
         <translation>Solte arquivos de áudio aqui para adicioná-los</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="138"/>
+        <location filename="../widgets/conversion_panel.py" line="140"/>
         <source>Filename</source>
         <translation>Nome do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="139"/>
+        <location filename="../widgets/conversion_panel.py" line="141"/>
         <source>From</source>
         <translation>De</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="140"/>
+        <location filename="../widgets/conversion_panel.py" line="142"/>
         <source>To</source>
         <translation>Para</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="143"/>
         <source>Status</source>
         <translatorcomment>Kept &apos;Status&apos; — standard loanword in pt_BR UI.</translatorcomment>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="168"/>
-        <location filename="../widgets/conversion_panel.py" line="479"/>
+        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="485"/>
         <source>No files</source>
         <translation>Nenhum arquivo</translation>
     </message>
@@ -398,85 +398,92 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Remover selecionados</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="181"/>
+        <location filename="../widgets/conversion_panel.py" line="183"/>
         <source>Send To</source>
         <translation>Enviar para</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="185"/>
         <source>Select at least one file to send.</source>
         <translation>Selecione pelo menos um arquivo para enviar.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="187"/>
         <source>Analyze</source>
         <translation>Analisar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="186"/>
+        <location filename="../widgets/conversion_panel.py" line="188"/>
         <source>Rename</source>
         <translation>Renomear</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="189"/>
         <source>Player</source>
         <translatorcomment>Kept &apos;Player&apos; in English (producer judgment, consistent with PLAYER heading kept English in help block). Common in Brazilian audio/DJ usage.</translatorcomment>
         <translation>Player</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="196"/>
+        <location filename="../widgets/conversion_panel.py" line="198"/>
         <source>Lossy files not allowed</source>
         <translation>Arquivos com perdas não permitidos</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="367"/>
+        <location filename="../widgets/conversion_panel.py" line="373"/>
         <source>Open File Location</source>
         <translation>Abrir local do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="369"/>
+        <location filename="../widgets/conversion_panel.py" line="375"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="447"/>
-        <location filename="../widgets/conversion_panel.py" line="593"/>
+        <location filename="../widgets/conversion_panel.py" line="453"/>
+        <location filename="../widgets/conversion_panel.py" line="638"/>
         <source>Done</source>
         <translation>Concluído</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="456"/>
+        <location filename="../widgets/conversion_panel.py" line="462"/>
         <source>Same format</source>
         <translation>Mesmo formato</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="463"/>
+        <location filename="../widgets/conversion_panel.py" line="469"/>
+        <location filename="../widgets/conversion_panel.py" line="635"/>
+        <location filename="../widgets/conversion_panel.py" line="660"/>
         <source>Ready</source>
         <translation>Pronto</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="474"/>
+        <location filename="../widgets/conversion_panel.py" line="480"/>
         <source>{count} files</source>
         <translation>{count} arquivos</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="476"/>
+        <location filename="../widgets/conversion_panel.py" line="482"/>
         <source>{count} to convert</source>
         <translation>{count} a converter</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="478"/>
+        <location filename="../widgets/conversion_panel.py" line="484"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>&apos;lossy&apos; -&gt; &apos;com perdas&apos; (standard pt_BR audio term for lossy compression).</translatorcomment>
         <translation>({count} com perdas ignorados)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="607"/>
+        <source>Converting</source>
+        <translation>Convertendo</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="628"/>
         <source>Incomplete</source>
         <translation>Incompleto</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="628"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
@@ -748,72 +755,72 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Uma conversão já está em execução. Aguarde.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="671"/>
+        <location filename="../main_window.py" line="674"/>
         <source>Converting...</source>
         <translation>Convertendo...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="685"/>
+        <location filename="../main_window.py" line="690"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Concluído: {0} convertidos, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="689"/>
+        <location filename="../main_window.py" line="694"/>
         <source>Complete: {0} files converted</source>
         <translation>Concluído: {0} arquivos convertidos</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="816"/>
+        <location filename="../main_window.py" line="821"/>
         <source>Rename in Progress</source>
         <translation>Renomeação em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="817"/>
+        <location filename="../main_window.py" line="822"/>
         <source>A rename operation is already running.</source>
         <translation>Uma operação de renomeação já está em execução.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="839"/>
+        <location filename="../main_window.py" line="844"/>
         <source>Renaming files...</source>
         <translation>Renomeando arquivos...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="851"/>
+        <location filename="../main_window.py" line="856"/>
         <source>Renamed {0} files</source>
         <translation>{0} arquivos renomeados</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="879"/>
+        <location filename="../main_window.py" line="884"/>
         <source>No Session</source>
         <translation>Nenhuma sessão</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="879"/>
+        <location filename="../main_window.py" line="884"/>
         <source>No rename session to undo.</source>
         <translation>Nenhuma sessão de renomeação para desfazer.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="888"/>
+        <location filename="../main_window.py" line="893"/>
         <source>Confirm Undo</source>
         <translation>Confirmar Desfazer</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="889"/>
+        <location filename="../main_window.py" line="894"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Desfazer a renomeação de {0} arquivos?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="898"/>
+        <location filename="../main_window.py" line="903"/>
         <source>Undoing rename...</source>
         <translation>Desfazendo renomeação...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="915"/>
+        <location filename="../main_window.py" line="920"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Desfeito: {0} arquivos, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="919"/>
+        <location filename="../main_window.py" line="924"/>
         <source>Undone {0} files</source>
         <translation>{0} arquivos desfeitos</translation>
     </message>
@@ -922,90 +929,90 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="822"/>
+        <location filename="../widgets/player_panel.py" line="828"/>
         <source>Player</source>
         <translatorcomment>Kept &apos;Player&apos; in English (producer judgment, consistent with PLAYER heading kept English in help block). Common in Brazilian audio/DJ usage.</translatorcomment>
         <translation>Player</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="838"/>
+        <location filename="../widgets/player_panel.py" line="844"/>
         <source>Edit Lock</source>
         <translation>Bloqueio de edição</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="842"/>
+        <location filename="../widgets/player_panel.py" line="848"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Bloquear a edição de metadados na playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="855"/>
+        <location filename="../widgets/player_panel.py" line="861"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="856"/>
+        <location filename="../widgets/player_panel.py" line="862"/>
         <source>Filename</source>
         <translation>Nome do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="857"/>
+        <location filename="../widgets/player_panel.py" line="863"/>
         <source>Artist</source>
         <translation>Artista</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="858"/>
+        <location filename="../widgets/player_panel.py" line="864"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="859"/>
+        <location filename="../widgets/player_panel.py" line="865"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="860"/>
+        <location filename="../widgets/player_panel.py" line="866"/>
         <source>Key</source>
         <translatorcomment>Musical key -&gt; &apos;Tonalidade&apos; per glossary (never &apos;chave&apos;). Used as analysis-results column header.</translatorcomment>
         <translation>Tonalidade</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="861"/>
+        <location filename="../widgets/player_panel.py" line="867"/>
         <source>Comment</source>
         <translation>Comentário</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="862"/>
+        <location filename="../widgets/player_panel.py" line="868"/>
         <source>Duration</source>
         <translation>Duração</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="863"/>
+        <location filename="../widgets/player_panel.py" line="869"/>
         <source>Year</source>
         <translation>Ano</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="941"/>
+        <location filename="../widgets/player_panel.py" line="961"/>
         <source>Previous</source>
         <translation>Anterior</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="952"/>
+        <location filename="../widgets/player_panel.py" line="972"/>
         <source>Play / Pause  (Space)</source>
         <translation>Reproduzir / Pausar  (Espaço)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="959"/>
+        <location filename="../widgets/player_panel.py" line="979"/>
         <source>Stop</source>
         <translation>Parar</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="966"/>
+        <location filename="../widgets/player_panel.py" line="986"/>
         <source>Next</source>
         <translatorcomment>Reviewed (pt_BR pass): &apos;Próxima&apos; agrees with &apos;faixa&apos; (next track) - confirmed.</translatorcomment>
         <translation>Próxima</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1006"/>
+        <location filename="../widgets/player_panel.py" line="1026"/>
         <source>Vol</source>
         <translation>Vol</translation>
     </message>
@@ -1014,37 +1021,37 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Remover selecionados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1026"/>
+        <location filename="../widgets/player_panel.py" line="1046"/>
         <source>Clear Playlist</source>
         <translation>Limpar playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1434"/>
+        <location filename="../widgets/player_panel.py" line="1454"/>
         <source>{0} track</source>
         <translation>{0} faixa</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1436"/>
+        <location filename="../widgets/player_panel.py" line="1456"/>
         <source>{0} tracks</source>
         <translation>{0} faixas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2004"/>
+        <location filename="../widgets/player_panel.py" line="2029"/>
         <source>Open File Location</source>
         <translation>Abrir local do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2005"/>
+        <location filename="../widgets/player_panel.py" line="2030"/>
         <source>Open in Metadata Panel</source>
         <translation>Abrir no painel de metadados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2006"/>
+        <location filename="../widgets/player_panel.py" line="2031"/>
         <source>Reload Metadata from File</source>
         <translation>Recarregar metadados do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2008"/>
+        <location filename="../widgets/player_panel.py" line="2033"/>
         <source>Remove from Playlist</source>
         <translation>Remover da playlist</translation>
     </message>
@@ -1295,7 +1302,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="296"/>
+        <location filename="../widgets/player_panel.py" line="302"/>
         <source>Drop audio files here</source>
         <translation>Solte arquivos de áudio aqui</translation>
     </message>

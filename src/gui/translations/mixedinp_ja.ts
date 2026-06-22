@@ -283,111 +283,111 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="64"/>
-        <location filename="../widgets/conversion_panel.py" line="174"/>
+        <location filename="../widgets/conversion_panel.py" line="66"/>
+        <location filename="../widgets/conversion_panel.py" line="176"/>
         <source>Convert</source>
         <translation>変換</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="67"/>
+        <location filename="../widgets/conversion_panel.py" line="69"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>オーディオファイルをフォーマット間で変換します（WAV、FLAC、AIFF、MP3）。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="73"/>
+        <location filename="../widgets/conversion_panel.py" line="75"/>
         <source>Target Format:</source>
         <translation>変換先フォーマット:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="80"/>
+        <location filename="../widgets/conversion_panel.py" line="82"/>
         <source>Sample Rate:</source>
         <translation>サンプルレート:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="83"/>
+        <location filename="../widgets/conversion_panel.py" line="85"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz（DVD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="84"/>
+        <location filename="../widgets/conversion_panel.py" line="86"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz（DAT）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="85"/>
+        <location filename="../widgets/conversion_panel.py" line="87"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz（CD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="86"/>
+        <location filename="../widgets/conversion_panel.py" line="88"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="96"/>
+        <location filename="../widgets/conversion_panel.py" line="98"/>
         <source>Bit Depth:</source>
         <translation>ビット深度:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="99"/>
+        <location filename="../widgets/conversion_panel.py" line="101"/>
         <source>32 bit</source>
         <translation>32 bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="100"/>
+        <location filename="../widgets/conversion_panel.py" line="102"/>
         <source>24 bit (DVD)</source>
         <translation>24 bit（DVD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="101"/>
+        <location filename="../widgets/conversion_panel.py" line="103"/>
         <source>16 bit (CD)</source>
         <translation>16 bit（CD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="102"/>
+        <location filename="../widgets/conversion_panel.py" line="104"/>
         <source>8 bit</source>
         <translation>8 bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="112"/>
+        <location filename="../widgets/conversion_panel.py" line="114"/>
         <source>Bitrate:</source>
         <translation>ビットレート:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="132"/>
+        <location filename="../widgets/conversion_panel.py" line="134"/>
         <source>Files</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="135"/>
+        <location filename="../widgets/conversion_panel.py" line="137"/>
         <source>Drop audio files here to add them</source>
         <translation>追加するにはここにオーディオファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="138"/>
+        <location filename="../widgets/conversion_panel.py" line="140"/>
         <source>Filename</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="139"/>
+        <location filename="../widgets/conversion_panel.py" line="141"/>
         <source>From</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>変換元</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="140"/>
+        <location filename="../widgets/conversion_panel.py" line="142"/>
         <source>To</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>変換先</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="143"/>
         <source>Status</source>
         <translation>ステータス</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="168"/>
-        <location filename="../widgets/conversion_panel.py" line="479"/>
+        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="485"/>
         <source>No files</source>
         <translation>ファイルなし</translation>
     </message>
@@ -396,88 +396,95 @@ or click “Add Artwork…”</source>
         <translation type="vanished">選択項目を削除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="181"/>
+        <location filename="../widgets/conversion_panel.py" line="183"/>
         <source>Send To</source>
         <translatorcomment>送る per glossary (not 送信). Plain verb. Confirmed.</translatorcomment>
         <translation>送る</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="185"/>
         <source>Select at least one file to send.</source>
         <translation>送るファイルを1つ以上選択してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="187"/>
         <source>Analyze</source>
         <translation>解析</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="186"/>
+        <location filename="../widgets/conversion_panel.py" line="188"/>
         <source>Rename</source>
         <translatorcomment>Action label → 名前を変更 (dictionary form per Apple JP). Note &apos;Rename History&apos; uses リネーム; intentional split between action vs feature label.</translatorcomment>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="189"/>
         <source>Player</source>
         <translation>プレイヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="196"/>
+        <location filename="../widgets/conversion_panel.py" line="198"/>
         <source>Lossy files not allowed</source>
         <translation>非可逆圧縮ファイルは使用できません</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="367"/>
+        <location filename="../widgets/conversion_panel.py" line="373"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="369"/>
+        <location filename="../widgets/conversion_panel.py" line="375"/>
         <source>Remove</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="447"/>
-        <location filename="../widgets/conversion_panel.py" line="593"/>
+        <location filename="../widgets/conversion_panel.py" line="453"/>
+        <location filename="../widgets/conversion_panel.py" line="638"/>
         <source>Done</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="456"/>
+        <location filename="../widgets/conversion_panel.py" line="462"/>
         <source>Same format</source>
         <translation>同じフォーマット</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="463"/>
+        <location filename="../widgets/conversion_panel.py" line="469"/>
+        <location filename="../widgets/conversion_panel.py" line="635"/>
+        <location filename="../widgets/conversion_panel.py" line="660"/>
         <source>Ready</source>
         <translation>準備完了</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="474"/>
+        <location filename="../widgets/conversion_panel.py" line="480"/>
         <source>{count} files</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>{count}個のファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="476"/>
+        <location filename="../widgets/conversion_panel.py" line="482"/>
         <source>{count} to convert</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>{count}件を変換</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="478"/>
+        <location filename="../widgets/conversion_panel.py" line="484"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>（{count}件の非可逆をスキップ）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="607"/>
+        <source>Converting</source>
+        <translation>変換中</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="628"/>
         <source>Incomplete</source>
         <translation>未完了</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="628"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -752,72 +759,72 @@ or click “Add Artwork…”</source>
         <translation>すでに変換を実行中です。お待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="671"/>
+        <location filename="../main_window.py" line="674"/>
         <source>Converting...</source>
         <translation>変換中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="685"/>
+        <location filename="../main_window.py" line="690"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完了: {0}件変換済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="689"/>
+        <location filename="../main_window.py" line="694"/>
         <source>Complete: {0} files converted</source>
         <translation>完了: {0}個のファイルを変換しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="816"/>
+        <location filename="../main_window.py" line="821"/>
         <source>Rename in Progress</source>
         <translation>名前変更を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="817"/>
+        <location filename="../main_window.py" line="822"/>
         <source>A rename operation is already running.</source>
         <translation>すでに名前変更操作を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="839"/>
+        <location filename="../main_window.py" line="844"/>
         <source>Renaming files...</source>
         <translation>ファイル名を変更中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="851"/>
+        <location filename="../main_window.py" line="856"/>
         <source>Renamed {0} files</source>
         <translation>{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="879"/>
+        <location filename="../main_window.py" line="884"/>
         <source>No Session</source>
         <translation>セッションなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="879"/>
+        <location filename="../main_window.py" line="884"/>
         <source>No rename session to undo.</source>
         <translation>取り消す名前変更セッションがありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="888"/>
+        <location filename="../main_window.py" line="893"/>
         <source>Confirm Undo</source>
         <translation>取り消しの確認</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="889"/>
+        <location filename="../main_window.py" line="894"/>
         <source>Undo renaming of {0} files?</source>
         <translation>{0}個のファイルの名前変更を取り消しますか？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="898"/>
+        <location filename="../main_window.py" line="903"/>
         <source>Undoing rename...</source>
         <translation>名前変更を取り消し中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="915"/>
+        <location filename="../main_window.py" line="920"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>取り消し完了: {0}個のファイル、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="919"/>
+        <location filename="../main_window.py" line="924"/>
         <source>Undone {0} files</source>
         <translation>{0}個のファイルを取り消しました</translation>
     </message>
@@ -927,88 +934,88 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="822"/>
+        <location filename="../widgets/player_panel.py" line="828"/>
         <source>Player</source>
         <translation>プレイヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="838"/>
+        <location filename="../widgets/player_panel.py" line="844"/>
         <source>Edit Lock</source>
         <translation>編集ロック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="842"/>
+        <location filename="../widgets/player_panel.py" line="848"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>プレイリストのメタデータ編集をロック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="855"/>
+        <location filename="../widgets/player_panel.py" line="861"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="856"/>
+        <location filename="../widgets/player_panel.py" line="862"/>
         <source>Filename</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="857"/>
+        <location filename="../widgets/player_panel.py" line="863"/>
         <source>Artist</source>
         <translation>アーティスト</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="858"/>
+        <location filename="../widgets/player_panel.py" line="864"/>
         <source>Title</source>
         <translation>タイトル</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="859"/>
+        <location filename="../widgets/player_panel.py" line="865"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="860"/>
+        <location filename="../widgets/player_panel.py" line="866"/>
         <source>Key</source>
         <translatorcomment>Chose キー (katakana) over 調性/調 per glossary, since this is a DJ/producer app. Used consistently everywhere &apos;key&apos; = musical key.</translatorcomment>
         <translation>キー</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="861"/>
+        <location filename="../widgets/player_panel.py" line="867"/>
         <source>Comment</source>
         <translation>コメント</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="862"/>
+        <location filename="../widgets/player_panel.py" line="868"/>
         <source>Duration</source>
         <translation>長さ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="863"/>
+        <location filename="../widgets/player_panel.py" line="869"/>
         <source>Year</source>
         <translation>年</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="941"/>
+        <location filename="../widgets/player_panel.py" line="961"/>
         <source>Previous</source>
         <translation>前へ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="952"/>
+        <location filename="../widgets/player_panel.py" line="972"/>
         <source>Play / Pause  (Space)</source>
         <translation>再生 / 一時停止  （Space）</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="959"/>
+        <location filename="../widgets/player_panel.py" line="979"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="966"/>
+        <location filename="../widgets/player_panel.py" line="986"/>
         <source>Next</source>
         <translation>次へ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1006"/>
+        <location filename="../widgets/player_panel.py" line="1026"/>
         <source>Vol</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>音量</translation>
@@ -1018,39 +1025,39 @@ or click “Add Artwork…”</source>
         <translation type="vanished">選択項目を削除</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1026"/>
+        <location filename="../widgets/player_panel.py" line="1046"/>
         <source>Clear Playlist</source>
         <translation>プレイリストをクリア</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1434"/>
+        <location filename="../widgets/player_panel.py" line="1454"/>
         <source>{0} track</source>
         <translatorcomment>No plural in Japanese; both singular/plural render identically as {0}トラック with counter omitted. Both &apos;{0} track&apos; and &apos;{0} tracks&apos; map to same form intentionally.</translatorcomment>
         <translation>{0}トラック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1436"/>
+        <location filename="../widgets/player_panel.py" line="1456"/>
         <source>{0} tracks</source>
         <translatorcomment>Identical to &apos;{0} track&apos; — Japanese has no plural distinction. Used トラック as counter-noun directly.</translatorcomment>
         <translation>{0}トラック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2004"/>
+        <location filename="../widgets/player_panel.py" line="2029"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2005"/>
+        <location filename="../widgets/player_panel.py" line="2030"/>
         <source>Open in Metadata Panel</source>
         <translation>メタデータパネルで開く</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2006"/>
+        <location filename="../widgets/player_panel.py" line="2031"/>
         <source>Reload Metadata from File</source>
         <translation>ファイルからメタデータを再読み込み</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2008"/>
+        <location filename="../widgets/player_panel.py" line="2033"/>
         <source>Remove from Playlist</source>
         <translation>プレイリストから削除</translation>
     </message>
@@ -1303,7 +1310,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="296"/>
+        <location filename="../widgets/player_panel.py" line="302"/>
         <source>Drop audio files here</source>
         <translation>ここにオーディオファイルをドロップ</translation>
     </message>
