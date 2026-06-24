@@ -2,6 +2,8 @@
 
 DJ audio analysis toolkit for detecting BPM and musical key & Complete file preparation workflow.
 
+![Mixed in P — Spectrum analyzer](docs/screenshots/spectrum.webp)
+
 ## Features
 
 - Batch file renaming with undo
