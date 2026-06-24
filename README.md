@@ -1,6 +1,6 @@
 # Mixed in P
 
-DJ audio analysis toolkit for detecting BPM and musical key & Complete file preparation workflow.
+DJ audio analysis toolkit - Complete file preparation workflow.
 
 ![Mixed in P — Spectrum analyzer](docs/screenshots/spectrum.webp)
 
@@ -10,12 +10,12 @@ DJ audio analysis toolkit for detecting BPM and musical key & Complete file prep
 - Audio conversion (MP3/WAV/FLAC/AIFF)
 - BPM detection using beat tracking (librosa)
 - Key detection using chroma analysis
-- Harmonic mixing notation
+- Audio player
 - Energy level detection
 - Auto-write metadata to file tags & Manual metadata editing
 - Slicer for sample lifting
 - Keyboard to play chords for comparison
-- Dark neon theme GUI
+- Dark/Light modes and waveform color customization
 
 ## Install
 
