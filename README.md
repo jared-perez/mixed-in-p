@@ -1,6 +1,6 @@
 # Mixed in P
 
-DJ audio analysis toolkit - Complete file preparation workflow.
+The full audio file preparation workflow for DJs.
 
 ![Mixed in P — Spectrum analyzer](docs/screenshots/spectrum.webp)
 
@@ -8,13 +8,13 @@ DJ audio analysis toolkit - Complete file preparation workflow.
 
 - Batch file renaming with undo
 - Audio conversion (MP3/WAV/FLAC/AIFF)
+- Acoustic spectrum analyzer
+- Audio Player + Slicer for sample lifting
+- Keyboard to play chords for key comparison
 - BPM detection using beat tracking (librosa)
 - Key detection using chroma analysis
-- Audio player
 - Energy level detection
 - Auto-write metadata to file tags & Manual metadata editing
-- Slicer for sample lifting
-- Keyboard to play chords for comparison
 - Dark/Light modes and waveform color customization
 
 ## Install
