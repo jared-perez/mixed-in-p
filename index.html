@@ -26,6 +26,11 @@
   *{margin:0;padding:0;box-sizing:border-box}
   html{
     scroll-behavior:smooth;
+    /* clip (not hidden): mobile browsers still allow touch-panning a
+       `hidden` root sideways; `clip` removes the horizontal scroll range
+       entirely. The first line is the fallback for pre-2022 browsers. */
+    overflow-x:hidden;
+    overflow-x:clip;
     background-color:var(--bg-lift);
     /* black through the hero (first viewport), then ease into warm charcoal.
        Set on <html> so the root background paints the full canvas edge-to-edge
@@ -41,6 +46,7 @@
     font-family:'Space Grotesk',sans-serif;
     line-height:1.6;
     overflow-x:hidden;
+    overflow-x:clip;
   }
   img{max-width:100%;height:auto;display:block}
 
@@ -360,6 +366,10 @@
   footer a:hover{text-decoration:underline}
 
   @media(max-width:820px){
+    /* hero glow: cap the side bleed at the hero's own 24px padding so the
+       pseudo-element never extends past the viewport (it's what made the
+       page horizontally pannable on phones) */
+    .hero-inner::before{inset:-60px -24px}
     .feature, .feature.flip{grid-template-columns:1fr;gap:24px}
     .feature.flip .shot{order:0}
     .feature{margin-bottom:72px}
