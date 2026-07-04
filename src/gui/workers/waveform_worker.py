@@ -18,6 +18,39 @@ logger = logging.getLogger(__name__)
 DETAIL_BINS_PER_SEC = 4000
 
 
+def timed_envelope(pcm: np.ndarray, sr: int, bins_per_sec: int = 200):
+    """Time-indexed mono min/max envelope at ~*bins_per_sec* resolution.
+
+    For the playlist backdrop's scrolling zoom window, which maps time → bins
+    directly (unlike the fixed-column overview the slicer uses, or the much
+    denser detail arrays its 1 s scrubber needs). Cheap enough to run on the
+    GUI thread at track start; ~200 bins/s keeps a 5-minute track under 0.5 MB.
+    Returns ``(env_min, env_max, actual_bins_per_sec)``. Raises ValueError on
+    empty audio.
+    """
+    if pcm.ndim == 1:
+        pcm = pcm.reshape(-1, 1)
+    n_samples = pcm.shape[0]
+    if n_samples == 0 or sr <= 0:
+        raise ValueError("Empty audio")
+    mono = pcm.mean(axis=1).astype(np.float32)
+    samples_per_bin = max(1, int(round(sr / bins_per_sec)))
+    if n_samples < samples_per_bin:
+        return (
+            np.array([mono.min()], dtype=np.float32),
+            np.array([mono.max()], dtype=np.float32),
+            sr / n_samples,
+        )
+    cols = n_samples // samples_per_bin
+    trimmed = mono[: samples_per_bin * cols]
+    reshaped = trimmed.reshape(cols, samples_per_bin)
+    return (
+        reshaped.min(axis=1).astype(np.float32),
+        reshaped.max(axis=1).astype(np.float32),
+        sr / samples_per_bin,
+    )
+
+
 def downsample_waveform(
     pcm: np.ndarray,
     sr: int,

@@ -104,6 +104,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
+        self._apply_visualization_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
         self._spectrum_panel.set_dynamic_range(self._config.spectrum_dynamic_range)
         self._load_last_session()
@@ -740,7 +741,22 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
+        self._apply_visualization_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
+
+    def _apply_visualization_settings(self) -> None:
+        """Push the visualizations switch (and waveform color) to every consumer.
+
+        The Player shows/hides its visuals dropdown; the Analyze and Convert
+        progress panels gate their animated activity waveform. Rename shares
+        the same ProgressPanel widget but is intentionally left plain.
+        """
+        enabled = self._config.visualizations_enabled
+        color = self._effective_waveform_color()
+        self._player_panel.set_visualizations_enabled(enabled)
+        for panel in (self._analysis_panel, self._conversion_panel):
+            panel.progress_panel.set_activity_enabled(enabled)
+            panel.progress_panel.set_activity_color(color)
 
     def _update_track_from_result(self, result: AnalysisResult) -> None:
         """Update a track with analysis results."""
@@ -1026,6 +1042,7 @@ class MainWindow(QMainWindow):
         self._config.convert_bit_depth = disk.convert_bit_depth
         self._config.player_edit_locked = disk.player_edit_locked
         self._config.player_column_state = disk.player_column_state
+        self._config.visualization_mode = disk.visualization_mode
         save_config(self._config)
 
     def closeEvent(self, event) -> None:

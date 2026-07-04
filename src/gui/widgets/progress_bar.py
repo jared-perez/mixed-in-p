@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 )
 
 from ..styles.theme import Theme
+from .vis_activity_waveform import VisActivityWaveform
 
 
 class ProgressPanel(QFrame):
@@ -21,6 +22,9 @@ class ProgressPanel(QFrame):
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        # Opt-in per host panel (Analyze/Convert turn it on, Rename doesn't)
+        # and gated by the visualizations setting via set_activity_enabled.
+        self._activity_enabled = False
         self._setup_ui()
         self.hide()  # Hidden by default
 
@@ -46,6 +50,11 @@ class ProgressPanel(QFrame):
 
         layout.addLayout(top_row)
 
+        # Animated activity waveform (visualizations feature), above the bar.
+        self._activity = VisActivityWaveform()
+        self._activity.hide()
+        layout.addWidget(self._activity)
+
         # Progress bar
         self._progress_bar = QProgressBar()
         self._progress_bar.setMinimum(0)
@@ -70,9 +79,11 @@ class ProgressPanel(QFrame):
             percentage = int((completed / total) * 100)
             self._progress_bar.setValue(percentage)
             self._progress_bar.setFormat(f"{completed}/{total} ({percentage}%)")
+            self._activity.set_fraction(completed / total)
         else:
             self._progress_bar.setValue(0)
             self._progress_bar.setFormat("0/0 (0%)")
+            self._activity.set_fraction(0.0)
 
     def set_current_file(self, file_path: str) -> None:
         """Set the current file being processed."""
@@ -95,6 +106,9 @@ class ProgressPanel(QFrame):
         self.reset()
         self._progress_bar.setMaximum(100)
         self.set_progress(0, total)
+        if self._activity_enabled:
+            self._activity.show()
+            self._activity.start()
         self.show()
 
     def complete(self, message: str | None = None) -> None:
@@ -106,9 +120,25 @@ class ProgressPanel(QFrame):
         self._status_label.setStyleSheet(f"color: {Theme.NEON_GREEN}; font-weight: bold;")
         self._progress_bar.setValue(100)
         self._file_label.setText("")
+        # Freeze the wave fully lit rather than yanking it away mid-look.
+        self._activity.set_fraction(1.0)
+        self._activity.stop()
+        self._activity.update()
 
     def set_error(self, message: str) -> None:
         """Show an error state. Full message is available on hover (tooltip)."""
         self._status_label.setText(message)
         self._status_label.setToolTip(message)
         self._status_label.setStyleSheet(f"color: {Theme.ERROR}; font-weight: bold;")
+        self._activity.stop()
+
+    def set_activity_enabled(self, enabled: bool) -> None:
+        """Gate the animated activity waveform (visualizations setting)."""
+        self._activity_enabled = enabled
+        if not enabled:
+            self._activity.stop()
+            self._activity.hide()
+
+    def set_activity_color(self, color: str) -> None:
+        """Set the activity waveform color (#RRGGBB)."""
+        self._activity.set_color(color)

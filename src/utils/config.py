@@ -24,6 +24,18 @@ _VALID_NAMING_PREFS = {
 _VALID_ENERGY_FORMATS = {"number_only", "with_label"}
 _VALID_ENERGY_MODES = {"prepend", "append", "replace"}
 _VALID_KEY_NOTATIONS = {"keycode", "traditional", "open_key"}
+_VALID_VIS_MODES = {
+    "off",
+    # Behind the playlist rows.
+    "backdrop",
+    "backdrop_scope",
+    "backdrop_spectrum",
+    "backdrop_fire",
+    # Popout visualizer window.
+    "oscilloscope",
+    "spectrum",
+    "fire",
+}
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
 
@@ -71,6 +83,11 @@ class AppConfig:
     waveform_color: str = "#f0ff00"
     # When True, the Player playlist's inline metadata editing is locked off.
     player_edit_locked: bool = False
+    # Master switch for audio visualizations (Player visuals dropdown and the
+    # Analyze/Convert activity waveform).
+    visualizations_enabled: bool = False
+    # Last visual chosen in the Player's visuals dropdown (see _VALID_VIS_MODES).
+    visualization_mode: str = "backdrop"
     language: str = DEFAULT_LANGUAGE
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).
@@ -135,6 +152,12 @@ def load_config() -> AppConfig:
                 player_edit_locked=bool(
                     data.get("player_edit_locked", AppConfig.player_edit_locked)
                 ),
+                visualizations_enabled=bool(
+                    data.get("visualizations_enabled", AppConfig.visualizations_enabled)
+                ),
+                visualization_mode=str(
+                    data.get("visualization_mode", AppConfig.visualization_mode)
+                ),
                 language=data.get("language", AppConfig.language),
                 theme=data.get("theme", AppConfig.theme),
                 player_column_state=data.get(
@@ -169,6 +192,8 @@ def load_config() -> AppConfig:
             cfg.spectrum_dynamic_range = max(60.0, min(cfg.spectrum_dynamic_range, 150.0))
             if not _HEX_COLOR_RE.match(cfg.waveform_color):
                 cfg.waveform_color = AppConfig.waveform_color
+            if cfg.visualization_mode not in _VALID_VIS_MODES:
+                cfg.visualization_mode = AppConfig.visualization_mode
             if cfg.language not in LANGUAGE_CODES:
                 cfg.language = AppConfig.language
             valid_themes = _valid_theme_ids()

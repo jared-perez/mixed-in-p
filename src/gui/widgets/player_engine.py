@@ -136,6 +136,30 @@ class PlayerEngine(QObject):
         with self._lock:
             self._volume = max(0.0, min(1.0, float(volume)))
 
+    def sample_rate(self) -> int:
+        with self._lock:
+            return self._sr
+
+    def recent_mono(self, n: int) -> np.ndarray | None:
+        """The last *n* frames behind the playhead, mono-mixed (for visualizers).
+
+        Returns None when no buffer is loaded. Zero-pads at the head near the
+        start of a track so callers always get exactly *n* samples. The slice
+        is copied out under the lock, so the audio callback can't swap the
+        buffer mid-read.
+        """
+        with self._lock:
+            pcm = self._pcm
+            pos = self._pos
+        if pcm is None or n <= 0:
+            return None
+        end = max(0, min(pos, pcm.shape[0]))
+        start = max(0, end - n)
+        mono = pcm[start:end].mean(axis=1).astype(np.float32, copy=False)
+        if len(mono) < n:
+            mono = np.concatenate([np.zeros(n - len(mono), dtype=np.float32), mono])
+        return mono
+
     def duration_ms(self) -> int:
         with self._lock:
             if self._sr <= 0:

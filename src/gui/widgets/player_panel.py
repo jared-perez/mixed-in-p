@@ -33,6 +33,7 @@ from PySide6.QtGui import (
     QFont,
     QFontMetrics,
     QIcon,
+    QImage,
     QKeySequence,
     QMouseEvent,
     QPainter,
@@ -45,6 +46,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QCheckBox,
+    QComboBox,
     QHBoxLayout,
     QHeaderView,
     QLabel,
@@ -76,7 +78,15 @@ from src.utils.config import load_config, save_config
 from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.thread_keeper import keep_alive
-from ..workers.waveform_worker import WaveformWorker, downsample_waveform
+from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
+from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, VisualizerWindow
+
+# Backdrop visualizer modes → the VisRenderer mode that draws them.
+_BACKDROP_VIS_MAP = {
+    "backdrop_scope": "oscilloscope",
+    "backdrop_spectrum": "spectrum",
+    "backdrop_fire": "fire",
+}
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin, blank_drag_pixmap
 from .player_engine import PlayerEngine
@@ -97,6 +107,19 @@ _TRANSPORT_GLYPH = "#c8c8c8"
 # Side length of the album-art thumbnail shown in the header (opposite the
 # "Player" title) while a track is loaded. Sized to sit within the title band.
 _HEADER_ART_SIZE = 56
+
+# Span of the playlist backdrop's scrolling zoom window (playhead centered, so
+# half of this is upcoming audio). Wide enough to read musical phrasing, slow
+# enough not to strobe behind the row text.
+_BACKDROP_WINDOW_MS = 12_000
+
+# Opacity for visualizer-frame backdrops (scope/spectrum/fire behind the
+# playlist) — dim enough that the row text stays readable.
+_BACKDROP_VIS_OPACITY = 0.40
+
+# After pause/stop, keep feeding a visualizer backdrop silence for this many
+# frames so bars fall and fire burns down, then stop its timer.
+_VIS_DECAY_FRAMES = 60
 
 
 def _make_play_icon(color: str = _TRANSPORT_GLYPH, size: int = 14) -> QIcon:
@@ -312,6 +335,18 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         # Predicate set by the panel: when it returns True (slice section open),
         # let S/Q/E bubble up to the panel instead of triggering type-ahead here.
         self._slice_keys_active = None
+        # Backdrop waveform (visualizations feature): a zoomed window of the
+        # playing track's envelope painted behind the rows, scrolling with the
+        # playhead (which stays centered) — the CDJ-style moving waveform.
+        # Repainted per position tick, so nothing is cached: the visible bin
+        # range changes every frame.
+        self._backdrop_env: tuple | None = None  # (min_array, max_array)
+        self._backdrop_bps: float = 0.0  # envelope bins per second
+        self._backdrop_color = QColor(Theme.WAVEFORM_DEFAULT)
+        self._backdrop_pos_ms: int = 0
+        # Alternative backdrop kind: a visualizer frame (scope/spectrum/fire)
+        # blitted dimmed behind the rows. Mutually exclusive with the envelope.
+        self._backdrop_image: QImage | None = None
 
     # Keys the slice section claims while it is expanded.
     _SLICE_KEYS = frozenset({Qt.Key.Key_S, Qt.Key.Key_Q, Qt.Key.Key_E, Qt.Key.Key_L})
@@ -491,7 +526,96 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         event.accept()
         self.order_changed.emit()
 
+    # ── Backdrop waveform (visualizations) ─────────────────────────────────
+
+    def set_backdrop_envelope(self, env_min, env_max, bins_per_sec: float) -> None:
+        """Show the given time-indexed envelope behind the playlist rows."""
+        self._backdrop_env = (env_min, env_max)
+        self._backdrop_bps = float(bins_per_sec)
+        self._backdrop_image = None
+        self.viewport().update()
+
+    def set_backdrop_image(self, image: QImage) -> None:
+        """Show a visualizer frame behind the rows (replaces the envelope)."""
+        self._backdrop_image = image
+        self._backdrop_env = None
+        self._backdrop_bps = 0.0
+        self.viewport().update()
+
+    def clear_backdrop(self) -> None:
+        if self._backdrop_env is None and self._backdrop_image is None:
+            return
+        self._backdrop_env = None
+        self._backdrop_bps = 0.0
+        self._backdrop_pos_ms = 0
+        self._backdrop_image = None
+        self.viewport().update()
+
+    def set_backdrop_color(self, color: str) -> None:
+        self._backdrop_color = QColor(color)
+        if self._backdrop_env is not None:
+            self.viewport().update()
+
+    def set_backdrop_position_ms(self, ms: int) -> None:
+        """Scroll the zoom window to the playhead; no-op without a backdrop."""
+        if self._backdrop_env is None:
+            return
+        self._backdrop_pos_ms = max(0, int(ms))
+        self.viewport().update()
+
+    def _paint_backdrop(self, painter: QPainter) -> None:
+        if self._backdrop_image is not None:
+            # Visualizer frame: stretch the low-res image over the viewport
+            # without smoothing (chunky retro pixels), dimmed so text reads.
+            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
+            painter.setOpacity(_BACKDROP_VIS_OPACITY)
+            painter.drawImage(self.viewport().rect(), self._backdrop_image)
+            painter.setOpacity(1.0)
+            return
+        env_min, env_max = self._backdrop_env
+        if self._backdrop_bps <= 0:
+            return
+        w, h = self.viewport().width(), self.viewport().height()
+        if w <= 0 or h <= 4:
+            return
+        mid = h / 2.0
+        half = max(1.0, mid - 4.0)
+        n = len(env_min)
+        window_bins = _BACKDROP_WINDOW_MS / 1000.0 * self._backdrop_bps
+        start = self._backdrop_pos_ms / 1000.0 * self._backdrop_bps - window_bins / 2.0
+        center_x = w // 2
+        bright = QColor(self._backdrop_color)
+        bright.setAlpha(96)
+        dim = QColor(self._backdrop_color)
+        dim.setAlpha(46)
+        pen = QPen(bright, 1)
+        painter.setPen(pen)
+        for x in range(w):
+            if x == center_x:
+                # Played half (left of the centered playhead) is brighter.
+                pen.setColor(dim)
+                painter.setPen(pen)
+            b = int(start + x / w * window_bins)
+            if b < 0 or b >= n:
+                continue  # before the track start / past its end
+            y_top = mid + env_min[b] * half  # env_min is negative
+            y_bot = mid + env_max[b] * half
+            painter.drawLine(x, int(min(y_top, y_bot)), x, int(max(y_top, y_bot)))
+        head_color = QColor(self._backdrop_color)
+        head_color.setAlpha(150)
+        painter.setPen(QPen(head_color, 2))
+        painter.drawLine(center_x, 0, center_x, h)
+
     def paintEvent(self, event) -> None:
+        # Backdrop goes under everything, so before super() paints the rows.
+        # Requires the table's own QSS background to be transparent — an opaque
+        # style background is filled inside super().paintEvent, over this.
+        if self._backdrop_env is not None or self._backdrop_image is not None:
+            painter = QPainter(self.viewport())
+            try:
+                self._paint_backdrop(painter)
+            finally:
+                painter.end()
         super().paintEvent(event)
         if self.rowCount() == 0 or self._drag_active:
             painter = QPainter(self.viewport())
@@ -753,7 +877,36 @@ class PlayerPanel(QWidget):
         # Suppresses selection-driven prefetch while we rebuild the table.
         self._rebuilding: bool = False
         # Inline metadata editing is gated by the Edit Lock toggle; persisted.
-        self._edit_locked: bool = load_config().player_edit_locked
+        _cfg = load_config()
+        self._edit_locked: bool = _cfg.player_edit_locked
+        # Visualizations: master switch (Settings) and last chosen visual.
+        self._visualizations_enabled: bool = _cfg.visualizations_enabled
+        self._vis_mode: str = _cfg.visualization_mode
+        # A popout visual doesn't survive a restart (a visualizer window
+        # popping up at launch, before the main window, would be jarring);
+        # the backdrop does. Downgrade without persisting — the next explicit
+        # dropdown change writes the config anyway.
+        if self._vis_mode in POPOUT_MODES:
+            self._vis_mode = "off"
+        # Source PCM behind the playlist backdrop waveform: the track loaded
+        # into the engine (a reference, not a copy). The envelope is computed
+        # lazily so switching modes mid-track can build it on demand.
+        self._backdrop_src: tuple | None = None  # (pcm, sr)
+        self._backdrop_env: tuple | None = None  # (min, max, bins_per_sec)
+        self._backdrop_env_path: str | None = None
+        # Popout visualizer (oscilloscope/spectrum/fire); created on first use.
+        self._vis_window: VisualizerWindow | None = None
+        # Backdrop visualizer: same renderers, blitted behind the playlist.
+        # Ticks only while playing (plus a short silence decay after pause).
+        self._backdrop_renderer: VisRenderer | None = None
+        self._vis_decay: int = 0
+        self._vis_tick_timer = QTimer(self)
+        self._vis_tick_timer.setInterval(FRAME_MS)
+        self._vis_tick_timer.timeout.connect(self._on_vis_backdrop_tick)
+        # True while WE close the popout (mode/setting change), so the closed
+        # handler only resets the dropdown when the USER dismissed the window.
+        self._vis_closing: bool = False
+        self._waveform_color: str = Theme.WAVEFORM_DEFAULT
 
         # One-shot waveform decode, used only when the slice section opens on a
         # track whose PCM was evicted from the cache (the common case builds the
@@ -838,6 +991,33 @@ class PlayerPanel(QWidget):
         title_row.addWidget(self._art_label, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addStretch()
 
+        # Visuals selector, shown only when visualizations are enabled in
+        # Settings. Item data holds the mode ids persisted in config
+        # (visualization_mode); the display text is translated UI prose.
+        self._vis_combo = QComboBox()
+        self._vis_combo.setObjectName("visModeCombo")
+        self._vis_combo.setToolTip(self.tr("Choose a visualization"))
+        self._vis_combo.setCursor(Qt.CursorShape.PointingHandCursor)
+        for mode, label in (
+            ("off", self.tr("Visuals off")),
+            ("backdrop", self.tr("Backdrop waveform")),
+            ("backdrop_scope", self.tr("Backdrop oscilloscope")),
+            ("backdrop_spectrum", self.tr("Backdrop spectrum")),
+            ("backdrop_fire", self.tr("Backdrop fire")),
+            ("oscilloscope", self.tr("Popout oscilloscope")),
+            ("spectrum", self.tr("Popout spectrum bars")),
+            ("fire", self.tr("Popout fire")),
+        ):
+            self._vis_combo.addItem(label, mode)
+        self._vis_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
+        mode_index = self._vis_combo.findData(self._vis_mode)
+        if mode_index >= 0:
+            self._vis_combo.setCurrentIndex(mode_index)
+        self._vis_combo.currentIndexChanged.connect(self._on_vis_mode_changed)
+        self._vis_combo.setVisible(self._visualizations_enabled)
+        title_row.addWidget(self._vis_combo, 0, Qt.AlignmentFlag.AlignVCenter)
+        title_row.addSpacing(16)
+
         # Edit Lock: a text label with a trailing radial indicator ("Edit Lock ◯"),
         # sitting top-right opposite the "Player" title. Checked = locked = inline
         # playlist editing disabled. RightToLeft puts the circle after the text.
@@ -876,8 +1056,11 @@ class PlayerPanel(QWidget):
         # The cell text inset (5px) is owned by NoElideDelegate, which hand-draws
         # the label; CSS horizontal padding would not affect it. This rule only
         # keeps the 8px vertical padding that sets the row height.
+        # Transparent (not BG_MEDIUM) so the backdrop waveform painted in
+        # paintEvent isn't covered by the style's background fill; the panel
+        # behind the table is BG_MEDIUM, so the resting look is identical.
         self._table.setStyleSheet(
-            f"QTableWidget {{ background-color: {Theme.BG_MEDIUM}; border: none; }}"
+            "QTableWidget { background-color: transparent; border: none; }"
             f"QHeaderView::section {{ background-color: {Theme.BG_MEDIUM}; }}"
             "QTableWidget::item { padding: 8px 0px; }"
             # The inline edit field otherwise inherits the global pill-shaped
@@ -1326,6 +1509,108 @@ class PlayerPanel(QWidget):
             cfg.player_edit_locked = locked
             save_config(cfg)
 
+    def _on_vis_mode_changed(self, index: int) -> None:
+        """Remember the chosen visual and persist it (like Edit Lock)."""
+        mode = self._vis_combo.itemData(index)
+        if not mode:
+            return
+        self._vis_mode = mode
+        cfg = load_config()
+        if cfg.visualization_mode != mode:
+            cfg.visualization_mode = mode
+            save_config(cfg)
+        self._apply_vis_mode()
+
+    def set_visualizations_enabled(self, enabled: bool) -> None:
+        """Show/hide the visuals selector to match the Settings master switch."""
+        self._visualizations_enabled = enabled
+        self._vis_combo.setVisible(enabled)
+        self._apply_vis_mode()
+
+    def _apply_vis_mode(self) -> None:
+        """Bring the active visual in line with the mode + master switch."""
+        self._refresh_backdrop()
+        popout = self._visualizations_enabled and self._vis_mode in POPOUT_MODES
+        if popout:
+            if self._vis_window is None:
+                self._vis_window = VisualizerWindow(self._engine, self)
+                self._vis_window.set_color(self._waveform_color)
+                self._vis_window.closed.connect(self._on_vis_window_closed)
+            self._vis_window.set_mode(self._vis_mode)
+            self._vis_window.show()
+            self._vis_window.raise_()
+        elif self._vis_window is not None and self._vis_window.isVisible():
+            self._vis_closing = True
+            try:
+                self._vis_window.close()
+            finally:
+                self._vis_closing = False
+
+    def _on_vis_window_closed(self) -> None:
+        """User dismissed the popout: drop the selector back to Off."""
+        if self._vis_closing or self._vis_mode not in POPOUT_MODES:
+            return
+        off_index = self._vis_combo.findData("off")
+        if off_index >= 0:
+            self._vis_combo.setCurrentIndex(off_index)
+
+    # ── Backdrop waveform (visualizations) ─────────────────────
+
+    def _on_engine_source_changed(self, pcm, sr: int) -> None:
+        """A new track was loaded into the engine; retarget the backdrop."""
+        self._backdrop_src = (pcm, sr)
+        self._backdrop_env = None  # stale — belongs to the previous track
+        self._backdrop_env_path = None
+        self._refresh_backdrop()
+
+    def _refresh_backdrop(self) -> None:
+        """Show/hide the playlist backdrop to match mode, switch, and track."""
+        enabled = self._visualizations_enabled
+        if enabled and self._vis_mode in _BACKDROP_VIS_MAP:
+            # Visualizer backdrop: frames arrive from the tick timer; the
+            # stale envelope/image (if any) clears on the first frame.
+            if self._backdrop_renderer is None:
+                self._backdrop_renderer = VisRenderer()
+            self._backdrop_renderer.set_mode(_BACKDROP_VIS_MAP[self._vis_mode])
+            self._backdrop_renderer.set_color(self._waveform_color)
+            if self._engine.is_playing():
+                self._vis_decay = _VIS_DECAY_FRAMES
+                self._vis_tick_timer.start()
+            else:
+                self._table.clear_backdrop()
+            return
+        self._vis_tick_timer.stop()
+        if not enabled or self._vis_mode != "backdrop" or self._backdrop_src is None:
+            self._table.clear_backdrop()
+            return
+        path = self._current_path()
+        if self._backdrop_env is None or self._backdrop_env_path != path:
+            pcm, sr = self._backdrop_src
+            try:
+                self._backdrop_env = timed_envelope(pcm, sr)
+            except ValueError:
+                self._table.clear_backdrop()
+                return
+            self._backdrop_env_path = path
+        self._table.set_backdrop_envelope(*self._backdrop_env)
+
+    def _on_vis_backdrop_tick(self) -> None:
+        """Advance the visualizer backdrop one frame (30 fps while playing)."""
+        if self._backdrop_renderer is None:
+            self._vis_tick_timer.stop()
+            return
+        playing = self._engine.is_playing()
+        samples = self._engine.recent_mono(FFT_SIZE) if playing else None
+        image = self._backdrop_renderer.render(samples, self._engine.sample_rate())
+        self._table.set_backdrop_image(image)
+        if playing:
+            self._vis_decay = _VIS_DECAY_FRAMES
+        else:
+            # Feed silence briefly so bars fall / fire burns down, then rest.
+            self._vis_decay -= 1
+            if self._vis_decay <= 0:
+                self._vis_tick_timer.stop()
+
     def _revert_cell(self, row: int, col: int, text: str) -> None:
         """Restore a cell's text without re-triggering itemChanged."""
         self._table.blockSignals(True)
@@ -1557,6 +1842,7 @@ class PlayerPanel(QWidget):
             self._pending_play_path = None
             pcm, sr = cached
             self._engine.load(pcm, sr)
+            self._on_engine_source_changed(pcm, sr)
             self._engine.play()
         else:
             # Decode in the background; the engine starts playing in _on_decoded
@@ -1676,6 +1962,7 @@ class PlayerPanel(QWidget):
         if path == self._pending_play_path:
             self._pending_play_path = None
             self._engine.load(pcm, sr)
+            self._on_engine_source_changed(pcm, sr)
             self._engine.play()
 
     @Slot(str, str)
@@ -1764,6 +2051,7 @@ class PlayerPanel(QWidget):
             self._current_time_label.setText(self._format_time(position))
         # The section guards its own playhead while the user is scrubbing it.
         self._slice.set_position(position)
+        self._table.set_backdrop_position_ms(position)
 
     @Slot(int)
     def _on_scrub_preview(self, value: int) -> None:
@@ -1780,7 +2068,13 @@ class PlayerPanel(QWidget):
 
     def set_waveform_color(self, color: str) -> None:
         """Recolor the full-length waveform body (from Settings)."""
+        self._waveform_color = color
         self._slice.set_waveform_color(color)
+        self._table.set_backdrop_color(color)
+        if self._vis_window is not None:
+            self._vis_window.set_color(color)
+        if self._backdrop_renderer is not None:
+            self._backdrop_renderer.set_color(color)
 
     @Slot()
     def _on_track_finished(self) -> None:
@@ -1796,10 +2090,19 @@ class PlayerPanel(QWidget):
         self._update_transport_state()
         # Zoom scrubbing is paused-only.
         self._slice.set_playing(playing)
+        if playing:
+            # (Re)start the visualizer-backdrop timer when playback begins.
+            self._refresh_backdrop()
         # Keep the header art up while loaded (playing or paused); drop it once
         # the track is fully stopped (incl. end-of-playlist via engine.stop()).
         if not playing and not self._engine.is_paused():
             self._hide_artwork()
+            # Backdrop follows the artwork's lifetime: gone on a full stop.
+            self._backdrop_src = None
+            self._backdrop_env = None
+            self._backdrop_env_path = None
+            self._vis_tick_timer.stop()
+            self._table.clear_backdrop()
 
     # ── Seek / Volume ───────────────────────────────────────────
 
