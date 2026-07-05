@@ -22,6 +22,8 @@ from PySide6.QtCore import (
     Slot,
 )
 from PySide6.QtGui import (
+    QAction,
+    QActionGroup,
     QBrush,
     QColor,
     QDesktopServices,
@@ -37,6 +39,7 @@ from PySide6.QtGui import (
     QKeySequence,
     QMouseEvent,
     QPainter,
+    QPainterPath,
     QPen,
     QPixmap,
     QPolygonF,
@@ -46,7 +49,6 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QCheckBox,
-    QComboBox,
     QHBoxLayout,
     QHeaderView,
     QLabel,
@@ -218,6 +220,39 @@ def _make_stop_icon(color: str = _TRANSPORT_GLYPH, size: int = 14) -> QIcon:
         p.setBrush(QColor(color))
         m = size * 0.2
         p.drawRect(QRectF(m, m, size - 2 * m, size - 2 * m))
+    finally:
+        p.end()
+    return QIcon(pm)
+
+
+def _make_eye_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon:
+    """Eye glyph (👁 outline + iris) for the visuals menu button.
+
+    Drawn (not text/emoji) like the transport glyphs, so it reads the same in
+    every language and follows the grey glyph colour instead of emoji fonts.
+    """
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        c = QColor(color)
+        mid = size / 2.0
+        m = size * 0.08
+        bow = size * 0.62  # how far the lid curves from the midline
+        # Almond outline: two mirrored quadratic lids meeting at the corners.
+        path = QPainterPath(QPointF(m, mid))
+        path.quadTo(QPointF(mid, mid - bow), QPointF(size - m, mid))
+        path.quadTo(QPointF(mid, mid + bow), QPointF(m, mid))
+        pen = QPen(c, max(1.0, size * 0.09))
+        p.setPen(pen)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawPath(path)
+        # Iris.
+        r = size * 0.16
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(c)
+        p.drawEllipse(QPointF(mid, mid), r, r)
     finally:
         p.end()
     return QIcon(pm)
@@ -967,6 +1002,10 @@ class PlayerPanel(QWidget):
             f" border: 2px solid {Theme.NEON_YELLOW}; border-radius: 6px; }}"
             f"QCheckBox#editLockCheck::indicator:unchecked {{ background-color: {Theme.BG_LIGHT};"
             f" border: 2px solid {Theme.CHROME_DARK}; border-radius: 6px; }}"
+            # Visuals eye button: keep the default (Clear Playlist-style) light
+            # fill/border but drop the wide text padding so the icon centres in
+            # its compact fixed size.
+            "QPushButton#visMenuButton { padding: 2px; }"
         )
         layout = QVBoxLayout(content)
         layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, Theme.PADDING)
@@ -991,13 +1030,21 @@ class PlayerPanel(QWidget):
         title_row.addWidget(self._art_label, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addStretch()
 
-        # Visuals selector, shown only when visualizations are enabled in
-        # Settings. Item data holds the mode ids persisted in config
-        # (visualization_mode); the display text is translated UI prose.
-        self._vis_combo = QComboBox()
-        self._vis_combo.setObjectName("visModeCombo")
-        self._vis_combo.setToolTip(self.tr("Choose a visualization"))
-        self._vis_combo.setCursor(Qt.CursorShape.PointingHandCursor)
+        # Visuals selector: a compact eye-icon button (default QPushButton
+        # style — the same light fill as Clear Playlist) that opens a checkable
+        # menu of modes. Shown only when visualizations are enabled in
+        # Settings. Mode ids are persisted in config (visualization_mode);
+        # the menu labels are translated UI prose.
+        self._vis_button = QPushButton()
+        self._vis_button.setObjectName("visMenuButton")
+        self._vis_button.setIcon(_make_eye_icon())
+        self._vis_button.setToolTip(self.tr("Choose a visualization"))
+        self._vis_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._vis_button.setFixedSize(40, 26)
+        self._vis_menu = QMenu(self)
+        self._vis_action_group = QActionGroup(self)
+        self._vis_action_group.setExclusive(True)
+        self._vis_actions: dict[str, QAction] = {}
         for mode, label in (
             ("off", self.tr("Visuals off")),
             ("backdrop", self.tr("Backdrop waveform")),
@@ -1008,14 +1055,19 @@ class PlayerPanel(QWidget):
             ("spectrum", self.tr("Popout spectrum bars")),
             ("fire", self.tr("Popout fire")),
         ):
-            self._vis_combo.addItem(label, mode)
-        self._vis_combo.setSizeAdjustPolicy(QComboBox.SizeAdjustPolicy.AdjustToContents)
-        mode_index = self._vis_combo.findData(self._vis_mode)
-        if mode_index >= 0:
-            self._vis_combo.setCurrentIndex(mode_index)
-        self._vis_combo.currentIndexChanged.connect(self._on_vis_mode_changed)
-        self._vis_combo.setVisible(self._visualizations_enabled)
-        title_row.addWidget(self._vis_combo, 0, Qt.AlignmentFlag.AlignVCenter)
+            action = QAction(label, self)
+            action.setCheckable(True)
+            action.triggered.connect(lambda _=False, m=mode: self._select_vis_mode(m))
+            self._vis_action_group.addAction(action)
+            self._vis_menu.addAction(action)
+            self._vis_actions[mode] = action
+        # A separator sets the popouts apart from the backdrop modes.
+        self._vis_menu.insertSeparator(self._vis_actions["oscilloscope"])
+        if self._vis_mode in self._vis_actions:
+            self._vis_actions[self._vis_mode].setChecked(True)
+        self._vis_button.clicked.connect(self._show_vis_menu)
+        self._vis_button.setVisible(self._visualizations_enabled)
+        title_row.addWidget(self._vis_button, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addSpacing(16)
 
         # Edit Lock: a text label with a trailing radial indicator ("Edit Lock ◯"),
@@ -1509,11 +1561,17 @@ class PlayerPanel(QWidget):
             cfg.player_edit_locked = locked
             save_config(cfg)
 
-    def _on_vis_mode_changed(self, index: int) -> None:
+    def _show_vis_menu(self) -> None:
+        """Open the visuals menu just below the eye button."""
+        self._vis_menu.exec(
+            self._vis_button.mapToGlobal(self._vis_button.rect().bottomLeft())
+        )
+
+    def _select_vis_mode(self, mode: str) -> None:
         """Remember the chosen visual and persist it (like Edit Lock)."""
-        mode = self._vis_combo.itemData(index)
-        if not mode:
+        if mode not in self._vis_actions:
             return
+        self._vis_actions[mode].setChecked(True)
         self._vis_mode = mode
         cfg = load_config()
         if cfg.visualization_mode != mode:
@@ -1524,7 +1582,7 @@ class PlayerPanel(QWidget):
     def set_visualizations_enabled(self, enabled: bool) -> None:
         """Show/hide the visuals selector to match the Settings master switch."""
         self._visualizations_enabled = enabled
-        self._vis_combo.setVisible(enabled)
+        self._vis_button.setVisible(enabled)
         self._apply_vis_mode()
 
     def _apply_vis_mode(self) -> None:
@@ -1550,9 +1608,7 @@ class PlayerPanel(QWidget):
         """User dismissed the popout: drop the selector back to Off."""
         if self._vis_closing or self._vis_mode not in POPOUT_MODES:
             return
-        off_index = self._vis_combo.findData("off")
-        if off_index >= 0:
-            self._vis_combo.setCurrentIndex(off_index)
+        self._select_vis_mode("off")
 
     # ── Backdrop waveform (visualizations) ─────────────────────
 
