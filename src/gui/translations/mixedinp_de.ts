@@ -929,135 +929,135 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="981"/>
+        <location filename="../widgets/player_panel.py" line="1020"/>
         <source>Player</source>
         <translatorcomment>Kept &apos;Player&apos; — established loanword in German DJ/audio software (Traktor, etc.).</translatorcomment>
         <translation>Player</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="999"/>
+        <location filename="../widgets/player_panel.py" line="1041"/>
         <source>Choose a visualization</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierung auswählen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1002"/>
+        <location filename="../widgets/player_panel.py" line="1049"/>
         <source>Visuals off</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierung aus</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1003"/>
+        <location filename="../widgets/player_panel.py" line="1050"/>
         <source>Backdrop waveform</source>
-        <translation type="unfinished"></translation>
+        <translation>Hintergrund: Wellenform</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1004"/>
+        <location filename="../widgets/player_panel.py" line="1051"/>
         <source>Backdrop oscilloscope</source>
-        <translation type="unfinished"></translation>
+        <translation>Hintergrund: Oszilloskop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1005"/>
+        <location filename="../widgets/player_panel.py" line="1052"/>
         <source>Backdrop spectrum</source>
-        <translation type="unfinished"></translation>
+        <translation>Hintergrund: Spektrum</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1006"/>
+        <location filename="../widgets/player_panel.py" line="1053"/>
         <source>Backdrop fire</source>
-        <translation type="unfinished"></translation>
+        <translation>Hintergrund: Feuer</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1007"/>
+        <location filename="../widgets/player_panel.py" line="1054"/>
         <source>Popout oscilloscope</source>
-        <translation type="unfinished"></translation>
+        <translation>Fenster: Oszilloskop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1008"/>
+        <location filename="../widgets/player_panel.py" line="1055"/>
         <source>Popout spectrum bars</source>
-        <translation type="unfinished"></translation>
+        <translation>Fenster: Spektrum-Balken</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1009"/>
+        <location filename="../widgets/player_panel.py" line="1056"/>
         <source>Popout fire</source>
-        <translation type="unfinished"></translation>
+        <translation>Fenster: Feuer</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1024"/>
+        <location filename="../widgets/player_panel.py" line="1076"/>
         <source>Edit Lock</source>
         <translation>Bearbeitungssperre</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1028"/>
+        <location filename="../widgets/player_panel.py" line="1080"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Metadaten-Bearbeitung in der Playlist sperren</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1041"/>
+        <location filename="../widgets/player_panel.py" line="1093"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1042"/>
+        <location filename="../widgets/player_panel.py" line="1094"/>
         <source>Filename</source>
         <translation>Dateiname</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1043"/>
+        <location filename="../widgets/player_panel.py" line="1095"/>
         <source>Artist</source>
         <translatorcomment>&apos;Interpret&apos; is the standard German tag/metadata term for the performing artist.</translatorcomment>
         <translation>Interpret</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1044"/>
+        <location filename="../widgets/player_panel.py" line="1096"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1045"/>
+        <location filename="../widgets/player_panel.py" line="1097"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1046"/>
+        <location filename="../widgets/player_panel.py" line="1098"/>
         <source>Key</source>
         <translatorcomment>Musical context -&gt; &apos;Tonart&apos; per glossary, never &apos;Schlüssel&apos;/&apos;Taste&apos;.</translatorcomment>
         <translation>Tonart</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1047"/>
+        <location filename="../widgets/player_panel.py" line="1099"/>
         <source>Comment</source>
         <translation>Kommentar</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1048"/>
+        <location filename="../widgets/player_panel.py" line="1100"/>
         <source>Duration</source>
         <translation>Dauer</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1049"/>
+        <location filename="../widgets/player_panel.py" line="1101"/>
         <source>Year</source>
         <translation>Jahr</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1144"/>
+        <location filename="../widgets/player_panel.py" line="1196"/>
         <source>Previous</source>
         <translation>Zurück</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1155"/>
+        <location filename="../widgets/player_panel.py" line="1207"/>
         <source>Play / Pause  (Space)</source>
         <translation>Wiedergabe / Pause  (Leertaste)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1162"/>
+        <location filename="../widgets/player_panel.py" line="1214"/>
         <source>Stop</source>
         <translation>Stopp</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1169"/>
+        <location filename="../widgets/player_panel.py" line="1221"/>
         <source>Next</source>
         <translation>Weiter</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1209"/>
+        <location filename="../widgets/player_panel.py" line="1261"/>
         <source>Vol</source>
         <translatorcomment>Abbreviation of Volume -&gt; &apos;Lautst.&apos; (Lautstärke) to fit the compact control.</translatorcomment>
         <translation>Lautst.</translation>
@@ -1067,39 +1067,39 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">Auswahl entfernen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1229"/>
+        <location filename="../widgets/player_panel.py" line="1281"/>
         <source>Clear Playlist</source>
         <translation>Playlist leeren</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1739"/>
+        <location filename="../widgets/player_panel.py" line="1795"/>
         <source>{0} track</source>
         <translatorcomment>&apos;Track&apos; kept as loanword, standard in German DJ software.</translatorcomment>
         <translation>{0} Track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1741"/>
+        <location filename="../widgets/player_panel.py" line="1797"/>
         <source>{0} tracks</source>
         <translatorcomment>&apos;Tracks&apos; kept as loanword (plural unchanged), standard in German DJ software.</translatorcomment>
         <translation>{0} Tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2332"/>
+        <location filename="../widgets/player_panel.py" line="2388"/>
         <source>Open File Location</source>
         <translation>Dateipfad öffnen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2333"/>
+        <location filename="../widgets/player_panel.py" line="2389"/>
         <source>Open in Metadata Panel</source>
         <translation>Im Metadaten-Panel öffnen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2334"/>
+        <location filename="../widgets/player_panel.py" line="2390"/>
         <source>Reload Metadata from File</source>
         <translation>Metadaten aus Datei neu laden</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2336"/>
+        <location filename="../widgets/player_panel.py" line="2392"/>
         <source>Remove from Playlist</source>
         <translation>Aus Playlist entfernen</translation>
     </message>
@@ -1344,7 +1344,7 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="325"/>
+        <location filename="../widgets/player_panel.py" line="360"/>
         <source>Drop audio files here</source>
         <translation>Audiodateien hier ablegen</translation>
     </message>
@@ -1420,17 +1420,17 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="167"/>
         <source>Visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualisierungen</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="175"/>
         <source>Enable audio visualizations</source>
-        <translation type="unfinished"></translation>
+        <translation>Audio-Visualisierungen aktivieren</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="182"/>
         <source>Adds a visuals selector to the Player and an animated waveform while analyzing or converting.</source>
-        <translation type="unfinished"></translation>
+        <translation>Fügt dem Player eine Auswahl für Visualisierungen hinzu und zeigt beim Analysieren oder Konvertieren eine animierte Wellenform an.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="193"/>
@@ -1959,7 +1959,7 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/vis_canvas.py" line="279"/>
         <source>Visualizer</source>
-        <translation type="unfinished"></translation>
+        <translation>Visualizer</translation>
     </message>
 </context>
 </TS>
