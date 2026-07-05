@@ -51,13 +51,21 @@ RENDER_MODES = ("oscilloscope", "spectrum", "fire")
 POPOUT_MODES = RENDER_MODES
 
 
-def _fire_palette() -> np.ndarray:
-    """256 RGB rows: black → red → orange/yellow → white."""
-    t = np.linspace(0.0, 1.0, 256)
-    r = np.clip(t * 3.0, 0.0, 1.0)
-    g = np.clip(t * 3.0 - 1.0, 0.0, 1.0)
-    b = np.clip(t * 3.0 - 2.0, 0.0, 1.0)
-    return (np.stack([r, g, b], axis=1) * 255).astype(np.uint8)
+def _fire_palette(color: QColor) -> np.ndarray:
+    """256 RGB rows: a heat ramp of *color* — black → color → white.
+
+    The classic red/orange fire is exactly this ramp for pure red; deriving it
+    from the waveform color instead ties the flames to the same setting as the
+    other visuals. Rebuilt only on color change; per-frame cost (a LUT lookup)
+    is unaffected by the palette's contents.
+    """
+    t = np.linspace(0.0, 1.0, 256)[:, None]
+    base = np.array([color.red(), color.green(), color.blue()], dtype=np.float64)
+    up = np.clip(t / 0.6, 0.0, 1.0)  # black → color over the cooler range
+    hot = np.clip((t - 0.6) / 0.4, 0.0, 1.0)  # color → white at the hottest
+    rgb = base * up
+    rgb = rgb + (255.0 - rgb) * hot
+    return rgb.astype(np.uint8)
 
 
 class VisRenderer:
@@ -76,7 +84,7 @@ class VisRenderer:
         self._peaks = np.zeros(_N_BARS, dtype=np.float64)
         self._peak_vel = np.full(_N_BARS, _PEAK_START, dtype=np.float64)
         self._heat = np.zeros((_H, _W), dtype=np.float32)
-        self._fire_lut = _fire_palette()
+        self._fire_lut = _fire_palette(self._color)
         # Beat pulse (Milkdrop-style): instantaneous bass energy against its
         # own smoothed average. Chosen over a precomputed librosa onset
         # envelope because heavy DSP during playback fights the audio callback
@@ -103,6 +111,7 @@ class VisRenderer:
 
     def set_color(self, color: str) -> None:
         self._color = QColor(color)
+        self._fire_lut = _fire_palette(self._color)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
