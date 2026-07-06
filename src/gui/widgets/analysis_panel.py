@@ -176,7 +176,7 @@ class AnalysisPanel(QWidget):
         layout.addLayout(header_row)
 
         # Progress panel (initially hidden)
-        self._progress_panel = ProgressPanel()
+        self._progress_panel = ProgressPanel(show_activity=True)
         self._progress_panel.cancel_clicked.connect(self.cancel_analysis.emit)
         layout.addWidget(self._progress_panel)
 

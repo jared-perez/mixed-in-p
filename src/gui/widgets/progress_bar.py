@@ -20,11 +20,13 @@ class ProgressPanel(QFrame):
 
     cancel_clicked = Signal()
 
-    def __init__(self, parent: QWidget | None = None) -> None:
+    def __init__(self, show_activity: bool = False, parent: QWidget | None = None) -> None:
         super().__init__(parent)
-        # Opt-in per host panel (Analyze/Convert turn it on, Rename doesn't)
-        # and gated by the visualizations setting via set_activity_enabled.
-        self._activity_enabled = False
+        # Opt-in per host panel: Analyze/Convert show a moving waveform in place
+        # of the progress bar as richer "something is happening" feedback (always
+        # on, independent of the visualizations setting); Rename keeps the plain
+        # bar. The waveform colour still follows the waveform-colour setting.
+        self._show_activity = show_activity
         self._setup_ui()
         self.hide()  # Hidden by default
 
@@ -50,24 +52,36 @@ class ProgressPanel(QFrame):
 
         layout.addLayout(top_row)
 
-        # Animated activity waveform (visualizations feature), above the bar.
+        # Animated activity waveform (moving progress feedback), above the bar.
         self._activity = VisActivityWaveform()
         self._activity.hide()
         layout.addWidget(self._activity)
 
-        # Progress bar
+        # Progress bar. When the waveform is the progress indicator it's hidden
+        # for good — the filling waveform replaces it.
         self._progress_bar = QProgressBar()
         self._progress_bar.setMinimum(0)
         self._progress_bar.setMaximum(100)
         self._progress_bar.setValue(0)
         self._progress_bar.setTextVisible(True)
+        if self._show_activity:
+            self._progress_bar.hide()
         layout.addWidget(self._progress_bar)
 
-        # Current file label
+        # Detail line below the bar/waveform: shows the current file during a
+        # run, and error text after one (so an error appears after the top
+        # info line rather than replacing it).
         self._file_label = QLabel("")
-        self._file_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 11px;")
         self._file_label.setWordWrap(True)
+        self._reset_file_label_style()
         layout.addWidget(self._file_label)
+
+    def _reset_file_label_style(self) -> None:
+        """Style the detail line as a muted current-file caption."""
+        self._file_label.setStyleSheet(
+            f"color: {Theme.TEXT_SECONDARY}; font-size: 11px;"
+        )
+        self._file_label.setToolTip("")
 
     def set_status(self, text: str) -> None:
         """Set the status label text."""
@@ -91,14 +105,17 @@ class ProgressPanel(QFrame):
         max_len = 80
         if len(file_path) > max_len:
             file_path = "..." + file_path[-(max_len - 3) :]
+        self._reset_file_label_style()
         self._file_label.setText(file_path)
 
     def reset(self) -> None:
         """Reset the progress panel to initial state."""
         self._status_label.setText(self.tr("Analyzing..."))
         self._status_label.setToolTip("")
+        self._status_label.setStyleSheet(f"color: {Theme.TEXT_PRIMARY}; font-weight: bold;")
         self._progress_bar.setValue(0)
         self._progress_bar.setFormat("0/0 (0%)")
+        self._reset_file_label_style()
         self._file_label.setText("")
 
     def start(self, total: int) -> None:
@@ -106,7 +123,7 @@ class ProgressPanel(QFrame):
         self.reset()
         self._progress_bar.setMaximum(100)
         self.set_progress(0, total)
-        if self._activity_enabled:
+        if self._show_activity:
             self._activity.show()
             self._activity.start()
         self.show()
@@ -119,6 +136,7 @@ class ProgressPanel(QFrame):
         self._status_label.setToolTip("")
         self._status_label.setStyleSheet(f"color: {Theme.NEON_GREEN}; font-weight: bold;")
         self._progress_bar.setValue(100)
+        self._reset_file_label_style()
         self._file_label.setText("")
         # Freeze the wave fully lit rather than yanking it away mid-look.
         self._activity.set_fraction(1.0)
@@ -126,18 +144,22 @@ class ProgressPanel(QFrame):
         self._activity.update()
 
     def set_error(self, message: str) -> None:
-        """Show an error state. Full message is available on hover (tooltip)."""
+        """Show an error state. Full message is available on hover (tooltip).
+
+        With the waveform as the indicator there is no progress bar, so the error
+        is shown on the detail line *below* the waveform — after the top info line
+        ("Complete: …") rather than replacing it. With the plain bar (Rename) it
+        falls back to the top status label, as before.
+        """
+        self._activity.stop()
+        if self._show_activity:
+            self._file_label.setStyleSheet(f"color: {Theme.ERROR}; font-weight: bold;")
+            self._file_label.setToolTip(message)
+            self._file_label.setText(message)
+            return
         self._status_label.setText(message)
         self._status_label.setToolTip(message)
         self._status_label.setStyleSheet(f"color: {Theme.ERROR}; font-weight: bold;")
-        self._activity.stop()
-
-    def set_activity_enabled(self, enabled: bool) -> None:
-        """Gate the animated activity waveform (visualizations setting)."""
-        self._activity_enabled = enabled
-        if not enabled:
-            self._activity.stop()
-            self._activity.hide()
 
     def set_activity_color(self, color: str) -> None:
         """Set the activity waveform color (#RRGGBB)."""

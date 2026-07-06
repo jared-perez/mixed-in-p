@@ -127,7 +127,7 @@ class ConversionPanel(QWidget):
         layout.addWidget(self._format_row_widget)
 
         # Progress panel (initially hidden)
-        self._progress_panel = ProgressPanel()
+        self._progress_panel = ProgressPanel(show_activity=True)
         layout.addWidget(self._progress_panel)
 
         # File table
