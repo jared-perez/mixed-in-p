@@ -1367,7 +1367,7 @@ ou clique em “Adicionar capa…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="86"/>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Tema</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="97"/>
@@ -1377,7 +1377,7 @@ ou clique em “Adicionar capa…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="98"/>
         <source>Night Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>Noite escura</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="99"/>
@@ -1387,12 +1387,12 @@ ou clique em “Adicionar capa…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="100"/>
         <source>Daylight</source>
-        <translation type="unfinished"></translation>
+        <translation>Luz do dia</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="111"/>
         <source>Restart to apply theme changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Reinicie para aplicar as alterações de tema.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="119"/>
@@ -1408,12 +1408,12 @@ ou clique em “Adicionar capa…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="146"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Padrão</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="148"/>
         <source>Use the theme&apos;s default waveform color</source>
-        <translation type="unfinished"></translation>
+        <translation>Usar a cor de forma de onda padrão do tema</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="156"/>
@@ -1597,12 +1597,12 @@ ou clique em “Adicionar capa…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="367"/>
         <source>Energy level written first</source>
-        <translation type="unfinished"></translation>
+        <translation>Gravar o nível de energia primeiro</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="371"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Quando a energia e a tonalidade são gravadas no comentário, a energia vem primeiro e a tonalidade depois.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="377"/>
@@ -1661,7 +1661,7 @@ ou clique em “Adicionar capa…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="613"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
-        <translation type="unfinished"></translation>
+        <translation>A alteração de tema entrará em vigor na próxima vez que você reiniciar o Mixed in P.</translation>
     </message>
 </context>
 <context>
@@ -1959,7 +1959,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="279"/>
+        <location filename="../widgets/vis_canvas.py" line="288"/>
         <source>Visualizer</source>
         <translation>Visualizador</translation>
     </message>

@@ -1349,7 +1349,7 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="86"/>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>테마</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="97"/>
@@ -1359,7 +1359,7 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="98"/>
         <source>Night Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>나이트 다크</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="99"/>
@@ -1369,12 +1369,12 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="100"/>
         <source>Daylight</source>
-        <translation type="unfinished"></translation>
+        <translation>데이라이트</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="111"/>
         <source>Restart to apply theme changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>테마 변경을 적용하려면 재시작하세요.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="119"/>
@@ -1390,12 +1390,12 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="146"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>기본값</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="148"/>
         <source>Use the theme&apos;s default waveform color</source>
-        <translation type="unfinished"></translation>
+        <translation>테마의 기본 파형 색상 사용</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="156"/>
@@ -1588,12 +1588,12 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="367"/>
         <source>Energy level written first</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지 레벨을 먼저 기록</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="371"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지와 조성을 모두 코멘트에 기록할 때 에너지를 먼저, 조성을 나중에 기록합니다.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="377"/>
@@ -1651,7 +1651,7 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="613"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
-        <translation type="unfinished"></translation>
+        <translation>테마 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>
 </context>
 <context>
@@ -1939,7 +1939,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="279"/>
+        <location filename="../widgets/vis_canvas.py" line="288"/>
         <source>Visualizer</source>
         <translation>시각 효과</translation>
     </message>

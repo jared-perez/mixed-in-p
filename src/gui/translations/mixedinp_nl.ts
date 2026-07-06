@@ -1358,7 +1358,7 @@ of klik op “Artwork toevoegen…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="86"/>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Thema</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="97"/>
@@ -1368,7 +1368,7 @@ of klik op “Artwork toevoegen…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="98"/>
         <source>Night Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachtdonker</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="99"/>
@@ -1378,12 +1378,12 @@ of klik op “Artwork toevoegen…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="100"/>
         <source>Daylight</source>
-        <translation type="unfinished"></translation>
+        <translation>Daglicht</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="111"/>
         <source>Restart to apply theme changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Start opnieuw op om themawijzigingen toe te passen.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="119"/>
@@ -1399,12 +1399,12 @@ of klik op “Artwork toevoegen…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="146"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="148"/>
         <source>Use the theme&apos;s default waveform color</source>
-        <translation type="unfinished"></translation>
+        <translation>Standaard golfvormkleur van het thema gebruiken</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="156"/>
@@ -1586,12 +1586,12 @@ of klik op “Artwork toevoegen…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="367"/>
         <source>Energy level written first</source>
-        <translation type="unfinished"></translation>
+        <translation>Energieniveau eerst schrijven</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="371"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Als zowel energie als toonsoort naar de opmerking wordt geschreven, komt de energie eerst en de toonsoort daarna.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="377"/>
@@ -1648,7 +1648,7 @@ of klik op “Artwork toevoegen…”</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="613"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
-        <translation type="unfinished"></translation>
+        <translation>De themawijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>
 </context>
 <context>
@@ -1941,7 +1941,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="279"/>
+        <location filename="../widgets/vis_canvas.py" line="288"/>
         <source>Visualizer</source>
         <translation>Visualizer</translation>
     </message>

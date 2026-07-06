@@ -1364,7 +1364,7 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="86"/>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Design</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="97"/>
@@ -1374,7 +1374,7 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="98"/>
         <source>Night Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>Nachtdunkel</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="99"/>
@@ -1384,12 +1384,12 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="100"/>
         <source>Daylight</source>
-        <translation type="unfinished"></translation>
+        <translation>Tageslicht</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="111"/>
         <source>Restart to apply theme changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Neu starten, um die Designänderungen zu übernehmen.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="119"/>
@@ -1405,12 +1405,12 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="146"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="148"/>
         <source>Use the theme&apos;s default waveform color</source>
-        <translation type="unfinished"></translation>
+        <translation>Standard-Wellenformfarbe des Designs verwenden</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="156"/>
@@ -1596,12 +1596,12 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="367"/>
         <source>Energy level written first</source>
-        <translation type="unfinished"></translation>
+        <translation>Energielevel zuerst schreiben</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="371"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Wenn sowohl Energie als auch Tonart in den Kommentar geschrieben werden, kommt die Energie zuerst und die Tonart danach.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="377"/>
@@ -1658,7 +1658,7 @@ oder „Cover hinzufügen …“ klicken</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="613"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
-        <translation type="unfinished"></translation>
+        <translation>Die Designänderung wird beim nächsten Neustart von Mixed in P wirksam.</translation>
     </message>
 </context>
 <context>
@@ -1957,7 +1957,7 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="279"/>
+        <location filename="../widgets/vis_canvas.py" line="288"/>
         <source>Visualizer</source>
         <translation>Visualizer</translation>
     </message>

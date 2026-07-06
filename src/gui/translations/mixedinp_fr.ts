@@ -1344,7 +1344,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="86"/>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>Thème</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="97"/>
@@ -1354,7 +1354,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="98"/>
         <source>Night Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>Nuit noire</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="99"/>
@@ -1364,12 +1364,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="100"/>
         <source>Daylight</source>
-        <translation type="unfinished"></translation>
+        <translation>Lumière du jour</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="111"/>
         <source>Restart to apply theme changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>Redémarrez pour appliquer les changements de thème.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="119"/>
@@ -1385,12 +1385,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="146"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>Par défaut</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="148"/>
         <source>Use the theme&apos;s default waveform color</source>
-        <translation type="unfinished"></translation>
+        <translation>Utiliser la couleur de forme d&apos;onde par défaut du thème</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="156"/>
@@ -1568,12 +1568,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="367"/>
         <source>Energy level written first</source>
-        <translation type="unfinished"></translation>
+        <translation>Écrire le niveau d&apos;énergie en premier</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="371"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
-        <translation type="unfinished"></translation>
+        <translation>Lorsque l&apos;énergie et la tonalité sont écrites dans le commentaire, l&apos;énergie est placée en premier et la tonalité ensuite.</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="377"/>
@@ -1631,7 +1631,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
     <message>
         <location filename="../widgets/settings_panel.py" line="613"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le changement de thème prendra effet au prochain redémarrage de Mixed in P.</translation>
     </message>
 </context>
 <context>
@@ -1919,7 +1919,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="279"/>
+        <location filename="../widgets/vis_canvas.py" line="288"/>
         <source>Visualizer</source>
         <translation>Visualiseur</translation>
     </message>
