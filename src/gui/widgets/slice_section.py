@@ -98,8 +98,11 @@ class SliceSection(QWidget):
         )
         # Shrink the bar to just the text height (+1px) so it stops hogging
         # vertical space; the default button padding made it far too tall.
+        # Bump the point size a couple steps so the header reads clearly.
         _header_font = self._header_btn.font()
         _header_font.setBold(True)
+        _header_font.setPointSize(_header_font.pointSize() + 2)
+        self._header_btn.setFont(_header_font)
         self._header_btn.setFixedHeight(QFontMetrics(_header_font).height() + 1)
         self._header_btn.toggled.connect(self._on_toggle)
         layout.addWidget(self._header_btn)
