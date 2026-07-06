@@ -1361,124 +1361,114 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Thema</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="97"/>
-        <source>Neon Dark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/settings_panel.py" line="98"/>
+        <location filename="../widgets/settings_panel.py" line="101"/>
         <source>Night Dark</source>
         <translation>Nachtdonker</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="99"/>
-        <source>Nuevo Leon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/settings_panel.py" line="100"/>
+        <location filename="../widgets/settings_panel.py" line="103"/>
         <source>Daylight</source>
         <translation>Daglicht</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="111"/>
+        <location filename="../widgets/settings_panel.py" line="114"/>
         <source>Restart to apply theme changes.</source>
         <translation>Start opnieuw op om themawijzigingen toe te passen.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="119"/>
+        <location filename="../widgets/settings_panel.py" line="122"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
         <translation>Golfvorm</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="127"/>
+        <location filename="../widgets/settings_panel.py" line="130"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>Kleur van de volledige golfvorm in de speler.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="146"/>
+        <location filename="../widgets/settings_panel.py" line="149"/>
         <source>Default</source>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="148"/>
+        <location filename="../widgets/settings_panel.py" line="151"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>Standaard golfvormkleur van het thema gebruiken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="156"/>
+        <location filename="../widgets/settings_panel.py" line="159"/>
         <source>Custom…</source>
         <translation>Aangepast…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="167"/>
+        <location filename="../widgets/settings_panel.py" line="170"/>
         <source>Visualizations</source>
         <translation>Visualisaties</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="175"/>
+        <location filename="../widgets/settings_panel.py" line="178"/>
         <source>Enable audio visualizations</source>
         <translation>Audiovisualisaties inschakelen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="182"/>
+        <location filename="../widgets/settings_panel.py" line="185"/>
         <source>Adds a visuals selector to the Player and an animated waveform while analyzing or converting.</source>
         <translation>Voegt een visualisatiekiezer toe aan de speler en toont een bewegende golfvorm tijdens het analyseren of converteren.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="193"/>
+        <location filename="../widgets/settings_panel.py" line="196"/>
         <source>Tempo Range</source>
         <translation>Tempobereik</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="201"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Min 50, Max 250.</source>
         <translation>Min 50, max 250.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="207"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Lowest BPM</source>
         <translation>Laagste BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="221"/>
+        <location filename="../widgets/settings_panel.py" line="224"/>
         <source>Highest BPM</source>
         <translation>Hoogste BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="236"/>
+        <location filename="../widgets/settings_panel.py" line="239"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translation>Toonsoort/BPM toevoegen aan bestandsnaam na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="244"/>
+        <location filename="../widgets/settings_panel.py" line="247"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translatorcomment>Reviewed (nl pass): confirmed.</translatorcomment>
         <translation>Automatisch analyseren bij slepen naar of sturen naar het Analyseren-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="249"/>
+        <location filename="../widgets/settings_panel.py" line="252"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>BPM automatisch naar tags schrijven na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="253"/>
+        <location filename="../widgets/settings_panel.py" line="256"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM wordt afgerond op het dichtstbijzijnde hele getal bij het schrijven naar de metadata.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="258"/>
+        <location filename="../widgets/settings_panel.py" line="261"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translation>Toonsoort automatisch naar tags schrijven na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="262"/>
+        <location filename="../widgets/settings_panel.py" line="265"/>
         <source>Automatically rename files after analysis</source>
         <translation>Bestanden automatisch hernoemen na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="272"/>
         <source>Write key to comment</source>
         <translation>Toonsoort naar opmerking schrijven</translation>
     </message>
@@ -1491,162 +1481,162 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Als zowel dit als de Energietag-opmerking worden geschreven, zet dan energie eerst en toonsoort daarna.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="275"/>
+        <location filename="../widgets/settings_panel.py" line="278"/>
         <source>Naming format:</source>
         <translation>Naamgevingsformaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="284"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>128 8A - Original_File_Name</source>
         <translation>128 8A - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="284"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + toonsoort prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="285"/>
+        <location filename="../widgets/settings_panel.py" line="288"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="285"/>
+        <location filename="../widgets/settings_panel.py" line="288"/>
         <source>Key + BPM prefix</source>
         <translation>Toonsoort + BPM prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="286"/>
+        <location filename="../widgets/settings_panel.py" line="289"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="286"/>
+        <location filename="../widgets/settings_panel.py" line="289"/>
         <source>Key prefix only</source>
         <translation>Alleen toonsoort prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="287"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>Originele_Bestandsnaam - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="287"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>suffix: Key + BPM</source>
         <translation>suffix: toonsoort + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="288"/>
+        <location filename="../widgets/settings_panel.py" line="291"/>
         <source>Original_File_Name - 8A</source>
         <translation>Originele_Bestandsnaam - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="288"/>
+        <location filename="../widgets/settings_panel.py" line="291"/>
         <source>suffix: Key only</source>
         <translation>suffix: alleen toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="311"/>
+        <location filename="../widgets/settings_panel.py" line="314"/>
         <source>Notation</source>
         <translation>Notatie</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="321"/>
+        <location filename="../widgets/settings_panel.py" line="324"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translatorcomment>Reviewed (nl pass): confirmed.</translatorcomment>
         <translation>Er kan slechts één notatie tegelijk actief zijn. Geldt voor de toonsoort die tijdens analyse naar tags/bestandsnamen wordt geschreven en voor de toonsoortlabels van het Toetsenbord-paneel.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="333"/>
+        <location filename="../widgets/settings_panel.py" line="336"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>Kept &apos;Key codes&apos; English per glossary; key-code tokens (8A etc.) preserved.</translatorcomment>
         <translation>👑 Key codes  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="334"/>
+        <location filename="../widgets/settings_panel.py" line="337"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>Traditionele toonsoortnotatie  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="335"/>
+        <location filename="../widgets/settings_panel.py" line="338"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="351"/>
+        <location filename="../widgets/settings_panel.py" line="354"/>
         <source>Energy Tag</source>
         <translatorcomment>&apos;Tag&apos;-&gt;compound &apos;Energietag&apos;; &apos;tag&apos; kept English (standard for metadata tags in NL).</translatorcomment>
         <translation>Energietag</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="359"/>
+        <location filename="../widgets/settings_panel.py" line="362"/>
         <source>Write energy level to Comment tag</source>
         <translation>Energieniveau naar Opmerking-tag schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="367"/>
+        <location filename="../widgets/settings_panel.py" line="370"/>
         <source>Energy level written first</source>
         <translation>Energieniveau eerst schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="371"/>
+        <location filename="../widgets/settings_panel.py" line="374"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>Als zowel energie als toonsoort naar de opmerking wordt geschreven, komt de energie eerst en de toonsoort daarna.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="377"/>
+        <location filename="../widgets/settings_panel.py" line="380"/>
         <source>Format:</source>
         <translation>Formaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="385"/>
+        <location filename="../widgets/settings_panel.py" line="388"/>
         <source>Number only  (7)</source>
         <translation>Alleen getal  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="386"/>
+        <location filename="../widgets/settings_panel.py" line="389"/>
         <source>With label  (Energy 7)</source>
         <translatorcomment>Kept the literal example label &apos;Energy 7&apos; as-is since it represents the actual text written to the tag.</translatorcomment>
         <translation>Met label  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="395"/>
+        <location filename="../widgets/settings_panel.py" line="398"/>
         <source>Write mode:</source>
         <translation>Schrijfmodus:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="403"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>Prepend to existing comment</source>
         <translation>Vooraan bestaande opmerking toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>Append to existing comment</source>
         <translation>Achteraan bestaande opmerking toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>Replace existing comment</source>
         <translation>Bestaande opmerking vervangen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="566"/>
+        <location filename="../widgets/settings_panel.py" line="569"/>
         <source>Waveform color</source>
         <translation>Golfvormkleur</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="598"/>
-        <location filename="../widgets/settings_panel.py" line="611"/>
+        <location filename="../widgets/settings_panel.py" line="601"/>
+        <location filename="../widgets/settings_panel.py" line="614"/>
         <source>Restart required</source>
         <translation>Opnieuw opstarten vereist</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="600"/>
+        <location filename="../widgets/settings_panel.py" line="603"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>De taalwijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="613"/>
+        <location filename="../widgets/settings_panel.py" line="616"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>De themawijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>

@@ -1379,124 +1379,114 @@ or click “Add Artwork…”</source>
         <translation>テーマ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="97"/>
-        <source>Neon Dark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/settings_panel.py" line="98"/>
+        <location filename="../widgets/settings_panel.py" line="101"/>
         <source>Night Dark</source>
         <translation>ナイトダーク</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="99"/>
-        <source>Nuevo Leon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/settings_panel.py" line="100"/>
+        <location filename="../widgets/settings_panel.py" line="103"/>
         <source>Daylight</source>
         <translation>デイライト</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="111"/>
+        <location filename="../widgets/settings_panel.py" line="114"/>
         <source>Restart to apply theme changes.</source>
         <translation>テーマの変更を適用するには再起動してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="119"/>
+        <location filename="../widgets/settings_panel.py" line="122"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
         <translation>波形</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="127"/>
+        <location filename="../widgets/settings_panel.py" line="130"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>プレーヤーの全体波形の色。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="146"/>
+        <location filename="../widgets/settings_panel.py" line="149"/>
         <source>Default</source>
         <translation>デフォルト</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="148"/>
+        <location filename="../widgets/settings_panel.py" line="151"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>テーマのデフォルトの波形の色を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="156"/>
+        <location filename="../widgets/settings_panel.py" line="159"/>
         <source>Custom…</source>
         <translation>カスタム…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="167"/>
+        <location filename="../widgets/settings_panel.py" line="170"/>
         <source>Visualizations</source>
         <translation>ビジュアライゼーション</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="175"/>
+        <location filename="../widgets/settings_panel.py" line="178"/>
         <source>Enable audio visualizations</source>
         <translation>オーディオビジュアライゼーションを有効にする</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="182"/>
+        <location filename="../widgets/settings_panel.py" line="185"/>
         <source>Adds a visuals selector to the Player and an animated waveform while analyzing or converting.</source>
         <translation>プレイヤーにビジュアル選択メニューを追加し、解析中や変換中にアニメーション波形を表示します。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="193"/>
+        <location filename="../widgets/settings_panel.py" line="196"/>
         <source>Tempo Range</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>テンポ範囲</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="201"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Min 50, Max 250.</source>
         <translation>最小50、最大250。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="207"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Lowest BPM</source>
         <translation>最低BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="221"/>
+        <location filename="../widgets/settings_panel.py" line="224"/>
         <source>Highest BPM</source>
         <translation>最高BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="236"/>
+        <location filename="../widgets/settings_panel.py" line="239"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translation>解析後にキー/BPMをファイル名に追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="244"/>
+        <location filename="../widgets/settings_panel.py" line="247"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>解析パネルにドロップまたは送ったときに自動的に解析</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="249"/>
+        <location filename="../widgets/settings_panel.py" line="252"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>解析後にBPMをタグへ自動的に書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="253"/>
+        <location filename="../widgets/settings_panel.py" line="256"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM はメタデータに書き込む際、最も近い整数に丸められます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="258"/>
+        <location filename="../widgets/settings_panel.py" line="261"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translation>解析後にキーをタグへ自動的に書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="262"/>
+        <location filename="../widgets/settings_panel.py" line="265"/>
         <source>Automatically rename files after analysis</source>
         <translation>解析後にファイル名を自動的に変更</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="272"/>
         <source>Write key to comment</source>
         <translation>キーをコメントに書き込む</translation>
     </message>
@@ -1510,167 +1500,167 @@ or click “Add Artwork…”</source>
         <translation type="vanished">この項目とエナジータグのコメントの両方を書き込む場合、エナジーを先に、キーを後に配置します。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="275"/>
+        <location filename="../widgets/settings_panel.py" line="278"/>
         <source>Naming format:</source>
         <translation>命名フォーマット:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="284"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Per instructions kept 128, 8A, &apos; - &apos;; rendered Original_File_Name as 元のファイル名 (no underscore). Consistent across all naming-example strings.</translatorcomment>
         <translation>128 8A - 元のファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="284"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + キーのプレフィックス</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="285"/>
+        <location filename="../widgets/settings_panel.py" line="288"/>
         <source>8A 128 - Original_File_Name</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder.</translatorcomment>
         <translation>8A 128 - 元のファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="285"/>
+        <location filename="../widgets/settings_panel.py" line="288"/>
         <source>Key + BPM prefix</source>
         <translation>キー + BPMのプレフィックス</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="286"/>
+        <location filename="../widgets/settings_panel.py" line="289"/>
         <source>8A - Original_File_Name</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder.</translatorcomment>
         <translation>8A - 元のファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="286"/>
+        <location filename="../widgets/settings_panel.py" line="289"/>
         <source>Key prefix only</source>
         <translation>キーのプレフィックスのみ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="287"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>Original_File_Name - 8A 128</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder, code segments preserved.</translatorcomment>
         <translation>元のファイル名 - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="287"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>suffix: Key + BPM</source>
         <translation>サフィックス: キー + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="288"/>
+        <location filename="../widgets/settings_panel.py" line="291"/>
         <source>Original_File_Name - 8A</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder.</translatorcomment>
         <translation>元のファイル名 - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="288"/>
+        <location filename="../widgets/settings_panel.py" line="291"/>
         <source>suffix: Key only</source>
         <translation>サフィックス: キーのみ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="311"/>
+        <location filename="../widgets/settings_panel.py" line="314"/>
         <source>Notation</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>表記</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="321"/>
+        <location filename="../widgets/settings_panel.py" line="324"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translation>一度に有効にできる表記は1つだけです。解析時にタグ/ファイル名へ書き込まれるキーと、キーボードパネルのキーラベルに適用されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="333"/>
+        <location filename="../widgets/settings_panel.py" line="336"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>Preserved emoji and double-space before parens; キーコード per glossary. Code samples kept Latin.</translatorcomment>
         <translation>👑 キーコード  （8A、5A、2B）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="334"/>
+        <location filename="../widgets/settings_panel.py" line="337"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>従来のキー表記  （Am、Ebm、F#…）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="335"/>
+        <location filename="../widgets/settings_panel.py" line="338"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>Traktor Open Key  （1m、10m、9d…）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="351"/>
+        <location filename="../widgets/settings_panel.py" line="354"/>
         <source>Energy Tag</source>
         <translatorcomment>Reviewed (ja pass): follows the エナジー (Energy) term choice; revisit together if that changes.</translatorcomment>
         <translation>エナジータグ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="359"/>
+        <location filename="../widgets/settings_panel.py" line="362"/>
         <source>Write energy level to Comment tag</source>
         <translation>エナジーレベルをコメントタグに書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="367"/>
+        <location filename="../widgets/settings_panel.py" line="370"/>
         <source>Energy level written first</source>
         <translation>エナジーレベルを先に書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="371"/>
+        <location filename="../widgets/settings_panel.py" line="374"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>エナジーレベルとキーの両方をコメントに書き込む場合、エナジーレベルを先に、キーを後に書き込みます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="377"/>
+        <location filename="../widgets/settings_panel.py" line="380"/>
         <source>Format:</source>
         <translation>フォーマット:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="385"/>
+        <location filename="../widgets/settings_panel.py" line="388"/>
         <source>Number only  (7)</source>
         <translation>数値のみ  （7）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="386"/>
+        <location filename="../widgets/settings_panel.py" line="389"/>
         <source>With label  (Energy 7)</source>
         <translation>ラベル付き  （Energy 7）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="395"/>
+        <location filename="../widgets/settings_panel.py" line="398"/>
         <source>Write mode:</source>
         <translation>書き込みモード:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="403"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>Prepend to existing comment</source>
         <translation>既存のコメントの前に追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>Append to existing comment</source>
         <translation>既存のコメントの後ろに追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>Replace existing comment</source>
         <translation>既存のコメントを置き換える</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="566"/>
+        <location filename="../widgets/settings_panel.py" line="569"/>
         <source>Waveform color</source>
         <translation>波形の色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="598"/>
-        <location filename="../widgets/settings_panel.py" line="611"/>
+        <location filename="../widgets/settings_panel.py" line="601"/>
+        <location filename="../widgets/settings_panel.py" line="614"/>
         <source>Restart required</source>
         <translation>再起動が必要です</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="600"/>
+        <location filename="../widgets/settings_panel.py" line="603"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>言語の変更は、次回Mixed in Pを再起動したときに反映されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="613"/>
+        <location filename="../widgets/settings_panel.py" line="616"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>テーマの変更は、次回Mixed in Pを再起動したときに反映されます。</translation>
     </message>
