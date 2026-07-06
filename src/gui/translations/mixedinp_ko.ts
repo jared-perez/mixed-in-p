@@ -659,34 +659,34 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="316"/>
+        <location filename="../main_window.py" line="317"/>
         <source>Select Audio Files</source>
         <translation>오디오 파일 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="327"/>
+        <location filename="../main_window.py" line="328"/>
         <source>Select Folder</source>
         <translation>폴더 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="414"/>
+        <location filename="../main_window.py" line="415"/>
         <source>No Audio Files</source>
         <translation>오디오 파일 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="415"/>
+        <location filename="../main_window.py" line="416"/>
         <source>No audio files found in:
 {0}</source>
         <translation>다음 위치에서 오디오 파일을 찾을 수 없어요:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="420"/>
+        <location filename="../main_window.py" line="421"/>
         <source>Invalid Folder</source>
         <translation>잘못된 폴더</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="421"/>
+        <location filename="../main_window.py" line="422"/>
         <source>Not a valid directory:
 {0}</source>
         <translatorcomment>directory → 디렉터리 (Apple Korean spelling). Flag for native review.</translatorcomment>
@@ -694,113 +694,113 @@ or click “Add Artwork…”</source>
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="454"/>
+        <location filename="../main_window.py" line="455"/>
         <source>Analysis in Progress</source>
         <translation>분석 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="455"/>
+        <location filename="../main_window.py" line="456"/>
         <source>An analysis is already running. Please wait or cancel it first.</source>
         <translation>이미 분석이 실행 중이에요. 잠시 기다리거나 먼저 취소하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="511"/>
+        <location filename="../main_window.py" line="512"/>
         <source>Analyzing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="536"/>
+        <location filename="../main_window.py" line="537"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>완료: {0}개 분석, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="540"/>
+        <location filename="../main_window.py" line="541"/>
         <source>Complete: {0} files analyzed</source>
         <translation>완료: 파일 {0}개 분석</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="557"/>
+        <location filename="../main_window.py" line="558"/>
         <source>Cancelled</source>
         <translation>취소됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="643"/>
+        <location filename="../main_window.py" line="644"/>
         <source>Conversion in Progress</source>
         <translation>변환 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="644"/>
+        <location filename="../main_window.py" line="645"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>이미 변환이 실행 중이에요. 잠시 기다리세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="674"/>
+        <location filename="../main_window.py" line="675"/>
         <source>Converting...</source>
         <translation>변환 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="690"/>
+        <location filename="../main_window.py" line="691"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>완료: {0}개 변환, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="694"/>
+        <location filename="../main_window.py" line="695"/>
         <source>Complete: {0} files converted</source>
         <translation>완료: 파일 {0}개 변환</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="821"/>
+        <location filename="../main_window.py" line="837"/>
         <source>Rename in Progress</source>
         <translation>이름 변경 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="822"/>
+        <location filename="../main_window.py" line="838"/>
         <source>A rename operation is already running.</source>
         <translation>이미 이름 변경 작업이 실행 중이에요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="844"/>
+        <location filename="../main_window.py" line="860"/>
         <source>Renaming files...</source>
         <translation>파일 이름 변경 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="856"/>
+        <location filename="../main_window.py" line="872"/>
         <source>Renamed {0} files</source>
         <translation>파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="884"/>
+        <location filename="../main_window.py" line="900"/>
         <source>No Session</source>
         <translation>세션 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="884"/>
+        <location filename="../main_window.py" line="900"/>
         <source>No rename session to undo.</source>
         <translation>실행 취소할 이름 변경 세션이 없어요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="893"/>
+        <location filename="../main_window.py" line="909"/>
         <source>Confirm Undo</source>
         <translation>실행 취소 확인</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="894"/>
+        <location filename="../main_window.py" line="910"/>
         <source>Undo renaming of {0} files?</source>
         <translatorcomment>Object particle avoided via 의 + 을 on 이름 변경. Counter 개. Flag for native review.</translatorcomment>
         <translation>파일 {0}개의 이름 변경을 실행 취소할까요?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="903"/>
+        <location filename="../main_window.py" line="919"/>
         <source>Undoing rename...</source>
         <translation>이름 변경 실행 취소 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="920"/>
+        <location filename="../main_window.py" line="936"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>실행 취소: 파일 {0}개, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="924"/>
+        <location filename="../main_window.py" line="940"/>
         <source>Undone {0} files</source>
         <translation>파일 {0}개 실행 취소 완료</translation>
     </message>
@@ -911,129 +911,174 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="828"/>
+        <location filename="../widgets/player_panel.py" line="1020"/>
         <source>Player</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="844"/>
+        <location filename="../widgets/player_panel.py" line="1041"/>
+        <source>Choose a visualization</source>
+        <translation>시각 효과 선택</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1049"/>
+        <source>Visuals off</source>
+        <translation>시각 효과 끔</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1050"/>
+        <source>Backdrop waveform</source>
+        <translation>배경: 파형</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1051"/>
+        <source>Backdrop oscilloscope</source>
+        <translation>배경: 오실로스코프</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1052"/>
+        <source>Backdrop spectrum</source>
+        <translation>배경: 스펙트럼</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1053"/>
+        <source>Backdrop fire</source>
+        <translation>배경: 불꽃</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1054"/>
+        <source>Popout oscilloscope</source>
+        <translation>별도 창: 오실로스코프</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1055"/>
+        <source>Popout spectrum bars</source>
+        <translation>별도 창: 스펙트럼 막대</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1056"/>
+        <source>Popout fire</source>
+        <translation>별도 창: 불꽃</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1076"/>
         <source>Edit Lock</source>
         <translation>편집 잠금</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="848"/>
+        <location filename="../widgets/player_panel.py" line="1080"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>재생목록의 메타데이터 편집 잠금</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="861"/>
+        <location filename="../widgets/player_panel.py" line="1093"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="862"/>
+        <location filename="../widgets/player_panel.py" line="1094"/>
         <source>Filename</source>
         <translation>파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="863"/>
+        <location filename="../widgets/player_panel.py" line="1095"/>
         <source>Artist</source>
         <translation>아티스트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="864"/>
+        <location filename="../widgets/player_panel.py" line="1096"/>
         <source>Title</source>
         <translation>제목</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="865"/>
+        <location filename="../widgets/player_panel.py" line="1097"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="866"/>
+        <location filename="../widgets/player_panel.py" line="1098"/>
         <source>Key</source>
         <translatorcomment>Playlist column for the musical key → 조성. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="867"/>
+        <location filename="../widgets/player_panel.py" line="1099"/>
         <source>Comment</source>
         <translation>코멘트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="868"/>
+        <location filename="../widgets/player_panel.py" line="1100"/>
         <source>Duration</source>
         <translatorcomment>Duration → 재생 시간 (playback length).</translatorcomment>
         <translation>재생 시간</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="869"/>
+        <location filename="../widgets/player_panel.py" line="1101"/>
         <source>Year</source>
         <translation>연도</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="961"/>
+        <location filename="../widgets/player_panel.py" line="1196"/>
         <source>Previous</source>
         <translation>이전</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="972"/>
+        <location filename="../widgets/player_panel.py" line="1207"/>
         <source>Play / Pause  (Space)</source>
         <translatorcomment>Playback → 재생; Pause → 일시정지. Key name &quot;Space&quot; kept Latin.</translatorcomment>
         <translation>재생 / 일시정지  (Space)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="979"/>
+        <location filename="../widgets/player_panel.py" line="1214"/>
         <source>Stop</source>
         <translation>정지</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="986"/>
+        <location filename="../widgets/player_panel.py" line="1221"/>
         <source>Next</source>
         <translation>다음</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1026"/>
+        <location filename="../widgets/player_panel.py" line="1261"/>
         <source>Vol</source>
         <translatorcomment>Volume abbreviation → 볼륨. Flag for native review (vs 음량).</translatorcomment>
         <translation>볼륨</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1046"/>
+        <location filename="../widgets/player_panel.py" line="1281"/>
         <source>Clear Playlist</source>
         <translatorcomment>playlist → 재생목록; action button → -기 (비우기).</translatorcomment>
         <translation>재생목록 비우기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1454"/>
+        <location filename="../widgets/player_panel.py" line="1795"/>
         <source>{0} track</source>
         <translatorcomment>Counter for tracks/songs → 곡 per glossary. Korean has no plural; {0} track and {0} tracks render identically. Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1456"/>
+        <location filename="../widgets/player_panel.py" line="1797"/>
         <source>{0} tracks</source>
         <translatorcomment>Counter 곡. Same form as the singular (no Korean plural). Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2029"/>
+        <location filename="../widgets/player_panel.py" line="2388"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2030"/>
+        <location filename="../widgets/player_panel.py" line="2389"/>
         <source>Open in Metadata Panel</source>
         <translation>메타데이터 패널에서 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2031"/>
+        <location filename="../widgets/player_panel.py" line="2390"/>
         <source>Reload Metadata from File</source>
         <translation>파일에서 메타데이터 다시 불러오기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2033"/>
+        <location filename="../widgets/player_panel.py" line="2392"/>
         <source>Remove from Playlist</source>
         <translation>재생목록에서 제거</translation>
     </message>
@@ -1041,18 +1086,18 @@ or click “Add Artwork…”</source>
 <context>
     <name>ProgressPanel</name>
     <message>
-        <location filename="../widgets/progress_bar.py" line="35"/>
-        <location filename="../widgets/progress_bar.py" line="87"/>
+        <location filename="../widgets/progress_bar.py" line="39"/>
+        <location filename="../widgets/progress_bar.py" line="98"/>
         <source>Analyzing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../widgets/progress_bar.py" line="41"/>
+        <location filename="../widgets/progress_bar.py" line="45"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../widgets/progress_bar.py" line="103"/>
+        <location filename="../widgets/progress_bar.py" line="117"/>
         <source>Complete</source>
         <translation>완료</translation>
     </message>
@@ -1284,7 +1329,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="302"/>
+        <location filename="../widgets/player_panel.py" line="360"/>
         <source>Drop audio files here</source>
         <translation>오디오 파일을 여기에 끌어다 놓으세요</translation>
     </message>
@@ -1304,115 +1349,120 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/settings_panel.py" line="86"/>
         <source>Theme</source>
-        <translation type="unfinished"></translation>
+        <translation>테마</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="97"/>
-        <source>Neon Dark</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/settings_panel.py" line="98"/>
+        <location filename="../widgets/settings_panel.py" line="101"/>
         <source>Night Dark</source>
-        <translation type="unfinished"></translation>
+        <translation>나이트 다크</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="99"/>
-        <source>Nuevo Leon</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../widgets/settings_panel.py" line="100"/>
+        <location filename="../widgets/settings_panel.py" line="103"/>
         <source>Daylight</source>
-        <translation type="unfinished"></translation>
+        <translation>데이라이트</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="111"/>
+        <location filename="../widgets/settings_panel.py" line="114"/>
         <source>Restart to apply theme changes.</source>
-        <translation type="unfinished"></translation>
+        <translation>테마 변경을 적용하려면 재시작하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="119"/>
+        <location filename="../widgets/settings_panel.py" line="122"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
         <translation>파형</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="127"/>
+        <location filename="../widgets/settings_panel.py" line="130"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>플레이어의 전체 파형 색상.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="146"/>
+        <location filename="../widgets/settings_panel.py" line="149"/>
         <source>Default</source>
-        <translation type="unfinished"></translation>
+        <translation>기본값</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="148"/>
+        <location filename="../widgets/settings_panel.py" line="151"/>
         <source>Use the theme&apos;s default waveform color</source>
-        <translation type="unfinished"></translation>
+        <translation>테마의 기본 파형 색상 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="156"/>
+        <location filename="../widgets/settings_panel.py" line="159"/>
         <source>Custom…</source>
         <translation>사용자 설정…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="167"/>
+        <location filename="../widgets/settings_panel.py" line="170"/>
+        <source>Visualizations</source>
+        <translation>시각 효과</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="178"/>
+        <source>Enable audio visualizations</source>
+        <translation>오디오 시각 효과 켜기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="185"/>
+        <source>Adds a visuals selector to the Player and an animated waveform while analyzing or converting.</source>
+        <translation>플레이어에 시각 효과 선택 메뉴를 추가하고, 분석 또는 변환 중에 움직이는 파형을 표시합니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="196"/>
         <source>Tempo Range</source>
         <translatorcomment>tempo → 템포 (loanword). Flag for native review.</translatorcomment>
         <translation>템포 범위</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="175"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Min 50, Max 250.</source>
         <translation>최소 50, 최대 250.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="181"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Lowest BPM</source>
         <translation>최저 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="195"/>
+        <location filename="../widgets/settings_panel.py" line="224"/>
         <source>Highest BPM</source>
         <translation>최고 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="210"/>
+        <location filename="../widgets/settings_panel.py" line="239"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translatorcomment>key → 조성. Flag for native review.</translatorcomment>
         <translation>분석 후 파일명에 조성/BPM 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="218"/>
+        <location filename="../widgets/settings_panel.py" line="247"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>분석 패널에 끌어다 놓거나 보낼 때 자동 분석</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="223"/>
+        <location filename="../widgets/settings_panel.py" line="252"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translatorcomment>Particle: BPM (비피엠, ends in ㅁ) takes 을 → &quot;BPM을&quot;. Flag for native review.</translatorcomment>
         <translation>분석 후 BPM을 태그에 자동 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="227"/>
+        <location filename="../widgets/settings_panel.py" line="256"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM은 메타데이터에 기록될 때 가장 가까운 정수로 반올림됩니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="232"/>
+        <location filename="../widgets/settings_panel.py" line="261"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translatorcomment>key → 조성; 조성을 (object particle 을 after consonant). Flag for native review.</translatorcomment>
         <translation>분석 후 조성을 태그에 자동 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="236"/>
+        <location filename="../widgets/settings_panel.py" line="265"/>
         <source>Automatically rename files after analysis</source>
         <translation>분석 후 파일 이름 자동 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="243"/>
+        <location filename="../widgets/settings_panel.py" line="272"/>
         <source>Write key to comment</source>
         <translatorcomment>key → 조성; comment → 코멘트 (consistent with the Comment tag). Flag for native review.</translatorcomment>
         <translation>조성을 코멘트에 기록</translation>
@@ -1428,170 +1478,170 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이 항목과 에너지 태그 코멘트를 모두 기록할 때, 에너지를 먼저, 조성을 나중에 표시해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="249"/>
+        <location filename="../widgets/settings_panel.py" line="278"/>
         <source>Naming format:</source>
         <translation>이름 형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="258"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Example pattern; the &quot;Original_File_Name&quot; placeholder is translated to 원본_파일명 so Korean users see where the original name lands. BPM/key code kept Latin. Flag for native review.</translatorcomment>
         <translation>128 8A - 원본_파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="258"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>BPM + Key prefix</source>
         <translatorcomment>key → 조성; prefix → 접두사.</translatorcomment>
         <translation>BPM + 조성 접두사</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="259"/>
+        <location filename="../widgets/settings_panel.py" line="288"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - 원본_파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="259"/>
+        <location filename="../widgets/settings_panel.py" line="288"/>
         <source>Key + BPM prefix</source>
         <translation>조성 + BPM 접두사</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="260"/>
+        <location filename="../widgets/settings_panel.py" line="289"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - 원본_파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="260"/>
+        <location filename="../widgets/settings_panel.py" line="289"/>
         <source>Key prefix only</source>
         <translation>조성 접두사만</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="261"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>원본_파일명 - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="261"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>suffix: Key + BPM</source>
         <translatorcomment>suffix → 접미사; key → 조성.</translatorcomment>
         <translation>접미사: 조성 + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="262"/>
+        <location filename="../widgets/settings_panel.py" line="291"/>
         <source>Original_File_Name - 8A</source>
         <translation>원본_파일명 - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="262"/>
+        <location filename="../widgets/settings_panel.py" line="291"/>
         <source>suffix: Key only</source>
         <translation>접미사: 조성만</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="285"/>
+        <location filename="../widgets/settings_panel.py" line="314"/>
         <source>Notation</source>
         <translatorcomment>notation → 표기법. Flag for native review.</translatorcomment>
         <translation>표기법</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="295"/>
+        <location filename="../widgets/settings_panel.py" line="324"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translatorcomment>key → 조성; &quot;Keyboard panel key labels&quot; → 건반 패널의 건반 레이블 (piano keys). 해요체. Flag for native review.</translatorcomment>
         <translation>한 번에 하나의 표기법만 활성화할 수 있어요. 분석 중 태그/파일명에 기록되는 조성과 건반 패널의 건반 레이블에 적용돼요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="307"/>
+        <location filename="../widgets/settings_panel.py" line="336"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translation>👑 키 코드  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="308"/>
+        <location filename="../widgets/settings_panel.py" line="337"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translatorcomment>key → 조성; note names (Am, Ebm, F#) kept Latin per CLAUDE.md.</translatorcomment>
         <translation>전통 조성 표기  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="309"/>
+        <location filename="../widgets/settings_panel.py" line="338"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>Traktor Open Key kept as a product name (English); code values kept Latin.</translatorcomment>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="325"/>
+        <location filename="../widgets/settings_panel.py" line="354"/>
         <source>Energy Tag</source>
         <translation>에너지 태그</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="333"/>
+        <location filename="../widgets/settings_panel.py" line="362"/>
         <source>Write energy level to Comment tag</source>
         <translatorcomment>energy level → 에너지 레벨; Comment tag → 코멘트 태그.</translatorcomment>
         <translation>에너지 레벨을 코멘트 태그에 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="341"/>
+        <location filename="../widgets/settings_panel.py" line="370"/>
         <source>Energy level written first</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지 레벨을 먼저 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="345"/>
+        <location filename="../widgets/settings_panel.py" line="374"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
-        <translation type="unfinished"></translation>
+        <translation>에너지와 조성을 모두 코멘트에 기록할 때 에너지를 먼저, 조성을 나중에 기록합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="351"/>
+        <location filename="../widgets/settings_panel.py" line="380"/>
         <source>Format:</source>
         <translation>형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="359"/>
+        <location filename="../widgets/settings_panel.py" line="388"/>
         <source>Number only  (7)</source>
         <translation>숫자만  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="360"/>
+        <location filename="../widgets/settings_panel.py" line="389"/>
         <source>With label  (Energy 7)</source>
         <translatorcomment>&quot;Energy 7&quot; left in English because it is the literal text written to the tag, not UI prose.</translatorcomment>
         <translation>레이블 포함  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="369"/>
+        <location filename="../widgets/settings_panel.py" line="398"/>
         <source>Write mode:</source>
         <translation>기록 방식:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="377"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>Prepend to existing comment</source>
         <translation>기존 코멘트 앞에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="378"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>Append to existing comment</source>
         <translation>기존 코멘트 뒤에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="379"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>Replace existing comment</source>
         <translation>기존 코멘트 대체</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="539"/>
+        <location filename="../widgets/settings_panel.py" line="569"/>
         <source>Waveform color</source>
         <translation>파형 색상</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="571"/>
-        <location filename="../widgets/settings_panel.py" line="584"/>
+        <location filename="../widgets/settings_panel.py" line="601"/>
+        <location filename="../widgets/settings_panel.py" line="614"/>
         <source>Restart required</source>
         <translation>재시작 필요</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="573"/>
+        <location filename="../widgets/settings_panel.py" line="603"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translatorcomment>Product name &quot;Mixed in P&quot; kept Latin; object particle 를 after the vowel-final &quot;P&quot; (피). Flag for native review.</translatorcomment>
         <translation>언어 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="586"/>
+        <location filename="../widgets/settings_panel.py" line="616"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
-        <translation type="unfinished"></translation>
+        <translation>테마 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>
 </context>
 <context>
@@ -1874,6 +1924,14 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/spectrum_panel.py" line="493"/>
         <source>Error: {0}</source>
         <translation>오류: {0}</translation>
+    </message>
+</context>
+<context>
+    <name>VisualizerWindow</name>
+    <message>
+        <location filename="../widgets/vis_canvas.py" line="288"/>
+        <source>Visualizer</source>
+        <translation>시각 효과</translation>
     </message>
 </context>
 </TS>

@@ -91,12 +91,15 @@ class SettingsPanel(QWidget):
         theme_layout.setContentsMargins(16, 10, 16, 10)
         theme_layout.setSpacing(8)
 
-        # Translatable display names keyed by palette id. Falls back to the
-        # palette's own label if a new theme is added without a label here.
+        # Display names keyed by palette id. Falls back to the palette's own
+        # label if a new theme is added without a label here. "Neon Dark"
+        # (product-flavor name) and "Nuevo Leon" (proper noun) are deliberately
+        # NOT tr()-wrapped — they stay English in every language; the other
+        # names are descriptive and translate normally.
         theme_labels = {
-            "neon_dark": self.tr("Neon Dark"),
+            "neon_dark": "Neon Dark",
             "night_dark": self.tr("Night Dark"),
-            "nuevo_leon": self.tr("Nuevo Leon"),
+            "nuevo_leon": "Nuevo Leon",
             "daylight": self.tr("Daylight"),
         }
         self._theme_combo = QComboBox()
@@ -162,6 +165,32 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(wave_frame)
         self._restyle_waveform_swatches()
+
+        # ── Section: Visualizations ────────────────────────────────────────
+        outer.addWidget(self._make_section_label(self.tr("Visualizations")))
+
+        vis_frame = QFrame()
+        vis_frame.setObjectName("settingsSection")
+        vis_layout = QVBoxLayout(vis_frame)
+        vis_layout.setContentsMargins(16, 10, 16, 10)
+        vis_layout.setSpacing(8)
+
+        self._visualizations_cb = QCheckBox(self.tr("Enable audio visualizations"))
+        self._visualizations_cb.setObjectName("circleCheckLg")
+        self._visualizations_cb.setChecked(False)
+        vis_layout.addWidget(self._visualizations_cb)
+
+        vis_hint = QLabel(
+            self.tr(
+                "Adds a visuals selector to the Player and an animated waveform "
+                "while analyzing or converting."
+            )
+        )
+        vis_hint.setObjectName("settingsHint")
+        vis_hint.setWordWrap(True)
+        vis_layout.addWidget(vis_hint)
+
+        outer.addWidget(vis_frame)
 
         # ── Section 1: Tempo Range ──────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Tempo Range")))
@@ -402,6 +431,7 @@ class SettingsPanel(QWidget):
         self._auto_write_bpm_cb.stateChanged.connect(self._emit_changed)
         self._auto_write_key_cb.stateChanged.connect(self._emit_changed)
         self._auto_analyze_cb.stateChanged.connect(self._emit_changed)
+        self._visualizations_cb.stateChanged.connect(self._emit_changed)
         self._format_group.buttonClicked.connect(self._emit_changed)
         self._language_combo.currentIndexChanged.connect(self._on_language_changed)
         self._theme_combo.currentIndexChanged.connect(self._on_theme_changed)
@@ -650,6 +680,7 @@ class SettingsPanel(QWidget):
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
             energy_written_first=self._energy_written_first_cb.isChecked(),
             waveform_color=self._waveform_color,
+            visualizations_enabled=self._visualizations_cb.isChecked(),
         )
 
     def load_config(self, cfg: AppConfig) -> None:
@@ -686,6 +717,10 @@ class SettingsPanel(QWidget):
             notation_radio.setChecked(True)
         self._auto_analyze_cb.setChecked(cfg.auto_analyze)
         self._key_in_comment_cb.setChecked(cfg.key_in_comment_enabled)
+
+        self._visualizations_cb.blockSignals(True)
+        self._visualizations_cb.setChecked(cfg.visualizations_enabled)
+        self._visualizations_cb.blockSignals(False)
 
         radio = self._format_radios.get(cfg.naming_preference)
         if radio:
