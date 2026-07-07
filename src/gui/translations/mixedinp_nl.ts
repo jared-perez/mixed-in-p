@@ -764,57 +764,57 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Voltooid: {0} bestanden geconverteerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="837"/>
+        <location filename="../main_window.py" line="838"/>
         <source>Rename in Progress</source>
         <translation>Hernoemen bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="838"/>
+        <location filename="../main_window.py" line="839"/>
         <source>A rename operation is already running.</source>
         <translation>Er loopt al een hernoembewerking.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="860"/>
+        <location filename="../main_window.py" line="861"/>
         <source>Renaming files...</source>
         <translation>Bestanden hernoemen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="872"/>
+        <location filename="../main_window.py" line="873"/>
         <source>Renamed {0} files</source>
         <translation>{0} bestanden hernoemd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="900"/>
+        <location filename="../main_window.py" line="901"/>
         <source>No Session</source>
         <translation>Geen sessie</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="900"/>
+        <location filename="../main_window.py" line="901"/>
         <source>No rename session to undo.</source>
         <translation>Geen hernoemsessie om te herstellen.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="909"/>
+        <location filename="../main_window.py" line="910"/>
         <source>Confirm Undo</source>
         <translation>Herstel bevestigen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="910"/>
+        <location filename="../main_window.py" line="911"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Hernoemen van {0} bestanden herstellen?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="919"/>
+        <location filename="../main_window.py" line="920"/>
         <source>Undoing rename...</source>
         <translation>Hernoemen herstellen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="936"/>
+        <location filename="../main_window.py" line="937"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Hersteld: {0} bestanden, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="940"/>
+        <location filename="../main_window.py" line="941"/>
         <source>Undone {0} files</source>
         <translation>{0} bestanden hersteld</translation>
     </message>
@@ -923,133 +923,143 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1020"/>
+        <location filename="../widgets/player_panel.py" line="1022"/>
         <source>Player</source>
         <translation>Speler</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1041"/>
+        <location filename="../widgets/player_panel.py" line="1043"/>
         <source>Choose a visualization</source>
         <translation>Kies een visualisatie</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1049"/>
+        <location filename="../widgets/player_panel.py" line="1051"/>
         <source>Visuals off</source>
         <translation>Geen visualisatie</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1050"/>
+        <location filename="../widgets/player_panel.py" line="1052"/>
         <source>Backdrop waveform</source>
         <translation>Achtergrond: golfvorm</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1051"/>
+        <location filename="../widgets/player_panel.py" line="1053"/>
         <source>Backdrop oscilloscope</source>
         <translation>Achtergrond: oscilloscoop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1052"/>
+        <location filename="../widgets/player_panel.py" line="1054"/>
         <source>Backdrop spectrum</source>
         <translation>Achtergrond: spectrum</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1053"/>
+        <location filename="../widgets/player_panel.py" line="1055"/>
         <source>Backdrop fire</source>
         <translation>Achtergrond: vuur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1054"/>
+        <location filename="../widgets/player_panel.py" line="1056"/>
+        <source>Backdrop fractal</source>
+        <translation>Achtergrond: fractal</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1057"/>
         <source>Popout oscilloscope</source>
         <translation>Venster: oscilloscoop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1055"/>
+        <location filename="../widgets/player_panel.py" line="1058"/>
         <source>Popout spectrum bars</source>
         <translation>Venster: spectrumbalken</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1056"/>
+        <location filename="../widgets/player_panel.py" line="1059"/>
         <source>Popout fire</source>
         <translation>Venster: vuur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1076"/>
+        <location filename="../widgets/player_panel.py" line="1060"/>
+        <source>Popout fractal</source>
+        <translation>Venster: fractal</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1080"/>
         <source>Edit Lock</source>
         <translation>Bewerkingsvergrendeling</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1080"/>
+        <location filename="../widgets/player_panel.py" line="1084"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Metadata bewerken in de afspeellijst vergrendelen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1093"/>
+        <location filename="../widgets/player_panel.py" line="1097"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1094"/>
+        <location filename="../widgets/player_panel.py" line="1098"/>
         <source>Filename</source>
         <translation>Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1095"/>
+        <location filename="../widgets/player_panel.py" line="1099"/>
         <source>Artist</source>
         <translation>Artiest</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1096"/>
+        <location filename="../widgets/player_panel.py" line="1100"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1097"/>
+        <location filename="../widgets/player_panel.py" line="1101"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1098"/>
+        <location filename="../widgets/player_panel.py" line="1102"/>
         <source>Key</source>
         <translatorcomment>Translated as &apos;Toonsoort&apos; (musical key), per glossary — not &apos;sleutel&apos;/&apos;toets&apos;.</translatorcomment>
         <translation>Toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1099"/>
+        <location filename="../widgets/player_panel.py" line="1103"/>
         <source>Comment</source>
         <translation>Opmerking</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1100"/>
+        <location filename="../widgets/player_panel.py" line="1104"/>
         <source>Duration</source>
         <translation>Duur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1101"/>
+        <location filename="../widgets/player_panel.py" line="1105"/>
         <source>Year</source>
         <translation>Jaar</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1196"/>
+        <location filename="../widgets/player_panel.py" line="1200"/>
         <source>Previous</source>
         <translation>Vorige</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1207"/>
+        <location filename="../widgets/player_panel.py" line="1211"/>
         <source>Play / Pause  (Space)</source>
         <translation>Afspelen / Pauze  (Spatie)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1214"/>
+        <location filename="../widgets/player_panel.py" line="1218"/>
         <source>Stop</source>
         <translation>Stoppen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1221"/>
+        <location filename="../widgets/player_panel.py" line="1225"/>
         <source>Next</source>
         <translation>Volgende</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1261"/>
+        <location filename="../widgets/player_panel.py" line="1265"/>
         <source>Vol</source>
         <translatorcomment>Kept &apos;Vol&apos; (volume abbreviation); identical short form works in NL.</translatorcomment>
         <translation>Vol</translation>
@@ -1059,38 +1069,38 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Selectie verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1281"/>
+        <location filename="../widgets/player_panel.py" line="1285"/>
         <source>Clear Playlist</source>
         <translation>Playlist wissen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1795"/>
+        <location filename="../widgets/player_panel.py" line="1799"/>
         <source>{0} track</source>
         <translation>{0} track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1797"/>
+        <location filename="../widgets/player_panel.py" line="1801"/>
         <source>{0} tracks</source>
         <translation>{0} tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2388"/>
+        <location filename="../widgets/player_panel.py" line="2392"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2389"/>
+        <location filename="../widgets/player_panel.py" line="2393"/>
         <source>Open in Metadata Panel</source>
         <translatorcomment>Reviewed (nl pass): no article surfaces here; &apos;paneel&apos; is het - confirmed.</translatorcomment>
         <translation>Openen in Metadata-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2390"/>
+        <location filename="../widgets/player_panel.py" line="2394"/>
         <source>Reload Metadata from File</source>
         <translation>Metadata opnieuw laden uit bestand</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2392"/>
+        <location filename="../widgets/player_panel.py" line="2396"/>
         <source>Remove from Playlist</source>
         <translation>Uit playlist verwijderen</translation>
     </message>
@@ -1098,18 +1108,18 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>ProgressPanel</name>
     <message>
-        <location filename="../widgets/progress_bar.py" line="39"/>
-        <location filename="../widgets/progress_bar.py" line="98"/>
+        <location filename="../widgets/progress_bar.py" line="41"/>
+        <location filename="../widgets/progress_bar.py" line="113"/>
         <source>Analyzing...</source>
         <translation>Analyseren...</translation>
     </message>
     <message>
-        <location filename="../widgets/progress_bar.py" line="45"/>
+        <location filename="../widgets/progress_bar.py" line="47"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../widgets/progress_bar.py" line="117"/>
+        <location filename="../widgets/progress_bar.py" line="134"/>
         <source>Complete</source>
         <translation>Voltooid</translation>
     </message>
@@ -1338,7 +1348,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="360"/>
+        <location filename="../widgets/player_panel.py" line="361"/>
         <source>Drop audio files here</source>
         <translation>Sleep audiobestanden hierheen</translation>
     </message>
@@ -1713,79 +1723,79 @@ of klik op “Artwork toevoegen…”</translation>
     <name>SliceSection</name>
     <message>
         <location filename="../widgets/slice_section.py" line="93"/>
-        <location filename="../widgets/slice_section.py" line="329"/>
+        <location filename="../widgets/slice_section.py" line="332"/>
         <source>▸  Waveform Loop Slicer</source>
         <translatorcomment>Kept entire &apos;Waveform Loop Slicer&apos; English: slicer term + &apos;waveform&apos;/&apos;loop&apos; are standard producer English in NL.</translatorcomment>
         <translation>▸  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="149"/>
+        <location filename="../widgets/slice_section.py" line="152"/>
         <source>Slice start time (m:ss:mmm) — type to set</source>
         <translation>Begintijd van de slice (m:ss:mmm) — typ om in te stellen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="158"/>
+        <location filename="../widgets/slice_section.py" line="161"/>
         <source>Slice end time (m:ss:mmm) — type to set</source>
         <translation>Eindtijd van de slice (m:ss:mmm) — typ om in te stellen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="160"/>
-        <location filename="../widgets/slice_section.py" line="167"/>
+        <location filename="../widgets/slice_section.py" line="163"/>
+        <location filename="../widgets/slice_section.py" line="170"/>
         <source>Mark</source>
         <translation>Markeren</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="161"/>
+        <location filename="../widgets/slice_section.py" line="164"/>
         <source>Mark start at playhead (Q)</source>
         <translation>Begin markeren bij afspeelkop (Q)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="168"/>
+        <location filename="../widgets/slice_section.py" line="171"/>
         <source>Mark end at playhead (E)</source>
         <translation>Einde markeren bij afspeelkop (E)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="183"/>
+        <location filename="../widgets/slice_section.py" line="186"/>
         <source>Nudge start marker back 10 ms</source>
         <translation>Beginmarkering 10 ms terug verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="185"/>
+        <location filename="../widgets/slice_section.py" line="188"/>
         <source>Nudge start marker forward 10 ms</source>
         <translation>Beginmarkering 10 ms vooruit verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="187"/>
+        <location filename="../widgets/slice_section.py" line="190"/>
         <source>Nudge end marker back 10 ms</source>
         <translation>Eindmarkering 10 ms terug verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="189"/>
+        <location filename="../widgets/slice_section.py" line="192"/>
         <source>Nudge end marker forward 10 ms</source>
         <translation>Eindmarkering 10 ms vooruit verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="217"/>
+        <location filename="../widgets/slice_section.py" line="220"/>
         <source>Length</source>
         <translation>Lengte</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="221"/>
+        <location filename="../widgets/slice_section.py" line="224"/>
         <source>Shorten slice by 10 ms</source>
         <translation>Slice 10 ms inkorten</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="225"/>
+        <location filename="../widgets/slice_section.py" line="228"/>
         <source>Slice length (m:ss:mmm) — type to set; moves the end marker</source>
         <translation>Lengte van de slice (m:ss:mmm) — typ om in te stellen; verplaatst de eindmarkering</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="227"/>
+        <location filename="../widgets/slice_section.py" line="230"/>
         <source>Lengthen slice by 10 ms</source>
         <translation>Slice 10 ms verlengen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="242"/>
+        <location filename="../widgets/slice_section.py" line="245"/>
         <source>&lt; Start</source>
         <translation>&lt; Begin</translation>
     </message>
@@ -1794,13 +1804,13 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Afspeelkop naar beginmarkering springen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="247"/>
+        <location filename="../widgets/slice_section.py" line="250"/>
         <source>Loop</source>
         <translatorcomment>Kept &apos;Loop&apos; English (standard producer term in NL).</translatorcomment>
         <translation>Loop</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="252"/>
+        <location filename="../widgets/slice_section.py" line="255"/>
         <source>Loop playback between the start and end markers (L)</source>
         <translatorcomment>Added (L) hotkey hint to the existing loop tooltip translation.</translatorcomment>
         <translation>Loop het afspelen tussen de begin- en eindmarkering (L)</translation>
@@ -1810,50 +1820,50 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Loop het afspelen tussen de begin- en eindmarkering</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="245"/>
+        <location filename="../widgets/slice_section.py" line="248"/>
         <source>Jump playhead to start marker (S)</source>
         <translation>Afspeelkop naar beginmarkering springen (S)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="259"/>
+        <location filename="../widgets/slice_section.py" line="262"/>
         <source>Save Slice As:</source>
         <translatorcomment>Kept &apos;Slice&apos; English (slicer/producer term per glossary).</translatorcomment>
         <translation>Slice opslaan als:</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="264"/>
+        <location filename="../widgets/slice_section.py" line="267"/>
         <source>output filename</source>
         <translation>uitvoerbestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="273"/>
+        <location filename="../widgets/slice_section.py" line="276"/>
         <source>Choose save folder</source>
         <translation>Kies opslagmap</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="280"/>
+        <location filename="../widgets/slice_section.py" line="283"/>
         <source>Slice</source>
         <translatorcomment>Kept &apos;Slice&apos; English (slicer-derived term per glossary).</translatorcomment>
         <translation>Slice</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="329"/>
+        <location filename="../widgets/slice_section.py" line="332"/>
         <source>▾  Waveform Loop Slicer</source>
         <translatorcomment>Kept entire &apos;Waveform Loop Slicer&apos; English: slicer term + &apos;waveform&apos;/&apos;loop&apos; are standard producer English in NL.</translatorcomment>
         <translation>▾  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="557"/>
+        <location filename="../widgets/slice_section.py" line="560"/>
         <source>Choose Save Folder</source>
         <translation>Kies opslagmap</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="576"/>
+        <location filename="../widgets/slice_section.py" line="579"/>
         <source>Saved: {0}</source>
         <translation>Opgeslagen: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="581"/>
+        <location filename="../widgets/slice_section.py" line="584"/>
         <source>Error: {0}</source>
         <translation>Fout: {0}</translation>
     </message>
@@ -1931,7 +1941,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="288"/>
+        <location filename="../widgets/vis_canvas.py" line="370"/>
         <source>Visualizer</source>
         <translation>Visualizer</translation>
     </message>

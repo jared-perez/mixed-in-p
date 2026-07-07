@@ -31,10 +31,12 @@ _VALID_VIS_MODES = {
     "backdrop_scope",
     "backdrop_spectrum",
     "backdrop_fire",
+    "backdrop_fractal",
     # Popout visualizer window.
     "oscilloscope",
     "spectrum",
     "fire",
+    "fractal",
 }
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
