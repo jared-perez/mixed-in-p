@@ -9,6 +9,10 @@ fast (non-smooth) transformation for a chunky pixel look:
   peak-hold caps that drop with accelerating speed.
 - ``fire`` — the classic heat-propagation fire effect, stoked from the bottom
   row by the same log-band energies.
+- ``fractal`` — a spinning escape-time Julia set (the Mandelbrot family). The
+  Julia constant orbits the classic radius so the branches continuously morph
+  between dendrites and spirals; overall level drives morph/spin speed and
+  brightness, and the kick pulse punches the zoom.
 
 The rendering lives in :class:`VisRenderer` (no widget), shared by two hosts:
 the popout :class:`VisCanvas`, and the Player playlist's backdrop (which blits
@@ -46,8 +50,22 @@ _PEAK_ACCEL = 1.1
 _SCOPE_SAMPLES = 576
 _SCOPE_LEVELS = 16
 _FIRE_STOKE_GAIN = 1.25
+# Fractal (Julia set) tuning. The constant moves on the classic morphing-Julia
+# circle |c| = 0.7885, but swings back and forth through the arc around angle π
+# (measured sweep: the sets there are rich branches/spirals) instead of
+# circling through the near-empty dust zone around angle 0. The view plane
+# spins and the kick pulse punches a momentary zoom.
+_JULIA_ITERATIONS = 26
+_JULIA_ORBIT_RADIUS = 0.7885
+_JULIA_ORBIT_SWING = 2.2  # max angular deviation from π on the c-circle
+_JULIA_VIEW_SPAN = 3.1  # complex-plane width of the (pre-zoom) viewport
+_JULIA_SPIN_BASE = 0.006  # radians/frame with no audio
+_JULIA_SPIN_LEVEL = 0.045  # extra spin at full level
+_JULIA_MORPH_BASE = 0.002  # c-orbit advance per frame (silence)
+_JULIA_MORPH_LEVEL = 0.022  # extra orbit speed at full level
+_JULIA_KICK_ZOOM = 0.14  # fraction of zoom-in on a full-strength kick
 
-RENDER_MODES = ("oscilloscope", "spectrum", "fire")
+RENDER_MODES = ("oscilloscope", "spectrum", "fire", "fractal")
 POPOUT_MODES = RENDER_MODES
 
 
@@ -92,6 +110,15 @@ class VisRenderer:
         # while playing); this is a few numpy ops per frame.
         self._bass_att: float = 0.0
         self._pulse: float = 0.0
+        # Fractal state: view rotation, c-orbit phase, and a fast-attack /
+        # slow-release level follower so the image fades out over silence.
+        self._fract_angle: float = 0.0
+        self._fract_phase: float = 0.0
+        self._fract_level: float = 0.0
+        # Pixel → complex-plane grid, built once (square pixels, centered).
+        xs = np.linspace(-0.5, 0.5, _W) * _JULIA_VIEW_SPAN
+        ys = np.linspace(-0.5, 0.5, _H) * (_JULIA_VIEW_SPAN * _H / _W)
+        self._fract_grid = (xs[None, :] + 1j * ys[:, None]).astype(np.complex64)
 
     # ── Public API ─────────────────────────────────────────────────────────
 
@@ -108,6 +135,9 @@ class VisRenderer:
         self._heat[:] = 0.0
         self._bass_att = 0.0
         self._pulse = 0.0
+        self._fract_angle = 0.0
+        self._fract_phase = 0.0
+        self._fract_level = 0.0
 
     def set_color(self, color: str) -> None:
         self._color = QColor(color)
@@ -125,6 +155,8 @@ class VisRenderer:
             heights = self._band_heights(samples, sr)
             if self._mode == "spectrum":
                 self._render_spectrum(heights)
+            elif self._mode == "fractal":
+                self._render_fractal(heights)
             else:
                 self._render_fire(heights)
         return self._image
@@ -247,6 +279,56 @@ class VisRenderer:
         bgra[..., 1] = rgb[..., 1]
         bgra[..., 2] = rgb[..., 0]
         bgra[..., 3] = (np.clip(heat * 2.5, 0.0, 1.0) * 255).astype(np.uint8)
+        self._image = QImage(
+            bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
+        ).copy()
+
+    def _render_fractal(self, heights: np.ndarray) -> None:
+        # Blend mean and max band height: mean alone leaves sparse spectra
+        # (e.g. a lone bass line) nearly invisible, max alone never breathes.
+        level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
+        # Fast attack, slow release: the fractal lights up with the music and
+        # fades out over ~2s of silence (0.94^60 ≈ 0.02) instead of freezing.
+        self._fract_level = max(level, self._fract_level * 0.94)
+        self._fract_angle += _JULIA_SPIN_BASE + _JULIA_SPIN_LEVEL * level
+        self._fract_phase += _JULIA_MORPH_BASE + _JULIA_MORPH_LEVEL * level
+
+        theta = np.pi + _JULIA_ORBIT_SWING * np.sin(self._fract_phase)
+        c = _JULIA_ORBIT_RADIUS * np.exp(1j * theta)
+        zoom = 1.0 - _JULIA_KICK_ZOOM * self._pulse
+        z = (self._fract_grid * (np.exp(-1j * self._fract_angle) * zoom)).ravel()
+
+        # Escape-time iteration; points that never escape (the set's interior)
+        # keep count 0 and are recolored to full brightness below.
+        count = np.zeros(z.shape, dtype=np.float32)
+        alive = np.ones(z.shape, dtype=bool)
+        for i in range(1, _JULIA_ITERATIONS + 1):
+            za = z[alive]
+            za = za * za + c
+            z[alive] = za
+            escaped = np.abs(za) > 2.0
+            idx = np.flatnonzero(alive)[escaped]
+            count[idx] = i
+            alive[idx] = False
+            if not alive.any():
+                break
+
+        # Late escape = close to the set = bright branch edge. The interior
+        # sits at mid brightness (body in the theme color) so the near-white
+        # top of the ramp is reserved for the dendrite fringe — full-bright
+        # interiors render as flat washed-out blobs. The exponent darkens the
+        # far field for contrast.
+        intensity = (count / _JULIA_ITERATIONS) ** 1.6
+        intensity[alive] = 0.5
+        brightness = self._fract_level * (0.8 + 0.5 * self._pulse)
+        intensity = (intensity * np.clip(brightness, 0.0, 1.0)).reshape(_H, _W)
+
+        rgb = self._fire_lut[(intensity * 255).astype(np.uint8)]
+        bgra = np.empty((_H, _W, 4), dtype=np.uint8)
+        bgra[..., 0] = rgb[..., 2]
+        bgra[..., 1] = rgb[..., 1]
+        bgra[..., 2] = rgb[..., 0]
+        bgra[..., 3] = (np.clip(intensity * 2.2, 0.0, 1.0) * 255).astype(np.uint8)
         self._image = QImage(
             bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
         ).copy()

@@ -88,6 +88,7 @@ _BACKDROP_VIS_MAP = {
     "backdrop_scope": "oscilloscope",
     "backdrop_spectrum": "spectrum",
     "backdrop_fire": "fire",
+    "backdrop_fractal": "fractal",
 }
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin, blank_drag_pixmap
@@ -115,8 +116,8 @@ _HEADER_ART_SIZE = 56
 # enough not to strobe behind the row text.
 _BACKDROP_WINDOW_MS = 12_000
 
-# Opacity for visualizer-frame backdrops (scope/spectrum/fire behind the
-# playlist) — dim enough that the row text stays readable.
+# Opacity for visualizer-frame backdrops (scope/spectrum/fire/fractal behind
+# the playlist) — dim enough that the row text stays readable.
 _BACKDROP_VIS_OPACITY = 0.40
 
 # After pause/stop, keep feeding a visualizer backdrop silence for this many
@@ -929,7 +930,8 @@ class PlayerPanel(QWidget):
         self._backdrop_src: tuple | None = None  # (pcm, sr)
         self._backdrop_env: tuple | None = None  # (min, max, bins_per_sec)
         self._backdrop_env_path: str | None = None
-        # Popout visualizer (oscilloscope/spectrum/fire); created on first use.
+        # Popout visualizer (oscilloscope/spectrum/fire/fractal); created on
+        # first use.
         self._vis_window: VisualizerWindow | None = None
         # Backdrop visualizer: same renderers, blitted behind the playlist.
         # Ticks only while playing (plus a short silence decay after pause).
@@ -1051,9 +1053,11 @@ class PlayerPanel(QWidget):
             ("backdrop_scope", self.tr("Backdrop oscilloscope")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_fire", self.tr("Backdrop fire")),
+            ("backdrop_fractal", self.tr("Backdrop fractal")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
             ("fire", self.tr("Popout fire")),
+            ("fractal", self.tr("Popout fractal")),
         ):
             action = QAction(label, self)
             action.setCheckable(True)
