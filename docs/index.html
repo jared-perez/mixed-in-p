@@ -74,11 +74,12 @@
     <a href="#workflows">4 · Core workflows</a>
     <a href="#routing">5 · Moving files</a>
     <a href="#settings">6 · Settings</a>
-    <a href="#shortcuts">7 · Keyboard shortcuts</a>
-    <a href="#formats">8 · Supported formats</a>
-    <a href="#keycodes">9 · Key-code reference</a>
-    <a href="#harmonic">10 · Harmonic mixing in 60s</a>
-    <a href="#faq">11 · FAQ &amp; troubleshooting</a>
+    <a href="#history">7 · History</a>
+    <a href="#shortcuts">8 · Keyboard shortcuts</a>
+    <a href="#formats">9 · Supported formats</a>
+    <a href="#keycodes">10 · Key-code reference</a>
+    <a href="#harmonic">11 · Harmonic mixing in 60s</a>
+    <a href="#faq">12 · FAQ &amp; troubleshooting</a>
   </nav>
 
   <main>
@@ -228,7 +229,11 @@
       <li><b>Sidebar drag</b> — select rows and drop them on another panel's sidebar button. Routes
         either <b>move</b> (remove from source) or <b>copy</b> the files; the button highlights when
         it's a valid target.</li>
-      <li><b>From your file manager</b> — dragging files in always <i>adds</i> them.</li>
+      <li><b>From your file manager</b> — dragging files in always <i>adds</i> them.
+        <ul>
+          <li>It works the other way too — drag files straight out of Mixed in P into other apps.</li>
+        </ul>
+      </li>
     </ul>
 
     <h2 id="settings"><span class="num">06</span>Settings reference</h2><hr>
@@ -244,20 +249,6 @@
             mint-green highlights; mirrors the website's look.</li>
         </ul>
       </li>
-      <li><b>Tempo range</b> — lowest/highest BPM (defaults 99–199); narrow it to avoid half/double
-        errors.</li>
-      <li><b>After analysis</b> — toggle auto-analyze, write BPM to tags, write key to tags,
-        auto-rename, and write key to comment (with energy-first option).</li>
-      <li><b>Naming format</b> — choose the prefix/suffix layout, e.g. <code>128 8A - Original_Name</code>
-        or <code>8A - Original_Name</code>. Affects auto-rename only.</li>
-      <li><b>Notation</b> — Key Codes (default), Traditional, or Traktor Open Key. Applied
-        live.</li>
-      <li><b>Waveform color</b> — the color of the full-length waveform in the Player. Pick a preset
-        or choose a custom color; applied live. The first option, <b>Default</b>, follows the active
-        theme (each theme has its own waveform color).</li>
-      <li><b>Visualizations</b> — <b>Enable audio visualizations</b> turns on the Player's audio
-        visuals (backdrop or popout modes, chosen from the eye-icon button); off by default, applied
-        live. More below.</li>
     </ul>
     <p>The four color themes (set in <b>Settings → Theme</b>, applied after a restart):</p>
     <div style="display:flex;flex-wrap:wrap;gap:14px;margin:16px 0">
@@ -278,6 +269,22 @@
         <figcaption style="color:var(--muted);font-size:13px;text-align:center;margin-top:6px">Nuevo Leon</figcaption>
       </figure>
     </div>
+    <ul>
+      <li><b>Tempo range</b> — lowest/highest BPM (defaults 99–199); narrow it to avoid half/double
+        errors.</li>
+      <li><b>After analysis</b> — toggle auto-analyze, write BPM to tags, write key to tags,
+        auto-rename, and write key to comment (with energy-first option).</li>
+      <li><b>Naming format</b> — choose the prefix/suffix layout, e.g. <code>128 8A - Original_Name</code>
+        or <code>8A - Original_Name</code>. Affects auto-rename only.</li>
+      <li><b>Notation</b> — Key Codes (default), Traditional, or Traktor Open Key. Applied
+        live.</li>
+      <li><b>Waveform color</b> — the color of the full-length waveform in the Player. Pick a preset
+        or choose a custom color; applied live. The first option, <b>Default</b>, follows the active
+        theme (each theme has its own waveform color).</li>
+      <li><b>Visualizations</b> — <b>Enable audio visualizations</b> turns on the Player's audio
+        visuals (backdrop or popout modes, chosen from the eye-icon button); off by default, applied
+        live. More below.</li>
+    </ul>
     <p><b>Audio visualizations</b> are off by default. To turn them on, open
       <b>Settings → Visualizations</b> and check <b>Enable audio visualizations</b>. Once enabled, an
       eye-icon button appears in the <b>Player</b> — click it to choose a visualization:</p>
@@ -293,7 +300,19 @@
       is always shown and isn't affected by this switch.)</p>
     <p>All settings save instantly — there's no Save button.</p>
 
-    <h2 id="shortcuts"><span class="num">07</span>Keyboard shortcuts</h2><hr>
+    <h2 id="history"><span class="num">07</span>History</h2><hr>
+    <p>The <b>History</b> panel keeps a running record of your work in two views, switched with the
+      toggle buttons at the bottom of the panel:</p>
+    <ul>
+      <li><b>Rename History</b> — every batch-rename session, newest first, with its date/time, file
+        count, and a preview of what changed. Select a session to undo it and roll those files back to
+        their previous names.</li>
+      <li><b>Song Key History</b> — every track you've analyzed, with its detected BPM, musical key and
+        key code, alternative key suggestions, energy level, and confidence scores. A persistent log of
+        past results, so you can look up a track's key without re-analyzing it.</li>
+    </ul>
+
+    <h2 id="shortcuts"><span class="num">08</span>Keyboard shortcuts</h2><hr>
     <table>
       <tr><th>Keys</th><th>Action</th><th>Where</th></tr>
       <tr><td>Space</td><td>Play / Pause</td><td>Player (when focused)</td></tr>
@@ -304,7 +323,7 @@
       <tr><td>S / Q / E</td><td>Slice section controls</td><td>Player (slicer expanded)</td></tr>
     </table>
 
-    <h2 id="formats"><span class="num">08</span>Supported formats</h2><hr>
+    <h2 id="formats"><span class="num">09</span>Supported formats</h2><hr>
     <table>
       <tr><th>Task</th><th>Formats</th></tr>
       <tr><td>Analyze</td><td>MP3, WAV, FLAC, AIFF/AIF, M4A, OGG</td></tr>
@@ -316,7 +335,7 @@
     <p>Converting <i>from</i> a lossy source into a lossless format is intentionally blocked — it
       can't restore lost quality.</p>
 
-    <h2 id="keycodes"><span class="num">09</span>Harmonic key-code reference</h2><hr>
+    <h2 id="keycodes"><span class="num">10</span>Harmonic key-code reference</h2><hr>
     <table>
       <tr><th>Code</th><th>Open Key</th><th>Minor key</th><th>Code</th><th>Open Key</th><th>Major key</th></tr>
       <tr><td>1A</td><td>6m</td><td>G#m / A♭m</td><td>1B</td><td>6d</td><td>B</td></tr>
@@ -336,18 +355,20 @@
       same keys in Traktor Open Key notation.</p>
     <p><b>Compatible for mixing:</b> the same number (relative major/minor), or ±1 on the same letter.</p>
 
-    <h2 id="harmonic"><span class="num">10</span>Harmonic mixing in 60 seconds</h2><hr>
+    <h2 id="harmonic"><span class="num">11</span>Harmonic mixing in 60 seconds</h2><hr>
     <p>Two tracks sound good together when their keys are compatible. Remembering raw key names
       (F# minor, D♭ major…) is awkward, so Mixed in P uses <b>key codes</b> — a clock-face system where
       every key gets a number (1–12) and a letter (<b>A</b> for minor, <b>B</b> for major).</p>
     <div class="callout"><b>The rule of thumb:</b> a track mixes smoothly with any track that shares its
       <b>number</b>, or sits <b>±1</b> on the same letter. So from <code>8A</code>, good next picks are
       <code>8B</code>, <code>7A</code>, or <code>9A</code>.</div>
+    <p>Trusting your ear is best though, so don't get too reliant on the key tags — the key analysis
+      isn't always accurate either.</p>
     <p>Prefer traditional note names or Traktor's Open Key format? Switch any time in
       <b>Settings → Notation</b>. The full mapping is in the
       <a href="#keycodes">key-code reference</a> below.</p>
 
-    <h2 id="faq"><span class="num">11</span>FAQ &amp; troubleshooting</h2><hr>
+    <h2 id="faq"><span class="num">12</span>FAQ &amp; troubleshooting</h2><hr>
     <p><b>A file says "Lossy not allowed" in Convert.</b> The source is MP3, M4A, or OGG. Lossless
       conversion needs a lossless source (WAV/FLAC/AIFF). Converting <i>to</i> MP3 is fine.</p>
     <p><b>The BPM looks half or double what I expect.</b> Set a tighter <b>tempo range</b> in Settings
