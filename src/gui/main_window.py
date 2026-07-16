@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 
 logger = logging.getLogger(__name__)
 
+from src.analysis import history as analysis_history
 from src.analysis.keycode import render_key
 from src.analysis.result import AnalysisResult
 from src.metadata import update_bpm_key, update_comment_with_energy
@@ -102,6 +103,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_auto_analyze(self._config.auto_analyze)
         self._analysis_panel.set_auto_write_bpm(self._config.auto_write_bpm)
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
+        self._analysis_panel.set_key_notation(self._config.key_notation)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
         self._apply_visualization_settings()
@@ -739,6 +741,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_auto_analyze(self._config.auto_analyze)
         self._analysis_panel.set_auto_write_bpm(self._config.auto_write_bpm)
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
+        self._analysis_panel.set_key_notation(self._config.key_notation)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
         self._apply_visualization_settings()
@@ -780,8 +783,27 @@ class MainWindow(QMainWindow):
                 key=result.key,
                 key_confidence=result.key_confidence,
                 keycode=result.keycode,
+                key_alternatives=result.key_alternatives,
                 energy=result.energy,
             )
+
+            # Record in the persistent analysis history (best-effort)
+            try:
+                from datetime import datetime
+
+                analysis_history.add_entry({
+                    "file_path": result.file_path,
+                    "timestamp": datetime.now().isoformat(),
+                    "bpm": result.bpm,
+                    "bpm_confidence": result.bpm_confidence,
+                    "key": result.key,
+                    "key_confidence": result.key_confidence,
+                    "keycode": result.keycode,
+                    "key_alternatives": result.key_alternatives,
+                    "energy": result.energy,
+                })
+            except Exception as e:
+                logger.warning(f"Failed to record analysis history: {e}")
 
             # Auto-write metadata — BPM and key are independently toggleable.
             write_bpm = self._analysis_panel.auto_write_bpm
@@ -883,6 +905,14 @@ class MainWindow(QMainWindow):
                     file_path=record.new_path,
                     display_name=new_name,
                 )
+
+        # Keep analysis history pointing at the renamed files (best-effort)
+        try:
+            analysis_history.update_paths(
+                [(r.original_path, r.new_path) for r in session.records]
+            )
+        except Exception as e:
+            logger.warning(f"Failed to update analysis history paths: {e}")
 
         # Refresh preview (paths updated in store), then mark renamed rows
         self._rename_panel.refresh()

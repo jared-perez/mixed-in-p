@@ -4,7 +4,7 @@ This module has NO heavy dependencies (no librosa, numpy, soundfile).
 Import freely without triggering slow library loads.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -21,6 +21,9 @@ class AnalysisResult:
     energy: int | None = None
     energy_confidence: float | None = None
     error: str | None = None
+    # Runner-up key candidates from the same analysis pass, best first:
+    # [{"key": "Fm", "keycode": "4A", "confidence": 0.27}, ...]
+    key_alternatives: list[dict] = field(default_factory=list)
 
     @property
     def filename(self) -> str:
@@ -40,6 +43,7 @@ class AnalysisResult:
             "energy": self.energy,
             "energy_confidence": self.energy_confidence,
             "error": self.error,
+            "key_alternatives": self.key_alternatives,
         }
 
 

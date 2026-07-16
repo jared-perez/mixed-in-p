@@ -9,7 +9,7 @@ from typing import Callable
 
 from .bpm_detector import detect_bpm
 from .energy_detector import detect_energy
-from .key_detector import detect_key
+from .key_detector import detect_key_with_alternatives
 from .keycode import key_to_keycode
 from .result import AnalysisResult
 
@@ -33,14 +33,24 @@ def analyze_file(
         # Detect BPM
         bpm, bpm_confidence = detect_bpm(file_path, min_bpm, max_bpm)
 
-        # Detect key
-        key, key_confidence = detect_key(file_path)
+        # Detect key (primary + runner-up candidates in one pass)
+        key, key_confidence, alternatives = detect_key_with_alternatives(file_path)
 
         # Convert to Key Code
         try:
             keycode = key_to_keycode(key)
         except ValueError:
             keycode = ""
+
+        key_alternatives = []
+        for alt_key, alt_confidence in alternatives:
+            try:
+                alt_keycode = key_to_keycode(alt_key)
+            except ValueError:
+                alt_keycode = ""
+            key_alternatives.append(
+                {"key": alt_key, "keycode": alt_keycode, "confidence": alt_confidence}
+            )
 
         # Detect energy level
         try:
@@ -57,6 +67,7 @@ def analyze_file(
             keycode=keycode,
             energy=energy,
             energy_confidence=energy_confidence,
+            key_alternatives=key_alternatives,
         )
 
     except Exception as e:

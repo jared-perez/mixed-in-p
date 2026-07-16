@@ -11,6 +11,7 @@ from src.analysis.key_detector import (
     _correlate_profiles,
     _fit_strength,
     detect_key,
+    detect_key_with_alternatives,
     get_key_alternatives,
 )
 
@@ -136,6 +137,20 @@ class TestGetKeyAlternatives:
     def test_silence_returns_empty_list(self, tmp_path):
         path = _write(tmp_path / "silence.wav", np.zeros(SR * 5, dtype=np.float32))
         assert get_key_alternatives(path) == []
+
+
+class TestDetectKeyWithAlternatives:
+    def test_primary_matches_detect_key_and_alternatives_exclude_it(self, tmp_path):
+        path = _write(tmp_path / "cmaj.wav", _render_chords(C_MAJOR_PROGRESSION))
+        key, confidence, alternatives = detect_key_with_alternatives(path, top_n=3)
+        assert (key, confidence) == detect_key(path)
+        assert len(alternatives) == 2
+        assert key not in [k for k, _ in alternatives]
+        assert all(c <= confidence for _, c in alternatives)
+
+    def test_silence_returns_empty(self, tmp_path):
+        path = _write(tmp_path / "silence.wav", np.zeros(SR * 5, dtype=np.float32))
+        assert detect_key_with_alternatives(path) == ("", 0.0, [])
 
 
 class TestConfidence:

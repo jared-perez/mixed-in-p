@@ -21,6 +21,8 @@ class _NoFocusDelegate(QStyledItemDelegate):
         super().initStyleOption(option, index)
         option.state &= ~QStyle.StateFlag.State_HasFocus
 
+from src.analysis.keycode import render_key
+
 from ..models import TrackState, TrackStore, TrackTableModel
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .droppable_table import DroppableTableView
@@ -37,13 +39,51 @@ class AnalysisTableModel(TrackTableModel):
         QCoreApplication.translate("AnalysisTableModel", "Key"),
         QCoreApplication.translate("AnalysisTableModel", "Conf"),
         QCoreApplication.translate("AnalysisTableModel", "Key Code"),
+        QCoreApplication.translate("AnalysisTableModel", "Alt Keys"),
         QCoreApplication.translate("AnalysisTableModel", "Energy"),
         QCoreApplication.translate("AnalysisTableModel", "Status"),
     ]
-    COLUMN_KEYS = ["display_name", "bpm", "bpm_confidence", "key", "key_confidence", "keycode", "energy", "state"]
+    COLUMN_KEYS = [
+        "display_name", "bpm", "bpm_confidence", "key", "key_confidence",
+        "keycode", "key_alternatives", "energy", "state",
+    ]
 
     def __init__(self, store: TrackStore, parent=None):
         super().__init__(store, parent)
+        self._key_notation = "keycode"
+
+    def set_key_notation(self, notation: str) -> None:
+        """Set the display notation for alternative keys and repaint."""
+        if notation == self._key_notation:
+            return
+        self._key_notation = notation
+        self.beginResetModel()
+        self.endResetModel()
+
+    def _format_alternatives(self, alternatives) -> str:
+        """Render runner-up keys compactly in the configured notation."""
+        if not alternatives:
+            return ""
+        parts = []
+        for alt in alternatives:
+            label = render_key(
+                alt.get("key", ""), alt.get("keycode", ""), self._key_notation
+            )
+            if label:
+                parts.append(f"{label} {alt.get('confidence', 0.0):.0%}")
+        return "  ".join(parts)
+
+    def _alternatives_tooltip(self, alternatives) -> str:
+        """Verbose tooltip for runner-up keys, showing both notations."""
+        if not alternatives:
+            return ""
+        parts = []
+        for alt in alternatives:
+            key = alt.get("key", "")
+            keycode = alt.get("keycode", "")
+            label = f"{key} ({keycode})" if key and keycode else key or keycode
+            parts.append(f"{label} {alt.get('confidence', 0.0):.0%}")
+        return self.tr("Other likely keys: {keys}").format(keys=", ".join(parts))
 
     def _get_filtered_tracks(self) -> list:
         """Get tracks that are pending, analysing, analysed, or error."""
@@ -88,7 +128,12 @@ class AnalysisTableModel(TrackTableModel):
                 return f"{value:.1f}"
             if column in ("bpm_confidence", "key_confidence") and value is not None:
                 return f"{value:.0%}"
+            if column == "key_alternatives":
+                return self._format_alternatives(value)
             return str(value) if value is not None else ""
+
+        if role == Qt.ItemDataRole.ToolTipRole and column == "key_alternatives":
+            return self._alternatives_tooltip(track.key_alternatives)
 
         if role == Qt.ItemDataRole.ForegroundRole:
             # Color based on state
@@ -203,16 +248,18 @@ class AnalysisPanel(QWidget):
         header.setSectionResizeMode(3, QHeaderView.ResizeMode.Fixed)  # Key
         header.setSectionResizeMode(4, QHeaderView.ResizeMode.Fixed)  # Key Conf
         header.setSectionResizeMode(5, QHeaderView.ResizeMode.Fixed)  # Key Code
-        header.setSectionResizeMode(6, QHeaderView.ResizeMode.Fixed)  # Energy
-        header.setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)  # Status
+        # Alt Keys sizes to its contents so the alternatives are never elided
+        header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)  # Energy
+        header.setSectionResizeMode(8, QHeaderView.ResizeMode.Fixed)  # Status
         self._table.setColumnWidth(0, 360)  # Name
         self._table.setColumnWidth(1, 80)   # BPM
         self._table.setColumnWidth(2, 75)   # BPM Conf
         self._table.setColumnWidth(3, 80)   # Key
         self._table.setColumnWidth(4, 75)   # Key Conf
         self._table.setColumnWidth(5, 80)   # Key Code
-        self._table.setColumnWidth(6, 60)   # Energy
-        self._table.setColumnWidth(7, 100)  # Status
+        self._table.setColumnWidth(7, 60)   # Energy
+        self._table.setColumnWidth(8, 100)  # Status
 
         layout.addWidget(self._table, 1)
 
@@ -297,6 +344,10 @@ class AnalysisPanel(QWidget):
     def set_auto_write_key(self, enabled: bool) -> None:
         """Set the auto-write-key flag (driven by the Settings panel)."""
         self._auto_write_key = enabled
+
+    def set_key_notation(self, notation: str) -> None:
+        """Set the key notation used for the Alt Keys column (from Settings)."""
+        self._model.set_key_notation(notation)
 
     def _update_stats(self, *args) -> None:
         """Update the stats label and Analyze button state."""

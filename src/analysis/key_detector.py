@@ -103,11 +103,29 @@ def detect_key(file_path: str) -> tuple[str, float]:
     ranked, agreement = _rank_keys(file_path)
     if not ranked:
         return "", 0.0
+    return _score_ranked(ranked, agreement, 1)[0]
 
-    best_key, best_corr = ranked[0]
-    margin = best_corr - ranked[1][1] if len(ranked) > 1 else DECISIVE_MARGIN
-    confidence = _confidence(best_corr, margin, agreement)
-    return best_key, round(confidence, 3)
+
+def detect_key_with_alternatives(
+    file_path: str, top_n: int = 3
+) -> tuple[str, float, list[tuple[str, float]]]:
+    """Detect the key and runner-up candidates in a single analysis pass.
+
+    Args:
+        file_path: Path to the audio file
+        top_n: Total number of keys to score, including the primary
+
+    Returns:
+        Tuple of (key, confidence, alternatives) where key/confidence match
+        detect_key() and alternatives holds the 2nd..top_n ranked keys as
+        (key, confidence) tuples (empty for silent/atonal audio).
+    """
+    ranked, agreement = _rank_keys(file_path)
+    if not ranked:
+        return "", 0.0, []
+    scored = _score_ranked(ranked, agreement, top_n)
+    key, confidence = scored[0]
+    return key, confidence, scored[1:]
 
 
 def get_key_alternatives(file_path: str, top_n: int = 3) -> list[tuple[str, float]]:
@@ -128,20 +146,30 @@ def get_key_alternatives(file_path: str, top_n: int = 3) -> list[tuple[str, floa
     ranked, agreement = _rank_keys(file_path)
     if not ranked:
         return []
+    return _score_ranked(ranked, agreement, top_n)
 
+
+def _score_ranked(
+    ranked: list[tuple[str, float]], agreement: float, top_n: int
+) -> list[tuple[str, float]]:
+    """Map the top N ranked (key, correlation) pairs to (key, confidence).
+
+    The best key gets the full margin/agreement-aware confidence; the rest
+    are scaled by how closely their profile fit approaches the winner's.
+    """
     best_corr = ranked[0][1]
     margin = best_corr - ranked[1][1] if len(ranked) > 1 else DECISIVE_MARGIN
     top_confidence = _confidence(best_corr, margin, agreement)
     top_strength = _fit_strength(best_corr)
 
-    alternatives: list[tuple[str, float]] = []
+    scored: list[tuple[str, float]] = []
     for key, corr in ranked[:top_n]:
         if top_strength <= 0.0:
             confidence = 0.0
         else:
             confidence = top_confidence * _fit_strength(corr) / top_strength
-        alternatives.append((key, round(confidence, 3)))
-    return alternatives
+        scored.append((key, round(confidence, 3)))
+    return scored
 
 
 def _rank_keys(file_path: str) -> tuple[list[tuple[str, float]], float]:

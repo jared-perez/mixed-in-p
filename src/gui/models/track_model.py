@@ -32,6 +32,7 @@ class TrackItem:
     key: str | None = None
     key_confidence: float | None = None
     keycode: str | None = None
+    key_alternatives: list | None = None  # [{"key", "keycode", "confidence"}, ...]
     energy: int | None = None
 
     # Metadata from file
