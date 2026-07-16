@@ -322,6 +322,13 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
     height: 0px;
 }
 
+/* The groove above/below the handle. Windows' style fills these with an opaque
+   (white) default that hides the track background; force them transparent so
+   the QScrollBar's own background shows through on every platform. */
+QScrollBar::add-page:vertical, QScrollBar::sub-page:vertical {
+    background: none;
+}
+
 QScrollBar:horizontal {
     background-color: @BG_MEDIUM@;
     height: 12px;
@@ -343,6 +350,11 @@ QScrollBar::handle:horizontal:hover {
 
 QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
     width: 0px;
+}
+
+/* See the vertical add-page/sub-page note above — same Windows white-fill fix. */
+QScrollBar::add-page:horizontal, QScrollBar::sub-page:horizontal {
+    background: none;
 }
 
 /* ===== Input Fields ===== */
