@@ -1187,55 +1187,11 @@ class PlayerPanel(QWidget):
 
         layout.addWidget(self._table, 1)
 
-        # Transport controls
-        transport_row = QHBoxLayout()
-        transport_row.addStretch()
-
-        # Transport controls are drawn glyphs (not text) so they read the same
-        # in every language; the words live on as translated tooltips.
-        self._prev_btn = QPushButton()
-        self._prev_btn.setFixedWidth(48)
-        self._prev_btn.setIcon(_make_prev_icon())
-        self._prev_btn.setIconSize(QSize(14, 14))
-        self._prev_btn.setToolTip(self.tr("Previous"))
-        transport_row.addWidget(self._prev_btn)
-
-        # Play/Pause uses a grey outline (default button style) with a drawn
-        # play triangle / pause bars instead of text, toggled on state change.
-        self._icon_play = _make_play_icon()
-        self._icon_pause = _make_pause_icon()
-        self._play_btn = QPushButton()
-        self._play_btn.setFixedWidth(48)
-        self._play_btn.setIcon(self._icon_play)
-        self._play_btn.setIconSize(QSize(14, 14))
-        self._play_btn.setToolTip(self.tr("Play / Pause  (Space)"))
-        transport_row.addWidget(self._play_btn)
-
-        self._stop_btn = QPushButton()
-        self._stop_btn.setFixedWidth(48)
-        self._stop_btn.setIcon(_make_stop_icon())
-        self._stop_btn.setIconSize(QSize(14, 14))
-        self._stop_btn.setToolTip(self.tr("Stop"))
-        transport_row.addWidget(self._stop_btn)
-
-        self._next_btn = QPushButton()
-        self._next_btn.setFixedWidth(48)
-        self._next_btn.setIcon(_make_next_icon())
-        self._next_btn.setIconSize(QSize(14, 14))
-        self._next_btn.setToolTip(self.tr("Next"))
-        transport_row.addWidget(self._next_btn)
-
-        # Transport buttons must not hold keyboard focus: otherwise a focused button
-        # would consume the Space key (and could re-fire its own action) instead of
-        # the play/pause shortcut. Standard for media transport controls.
-        for btn in (self._prev_btn, self._play_btn, self._stop_btn, self._next_btn):
-            btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-
-        transport_row.addStretch()
-        layout.addLayout(transport_row)
-
         # Seek bar — wrapped in a widget so it can be hidden when the slice
-        # section's waveform takes over as the seek control.
+        # section's waveform takes over as the seek control. It sits directly
+        # above the combined controls row so the scrub bar reads as part of the
+        # transport cluster, and vanishing while the slicer is open just tucks
+        # the controls row up under the playlist.
         seek_row = QHBoxLayout()
         seek_row.setContentsMargins(0, 0, 0, 0)
 
@@ -1259,34 +1215,78 @@ class PlayerPanel(QWidget):
         self._seek_row_widget.setLayout(seek_row)
         layout.addWidget(self._seek_row_widget)
 
-        # Volume row
-        volume_row = QHBoxLayout()
+        # Combined controls row: volume on the left, transport buttons centered,
+        # then track-count stats and Clear Playlist on the right. Folding the
+        # transport buttons onto the volume/Clear line (instead of a row of their
+        # own) saves vertical space and puts them just under the seek bar. This
+        # row stays put when the seek bar is hidden for the slicer's waveform.
+        controls_row = QHBoxLayout()
 
         vol_label = QLabel(self.tr("Vol"))
         vol_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         vol_label.setMinimumWidth(25)
-        volume_row.addWidget(vol_label)
+        controls_row.addWidget(vol_label)
 
         self._volume_slider = QSlider(Qt.Orientation.Horizontal)
         self._volume_slider.setRange(0, 100)
         self._volume_slider.setValue(70)
         self._volume_slider.setFixedWidth(120)
-        volume_row.addWidget(self._volume_slider)
+        controls_row.addWidget(self._volume_slider)
 
-        volume_row.addStretch()
+        controls_row.addStretch()
+
+        # Transport controls are drawn glyphs (not text) so they read the same
+        # in every language; the words live on as translated tooltips.
+        self._prev_btn = QPushButton()
+        self._prev_btn.setFixedWidth(48)
+        self._prev_btn.setIcon(_make_prev_icon())
+        self._prev_btn.setIconSize(QSize(14, 14))
+        self._prev_btn.setToolTip(self.tr("Previous"))
+        controls_row.addWidget(self._prev_btn)
+
+        # Play/Pause uses a grey outline (default button style) with a drawn
+        # play triangle / pause bars instead of text, toggled on state change.
+        self._icon_play = _make_play_icon()
+        self._icon_pause = _make_pause_icon()
+        self._play_btn = QPushButton()
+        self._play_btn.setFixedWidth(48)
+        self._play_btn.setIcon(self._icon_play)
+        self._play_btn.setIconSize(QSize(14, 14))
+        self._play_btn.setToolTip(self.tr("Play / Pause  (Space)"))
+        controls_row.addWidget(self._play_btn)
+
+        self._stop_btn = QPushButton()
+        self._stop_btn.setFixedWidth(48)
+        self._stop_btn.setIcon(_make_stop_icon())
+        self._stop_btn.setIconSize(QSize(14, 14))
+        self._stop_btn.setToolTip(self.tr("Stop"))
+        controls_row.addWidget(self._stop_btn)
+
+        self._next_btn = QPushButton()
+        self._next_btn.setFixedWidth(48)
+        self._next_btn.setIcon(_make_next_icon())
+        self._next_btn.setIconSize(QSize(14, 14))
+        self._next_btn.setToolTip(self.tr("Next"))
+        controls_row.addWidget(self._next_btn)
+
+        # Transport buttons must not hold keyboard focus: otherwise a focused button
+        # would consume the Space key (and could re-fire its own action) instead of
+        # the play/pause shortcut. Standard for media transport controls.
+        for btn in (self._prev_btn, self._play_btn, self._stop_btn, self._next_btn):
+            btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+
+        controls_row.addStretch()
 
         # Stats label
         self._stats_label = QLabel("")
         self._stats_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
-        volume_row.addWidget(self._stats_label)
-
-        volume_row.addStretch()
+        controls_row.addWidget(self._stats_label)
 
         self._clear_btn = QPushButton(self.tr("Clear Playlist"))
         self._clear_btn.clicked.connect(self._on_clear_playlist)
-        volume_row.addWidget(self._clear_btn)
+        controls_row.addWidget(self._clear_btn)
 
-        layout.addLayout(volume_row)
+        layout.addLayout(controls_row)
 
         # Collapsible slice section — shares the engine; builds its waveform
         # lazily on expand. Lets the user trim a slice from the loaded track.
