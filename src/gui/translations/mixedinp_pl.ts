@@ -4,25 +4,25 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="73"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="91"/>
         <source>docs</source>
         <translatorcomment>Kept in English: ubiquitous software borrowing in a Latin-script UI (cf. sample/slicer rule).</translatorcomment>
         <translation>docs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="107"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="116"/>
         <source>Jared P presents</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Jared P przedstawia</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="122"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="131"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>Reviewed (pl pass): genitive-plural single form - natural for 0 and 5+, mildly off for 1-4; accepted (app uses .format, no Qt numerus).</translatorcomment>
         <translation>Zestaw narzędzi do analizy audio dla DJ-ów</translation>
@@ -59,12 +59,17 @@ Funkcje:
         <translation type="vanished">Wersja 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="130"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="139"/>
         <source>Version {0}</source>
         <translation>Wersja {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="140"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
+        <source>Check for updates</source>
+        <translation>Sprawdź aktualizacje</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="187"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -90,36 +95,66 @@ Funkcje:
   - Analizator widma</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="208"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Obsługiwane formaty: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="180"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="227"/>
         <source>Find Your Way Around</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Rozejrzyj się</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="193"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="240"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Upuść pliki na dowolny panel, aby zacząć.&lt;br&gt;Pasek boczny to nie tylko nawigacja — możesz&lt;br&gt;przeciągać pliki wprost na przyciski, aby je tam skierować.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ZMIEŃ NAZWĘ&lt;/span&gt; — Najpierw uporządkuj nazwy plików&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;przytnij, dodaj prefiks, sprawdź podgląd przed zatwierdzeniem&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALIZA&lt;/span&gt; — Wykrywa BPM, tonację i energię&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;automatycznie zapisuje tagi i zmienia nazwy za jednym razem&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KONWERSJA&lt;/span&gt; — Zmieniaj formaty&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Użyj &lt;span style=&quot;color: {y};&quot;&gt;Wyślij do&lt;/span&gt;, aby przenosić pliki między panelami.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="294"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
         <source>click for more</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>kliknij, aby zobaczyć więcej</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="239"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="362"/>
+        <source>Checking…</source>
+        <translation>Sprawdzanie…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <source>You&apos;re on the latest version</source>
+        <translation>Masz najnowszą wersję</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="390"/>
+        <source>Download</source>
+        <translation>Pobierz</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="391"/>
+        <source>Update available: {0}</source>
+        <translation>Dostępna aktualizacja: {0}</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="399"/>
+        <source>see all releases</source>
+        <translation>zobacz wszystkie wersje</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="400"/>
+        <source>Couldn&apos;t check for updates</source>
+        <translation>Nie można sprawdzić aktualizacji</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="286"/>
         <source>The Rest of the Kit</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Reszta zestawu</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="249"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="296"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Wytnij fragment z dowolnego utworu.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Otwierany z okna Odtwarzacza.&lt;br&gt;Ustaw początek/koniec suwakiem zakresu lub zaznacz&lt;br&gt;granice podczas odtwarzania. Przesuwaj o ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADANE&lt;/span&gt; — Upuść plik, edytuj jego tagi.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Zapisuje się automatycznie, gdy przejdziesz dalej.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KLAWIATURA&lt;/span&gt; — Graj nuty w dowolnej tonacji.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip od razu pod ręką jako odniesienie.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;WIDMO&lt;/span&gt; — Analizator widma akustycznego.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Wizualna reprezentacja jakości dźwięku.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;USTAWIENIA&lt;/span&gt; — Zakres BPM, format tonacji,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;reguły automatycznej zmiany nazw.&lt;/span&gt;&lt;/div&gt;</translation>
@@ -1128,27 +1163,27 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation>Rok</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1200"/>
+        <location filename="../widgets/player_panel.py" line="1244"/>
         <source>Previous</source>
         <translation>Poprzedni</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1211"/>
+        <location filename="../widgets/player_panel.py" line="1255"/>
         <source>Play / Pause  (Space)</source>
         <translation>Odtwórz / Pauza  (Spacja)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1218"/>
+        <location filename="../widgets/player_panel.py" line="1262"/>
         <source>Stop</source>
         <translation>Zatrzymaj</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1225"/>
+        <location filename="../widgets/player_panel.py" line="1269"/>
         <source>Next</source>
         <translation>Następny</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1265"/>
+        <location filename="../widgets/player_panel.py" line="1225"/>
         <source>Vol</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Głośność</translation>

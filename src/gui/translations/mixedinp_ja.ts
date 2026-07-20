@@ -4,25 +4,25 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="73"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="91"/>
         <source>docs</source>
         <translatorcomment>Native script for a non-Latin UI (cf. sample/slicer rule).</translatorcomment>
         <translation>ドキュメント</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="107"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="116"/>
         <source>Jared P presents</source>
         <translatorcomment>Left untranslated as a proper-name credit line; could be transliterated (ジャレッドPが贈る). Flagging for review.</translatorcomment>
         <translation>Jared P presents</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="122"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="131"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>DJ向けオーディオ解析ツールキット</translation>
@@ -58,12 +58,17 @@ Features:
         <translation type="vanished">バージョン 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="130"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="139"/>
         <source>Version {0}</source>
         <translation>バージョン {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="140"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
+        <source>Check for updates</source>
+        <translation>アップデートを確認</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="187"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -89,34 +94,64 @@ Features:
   - スペクトラムアナライザー</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="208"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>対応フォーマット: MP3、WAV、FLAC、AIFF、M4A、OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="180"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="227"/>
         <source>Find Your Way Around</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>使い方ガイド</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="193"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="240"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;いずれかのパネルにファイルをドロップすると始められます。&lt;br&gt;サイドバーはナビゲーション用だけではありません。&lt;br&gt;ボタンに直接ファイルをドラッグして振り分けられます。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;名前変更&lt;/span&gt; — まずファイル名を整えます&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;確定前にトリミング・プレフィックス・プレビュー&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;解析&lt;/span&gt; — BPM・キー・エナジーを検出&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;タグの自動書き込みと名前変更を一括で実行&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;変換&lt;/span&gt; — フォーマットを切り替え&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y};&quot;&gt;送る&lt;/span&gt;を使ってパネル間でファイルを移動できます。&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="294"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
         <source>click for more</source>
         <translation>詳しくはクリック</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="239"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="362"/>
+        <source>Checking…</source>
+        <translation>確認中…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <source>You&apos;re on the latest version</source>
+        <translation>最新バージョンです</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="390"/>
+        <source>Download</source>
+        <translation>ダウンロード</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="391"/>
+        <source>Update available: {0}</source>
+        <translation>アップデートを利用できます: {0}</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="399"/>
+        <source>see all releases</source>
+        <translation>すべてのリリースを表示</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="400"/>
+        <source>Couldn&apos;t check for updates</source>
+        <translation>アップデートを確認できませんでした</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="286"/>
         <source>The Rest of the Kit</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>その他の機能</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="249"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="296"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;スライス&lt;/span&gt; — 任意のトラックから一部を切り出します。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;プレイヤー画面から開きます。&lt;br&gt;レンジスライダーで開始/終了を設定するか、再生中に&lt;br&gt;境界をマークします。±10msでナッジできます。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;メタデータ&lt;/span&gt; — ファイルをドロップしてタグを編集。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;次に移ると自動保存されます。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;キーボード&lt;/span&gt; — 任意のキーで音を鳴らせます。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;参照用のハーモニックキーストリップをすぐ横に表示。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;スペクトラム&lt;/span&gt; — 音響スペクトラムアナライザー。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;音質を視覚的に表示します。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;設定&lt;/span&gt; — BPM範囲、キーの表記、&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;自動名前変更のルール。&lt;/span&gt;&lt;/div&gt;</translation>
@@ -1119,27 +1154,27 @@ or click “Add Artwork…”</source>
         <translation>年</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1200"/>
+        <location filename="../widgets/player_panel.py" line="1244"/>
         <source>Previous</source>
         <translation>前へ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1211"/>
+        <location filename="../widgets/player_panel.py" line="1255"/>
         <source>Play / Pause  (Space)</source>
         <translation>再生 / 一時停止  （Space）</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1218"/>
+        <location filename="../widgets/player_panel.py" line="1262"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1225"/>
+        <location filename="../widgets/player_panel.py" line="1269"/>
         <source>Next</source>
         <translation>次へ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1265"/>
+        <location filename="../widgets/player_panel.py" line="1225"/>
         <source>Vol</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>音量</translation>

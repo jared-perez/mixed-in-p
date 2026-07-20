@@ -2,17 +2,25 @@
 
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, Qt
+from PySide6.QtCore import QCoreApplication, QEvent, Qt
 from PySide6.QtGui import QPixmap
 from PySide6.QtWidgets import (
     QDialog,
     QLabel,
+    QPushButton,
     QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
 
 from ...styles.theme import Theme
+from ...workers.update_worker import (
+    RELEASES_PAGE_URL,
+    STATUS_AVAILABLE,
+    STATUS_CURRENT,
+    UpdateCheckResult,
+    UpdateCheckThread,
+)
 
 import sys
 
@@ -32,6 +40,7 @@ class AboutDialog(QDialog):
         )
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
         self.setFixedSize(440, 560)
+        self._update_thread: UpdateCheckThread | None = None
         self._setup_ui()
 
     def _setup_ui(self) -> None:
@@ -132,6 +141,44 @@ class AboutDialog(QDialog):
 
         version.setStyleSheet(f"color: {Theme.CHROME};")
         info_layout.addWidget(version)
+
+        # Manual update check. The button and the status label share the same
+        # slot; only one is visible at a time. A QPushButton consumes its own
+        # click, so pressing it does NOT also cycle the dialog to the next slide.
+        self._update_button = QPushButton(self.tr("Check for updates"))
+        self._update_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._update_button.setStyleSheet(f"""
+            QPushButton {{
+                color: {Theme.TEXT_SECONDARY};
+                background: transparent;
+                border: 1px solid {Theme.CHROME_DARK};
+                border-radius: 6px;
+                padding: 4px 14px;
+                font-size: 12px;
+            }}
+            QPushButton:hover {{
+                color: {Theme.NEON_YELLOW};
+                border-color: {Theme.NEON_YELLOW};
+            }}
+        """)
+        self._update_button.clicked.connect(self._start_update_check)
+        info_layout.addWidget(self._update_button, 0, Qt.AlignmentFlag.AlignCenter)
+
+        # Result / progress text. Hidden until a check starts. Rich text so the
+        # "available" and "error" states can embed a browser link (like the
+        # docs link above). Links open externally; non-link clicks fall through
+        # to the dialog and cycle the slide, which is fine.
+        self._update_status = QLabel()
+        self._update_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._update_status.setTextFormat(Qt.TextFormat.RichText)
+        self._update_status.setOpenExternalLinks(True)
+        self._update_status.setTextInteractionFlags(
+            Qt.TextInteractionFlag.LinksAccessibleByMouse
+        )
+        self._update_status.setStyleSheet("font-size: 12px;")
+        self._update_status.setWordWrap(True)
+        self._update_status.hide()
+        info_layout.addWidget(self._update_status)
 
         info_layout.addSpacing(10)
 
@@ -303,6 +350,62 @@ class AboutDialog(QDialog):
         # Start on info page
         self._stack.setCurrentIndex(1)
         self._update_hint_visibility()
+
+    def _start_update_check(self) -> None:
+        """Kick off the background check and show a 'Checking…' placeholder."""
+        if self._update_thread is not None:
+            return  # a check is already running
+        self._update_button.hide()
+        self._update_status.setStyleSheet(
+            f"font-size: 12px; color: {Theme.TEXT_SECONDARY};"
+        )
+        self._update_status.setText(self.tr("Checking…"))
+        self._update_status.show()
+
+        # Parent the thread to the application, not to this dialog: the dialog is
+        # WA_DeleteOnClose and closes on focus loss, which could otherwise delete
+        # a still-running QThread. The result slot auto-disconnects if the dialog
+        # is gone; the thread cleans itself up via deleteLater.
+        thread = UpdateCheckThread(QCoreApplication.instance())
+        self._update_thread = thread
+        thread.result_ready.connect(self._on_update_result)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(self._clear_update_thread)
+        thread.start()
+
+    def _clear_update_thread(self) -> None:
+        """Drop our reference once the worker thread has finished."""
+        self._update_thread = None
+
+    def _on_update_result(self, result: UpdateCheckResult) -> None:
+        """Render the check outcome in place of the button."""
+        if result.status == STATUS_CURRENT:
+            self._update_status.setStyleSheet(
+                f"font-size: 12px; color: {Theme.NEON_GREEN};"
+            )
+            self._update_status.setText(self.tr("You're on the latest version"))
+        elif result.status == STATUS_AVAILABLE:
+            # Version stays out of the translatable string (like "Version {0}")
+            # so a new release never orphans the translation.
+            download = self.tr("Download")
+            message = self.tr("Update available: {0}").format(result.latest_version)
+            self._update_status.setStyleSheet("font-size: 12px;")
+            self._update_status.setText(
+                f'<span style="color: {Theme.NEON_YELLOW};">{message}</span>'
+                f' &nbsp;<a href="{RELEASES_PAGE_URL}"'
+                f' style="color: {Theme.NEON_YELLOW};">{download}</a>'
+            )
+        else:  # STATUS_ERROR
+            releases = self.tr("see all releases")
+            message = self.tr("Couldn't check for updates")
+            self._update_status.setStyleSheet(
+                f"font-size: 12px; color: {Theme.TEXT_SECONDARY};"
+            )
+            self._update_status.setText(
+                f"{message} &nbsp;"
+                f'<a href="{RELEASES_PAGE_URL}"'
+                f' style="color: {Theme.CHROME};">{releases}</a>'
+            )
 
     def _update_hint_visibility(self) -> None:
         """Show the hint on the info / how-to slides, not the icon slide."""

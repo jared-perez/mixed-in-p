@@ -4,24 +4,24 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="73"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="91"/>
         <source>docs</source>
         <translatorcomment>Native script for a Cyrillic UI (cf. sample/slicer rule).</translatorcomment>
         <translation>Документация</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="107"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="116"/>
         <source>Jared P presents</source>
         <translation>Jared P представляет</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="122"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="131"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translation>Набор инструментов для анализа аудио для диджеев</translation>
     </message>
@@ -57,12 +57,17 @@ Features:
         <translation type="vanished">Версия 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="130"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="139"/>
         <source>Version {0}</source>
         <translation>Версия {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="140"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
+        <source>Check for updates</source>
+        <translation>Проверить обновления</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="187"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -88,33 +93,63 @@ Features:
   - Анализатор спектра</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="208"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Поддерживаемые форматы: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="180"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="227"/>
         <source>Find Your Way Around</source>
         <translation>Освойтесь</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="193"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="240"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translatorcomment>Intentional indirect/shortened ru rendering of the opening line (source: &quot;Drop your files into panels or onto the sidebar.&quot;) — the literal translation wrapped to 4 lines and overflowed the About dialog slide. Applied to ru only.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Перетащите файлы на панели или на боковую панель.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ПЕРЕИМЕНОВАНИЕ&lt;/span&gt; — Сначала приведите имена файлов в порядок&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;обрезка, префикс, предпросмотр перед применением&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;АНАЛИЗ&lt;/span&gt; — Определяет BPM, тональность и энергию&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;автоматически записывает теги и переименовывает за один раз&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КОНВЕРТАЦИЯ&lt;/span&gt; — Смена форматов&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Используйте &lt;span style=&quot;color: {y};&quot;&gt;Отправить в&lt;/span&gt;, чтобы перемещать файлы между панелями.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="294"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
         <source>click for more</source>
         <translation>нажмите, чтобы узнать больше</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="239"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="362"/>
+        <source>Checking…</source>
+        <translation>Проверка…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <source>You&apos;re on the latest version</source>
+        <translation>У вас последняя версия</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="390"/>
+        <source>Download</source>
+        <translation>Загрузить</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="391"/>
+        <source>Update available: {0}</source>
+        <translation>Доступно обновление: {0}</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="399"/>
+        <source>see all releases</source>
+        <translation>все версии</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="400"/>
+        <source>Couldn&apos;t check for updates</source>
+        <translation>Не удалось проверить обновления</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="286"/>
         <source>The Rest of the Kit</source>
         <translation>Остальные инструменты</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="249"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="296"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СЛАЙСЕР&lt;/span&gt; — Возьмите фрагмент из любого трека.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Открывается из окна Плеера.&lt;br&gt;Задайте начало/конец ползунком диапазона или отметьте&lt;br&gt;границы во время воспроизведения. Сдвиг ±10 мс.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;МЕТАДАННЫЕ&lt;/span&gt; — Перетащите файл, редактируйте его теги.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Автосохранение при переходе дальше.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КЛАВИАТУРА&lt;/span&gt; — Играйте ноты в любой тональности.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Гармоническая полоса тональностей прямо здесь для справки.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СПЕКТР&lt;/span&gt; — Анализатор акустического спектра.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Визуальное представление качества звука.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;НАСТРОЙКИ&lt;/span&gt; — Диапазон BPM, формат тональности,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;правила автопереименования.&lt;/span&gt;&lt;/div&gt;</translation>
@@ -1100,27 +1135,27 @@ or click “Add Artwork…”</source>
         <translation>Год</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1200"/>
+        <location filename="../widgets/player_panel.py" line="1244"/>
         <source>Previous</source>
         <translation>Предыдущий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1211"/>
+        <location filename="../widgets/player_panel.py" line="1255"/>
         <source>Play / Pause  (Space)</source>
         <translation>Воспроизведение / Пауза  (Пробел)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1218"/>
+        <location filename="../widgets/player_panel.py" line="1262"/>
         <source>Stop</source>
         <translation>Стоп</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1225"/>
+        <location filename="../widgets/player_panel.py" line="1269"/>
         <source>Next</source>
         <translation>Следующий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1265"/>
+        <location filename="../widgets/player_panel.py" line="1225"/>
         <source>Vol</source>
         <translation>Громк.</translation>
     </message>
