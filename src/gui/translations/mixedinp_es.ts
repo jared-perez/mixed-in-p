@@ -1437,12 +1437,22 @@ o haz clic en “Añadir carátula…”</translation>
         <translation>Modificado</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy text</source>
+        <translation>Copiar texto</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy {0} names</source>
+        <translation>Copiar {0} nombres</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove from list</source>
         <translation>Quitar de la lista</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove {0} from list</source>
         <translation>Quitar {0} de la lista</translation>
     </message>

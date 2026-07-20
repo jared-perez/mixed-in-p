@@ -2,8 +2,8 @@
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor, QKeySequence, QShortcut
+from PySide6.QtCore import QEvent, Qt, Signal
+from PySide6.QtGui import QColor, QGuiApplication, QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QCheckBox,
@@ -16,6 +16,7 @@ from PySide6.QtWidgets import (
     QMenu,
     QPushButton,
     QSpinBox,
+    QStyledItemDelegate,
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
@@ -39,6 +40,38 @@ from ..models import TrackState, TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .droppable_table import DroppableTableWidget
 from .progress_bar import ProgressPanel
+
+
+class _SelectableTextDelegate(QStyledItemDelegate):
+    """Cell delegate that opens a read-only, text-selectable editor.
+
+    Double-clicking a preview cell pops a frameless QLineEdit pre-selecting the
+    cell text, so the user can copy the whole name or drag to grab just part of
+    it (e.g. to paste into the Prepend/Append box). The editor is read-only and
+    ``setModelData`` is a no-op, so the preview text can never be edited — the
+    cell only becomes selectable, not writable.
+    """
+
+    def createEditor(self, parent, option, index):
+        editor = QLineEdit(parent)
+        editor.setReadOnly(True)
+        editor.setFrame(False)
+        editor.setStyleSheet(
+            f"QLineEdit {{ background: {Theme.BG_MEDIUM}; color: {Theme.TEXT_PRIMARY};"
+            f" selection-background-color: {Theme.NEON_YELLOW};"
+            " selection-color: #000000; padding: 0px; }"
+        )
+        return editor
+
+    def setEditorData(self, editor, index):
+        super().setEditorData(editor, index)
+        # Pre-select everything so a bare double-click + Ctrl+C copies the whole
+        # name; the user can still click to place a cursor and drag a sub-range.
+        editor.selectAll()
+
+    def setModelData(self, editor, model, index):
+        # Read-only: never write the (possibly re-selected) text back to the cell.
+        pass
 
 
 class RenamePanel(QWidget):
@@ -192,6 +225,24 @@ class RenamePanel(QWidget):
         self._preview_table.enable_drag_out("rename", self._drag_data)
         self._preview_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self._preview_table.verticalHeader().setVisible(False)
+
+        # Let the user select/copy text inside the Original and Preview cells.
+        # Because drag-out is enabled (setDragEnabled), the built-in DoubleClicked
+        # edit trigger never fires — the drag machinery swallows the gesture. So
+        # we keep triggers off and open the read-only editor ourselves from the
+        # doubleClicked signal (see _on_cell_double_clicked). Single-click still
+        # selects the row and press-drag still drags rows out to the sidebar.
+        self._preview_table.setEditTriggers(
+            QAbstractItemView.EditTrigger.NoEditTriggers
+        )
+        self._select_delegate = _SelectableTextDelegate(self._preview_table)
+        self._preview_table.setItemDelegateForColumn(0, self._select_delegate)
+        self._preview_table.setItemDelegateForColumn(1, self._select_delegate)
+        # With drag-out on, neither the DoubleClicked trigger nor the
+        # doubleClicked signal fires (the view's drag handling eats the second
+        # click), so we intercept the raw double-click on the viewport — which
+        # arrives before that machinery — and open the editor ourselves.
+        self._preview_table.viewport().installEventFilter(self)
 
         # Fixed column widths so the table contents don't reflow as the window
         # is resized; a horizontal scrollbar appears when the columns overflow.
@@ -365,14 +416,14 @@ class RenamePanel(QWidget):
         conflicts_count = 0
 
         for row, preview in enumerate(self._previews):
-            # Original name
+            # Original name. Left editable so the read-only selection editor
+            # (_SelectableTextDelegate) can open on double-click; it never
+            # writes changes back, so the preview stays authoritative.
             orig_item = QTableWidgetItem(preview.original_name)
-            orig_item.setFlags(orig_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self._preview_table.setItem(row, 0, orig_item)
 
-            # New name
+            # New name (also selectable/copyable via the same delegate).
             new_item = QTableWidgetItem(preview.new_name)
-            new_item.setFlags(new_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             if preview.will_conflict:
                 new_item.setForeground(Qt.GlobalColor.red)
             elif preview.original_name != preview.new_name:
@@ -562,15 +613,54 @@ class RenamePanel(QWidget):
         self._update_preview()
 
     def _on_context_menu(self, pos) -> None:
-        """Show a right-click 'Remove' menu over selected rows."""
+        """Show a right-click menu (copy original name / remove) over selected rows."""
         rows = self._selected_rows()
         if not rows:
             return
         menu = QMenu(self._preview_table)
+
+        # Copy the Original-column text so it can be pasted into the
+        # Prepend/Append box. Plural label when several rows are selected
+        # (names are copied one per line).
+        copy_label = self.tr("Copy text") if len(rows) == 1 else self.tr("Copy {0} names").format(len(rows))
+        copy_action = menu.addAction(copy_label)
+        copy_action.triggered.connect(self._copy_selected_original)
+
+        menu.addSeparator()
+
         label = self.tr("Remove from list") if len(rows) == 1 else self.tr("Remove {0} from list").format(len(rows))
         action = menu.addAction(label)
         action.triggered.connect(self._remove_selected)
         menu.exec(self._preview_table.viewport().mapToGlobal(pos))
+
+    def eventFilter(self, obj, event) -> bool:
+        """Open the read-only selection editor on a double-click in a text cell.
+
+        Installed on the preview table's viewport (see _setup_ui): catching the
+        double-click here bypasses the drag-out machinery that otherwise
+        suppresses editing. Only the Original/Preview columns are selectable.
+        """
+        if (
+            obj is self._preview_table.viewport()
+            and event.type() == QEvent.Type.MouseButtonDblClick
+            and event.button() == Qt.MouseButton.LeftButton
+        ):
+            index = self._preview_table.indexAt(event.position().toPoint())
+            if index.isValid() and index.column() in (0, 1):
+                self._preview_table.edit(index)
+                return True
+        return super().eventFilter(obj, event)
+
+    def _copy_selected_original(self) -> None:
+        """Copy the Original-column names of the selected rows to the clipboard."""
+        rows = self._selected_rows()
+        names = [
+            self._previews[r].original_name
+            for r in rows
+            if 0 <= r < len(self._previews)
+        ]
+        if names:
+            QGuiApplication.clipboard().setText("\n".join(names))
 
     def _selected_rows(self) -> list[int]:
         return sorted({idx.row() for idx in self._preview_table.selectedIndexes()})

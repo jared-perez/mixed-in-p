@@ -1469,12 +1469,22 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation>Zmieniono</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy text</source>
+        <translation>Kopiuj tekst</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy {0} names</source>
+        <translation>Kopiuj {0} nazw</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove from list</source>
         <translation>Usuń z listy</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove {0} from list</source>
         <translation>Usuń {0} z listy</translation>
     </message>

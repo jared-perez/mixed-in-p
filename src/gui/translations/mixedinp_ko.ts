@@ -1429,12 +1429,22 @@ or click “Add Artwork…”</source>
         <translation>변경됨</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy text</source>
+        <translation>텍스트 복사</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy {0} names</source>
+        <translation>이름 {0}개 복사</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove from list</source>
         <translation>목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove {0} from list</source>
         <translatorcomment>{0} (a filename) placed before 제거 with a space to avoid attaching a particle to a variable. Flag for native review.</translatorcomment>
         <translation>목록에서 {0} 제거</translation>

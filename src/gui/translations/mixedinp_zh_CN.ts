@@ -1454,12 +1454,22 @@ or click “Add Artwork…”</source>
         <translation>已更改</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy text</source>
+        <translation>复制文本</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy {0} names</source>
+        <translation>复制 {0} 个名称</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove from list</source>
         <translation>从列表中移除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove {0} from list</source>
         <translation>从列表中移除{0}</translation>
     </message>

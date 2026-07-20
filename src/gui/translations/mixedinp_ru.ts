@@ -1426,12 +1426,22 @@ or click “Add Artwork…”</source>
         <translation>Изменено</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy text</source>
+        <translation>Копировать текст</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="574"/>
+        <source>Copy {0} names</source>
+        <translation>Копировать {0} имён</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove from list</source>
         <translation>Удалить из списка</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="570"/>
+        <location filename="../widgets/rename_panel.py" line="580"/>
         <source>Remove {0} from list</source>
         <translation>Удалить {0} из списка</translation>
     </message>
