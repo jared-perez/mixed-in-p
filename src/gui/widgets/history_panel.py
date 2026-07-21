@@ -1,16 +1,19 @@
 """History panel for viewing and undoing rename sessions."""
 
 import re
+from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QButtonGroup,
+    QFileDialog,
     QFrame,
     QHBoxLayout,
     QHeaderView,
     QLabel,
+    QMessageBox,
     QPushButton,
     QStackedWidget,
     QTableWidget,
@@ -21,6 +24,7 @@ from PySide6.QtWidgets import (
 
 from src.analysis.history import load_entries as load_analysis_entries
 from src.renamer import RenameSession, delete_session, list_sessions, load_session
+from src.utils.export import write_csv
 
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 
@@ -30,6 +34,12 @@ _KEYCODE_RE = re.compile(r"(\d{1,2})([AB])", re.IGNORECASE)
 # without hunting down bare indices — _get_selected_session in particular reads
 # the session id back off the _SESS_ID cell.
 _SESS_DATE, _SESS_FILES, _SESS_DESC, _SESS_ID = range(4)
+
+# Index of the backing self._entries record, stashed on each keys-table row so
+# export can walk rows in the user's current sort order and still emit the
+# underlying values rather than re-parsing formatted cell text. UserRole itself
+# is taken by _SortableItem's sort value, hence +1.
+_ENTRY_INDEX_ROLE = Qt.ItemDataRole.UserRole + 1
 
 
 class _SortableItem(QTableWidgetItem):
@@ -228,6 +238,13 @@ class HistoryPanel(QWidget):
 
         button_layout.addStretch()
 
+        self._export_btn = QPushButton(self.tr("Export CSV"))
+        self._export_btn.setToolTip(
+            self.tr("Export the table below to a spreadsheet-friendly CSV file.")
+        )
+        self._export_btn.clicked.connect(self._on_export_clicked)
+        button_layout.addWidget(self._export_btn)
+
         self._refresh_btn = QPushButton(self.tr("Refresh"))
         self._refresh_btn.clicked.connect(self.refresh)
         button_layout.addWidget(self._refresh_btn)
@@ -312,9 +329,9 @@ class HistoryPanel(QWidget):
             timestamp = entry.get("timestamp", "")
             name = Path(entry.get("file_path", "")).name
             keycode = entry.get("keycode") or ""
-            self._keys_table.setItem(
-                row, 0, _item(name, sort_value=name.lower())
-            )
+            name_item = _item(name, sort_value=name.lower())
+            name_item.setData(_ENTRY_INDEX_ROLE, row)
+            self._keys_table.setItem(row, 0, name_item)
             self._keys_table.setItem(
                 row,
                 1,
@@ -446,6 +463,121 @@ class HistoryPanel(QWidget):
         session_id = item.data(Qt.ItemDataRole.UserRole)
         return next(
             (s for s in self._sessions if s.session_id == session_id), None
+        )
+
+    # ---- CSV export -------------------------------------------------------
+
+    def _showing_keys(self) -> bool:
+        """True when the Song Keys view is the visible one."""
+        return self._stack.currentWidget() is self._keys_table
+
+    def _keys_export_rows(self) -> tuple[list[str], list[list]]:
+        """Key History as (headers, rows), in the table's current sort order.
+
+        Values are taken from the backing entries rather than the formatted
+        cells, so confidences export as decimals (0.91) that a spreadsheet can
+        compute with, not as the display string "91%".
+
+        Alternative keys are the one lossy column: a list of {key, keycode,
+        confidence} records flattened to text, because CSV rows cannot nest.
+        """
+        headers = [
+            "File Name", "File Path", "BPM", "BPM Confidence", "Key",
+            "Key Confidence", "Key Code", "Alternative Keys", "Energy",
+            "Analyzed At",
+        ]
+        rows = []
+        for row in range(self._keys_table.rowCount()):
+            item = self._keys_table.item(row, 0)
+            index = None if item is None else item.data(_ENTRY_INDEX_ROLE)
+            if index is None or not 0 <= index < len(self._entries):
+                continue
+            entry = self._entries[index]
+            rows.append([
+                Path(entry.get("file_path", "")).name,
+                entry.get("file_path", ""),
+                entry.get("bpm"),
+                entry.get("bpm_confidence"),
+                entry.get("key", ""),
+                entry.get("key_confidence"),
+                entry.get("keycode", ""),
+                self._format_alternatives(entry.get("key_alternatives")),
+                entry.get("energy"),
+                entry.get("timestamp", ""),
+            ])
+        return headers, rows
+
+    def _sessions_export_rows(self) -> tuple[list[str], list[list]]:
+        """Rename History as (headers, rows) — one row per renamed file.
+
+        A session owns a list of records, which CSV cannot nest, so the session
+        columns repeat across that session's file rows.
+        """
+        headers = [
+            "Session ID", "Session Timestamp", "Original Path", "New Path",
+            "Renamed At",
+        ]
+        rows = []
+        for row in range(self._table.rowCount()):
+            item = self._table.item(row, _SESS_ID)
+            session_id = None if item is None else item.data(Qt.ItemDataRole.UserRole)
+            session = next(
+                (s for s in self._sessions if s.session_id == session_id), None
+            )
+            if session is None:
+                continue
+            for record in session.records:
+                rows.append([
+                    session.session_id,
+                    session.timestamp,
+                    record.original_path,
+                    record.new_path,
+                    record.timestamp,
+                ])
+        return headers, rows
+
+    def _on_export_clicked(self) -> None:
+        """Export the visible table to CSV."""
+        keys = self._showing_keys()
+        headers, rows = (
+            self._keys_export_rows() if keys else self._sessions_export_rows()
+        )
+
+        if not rows:
+            QMessageBox.information(
+                self,
+                self.tr("Export CSV"),
+                self.tr("There is nothing to export yet."),
+            )
+            return
+
+        # Filename is data, not UI prose — left untranslated so exported files
+        # sort together regardless of the language the app is running in.
+        default_name = "{0}-{1}.csv".format(
+            "key-history" if keys else "rename-history",
+            datetime.now().strftime("%Y-%m-%d"),
+        )
+        # Filter string is not wrapped: file-glob filters are config, not prose.
+        path, _ = QFileDialog.getSaveFileName(
+            self, self.tr("Export CSV"), default_name, "CSV (*.csv)"
+        )
+        if not path:
+            return
+
+        try:
+            write_csv(path, headers, rows)
+        except OSError as exc:
+            QMessageBox.warning(
+                self,
+                self.tr("Export failed"),
+                self.tr("Could not write the file:\n{0}").format(exc),
+            )
+            return
+
+        QMessageBox.information(
+            self,
+            self.tr("Export complete"),
+            self.tr("Exported {0} rows to:\n{1}").format(len(rows), path),
         )
 
     def _on_undo_clicked(self) -> None:

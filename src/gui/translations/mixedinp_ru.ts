@@ -582,117 +582,158 @@ or click “Add Artwork…”</source>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="56"/>
-        <location filename="../widgets/history_panel.py" line="199"/>
+        <location filename="../widgets/history_panel.py" line="118"/>
+        <location filename="../widgets/history_panel.py" line="281"/>
         <source>Rename History</source>
         <translation>История переименований</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="60"/>
-        <location filename="../widgets/history_panel.py" line="201"/>
+        <location filename="../widgets/history_panel.py" line="122"/>
+        <location filename="../widgets/history_panel.py" line="283"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>Просмотр недавних операций переименования. Выберите сессию, чтобы отменить её.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
         <source>Session ID</source>
         <translation>ID сессии</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
-        <location filename="../widgets/history_panel.py" line="107"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
+        <location filename="../widgets/history_panel.py" line="174"/>
         <source>Date/Time</source>
         <translation>Дата/время</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
         <source>Files</source>
         <translation>Файлы</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
         <source>Description</source>
         <translation>Описание</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="99"/>
+        <location filename="../widgets/history_panel.py" line="166"/>
         <source>Name</source>
         <translation>Имя</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="100"/>
+        <location filename="../widgets/history_panel.py" line="167"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="101"/>
-        <location filename="../widgets/history_panel.py" line="103"/>
+        <location filename="../widgets/history_panel.py" line="168"/>
+        <location filename="../widgets/history_panel.py" line="170"/>
         <source>Conf</source>
         <translation>Дост.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="102"/>
+        <location filename="../widgets/history_panel.py" line="169"/>
         <source>Key</source>
         <translation>Тональность</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="104"/>
+        <location filename="../widgets/history_panel.py" line="171"/>
         <source>Key Code</source>
         <translation>Код тональности</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="105"/>
+        <location filename="../widgets/history_panel.py" line="172"/>
         <source>Alt Keys</source>
         <translation>Альт. тональности</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="106"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Energy</source>
         <translation>Энергия</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="144"/>
-        <location filename="../widgets/history_panel.py" line="309"/>
+        <location filename="../widgets/history_panel.py" line="219"/>
+        <location filename="../widgets/history_panel.py" line="432"/>
         <source>{0} Rename Sessions</source>
         <translation>Сеансы переименования: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="151"/>
-        <location filename="../widgets/history_panel.py" line="257"/>
+        <location filename="../widgets/history_panel.py" line="226"/>
+        <location filename="../widgets/history_panel.py" line="377"/>
         <source>{0} Song Keys</source>
         <translation>Тональности треков: {0}</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="241"/>
+        <location filename="../widgets/history_panel.py" line="549"/>
+        <location filename="../widgets/history_panel.py" line="562"/>
+        <source>Export CSV</source>
+        <translation>Экспортировать CSV</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="243"/>
+        <source>Export the table below to a spreadsheet-friendly CSV file.</source>
+        <translation>Экспортировать таблицу ниже в файл CSV для электронных таблиц.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="550"/>
+        <source>There is nothing to export yet.</source>
+        <translation>Пока нечего экспортировать.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="572"/>
+        <source>Export failed</source>
+        <translation>Не удалось экспортировать</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="573"/>
+        <source>Could not write the file:
+{0}</source>
+        <translation>Не удалось записать файл:
+{0}</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="579"/>
+        <source>Export complete</source>
+        <translation>Экспорт завершён</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="580"/>
+        <source>Exported {0} rows to:
+{1}</source>
+        <translation>Экспортировано строк: {0}
+{1}</translation>
     </message>
     <message>
         <source>0 sessions</source>
         <translation type="vanished">0 сессий</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="166"/>
+        <location filename="../widgets/history_panel.py" line="248"/>
         <source>Refresh</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="170"/>
+        <location filename="../widgets/history_panel.py" line="252"/>
         <source>Delete</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="175"/>
+        <location filename="../widgets/history_panel.py" line="257"/>
         <source>Undo Selected</source>
         <translation>Отменить выбранное</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="194"/>
+        <location filename="../widgets/history_panel.py" line="276"/>
         <source>Key History</source>
         <translation>История тональностей</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="196"/>
+        <location filename="../widgets/history_panel.py" line="278"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>Недавно проанализированные треки и их определённые тональности.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="299"/>
+        <location filename="../widgets/history_panel.py" line="422"/>
         <source>Renamed {0} files: {1}</source>
         <translation>Переименовано {0} файлов: {1}</translation>
     </message>
@@ -701,7 +742,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Переименовано {0} файлов</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="303"/>
+        <location filename="../widgets/history_panel.py" line="426"/>
         <source>No description</source>
         <translation>Без описания</translation>
     </message>

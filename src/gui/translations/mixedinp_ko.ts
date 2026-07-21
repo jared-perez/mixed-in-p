@@ -558,120 +558,161 @@ or click “Add Artwork…”</source>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="56"/>
-        <location filename="../widgets/history_panel.py" line="199"/>
+        <location filename="../widgets/history_panel.py" line="118"/>
+        <location filename="../widgets/history_panel.py" line="281"/>
         <source>Rename History</source>
         <translatorcomment>History → 기록 (more native/polished than the loanword 히스토리), per glossary. Flag for native review.</translatorcomment>
         <translation>이름 변경 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="60"/>
-        <location filename="../widgets/history_panel.py" line="201"/>
+        <location filename="../widgets/history_panel.py" line="122"/>
+        <location filename="../widgets/history_panel.py" line="283"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translatorcomment>Undo → 실행 취소 (Apple/MS/Samsung Korean standard). 해요체.</translatorcomment>
         <translation>최근 이름 변경 작업을 확인해요. 실행을 취소하려면 세션을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
         <source>Session ID</source>
         <translation>세션 ID</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
-        <location filename="../widgets/history_panel.py" line="107"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
+        <location filename="../widgets/history_panel.py" line="174"/>
         <source>Date/Time</source>
         <translation>날짜/시간</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
         <source>Files</source>
         <translation>파일</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="70"/>
+        <location filename="../widgets/history_panel.py" line="136"/>
         <source>Description</source>
         <translation>설명</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="99"/>
+        <location filename="../widgets/history_panel.py" line="166"/>
         <source>Name</source>
         <translation>이름</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="100"/>
+        <location filename="../widgets/history_panel.py" line="167"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="101"/>
-        <location filename="../widgets/history_panel.py" line="103"/>
+        <location filename="../widgets/history_panel.py" line="168"/>
+        <location filename="../widgets/history_panel.py" line="170"/>
         <source>Conf</source>
         <translation>신뢰도</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="102"/>
+        <location filename="../widgets/history_panel.py" line="169"/>
         <source>Key</source>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="104"/>
+        <location filename="../widgets/history_panel.py" line="171"/>
         <source>Key Code</source>
         <translation>키 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="105"/>
+        <location filename="../widgets/history_panel.py" line="172"/>
         <source>Alt Keys</source>
         <translation>대체 조성</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="106"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Energy</source>
         <translation>에너지</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="144"/>
-        <location filename="../widgets/history_panel.py" line="309"/>
+        <location filename="../widgets/history_panel.py" line="219"/>
+        <location filename="../widgets/history_panel.py" line="432"/>
         <source>{0} Rename Sessions</source>
         <translation>이름 변경 세션 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="151"/>
-        <location filename="../widgets/history_panel.py" line="257"/>
+        <location filename="../widgets/history_panel.py" line="226"/>
+        <location filename="../widgets/history_panel.py" line="377"/>
         <source>{0} Song Keys</source>
         <translation>곡 조성 {0}개</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="241"/>
+        <location filename="../widgets/history_panel.py" line="549"/>
+        <location filename="../widgets/history_panel.py" line="562"/>
+        <source>Export CSV</source>
+        <translation>CSV 내보내기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="243"/>
+        <source>Export the table below to a spreadsheet-friendly CSV file.</source>
+        <translation>아래 표를 스프레드시트에서 열 수 있는 CSV 파일로 내보냅니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="550"/>
+        <source>There is nothing to export yet.</source>
+        <translation>아직 내보낼 항목이 없습니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="572"/>
+        <source>Export failed</source>
+        <translation>내보내기 실패</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="573"/>
+        <source>Could not write the file:
+{0}</source>
+        <translation>파일을 쓸 수 없습니다:
+{0}</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="579"/>
+        <source>Export complete</source>
+        <translation>내보내기 완료</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="580"/>
+        <source>Exported {0} rows to:
+{1}</source>
+        <translation>{0}개 행을 내보냈습니다:
+{1}</translation>
     </message>
     <message>
         <source>0 sessions</source>
         <translation type="vanished">세션 0개</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="166"/>
+        <location filename="../widgets/history_panel.py" line="248"/>
         <source>Refresh</source>
         <translatorcomment>새로 고침 = Apple Korean standard (with space).</translatorcomment>
         <translation>새로 고침</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="170"/>
+        <location filename="../widgets/history_panel.py" line="252"/>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="175"/>
+        <location filename="../widgets/history_panel.py" line="257"/>
         <source>Undo Selected</source>
         <translation>선택 항목 실행 취소</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="194"/>
+        <location filename="../widgets/history_panel.py" line="276"/>
         <source>Key History</source>
         <translation>조성 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="196"/>
+        <location filename="../widgets/history_panel.py" line="278"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>최근 분석한 트랙과 감지된 조성입니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="299"/>
+        <location filename="../widgets/history_panel.py" line="422"/>
         <source>Renamed {0} files: {1}</source>
         <translation>파일 {0}개 이름 변경 완료: {1}</translation>
     </message>
@@ -680,7 +721,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="303"/>
+        <location filename="../widgets/history_panel.py" line="426"/>
         <source>No description</source>
         <translation>설명 없음</translation>
     </message>
