@@ -593,132 +593,137 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="149"/>
-        <location filename="../widgets/history_panel.py" line="312"/>
+        <location filename="../widgets/history_panel.py" line="155"/>
+        <location filename="../widgets/history_panel.py" line="373"/>
         <source>Rename History</source>
         <translation>Histórico de renomeação</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="153"/>
-        <location filename="../widgets/history_panel.py" line="314"/>
+        <location filename="../widgets/history_panel.py" line="159"/>
+        <location filename="../widgets/history_panel.py" line="375"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>Veja as operações de renomeação recentes. Selecione uma sessão para desfazê-la.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Session ID</source>
         <translation>ID da sessão</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
-        <location filename="../widgets/history_panel.py" line="205"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
+        <location filename="../widgets/history_panel.py" line="211"/>
         <source>Date/Time</source>
         <translation>Data/Hora</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Files</source>
         <translation>Arquivos</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Description</source>
         <translation>Descrição</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="197"/>
+        <location filename="../widgets/history_panel.py" line="203"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="198"/>
+        <location filename="../widgets/history_panel.py" line="204"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="199"/>
-        <location filename="../widgets/history_panel.py" line="201"/>
+        <location filename="../widgets/history_panel.py" line="205"/>
+        <location filename="../widgets/history_panel.py" line="207"/>
         <source>Conf</source>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="200"/>
+        <location filename="../widgets/history_panel.py" line="206"/>
         <source>Key</source>
         <translation>Tonalidade</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="202"/>
+        <location filename="../widgets/history_panel.py" line="208"/>
         <source>Key Code</source>
         <translation>Key Code</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="203"/>
+        <location filename="../widgets/history_panel.py" line="209"/>
         <source>Alt Keys</source>
         <translation>Tonalidades alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="204"/>
+        <location filename="../widgets/history_panel.py" line="210"/>
         <source>Energy</source>
         <translation>Energia</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="250"/>
-        <location filename="../widgets/history_panel.py" line="491"/>
+        <location filename="../widgets/history_panel.py" line="256"/>
+        <location filename="../widgets/history_panel.py" line="559"/>
         <source>{0} Rename Sessions</source>
         <translation>{0} sessões de renomeação</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="257"/>
-        <location filename="../widgets/history_panel.py" line="436"/>
+        <location filename="../widgets/history_panel.py" line="263"/>
+        <location filename="../widgets/history_panel.py" line="504"/>
         <source>{0} Song Keys</source>
         <translation>{0} tonalidades</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="272"/>
-        <location filename="../widgets/history_panel.py" line="608"/>
-        <location filename="../widgets/history_panel.py" line="621"/>
+        <location filename="../widgets/history_panel.py" line="281"/>
+        <source>Show</source>
+        <translation>Mostrar</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="303"/>
+        <location filename="../widgets/history_panel.py" line="676"/>
+        <location filename="../widgets/history_panel.py" line="689"/>
         <source>Export CSV</source>
         <translation>Exportar CSV</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="274"/>
+        <location filename="../widgets/history_panel.py" line="305"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>Exporta a tabela abaixo para um arquivo CSV compatível com planilhas.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="352"/>
+        <location filename="../widgets/history_panel.py" line="418"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>Confiança baixa: vale a pena verificar esta tonalidade.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="355"/>
+        <location filename="../widgets/history_panel.py" line="421"/>
         <source>Low confidence — the tempo may be half or double time.</source>
         <translation>Confiança baixa: o tempo pode estar na metade ou no dobro.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="609"/>
+        <location filename="../widgets/history_panel.py" line="677"/>
         <source>There is nothing to export yet.</source>
         <translation>Ainda não há nada para exportar.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="631"/>
+        <location filename="../widgets/history_panel.py" line="699"/>
         <source>Export failed</source>
         <translation>Falha na exportação</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="632"/>
+        <location filename="../widgets/history_panel.py" line="700"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Não foi possível gravar o arquivo:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="638"/>
+        <location filename="../widgets/history_panel.py" line="706"/>
         <source>Export complete</source>
         <translation>Exportação concluída</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="639"/>
+        <location filename="../widgets/history_panel.py" line="707"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>{0} linhas exportadas para:
@@ -729,32 +734,31 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">0 sessões</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="279"/>
         <source>Refresh</source>
-        <translation>Atualizar</translation>
+        <translation type="vanished">Atualizar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="283"/>
+        <location filename="../widgets/history_panel.py" line="313"/>
         <source>Delete</source>
         <translation>Excluir</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="288"/>
+        <location filename="../widgets/history_panel.py" line="318"/>
         <source>Undo Selected</source>
         <translation>Desfazer selecionados</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="307"/>
+        <location filename="../widgets/history_panel.py" line="368"/>
         <source>Key History</source>
         <translation>Histórico de tonalidades</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="309"/>
+        <location filename="../widgets/history_panel.py" line="370"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>Faixas analisadas recentemente e suas tonalidades detectadas.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="481"/>
+        <location filename="../widgets/history_panel.py" line="549"/>
         <source>Renamed {0} files: {1}</source>
         <translation>{0} arquivos renomeados: {1}</translation>
     </message>
@@ -763,7 +767,7 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">{0} arquivos renomeados</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="485"/>
+        <location filename="../widgets/history_panel.py" line="553"/>
         <source>No description</source>
         <translation>Sem descrição</translation>
     </message>
@@ -852,146 +856,146 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="319"/>
+        <location filename="../main_window.py" line="323"/>
         <source>Select Audio Files</source>
         <translation>Selecionar arquivos de áudio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="330"/>
+        <location filename="../main_window.py" line="334"/>
         <source>Select Folder</source>
         <translation>Selecionar pasta</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="417"/>
+        <location filename="../main_window.py" line="421"/>
         <source>No Audio Files</source>
         <translation>Nenhum arquivo de áudio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="418"/>
+        <location filename="../main_window.py" line="422"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Nenhum arquivo de áudio encontrado em:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="423"/>
+        <location filename="../main_window.py" line="427"/>
         <source>Invalid Folder</source>
         <translation>Pasta inválida</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="424"/>
+        <location filename="../main_window.py" line="428"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Não é um diretório válido:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="457"/>
+        <location filename="../main_window.py" line="461"/>
         <source>Analysis in Progress</source>
         <translation>Análise em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="458"/>
+        <location filename="../main_window.py" line="462"/>
         <source>An analysis is already running. Please wait or cancel it first.</source>
         <translation>Uma análise já está em execução. Aguarde ou cancele-a primeiro.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="514"/>
+        <location filename="../main_window.py" line="518"/>
         <source>Analyzing...</source>
         <translation>Analisando...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="539"/>
+        <location filename="../main_window.py" line="543"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Concluído: {0} analisados, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="547"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Concluído: {0} arquivos analisados</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="560"/>
+        <location filename="../main_window.py" line="564"/>
         <source>Cancelled</source>
         <translation>Cancelado</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="646"/>
+        <location filename="../main_window.py" line="650"/>
         <source>Conversion in Progress</source>
         <translation>Conversão em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="647"/>
+        <location filename="../main_window.py" line="651"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Uma conversão já está em execução. Aguarde.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="677"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Converting...</source>
         <translation>Convertendo...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="693"/>
+        <location filename="../main_window.py" line="697"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Concluído: {0} convertidos, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="701"/>
         <source>Complete: {0} files converted</source>
         <translation>Concluído: {0} arquivos convertidos</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="860"/>
+        <location filename="../main_window.py" line="870"/>
         <source>Rename in Progress</source>
         <translation>Renomeação em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="861"/>
+        <location filename="../main_window.py" line="871"/>
         <source>A rename operation is already running.</source>
         <translation>Uma operação de renomeação já está em execução.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="883"/>
+        <location filename="../main_window.py" line="893"/>
         <source>Renaming files...</source>
         <translation>Renomeando arquivos...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="895"/>
+        <location filename="../main_window.py" line="905"/>
         <source>Renamed {0} files</source>
         <translation>{0} arquivos renomeados</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="931"/>
+        <location filename="../main_window.py" line="941"/>
         <source>No Session</source>
         <translation>Nenhuma sessão</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="931"/>
+        <location filename="../main_window.py" line="941"/>
         <source>No rename session to undo.</source>
         <translation>Nenhuma sessão de renomeação para desfazer.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="940"/>
+        <location filename="../main_window.py" line="950"/>
         <source>Confirm Undo</source>
         <translation>Confirmar Desfazer</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="951"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Desfazer a renomeação de {0} arquivos?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="950"/>
+        <location filename="../main_window.py" line="960"/>
         <source>Undoing rename...</source>
         <translation>Desfazendo renomeação...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="967"/>
+        <location filename="../main_window.py" line="977"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Desfeito: {0} arquivos, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="971"/>
+        <location filename="../main_window.py" line="981"/>
         <source>Undone {0} files</source>
         <translation>{0} arquivos desfeitos</translation>
     </message>

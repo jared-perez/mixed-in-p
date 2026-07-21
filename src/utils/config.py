@@ -21,6 +21,15 @@ _VALID_NAMING_PREFS = {
     "suffix_key",
 }
 
+# Selectable row counts for the History panel's "Show" dropdown. The largest is
+# also the effective retention ceiling — see analysis.history.MAX_ENTRIES, kept
+# in step so raising the display limit can always reveal stored rows.
+HISTORY_DISPLAY_LIMITS = (50, 100, 250, 500, 1000)
+
+# Default row count. Not necessarily the first option — decoupled so the default
+# can differ from the smallest selectable value.
+DEFAULT_HISTORY_DISPLAY_LIMIT = 100
+
 _VALID_ENERGY_FORMATS = {"number_only", "with_label"}
 _VALID_ENERGY_MODES = {"prepend", "append", "replace"}
 _VALID_KEY_NOTATIONS = {"keycode", "traditional", "open_key"}
@@ -94,6 +103,11 @@ class AppConfig:
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).
     theme: str = "nuevo_leon"
+    # How many rows the History panel shows (both the Key History and Rename
+    # views). A display cap only — analysis entries are retained up to
+    # analysis.history.MAX_ENTRIES and session files persist regardless, so
+    # raising this later reveals older rows rather than re-creating them.
+    history_display_limit: int = DEFAULT_HISTORY_DISPLAY_LIMIT
     # Base64-encoded QHeaderView.saveState() for the Player playlist columns
     # (order + widths). Empty = use the built-in default layout.
     player_column_state: str = ""
@@ -162,6 +176,9 @@ def load_config() -> AppConfig:
                 ),
                 language=data.get("language", AppConfig.language),
                 theme=data.get("theme", AppConfig.theme),
+                history_display_limit=int(
+                    data.get("history_display_limit", AppConfig.history_display_limit)
+                ),
                 player_column_state=data.get(
                     "player_column_state", AppConfig.player_column_state
                 ),
@@ -201,6 +218,8 @@ def load_config() -> AppConfig:
             valid_themes = _valid_theme_ids()
             if valid_themes is not None and cfg.theme not in valid_themes:
                 cfg.theme = AppConfig.theme
+            if cfg.history_display_limit not in HISTORY_DISPLAY_LIMITS:
+                cfg.history_display_limit = AppConfig.history_display_limit
             return cfg
     except Exception as exc:
         logger.warning("Failed to load config: %s", exc)

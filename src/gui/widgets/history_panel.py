@@ -14,8 +14,10 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QHeaderView,
     QLabel,
+    QMenu,
     QMessageBox,
     QPushButton,
+    QToolButton,
     QStackedWidget,
     QTableWidget,
     QTableWidgetItem,
@@ -25,6 +27,7 @@ from PySide6.QtWidgets import (
 
 from src.analysis.history import load_entries as load_analysis_entries
 from src.renamer import RenameSession, delete_session, list_sessions, load_session
+from src.utils.config import DEFAULT_HISTORY_DISPLAY_LIMIT, HISTORY_DISPLAY_LIMITS
 from src.utils.export import write_csv
 
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
@@ -121,11 +124,14 @@ class HistoryPanel(QWidget):
     """Panel for viewing rename history and recent key analysis results."""
 
     undo_session = Signal(RenameSession)
+    # Emitted when the user picks a new row count, for the window to persist.
+    history_limit_changed = Signal(int)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._sessions: list[RenameSession] = []
         self._entries: list[dict] = []
+        self._display_limit = DEFAULT_HISTORY_DISPLAY_LIMIT
         self._loaded = False
         self._setup_ui()
         self._bg_overlay = BackgroundOverlay("bg_history.png", self)
@@ -269,6 +275,31 @@ class HistoryPanel(QWidget):
 
         button_layout.addStretch()
 
+        # Row-count cap for whichever view is showing. A display limit only —
+        # see set_history_limit. The label uses "Show" as the field name; the
+        # counts themselves are numeric data and stay unwrapped.
+        self._show_label = QLabel(self.tr("Show"))
+        button_layout.addWidget(self._show_label)
+        # A menu button, not a QComboBox: on macOS the combo's editable text
+        # field fought the QSS padding and clipped "1000" behind the arrow. A
+        # QToolButton auto-sizes to its label and pops a plain menu — the same
+        # pattern as the header "Add" button.
+        self._limit_btn = QToolButton()
+        self._limit_btn.setObjectName("historyLimit")
+        self._limit_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        self._limit_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        limit_menu = QMenu(self._limit_btn)
+        self._limit_actions: dict[int, object] = {}
+        for value in HISTORY_DISPLAY_LIMITS:
+            action = limit_menu.addAction(
+                str(value), lambda v=value: self._on_limit_selected(v)
+            )
+            action.setCheckable(True)
+            self._limit_actions[value] = action
+        self._limit_btn.setMenu(limit_menu)
+        self._sync_limit_button()
+        button_layout.addWidget(self._limit_btn)
+
         self._export_btn = QPushButton(self.tr("Export CSV"))
         self._export_btn.setToolTip(
             self.tr("Export the table below to a spreadsheet-friendly CSV file.")
@@ -276,10 +307,9 @@ class HistoryPanel(QWidget):
         self._export_btn.clicked.connect(self._on_export_clicked)
         button_layout.addWidget(self._export_btn)
 
-        self._refresh_btn = QPushButton(self.tr("Refresh"))
-        self._refresh_btn.clicked.connect(self.refresh)
-        button_layout.addWidget(self._refresh_btn)
-
+        # No manual Refresh button: MainWindow calls refresh() every time the
+        # History page is shown, and Delete/limit changes refresh themselves, so
+        # the view is never stale in normal use.
         self._delete_btn = QPushButton(self.tr("Delete"))
         self._delete_btn.clicked.connect(self._on_delete_clicked)
         self._delete_btn.setEnabled(False)
@@ -295,6 +325,37 @@ class HistoryPanel(QWidget):
 
         # Connect selection change
         self._table.selectionModel().selectionChanged.connect(self._on_selection_changed)
+
+    def set_history_limit(self, limit: int) -> None:
+        """Set how many rows each view shows, from persisted config.
+
+        A *display* cap, not a retention cap: analysis entries are kept up to
+        analysis.history.MAX_ENTRIES and session files are never deleted, so a
+        larger limit surfaces rows that were stored all along. Unknown values
+        fall back to the first option. Does not emit history_limit_changed —
+        this is loading state, not a user edit.
+        """
+        if limit not in HISTORY_DISPLAY_LIMITS:
+            limit = DEFAULT_HISTORY_DISPLAY_LIMIT
+        self._display_limit = limit
+        self._sync_limit_button()
+        if self._loaded:
+            self.refresh()
+
+    def _sync_limit_button(self) -> None:
+        """Point the menu button's label and checkmark at the current limit."""
+        self._limit_btn.setText(str(self._display_limit))
+        for value, action in self._limit_actions.items():
+            action.setChecked(value == self._display_limit)
+
+    def _on_limit_selected(self, limit: int) -> None:
+        """User picked a new row count from the menu: apply, persist, redraw."""
+        if limit == self._display_limit:
+            return
+        self._display_limit = limit
+        self._sync_limit_button()
+        self.history_limit_changed.emit(limit)
+        self.refresh()
 
     def _set_view(self, view: str) -> None:
         """Switch between the rename-sessions and song-keys views."""
@@ -333,6 +394,11 @@ class HistoryPanel(QWidget):
         except Exception:
             self._entries = []
 
+        # Show only the configured number of rows. self._entries stays the full
+        # loaded list so export and the entry-index role still resolve; the
+        # slice is a prefix, so a row's index maps into both alike.
+        visible = self._entries[: self._display_limit]
+
         def _item(
             text: str, center: bool = False, sort_value: object | None = None
         ) -> QTableWidgetItem:
@@ -359,8 +425,8 @@ class HistoryPanel(QWidget):
         # re-sorts after every setItem() and rows move out from under the loop.
         # Re-enabling re-applies the user's current sort column/order.
         self._keys_table.setSortingEnabled(False)
-        self._keys_table.setRowCount(len(self._entries))
-        for row, entry in enumerate(self._entries):
+        self._keys_table.setRowCount(len(visible))
+        for row, entry in enumerate(visible):
             bpm = entry.get("bpm")
             bpm_conf = entry.get("bpm_confidence")
             key_conf = entry.get("key_confidence")
@@ -433,12 +499,14 @@ class HistoryPanel(QWidget):
                     cell.setToolTip(low_bpm_hint)
         self._keys_table.setSortingEnabled(True)
 
-        self._keys_btn.setText(self.tr("{0} Song Keys").format(len(self._entries)))
+        # Count reflects what's shown, matching the table (may be capped by the
+        # display limit below the number actually retained on disk).
+        self._keys_btn.setText(self.tr("{0} Song Keys").format(len(visible)))
 
     def _refresh_sessions(self) -> None:
         """Refresh the sessions list from disk."""
         try:
-            self._sessions = list_sessions(limit=50)
+            self._sessions = list_sessions(limit=self._display_limit)
         except Exception:
             self._sessions = []
 

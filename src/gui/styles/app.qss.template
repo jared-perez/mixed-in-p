@@ -156,6 +156,36 @@ QToolButton#headerActionButton::menu-indicator {
     right: 8px;
 }
 
+/* History panel "Show N" menu button (QToolButton). Restates the QPushButton
+   chrome (QToolButton doesn't inherit it) so it matches the row's other
+   buttons; the extra right padding reserves room for the menu-indicator arrow
+   so it never overlaps the number. */
+QToolButton#historyLimit {
+    background-color: @BG_LIGHT@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    padding: 8px 26px 8px 14px;
+    font-weight: 500;
+    min-height: 20px;
+}
+
+QToolButton#historyLimit:hover {
+    background-color: @BG_LIGHTER@;
+    border-color: @CHROME@;
+}
+
+QToolButton#historyLimit:pressed {
+    background-color: @BG_MEDIUM@;
+}
+
+QToolButton#historyLimit::menu-indicator {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 12px;
+    right: 8px;
+}
+
 QPushButton#primaryButton {
     background-color: @NEON_YELLOW@;
     color: @BG_DARK@;

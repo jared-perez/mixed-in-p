@@ -202,6 +202,7 @@ class MainWindow(QMainWindow):
 
         # History panel (index 7)
         self._history_panel = HistoryPanel()
+        self._history_panel.set_history_limit(self._config.history_display_limit)
         self._page_widgets["history"] = self._history_panel
         self._pages.addWidget(self._history_panel)
 
@@ -247,6 +248,9 @@ class MainWindow(QMainWindow):
 
         # History panel signals
         self._history_panel.undo_session.connect(self._undo_session_from_history)
+        self._history_panel.history_limit_changed.connect(
+            self._on_history_limit_changed
+        )
 
         # Player panel signals
         self._player_panel.files_dropped.connect(self._add_files_to_player)
@@ -708,6 +712,12 @@ class MainWindow(QMainWindow):
     def _on_spectrum_sensitivity(self, dr: float) -> None:
         """Persist the spectrum colour sensitivity when the slider is released."""
         self._config.spectrum_dynamic_range = dr
+        self._persist_config()
+
+    def _on_history_limit_changed(self, limit: int) -> None:
+        """Persist the History panel's row-count choice. The panel has already
+        redrawn itself; this only records the selection for next launch."""
+        self._config.history_display_limit = limit
         self._persist_config()
 
     def _on_auto_analyze_toggled(self, enabled: bool) -> None:

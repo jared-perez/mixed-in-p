@@ -595,133 +595,138 @@ or click “Add Artwork…”</source>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="149"/>
-        <location filename="../widgets/history_panel.py" line="312"/>
+        <location filename="../widgets/history_panel.py" line="155"/>
+        <location filename="../widgets/history_panel.py" line="373"/>
         <source>Rename History</source>
         <translatorcomment>Used リネーム履歴 per glossary (batch-rename feature label). Alternative 名前変更の履歴 also allowed. Flagging the choice.</translatorcomment>
         <translation>リネーム履歴</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="153"/>
-        <location filename="../widgets/history_panel.py" line="314"/>
+        <location filename="../widgets/history_panel.py" line="159"/>
+        <location filename="../widgets/history_panel.py" line="375"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>最近の名前変更操作を表示します。取り消すにはセッションを選択してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Session ID</source>
         <translation>セッションID</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
-        <location filename="../widgets/history_panel.py" line="205"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
+        <location filename="../widgets/history_panel.py" line="211"/>
         <source>Date/Time</source>
         <translation>日時</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Files</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="173"/>
         <source>Description</source>
         <translation>説明</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="197"/>
+        <location filename="../widgets/history_panel.py" line="203"/>
         <source>Name</source>
         <translation>名前</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="198"/>
+        <location filename="../widgets/history_panel.py" line="204"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="199"/>
-        <location filename="../widgets/history_panel.py" line="201"/>
+        <location filename="../widgets/history_panel.py" line="205"/>
+        <location filename="../widgets/history_panel.py" line="207"/>
         <source>Conf</source>
         <translation>信頼度</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="200"/>
+        <location filename="../widgets/history_panel.py" line="206"/>
         <source>Key</source>
         <translation>キー</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="202"/>
+        <location filename="../widgets/history_panel.py" line="208"/>
         <source>Key Code</source>
         <translation>キーコード</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="203"/>
+        <location filename="../widgets/history_panel.py" line="209"/>
         <source>Alt Keys</source>
         <translation>代替キー</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="204"/>
+        <location filename="../widgets/history_panel.py" line="210"/>
         <source>Energy</source>
         <translation>エナジー</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="250"/>
-        <location filename="../widgets/history_panel.py" line="491"/>
+        <location filename="../widgets/history_panel.py" line="256"/>
+        <location filename="../widgets/history_panel.py" line="559"/>
         <source>{0} Rename Sessions</source>
         <translation>リネームセッション: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="257"/>
-        <location filename="../widgets/history_panel.py" line="436"/>
+        <location filename="../widgets/history_panel.py" line="263"/>
+        <location filename="../widgets/history_panel.py" line="504"/>
         <source>{0} Song Keys</source>
         <translation>曲のキー: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="272"/>
-        <location filename="../widgets/history_panel.py" line="608"/>
-        <location filename="../widgets/history_panel.py" line="621"/>
+        <location filename="../widgets/history_panel.py" line="281"/>
+        <source>Show</source>
+        <translation>表示</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="303"/>
+        <location filename="../widgets/history_panel.py" line="676"/>
+        <location filename="../widgets/history_panel.py" line="689"/>
         <source>Export CSV</source>
         <translation>CSVを書き出す</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="274"/>
+        <location filename="../widgets/history_panel.py" line="305"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>下の表を表計算ソフトで開けるCSVファイルに書き出します。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="352"/>
+        <location filename="../widgets/history_panel.py" line="418"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>確度が低いため、このキーは確認することをおすすめします。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="355"/>
+        <location filename="../widgets/history_panel.py" line="421"/>
         <source>Low confidence — the tempo may be half or double time.</source>
         <translation>確度が低いため、テンポが半分または倍の可能性があります。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="609"/>
+        <location filename="../widgets/history_panel.py" line="677"/>
         <source>There is nothing to export yet.</source>
         <translation>書き出せるものがまだありません。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="631"/>
+        <location filename="../widgets/history_panel.py" line="699"/>
         <source>Export failed</source>
         <translation>書き出しに失敗しました</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="632"/>
+        <location filename="../widgets/history_panel.py" line="700"/>
         <source>Could not write the file:
 {0}</source>
         <translation>ファイルを書き込めませんでした:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="638"/>
+        <location filename="../widgets/history_panel.py" line="706"/>
         <source>Export complete</source>
         <translation>書き出しが完了しました</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="639"/>
+        <location filename="../widgets/history_panel.py" line="707"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>{0}行を書き出しました:
@@ -732,33 +737,32 @@ or click “Add Artwork…”</source>
         <translation type="vanished">0セッション</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="279"/>
         <source>Refresh</source>
-        <translation>更新</translation>
+        <translation type="vanished">更新</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="283"/>
+        <location filename="../widgets/history_panel.py" line="313"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="288"/>
+        <location filename="../widgets/history_panel.py" line="318"/>
         <source>Undo Selected</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>選択項目を取り消す</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="307"/>
+        <location filename="../widgets/history_panel.py" line="368"/>
         <source>Key History</source>
         <translation>キー履歴</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="309"/>
+        <location filename="../widgets/history_panel.py" line="370"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>最近分析したトラックと検出されたキー。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="481"/>
+        <location filename="../widgets/history_panel.py" line="549"/>
         <source>Renamed {0} files: {1}</source>
         <translation>{0}個のファイル名を変更しました：{1}</translation>
     </message>
@@ -767,7 +771,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="485"/>
+        <location filename="../widgets/history_panel.py" line="553"/>
         <source>No description</source>
         <translation>説明なし</translation>
     </message>
@@ -856,146 +860,146 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="319"/>
+        <location filename="../main_window.py" line="323"/>
         <source>Select Audio Files</source>
         <translation>オーディオファイルを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="330"/>
+        <location filename="../main_window.py" line="334"/>
         <source>Select Folder</source>
         <translation>フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="417"/>
+        <location filename="../main_window.py" line="421"/>
         <source>No Audio Files</source>
         <translation>オーディオファイルなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="418"/>
+        <location filename="../main_window.py" line="422"/>
         <source>No audio files found in:
 {0}</source>
         <translation>次の場所にオーディオファイルが見つかりません:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="423"/>
+        <location filename="../main_window.py" line="427"/>
         <source>Invalid Folder</source>
         <translation>無効なフォルダ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="424"/>
+        <location filename="../main_window.py" line="428"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>有効なディレクトリではありません:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="457"/>
+        <location filename="../main_window.py" line="461"/>
         <source>Analysis in Progress</source>
         <translation>解析を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="458"/>
+        <location filename="../main_window.py" line="462"/>
         <source>An analysis is already running. Please wait or cancel it first.</source>
         <translation>すでに解析を実行中です。完了を待つか、先にキャンセルしてください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="514"/>
+        <location filename="../main_window.py" line="518"/>
         <source>Analyzing...</source>
         <translation>解析中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="539"/>
+        <location filename="../main_window.py" line="543"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完了: {0}件解析済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="547"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完了: {0}個のファイルを解析しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="560"/>
+        <location filename="../main_window.py" line="564"/>
         <source>Cancelled</source>
         <translation>キャンセルしました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="646"/>
+        <location filename="../main_window.py" line="650"/>
         <source>Conversion in Progress</source>
         <translation>変換を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="647"/>
+        <location filename="../main_window.py" line="651"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>すでに変換を実行中です。お待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="677"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Converting...</source>
         <translation>変換中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="693"/>
+        <location filename="../main_window.py" line="697"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完了: {0}件変換済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="701"/>
         <source>Complete: {0} files converted</source>
         <translation>完了: {0}個のファイルを変換しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="860"/>
+        <location filename="../main_window.py" line="870"/>
         <source>Rename in Progress</source>
         <translation>名前変更を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="861"/>
+        <location filename="../main_window.py" line="871"/>
         <source>A rename operation is already running.</source>
         <translation>すでに名前変更操作を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="883"/>
+        <location filename="../main_window.py" line="893"/>
         <source>Renaming files...</source>
         <translation>ファイル名を変更中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="895"/>
+        <location filename="../main_window.py" line="905"/>
         <source>Renamed {0} files</source>
         <translation>{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="931"/>
+        <location filename="../main_window.py" line="941"/>
         <source>No Session</source>
         <translation>セッションなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="931"/>
+        <location filename="../main_window.py" line="941"/>
         <source>No rename session to undo.</source>
         <translation>取り消す名前変更セッションがありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="940"/>
+        <location filename="../main_window.py" line="950"/>
         <source>Confirm Undo</source>
         <translation>取り消しの確認</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="951"/>
         <source>Undo renaming of {0} files?</source>
         <translation>{0}個のファイルの名前変更を取り消しますか？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="950"/>
+        <location filename="../main_window.py" line="960"/>
         <source>Undoing rename...</source>
         <translation>名前変更を取り消し中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="967"/>
+        <location filename="../main_window.py" line="977"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>取り消し完了: {0}個のファイル、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="971"/>
+        <location filename="../main_window.py" line="981"/>
         <source>Undone {0} files</source>
         <translation>{0}個のファイルを取り消しました</translation>
     </message>

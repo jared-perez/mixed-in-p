@@ -15,7 +15,12 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-MAX_ENTRIES = 50
+# Retention ceiling for stored analysis entries. Kept at or above the largest
+# History "Show" option (config.HISTORY_DISPLAY_LIMITS) so raising that display
+# limit reveals rows that were retained all along rather than lost. This is a
+# storage cap, not a display cap: the panel shows only as many as configured.
+# At ~0.3 KB/entry a full file is well under 1 MB.
+MAX_ENTRIES = 1000
 
 
 def get_history_file() -> Path:
