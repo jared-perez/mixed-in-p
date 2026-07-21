@@ -26,6 +26,11 @@ from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 
 _KEYCODE_RE = re.compile(r"(\d{1,2})([AB])", re.IGNORECASE)
 
+# Rename Sessions table column order. Named so the display order can change
+# without hunting down bare indices — _get_selected_session in particular reads
+# the session id back off the _SESS_ID cell.
+_SESS_DATE, _SESS_FILES, _SESS_DESC, _SESS_ID = range(4)
+
 
 class _SortableItem(QTableWidgetItem):
     """Table item that sorts on a value held separately from its display text.
@@ -113,8 +118,12 @@ class HistoryPanel(QWidget):
         self._table = QTableWidget()
         self._table.setObjectName("historyTable")
         self._table.setColumnCount(4)
+        # Session ID is last: GUI users undo by selecting a row, so the id is
+        # only a handle for the CLI ("mixed-in-p rename --undo <id>") and for
+        # finding session_<id>.json on disk. Kept available, but pushed right of
+        # the Description so it sits out of the way.
         self._table.setHorizontalHeaderLabels(
-            [self.tr("Session ID"), self.tr("Date/Time"), self.tr("Files"), self.tr("Description")]
+            [self.tr("Date/Time"), self.tr("Files"), self.tr("Description"), self.tr("Session ID")]
         )
         self._table.setAlternatingRowColors(True)
         self._table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
@@ -126,17 +135,18 @@ class HistoryPanel(QWidget):
         self._table.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
 
         header = self._table.horizontalHeader()
-        header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
         # Date/Time is user-resizable; defaults wide enough for the full timestamp.
-        header.setSectionResizeMode(1, QHeaderView.ResizeMode.Interactive)
-        header.setSectionResizeMode(2, QHeaderView.ResizeMode.Fixed)
+        header.setSectionResizeMode(_SESS_DATE, QHeaderView.ResizeMode.Interactive)
+        header.setSectionResizeMode(_SESS_FILES, QHeaderView.ResizeMode.Fixed)
         # Description grows to fit its filename preview rather than stretching to
-        # fill, so long previews push past the edge and become scrollable.
-        header.setSectionResizeMode(3, QHeaderView.ResizeMode.ResizeToContents)
+        # fill, so long previews push past the edge and become scrollable — which
+        # is also what carries Session ID off the right edge.
+        header.setSectionResizeMode(_SESS_DESC, QHeaderView.ResizeMode.ResizeToContents)
+        header.setSectionResizeMode(_SESS_ID, QHeaderView.ResizeMode.Fixed)
         header.setStretchLastSection(False)
-        self._table.setColumnWidth(0, 100)
-        self._table.setColumnWidth(1, 170)
-        self._table.setColumnWidth(2, 60)
+        self._table.setColumnWidth(_SESS_DATE, 170)
+        self._table.setColumnWidth(_SESS_FILES, 60)
+        self._table.setColumnWidth(_SESS_ID, 100)
 
         # Song keys table: recently analyzed tracks with their detection results
         self._keys_table = QTableWidget()
@@ -359,21 +369,24 @@ class HistoryPanel(QWidget):
         self._table.setRowCount(len(self._sessions))
 
         for row, session in enumerate(self._sessions):
-            # Session ID
-            id_item = QTableWidgetItem(session.session_id)
-            id_item.setFlags(id_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self._table.setItem(row, 0, id_item)
-
             # Timestamp
             time_item = QTableWidgetItem(session.timestamp[:19].replace("T", " "))
             time_item.setFlags(time_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self._table.setItem(row, 1, time_item)
+            self._table.setItem(row, _SESS_DATE, time_item)
 
             # File count
             count_item = QTableWidgetItem(str(session.file_count))
             count_item.setFlags(count_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             count_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-            self._table.setItem(row, 2, count_item)
+            self._table.setItem(row, _SESS_FILES, count_item)
+
+            # Session ID. The id is also stashed on the item so selection can be
+            # resolved by identity rather than by row position — see
+            # _get_selected_session.
+            id_item = QTableWidgetItem(session.session_id)
+            id_item.setFlags(id_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
+            id_item.setData(Qt.ItemDataRole.UserRole, session.session_id)
+            self._table.setItem(row, _SESS_ID, id_item)
 
             # Description. The stored description is the English data string
             # "Renamed N files" (written by the rename worker / CLI and persisted
@@ -396,7 +409,7 @@ class HistoryPanel(QWidget):
                 description = session.description or self.tr("No description")
             desc_item = QTableWidgetItem(description)
             desc_item.setFlags(desc_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-            self._table.setItem(row, 3, desc_item)
+            self._table.setItem(row, _SESS_DESC, desc_item)
 
         self._sessions_btn.setText(
             self.tr("{0} Rename Sessions").format(len(self._sessions))
@@ -414,15 +427,26 @@ class HistoryPanel(QWidget):
         self._delete_btn.setEnabled(has_selection)
 
     def _get_selected_session(self) -> RenameSession | None:
-        """Get the currently selected session."""
+        """Get the currently selected session.
+
+        Resolved by session id carried on the row's own item, NOT by indexing
+        self._sessions with the row number: sorting the table reorders the
+        items while self._sessions keeps its original order, so a row index
+        would point at the wrong session — and Undo/Delete would act on a
+        session the user never selected.
+        """
         selected = self._table.selectionModel().selectedRows()
         if not selected:
             return None
 
-        row = selected[0].row()
-        if 0 <= row < len(self._sessions):
-            return self._sessions[row]
-        return None
+        item = self._table.item(selected[0].row(), _SESS_ID)
+        if item is None:
+            return None
+
+        session_id = item.data(Qt.ItemDataRole.UserRole)
+        return next(
+            (s for s in self._sessions if s.session_id == session_id), None
+        )
 
     def _on_undo_clicked(self) -> None:
         """Handle undo button click."""
