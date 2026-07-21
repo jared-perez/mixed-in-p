@@ -62,6 +62,16 @@ _ENTRY_INDEX_ROLE = Qt.ItemDataRole.UserRole + 1
 # and stops meaning "check this". Retune against your own distribution.
 LOW_KEY_CONFIDENCE = 0.25
 
+# Separate from LOW_KEY_CONFIDENCE on purpose: BPM confidence is a different
+# detector with a different distribution, so the two thresholds must move
+# independently. On a real 50-track library BPM confidence was bimodal — most
+# tracks 80-100%, a distinct low tail below ~40% — with a sparse valley between.
+# A low BPM score often means the half/double-time ambiguity (see _refine_bpm in
+# bpm_detector.py, which halves confidence when no in-range metrical level had
+# autocorrelation support), i.e. the tempo may be doubled or halved. 0.70 flags
+# ~32% on that library — the whole low cluster plus the valley floor.
+LOW_BPM_CONFIDENCE = 0.70
+
 
 class _SortableItem(QTableWidgetItem):
     """Table item that sorts on a value held separately from its display text.
@@ -341,6 +351,9 @@ class HistoryPanel(QWidget):
         low_confidence_hint = self.tr(
             "Low confidence — this key is worth double-checking."
         )
+        low_bpm_hint = self.tr(
+            "Low confidence — the tempo may be half or double time."
+        )
 
         # Sorting must be off while the table is populated: with it on, Qt
         # re-sorts after every setItem() and rows move out from under the loop.
@@ -409,6 +422,15 @@ class HistoryPanel(QWidget):
                     cell = self._keys_table.item(row, col)
                     cell.setForeground(QColor(Theme.WARNING))
                     cell.setToolTip(low_confidence_hint)
+
+            # Independently, tint the BPM cells on a shaky tempo. A row can have
+            # either flag, both, or neither — an uncertain tempo says nothing
+            # about the key, and vice versa.
+            if bpm_conf is not None and bpm_conf <= LOW_BPM_CONFIDENCE:
+                for col in (1, 2):  # BPM, BPM Conf
+                    cell = self._keys_table.item(row, col)
+                    cell.setForeground(QColor(Theme.WARNING))
+                    cell.setToolTip(low_bpm_hint)
         self._keys_table.setSortingEnabled(True)
 
         self._keys_btn.setText(self.tr("{0} Song Keys").format(len(self._entries)))

@@ -594,127 +594,132 @@ or click “Add Artwork…”</source>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="135"/>
-        <location filename="../widgets/history_panel.py" line="298"/>
+        <location filename="../widgets/history_panel.py" line="149"/>
+        <location filename="../widgets/history_panel.py" line="312"/>
         <source>Rename History</source>
         <translation>重命名历史</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="139"/>
-        <location filename="../widgets/history_panel.py" line="300"/>
+        <location filename="../widgets/history_panel.py" line="153"/>
+        <location filename="../widgets/history_panel.py" line="314"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>查看最近的重命名操作。选择一个会话以撤销。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="153"/>
+        <location filename="../widgets/history_panel.py" line="167"/>
         <source>Session ID</source>
         <translation>会话 ID</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="153"/>
-        <location filename="../widgets/history_panel.py" line="191"/>
+        <location filename="../widgets/history_panel.py" line="167"/>
+        <location filename="../widgets/history_panel.py" line="205"/>
         <source>Date/Time</source>
         <translation>日期/时间</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="153"/>
+        <location filename="../widgets/history_panel.py" line="167"/>
         <source>Files</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="153"/>
+        <location filename="../widgets/history_panel.py" line="167"/>
         <source>Description</source>
         <translation>描述</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="183"/>
+        <location filename="../widgets/history_panel.py" line="197"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="184"/>
+        <location filename="../widgets/history_panel.py" line="198"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="185"/>
-        <location filename="../widgets/history_panel.py" line="187"/>
+        <location filename="../widgets/history_panel.py" line="199"/>
+        <location filename="../widgets/history_panel.py" line="201"/>
         <source>Conf</source>
         <translation>置信度</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="186"/>
+        <location filename="../widgets/history_panel.py" line="200"/>
         <source>Key</source>
         <translation>调</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="188"/>
+        <location filename="../widgets/history_panel.py" line="202"/>
         <source>Key Code</source>
         <translation>键码</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="189"/>
+        <location filename="../widgets/history_panel.py" line="203"/>
         <source>Alt Keys</source>
         <translation>备选调</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="190"/>
+        <location filename="../widgets/history_panel.py" line="204"/>
         <source>Energy</source>
         <translation>能量</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="236"/>
-        <location filename="../widgets/history_panel.py" line="465"/>
+        <location filename="../widgets/history_panel.py" line="250"/>
+        <location filename="../widgets/history_panel.py" line="491"/>
         <source>{0} Rename Sessions</source>
         <translation>{0} 个重命名会话</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="243"/>
-        <location filename="../widgets/history_panel.py" line="410"/>
+        <location filename="../widgets/history_panel.py" line="257"/>
+        <location filename="../widgets/history_panel.py" line="436"/>
         <source>{0} Song Keys</source>
         <translation>{0} 个曲目调</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="258"/>
-        <location filename="../widgets/history_panel.py" line="582"/>
-        <location filename="../widgets/history_panel.py" line="595"/>
+        <location filename="../widgets/history_panel.py" line="272"/>
+        <location filename="../widgets/history_panel.py" line="608"/>
+        <location filename="../widgets/history_panel.py" line="621"/>
         <source>Export CSV</source>
         <translation>导出 CSV</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="260"/>
+        <location filename="../widgets/history_panel.py" line="274"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>将下方表格导出为电子表格可用的 CSV 文件。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="338"/>
+        <location filename="../widgets/history_panel.py" line="352"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>置信度较低，建议核对该调性。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="583"/>
+        <location filename="../widgets/history_panel.py" line="355"/>
+        <source>Low confidence — the tempo may be half or double time.</source>
+        <translation>置信度较低，速度可能为一半或两倍。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="609"/>
         <source>There is nothing to export yet.</source>
         <translation>暂无可导出的内容。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="605"/>
+        <location filename="../widgets/history_panel.py" line="631"/>
         <source>Export failed</source>
         <translation>导出失败</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="606"/>
+        <location filename="../widgets/history_panel.py" line="632"/>
         <source>Could not write the file:
 {0}</source>
         <translation>无法写入文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="612"/>
+        <location filename="../widgets/history_panel.py" line="638"/>
         <source>Export complete</source>
         <translation>导出完成</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="613"/>
+        <location filename="../widgets/history_panel.py" line="639"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>已导出 {0} 行到：
@@ -726,32 +731,32 @@ or click “Add Artwork…”</source>
         <translation type="vanished">0个会话</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="265"/>
+        <location filename="../widgets/history_panel.py" line="279"/>
         <source>Refresh</source>
         <translation>刷新</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="269"/>
+        <location filename="../widgets/history_panel.py" line="283"/>
         <source>Delete</source>
         <translation>删除</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="274"/>
+        <location filename="../widgets/history_panel.py" line="288"/>
         <source>Undo Selected</source>
         <translation>撤销所选</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="293"/>
+        <location filename="../widgets/history_panel.py" line="307"/>
         <source>Key History</source>
         <translation>调检测历史</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="295"/>
+        <location filename="../widgets/history_panel.py" line="309"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>最近分析的曲目及其检测到的调。</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="455"/>
+        <location filename="../widgets/history_panel.py" line="481"/>
         <source>Renamed {0} files: {1}</source>
         <translation>已重命名{0}个文件：{1}</translation>
     </message>
@@ -760,7 +765,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="459"/>
+        <location filename="../widgets/history_panel.py" line="485"/>
         <source>No description</source>
         <translation>无描述</translation>
     </message>
