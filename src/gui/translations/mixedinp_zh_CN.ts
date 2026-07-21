@@ -549,30 +549,46 @@ or click “Add Artwork…”</source>
 <context>
     <name>HeaderBar</name>
     <message>
-        <location filename="../widgets/header_bar.py" line="57"/>
+        <location filename="../widgets/header_bar.py" line="59"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>DJ kept Latin (universal term); &apos;Toolkit&apos; → 工具包.</translatorcomment>
         <translation>DJ 音频分析工具包</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="65"/>
+        <location filename="../widgets/header_bar.py" line="71"/>
+        <source>Add</source>
+        <translation>添加</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="77"/>
+        <source>Add files or a folder to the panel you&apos;re currently viewing</source>
+        <translation>将文件或文件夹添加到当前查看的面板</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="81"/>
+        <source>Files…</source>
+        <translation>文件…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="82"/>
+        <source>Folder…</source>
+        <translation>文件夹…</translation>
+    </message>
+    <message>
         <source>Add Files</source>
-        <translation>添加文件</translation>
+        <translation type="vanished">添加文件</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="70"/>
         <source>Adds files to the panel you&apos;re currently viewing</source>
-        <translation>将文件添加到当前查看的面板</translation>
+        <translation type="vanished">将文件添加到当前查看的面板</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="75"/>
         <source>Add Folder</source>
-        <translation>添加文件夹</translation>
+        <translation type="vanished">添加文件夹</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="78"/>
         <source>Adds a folder&apos;s files to the panel you&apos;re currently viewing</source>
-        <translation>将文件夹中的文件添加到当前查看的面板</translation>
+        <translation type="vanished">将文件夹中的文件添加到当前查看的面板</translation>
     </message>
 </context>
 <context>
@@ -1294,182 +1310,182 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="82"/>
+        <location filename="../widgets/rename_panel.py" line="115"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="85"/>
+        <location filename="../widgets/rename_panel.py" line="118"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>从下方所有文件名的开头和结尾修剪字符。在所有文件名的开头（前缀）或结尾（后缀）添加文本。</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="90"/>
+        <location filename="../widgets/rename_panel.py" line="123"/>
         <source>Operations</source>
         <translation>操作</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="97"/>
+        <location filename="../widgets/rename_panel.py" line="130"/>
         <source>Trim Start:</source>
         <translation>修剪开头：</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="101"/>
-        <location filename="../widgets/rename_panel.py" line="113"/>
+        <location filename="../widgets/rename_panel.py" line="134"/>
+        <location filename="../widgets/rename_panel.py" line="146"/>
         <source> chars</source>
         <translation>个字符</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="102"/>
+        <location filename="../widgets/rename_panel.py" line="135"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>从文件名开头移除字符</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="109"/>
+        <location filename="../widgets/rename_panel.py" line="142"/>
         <source>Trim End:</source>
         <translation>修剪结尾：</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="114"/>
+        <location filename="../widgets/rename_panel.py" line="147"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>从文件名结尾（扩展名之前）移除字符</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="119"/>
+        <location filename="../widgets/rename_panel.py" line="152"/>
         <source>Clear</source>
         <translation>清除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="129"/>
+        <location filename="../widgets/rename_panel.py" line="162"/>
         <source>Remove Underscores</source>
         <translation>移除下划线</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
+        <location filename="../widgets/rename_panel.py" line="180"/>
         <source>Prepend Text</source>
         <translation>添加前缀文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="150"/>
+        <location filename="../widgets/rename_panel.py" line="183"/>
         <source>Append Text</source>
         <translation>添加后缀文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Preview</source>
         <translation>预览</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="183"/>
+        <location filename="../widgets/rename_panel.py" line="216"/>
         <source>Drop audio files here to add them</source>
         <translation>将音频文件拖到此处以添加</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Original</source>
         <translation>原始</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="213"/>
+        <location filename="../widgets/rename_panel.py" line="264"/>
         <source>No files to rename</source>
         <translation>无可重命名的文件</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="219"/>
+        <location filename="../widgets/rename_panel.py" line="270"/>
         <source>Undo Last</source>
         <translation>撤销上一步</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="224"/>
+        <location filename="../widgets/rename_panel.py" line="275"/>
         <source>Remove All</source>
         <translation>全部移除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="229"/>
+        <location filename="../widgets/rename_panel.py" line="280"/>
         <source>Apply Rename</source>
         <translation>应用重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="236"/>
+        <location filename="../widgets/rename_panel.py" line="287"/>
         <source>Send To</source>
         <translation>发送到</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="239"/>
+        <location filename="../widgets/rename_panel.py" line="290"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="240"/>
+        <location filename="../widgets/rename_panel.py" line="291"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="300"/>
+        <location filename="../widgets/rename_panel.py" line="351"/>
         <source>Text to add at end of filename</source>
         <translation>添加到文件名结尾的文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="302"/>
+        <location filename="../widgets/rename_panel.py" line="353"/>
         <source>Text to add at start of filename</source>
         <translation>添加到文件名开头的文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="340"/>
+        <location filename="../widgets/rename_panel.py" line="391"/>
         <source>No files</source>
         <translation>无文件</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="384"/>
+        <location filename="../widgets/rename_panel.py" line="435"/>
         <source>Conflict</source>
         <translation>冲突</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="401"/>
+        <location filename="../widgets/rename_panel.py" line="452"/>
         <source>{0} files</source>
         <translatorcomment>Measure word 个: {0}个文件.</translatorcomment>
         <translation>{0}个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="403"/>
+        <location filename="../widgets/rename_panel.py" line="454"/>
         <source>{0} to rename</source>
         <translatorcomment>Measure word 个: {0}个待重命名.</translatorcomment>
         <translation>{0}个待重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="405"/>
+        <location filename="../widgets/rename_panel.py" line="456"/>
         <source>{0} conflicts</source>
         <translatorcomment>Measure word 个: {0}个冲突.</translatorcomment>
         <translation>{0}个冲突</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="503"/>
+        <location filename="../widgets/rename_panel.py" line="554"/>
         <source>Changed</source>
         <translation>已更改</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="574"/>
+        <location filename="../widgets/rename_panel.py" line="625"/>
         <source>Copy text</source>
         <translation>复制文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="574"/>
+        <location filename="../widgets/rename_panel.py" line="625"/>
         <source>Copy {0} names</source>
         <translation>复制 {0} 个名称</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="580"/>
+        <location filename="../widgets/rename_panel.py" line="631"/>
         <source>Remove from list</source>
         <translation>从列表中移除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="580"/>
+        <location filename="../widgets/rename_panel.py" line="631"/>
         <source>Remove {0} from list</source>
         <translation>从列表中移除{0}</translation>
     </message>

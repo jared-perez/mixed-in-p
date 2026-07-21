@@ -122,11 +122,38 @@ QPushButton:disabled {
     border-color: @BG_LIGHT@;
 }
 
-/* Header Add Files / Add Folder buttons. Set here (not via an inline
-   setStyleSheet) so the larger font doesn't leak into the buttons' tooltips,
-   which would otherwise render at 16px instead of the default tooltip size. */
-QPushButton#headerActionButton {
+/* Header "Add" menu button (QToolButton). Styled here (not via an inline
+   setStyleSheet) so the larger font doesn't leak into the button's tooltip/menu,
+   which would otherwise render at 16px instead of the default size. QToolButton
+   doesn't inherit the QPushButton rules above, so the chrome is restated to
+   match the other header buttons. */
+QToolButton#headerActionButton {
+    background-color: @BG_LIGHT@;
+    color: @TEXT_PRIMARY@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    /* Extra right padding reserves room for the menu-indicator arrow so it
+       doesn't overlap the label. */
+    padding: 8px 28px 8px 16px;
     font-size: 16px;
+    font-weight: 500;
+    min-height: 20px;
+}
+
+QToolButton#headerActionButton:hover {
+    background-color: @BG_LIGHTER@;
+    border-color: @CHROME@;
+}
+
+QToolButton#headerActionButton:pressed {
+    background-color: @BG_MEDIUM@;
+}
+
+QToolButton#headerActionButton::menu-indicator {
+    subcontrol-origin: padding;
+    subcontrol-position: center right;
+    width: 12px;
+    right: 8px;
 }
 
 QPushButton#primaryButton {

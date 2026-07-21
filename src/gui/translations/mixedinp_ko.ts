@@ -514,29 +514,45 @@ or click “Add Artwork…”</source>
 <context>
     <name>HeaderBar</name>
     <message>
-        <location filename="../widgets/header_bar.py" line="57"/>
+        <location filename="../widgets/header_bar.py" line="59"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translation>DJ 오디오 분석 툴킷</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="65"/>
+        <location filename="../widgets/header_bar.py" line="71"/>
+        <source>Add</source>
+        <translation>추가</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="77"/>
+        <source>Add files or a folder to the panel you&apos;re currently viewing</source>
+        <translation>현재 보고 있는 패널에 파일 또는 폴더를 추가합니다</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="81"/>
+        <source>Files…</source>
+        <translation>파일…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="82"/>
+        <source>Folder…</source>
+        <translation>폴더…</translation>
+    </message>
+    <message>
         <source>Add Files</source>
-        <translation>파일 추가</translation>
+        <translation type="vanished">파일 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="70"/>
         <source>Adds files to the panel you&apos;re currently viewing</source>
-        <translation>현재 보고 있는 패널에 파일을 추가합니다</translation>
+        <translation type="vanished">현재 보고 있는 패널에 파일을 추가합니다</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="75"/>
         <source>Add Folder</source>
-        <translation>폴더 추가</translation>
+        <translation type="vanished">폴더 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="78"/>
         <source>Adds a folder&apos;s files to the panel you&apos;re currently viewing</source>
-        <translation>현재 보고 있는 패널에 폴더의 파일을 추가합니다</translation>
+        <translation type="vanished">현재 보고 있는 패널에 폴더의 파일을 추가합니다</translation>
     </message>
 </context>
 <context>
@@ -1268,183 +1284,183 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="82"/>
+        <location filename="../widgets/rename_panel.py" line="115"/>
         <source>Rename</source>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="85"/>
+        <location filename="../widgets/rename_panel.py" line="118"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translatorcomment>해요체 descriptive text. Prepend/Append rendered inline as 앞에 추가 / 뒤에 추가. Flag for native review (spacing + clarity).</translatorcomment>
         <translation>아래 모든 파일명의 앞뒤에서 문자를 잘라내요. 모든 파일명의 앞(앞에 추가) 또는 뒤(뒤에 추가)에 텍스트를 추가해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="90"/>
+        <location filename="../widgets/rename_panel.py" line="123"/>
         <source>Operations</source>
         <translation>작업</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="97"/>
+        <location filename="../widgets/rename_panel.py" line="130"/>
         <source>Trim Start:</source>
         <translation>앞 잘라내기:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="101"/>
-        <location filename="../widgets/rename_panel.py" line="113"/>
+        <location filename="../widgets/rename_panel.py" line="134"/>
+        <location filename="../widgets/rename_panel.py" line="146"/>
         <source> chars</source>
         <translatorcomment>Suffix after a number (e.g. &quot;5자&quot;). Korean uses the counter 자 for characters with no preceding space, so the English leading space is intentionally dropped. Flag for native review (spacing).</translatorcomment>
         <translation>자</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="102"/>
+        <location filename="../widgets/rename_panel.py" line="135"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>파일명 앞부분의 문자를 제거해요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="109"/>
+        <location filename="../widgets/rename_panel.py" line="142"/>
         <source>Trim End:</source>
         <translation>뒤 잘라내기:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="114"/>
+        <location filename="../widgets/rename_panel.py" line="147"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>파일명 뒷부분(확장자 앞)의 문자를 제거해요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="119"/>
+        <location filename="../widgets/rename_panel.py" line="152"/>
         <source>Clear</source>
         <translation>지우기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="129"/>
+        <location filename="../widgets/rename_panel.py" line="162"/>
         <source>Remove Underscores</source>
         <translatorcomment>underscore → 밑줄. Flag for native review.</translatorcomment>
         <translation>밑줄 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
+        <location filename="../widgets/rename_panel.py" line="180"/>
         <source>Prepend Text</source>
         <translation>앞에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="150"/>
+        <location filename="../widgets/rename_panel.py" line="183"/>
         <source>Append Text</source>
         <translation>뒤에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Preview</source>
         <translatorcomment>Preview → 미리 보기 (Apple Korean Finder exact term).</translatorcomment>
         <translation>미리 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="183"/>
+        <location filename="../widgets/rename_panel.py" line="216"/>
         <source>Drop audio files here to add them</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Original</source>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="213"/>
+        <location filename="../widgets/rename_panel.py" line="264"/>
         <source>No files to rename</source>
         <translation>이름 변경할 파일이 없어요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="219"/>
+        <location filename="../widgets/rename_panel.py" line="270"/>
         <source>Undo Last</source>
         <translation>마지막 작업 실행 취소</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="224"/>
+        <location filename="../widgets/rename_panel.py" line="275"/>
         <source>Remove All</source>
         <translation>전체 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="229"/>
+        <location filename="../widgets/rename_panel.py" line="280"/>
         <source>Apply Rename</source>
         <translation>이름 변경 적용</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="236"/>
+        <location filename="../widgets/rename_panel.py" line="287"/>
         <source>Send To</source>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="239"/>
+        <location filename="../widgets/rename_panel.py" line="290"/>
         <source>Convert</source>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="240"/>
+        <location filename="../widgets/rename_panel.py" line="291"/>
         <source>Analyze</source>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="300"/>
+        <location filename="../widgets/rename_panel.py" line="351"/>
         <source>Text to add at end of filename</source>
         <translation>파일명 끝에 추가할 텍스트</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="302"/>
+        <location filename="../widgets/rename_panel.py" line="353"/>
         <source>Text to add at start of filename</source>
         <translation>파일명 앞에 추가할 텍스트</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="340"/>
+        <location filename="../widgets/rename_panel.py" line="391"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="384"/>
+        <location filename="../widgets/rename_panel.py" line="435"/>
         <source>Conflict</source>
         <translation>충돌</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="401"/>
+        <location filename="../widgets/rename_panel.py" line="452"/>
         <source>{0} files</source>
         <translation>파일 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="403"/>
+        <location filename="../widgets/rename_panel.py" line="454"/>
         <source>{0} to rename</source>
         <translation>이름 변경 대상 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="405"/>
+        <location filename="../widgets/rename_panel.py" line="456"/>
         <source>{0} conflicts</source>
         <translation>충돌 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="503"/>
+        <location filename="../widgets/rename_panel.py" line="554"/>
         <source>Changed</source>
         <translation>변경됨</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="574"/>
+        <location filename="../widgets/rename_panel.py" line="625"/>
         <source>Copy text</source>
         <translation>텍스트 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="574"/>
+        <location filename="../widgets/rename_panel.py" line="625"/>
         <source>Copy {0} names</source>
         <translation>이름 {0}개 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="580"/>
+        <location filename="../widgets/rename_panel.py" line="631"/>
         <source>Remove from list</source>
         <translation>목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="580"/>
+        <location filename="../widgets/rename_panel.py" line="631"/>
         <source>Remove {0} from list</source>
         <translatorcomment>{0} (a filename) placed before 제거 with a space to avoid attaching a particle to a variable. Flag for native review.</translatorcomment>
         <translation>목록에서 {0} 제거</translation>

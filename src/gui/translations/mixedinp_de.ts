@@ -545,29 +545,45 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>HeaderBar</name>
     <message>
-        <location filename="../widgets/header_bar.py" line="57"/>
+        <location filename="../widgets/header_bar.py" line="59"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translation>DJ-Audioanalyse-Toolkit</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="65"/>
+        <location filename="../widgets/header_bar.py" line="71"/>
+        <source>Add</source>
+        <translation>Hinzufügen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="77"/>
+        <source>Add files or a folder to the panel you&apos;re currently viewing</source>
+        <translation>Fügt Dateien oder einen Ordner zum aktuell angezeigten Panel hinzu</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="81"/>
+        <source>Files…</source>
+        <translation>Dateien…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/header_bar.py" line="82"/>
+        <source>Folder…</source>
+        <translation>Ordner…</translation>
+    </message>
+    <message>
         <source>Add Files</source>
-        <translation>Dateien hinzufügen</translation>
+        <translation type="vanished">Dateien hinzufügen</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="70"/>
         <source>Adds files to the panel you&apos;re currently viewing</source>
-        <translation>Fügt Dateien zum aktuell angezeigten Panel hinzu</translation>
+        <translation type="vanished">Fügt Dateien zum aktuell angezeigten Panel hinzu</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="75"/>
         <source>Add Folder</source>
-        <translation>Ordner hinzufügen</translation>
+        <translation type="vanished">Ordner hinzufügen</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="78"/>
         <source>Adds a folder&apos;s files to the panel you&apos;re currently viewing</source>
-        <translation>Fügt die Dateien eines Ordners zum aktuell angezeigten Panel hinzu</translation>
+        <translation type="vanished">Fügt die Dateien eines Ordners zum aktuell angezeigten Panel hinzu</translation>
     </message>
 </context>
 <context>
@@ -1288,179 +1304,179 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="82"/>
+        <location filename="../widgets/rename_panel.py" line="115"/>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="85"/>
+        <location filename="../widgets/rename_panel.py" line="118"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>Zeichen am Anfang und Ende ALLER Dateinamen unten entfernen. Text am Anfang (Voranstellen) oder Ende (Anhängen) ALLER Dateinamen hinzufügen.</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="90"/>
+        <location filename="../widgets/rename_panel.py" line="123"/>
         <source>Operations</source>
         <translation>Vorgänge</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="97"/>
+        <location filename="../widgets/rename_panel.py" line="130"/>
         <source>Trim Start:</source>
         <translation>Anfang kürzen:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="101"/>
-        <location filename="../widgets/rename_panel.py" line="113"/>
+        <location filename="../widgets/rename_panel.py" line="134"/>
+        <location filename="../widgets/rename_panel.py" line="146"/>
         <source> chars</source>
         <translation> Zeichen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="102"/>
+        <location filename="../widgets/rename_panel.py" line="135"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>Zeichen am Anfang des Dateinamens entfernen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="109"/>
+        <location filename="../widgets/rename_panel.py" line="142"/>
         <source>Trim End:</source>
         <translation>Ende kürzen:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="114"/>
+        <location filename="../widgets/rename_panel.py" line="147"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>Zeichen am Ende des Dateinamens entfernen (vor der Erweiterung)</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="119"/>
+        <location filename="../widgets/rename_panel.py" line="152"/>
         <source>Clear</source>
         <translation>Leeren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="129"/>
+        <location filename="../widgets/rename_panel.py" line="162"/>
         <source>Remove Underscores</source>
         <translation>Unterstriche entfernen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
+        <location filename="../widgets/rename_panel.py" line="180"/>
         <source>Prepend Text</source>
         <translation>Text voranstellen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="150"/>
+        <location filename="../widgets/rename_panel.py" line="183"/>
         <source>Append Text</source>
         <translation>Text anhängen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Preview</source>
         <translation>Vorschau</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="183"/>
+        <location filename="../widgets/rename_panel.py" line="216"/>
         <source>Drop audio files here to add them</source>
         <translation>Audiodateien hier ablegen, um sie hinzuzufügen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Original</source>
         <translation>Original</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="213"/>
+        <location filename="../widgets/rename_panel.py" line="264"/>
         <source>No files to rename</source>
         <translation>Keine Dateien zum Umbenennen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="219"/>
+        <location filename="../widgets/rename_panel.py" line="270"/>
         <source>Undo Last</source>
         <translation>Letztes widerrufen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="224"/>
+        <location filename="../widgets/rename_panel.py" line="275"/>
         <source>Remove All</source>
         <translation>Alle entfernen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="229"/>
+        <location filename="../widgets/rename_panel.py" line="280"/>
         <source>Apply Rename</source>
         <translation>Umbenennen anwenden</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="236"/>
+        <location filename="../widgets/rename_panel.py" line="287"/>
         <source>Send To</source>
         <translation>Senden an</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="239"/>
+        <location filename="../widgets/rename_panel.py" line="290"/>
         <source>Convert</source>
         <translation>Konvertieren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="240"/>
+        <location filename="../widgets/rename_panel.py" line="291"/>
         <source>Analyze</source>
         <translation>Analysieren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="300"/>
+        <location filename="../widgets/rename_panel.py" line="351"/>
         <source>Text to add at end of filename</source>
         <translation>Text, der am Ende des Dateinamens hinzugefügt wird</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="302"/>
+        <location filename="../widgets/rename_panel.py" line="353"/>
         <source>Text to add at start of filename</source>
         <translation>Text, der am Anfang des Dateinamens hinzugefügt wird</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="340"/>
+        <location filename="../widgets/rename_panel.py" line="391"/>
         <source>No files</source>
         <translation>Keine Dateien</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="384"/>
+        <location filename="../widgets/rename_panel.py" line="435"/>
         <source>Conflict</source>
         <translation>Konflikt</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="401"/>
+        <location filename="../widgets/rename_panel.py" line="452"/>
         <source>{0} files</source>
         <translation>{0} Dateien</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="403"/>
+        <location filename="../widgets/rename_panel.py" line="454"/>
         <source>{0} to rename</source>
         <translation>{0} umzubenennen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="405"/>
+        <location filename="../widgets/rename_panel.py" line="456"/>
         <source>{0} conflicts</source>
         <translation>{0} Konflikte</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="503"/>
+        <location filename="../widgets/rename_panel.py" line="554"/>
         <source>Changed</source>
         <translation>Geändert</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="574"/>
+        <location filename="../widgets/rename_panel.py" line="625"/>
         <source>Copy text</source>
         <translation>Text kopieren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="574"/>
+        <location filename="../widgets/rename_panel.py" line="625"/>
         <source>Copy {0} names</source>
         <translation>{0} Namen kopieren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="580"/>
+        <location filename="../widgets/rename_panel.py" line="631"/>
         <source>Remove from list</source>
         <translation>Aus Liste entfernen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="580"/>
+        <location filename="../widgets/rename_panel.py" line="631"/>
         <source>Remove {0} from list</source>
         <translation>{0} aus Liste entfernen</translation>
     </message>

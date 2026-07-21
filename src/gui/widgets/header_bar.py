@@ -9,7 +9,9 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QMenu,
     QPushButton,
+    QToolButton,
     QWidget,
 )
 
@@ -61,24 +63,25 @@ class HeaderBar(QFrame):
         # Spacer
         layout.addStretch()
 
-        # Action buttons
-        self._add_files_btn = QPushButton(self.tr("Add Files"))
-        # Font size lives in the stylesheet (QPushButton#headerActionButton), not
-        # an inline setStyleSheet, so it doesn't leak into the tooltip's font.
-        self._add_files_btn.setObjectName("headerActionButton")
-        self._add_files_btn.setToolTip(
-            self.tr("Adds files to the panel you're currently viewing")
+        # Single "Add" menu button: click reveals Files / Folder actions, which
+        # emit the same signals the two old buttons did (wiring is unchanged in
+        # main_window). Collapsing two buttons into one also keeps the subtitle
+        # visible at narrower widths (see resizeEvent).
+        self._add_btn = QToolButton()
+        self._add_btn.setText(self.tr("Add"))
+        # Font size lives in the stylesheet (#headerActionButton), not an inline
+        # setStyleSheet, so it doesn't leak into the button's tooltip/menu font.
+        self._add_btn.setObjectName("headerActionButton")
+        self._add_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        self._add_btn.setToolTip(
+            self.tr("Add files or a folder to the panel you're currently viewing")
         )
-        self._add_files_btn.clicked.connect(self.add_files_clicked.emit)
-        layout.addWidget(self._add_files_btn)
 
-        self._add_folder_btn = QPushButton(self.tr("Add Folder"))
-        self._add_folder_btn.setObjectName("headerActionButton")
-        self._add_folder_btn.setToolTip(
-            self.tr("Adds a folder's files to the panel you're currently viewing")
-        )
-        self._add_folder_btn.clicked.connect(self.add_folder_clicked.emit)
-        layout.addWidget(self._add_folder_btn)
+        add_menu = QMenu(self._add_btn)
+        add_menu.addAction(self.tr("Files…"), self.add_files_clicked.emit)
+        add_menu.addAction(self.tr("Folder…"), self.add_folder_clicked.emit)
+        self._add_btn.setMenu(add_menu)
+        layout.addWidget(self._add_btn)
 
         self._about_btn = QPushButton("?")
         self._about_btn.setFixedSize(36, 36)
@@ -104,8 +107,7 @@ class HeaderBar(QFrame):
         widgets = [
             self._logo_label,
             self._subtitle,
-            self._add_files_btn,
-            self._add_folder_btn,
+            self._add_btn,
             self._about_btn,
         ]
         total = margins.left() + margins.right() + spacing * (len(widgets) - 1)
