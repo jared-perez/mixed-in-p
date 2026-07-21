@@ -5,6 +5,7 @@ from datetime import datetime
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
+from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QButtonGroup,
@@ -40,6 +41,26 @@ _SESS_DATE, _SESS_FILES, _SESS_DESC, _SESS_ID = range(4)
 # underlying values rather than re-parsing formatted cell text. UserRole itself
 # is taken by _SortableItem's sort value, hence +1.
 _ENTRY_INDEX_ROLE = Qt.ItemDataRole.UserRole + 1
+
+# Key detections at or below this confidence are tinted for review.
+#
+# Flagging on key_confidence alone is deliberate: the detector already folds the
+# runner-up margin into that score, weighted more heavily than anything else
+# (see _confidence in src/analysis/key_detector.py, where separation carries
+# 0.45 of the blend). Re-deriving a margin from key_alternatives here would
+# double-count a signal the number already carries.
+#
+# A low score has two causes and both warrant a second look: weak tonal material
+# (low fit strength) or a near-tie between candidate keys (low separation).
+#
+# 0.25 was chosen from a real 50-track library, not from the formula. That
+# library's key_confidence runs low and smooth (median ~44%, no bimodal split),
+# so this detector has no natural "confident vs unsure" gap to snap to — the
+# threshold instead picks the worst minority worth re-checking. 0.25 flags ~26%
+# (the bottom quartile; the library's p25 was 23%). Raising it climbs fast:
+# ~0.35 flags 40%, ~0.50 flags 64%, at which point the tint marks the majority
+# and stops meaning "check this". Retune against your own distribution.
+LOW_KEY_CONFIDENCE = 0.25
 
 
 class _SortableItem(QTableWidgetItem):
@@ -316,6 +337,11 @@ class HistoryPanel(QWidget):
                 item.setData(Qt.ItemDataRole.UserRole, sort_value)
             return item
 
+        # Resolved once rather than per row.
+        low_confidence_hint = self.tr(
+            "Low confidence — this key is worth double-checking."
+        )
+
         # Sorting must be off while the table is populated: with it on, Qt
         # re-sorts after every setItem() and rows move out from under the loop.
         # Re-enabling re-applies the user's current sort column/order.
@@ -372,6 +398,17 @@ class HistoryPanel(QWidget):
             # Timestamps need no sort value: the "YYYY-MM-DD HH:MM:SS" display
             # form already sorts chronologically as text.
             self._keys_table.setItem(row, 8, _item(timestamp[:19].replace("T", " ")))
+
+            # Tint the key-related cells when the detection is shaky. Only those
+            # three: BPM and energy are unaffected by an uncertain key, and
+            # colouring the whole row would overstate what's in doubt. Entries
+            # with no confidence at all carry no detection to second-guess, so
+            # they are left alone rather than flagged.
+            if key_conf is not None and key_conf <= LOW_KEY_CONFIDENCE:
+                for col in (3, 4, 5):  # Key, Key Conf, Key Code
+                    cell = self._keys_table.item(row, col)
+                    cell.setForeground(QColor(Theme.WARNING))
+                    cell.setToolTip(low_confidence_hint)
         self._keys_table.setSortingEnabled(True)
 
         self._keys_btn.setText(self.tr("{0} Song Keys").format(len(self._entries)))
