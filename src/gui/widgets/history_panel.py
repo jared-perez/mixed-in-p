@@ -29,6 +29,7 @@ from src.analysis.history import load_entries as load_analysis_entries
 from src.renamer import RenameSession, delete_session, list_sessions, load_session
 from src.utils.config import DEFAULT_HISTORY_DISPLAY_LIMIT, HISTORY_DISPLAY_LIMITS
 from src.utils.export import write_csv
+from src.utils.reveal import reveal_in_file_manager
 
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 
@@ -216,6 +217,9 @@ class HistoryPanel(QWidget):
         self._keys_table.verticalHeader().setVisible(False)
         self._keys_table.setTextElideMode(Qt.TextElideMode.ElideNone)
         self._keys_table.setHorizontalScrollMode(QAbstractItemView.ScrollMode.ScrollPerPixel)
+        # Right-click a row to reveal its file in Finder/Explorer.
+        self._keys_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self._keys_table.customContextMenuRequested.connect(self._on_keys_context_menu)
 
         keys_header = self._keys_table.horizontalHeader()
         keys_header.setStretchLastSection(False)
@@ -591,6 +595,49 @@ class HistoryPanel(QWidget):
         return next(
             (s for s in self._sessions if s.session_id == session_id), None
         )
+
+    # ---- Reveal in file manager -------------------------------------------
+
+    def _entry_path_at_row(self, row: int) -> str | None:
+        """File path backing a Key History row, via the name cell's index role."""
+        name_item = self._keys_table.item(row, 0)
+        if name_item is None:
+            return None
+        index = name_item.data(_ENTRY_INDEX_ROLE)
+        if index is None or not 0 <= index < len(self._entries):
+            return None
+        return self._entries[index].get("file_path") or None
+
+    def _on_keys_context_menu(self, pos) -> None:
+        """Right-click a Key History row: offer to reveal its file."""
+        item = self._keys_table.itemAt(pos)
+        if item is None:
+            return
+        file_path = self._entry_path_at_row(item.row())
+        if file_path is None:
+            return
+        menu = QMenu(self)
+        open_action = menu.addAction(self.tr("Open File Location"))
+        chosen = menu.exec(self._keys_table.viewport().mapToGlobal(pos))
+        if chosen == open_action:
+            self._open_file_location(file_path)
+
+    def _open_file_location(self, file_path: str) -> None:
+        """Reveal the file in Finder/Explorer, or explain that it's gone.
+
+        Files logged in history are frequently moved or renamed afterwards, so a
+        miss is expected, not an error — hence an informational message rather
+        than a warning.
+        """
+        if not reveal_in_file_manager(file_path):
+            QMessageBox.information(
+                self,
+                self.tr("Open File Location"),
+                self.tr(
+                    "This file can't be found — it may have been moved, "
+                    "renamed, or deleted."
+                ),
+            )
 
     # ---- CSV export -------------------------------------------------------
 

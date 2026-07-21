@@ -595,137 +595,148 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="155"/>
-        <location filename="../widgets/history_panel.py" line="373"/>
+        <location filename="../widgets/history_panel.py" line="156"/>
+        <location filename="../widgets/history_panel.py" line="377"/>
         <source>Rename History</source>
         <translation>Cronologia rinomina</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="159"/>
-        <location filename="../widgets/history_panel.py" line="375"/>
+        <location filename="../widgets/history_panel.py" line="160"/>
+        <location filename="../widgets/history_panel.py" line="379"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>Visualizza le operazioni di rinomina recenti. Seleziona una sessione per annullarla.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="173"/>
+        <location filename="../widgets/history_panel.py" line="174"/>
         <source>Session ID</source>
         <translation>ID sessione</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="173"/>
-        <location filename="../widgets/history_panel.py" line="211"/>
+        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="212"/>
         <source>Date/Time</source>
         <translation>Data/Ora</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="173"/>
+        <location filename="../widgets/history_panel.py" line="174"/>
         <source>Files</source>
         <translation>File</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="173"/>
+        <location filename="../widgets/history_panel.py" line="174"/>
         <source>Description</source>
         <translation>Descrizione</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="203"/>
+        <location filename="../widgets/history_panel.py" line="204"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="204"/>
+        <location filename="../widgets/history_panel.py" line="205"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="205"/>
-        <location filename="../widgets/history_panel.py" line="207"/>
+        <location filename="../widgets/history_panel.py" line="206"/>
+        <location filename="../widgets/history_panel.py" line="208"/>
         <source>Conf</source>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="206"/>
+        <location filename="../widgets/history_panel.py" line="207"/>
         <source>Key</source>
         <translation>Tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="208"/>
+        <location filename="../widgets/history_panel.py" line="209"/>
         <source>Key Code</source>
         <translation>Key Code</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="209"/>
+        <location filename="../widgets/history_panel.py" line="210"/>
         <source>Alt Keys</source>
         <translation>Tonalità alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="210"/>
+        <location filename="../widgets/history_panel.py" line="211"/>
         <source>Energy</source>
         <translation>Energia</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="256"/>
-        <location filename="../widgets/history_panel.py" line="559"/>
+        <location filename="../widgets/history_panel.py" line="260"/>
+        <location filename="../widgets/history_panel.py" line="563"/>
         <source>{0} Rename Sessions</source>
         <translation>{0} sessioni di rinomina</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="263"/>
-        <location filename="../widgets/history_panel.py" line="504"/>
+        <location filename="../widgets/history_panel.py" line="267"/>
+        <location filename="../widgets/history_panel.py" line="508"/>
         <source>{0} Song Keys</source>
         <translation>{0} tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="281"/>
+        <location filename="../widgets/history_panel.py" line="285"/>
         <source>Show</source>
         <translation>Mostra</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="303"/>
-        <location filename="../widgets/history_panel.py" line="676"/>
-        <location filename="../widgets/history_panel.py" line="689"/>
+        <location filename="../widgets/history_panel.py" line="307"/>
+        <location filename="../widgets/history_panel.py" line="723"/>
+        <location filename="../widgets/history_panel.py" line="736"/>
         <source>Export CSV</source>
         <translation>Esporta CSV</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="305"/>
+        <location filename="../widgets/history_panel.py" line="309"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>Esporta la tabella qui sotto in un file CSV compatibile con i fogli di calcolo.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="418"/>
+        <location filename="../widgets/history_panel.py" line="422"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>Affidabilità bassa: conviene verificare questa tonalità.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="421"/>
+        <location filename="../widgets/history_panel.py" line="425"/>
         <source>Low confidence — the tempo may be half or double time.</source>
         <translation>Affidabilità bassa: il tempo potrebbe essere dimezzato o raddoppiato.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="677"/>
+        <location filename="../widgets/history_panel.py" line="620"/>
+        <location filename="../widgets/history_panel.py" line="635"/>
+        <source>Open File Location</source>
+        <translation>Apri posizione file</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="637"/>
+        <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
+        <translation>Impossibile trovare questo file: potrebbe essere stato spostato, rinominato o eliminato.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/history_panel.py" line="724"/>
         <source>There is nothing to export yet.</source>
         <translation>Non c’è ancora nulla da esportare.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="699"/>
+        <location filename="../widgets/history_panel.py" line="746"/>
         <source>Export failed</source>
         <translation>Esportazione non riuscita</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="700"/>
+        <location filename="../widgets/history_panel.py" line="747"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Impossibile scrivere il file:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="706"/>
+        <location filename="../widgets/history_panel.py" line="753"/>
         <source>Export complete</source>
         <translation>Esportazione completata</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="707"/>
+        <location filename="../widgets/history_panel.py" line="754"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>{0} righe esportate in:
@@ -740,27 +751,27 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Aggiorna</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="313"/>
+        <location filename="../widgets/history_panel.py" line="317"/>
         <source>Delete</source>
         <translation>Elimina</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="318"/>
+        <location filename="../widgets/history_panel.py" line="322"/>
         <source>Undo Selected</source>
         <translation>Annulla selezionati</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="368"/>
+        <location filename="../widgets/history_panel.py" line="372"/>
         <source>Key History</source>
         <translation>Cronologia tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="370"/>
+        <location filename="../widgets/history_panel.py" line="374"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>Tracce analizzate di recente e le loro tonalità rilevate.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="549"/>
+        <location filename="../widgets/history_panel.py" line="553"/>
         <source>Renamed {0} files: {1}</source>
         <translation>Rinominati {0} file: {1}</translation>
     </message>
@@ -769,7 +780,7 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Rinominati {0} file</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="553"/>
+        <location filename="../widgets/history_panel.py" line="557"/>
         <source>No description</source>
         <translation>Nessuna descrizione</translation>
     </message>
