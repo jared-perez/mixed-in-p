@@ -1,5 +1,6 @@
 """History panel for viewing and undoing rename sessions."""
 
+import re
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
@@ -22,6 +23,52 @@ from src.analysis.history import load_entries as load_analysis_entries
 from src.renamer import RenameSession, delete_session, list_sessions, load_session
 
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+
+_KEYCODE_RE = re.compile(r"(\d{1,2})([AB])", re.IGNORECASE)
+
+
+class _SortableItem(QTableWidgetItem):
+    """Table item that sorts on a value held separately from its display text.
+
+    A cell showing "128.0" or "91%" or "10A" must not sort as that string, but
+    QTableWidgetItem treats EditRole and DisplayRole as the *same* storage, so
+    a typed sort value written to EditRole would replace what the cell shows.
+    The sort value lives in UserRole instead and is compared here.
+
+    Items with no sort value (or whose values aren't mutually comparable) fall
+    back to comparing display text.
+
+    NB: the fallback compares text directly rather than delegating with
+    super().__lt__(other) — under PySide6 that re-enters this override instead
+    of reaching the C++ base, recursing until the interpreter segfaults.
+    """
+
+    def __lt__(self, other: QTableWidgetItem) -> bool:
+        mine = self.data(Qt.ItemDataRole.UserRole)
+        theirs = other.data(Qt.ItemDataRole.UserRole)
+        if mine is not None and theirs is not None:
+            try:
+                return mine < theirs
+            except TypeError:
+                pass
+        return self.text() < other.text()
+
+
+def _keycode_sort_key(keycode: str) -> str:
+    """Zero-pad a key code so it sorts 1A, 1B, 2A, … instead of 10A, 1A, 2A.
+
+    Compared as plain text "10A" sorts before "1A", because "0" < "A". Padding
+    the number to two digits restores numeric order, which also keeps each
+    number's A/B pair (relative minor/major) adjacent — so sorting by this
+    column groups harmonically compatible tracks together.
+
+    Unrecognized values (including "") are returned unchanged so they still
+    sort deterministically rather than raising.
+    """
+    match = _KEYCODE_RE.fullmatch(keycode.strip())
+    if not match:
+        return keycode
+    return f"{int(match.group(1)):02d}{match.group(2).upper()}"
 
 
 class HistoryPanel(QWidget):
@@ -130,6 +177,14 @@ class HistoryPanel(QWidget):
         self._keys_table.setColumnWidth(7, 65)   # Energy
         self._keys_table.setColumnWidth(8, 170)  # Date/Time
 
+        # Click a header to sort. Cells carry a typed sort value (see _item and
+        # _SortableItem) because comparing the *display* string would order
+        # "91%" before "9%", "100.0" before "91.5", and "10A" before "1A".
+        # Default to Date/Time descending so the initial order still matches the
+        # newest-first order load_entries() returns.
+        self._keys_table.setSortingEnabled(True)
+        self._keys_table.sortByColumn(8, Qt.SortOrder.DescendingOrder)
+
         # Stack the two views; the toggle buttons below switch between them
         self._stack = QStackedWidget()
         self._stack.addWidget(self._table)
@@ -220,13 +275,24 @@ class HistoryPanel(QWidget):
         except Exception:
             self._entries = []
 
-        def _item(text: str, center: bool = False) -> QTableWidgetItem:
-            item = QTableWidgetItem(text)
+        def _item(
+            text: str, center: bool = False, sort_value: object | None = None
+        ) -> QTableWidgetItem:
+            item = _SortableItem(text)
             item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             if center:
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+            # Columns whose display text doesn't sort correctly (numbers
+            # formatted as strings, key codes) pass the underlying value here;
+            # _SortableItem compares it instead of the text.
+            if sort_value is not None:
+                item.setData(Qt.ItemDataRole.UserRole, sort_value)
             return item
 
+        # Sorting must be off while the table is populated: with it on, Qt
+        # re-sorts after every setItem() and rows move out from under the loop.
+        # Re-enabling re-applies the user's current sort column/order.
+        self._keys_table.setSortingEnabled(False)
         self._keys_table.setRowCount(len(self._entries))
         for row, entry in enumerate(self._entries):
             bpm = entry.get("bpm")
@@ -234,25 +300,52 @@ class HistoryPanel(QWidget):
             key_conf = entry.get("key_confidence")
             energy = entry.get("energy")
             timestamp = entry.get("timestamp", "")
-            self._keys_table.setItem(row, 0, _item(Path(entry.get("file_path", "")).name))
-            self._keys_table.setItem(row, 1, _item(f"{bpm:.1f}" if bpm else ""))
+            name = Path(entry.get("file_path", "")).name
+            keycode = entry.get("keycode") or ""
             self._keys_table.setItem(
-                row, 2, _item(f"{bpm_conf:.0%}" if bpm_conf is not None else "")
+                row, 0, _item(name, sort_value=name.lower())
+            )
+            self._keys_table.setItem(
+                row,
+                1,
+                _item(f"{bpm:.1f}" if bpm else "", sort_value=float(bpm or -1.0)),
+            )
+            self._keys_table.setItem(
+                row,
+                2,
+                _item(
+                    f"{bpm_conf:.0%}" if bpm_conf is not None else "",
+                    sort_value=float(bpm_conf if bpm_conf is not None else -1.0),
+                ),
             )
             self._keys_table.setItem(row, 3, _item(entry.get("key") or ""))
             self._keys_table.setItem(
-                row, 4, _item(f"{key_conf:.0%}" if key_conf is not None else "")
+                row,
+                4,
+                _item(
+                    f"{key_conf:.0%}" if key_conf is not None else "",
+                    sort_value=float(key_conf if key_conf is not None else -1.0),
+                ),
             )
-            self._keys_table.setItem(row, 5, _item(entry.get("keycode") or ""))
+            self._keys_table.setItem(
+                row, 5, _item(keycode, sort_value=_keycode_sort_key(keycode))
+            )
             self._keys_table.setItem(
                 row, 6, _item(self._format_alternatives(entry.get("key_alternatives")))
             )
             self._keys_table.setItem(
-                row, 7, _item(str(energy) if energy is not None else "", center=True)
+                row,
+                7,
+                _item(
+                    str(energy) if energy is not None else "",
+                    center=True,
+                    sort_value=int(energy if energy is not None else -1),
+                ),
             )
-            self._keys_table.setItem(
-                row, 8, _item(timestamp[:19].replace("T", " "))
-            )
+            # Timestamps need no sort value: the "YYYY-MM-DD HH:MM:SS" display
+            # form already sorts chronologically as text.
+            self._keys_table.setItem(row, 8, _item(timestamp[:19].replace("T", " ")))
+        self._keys_table.setSortingEnabled(True)
 
         self._keys_btn.setText(self.tr("{0} Song Keys").format(len(self._entries)))
 
