@@ -431,8 +431,11 @@ class ConversionPanel(QWidget):
             src_ext = src_path.suffix.lower()
             normalised_src = ".aiff" if src_ext == ".aif" else src_ext
 
-            # Filename
-            name_item = QTableWidgetItem(src_path.name)
+            # Filename — once converted, show the output's name (new extension) so
+            # the user can see the result and knows that's what a drag / Send To
+            # will move to another panel.
+            display_name = Path(self._converted_outputs.get(file_path, file_path)).name
+            name_item = QTableWidgetItem(display_name)
             name_item.setFlags(name_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
             self._file_table.setItem(row, 0, name_item)
 
@@ -635,6 +638,11 @@ class ConversionPanel(QWidget):
             self._set_text_status(row, self.tr("Ready"), QColor(Qt.GlobalColor.green))
         else:
             self._converted_outputs[result.source_path] = result.output_path
+            # Update the Filename cell in place so it shows the new extension the
+            # moment this file finishes (rather than only on the next rebuild).
+            name_item = self._file_table.item(row, 0)
+            if name_item is not None:
+                name_item.setText(Path(result.output_path).name)
             self._set_bar_status(row, self.tr("Done"), Theme.NEON_GREEN)
 
     def mark_converted(self, results: list[ConversionResult]) -> None:
