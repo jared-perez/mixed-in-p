@@ -183,6 +183,7 @@ class AnalysisPanel(QWidget):
         self._auto_write_bpm = True
         self._auto_write_key = True
         self._auto_analyze = True
+        self._analyzing = False
         self._setup_ui()
         self._connect_signals()
         self._bg_overlay = BackgroundOverlay("bg_analyze.png", self)
@@ -368,8 +369,22 @@ class AnalysisPanel(QWidget):
 
         self._stats_label.setText(" | ".join(parts) if parts else self.tr("No results yet"))
 
-        # Analyze button: enabled only when auto-analyze is OFF and there are pending tracks
-        self._analyze_btn.setEnabled(not self._auto_analyze and pending > 0)
+        # Analyze button: enabled only in manual mode, when tracks are waiting and
+        # no batch is currently running. Disabling it during a run means files
+        # dropped in while analyzing simply pile up in the queue; the button lights
+        # back up when the batch stops so the user can start them when they like.
+        self._analyze_btn.setEnabled(
+            not self._auto_analyze and pending > 0 and not self._analyzing
+        )
+
+    def set_analyzing(self, running: bool) -> None:
+        """Mark whether a batch is currently running (drives the Analyze button).
+
+        While running, the manual Analyze button is disabled so newly dropped
+        files just queue up; once the batch stops it re-enables if tracks remain.
+        """
+        self._analyzing = running
+        self._update_stats()
 
     def set_auto_analyze(self, enabled: bool) -> None:
         """Set the auto-analyze flag and sync the Auto toggle + button state.

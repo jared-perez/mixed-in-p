@@ -456,11 +456,18 @@ class MainWindow(QMainWindow):
     def _start_analysis(self, track_ids: list[str]) -> None:
         """Start analysis for the given tracks."""
         if self._analysis_thread is not None and self._analysis_thread.isRunning():
-            QMessageBox.warning(
-                self,
-                self.tr("Analysis in Progress"),
-                self.tr("An analysis is already running. Please wait or cancel it first."),
-            )
+            # A batch is already running. Rather than blocking the user with a
+            # warning, enqueue these tracks (mark them PENDING so they show in the
+            # Analyze table) and leave them to be analyzed later. In auto mode
+            # _start_pending_analysis picks them up as soon as the current batch
+            # finishes; in manual mode they wait in the queue until the user
+            # presses Analyze again. Tracks that are already queued/analysing are
+            # left untouched, so re-dropping in-flight files is a no-op rather
+            # than a duplicate.
+            for track_id in track_ids:
+                track = self._store.get(track_id)
+                if track and track.state == TrackState.QUEUED:
+                    self._store.update(track_id, state=TrackState.PENDING)
             return
 
         # Get file paths and mark as pending
@@ -500,6 +507,7 @@ class MainWindow(QMainWindow):
         self._analysis_thread.analysis_finished.connect(self._on_analysis_finished)
         self._analysis_thread.analysis_cancelled.connect(self._on_analysis_cancelled)
         self._analysis_thread.start()
+        self._analysis_panel.set_analyzing(True)
 
     def _analyze_and_rename_files(
         self, track_ids: list[str], operations: list[RenameOperation]
@@ -553,11 +561,34 @@ class MainWindow(QMainWindow):
         # Clean up
         self._analyzing_track_ids = []
         self._analysis_thread = None
+        # Re-enable the manual Analyze button (re-armed here; if auto-mode
+        # chaining kicks off a new batch below it flips back on).
+        self._analysis_panel.set_analyzing(False)
 
         # Auto-rename pipeline: only for tracks just analyzed in this batch
         if self._pending_rename_operations is not None and self._config.auto_rename:
             self._auto_rename_after_analysis(results)
         self._pending_rename_operations = None
+
+        # Pick up anything dropped into the panel while this batch was running.
+        self._start_pending_analysis()
+
+    def _start_pending_analysis(self) -> None:
+        """Analyze tracks that were enqueued while a previous batch was running.
+
+        Files dropped into (or sent to) the Analyze panel during an active
+        auto-analysis are marked PENDING rather than rejected; once the running
+        batch finishes we start a fresh batch for whatever is still waiting so
+        each track is analyzed when its turn comes.
+        """
+        if not self._config.auto_analyze:
+            return
+        if self._analysis_thread is not None and self._analysis_thread.isRunning():
+            return
+        pending_ids = [t.id for t in self._store.get_by_state(TrackState.PENDING)]
+        if pending_ids:
+            self._pending_rename_operations = []  # enable auto-rename gate
+            self._start_analysis(pending_ids)
 
     def _on_analysis_cancelled(self) -> None:
         """Handle analysis cancelled."""
@@ -571,6 +602,7 @@ class MainWindow(QMainWindow):
 
         self._analyzing_track_ids = []
         self._analysis_thread = None
+        self._analysis_panel.set_analyzing(False)
 
     def _auto_rename_after_analysis(self, current_results: list[AnalysisResult]) -> None:
         """Build rename previews for the current analysis batch and start rename thread."""
