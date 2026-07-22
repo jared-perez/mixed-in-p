@@ -163,33 +163,33 @@ Functies:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="200"/>
-        <location filename="../widgets/analysis_panel.py" line="279"/>
+        <location filename="../widgets/analysis_panel.py" line="201"/>
+        <location filename="../widgets/analysis_panel.py" line="280"/>
         <source>Analyze</source>
         <translation>Analyseren</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="203"/>
+        <location filename="../widgets/analysis_panel.py" line="204"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>Sleep bestanden om te analyseren, tenzij gewijzigd in instellingen. Resultaten worden in real-time bijgewerkt.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="210"/>
+        <location filename="../widgets/analysis_panel.py" line="211"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="216"/>
+        <location filename="../widgets/analysis_panel.py" line="217"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>Automatisch analyseren bij slepen naar of sturen naar het Analyseren-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="229"/>
+        <location filename="../widgets/analysis_panel.py" line="230"/>
         <source>Drop files here to analyze immediately</source>
         <translation>Sleep bestanden hierheen om direct te analyseren</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="275"/>
+        <location filename="../widgets/analysis_panel.py" line="276"/>
         <source>Clear Results</source>
         <translation>Resultaten wissen</translation>
     </message>
@@ -198,47 +198,47 @@ Functies:
         <translation type="vanished">Selectie verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="286"/>
+        <location filename="../widgets/analysis_panel.py" line="287"/>
         <source>Send To</source>
         <translation>Sturen naar</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="288"/>
+        <location filename="../widgets/analysis_panel.py" line="289"/>
         <source>Convert</source>
         <translation>Converteren</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="290"/>
         <source>Player</source>
         <translation>Speler</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="362"/>
         <source>{n} analyzed</source>
         <translation>{n} geanalyseerd</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="363"/>
+        <location filename="../widgets/analysis_panel.py" line="364"/>
         <source>{n} errors</source>
         <translation>{n} fouten</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="365"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>{n} pending</source>
         <translation>{n} in wachtrij</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="367"/>
+        <location filename="../widgets/analysis_panel.py" line="368"/>
         <source>{n} in progress</source>
         <translation>{n} bezig</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="369"/>
+        <location filename="../widgets/analysis_panel.py" line="370"/>
         <source>No results yet</source>
         <translation>Nog geen resultaten</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="411"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
@@ -251,7 +251,7 @@ Functies:
         <translation type="vanished">Sturen naar Speler</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="413"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Remove</source>
         <translation>Verwijderen</translation>
     </message>
@@ -428,7 +428,7 @@ of klik op “Artwork toevoegen…”</translation>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="170"/>
-        <location filename="../widgets/conversion_panel.py" line="485"/>
+        <location filename="../widgets/conversion_panel.py" line="488"/>
         <source>No files</source>
         <translation>Geen bestanden</translation>
     </message>
@@ -477,51 +477,51 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="453"/>
-        <location filename="../widgets/conversion_panel.py" line="638"/>
+        <location filename="../widgets/conversion_panel.py" line="456"/>
+        <location filename="../widgets/conversion_panel.py" line="646"/>
         <source>Done</source>
         <translation>Klaar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="462"/>
+        <location filename="../widgets/conversion_panel.py" line="465"/>
         <source>Same format</source>
         <translation>Zelfde formaat</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="469"/>
-        <location filename="../widgets/conversion_panel.py" line="635"/>
-        <location filename="../widgets/conversion_panel.py" line="660"/>
+        <location filename="../widgets/conversion_panel.py" line="472"/>
+        <location filename="../widgets/conversion_panel.py" line="638"/>
+        <location filename="../widgets/conversion_panel.py" line="668"/>
         <source>Ready</source>
         <translation>Gereed</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="480"/>
+        <location filename="../widgets/conversion_panel.py" line="483"/>
         <source>{count} files</source>
         <translation>{count} bestanden</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="482"/>
+        <location filename="../widgets/conversion_panel.py" line="485"/>
         <source>{count} to convert</source>
         <translation>{count} te converteren</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="484"/>
+        <location filename="../widgets/conversion_panel.py" line="487"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Kept &apos;lossy&apos; English; standard audio-engineering term in NL.</translatorcomment>
         <translation>({count} lossy overgeslagen)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="607"/>
+        <location filename="../widgets/conversion_panel.py" line="610"/>
         <source>Converting</source>
         <translation>Converteren</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="628"/>
+        <location filename="../widgets/conversion_panel.py" line="631"/>
         <source>Incomplete</source>
         <translation>Onvolledig</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="628"/>
+        <location filename="../widgets/conversion_panel.py" line="631"/>
         <source>Error</source>
         <translation>Fout</translation>
     </message>
@@ -812,43 +812,58 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="580"/>
+        <location filename="../widgets/keyboard_panel.py" line="583"/>
         <source>Keyboard</source>
         <translation>Toetsenbord</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="583"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Speel akkoorden om toonsoorten te vergelijken. Klik op toetsen of gebruik QWERTY-sneltoetsen (A-J, K-L-;). Z/X om van octaaf te wisselen.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="593"/>
+        <location filename="../widgets/keyboard_panel.py" line="596"/>
         <source>Notation can be changed in settings</source>
         <translation>Notatie kan worden gewijzigd in Instellingen</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="607"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Minor Chord</source>
         <translation>Mineurakkoord</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="608"/>
+        <location filename="../widgets/keyboard_panel.py" line="611"/>
         <source>Major Chord</source>
         <translation>Majeurakkoord</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="790"/>
-        <location filename="../widgets/keyboard_panel.py" line="793"/>
+        <location filename="../widgets/keyboard_panel.py" line="678"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="682"/>
+        <source>Circle of Fifths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="683"/>
+        <source>Hex Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="825"/>
+        <location filename="../widgets/keyboard_panel.py" line="828"/>
         <source>👑 Key Codes</source>
         <translation>👑 Key codes</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="791"/>
+        <location filename="../widgets/keyboard_panel.py" line="826"/>
         <source>Traditional Key Notation</source>
         <translation>Traditionele toonsoortnotatie</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="792"/>
+        <location filename="../widgets/keyboard_panel.py" line="827"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -895,112 +910,110 @@ of klik op “Artwork toevoegen…”</translation>
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="461"/>
         <source>Analysis in Progress</source>
-        <translation>Analyse bezig</translation>
+        <translation type="vanished">Analyse bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="462"/>
         <source>An analysis is already running. Please wait or cancel it first.</source>
-        <translation>Er loopt al een analyse. Wacht even of annuleer deze eerst.</translation>
+        <translation type="vanished">Er loopt al een analyse. Wacht even of annuleer deze eerst.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="518"/>
+        <location filename="../main_window.py" line="526"/>
         <source>Analyzing...</source>
         <translation>Analyseren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="551"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Voltooid: {0} geanalyseerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="547"/>
+        <location filename="../main_window.py" line="555"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Voltooid: {0} bestanden geanalyseerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="564"/>
+        <location filename="../main_window.py" line="595"/>
         <source>Cancelled</source>
         <translation>Geannuleerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="650"/>
+        <location filename="../main_window.py" line="682"/>
         <source>Conversion in Progress</source>
         <translation>Conversie bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="651"/>
+        <location filename="../main_window.py" line="683"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Er loopt al een conversie. Wacht even.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="681"/>
+        <location filename="../main_window.py" line="713"/>
         <source>Converting...</source>
         <translation>Converteren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="729"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Voltooid: {0} geconverteerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="701"/>
+        <location filename="../main_window.py" line="733"/>
         <source>Complete: {0} files converted</source>
         <translation>Voltooid: {0} bestanden geconverteerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="870"/>
+        <location filename="../main_window.py" line="902"/>
         <source>Rename in Progress</source>
         <translation>Hernoemen bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="871"/>
+        <location filename="../main_window.py" line="903"/>
         <source>A rename operation is already running.</source>
         <translation>Er loopt al een hernoembewerking.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="893"/>
+        <location filename="../main_window.py" line="925"/>
         <source>Renaming files...</source>
         <translation>Bestanden hernoemen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="905"/>
+        <location filename="../main_window.py" line="937"/>
         <source>Renamed {0} files</source>
         <translation>{0} bestanden hernoemd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="973"/>
         <source>No Session</source>
         <translation>Geen sessie</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="973"/>
         <source>No rename session to undo.</source>
         <translation>Geen hernoemsessie om te herstellen.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="950"/>
+        <location filename="../main_window.py" line="982"/>
         <source>Confirm Undo</source>
         <translation>Herstel bevestigen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="951"/>
+        <location filename="../main_window.py" line="983"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Hernoemen van {0} bestanden herstellen?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="960"/>
+        <location filename="../main_window.py" line="992"/>
         <source>Undoing rename...</source>
         <translation>Hernoemen herstellen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="977"/>
+        <location filename="../main_window.py" line="1009"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Hersteld: {0} bestanden, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="981"/>
+        <location filename="../main_window.py" line="1013"/>
         <source>Undone {0} files</source>
         <translation>{0} bestanden hersteld</translation>
     </message>

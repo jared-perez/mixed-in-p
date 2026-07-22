@@ -162,33 +162,33 @@ Features:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="200"/>
-        <location filename="../widgets/analysis_panel.py" line="279"/>
+        <location filename="../widgets/analysis_panel.py" line="201"/>
+        <location filename="../widgets/analysis_panel.py" line="280"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="203"/>
+        <location filename="../widgets/analysis_panel.py" line="204"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>拖入文件即可分析（除非在设置中更改）。结果实时更新。</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="210"/>
+        <location filename="../widgets/analysis_panel.py" line="211"/>
         <source>Auto</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="216"/>
+        <location filename="../widgets/analysis_panel.py" line="217"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>拖入或发送到分析面板时自动分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="229"/>
+        <location filename="../widgets/analysis_panel.py" line="230"/>
         <source>Drop files here to analyze immediately</source>
         <translation>将文件拖到此处立即分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="275"/>
+        <location filename="../widgets/analysis_panel.py" line="276"/>
         <source>Clear Results</source>
         <translation>清除结果</translation>
     </message>
@@ -197,51 +197,51 @@ Features:
         <translation type="vanished">移除所选</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="286"/>
+        <location filename="../widgets/analysis_panel.py" line="287"/>
         <source>Send To</source>
         <translation>发送到</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="288"/>
+        <location filename="../widgets/analysis_panel.py" line="289"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="290"/>
         <source>Player</source>
         <translation>播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="362"/>
         <source>{n} analyzed</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>已分析{n}个</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="363"/>
+        <location filename="../widgets/analysis_panel.py" line="364"/>
         <source>{n} errors</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>{n}个错误</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="365"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>{n} pending</source>
         <translatorcomment>Measure word 个: {n}个待处理.</translatorcomment>
         <translation>{n}个待处理</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="367"/>
+        <location filename="../widgets/analysis_panel.py" line="368"/>
         <source>{n} in progress</source>
         <translatorcomment>Measure word 个: {n}个进行中.</translatorcomment>
         <translation>{n}个进行中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="369"/>
+        <location filename="../widgets/analysis_panel.py" line="370"/>
         <source>No results yet</source>
         <translation>暂无结果</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="411"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
@@ -254,7 +254,7 @@ Features:
         <translation type="vanished">发送到播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="413"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
@@ -433,7 +433,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="170"/>
-        <location filename="../widgets/conversion_panel.py" line="485"/>
+        <location filename="../widgets/conversion_panel.py" line="488"/>
         <source>No files</source>
         <translation>无文件</translation>
     </message>
@@ -482,53 +482,53 @@ or click “Add Artwork…”</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="453"/>
-        <location filename="../widgets/conversion_panel.py" line="638"/>
+        <location filename="../widgets/conversion_panel.py" line="456"/>
+        <location filename="../widgets/conversion_panel.py" line="646"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="462"/>
+        <location filename="../widgets/conversion_panel.py" line="465"/>
         <source>Same format</source>
         <translation>相同格式</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="469"/>
-        <location filename="../widgets/conversion_panel.py" line="635"/>
-        <location filename="../widgets/conversion_panel.py" line="660"/>
+        <location filename="../widgets/conversion_panel.py" line="472"/>
+        <location filename="../widgets/conversion_panel.py" line="638"/>
+        <location filename="../widgets/conversion_panel.py" line="668"/>
         <source>Ready</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="480"/>
+        <location filename="../widgets/conversion_panel.py" line="483"/>
         <source>{count} files</source>
         <translatorcomment>File count measure word 个: {count}个文件.</translatorcomment>
         <translation>{count}个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="482"/>
+        <location filename="../widgets/conversion_panel.py" line="485"/>
         <source>{count} to convert</source>
         <translatorcomment>Measure word 个: {count}个待转换.</translatorcomment>
         <translation>{count}个待转换</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="484"/>
+        <location filename="../widgets/conversion_panel.py" line="487"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>（已跳过{count}个有损文件）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="607"/>
+        <location filename="../widgets/conversion_panel.py" line="610"/>
         <source>Converting</source>
         <translation>转换中</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="628"/>
+        <location filename="../widgets/conversion_panel.py" line="631"/>
         <source>Incomplete</source>
         <translation>未完成</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="628"/>
+        <location filename="../widgets/conversion_panel.py" line="631"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
@@ -821,45 +821,60 @@ or click “Add Artwork…”</source>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="580"/>
+        <location filename="../widgets/keyboard_panel.py" line="583"/>
         <source>Keyboard</source>
         <translation>键盘</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="583"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>弹奏和弦以比较调性。点击琴键或使用 QWERTY 快捷键（A-J、K-L-;）。Z/X 用于切换八度。</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="593"/>
+        <location filename="../widgets/keyboard_panel.py" line="596"/>
         <source>Notation can be changed in settings</source>
         <translation>记号法可在设置中更改</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="607"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Minor Chord</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>小三和弦</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="608"/>
+        <location filename="../widgets/keyboard_panel.py" line="611"/>
         <source>Major Chord</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>大三和弦</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="790"/>
-        <location filename="../widgets/keyboard_panel.py" line="793"/>
+        <location filename="../widgets/keyboard_panel.py" line="678"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="682"/>
+        <source>Circle of Fifths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="683"/>
+        <source>Hex Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="825"/>
+        <location filename="../widgets/keyboard_panel.py" line="828"/>
         <source>👑 Key Codes</source>
         <translation>👑 键码</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="791"/>
+        <location filename="../widgets/keyboard_panel.py" line="826"/>
         <source>Traditional Key Notation</source>
         <translation>传统调性记号</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="792"/>
+        <location filename="../widgets/keyboard_panel.py" line="827"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -906,112 +921,110 @@ or click “Add Artwork…”</source>
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="461"/>
         <source>Analysis in Progress</source>
-        <translation>分析进行中</translation>
+        <translation type="vanished">分析进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="462"/>
         <source>An analysis is already running. Please wait or cancel it first.</source>
-        <translation>已有分析正在运行。请等待或先取消。</translation>
+        <translation type="vanished">已有分析正在运行。请等待或先取消。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="518"/>
+        <location filename="../main_window.py" line="526"/>
         <source>Analyzing...</source>
         <translation>分析中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="551"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完成：已分析{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="547"/>
+        <location filename="../main_window.py" line="555"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完成：已分析{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="564"/>
+        <location filename="../main_window.py" line="595"/>
         <source>Cancelled</source>
         <translation>已取消</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="650"/>
+        <location filename="../main_window.py" line="682"/>
         <source>Conversion in Progress</source>
         <translation>转换进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="651"/>
+        <location filename="../main_window.py" line="683"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>已有转换正在运行。请稍候。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="681"/>
+        <location filename="../main_window.py" line="713"/>
         <source>Converting...</source>
         <translation>转换中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="729"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完成：已转换{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="701"/>
+        <location filename="../main_window.py" line="733"/>
         <source>Complete: {0} files converted</source>
         <translation>完成：已转换{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="870"/>
+        <location filename="../main_window.py" line="902"/>
         <source>Rename in Progress</source>
         <translation>重命名进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="871"/>
+        <location filename="../main_window.py" line="903"/>
         <source>A rename operation is already running.</source>
         <translation>已有重命名操作正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="893"/>
+        <location filename="../main_window.py" line="925"/>
         <source>Renaming files...</source>
         <translation>正在重命名文件……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="905"/>
+        <location filename="../main_window.py" line="937"/>
         <source>Renamed {0} files</source>
         <translation>已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="973"/>
         <source>No Session</source>
         <translation>无会话</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="973"/>
         <source>No rename session to undo.</source>
         <translation>没有可撤销的重命名会话。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="950"/>
+        <location filename="../main_window.py" line="982"/>
         <source>Confirm Undo</source>
         <translation>确认撤销</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="951"/>
+        <location filename="../main_window.py" line="983"/>
         <source>Undo renaming of {0} files?</source>
         <translation>撤销{0}个文件的重命名？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="960"/>
+        <location filename="../main_window.py" line="992"/>
         <source>Undoing rename...</source>
         <translation>正在撤销重命名……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="977"/>
+        <location filename="../main_window.py" line="1009"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>已撤销：{0}个文件，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="981"/>
+        <location filename="../main_window.py" line="1013"/>
         <source>Undone {0} files</source>
         <translation>已撤销{0}个文件</translation>
     </message>

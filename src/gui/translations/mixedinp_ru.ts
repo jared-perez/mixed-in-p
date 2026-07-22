@@ -163,33 +163,33 @@ Features:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="200"/>
-        <location filename="../widgets/analysis_panel.py" line="279"/>
+        <location filename="../widgets/analysis_panel.py" line="201"/>
+        <location filename="../widgets/analysis_panel.py" line="280"/>
         <source>Analyze</source>
         <translation>Анализ</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="203"/>
+        <location filename="../widgets/analysis_panel.py" line="204"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>Перетащите файлы для анализа, если не изменено в настройках. Результаты обновляются в реальном времени.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="210"/>
+        <location filename="../widgets/analysis_panel.py" line="211"/>
         <source>Auto</source>
         <translation>Авто</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="216"/>
+        <location filename="../widgets/analysis_panel.py" line="217"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>Автоматически анализировать при перетаскивании или отправке на панель Анализа</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="229"/>
+        <location filename="../widgets/analysis_panel.py" line="230"/>
         <source>Drop files here to analyze immediately</source>
         <translation>Перетащите файлы сюда для немедленного анализа</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="275"/>
+        <location filename="../widgets/analysis_panel.py" line="276"/>
         <source>Clear Results</source>
         <translation>Очистить результаты</translation>
     </message>
@@ -198,47 +198,47 @@ Features:
         <translation type="vanished">Удалить выбранные</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="286"/>
+        <location filename="../widgets/analysis_panel.py" line="287"/>
         <source>Send To</source>
         <translation>Отправить в</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="288"/>
+        <location filename="../widgets/analysis_panel.py" line="289"/>
         <source>Convert</source>
         <translation>Конвертация</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="290"/>
         <source>Player</source>
         <translation>Плеер</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="362"/>
         <source>{n} analyzed</source>
         <translation>{n} проанализировано</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="363"/>
+        <location filename="../widgets/analysis_panel.py" line="364"/>
         <source>{n} errors</source>
         <translation>{n} ошибок</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="365"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>{n} pending</source>
         <translation>{n} в очереди</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="367"/>
+        <location filename="../widgets/analysis_panel.py" line="368"/>
         <source>{n} in progress</source>
         <translation>{n} в процессе</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="369"/>
+        <location filename="../widgets/analysis_panel.py" line="370"/>
         <source>No results yet</source>
         <translation>Пока нет результатов</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="411"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Open File Location</source>
         <translation>Открыть расположение файла</translation>
     </message>
@@ -251,7 +251,7 @@ Features:
         <translation type="vanished">Отправить в Плеер</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="413"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
@@ -425,7 +425,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="170"/>
-        <location filename="../widgets/conversion_panel.py" line="485"/>
+        <location filename="../widgets/conversion_panel.py" line="488"/>
         <source>No files</source>
         <translation>Нет файлов</translation>
     </message>
@@ -474,50 +474,50 @@ or click “Add Artwork…”</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="453"/>
-        <location filename="../widgets/conversion_panel.py" line="638"/>
+        <location filename="../widgets/conversion_panel.py" line="456"/>
+        <location filename="../widgets/conversion_panel.py" line="646"/>
         <source>Done</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="462"/>
+        <location filename="../widgets/conversion_panel.py" line="465"/>
         <source>Same format</source>
         <translation>Тот же формат</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="469"/>
-        <location filename="../widgets/conversion_panel.py" line="635"/>
-        <location filename="../widgets/conversion_panel.py" line="660"/>
+        <location filename="../widgets/conversion_panel.py" line="472"/>
+        <location filename="../widgets/conversion_panel.py" line="638"/>
+        <location filename="../widgets/conversion_panel.py" line="668"/>
         <source>Ready</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="480"/>
+        <location filename="../widgets/conversion_panel.py" line="483"/>
         <source>{count} files</source>
         <translation>{count} файлов</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="482"/>
+        <location filename="../widgets/conversion_panel.py" line="485"/>
         <source>{count} to convert</source>
         <translation>{count} к конвертации</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="484"/>
+        <location filename="../widgets/conversion_panel.py" line="487"/>
         <source>({count} lossy skipped)</source>
         <translation>({count} с потерями пропущено)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="607"/>
+        <location filename="../widgets/conversion_panel.py" line="610"/>
         <source>Converting</source>
         <translation>Конвертация</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="628"/>
+        <location filename="../widgets/conversion_panel.py" line="631"/>
         <source>Incomplete</source>
         <translation>Не завершено</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="628"/>
+        <location filename="../widgets/conversion_panel.py" line="631"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -807,43 +807,58 @@ or click “Add Artwork…”</source>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="580"/>
+        <location filename="../widgets/keyboard_panel.py" line="583"/>
         <source>Keyboard</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="583"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Играйте аккорды для сравнения музыкальных тональностей. Нажимайте клавиши или используйте сочетания QWERTY (A-J, K-L-;). Z/X для смены октавы.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="593"/>
+        <location filename="../widgets/keyboard_panel.py" line="596"/>
         <source>Notation can be changed in settings</source>
         <translation>Нотацию можно изменить в Настройках</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="607"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Minor Chord</source>
         <translation>Минорный аккорд</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="608"/>
+        <location filename="../widgets/keyboard_panel.py" line="611"/>
         <source>Major Chord</source>
         <translation>Мажорный аккорд</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="790"/>
-        <location filename="../widgets/keyboard_panel.py" line="793"/>
+        <location filename="../widgets/keyboard_panel.py" line="678"/>
+        <source>View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="682"/>
+        <source>Circle of Fifths</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="683"/>
+        <source>Hex Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="825"/>
+        <location filename="../widgets/keyboard_panel.py" line="828"/>
         <source>👑 Key Codes</source>
         <translation>👑 Коды тональности</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="791"/>
+        <location filename="../widgets/keyboard_panel.py" line="826"/>
         <source>Traditional Key Notation</source>
         <translation>Традиционная нотация тональностей</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="792"/>
+        <location filename="../widgets/keyboard_panel.py" line="827"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -890,112 +905,110 @@ or click “Add Artwork…”</source>
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="461"/>
         <source>Analysis in Progress</source>
-        <translation>Анализ выполняется</translation>
+        <translation type="vanished">Анализ выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="462"/>
         <source>An analysis is already running. Please wait or cancel it first.</source>
-        <translation>Анализ уже выполняется. Подождите или сначала отмените его.</translation>
+        <translation type="vanished">Анализ уже выполняется. Подождите или сначала отмените его.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="518"/>
+        <location filename="../main_window.py" line="526"/>
         <source>Analyzing...</source>
         <translation>Анализ...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="551"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Готово: {0} проанализировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="547"/>
+        <location filename="../main_window.py" line="555"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Готово: {0} файлов проанализировано</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="564"/>
+        <location filename="../main_window.py" line="595"/>
         <source>Cancelled</source>
         <translation>Отменено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="650"/>
+        <location filename="../main_window.py" line="682"/>
         <source>Conversion in Progress</source>
         <translation>Конвертация выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="651"/>
+        <location filename="../main_window.py" line="683"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Конвертация уже выполняется. Подождите.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="681"/>
+        <location filename="../main_window.py" line="713"/>
         <source>Converting...</source>
         <translation>Конвертация...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="729"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Готово: {0} конвертировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="701"/>
+        <location filename="../main_window.py" line="733"/>
         <source>Complete: {0} files converted</source>
         <translation>Готово: {0} файлов конвертировано</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="870"/>
+        <location filename="../main_window.py" line="902"/>
         <source>Rename in Progress</source>
         <translation>Переименование выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="871"/>
+        <location filename="../main_window.py" line="903"/>
         <source>A rename operation is already running.</source>
         <translation>Операция переименования уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="893"/>
+        <location filename="../main_window.py" line="925"/>
         <source>Renaming files...</source>
         <translation>Переименование файлов...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="905"/>
+        <location filename="../main_window.py" line="937"/>
         <source>Renamed {0} files</source>
         <translation>Переименовано {0} файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="973"/>
         <source>No Session</source>
         <translation>Нет сессии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="941"/>
+        <location filename="../main_window.py" line="973"/>
         <source>No rename session to undo.</source>
         <translation>Нет сессии переименования для отмены.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="950"/>
+        <location filename="../main_window.py" line="982"/>
         <source>Confirm Undo</source>
         <translation>Подтвердите отмену</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="951"/>
+        <location filename="../main_window.py" line="983"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Отменить переименование {0} файлов?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="960"/>
+        <location filename="../main_window.py" line="992"/>
         <source>Undoing rename...</source>
         <translation>Отмена переименования...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="977"/>
+        <location filename="../main_window.py" line="1009"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Отменено: {0} файлов, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="981"/>
+        <location filename="../main_window.py" line="1013"/>
         <source>Undone {0} files</source>
         <translation>Отменено {0} файлов</translation>
     </message>

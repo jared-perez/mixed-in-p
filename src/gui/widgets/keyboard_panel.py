@@ -10,6 +10,7 @@ import sounddevice as sd
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor, QFont, QKeySequence, QPainter, QPen, QShortcut
 from PySide6.QtWidgets import (
+    QComboBox,
     QFrame,
     QHBoxLayout,
     QLabel,
@@ -23,6 +24,7 @@ from PySide6.QtWidgets import (
 from src.analysis.keycode import KEYCODE_TO_KEY, render_key
 
 from ..styles.theme import Theme, panel_header_row
+from .circle_of_fifths_grid import CircleOfFifthsGrid
 from .hex_key_grid import HexKeyGrid
 from .key_info_box import KeyInfoBox
 from .linear_key_strip import LinearKeyStrip
@@ -662,13 +664,53 @@ class KeyboardPanel(QWidget):
 
         ref_row.addStretch(1)
 
-        # Right: hex honeycomb harmonic reference, with the key-info box below
-        # it. The grid is left-aligned (rather than centred in the wider info-box
-        # column) so it sits ~1/3 closer to the strip, cutting the old hard gap.
+        # Right: harmonic reference grid (Circle of Fifths or hex honeycomb,
+        # chosen by a dropdown) with the key-info box below it. The grid is
+        # left-aligned (rather than centred in the wider info-box column) so it
+        # sits ~1/3 closer to the strip, cutting the old hard gap.
         right_col = QVBoxLayout()
         right_col.setSpacing(12)
+
+        # View switcher: Hex Grid (default) / Circle of Fifths.
+        view_row = QHBoxLayout()
+        view_row.setSpacing(8)
+        view_label = QLabel(self.tr("View"))
+        view_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;")
+        view_row.addWidget(view_label)
+        self._view_combo = QComboBox()
+        self._view_combo.addItem(self.tr("Hex Grid"))
+        self._view_combo.addItem(self.tr("Circle of Fifths"))
+        self._view_combo.setCursor(Qt.CursorShape.PointingHandCursor)
+        # Slim it down vertically so the switcher row takes less space; keep
+        # horizontal padding + a min width so "Circle of Fifths" isn't clipped.
+        self._view_combo.setFixedHeight(26)
+        self._view_combo.setMinimumWidth(150)
+        self._view_combo.setStyleSheet(
+            "QComboBox { padding: 1px 8px; }"
+        )
+        view_row.addWidget(self._view_combo)
+        view_row.addStretch(1)
+        right_col.addLayout(view_row)
+
+        # Both grids sit left-aligned in a fixed-width holder (no visible frame,
+        # so no backdrop) whose width is the wider grid's. Fixing the width keeps
+        # the column from reflowing — and sliding right — when the narrower
+        # Circle of Fifths replaces the wider hex grid. The combo toggles which
+        # grid is visible; both are highlighted in lockstep even while hidden, so
+        # the visible one is always current on switch. Hex grid shows by default.
+        self._circle = CircleOfFifthsGrid()
         self._hex = HexKeyGrid()
-        right_col.addWidget(self._hex, alignment=Qt.AlignmentFlag.AlignLeft)
+        grid_holder = QWidget()
+        grid_layout = QVBoxLayout(grid_holder)
+        grid_layout.setContentsMargins(0, 0, 0, 0)
+        top_left = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        grid_layout.addWidget(self._hex, alignment=top_left)
+        grid_layout.addWidget(self._circle, alignment=top_left)
+        grid_holder.setFixedWidth(max(self._hex.width(), self._circle.width()))
+        self._circle.setVisible(False)
+        self._view_combo.currentIndexChanged.connect(self._on_view_changed)
+        right_col.addWidget(grid_holder, alignment=Qt.AlignmentFlag.AlignLeft)
+
         self._info_box = KeyInfoBox()
         # Fixed-width box (every value in its own fixed slot), centred under the
         # grid. It's a little wider than the grid, so the grid re-centres within
@@ -685,13 +727,17 @@ class KeyboardPanel(QWidget):
         self._canvas.chord_ended.connect(self._strip.remove_highlight)
         self._canvas.chord_started.connect(self._hex.add_highlight)
         self._canvas.chord_ended.connect(self._hex.remove_highlight)
+        self._canvas.chord_started.connect(self._circle.add_highlight)
+        self._canvas.chord_ended.connect(self._circle.remove_highlight)
         # Piano -> info box: summarise the last key pressed.
         self._canvas.chord_started.connect(self._on_chord_started)
-        # Hex / strip -> piano: play the matching chord and light everything.
+        # Grid / strip -> piano: play the matching chord and light everything.
         self._strip.segment_pressed.connect(self._on_segment_pressed)
         self._strip.segment_released.connect(self._on_segment_released)
         self._hex.segment_pressed.connect(self._on_segment_pressed)
         self._hex.segment_released.connect(self._on_segment_released)
+        self._circle.segment_pressed.connect(self._on_segment_pressed)
+        self._circle.segment_released.connect(self._on_segment_released)
 
         # Z/X octave shift, scoped to this panel so it works whether focus is on
         # the piano, the key strip, or anywhere else in the panel.
@@ -721,6 +767,12 @@ class KeyboardPanel(QWidget):
         self._minor_btn.setStyleSheet(active_ss if self._minor_btn.isChecked() else inactive_ss)
         self._major_btn.setStyleSheet(active_ss if self._major_btn.isChecked() else inactive_ss)
 
+    def _on_view_changed(self, index: int) -> None:
+        """Toggle the visible reference grid (0 = Hex, 1 = Circle of Fifths)."""
+        show_hex = index == 0
+        self._hex.setVisible(show_hex)
+        self._circle.setVisible(not show_hex)
+
     def _on_volume_change(self, value: int) -> None:
         self._engine.volume = value / 100.0
 
@@ -741,6 +793,7 @@ class KeyboardPanel(QWidget):
         self._canvas.play_from_strip(note, ("strip", number))
         self._strip.add_highlight(code)
         self._hex.add_highlight(code)
+        self._circle.add_highlight(code)
         self._info_box.update_for_number(number)
 
     def _on_segment_released(self, number: int) -> None:
@@ -751,6 +804,7 @@ class KeyboardPanel(QWidget):
         self._canvas.stop_from_strip(note, ("strip", number))
         self._strip.remove_highlight(code)
         self._hex.remove_highlight(code)
+        self._circle.remove_highlight(code)
 
     # --- Public API ---
 
@@ -778,6 +832,7 @@ class KeyboardPanel(QWidget):
         """Set the notation used for the piano key labels and the 1-12 numbers."""
         self._canvas.set_notation(notation)
         self._hex.set_key_notation(notation)
+        self._circle.set_key_notation(notation)
         self._strip.set_key_notation(notation)
         self._info_box.set_key_notation(notation)
         self._notation = notation
