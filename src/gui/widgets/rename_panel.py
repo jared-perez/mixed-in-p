@@ -125,12 +125,18 @@ class RenamePanel(QWidget):
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         layout.addLayout(panel_header_row(title, desc))
 
-        # Operations section
-        ops_group = QGroupBox(self.tr("Operations"))
-        ops_layout = QVBoxLayout(ops_group)
+        # Operations section — a plain container (no "Operations" group box) so
+        # it sits tight under the header, matching the Convert panel's controls.
+        # The outer container keeps Qt's default layout margins (same as the
+        # Convert panel's format row) so a little of the panel background shows
+        # around the controls; the inner rows are zeroed so it isn't doubled.
+        ops_widget = QWidget()
+        ops_layout = QVBoxLayout(ops_widget)
+        ops_layout.setSpacing(Theme.SPACING)
 
         # Trim controls row
         trim_row = QHBoxLayout()
+        trim_row.setContentsMargins(0, 0, 0, 0)
 
         # Trim start
         trim_row.addWidget(QLabel(self.tr("Trim Start:")))
@@ -180,6 +186,7 @@ class RenamePanel(QWidget):
 
         # Prepend/Append text row
         prepend_row = QHBoxLayout()
+        prepend_row.setContentsMargins(0, 0, 0, 0)
 
         # Mode toggle: Prepend (default) vs Append. Only one active at a time.
         self._append_mode = False
@@ -209,7 +216,7 @@ class RenamePanel(QWidget):
 
         self._update_add_mode_buttons()
 
-        layout.addWidget(ops_group)
+        layout.addWidget(ops_widget)
 
         # Preview table
         preview_group = QGroupBox(self.tr("Preview"))
