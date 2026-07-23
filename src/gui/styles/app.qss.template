@@ -333,6 +333,15 @@ QTableWidget#historyTable::item {
     padding: 8px 2px;
 }
 
+/* Rename preview table: trim the VERTICAL cell padding so the green "Changed"
+   status tag (a cell widget) can fill nearly the full compact row height and
+   sit centered, without having to grow the row. Rows stay at their default
+   height; only the widget inset shrinks. Keep _STATUS_ITEM_PAD_V in
+   rename_panel.py in sync with this value. */
+QTableWidget#renamePreviewTable::item {
+    padding: 2px 8px;
+}
+
 QTableView::item:selected, QTableWidget::item:selected {
     background-color: @BG_LIGHT@;
     color: @NEON_YELLOW@;

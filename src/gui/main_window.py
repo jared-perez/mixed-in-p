@@ -57,7 +57,6 @@ from .workers import (
     AnalysisThread,
     ConversionProgress,
     ConversionThread,
-    RenameProgress,
     RenameThread,
     UndoThread,
 )
@@ -909,33 +908,18 @@ class MainWindow(QMainWindow):
         if rename_count == 0:
             return
 
-        # Start progress
-        self._rename_panel.progress_panel.start(rename_count)
-
-        # Create and start rename thread
+        # Rename is near-instant, so there's no progress bar: completed rows
+        # are highlighted with a green tint + "Changed" pill by the panel once
+        # _on_rename_finished lands (see RenamePanel.mark_renamed).
         self._rename_thread = RenameThread(previews, operations, parent=self)
-        self._rename_thread.rename_started.connect(self._on_rename_started)
-        self._rename_thread.rename_progress.connect(self._on_rename_progress)
         self._rename_thread.rename_finished.connect(self._on_rename_finished)
         self._rename_thread.rename_error.connect(self._on_rename_error)
         self._rename_thread.start()
-
-    def _on_rename_started(self) -> None:
-        """Handle rename started."""
-        self._rename_panel.progress_panel.set_status(self.tr("Renaming files..."))
-
-    def _on_rename_progress(self, progress: RenameProgress) -> None:
-        """Handle rename progress."""
-        self._rename_panel.progress_panel.set_progress(progress.completed, progress.total)
-        self._rename_panel.progress_panel.set_current_file(progress.current_file)
 
     def _on_rename_finished(self, session: RenameSession) -> None:
         """Handle rename finished."""
         self._last_session = session
         self._rename_panel.set_undo_enabled(True)
-        self._rename_panel.progress_panel.complete(
-            self.tr("Renamed {0} files").format(session.file_count)
-        )
 
         # Update track paths in store
         for record in session.records:
@@ -964,7 +948,7 @@ class MainWindow(QMainWindow):
 
     def _on_rename_error(self, error: str) -> None:
         """Handle rename error."""
-        self._rename_panel.progress_panel.set_error(error)
+        QMessageBox.critical(self, self.tr("Rename Failed"), error)
         self._rename_thread = None
 
     def _undo_last_rename(self) -> None:
@@ -987,30 +971,19 @@ class MainWindow(QMainWindow):
         if reply != QMessageBox.StandardButton.Yes:
             return
 
-        # Start undo
-        self._rename_panel.progress_panel.start(self._last_session.file_count)
-        self._rename_panel.progress_panel.set_status(self.tr("Undoing rename..."))
-
+        # Start undo (near-instant, no progress bar — see _start_rename).
         self._undo_thread = UndoThread(self._last_session, parent=self)
-        self._undo_thread.undo_progress.connect(self._on_undo_progress)
         self._undo_thread.undo_finished.connect(self._on_undo_finished)
         self._undo_thread.undo_error.connect(self._on_undo_error)
         self._undo_thread.start()
 
-    def _on_undo_progress(self, progress: RenameProgress) -> None:
-        """Handle undo progress."""
-        self._rename_panel.progress_panel.set_progress(progress.completed, progress.total)
-        self._rename_panel.progress_panel.set_current_file(progress.current_file)
-
     def _on_undo_finished(self, success_count: int, error_count: int) -> None:
         """Handle undo finished."""
         if error_count > 0:
-            self._rename_panel.progress_panel.complete(
-                self.tr("Undone: {0} files, {1} errors").format(success_count, error_count)
-            )
-        else:
-            self._rename_panel.progress_panel.complete(
-                self.tr("Undone {0} files").format(success_count)
+            QMessageBox.warning(
+                self,
+                self.tr("Undo Rename"),
+                self.tr("Undone: {0} files, {1} errors").format(success_count, error_count),
             )
 
         # Update track paths in store
@@ -1032,7 +1005,7 @@ class MainWindow(QMainWindow):
 
     def _on_undo_error(self, error: str) -> None:
         """Handle undo error."""
-        self._rename_panel.progress_panel.set_error(error)
+        QMessageBox.critical(self, self.tr("Undo Failed"), error)
         self._undo_thread = None
 
     def _undo_session_from_history(self, session: RenameSession) -> None:

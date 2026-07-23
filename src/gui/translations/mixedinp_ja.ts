@@ -822,32 +822,32 @@ or click “Add Artwork…”</source>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="583"/>
+        <location filename="../widgets/keyboard_panel.py" line="582"/>
         <source>Keyboard</source>
         <translation>キーボード</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="586"/>
+        <location filename="../widgets/keyboard_panel.py" line="585"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>コードを鳴らしてキーを比較します。鍵盤をクリックするか、QWERTYショートカット（A-J、K-L-;）を使用します。Z/Xでオクターブを切り替えます。</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="596"/>
+        <location filename="../widgets/keyboard_panel.py" line="595"/>
         <source>Notation can be changed in settings</source>
         <translation>表記は設定で変更できます</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="610"/>
+        <location filename="../widgets/keyboard_panel.py" line="609"/>
         <source>Minor Chord</source>
         <translation>マイナーコード</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="611"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Major Chord</source>
         <translation>メジャーコード</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="678"/>
+        <location filename="../widgets/keyboard_panel.py" line="677"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -857,23 +857,23 @@ or click “Add Artwork…”</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="683"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>Hex Grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="825"/>
-        <location filename="../widgets/keyboard_panel.py" line="828"/>
+        <location filename="../widgets/keyboard_panel.py" line="845"/>
+        <location filename="../widgets/keyboard_panel.py" line="848"/>
         <source>👑 Key Codes</source>
         <translation>👑 キーコード</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="826"/>
+        <location filename="../widgets/keyboard_panel.py" line="846"/>
         <source>Traditional Key Notation</source>
         <translation>従来のキー表記</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="827"/>
+        <location filename="../widgets/keyboard_panel.py" line="847"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -881,39 +881,39 @@ or click “Add Artwork…”</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="71"/>
+        <location filename="../main_window.py" line="70"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="323"/>
+        <location filename="../main_window.py" line="322"/>
         <source>Select Audio Files</source>
         <translation>オーディオファイルを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="334"/>
+        <location filename="../main_window.py" line="333"/>
         <source>Select Folder</source>
         <translation>フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="421"/>
+        <location filename="../main_window.py" line="420"/>
         <source>No Audio Files</source>
         <translation>オーディオファイルなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="422"/>
+        <location filename="../main_window.py" line="421"/>
         <source>No audio files found in:
 {0}</source>
         <translation>次の場所にオーディオファイルが見つかりません:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="427"/>
+        <location filename="../main_window.py" line="426"/>
         <source>Invalid Folder</source>
         <translation>無効なフォルダ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="428"/>
+        <location filename="../main_window.py" line="427"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>有効なディレクトリではありません:
@@ -928,104 +928,115 @@ or click “Add Artwork…”</source>
         <translation type="vanished">すでに解析を実行中です。完了を待つか、先にキャンセルしてください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="526"/>
+        <location filename="../main_window.py" line="525"/>
         <source>Analyzing...</source>
         <translation>解析中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="550"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完了: {0}件解析済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="555"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完了: {0}個のファイルを解析しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="595"/>
+        <location filename="../main_window.py" line="594"/>
         <source>Cancelled</source>
         <translation>キャンセルしました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="682"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Conversion in Progress</source>
         <translation>変換を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="683"/>
+        <location filename="../main_window.py" line="682"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>すでに変換を実行中です。お待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="713"/>
+        <location filename="../main_window.py" line="712"/>
         <source>Converting...</source>
         <translation>変換中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="729"/>
+        <location filename="../main_window.py" line="728"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完了: {0}件変換済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="733"/>
+        <location filename="../main_window.py" line="732"/>
         <source>Complete: {0} files converted</source>
         <translation>完了: {0}個のファイルを変換しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="902"/>
+        <location filename="../main_window.py" line="901"/>
         <source>Rename in Progress</source>
         <translation>名前変更を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="903"/>
+        <location filename="../main_window.py" line="902"/>
         <source>A rename operation is already running.</source>
         <translation>すでに名前変更操作を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="925"/>
+        <location filename="../main_window.py" line="951"/>
+        <source>Rename Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="985"/>
+        <source>Undo Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1008"/>
+        <source>Undo Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Renaming files...</source>
-        <translation>ファイル名を変更中...</translation>
+        <translation type="vanished">ファイル名を変更中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="937"/>
         <source>Renamed {0} files</source>
-        <translation>{0}個のファイル名を変更しました</translation>
+        <translation type="vanished">{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="973"/>
+        <location filename="../main_window.py" line="957"/>
         <source>No Session</source>
         <translation>セッションなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="973"/>
+        <location filename="../main_window.py" line="957"/>
         <source>No rename session to undo.</source>
         <translation>取り消す名前変更セッションがありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="982"/>
+        <location filename="../main_window.py" line="966"/>
         <source>Confirm Undo</source>
         <translation>取り消しの確認</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="983"/>
+        <location filename="../main_window.py" line="967"/>
         <source>Undo renaming of {0} files?</source>
         <translation>{0}個のファイルの名前変更を取り消しますか？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="992"/>
         <source>Undoing rename...</source>
-        <translation>名前変更を取り消し中...</translation>
+        <translation type="vanished">名前変更を取り消し中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1009"/>
+        <location filename="../main_window.py" line="986"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>取り消し完了: {0}個のファイル、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1013"/>
         <source>Undone {0} files</source>
-        <translation>{0}個のファイルを取り消しました</translation>
+        <translation type="vanished">{0}個のファイルを取り消しました</translation>
     </message>
 </context>
 <context>
@@ -1387,186 +1398,186 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="115"/>
+        <location filename="../widgets/rename_panel.py" line="114"/>
         <source>Rename</source>
         <translatorcomment>Action label → 名前を変更 (dictionary form per Apple JP). Note &apos;Rename History&apos; uses リネーム; intentional split between action vs feature label.</translatorcomment>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="118"/>
+        <location filename="../widgets/rename_panel.py" line="117"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>下のすべてのファイル名の先頭と末尾から文字をトリミングします。すべてのファイル名の先頭（前に追加）または末尾（後ろに追加）にテキストを加えます。</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="123"/>
+        <location filename="../widgets/rename_panel.py" line="122"/>
         <source>Operations</source>
         <translation>操作</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="130"/>
+        <location filename="../widgets/rename_panel.py" line="129"/>
         <source>Trim Start:</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>先頭をトリミング:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="134"/>
-        <location filename="../widgets/rename_panel.py" line="146"/>
+        <location filename="../widgets/rename_panel.py" line="133"/>
+        <location filename="../widgets/rename_panel.py" line="145"/>
         <source> chars</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>文字</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="135"/>
+        <location filename="../widgets/rename_panel.py" line="134"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>ファイル名の先頭から文字を削除します</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="142"/>
+        <location filename="../widgets/rename_panel.py" line="141"/>
         <source>Trim End:</source>
         <translation>末尾をトリミング:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
+        <location filename="../widgets/rename_panel.py" line="146"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>ファイル名の末尾（拡張子の前）から文字を削除します</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="152"/>
+        <location filename="../widgets/rename_panel.py" line="151"/>
         <source>Clear</source>
         <translation>クリア</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="162"/>
+        <location filename="../widgets/rename_panel.py" line="161"/>
         <source>Remove Underscores</source>
         <translation>アンダースコアを削除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
+        <location filename="../widgets/rename_panel.py" line="179"/>
         <source>Prepend Text</source>
         <translation>テキストを前に追加</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="183"/>
+        <location filename="../widgets/rename_panel.py" line="182"/>
         <source>Append Text</source>
         <translation>テキストを後ろに追加</translation>
     </message>
     <message>
+        <location filename="../widgets/rename_panel.py" line="208"/>
         <location filename="../widgets/rename_panel.py" line="213"/>
-        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Preview</source>
         <translation>プレビュー</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="216"/>
+        <location filename="../widgets/rename_panel.py" line="211"/>
         <source>Drop audio files here to add them</source>
         <translation>追加するにはここにオーディオファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Original</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>元の名前</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Status</source>
         <translation>ステータス</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="264"/>
+        <location filename="../widgets/rename_panel.py" line="259"/>
         <source>No files to rename</source>
         <translation>名前を変更するファイルがありません</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="270"/>
+        <location filename="../widgets/rename_panel.py" line="265"/>
         <source>Undo Last</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>直前を取り消す</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="275"/>
+        <location filename="../widgets/rename_panel.py" line="270"/>
         <source>Remove All</source>
         <translation>すべて削除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="280"/>
+        <location filename="../widgets/rename_panel.py" line="275"/>
         <source>Apply Rename</source>
         <translation>名前変更を適用</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="287"/>
+        <location filename="../widgets/rename_panel.py" line="282"/>
         <source>Send To</source>
         <translatorcomment>送る per glossary (not 送信). Plain verb. Confirmed.</translatorcomment>
         <translation>送る</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="290"/>
+        <location filename="../widgets/rename_panel.py" line="285"/>
         <source>Convert</source>
         <translation>変換</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="291"/>
+        <location filename="../widgets/rename_panel.py" line="286"/>
         <source>Analyze</source>
         <translation>解析</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="351"/>
+        <location filename="../widgets/rename_panel.py" line="346"/>
         <source>Text to add at end of filename</source>
         <translation>ファイル名の末尾に追加するテキスト</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="353"/>
+        <location filename="../widgets/rename_panel.py" line="348"/>
         <source>Text to add at start of filename</source>
         <translation>ファイル名の先頭に追加するテキスト</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="391"/>
+        <location filename="../widgets/rename_panel.py" line="386"/>
         <source>No files</source>
         <translation>ファイルなし</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="435"/>
+        <location filename="../widgets/rename_panel.py" line="430"/>
         <source>Conflict</source>
         <translation>競合</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="452"/>
+        <location filename="../widgets/rename_panel.py" line="447"/>
         <source>{0} files</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>{0}個のファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="454"/>
+        <location filename="../widgets/rename_panel.py" line="449"/>
         <source>{0} to rename</source>
         <translation>{0}件を名前変更</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="456"/>
+        <location filename="../widgets/rename_panel.py" line="451"/>
         <source>{0} conflicts</source>
         <translation>{0}件の競合</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="554"/>
+        <location filename="../widgets/rename_panel.py" line="568"/>
         <source>Changed</source>
         <translation>変更あり</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="625"/>
+        <location filename="../widgets/rename_panel.py" line="641"/>
         <source>Copy text</source>
         <translation>テキストをコピー</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="625"/>
+        <location filename="../widgets/rename_panel.py" line="641"/>
         <source>Copy {0} names</source>
         <translation>{0}件の名前をコピー</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="631"/>
+        <location filename="../widgets/rename_panel.py" line="647"/>
         <source>Remove from list</source>
         <translation>リストから削除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="631"/>
+        <location filename="../widgets/rename_panel.py" line="647"/>
         <source>Remove {0} from list</source>
         <translation>{0}をリストから削除</translation>
     </message>

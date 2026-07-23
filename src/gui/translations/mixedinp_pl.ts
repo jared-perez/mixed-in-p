@@ -831,32 +831,32 @@ lub kliknij „Dodaj okładkę…”</translation>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="583"/>
+        <location filename="../widgets/keyboard_panel.py" line="582"/>
         <source>Keyboard</source>
         <translation>Klawiatura</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="586"/>
+        <location filename="../widgets/keyboard_panel.py" line="585"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Graj akordy, aby porównywać tonacje. Klikaj klawisze lub używaj skrótów QWERTY (A-J, K-L-;). Z/X zmienia oktawę.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="596"/>
+        <location filename="../widgets/keyboard_panel.py" line="595"/>
         <source>Notation can be changed in settings</source>
         <translation>Notację można zmienić w Ustawieniach</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="610"/>
+        <location filename="../widgets/keyboard_panel.py" line="609"/>
         <source>Minor Chord</source>
         <translation>Akord molowy</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="611"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Major Chord</source>
         <translation>Akord durowy</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="678"/>
+        <location filename="../widgets/keyboard_panel.py" line="677"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -866,23 +866,23 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="683"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>Hex Grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="825"/>
-        <location filename="../widgets/keyboard_panel.py" line="828"/>
+        <location filename="../widgets/keyboard_panel.py" line="845"/>
+        <location filename="../widgets/keyboard_panel.py" line="848"/>
         <source>👑 Key Codes</source>
         <translation>👑 Key Codes</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="826"/>
+        <location filename="../widgets/keyboard_panel.py" line="846"/>
         <source>Traditional Key Notation</source>
         <translation>Tradycyjna notacja tonacji</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="827"/>
+        <location filename="../widgets/keyboard_panel.py" line="847"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -890,39 +890,39 @@ lub kliknij „Dodaj okładkę…”</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="71"/>
+        <location filename="../main_window.py" line="70"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="323"/>
+        <location filename="../main_window.py" line="322"/>
         <source>Select Audio Files</source>
         <translation>Wybierz pliki audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="334"/>
+        <location filename="../main_window.py" line="333"/>
         <source>Select Folder</source>
         <translation>Wybierz folder</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="421"/>
+        <location filename="../main_window.py" line="420"/>
         <source>No Audio Files</source>
         <translation>Brak plików audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="422"/>
+        <location filename="../main_window.py" line="421"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Nie znaleziono plików audio w:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="427"/>
+        <location filename="../main_window.py" line="426"/>
         <source>Invalid Folder</source>
         <translation>Nieprawidłowy folder</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="428"/>
+        <location filename="../main_window.py" line="427"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Nieprawidłowy katalog:
@@ -937,104 +937,115 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation type="vanished">Analiza jest już uruchomiona. Poczekaj lub najpierw ją anuluj.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="526"/>
+        <location filename="../main_window.py" line="525"/>
         <source>Analyzing...</source>
         <translation>Analizowanie...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="550"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Ukończono: {0} przeanalizowanych, {1} błędów</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="555"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Ukończono: przeanalizowano {0} plików</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="595"/>
+        <location filename="../main_window.py" line="594"/>
         <source>Cancelled</source>
         <translation>Anulowano</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="682"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Conversion in Progress</source>
         <translation>Konwersja w toku</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="683"/>
+        <location filename="../main_window.py" line="682"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Konwersja jest już uruchomiona. Poczekaj.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="713"/>
+        <location filename="../main_window.py" line="712"/>
         <source>Converting...</source>
         <translation>Konwertowanie...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="729"/>
+        <location filename="../main_window.py" line="728"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Ukończono: {0} przekonwertowanych, {1} błędów</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="733"/>
+        <location filename="../main_window.py" line="732"/>
         <source>Complete: {0} files converted</source>
         <translation>Ukończono: przekonwertowano {0} plików</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="902"/>
+        <location filename="../main_window.py" line="901"/>
         <source>Rename in Progress</source>
         <translation>Zmiana nazwy w toku</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="903"/>
+        <location filename="../main_window.py" line="902"/>
         <source>A rename operation is already running.</source>
         <translation>Operacja zmiany nazwy jest już uruchomiona.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="925"/>
+        <location filename="../main_window.py" line="951"/>
+        <source>Rename Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="985"/>
+        <source>Undo Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1008"/>
+        <source>Undo Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Renaming files...</source>
-        <translation>Zmienianie nazw plików...</translation>
+        <translation type="vanished">Zmienianie nazw plików...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="937"/>
         <source>Renamed {0} files</source>
-        <translation>Zmieniono nazwy {0} plików</translation>
+        <translation type="vanished">Zmieniono nazwy {0} plików</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="973"/>
+        <location filename="../main_window.py" line="957"/>
         <source>No Session</source>
         <translation>Brak sesji</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="973"/>
+        <location filename="../main_window.py" line="957"/>
         <source>No rename session to undo.</source>
         <translation>Brak sesji zmiany nazw do cofnięcia.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="982"/>
+        <location filename="../main_window.py" line="966"/>
         <source>Confirm Undo</source>
         <translation>Potwierdź cofnięcie</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="983"/>
+        <location filename="../main_window.py" line="967"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Cofnąć zmianę nazw {0} plików?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="992"/>
         <source>Undoing rename...</source>
-        <translation>Cofanie zmiany nazwy...</translation>
+        <translation type="vanished">Cofanie zmiany nazwy...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1009"/>
+        <location filename="../main_window.py" line="986"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Cofnięto: {0} plików, {1} błędów</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1013"/>
         <source>Undone {0} files</source>
-        <translation>Cofnięto {0} plików</translation>
+        <translation type="vanished">Cofnięto {0} plików</translation>
     </message>
 </context>
 <context>
@@ -1398,188 +1409,188 @@ lub kliknij „Dodaj okładkę…”</translation>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="115"/>
+        <location filename="../widgets/rename_panel.py" line="114"/>
         <source>Rename</source>
         <translation>Zmień nazwę</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="118"/>
+        <location filename="../widgets/rename_panel.py" line="117"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Przytnij znaki z początku i końca WSZYSTKICH poniższych nazw plików. Dodaj tekst na początku (Dodaj na początku) lub na końcu (Dodaj na końcu) WSZYSTKICH nazw plików.</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="123"/>
+        <location filename="../widgets/rename_panel.py" line="122"/>
         <source>Operations</source>
         <translation>Operacje</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="130"/>
+        <location filename="../widgets/rename_panel.py" line="129"/>
         <source>Trim Start:</source>
         <translation>Przytnij początek:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="134"/>
-        <location filename="../widgets/rename_panel.py" line="146"/>
+        <location filename="../widgets/rename_panel.py" line="133"/>
+        <location filename="../widgets/rename_panel.py" line="145"/>
         <source> chars</source>
         <translatorcomment>Reviewed (pl pass): genitive-plural single form - natural for 0 and 5+, mildly off for 1-4; accepted (app uses .format, no Qt numerus).</translatorcomment>
         <translation> znaków</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="135"/>
+        <location filename="../widgets/rename_panel.py" line="134"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>Usuń znaki z początku nazwy pliku</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="142"/>
+        <location filename="../widgets/rename_panel.py" line="141"/>
         <source>Trim End:</source>
         <translation>Przytnij koniec:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
+        <location filename="../widgets/rename_panel.py" line="146"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>Usuń znaki z końca nazwy pliku (przed rozszerzeniem)</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="152"/>
+        <location filename="../widgets/rename_panel.py" line="151"/>
         <source>Clear</source>
         <translation>Wyczyść</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="162"/>
+        <location filename="../widgets/rename_panel.py" line="161"/>
         <source>Remove Underscores</source>
         <translation>Usuń podkreślenia</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
+        <location filename="../widgets/rename_panel.py" line="179"/>
         <source>Prepend Text</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Dodaj tekst na początku</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="183"/>
+        <location filename="../widgets/rename_panel.py" line="182"/>
         <source>Append Text</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Dodaj tekst na końcu</translation>
     </message>
     <message>
+        <location filename="../widgets/rename_panel.py" line="208"/>
         <location filename="../widgets/rename_panel.py" line="213"/>
-        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Preview</source>
         <translation>Podgląd</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="216"/>
+        <location filename="../widgets/rename_panel.py" line="211"/>
         <source>Drop audio files here to add them</source>
         <translation>Upuść tutaj pliki audio, aby je dodać</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Original</source>
         <translation>Oryginał</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="264"/>
+        <location filename="../widgets/rename_panel.py" line="259"/>
         <source>No files to rename</source>
         <translation>Brak plików do zmiany nazwy</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="270"/>
+        <location filename="../widgets/rename_panel.py" line="265"/>
         <source>Undo Last</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Cofnij ostatnią</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="275"/>
+        <location filename="../widgets/rename_panel.py" line="270"/>
         <source>Remove All</source>
         <translation>Usuń wszystkie</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="280"/>
+        <location filename="../widgets/rename_panel.py" line="275"/>
         <source>Apply Rename</source>
         <translation>Zastosuj zmianę nazw</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="287"/>
+        <location filename="../widgets/rename_panel.py" line="282"/>
         <source>Send To</source>
         <translation>Wyślij do</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="290"/>
+        <location filename="../widgets/rename_panel.py" line="285"/>
         <source>Convert</source>
         <translation>Konwertuj</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="291"/>
+        <location filename="../widgets/rename_panel.py" line="286"/>
         <source>Analyze</source>
         <translation>Analizuj</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="351"/>
+        <location filename="../widgets/rename_panel.py" line="346"/>
         <source>Text to add at end of filename</source>
         <translation>Tekst do dodania na końcu nazwy pliku</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="353"/>
+        <location filename="../widgets/rename_panel.py" line="348"/>
         <source>Text to add at start of filename</source>
         <translation>Tekst do dodania na początku nazwy pliku</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="391"/>
+        <location filename="../widgets/rename_panel.py" line="386"/>
         <source>No files</source>
         <translation>Brak plików</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="435"/>
+        <location filename="../widgets/rename_panel.py" line="430"/>
         <source>Conflict</source>
         <translation>Konflikt</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="452"/>
+        <location filename="../widgets/rename_panel.py" line="447"/>
         <source>{0} files</source>
         <translatorcomment>Reviewed (pl pass): genitive-plural single form - natural for 0 and 5+, mildly off for 1-4; accepted (app uses .format, no Qt numerus).</translatorcomment>
         <translation>{0} plików</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="454"/>
+        <location filename="../widgets/rename_panel.py" line="449"/>
         <source>{0} to rename</source>
         <translatorcomment>&apos;do zmiany nazwy&apos; invariant — good across counts.</translatorcomment>
         <translation>{0} do zmiany nazwy</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="456"/>
+        <location filename="../widgets/rename_panel.py" line="451"/>
         <source>{0} conflicts</source>
         <translatorcomment>Reviewed (pl pass): genitive-plural single form - natural for 0 and 5+, mildly off for 1-4; accepted (app uses .format, no Qt numerus).</translatorcomment>
         <translation>{0} konfliktów</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="554"/>
+        <location filename="../widgets/rename_panel.py" line="568"/>
         <source>Changed</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Zmieniono</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="625"/>
+        <location filename="../widgets/rename_panel.py" line="641"/>
         <source>Copy text</source>
         <translation>Kopiuj tekst</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="625"/>
+        <location filename="../widgets/rename_panel.py" line="641"/>
         <source>Copy {0} names</source>
         <translation>Kopiuj {0} nazw</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="631"/>
+        <location filename="../widgets/rename_panel.py" line="647"/>
         <source>Remove from list</source>
         <translation>Usuń z listy</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="631"/>
+        <location filename="../widgets/rename_panel.py" line="647"/>
         <source>Remove {0} from list</source>
         <translation>Usuń {0} z listy</translation>
     </message>

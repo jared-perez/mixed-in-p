@@ -39,7 +39,6 @@ from src.renamer import (
 from ..models import TrackState, TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .droppable_table import DroppableTableWidget
-from .progress_bar import ProgressPanel
 
 
 class _SelectableTextDelegate(QStyledItemDelegate):
@@ -76,6 +75,13 @@ class _SelectableTextDelegate(QStyledItemDelegate):
 
 class RenamePanel(QWidget):
     """Panel for configuring and applying batch renames."""
+
+    # Vertical item padding applied to the preview table (see the
+    # #renamePreviewTable rule in app.qss.template). The green "Changed" tag is
+    # a cell widget, which the table insets by this many px top and bottom, so
+    # the tag is sized to (row height - 2*this) to fill the row and stay
+    # centered. Keep this equal to the QSS value.
+    _STATUS_ITEM_PAD_V = 2
 
     apply_rename = Signal(list, list)  # (previews, operations)
     undo_last = Signal()
@@ -205,15 +211,14 @@ class RenamePanel(QWidget):
 
         layout.addWidget(ops_group)
 
-        # Progress panel (initially hidden)
-        self._progress_panel = ProgressPanel()
-        layout.addWidget(self._progress_panel)
-
         # Preview table
         preview_group = QGroupBox(self.tr("Preview"))
         preview_layout = QVBoxLayout(preview_group)
 
         self._preview_table = DroppableTableWidget(self.tr("Drop audio files here to add them"), bottom_quarter=True)
+        # Named so app.qss can trim its vertical item padding (lets the green
+        # "Changed" tag fill the compact row without growing it).
+        self._preview_table.setObjectName("renamePreviewTable")
         self._preview_table.setColumnCount(3)
         self._preview_table.setHorizontalHeaderLabels([self.tr("Original"), self.tr("Preview"), self.tr("Status")])
         self._preview_table.setAlternatingRowColors(True)
@@ -498,11 +503,6 @@ class RenamePanel(QWidget):
         if self._previews and self._operations:
             self.apply_rename.emit(self._previews, self._operations)
 
-    @property
-    def progress_panel(self) -> ProgressPanel:
-        """Get the progress panel widget."""
-        return self._progress_panel
-
     def set_undo_enabled(self, enabled: bool) -> None:
         """Enable or disable the undo button."""
         self._undo_btn.setEnabled(enabled)
@@ -536,29 +536,66 @@ class RenamePanel(QWidget):
     def mark_renamed(self, session) -> None:
         """Record renamed paths after a rename completes.
 
-        The actual yellow "Changed" badges are applied by _apply_renamed_badges
-        on every preview refresh, so they survive the operation-clearing
-        cascade that runs right after this call.
+        The row highlight and "Changed" pill are (re)applied by
+        _apply_renamed_badges on every preview refresh, so they survive the
+        operation-clearing cascade that runs right after this call. This is
+        the sole completion feedback now that the rename progress bar is gone.
         """
         self._renamed_paths.update(r.new_path for r in session.records)
         self._apply_renamed_badges()
 
     def _apply_renamed_badges(self) -> None:
-        """Overlay the yellow 'Changed' badge on rows whose path is in _renamed_paths."""
+        """Highlight freshly-renamed rows and drop a 'Changed' pill in Status.
+
+        Rename is near-instant, so instead of a progress bar the completed
+        rows carry a soft green (success) row tint and a rounded pill badge —
+        the same green the app uses elsewhere for "done".
+        """
         if not self._renamed_paths:
             return
+        row_tint = QColor(Theme.NEON_GREEN)
+        row_tint.setAlpha(38)  # faint wash so zebra striping still reads through
         for row in range(min(self._preview_table.rowCount(), len(self._previews))):
             preview = self._previews[row]
             if preview.original_path not in self._renamed_paths:
                 continue
-            label = QLabel(self.tr("Changed"))
-            label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            label.setStyleSheet(
-                f"background-color: {Theme.NEON_YELLOW};"
-                " color: #000000;"
-                " font-weight: bold;"
-            )
-            self._preview_table.setCellWidget(row, 2, label)
+            for col in range(self._preview_table.columnCount()):
+                item = self._preview_table.item(row, col)
+                if item is not None:
+                    item.setBackground(row_tint)
+            # Size the tag to fill the existing (compact) row: the table insets
+            # cell widgets by _STATUS_ITEM_PAD_V top+bottom, so tag height is
+            # (row height - 2*inset) to fill that region and stay centered. The
+            # row height itself is left untouched — no growing rows.
+            tag_h = self._preview_table.rowHeight(row) - 2 * self._STATUS_ITEM_PAD_V
+            self._preview_table.setCellWidget(row, 2, self._make_changed_pill(tag_h))
+
+    def _make_changed_pill(self, height: int) -> QWidget:
+        """Build a rounded, vertically-centered green 'Changed' tag.
+
+        The label is used directly as the cell widget. Its height is FIXED to
+        the region the table's reduced item padding leaves after insetting the
+        widget (``row height - 2*_STATUS_ITEM_PAD_V``, passed in as ``height``).
+        Sizing it to exactly that region makes the green tag fill the compact
+        row and sit centered (an oversized tag overflows downward and reads as
+        "too low"; an undersized one floats). Only horizontal padding is used,
+        so the text can't be vertically clipped; the small item inset is what
+        shows the green row tint around the tag.
+        """
+        tag = QLabel(self.tr("Changed"))
+        tag.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        tag.setFixedHeight(max(20, height))
+        tag.setStyleSheet(
+            "QLabel {"
+            f" background-color: {Theme.NEON_GREEN};"
+            " color: #000000;"
+            " font-weight: 700;"
+            " font-size: 13px;"
+            " border-radius: 6px;"
+            " padding: 0px 12px;"
+            "}"
+        )
+        return tag
 
     def _on_selection_changed(self) -> None:
         """Enable/disable Remove All based on whether files exist."""
@@ -596,14 +633,12 @@ class RenamePanel(QWidget):
     def _on_batch_finished(self) -> None:
         """Run after the store finishes a batch update.
 
-        When genuinely new QUEUED files arrive, also hide the previous
-        rename's "Renamed N files" banner (stale once user moves on)
-        and drop any previously-renamed rows.
+        When genuinely new QUEUED files arrive, drop any previously-renamed
+        rows (their "Changed" highlight is stale once the user moves on).
         """
         current_paths = {t.file_path for t in self._store.get_by_state(TrackState.QUEUED)}
         new_paths = current_paths - self._last_queued_paths - self._renamed_paths
         if new_paths:
-            self._progress_panel.hide()
             if self._renamed_paths:
                 to_remove = self._renamed_paths - new_paths
                 self._renamed_paths.clear()

@@ -820,32 +820,32 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="583"/>
+        <location filename="../widgets/keyboard_panel.py" line="582"/>
         <source>Keyboard</source>
         <translation>Tastiera</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="586"/>
+        <location filename="../widgets/keyboard_panel.py" line="585"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Suona gli accordi per confrontare le tonalità. Fai clic sui tasti o usa le scorciatoie QWERTY (A-J, K-L-;). Z/X per cambiare ottava.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="596"/>
+        <location filename="../widgets/keyboard_panel.py" line="595"/>
         <source>Notation can be changed in settings</source>
         <translation>La notazione può essere modificata in Impostazioni</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="610"/>
+        <location filename="../widgets/keyboard_panel.py" line="609"/>
         <source>Minor Chord</source>
         <translation>Accordo minore</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="611"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Major Chord</source>
         <translation>Accordo maggiore</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="678"/>
+        <location filename="../widgets/keyboard_panel.py" line="677"/>
         <source>View</source>
         <translation type="unfinished"></translation>
     </message>
@@ -855,23 +855,23 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="683"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>Hex Grid</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="825"/>
-        <location filename="../widgets/keyboard_panel.py" line="828"/>
+        <location filename="../widgets/keyboard_panel.py" line="845"/>
+        <location filename="../widgets/keyboard_panel.py" line="848"/>
         <source>👑 Key Codes</source>
         <translation>👑 Key Code</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="826"/>
+        <location filename="../widgets/keyboard_panel.py" line="846"/>
         <source>Traditional Key Notation</source>
         <translation>Notazione tradizionale</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="827"/>
+        <location filename="../widgets/keyboard_panel.py" line="847"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -879,39 +879,39 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="71"/>
+        <location filename="../main_window.py" line="70"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="323"/>
+        <location filename="../main_window.py" line="322"/>
         <source>Select Audio Files</source>
         <translation>Seleziona file audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="334"/>
+        <location filename="../main_window.py" line="333"/>
         <source>Select Folder</source>
         <translation>Seleziona cartella</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="421"/>
+        <location filename="../main_window.py" line="420"/>
         <source>No Audio Files</source>
         <translation>Nessun file audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="422"/>
+        <location filename="../main_window.py" line="421"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Nessun file audio trovato in:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="427"/>
+        <location filename="../main_window.py" line="426"/>
         <source>Invalid Folder</source>
         <translation>Cartella non valida</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="428"/>
+        <location filename="../main_window.py" line="427"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Directory non valida:
@@ -927,108 +927,119 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Un&apos;analisi è già in corso. Attendi o annullala prima.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="526"/>
+        <location filename="../main_window.py" line="525"/>
         <source>Analyzing...</source>
         <translation>Analisi in corso...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="550"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Completato: {0} analizzati, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="555"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Completato: {0} file analizzati</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="595"/>
+        <location filename="../main_window.py" line="594"/>
         <source>Cancelled</source>
         <translation>Annullato</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="682"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Conversion in Progress</source>
         <translation>Conversione in corso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="683"/>
+        <location filename="../main_window.py" line="682"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Una conversione è già in corso. Attendi.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="713"/>
+        <location filename="../main_window.py" line="712"/>
         <source>Converting...</source>
         <translation>Conversione in corso...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="729"/>
+        <location filename="../main_window.py" line="728"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Completato: {0} convertiti, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="733"/>
+        <location filename="../main_window.py" line="732"/>
         <source>Complete: {0} files converted</source>
         <translation>Completato: {0} file convertiti</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="902"/>
+        <location filename="../main_window.py" line="901"/>
         <source>Rename in Progress</source>
         <translation>Rinomina in corso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="903"/>
+        <location filename="../main_window.py" line="902"/>
         <source>A rename operation is already running.</source>
         <translatorcomment>Elision applied: &apos;Un&apos;operazione&apos;.</translatorcomment>
         <translation>Un&apos;operazione di rinomina è già in corso.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="925"/>
-        <source>Renaming files...</source>
-        <translation>Rinomina dei file in corso...</translation>
+        <location filename="../main_window.py" line="951"/>
+        <source>Rename Failed</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="937"/>
+        <location filename="../main_window.py" line="985"/>
+        <source>Undo Rename</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1008"/>
+        <source>Undo Failed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Renaming files...</source>
+        <translation type="vanished">Rinomina dei file in corso...</translation>
+    </message>
+    <message>
         <source>Renamed {0} files</source>
         <translatorcomment>Past participle &apos;Rinominati&apos; agrees with masculine plural &apos;file&apos;.</translatorcomment>
-        <translation>Rinominati {0} file</translation>
+        <translation type="vanished">Rinominati {0} file</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="973"/>
+        <location filename="../main_window.py" line="957"/>
         <source>No Session</source>
         <translation>Nessuna sessione</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="973"/>
+        <location filename="../main_window.py" line="957"/>
         <source>No rename session to undo.</source>
         <translation>Nessuna sessione di rinomina da annullare.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="982"/>
+        <location filename="../main_window.py" line="966"/>
         <source>Confirm Undo</source>
         <translation>Conferma annullamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="983"/>
+        <location filename="../main_window.py" line="967"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Annullare la rinomina di {0} file?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="992"/>
         <source>Undoing rename...</source>
-        <translation>Annullamento della rinomina...</translation>
+        <translation type="vanished">Annullamento della rinomina...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1009"/>
+        <location filename="../main_window.py" line="986"/>
         <source>Undone: {0} files, {1} errors</source>
         <translatorcomment>Reviewed (it pass): &apos;Annullati&apos; agrees with &apos;file&apos; (m.pl) - confirmed.</translatorcomment>
         <translation>Annullati: {0} file, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1013"/>
         <source>Undone {0} files</source>
         <translatorcomment>&apos;Annullati&apos; agrees with masculine plural &apos;file&apos;.</translatorcomment>
-        <translation>Annullati {0} file</translation>
+        <translation type="vanished">Annullati {0} file</translation>
     </message>
 </context>
 <context>
@@ -1388,179 +1399,179 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="115"/>
+        <location filename="../widgets/rename_panel.py" line="114"/>
         <source>Rename</source>
         <translation>Rinomina</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="118"/>
+        <location filename="../widgets/rename_panel.py" line="117"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>Accorcia i caratteri all&apos;inizio e alla fine di TUTTI i nomi di file qui sotto. Aggiungi testo all&apos;inizio (Anteponi) o alla fine (Accoda) di TUTTI i nomi di file.</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="123"/>
+        <location filename="../widgets/rename_panel.py" line="122"/>
         <source>Operations</source>
         <translation>Operazioni</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="130"/>
+        <location filename="../widgets/rename_panel.py" line="129"/>
         <source>Trim Start:</source>
         <translation>Accorcia inizio:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="134"/>
-        <location filename="../widgets/rename_panel.py" line="146"/>
+        <location filename="../widgets/rename_panel.py" line="133"/>
+        <location filename="../widgets/rename_panel.py" line="145"/>
         <source> chars</source>
         <translation> caratteri</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="135"/>
+        <location filename="../widgets/rename_panel.py" line="134"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>Rimuovi i caratteri dall&apos;inizio del nome del file</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="142"/>
+        <location filename="../widgets/rename_panel.py" line="141"/>
         <source>Trim End:</source>
         <translation>Accorcia fine:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
+        <location filename="../widgets/rename_panel.py" line="146"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>Rimuovi i caratteri dalla fine del nome del file (prima dell&apos;estensione)</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="152"/>
+        <location filename="../widgets/rename_panel.py" line="151"/>
         <source>Clear</source>
         <translation>Cancella</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="162"/>
+        <location filename="../widgets/rename_panel.py" line="161"/>
         <source>Remove Underscores</source>
         <translation>Rimuovi trattini bassi</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
+        <location filename="../widgets/rename_panel.py" line="179"/>
         <source>Prepend Text</source>
         <translation>Anteponi testo</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="183"/>
+        <location filename="../widgets/rename_panel.py" line="182"/>
         <source>Append Text</source>
         <translation>Accoda testo</translation>
     </message>
     <message>
+        <location filename="../widgets/rename_panel.py" line="208"/>
         <location filename="../widgets/rename_panel.py" line="213"/>
-        <location filename="../widgets/rename_panel.py" line="218"/>
         <source>Preview</source>
         <translation>Anteprima</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="216"/>
+        <location filename="../widgets/rename_panel.py" line="211"/>
         <source>Drop audio files here to add them</source>
         <translation>Trascina qui i file audio per aggiungerli</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Original</source>
         <translation>Originale</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Status</source>
         <translation>Stato</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="264"/>
+        <location filename="../widgets/rename_panel.py" line="259"/>
         <source>No files to rename</source>
         <translation>Nessun file da rinominare</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="270"/>
+        <location filename="../widgets/rename_panel.py" line="265"/>
         <source>Undo Last</source>
         <translation>Annulla ultima</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="275"/>
+        <location filename="../widgets/rename_panel.py" line="270"/>
         <source>Remove All</source>
         <translation>Rimuovi tutti</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="280"/>
+        <location filename="../widgets/rename_panel.py" line="275"/>
         <source>Apply Rename</source>
         <translation>Applica rinomina</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="287"/>
+        <location filename="../widgets/rename_panel.py" line="282"/>
         <source>Send To</source>
         <translation>Invia a</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="290"/>
+        <location filename="../widgets/rename_panel.py" line="285"/>
         <source>Convert</source>
         <translation>Converti</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="291"/>
+        <location filename="../widgets/rename_panel.py" line="286"/>
         <source>Analyze</source>
         <translation>Analizza</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="351"/>
+        <location filename="../widgets/rename_panel.py" line="346"/>
         <source>Text to add at end of filename</source>
         <translation>Testo da aggiungere alla fine del nome del file</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="353"/>
+        <location filename="../widgets/rename_panel.py" line="348"/>
         <source>Text to add at start of filename</source>
         <translation>Testo da aggiungere all&apos;inizio del nome del file</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="391"/>
+        <location filename="../widgets/rename_panel.py" line="386"/>
         <source>No files</source>
         <translation>Nessun file</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="435"/>
+        <location filename="../widgets/rename_panel.py" line="430"/>
         <source>Conflict</source>
         <translation>Conflitto</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="452"/>
+        <location filename="../widgets/rename_panel.py" line="447"/>
         <source>{0} files</source>
         <translation>{0} file</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="454"/>
+        <location filename="../widgets/rename_panel.py" line="449"/>
         <source>{0} to rename</source>
         <translation>{0} da rinominare</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="456"/>
+        <location filename="../widgets/rename_panel.py" line="451"/>
         <source>{0} conflicts</source>
         <translation>{0} conflitti</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="554"/>
+        <location filename="../widgets/rename_panel.py" line="568"/>
         <source>Changed</source>
         <translation>Modificato</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="625"/>
+        <location filename="../widgets/rename_panel.py" line="641"/>
         <source>Copy text</source>
         <translation>Copia testo</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="625"/>
+        <location filename="../widgets/rename_panel.py" line="641"/>
         <source>Copy {0} names</source>
         <translation>Copia {0} nomi</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="631"/>
+        <location filename="../widgets/rename_panel.py" line="647"/>
         <source>Remove from list</source>
         <translation>Rimuovi dalla lista</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="631"/>
+        <location filename="../widgets/rename_panel.py" line="647"/>
         <source>Remove {0} from list</source>
         <translation>Rimuovi {0} dalla lista</translation>
     </message>
