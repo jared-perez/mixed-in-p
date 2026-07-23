@@ -29,6 +29,7 @@ from src.renamer import (
     RenameOperation,
     RenamePreview,
     Replace,
+    SpaceDashes,
     TrimEnd,
     TrimStart,
     has_changes,
@@ -170,12 +171,33 @@ class RenamePanel(QWidget):
         trim_row.addWidget(self._clear_ops_btn)
 
         trim_row.addStretch()
+        # The two cleanup toggles line up on the right edge as a vertical pair:
+        # Remove Underscores anchors the right of this (trim) row, and Space
+        # Dashes anchors the right of the Prepend/Append row below. Each reuses
+        # a row that already exists, so the box keeps its original height.
+        # Both are created here so they can share one width and stack cleanly.
         self._remove_underscores = False
         self._remove_underscores_btn = QPushButton(self.tr("Remove Underscores"))
         self._remove_underscores_btn.setCheckable(True)
-        self._remove_underscores_btn.setMinimumWidth(
-            self._remove_underscores_btn.sizeHint().width()
+
+        self._space_dashes = False
+        self._space_dashes_btn = QPushButton(self.tr("Space Dashes"))
+        self._space_dashes_btn.setCheckable(True)
+        self._space_dashes_btn.setToolTip(self.tr(
+            "Add spaces around a dash that has none "
+            "(Artist-Track → Artist - Track). Dashes that already "
+            "have spaces are left as-is. Helps searching by artist or "
+            "track name in DJ software."
+        ))
+
+        # Equal width (sized to the wider label) so the flush-right pair reads
+        # as an aligned stack and neither clips in longer-text languages.
+        _cleanup_w = max(
+            self._remove_underscores_btn.sizeHint().width(),
+            self._space_dashes_btn.sizeHint().width(),
         )
+        self._remove_underscores_btn.setMinimumWidth(_cleanup_w)
+        self._space_dashes_btn.setMinimumWidth(_cleanup_w)
         trim_row.addWidget(self._remove_underscores_btn)
         # Host the trim controls in a widget so the window sizer can read their
         # pushed-together width and keep the Rename window from getting narrower
@@ -212,6 +234,9 @@ class RenamePanel(QWidget):
         self._prepend_edit.setMinimumWidth(int(self._prepend_edit.sizeHint().width() * 1.2))
         prepend_row.addWidget(self._prepend_edit)
         prepend_row.addStretch()
+        # Space Dashes anchors the right edge here, directly under Remove
+        # Underscores on the trim row above (both flush-right, equal width).
+        prepend_row.addWidget(self._space_dashes_btn)
         ops_layout.addLayout(prepend_row)
 
         self._update_add_mode_buttons()
@@ -323,6 +348,7 @@ class RenamePanel(QWidget):
         self._send_to_analyze_action.triggered.connect(self._on_analyze_clicked)
         self._clear_ops_btn.clicked.connect(self._clear_operations)
         self._remove_underscores_btn.clicked.connect(self._on_remove_underscores)
+        self._space_dashes_btn.clicked.connect(self._on_space_dashes)
         self._preview_table.itemSelectionChanged.connect(self._on_selection_changed)
 
         # Delete/Backspace remove selected rows. WidgetShortcut keeps the
@@ -389,6 +415,9 @@ class RenamePanel(QWidget):
 
         if self._remove_underscores:
             operations.append(Replace("_", " "))
+
+        if self._space_dashes:
+            operations.append(SpaceDashes())
 
         return operations
 
@@ -525,6 +554,17 @@ class RenamePanel(QWidget):
             self._remove_underscores_btn.setStyleSheet("")
         self._update_preview()
 
+    def _on_space_dashes(self) -> None:
+        """Toggle spacing of tightly-packed dashes."""
+        self._space_dashes = self._space_dashes_btn.isChecked()
+        if self._space_dashes:
+            self._space_dashes_btn.setStyleSheet(
+                f"background-color: {Theme.NEON_YELLOW}; color: #000000;"
+            )
+        else:
+            self._space_dashes_btn.setStyleSheet("")
+        self._update_preview()
+
     def _clear_operations(self) -> None:
         """Reset trim and prepend fields to defaults."""
         self._trim_start_spin.setValue(0)
@@ -535,6 +575,9 @@ class RenamePanel(QWidget):
         self._remove_underscores = False
         self._remove_underscores_btn.setChecked(False)
         self._remove_underscores_btn.setStyleSheet("")
+        self._space_dashes = False
+        self._space_dashes_btn.setChecked(False)
+        self._space_dashes_btn.setStyleSheet("")
 
     def refresh(self) -> None:
         """Refresh the preview."""

@@ -6,9 +6,13 @@ complex filename transformations while preserving file extensions.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
+
+# A dash flanked by non-space characters on both sides (e.g. the "-" in "a-b").
+_TIGHT_DASH = re.compile(r"(?<=\S)-(?=\S)")
 
 if TYPE_CHECKING:
     from ..analysis.analyzer import AnalysisResult
@@ -55,6 +59,20 @@ class Replace(RenameOperation):
 
     find: str
     replace: str
+
+
+@dataclass
+class SpaceDashes(RenameOperation):
+    """Add a space on each side of a dash that has none.
+
+    Only affects a dash tightly wedged between two non-space characters
+    (``a-b`` -> ``a - b``); dashes that already have spacing (``a - b``),
+    one-sided spacing (``a -b``), or a leading/trailing position are left
+    untouched. Useful when a name separates artist and track with a bare
+    ``-`` and no spaces, which some DJ software can't search well.
+    """
+
+    pass
 
 
 @dataclass
@@ -157,6 +175,9 @@ def apply_operation(
     elif isinstance(op, Replace):
         stem = stem.replace(op.find, op.replace)
 
+    elif isinstance(op, SpaceDashes):
+        stem = _TIGHT_DASH.sub(" - ", stem)
+
     elif isinstance(op, AddAnalysis):
         if analysis is None:
             raise ValueError("AddAnalysis requires an AnalysisResult")
@@ -210,6 +231,8 @@ def operations_to_dict(ops: list[RenameOperation]) -> list[dict]:
             result.append({"type": "add_suffix", "suffix": op.suffix})
         elif isinstance(op, Replace):
             result.append({"type": "replace", "find": op.find, "replace": op.replace})
+        elif isinstance(op, SpaceDashes):
+            result.append({"type": "space_dashes"})
         elif isinstance(op, AddAnalysis):
             result.append({
                 "type": "add_analysis",
@@ -239,6 +262,8 @@ def operations_from_dict(data: list[dict]) -> list[RenameOperation]:
             result.append(AddSuffix(suffix=item["suffix"]))
         elif op_type == "replace":
             result.append(Replace(find=item["find"], replace=item["replace"]))
+        elif op_type == "space_dashes":
+            result.append(SpaceDashes())
         elif op_type == "add_analysis":
             result.append(AddAnalysis(
                 include_bpm=item.get("include_bpm", True),
