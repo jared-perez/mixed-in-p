@@ -18,6 +18,7 @@ from PySide6.QtWidgets import (
 logger = logging.getLogger(__name__)
 
 from src.analysis import history as analysis_history
+from src import library
 from src.analysis.keycode import render_key
 from src.analysis.result import AnalysisResult
 from src.metadata import update_bpm_key, update_comment_with_energy
@@ -940,6 +941,15 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logger.warning(f"Failed to update analysis history paths: {e}")
 
+        # Keep saved playlists pointing at the renamed files (best-effort;
+        # no-op until the user has a playlist library)
+        try:
+            library.update_paths(
+                [(r.original_path, r.new_path) for r in session.records]
+            )
+        except Exception as e:
+            logger.warning(f"Failed to update library paths: {e}")
+
         # Refresh preview (paths updated in store), then mark renamed rows
         self._rename_panel.refresh()
         self._rename_panel.mark_renamed(session)
@@ -997,6 +1007,14 @@ class MainWindow(QMainWindow):
                         file_path=record.original_path,
                         display_name=original_name,
                     )
+
+            # Point saved playlists back at the restored names (best-effort)
+            try:
+                library.update_paths(
+                    [(r.new_path, r.original_path) for r in self._last_session.records]
+                )
+            except Exception as e:
+                logger.warning(f"Failed to update library paths: {e}")
 
         self._last_session = None
         self._rename_panel.set_undo_enabled(False)

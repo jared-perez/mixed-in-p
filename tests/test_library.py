@@ -1,0 +1,288 @@
+"""Tests for the playlist library data layer."""
+
+import sqlite3
+
+import pytest
+
+from src.library import (
+    SCRATCH_NODE_ID,
+    Library,
+    compute_content_id,
+    update_paths,
+)
+
+
+@pytest.fixture(params=["fts", "like"])
+def lib(request, tmp_path):
+    """A fresh library, run once with FTS5 and once on the LIKE fallback."""
+    library = Library(tmp_path / "library.db", enable_fts=request.param == "fts")
+    yield library
+    library.close()
+
+
+def make_files(tmp_path, *names, content=b"audio-bytes"):
+    paths = []
+    for name in names:
+        p = tmp_path / name
+        p.write_bytes(content + name.encode())
+        paths.append(str(p))
+    return paths
+
+
+class TestSchema:
+    def test_scratch_exists_and_reopen_is_idempotent(self, tmp_path):
+        db = tmp_path / "library.db"
+        with Library(db) as lib:
+            scratch = lib.get_node(SCRATCH_NODE_ID)
+            assert scratch is not None
+            assert scratch.kind == "scratch"
+        with Library(db) as lib:
+            assert lib.get_node(SCRATCH_NODE_ID).kind == "scratch"
+            assert len([n for n in lib.get_children() if n.kind == "scratch"]) == 0
+
+    def test_scratch_is_protected(self, lib):
+        with pytest.raises(ValueError):
+            lib.rename_node(SCRATCH_NODE_ID, "Nope")
+        with pytest.raises(ValueError):
+            lib.delete_node(SCRATCH_NODE_ID)
+        with pytest.raises(ValueError):
+            lib.move_node(SCRATCH_NODE_ID, None, 0)
+
+    def test_invalid_kind_rejected_by_schema(self, lib):
+        with pytest.raises(sqlite3.IntegrityError):
+            lib._con.execute(
+                "INSERT INTO nodes (parent_id, kind, name, position, created_at)"
+                " VALUES (NULL, 'bogus', 'x', 0, 'now')"
+            )
+
+
+class TestTracks:
+    def test_add_track_upserts_by_path(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        tid = lib.add_track(path, artist="Anz", title="Cadence")
+        assert lib.add_track(path) == tid  # same path -> same id, tags untouched
+        track = lib.get_track(tid)
+        assert (track.artist, track.title) == ("Anz", "Cadence")
+
+        lib.add_track(path, title="Cadence (VIP)")  # partial update
+        track = lib.get_track(tid)
+        assert (track.artist, track.title) == ("Anz", "Cadence (VIP)")
+
+    def test_add_track_records_file_stats(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        track = lib.get_track(lib.add_track(path))
+        assert track.size > 0
+        assert track.mtime is not None
+        assert track.content_id == compute_content_id(path)
+        assert track.filename == "one.aiff"
+
+    def test_content_id_distinguishes_content(self, tmp_path):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        assert compute_content_id(a) != compute_content_id(b)
+        assert compute_content_id(tmp_path / "missing.wav") is None
+
+    def test_update_track_tags_rejects_unknown_columns(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        tid = lib.add_track(path)
+        with pytest.raises(ValueError):
+            lib.update_track_tags(tid, path="/etc/passwd")
+
+
+class TestTree:
+    def test_new_nodes_go_to_top_and_order_persists(self, tmp_path):
+        db = tmp_path / "library.db"
+        with Library(db) as lib:
+            a = lib.create_playlist("A")
+            b = lib.create_folder("B")
+            c = lib.create_playlist("C")
+            assert [n.id for n in lib.get_children()] == [c, b, a]
+            lib.set_child_order(None, [b, a, c])
+        with Library(db) as lib:  # user-set order survives restart
+            assert [n.id for n in lib.get_children()] == [b, a, c]
+
+    def test_set_child_order_requires_permutation(self, lib):
+        a = lib.create_playlist("A")
+        lib.create_playlist("B")
+        with pytest.raises(ValueError):
+            lib.set_child_order(None, [a])
+
+    def test_move_node_reparents_and_renumbers(self, lib):
+        folder = lib.create_folder("Folder")
+        a = lib.create_playlist("A")
+        b = lib.create_playlist("B")
+        lib.move_node(a, folder, 0)
+        assert [n.id for n in lib.get_children(folder)] == [a]
+        assert [n.id for n in lib.get_children()] == [b, folder]
+        assert lib.ancestor_ids(a) == [folder]
+
+    def test_move_node_rejects_cycles_and_playlist_parents(self, lib):
+        outer = lib.create_folder("Outer")
+        inner = lib.create_folder("Inner")
+        playlist = lib.create_playlist("P")
+        lib.move_node(inner, outer, 0)
+        with pytest.raises(ValueError):
+            lib.move_node(outer, inner, 0)
+        with pytest.raises(ValueError):
+            lib.move_node(inner, playlist, 0)
+        with pytest.raises(ValueError):
+            lib.create_playlist("Q", parent_id=playlist)
+
+    def test_delete_folder_cascades(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        folder = lib.create_folder("Folder")
+        playlist = lib.create_playlist("P", parent_id=folder)
+        tid = lib.add_track(path)
+        lib.add_items(playlist, [tid])
+        lib.delete_node(folder)
+        assert lib.get_node(folder) is None
+        assert lib.get_node(playlist) is None
+        assert lib.get_track(tid) is None  # orphan GC'd with its last playlist
+
+
+class TestItems:
+    def test_duplicates_allowed_and_order_kept(self, lib, tmp_path):
+        one, two = make_files(tmp_path, "one.aiff", "two.aiff")
+        playlist = lib.create_playlist("Set")
+        t1, t2 = lib.add_track(one), lib.add_track(two)
+        lib.add_items(playlist, [t1, t2, t1])  # same track twice, on purpose
+        assert lib.get_item_track_ids(playlist) == [t1, t2, t1]
+        assert lib.item_count(playlist) == 3
+
+    def test_splice_remove_and_move(self, lib, tmp_path):
+        paths = make_files(tmp_path, "a.wav", "b.wav", "c.wav")
+        playlist = lib.create_playlist("Set")
+        a, b, c = (lib.add_track(p) for p in paths)
+        lib.add_items(playlist, [a, c])
+        lib.add_items(playlist, [b], position=1)
+        assert lib.get_item_track_ids(playlist) == [a, b, c]
+        lib.move_item(playlist, 0, 2)
+        assert lib.get_item_track_ids(playlist) == [b, c, a]
+        lib.remove_items(playlist, [1])
+        assert lib.get_item_track_ids(playlist) == [b, a]
+
+    def test_items_only_on_playlists(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        folder = lib.create_folder("F")
+        tid_holder = lib.create_playlist("holder")
+        tid = lib.add_track(path)
+        lib.add_items(tid_holder, [tid])
+        with pytest.raises(ValueError):
+            lib.add_items(folder, [tid])
+
+    def test_scratch_holds_items(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        tid = lib.add_track(path)
+        lib.add_items(SCRATCH_NODE_ID, [tid])
+        assert lib.get_item_track_ids(SCRATCH_NODE_ID) == [tid]
+
+    def test_orphan_gc_waits_for_last_membership(self, lib, tmp_path):
+        (path,) = make_files(tmp_path, "one.aiff")
+        p1, p2 = lib.create_playlist("P1"), lib.create_playlist("P2")
+        tid = lib.add_track(path)
+        lib.add_items(p1, [tid])
+        lib.add_items(p2, [tid])
+        lib.remove_items(p1, [0])
+        assert lib.get_track(tid) is not None  # still in P2
+        lib.remove_items(p2, [0])
+        assert lib.get_track(tid) is None  # last membership gone
+
+
+class TestMembership:
+    def test_counts_and_reverse_lookup_exclude_scratch(self, lib, tmp_path):
+        one, two = make_files(tmp_path, "one.aiff", "two.aiff")
+        warm = lib.create_playlist("Warmup")
+        peak = lib.create_playlist("Peak")
+        t1, t2 = lib.add_track(one), lib.add_track(two)
+        lib.add_items(warm, [t1, t2])
+        lib.add_items(peak, [t1, t1])  # duplicate: still one playlist
+        lib.add_items(SCRATCH_NODE_ID, [t1])
+
+        assert lib.membership_counts([t1, t2]) == {t1: 2, t2: 1}
+        assert [n.name for n in lib.playlists_containing(t1)] == ["Peak", "Warmup"]
+        assert [n.name for n in lib.playlists_containing(t2)] == ["Warmup"]
+
+
+class TestSearch:
+    def _seed(self, lib, tmp_path):
+        paths = make_files(tmp_path, "cadence.aiff", "sway.wav", "feelin.mp3")
+        playlist = lib.create_playlist("Set")
+        ids = [
+            lib.add_track(paths[0], artist="Anz", title="Cadence"),
+            lib.add_track(paths[1], artist="Nu Yorica", title="Sway"),
+            lib.add_track(paths[2], artist="DJ Rashad", title="Feelin'"),
+        ]
+        lib.add_items(playlist, ids)
+        return ids
+
+    def test_search_matches_artist_title_and_filename(self, lib, tmp_path):
+        anz, sway, rashad = self._seed(lib, tmp_path)
+        assert lib.search("cadence") == [anz]
+        assert lib.search("nu yorica") == [sway]
+        assert lib.search("feelin") == [rashad]  # filename + title
+        assert lib.search("cad") == [anz]  # prefix
+        assert lib.search("zzz") == []
+        assert lib.search("") == []
+        assert lib.search("   ") == []
+
+    def test_search_is_safe_against_query_syntax(self, lib, tmp_path):
+        self._seed(lib, tmp_path)
+        for hostile in ['"', 'a" OR "b', "NEAR(", "%", "_", "\\"]:
+            lib.search(hostile)  # must not raise
+
+    def test_tag_edit_updates_search(self, lib, tmp_path):
+        anz, _, _ = self._seed(lib, tmp_path)
+        lib.update_track_tags(anz, title="Loos in Twos")
+        assert lib.search("loos") == [anz]
+        assert anz not in lib.search("cadence.aiff") or lib.get_track(anz).filename == "cadence.aiff"
+
+    def test_fts_index_resyncs_after_fallback_session(self, tmp_path):
+        db = tmp_path / "library.db"
+        with Library(db, enable_fts=True) as lib:
+            if not lib.has_fts:
+                pytest.skip("FTS5 unavailable in this Python build")
+            (path,) = make_files(tmp_path, "cadence.aiff")
+            playlist = lib.create_playlist("Set")
+            lib.add_items(playlist, [lib.add_track(path, artist="Anz")])
+        with Library(db, enable_fts=False) as lib:  # simulates a no-FTS build
+            (path2,) = make_files(tmp_path, "sway.wav")
+            lib.add_items(
+                lib.get_children()[0].id, [lib.add_track(path2, artist="Nu Yorica")]
+            )
+            assert len(lib.search("nu")) == 1  # LIKE fallback still finds it
+        with Library(db, enable_fts=True) as lib:  # FTS build resyncs the index
+            assert len(lib.search("nu")) == 1
+            assert len(lib.search("anz")) == 1
+
+
+class TestUpdatePaths:
+    def test_rename_hook_updates_row_and_keeps_playlists(self, lib, tmp_path):
+        (old,) = make_files(tmp_path, "01 - Cadence.aiff")
+        playlist = lib.create_playlist("Set")
+        tid = lib.add_track(old, artist="Anz", title="Cadence")
+        lib.add_items(playlist, [tid])
+
+        new = str(tmp_path / "Cadence - 8A - 138.aiff")
+        (tmp_path / "01 - Cadence.aiff").rename(new)
+        assert lib.update_paths([(old, new)]) == 1
+
+        track = lib.get_track(tid)
+        assert track.path == new
+        assert track.filename == "Cadence - 8A - 138.aiff"
+        assert lib.get_track_by_path(new).id == tid
+        assert lib.get_item_track_ids(playlist) == [tid]  # membership untouched
+        assert lib.search("8a") == [tid]  # search sees the new filename
+
+    def test_unknown_and_clashing_paths_are_skipped(self, lib, tmp_path):
+        one, two = make_files(tmp_path, "one.aiff", "two.aiff")
+        playlist = lib.create_playlist("Set")
+        t1, t2 = lib.add_track(one), lib.add_track(two)
+        lib.add_items(playlist, [t1, t2])
+
+        assert lib.update_paths([("/nowhere/x.wav", "/nowhere/y.wav")]) == 0
+        assert lib.update_paths([(one, two)]) == 0  # would collide with t2's row
+        assert lib.get_track(t1).path == one
+
+    def test_module_hook_is_noop_without_database(self, tmp_path):
+        missing = tmp_path / "never-created.db"
+        assert update_paths([("/a.wav", "/b.wav")], db_path=missing) == 0
+        assert not missing.exists()
