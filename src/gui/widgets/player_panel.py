@@ -1584,6 +1584,8 @@ class PlayerPanel(QWidget):
         for t in tracks:
             artist = t.get("artist", "")
             title = t.get("title", "")
+            bpm = t.get("bpm", "")
+            key = t.get("key", "")
             comment = t.get("comment", "")
             year = t.get("year", "")
             duration_sec = t.get("duration")
@@ -1593,6 +1595,8 @@ class PlayerPanel(QWidget):
             if (
                 not artist
                 or not title
+                or not bpm
+                or not key
                 or not comment
                 or not year
                 or duration_sec is None
@@ -1603,6 +1607,8 @@ class PlayerPanel(QWidget):
                     meta = read_metadata(t["file_path"])
                     artist = artist or (meta.artist or "")
                     title = title or (meta.title or "")
+                    bpm = bpm or (str(int(round(meta.bpm))) if meta.bpm else "")
+                    key = key or (meta.key or "")
                     comment = comment or (meta.comment or "")
                     year = year or (str(meta.year) if meta.year else "")
                     if duration_sec is None:
@@ -1619,8 +1625,8 @@ class PlayerPanel(QWidget):
                 display_name=t["display_name"],
                 artist=artist,
                 title=title,
-                bpm=t.get("bpm", ""),
-                key=t.get("key", ""),
+                bpm=bpm,
+                key=key,
                 comment=comment,
                 duration=duration_str,
                 year=year,
@@ -1693,9 +1699,22 @@ class PlayerPanel(QWidget):
             self._loaded_node_id = node_id
             self._playlist = []
             self._current_index = -1
+            # Hand add_tracks everything the library row already carries, so
+            # a load doesn't depend on (or wait for) per-file tag reads —
+            # and a track whose file is missing still shows its stored tags.
+            # The tag-read fallback then only fills what the DB lacks
+            # (comment/year).
             self.add_tracks(
                 [
-                    {"file_path": t.path, "display_name": Path(t.path).name}
+                    {
+                        "file_path": t.path,
+                        "display_name": Path(t.path).name,
+                        "artist": t.artist,
+                        "title": t.title,
+                        "bpm": str(int(round(t.bpm))) if t.bpm else "",
+                        "key": t.key,
+                        "duration": t.duration,
+                    }
                     for t in tracks
                 ],
                 allow_duplicates=True,  # a saved list may repeat a track on purpose

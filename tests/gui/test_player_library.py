@@ -201,3 +201,45 @@ class TestSavePlaylist:
         panel = PlayerPanel()
         qtbot.addWidget(panel)
         assert panel._save_btn.isHidden()
+
+
+class TestTagPopulation:
+    def test_add_tracks_falls_back_to_file_tags_for_bpm_and_key(
+        self, player, lib, tmp_path, monkeypatch
+    ):
+        # Regression: the tag-read fallback filled artist/title/comment/year
+        # but skipped bpm/key, leaving those two columns blank for file drops.
+        from src.metadata.tags import TrackMetadata
+
+        (a,) = make_files(tmp_path, "a.wav")
+        monkeypatch.setattr(
+            "src.metadata.tags.read_metadata",
+            lambda _p: TrackMetadata(
+                artist="Helene", title="Astral", bpm=180.0, key="6A", duration=410.0
+            ),
+        )
+        player.add_tracks(track_dicts([a]))
+
+        entry = player._playlist[0]
+        assert (entry.bpm, entry.key) == ("180", "6A")
+        # And the auto-save carried them into the library row.
+        track = lib.get_track_by_path(a)
+        assert (track.bpm, track.key) == (180.0, "6A")
+
+    def test_load_node_uses_stored_tags_without_file_reads(
+        self, player, lib, tmp_path
+    ):
+        # The DB row is the source: a load must show its tags even when the
+        # file can't be read (here: fake bytes that mutagen rejects).
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = lib.create_playlist("Set")
+        tid = lib.add_track(
+            a, artist="Helene", title="Astral", bpm=180.0, key="6A", duration=410.0
+        )
+        lib.set_items(pl, [tid])
+
+        player.load_node(pl)
+        entry = player._playlist[0]
+        assert (entry.artist, entry.title) == ("Helene", "Astral")
+        assert (entry.bpm, entry.key) == ("180", "6A")
+        assert entry.duration == "6:50"
