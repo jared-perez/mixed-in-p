@@ -49,6 +49,7 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QCheckBox,
+    QComboBox,
     QHBoxLayout,
     QHeaderView,
     QInputDialog,
@@ -126,6 +127,11 @@ _BACKDROP_VIS_OPACITY = 0.40
 # After pause/stop, keep feeding a visualizer backdrop silence for this many
 # frames so bars fall and fire burns down, then stop its timer.
 _VIS_DECAY_FRAMES = 60
+
+# Most search matches shown at once. Populating this many QTableWidget rows
+# measures a few ms; past the cap the stats label reads "500+ results" so the
+# count never lies about how many tracks matched.
+_SEARCH_LIMIT = 500
 
 
 def _make_play_icon(color: str = _TRANSPORT_GLYPH, size: int = 14) -> QIcon:
@@ -379,6 +385,7 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         super().__init__(parent)
         self._drag_active = False
         self._placeholder_text = self.tr("Drop audio files here")
+        self._default_placeholder = self._placeholder_text
         self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
         self.setSelectionBehavior(QAbstractItemView.SelectionBehavior.SelectRows)
         self.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
@@ -409,6 +416,11 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
 
     def set_slice_keys_active(self, predicate) -> None:
         self._slice_keys_active = predicate
+
+    def set_placeholder(self, text: str | None) -> None:
+        """Override the empty-table hint (None restores the default)."""
+        self._placeholder_text = text if text is not None else self._default_placeholder
+        self.viewport().update()
 
     def _slice_claims_key(self, event) -> bool:
         return (
@@ -910,6 +922,20 @@ class PlayerPanel(QWidget):
         self._library: Library | None = None
         self._loaded_node_id: int = SCRATCH_NODE_ID
         self._loading_playlist = False
+        # Search-as-scope (§9): while active, _playlist holds the search
+        # results and _base_entries keeps the loaded node's list to restore.
+        # Search results are display-only in the library sense — they must
+        # never be written through to the loaded node.
+        self._search_active = False
+        self._search_scope_all = True
+        self._base_entries: list[PlaylistEntry] | None = None
+        # Parallel to _playlist while an All-playlists search is showing:
+        # per-row membership counts + tooltip of the playlist names.
+        self._search_counts: list[int] | None = None
+        self._search_tooltips: list[str] | None = None
+        self._search_capped = False
+        self._count_column_active = False
+        self._num_col_width = 40
 
         # In-memory PCM playback engine. Decoding the whole track to RAM makes
         # seeking instant (just an integer offset) — QMediaPlayer's setPosition
@@ -1071,6 +1097,29 @@ class PlayerPanel(QWidget):
         self._art_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._art_label.hide()
         title_row.addWidget(self._art_label, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        # Search-as-scope: results are just another list, shown in the same
+        # table and playable immediately. Both widgets stay hidden until a
+        # library is attached (set_library) — there is nothing to search
+        # before that. The visible placeholder is the discoverability hook
+        # (§9: a search box announces less than a button, so it must speak).
+        title_row.addSpacing(16)
+        self._search_field = QLineEdit()
+        self._search_field.setObjectName("playerSearchField")
+        self._search_field.setClearButtonEnabled(True)
+        self._search_field.setFixedWidth(180)
+        self._search_field.setPlaceholderText(self.tr("Search all playlists…"))
+        self._search_field.hide()
+        title_row.addWidget(self._search_field, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        self._scope_combo = QComboBox()
+        self._scope_combo.addItems(
+            [self.tr("This playlist"), self.tr("All playlists")]
+        )
+        self._scope_combo.setCurrentIndex(1)
+        self._scope_combo.hide()
+        title_row.addWidget(self._scope_combo, 0, Qt.AlignmentFlag.AlignVCenter)
+
         title_row.addStretch()
 
         # Visuals selector: a compact eye-icon button (default QPushButton
@@ -1214,6 +1263,13 @@ class PlayerPanel(QWidget):
             width = header_fm.horizontalAdvance(label) + 2 * SeparatorHeaderView._TEXT_PAD + 4
             self._word_fit_widths[col] = width
             self._table.setColumnWidth(col, width)
+        # Width the # column grows to while it shows membership counts under
+        # the "Playlists" header (All-playlists search), measured the same way.
+        self._playlists_col_width = (
+            header_fm.horizontalAdvance(self.tr("Playlists"))
+            + 2 * SeparatorHeaderView._TEXT_PAD
+            + 4
+        )
 
         # No '…' in any column — the no-elide delegate is the table default; the
         # '#' column then overrides it with its current-row delegate. NoElide also
@@ -1413,6 +1469,22 @@ class PlayerPanel(QWidget):
         self._play_pause_shortcut.setContext(Qt.ShortcutContext.WidgetWithChildrenShortcut)
         self._play_pause_shortcut.activated.connect(self._on_play_pause)
 
+        # Search: debounced so a fast typist gets one query per pause, not one
+        # per keystroke (each run repopulates the table).
+        self._search_timer = QTimer(self)
+        self._search_timer.setSingleShot(True)
+        self._search_timer.setInterval(150)
+        self._search_timer.timeout.connect(self._run_search)
+        self._search_field.textChanged.connect(self._on_search_text_changed)
+        self._scope_combo.currentIndexChanged.connect(self._on_search_scope_changed)
+        # Escape backs out of a search from the field or the table. Widget-
+        # scoped so it never fires while an inline cell editor has focus
+        # (there Escape must keep meaning "cancel the edit").
+        for widget in (self._search_field, self._table):
+            esc = QShortcut(QKeySequence(Qt.Key.Key_Escape), widget)
+            esc.setContext(Qt.ShortcutContext.WidgetShortcut)
+            esc.activated.connect(self._exit_search)
+
         # Slice section: swap the seek control on expand, supply the waveform
         # lazily, and forward its playhead seeks to the engine.
         self._slice.expanded_changed.connect(self._on_slice_expanded)
@@ -1430,6 +1502,10 @@ class PlayerPanel(QWidget):
         ``allow_duplicates`` bypasses the by-path dedupe — used when loading a
         saved playlist, where a deliberately repeated track must survive.
         """
+        # Files added while a search is showing target the loaded playlist —
+        # leave the search so the user sees where they landed.
+        if self._search_active:
+            self._exit_search()
         for t in tracks:
             artist = t.get("artist", "")
             title = t.get("title", "")
@@ -1512,6 +1588,8 @@ class PlayerPanel(QWidget):
         """
         self._library = library
         self._save_btn.show()
+        self._search_field.show()
+        self._scope_combo.show()
         self._update_context_label()
 
     @property
@@ -1526,6 +1604,11 @@ class PlayerPanel(QWidget):
         """
         if self._library is None or self._library.get_node(node_id) is None:
             return
+        # Loading a playlist ends a search (§10: click a highlighted playlist
+        # → it loads and the search clears). No list restore — the node's
+        # list is about to replace whatever is showing.
+        if self._search_active:
+            self._dismiss_search()
         tracks = self._library.get_items(node_id)
         # Swap only the visible list — the engine keeps playing whatever it
         # was playing. The now-playing label (above the slicer) carries the
@@ -1546,21 +1629,16 @@ class PlayerPanel(QWidget):
             self._loading_playlist = False
         # Re-link the playing track to its row if this list contains it.
         if self._playing_path is not None:
-            self._current_index = next(
-                (
-                    i
-                    for i, e in enumerate(self._playlist)
-                    if e.file_path == self._playing_path
-                ),
-                -1,
-            )
+            self._relink_playing_row()
             self._highlight_current_row()
             self._update_transport_state()
         self._update_context_label()
 
     def _persist_playlist(self) -> None:
         """Auto-save: write the visible list through to the loaded node."""
-        if self._library is None or self._loading_playlist:
+        # A visible search result list is NOT the loaded node's content —
+        # persisting it would overwrite the playlist with the search hits.
+        if self._library is None or self._loading_playlist or self._search_active:
             return
         if self._library.get_node(self._loaded_node_id) is None:
             # The loaded playlist was deleted from the tree; fall back to
@@ -1596,6 +1674,10 @@ class PlayerPanel(QWidget):
         if self._library is None:
             self._context_label.setText("")
             return
+        if self._search_active:
+            query = self._search_field.text().strip()
+            self._context_label.setText("› " + self.tr("Search: {0}").format(query))
+            return
         if self._loaded_node_id == SCRATCH_NODE_ID:
             name = self.tr("Scratch")
         else:
@@ -1626,6 +1708,189 @@ class PlayerPanel(QWidget):
         self._library.set_items(node_id, track_ids)
         self.playlist_saved.emit(node_id)
 
+    # ── Search-as-scope (§9) ────────────────────────────────────
+
+    def _on_search_text_changed(self, text: str) -> None:
+        if text.strip():
+            self._search_timer.start()
+        else:
+            self._search_timer.stop()
+            self._exit_search()
+
+    def _on_search_scope_changed(self, index: int) -> None:
+        self._search_scope_all = index == 1
+        self._search_field.setPlaceholderText(
+            self.tr("Search all playlists…")
+            if self._search_scope_all
+            else self.tr("Search this playlist…")
+        )
+        if self._search_field.text().strip():
+            self._search_timer.stop()
+            self._run_search()
+
+    def _run_search(self) -> None:
+        query = self._search_field.text().strip()
+        if not query or self._library is None:
+            return
+        if not self._search_active:
+            self._search_active = True
+            self._base_entries = self._playlist
+            # Search results take no drops: internal reorder has no order to
+            # persist, and dropped files have no defined destination here.
+            self._table.setAcceptDrops(False)
+            self._table.set_placeholder(self.tr("No matching tracks"))
+            self._save_btn.setEnabled(False)
+            self._clear_btn.setEnabled(False)
+        counts: list[int] | None = None
+        tooltips: list[str] | None = None
+        capped = False
+        if self._search_scope_all:
+            ids = self._library.search(query, limit=_SEARCH_LIMIT + 1)
+            capped = len(ids) > _SEARCH_LIMIT
+            found = self._library.get_tracks(ids[:_SEARCH_LIMIT])
+            # A track already in the loaded list reuses that entry, keeping
+            # file-only fields (comment/year) the library rows don't carry —
+            # and letting inline edits flow back to the loaded list for free.
+            by_path = {e.file_path: e for e in self._base_entries or []}
+            entries = [
+                by_path.get(t.path) or self._entry_from_track(t) for t in found
+            ]
+            count_map = self._library.membership_counts([t.id for t in found])
+            counts = [count_map.get(t.id, 0) for t in found]
+            tooltips = [
+                "\n".join(
+                    n.name for n in self._library.playlists_containing(t.id)
+                )
+                for t in found
+            ]
+        else:
+            entries = [
+                e
+                for e in self._base_entries or []
+                if self._entry_matches(e, query)
+            ]
+        self._playlist = entries
+        self._search_counts = counts
+        self._search_tooltips = tooltips
+        self._search_capped = capped
+        self._set_count_column(counts is not None)
+        self._relink_playing_row()
+        self._rebuild_table()
+        self._update_stats()
+        self._update_transport_state()
+        self._update_context_label()
+
+    def _exit_search(self) -> None:
+        """Clear the search and put the loaded playlist back on screen."""
+        if not self._search_active:
+            return
+        entries = self._base_entries or []
+        self._dismiss_search()
+        self._playlist = entries
+        self._relink_playing_row()
+        self._rebuild_table()
+        self._update_stats()
+        self._update_transport_state()
+        self._update_context_label()
+
+    def _dismiss_search(self) -> None:
+        """Tear down the search UI without restoring the previous list (the
+        caller installs a new one — load_node — or _exit_search restores)."""
+        self._search_timer.stop()
+        self._search_field.blockSignals(True)
+        self._search_field.clear()
+        self._search_field.blockSignals(False)
+        self._search_active = False
+        self._base_entries = None
+        self._search_counts = None
+        self._search_tooltips = None
+        self._search_capped = False
+        self._set_count_column(False)
+        self._table.setAcceptDrops(True)
+        self._table.set_placeholder(None)
+        self._save_btn.setEnabled(True)
+        self._clear_btn.setEnabled(True)
+
+    def _set_count_column(self, counts: bool) -> None:
+        """Swap column 0 between row numbers ('#') and membership counts
+        ('Playlists') — the one column All-playlists search needs that
+        playlist view doesn't (§9)."""
+        if counts == self._count_column_active:
+            return
+        self._count_column_active = counts
+        header_item = self._table.horizontalHeaderItem(0)
+        if counts:
+            self._num_col_width = self._table.columnWidth(0)
+            header_item.setText(self.tr("Playlists"))
+            self._table.setColumnWidth(0, self._playlists_col_width)
+        else:
+            header_item.setText(self.tr("#"))
+            self._table.setColumnWidth(0, self._num_col_width)
+
+    def _relink_playing_row(self) -> None:
+        """Point _current_index at the engine's track in the visible list
+        (-1 when this list doesn't contain it)."""
+        if self._playing_path is None:
+            self._current_index = -1
+            return
+        self._current_index = next(
+            (
+                i
+                for i, e in enumerate(self._playlist)
+                if e.file_path == self._playing_path
+            ),
+            -1,
+        )
+
+    def _entry_from_track(self, track) -> PlaylistEntry:
+        """A displayable entry for a library track that isn't in the loaded
+        list. Comment/year stay blank — the library rows don't carry them."""
+        bpm = str(int(round(track.bpm))) if track.bpm else ""
+        duration = (
+            self._format_time(int(track.duration * 1000)) if track.duration else ""
+        )
+        return PlaylistEntry(
+            file_path=track.path,
+            display_name=track.filename,
+            artist=track.artist,
+            title=track.title,
+            bpm=bpm,
+            key=track.key,
+            duration=duration,
+        )
+
+    @staticmethod
+    def _entry_matches(entry: PlaylistEntry, query: str) -> bool:
+        """This-playlist scope: substring-match every word against the row's
+        visible text (search what you see)."""
+        blob = " ".join(
+            (
+                entry.display_name,
+                entry.artist,
+                entry.title,
+                entry.comment,
+                entry.key,
+                entry.year,
+            )
+        ).lower()
+        return all(token in blob for token in query.lower().split())
+
+    def _refresh_library_track(self, entry: PlaylistEntry) -> None:
+        """Write an edited search row's tags to its library track (edits reach
+        every playlist holding the track via the track_id indirection)."""
+        if self._library is None:
+            return
+        track = self._library.get_track_by_path(entry.file_path)
+        if track is None:
+            return
+        self._library.update_track_tags(
+            track.id,
+            artist=entry.artist,
+            title=entry.title,
+            bpm=_parse_bpm(entry.bpm),
+            key=entry.key,
+        )
+
     # ── Table management ────────────────────────────────────────
 
     def _rebuild_table(self) -> None:
@@ -1653,7 +1918,15 @@ class PlayerPanel(QWidget):
         self._table.blockSignals(True)
         try:
             for row, entry in enumerate(self._playlist):
-                num_item = QTableWidgetItem(str(row + 1))
+                # All-playlists search: column 0 is the membership count, with
+                # the playlist names as its tooltip (§10 — the answer without
+                # touching the tree). Otherwise it's the row number.
+                if self._search_counts is not None and row < len(self._search_counts):
+                    num_item = QTableWidgetItem(str(self._search_counts[row]))
+                    if self._search_tooltips is not None:
+                        num_item.setToolTip(self._search_tooltips[row])
+                else:
+                    num_item = QTableWidgetItem(str(row + 1))
                 num_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 num_item.setFlags(non_drop_flags)
                 self._table.setItem(row, 0, num_item)
@@ -1926,7 +2199,14 @@ class PlayerPanel(QWidget):
         if new_text != item.text():
             self._revert_cell(row, item.column(), new_text)
         # Refresh the library row so playlists/search see the edited tags.
-        self._persist_playlist()
+        if self._search_active:
+            # A search row isn't the loaded node's content: refresh its
+            # library track directly — never persist the result list.
+            self._refresh_library_track(entry)
+            # An out-of-list result reused the loaded list's entry object when
+            # the paths matched, so the loaded list is already in sync.
+        else:
+            self._persist_playlist()
 
     def _reload_selected_metadata(self, fallback_row: int) -> None:
         """Re-read tags from disk for the selected rows (or the clicked row)."""
@@ -1984,11 +2264,21 @@ class PlayerPanel(QWidget):
 
     def _update_stats(self) -> None:
         count = len(self._playlist)
-        text = (
-            self.tr("{0} track").format(count)
-            if count == 1
-            else self.tr("{0} tracks").format(count)
-        )
+        if self._search_active:
+            if self._search_capped:
+                text = self.tr("{0}+ results").format(_SEARCH_LIMIT)
+            else:
+                text = (
+                    self.tr("{0} result").format(count)
+                    if count == 1
+                    else self.tr("{0} results").format(count)
+                )
+        else:
+            text = (
+                self.tr("{0} track").format(count)
+                if count == 1
+                else self.tr("{0} tracks").format(count)
+            )
         self._stats_label.setText(text)
 
     # ── Column layout persistence ───────────────────────────────
@@ -2012,6 +2302,10 @@ class PlayerPanel(QWidget):
 
     def _schedule_column_save(self, *args) -> None:
         """Debounce saves so a drag-resize writes the config once, not per pixel."""
+        # Not while searching: column 0 is temporarily widened for its
+        # "Playlists" header, and saveState would persist that width onto '#'.
+        if self._search_active:
+            return
         self._col_save_timer.start()
 
     def _save_column_state(self) -> None:
@@ -2513,11 +2807,18 @@ class PlayerPanel(QWidget):
         paths = [self._playlist[r].file_path for r in rows if 0 <= r < len(self._playlist)]
         if not paths:
             return None
-        return paths, self._on_remove_selected
+        # Dragging a search result out is always a copy — there's no list to
+        # remove it from, so a move drop must not delete the row.
+        remove_cb = None if self._search_active else self._on_remove_selected
+        return paths, remove_cb
 
     # ── Remove / Clear ──────────────────────────────────────────
 
     def _on_remove_selected(self) -> None:
+        # Removing a search result is undefined (remove from which playlist?)
+        # — the row lives in the results view, not in a list the user edits.
+        if self._search_active:
+            return
         rows = sorted({idx.row() for idx in self._table.selectionModel().selectedRows()}, reverse=True)
         if not rows:
             return
