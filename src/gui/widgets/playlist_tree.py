@@ -45,6 +45,7 @@ from PySide6.QtWidgets import (
 )
 
 from src.library import SCRATCH_NODE_ID, Library
+from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from .droppable_table import SOURCE_PAGE_MIME, blank_drag_pixmap
 
@@ -164,6 +165,9 @@ class PlaylistTree(QTreeView):
         self._library: Library | None = None
         self._loaded = False
         self._building = False
+        # Session undo stack (§11), owned by MainWindow. None until
+        # set_undo_stack — deletes and moves then simply aren't recorded.
+        self._undo: UndoStack | None = None
         # §10 highlight trail state, kept so it survives DB-driven rebuilds
         # (and a set_highlight arriving before the first load).
         self._hl_playlists: set[int] = set()
@@ -208,6 +212,10 @@ class PlaylistTree(QTreeView):
         """Use a shared library instance (the main window's) instead of
         opening our own connection."""
         self._library = library
+
+    def set_undo_stack(self, stack: UndoStack) -> None:
+        """Attach the session undo stack that deletes and moves record onto."""
+        self._undo = stack
 
     def ensure_loaded(self) -> None:
         """Populate on first use. Opens its own library connection only if a
@@ -419,7 +427,17 @@ class PlaylistTree(QTreeView):
         )
         if reply != QMessageBox.StandardButton.Yes:
             return
+        # The confirm is the first line of defence; undo is the second (§11).
+        # Snapshot before the cascade — a folder delete takes every playlist
+        # underneath it, and their contents, with it.
+        snapshot = self._library.snapshot_subtree(node_id)
         self._library.delete_node(node_id)
+        if self._undo is not None:
+            # Untranslated on purpose — an internal identifier, not UI prose;
+            # nothing displays undo labels yet.
+            label = "Delete Folder" if node.kind == "folder" else "Delete Playlist"
+            library = self._library
+            self._undo.push(label, lambda: library.restore_subtree(snapshot))
         self._rebuild()
 
     # ------------------------------------------------------------ context menu
@@ -559,6 +577,18 @@ class PlaylistTree(QTreeView):
             self._library.move_node(node_id, parent_id, row)
         except ValueError:
             return False  # cycle, playlist parent, or scratch — refuse the drop
+        if self._undo is not None and (node.parent_id, node.position) != (
+            parent_id,
+            row,
+        ):
+            # move_node's position counts siblings with the node removed,
+            # which is exactly how the old slot was recorded — so replaying
+            # the old (parent, position) lands it back where it started.
+            library, old_parent, old_pos = self._library, node.parent_id, node.position
+            self._undo.push(
+                "Move Playlist" if node.kind == "playlist" else "Move Folder",
+                lambda: library.move_node(node_id, old_parent, old_pos),
+            )
         self._rebuild()
         if parent_id is not None:
             parent_item = self._find_item(parent_id)
@@ -596,3 +626,6 @@ class PlaylistTreePanel(QWidget):
 
     def set_library(self, library: Library) -> None:
         self.tree.set_library(library)
+
+    def set_undo_stack(self, stack: UndoStack) -> None:
+        self.tree.set_undo_stack(stack)

@@ -80,6 +80,7 @@ from src.metadata.tags import (
 )
 from src.utils.config import load_config, save_config
 
+from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.thread_keeper import keep_alive
@@ -973,6 +974,9 @@ class PlayerPanel(QWidget):
         self._library: Library | None = None
         self._loaded_node_id: int = SCRATCH_NODE_ID
         self._loading_playlist = False
+        # Session undo stack (§11), owned by MainWindow — auto-save's safety
+        # net. None until set_undo_stack, so the Player still works standalone.
+        self._undo: UndoStack | None = None
         # Search-as-scope (§9): while active, _playlist holds the search
         # results and _base_entries keeps the loaded node's list to restore.
         # Search results are display-only in the library sense — they must
@@ -1673,6 +1677,10 @@ class PlayerPanel(QWidget):
         self._scope_btn.show()
         self._update_context_label()
 
+    def set_undo_stack(self, stack: UndoStack) -> None:
+        """Attach the session undo stack that list edits record onto."""
+        self._undo = stack
+
     @property
     def loaded_node_id(self) -> int:
         return self._loaded_node_id
@@ -1739,6 +1747,12 @@ class PlayerPanel(QWidget):
             # Scratch rather than writing into a void.
             self._loaded_node_id = SCRATCH_NODE_ID
             self._update_context_label()
+        # Every list mutation lands here, so this is where undo is captured
+        # (§11) — one snapshot covers remove, Clear, drag-reorder, and add
+        # alike. Taken before the write, and only kept if the contents
+        # actually changed, which is what keeps inline tag edits (they route
+        # through here too) off the stack.
+        before = self._library.snapshot_items(self._loaded_node_id)
         # Entry fields mirror the file's tags (read at add time), so they're
         # passed through even when empty — clearing a tag clears the row.
         track_ids = [
@@ -1753,6 +1767,36 @@ class PlayerPanel(QWidget):
             for e in self._playlist
         ]
         self._library.set_items(self._loaded_node_id, track_ids)
+        self._push_items_undo(self._loaded_node_id, before, track_ids)
+
+    def _push_items_undo(
+        self, node_id: int, before: list, after_ids: list[int]
+    ) -> None:
+        """Record how to put *node_id* back the way it was, if it changed."""
+        if self._undo is None:
+            return
+        before_ids = [t.id for t in before]
+        if before_ids == after_ids:
+            return  # a tag edit, or a no-op rewrite: nothing to reverse
+        # Labels are internal identifiers, NOT translated: nothing displays
+        # them yet (there is no Edit menu and no toast surface). Wrap them
+        # when something shows them — that is also when their English copy
+        # settles, which is the order the i18n notes ask for.
+        if not after_ids:
+            label = "Clear Playlist"
+        elif len(after_ids) < len(before_ids):
+            label = "Remove Tracks"
+        elif len(after_ids) > len(before_ids):
+            label = "Add Tracks"
+        else:
+            label = "Reorder Playlist"
+        library = self._library
+
+        def restore() -> None:
+            if library.get_node(node_id) is not None:
+                library.restore_items(node_id, before)
+
+        self._undo.push(label, restore)
 
     def _update_now_playing(self) -> None:
         """Show the loaded track's filename above the slicer, or hide the line."""

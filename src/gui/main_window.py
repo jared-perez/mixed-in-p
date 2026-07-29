@@ -4,14 +4,20 @@ import logging
 from pathlib import Path
 
 from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
+    QAbstractSpinBox,
+    QApplication,
     QFileDialog,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMainWindow,
     QMessageBox,
+    QPlainTextEdit,
     QSplitter,
     QTableWidget,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -38,6 +44,7 @@ from src.renamer import (
 from src.utils.config import AppConfig, load_config, save_config
 
 from .models import TrackState, TrackStore
+from .models.undo_stack import UndoStack
 from .styles.theme import NoFocusDelegate, Theme
 from .window_sizer import CurrentPageStack, WindowSizer
 from src.conversion.result import ConversionResult
@@ -121,6 +128,15 @@ class MainWindow(QMainWindow):
         self._library = library.Library()
         self._playlists_panel.set_library(self._library)
         self._player_panel.set_library(self._library)
+        # Playlist edits auto-save, so Cmd/Ctrl+Z is the only way back (§11).
+        # One stack for both views: a delete in the tree and a Clear in the
+        # Player are the same kind of mistake and undo in the same order.
+        self._undo_stack = UndoStack(self)
+        self._playlists_panel.set_undo_stack(self._undo_stack)
+        self._player_panel.set_undo_stack(self._undo_stack)
+        self._undo_stack.undone.connect(self._on_undone)
+        undo_sc = QShortcut(QKeySequence.StandardKey.Undo, self)
+        undo_sc.activated.connect(self._on_undo_shortcut)
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._load_last_session()
 
@@ -348,6 +364,37 @@ class MainWindow(QMainWindow):
         """Save Playlist created a node — make sure the tree shows it."""
         self._playlists_panel.ensure_loaded()
         self._playlists_panel.tree.refresh()
+
+    def _on_undo_shortcut(self) -> None:
+        """Cmd/Ctrl+Z: text editing first, then the playlist undo stack (§11).
+
+        A window-level shortcut is consumed before the key reaches the
+        focused widget, so without this hand-off Cmd+Z would stop undoing
+        *typing* — in the tree's inline rename editor, the Player's search
+        field, and every metadata field. Text editors keep their own undo;
+        the playlist stack only gets the keystroke when no editor has focus.
+        """
+        widget = QApplication.focusWidget()
+        if isinstance(widget, QAbstractSpinBox):
+            widget = widget.findChild(QLineEdit)
+        if isinstance(widget, (QLineEdit, QTextEdit, QPlainTextEdit)):
+            widget.undo()
+            return
+        self._undo_stack.undo()
+
+    def _on_undone(self, _label: str) -> None:
+        """An undo rewrote library state — resync both views onto it.
+
+        The entries themselves only touch the database, so this is the one
+        place that knows how to show the result: the tree re-reads, and the
+        Player reloads its node (which is a no-op for content that didn't
+        change, and falls back to Scratch if that node is gone).
+        """
+        self._playlists_panel.tree.refresh()
+        node_id = self._player_panel.loaded_node_id
+        if self._library.get_node(node_id) is None:
+            node_id = library.SCRATCH_NODE_ID
+        self._player_panel.load_node(node_id)
 
     def _on_tree_highlight(self, playlist_ids, folder_counts) -> None:
         """A search selection changed — light (or clear) the tree's trail.

@@ -681,6 +681,125 @@ class Library:
             self._con.executemany("DELETE FROM tracks_fts WHERE rowid=?", ids)
         self._con.executemany("DELETE FROM tracks WHERE id=?", ids)
 
+    # ------------------------------------------------------------------- undo
+
+    def snapshot_items(self, node_id: int) -> list[Track]:
+        """Capture a playlist's contents for the session undo stack (§11).
+
+        Full ``Track`` rows rather than ids, because ids are not stable
+        across the operation being undone — see :meth:`restore_items`.
+        """
+        return self.get_items(node_id)
+
+    def restore_items(self, node_id: int, tracks: list[Track]) -> None:
+        """Put a playlist back to a :meth:`snapshot_items` capture.
+
+        Resolves each track by **path**, not by id: removing a track's last
+        membership garbage-collects its row (:meth:`_gc_tracks`), so a
+        snapshot's ids may name rows that no longer exist. A surviving row
+        is reused as-is — its tags may have been edited since the snapshot
+        (via another playlist, or the metadata panel) and undoing a
+        *playlist* edit must never roll back *file* tags (§11). Only a row
+        that really vanished is recreated, from the snapshot's fields.
+        """
+        track_ids = []
+        for t in tracks:
+            live = self.get_track_by_path(t.path)
+            track_ids.append(
+                live.id
+                if live is not None
+                else self.add_track(
+                    t.path,
+                    artist=t.artist,
+                    title=t.title,
+                    album=t.album,
+                    genre=t.genre,
+                    bpm=t.bpm,
+                    key=t.key,
+                    energy=t.energy,
+                    duration=t.duration,
+                )
+            )
+        self.set_items(node_id, track_ids)
+
+    def snapshot_subtree(self, node_id: int) -> dict:
+        """Capture a node, its descendants, and their contents.
+
+        The undo token for a delete, which cascades
+        (``nodes.parent_id … ON DELETE CASCADE``). Nodes come back
+        parents-first so :meth:`restore_subtree` can remap ids as it walks.
+        """
+        node = self._require_node(node_id)
+        if node.kind == "scratch":
+            raise ValueError("Scratch cannot be snapshotted")
+        rows = self._con.execute(
+            """
+            WITH RECURSIVE sub(id) AS (
+                SELECT ? UNION ALL
+                SELECT n.id FROM nodes n JOIN sub ON n.parent_id = sub.id
+            )
+            SELECT * FROM nodes WHERE id IN (SELECT id FROM sub)
+            """,
+            (node_id,),
+        ).fetchall()
+        # Order parents before children so restore always has its parent's
+        # new id in hand (the CTE's own order is not contractual).
+        nodes = [_node(row) for row in rows]
+        by_depth = {n.id: len(self.ancestor_ids(n.id)) for n in nodes}
+        nodes.sort(key=lambda n: (by_depth[n.id], n.position, n.id))
+        return {
+            "root_id": node_id,
+            "nodes": nodes,
+            "items": {
+                n.id: self.get_items(n.id) for n in nodes if n.kind == "playlist"
+            },
+        }
+
+    def restore_subtree(self, snapshot: dict) -> int:
+        """Re-create a :meth:`snapshot_subtree` capture. Returns the root's id.
+
+        Original ids are kept when still free, so a restored playlist keeps
+        its identity for anything holding an id (the Player's loaded node,
+        the tree's highlight trail). SQLite reuses ``max(id)+1``, so an id
+        can have been claimed since the delete — those nodes come back with
+        a fresh id and their children are remapped onto it.
+        """
+        id_map: dict[int, int] = {}
+        for node in snapshot["nodes"]:
+            parent_id = id_map.get(node.parent_id, node.parent_id)
+            if parent_id is not None and self.get_node(parent_id) is None:
+                parent_id = None  # the old parent is gone too — restore at the root
+            id_map[node.id] = self._restore_node(node, parent_id)
+        for old_id, tracks in snapshot["items"].items():
+            self.restore_items(id_map[old_id], tracks)
+        return id_map[snapshot["root_id"]]
+
+    def _restore_node(self, node: Node, parent_id: int | None) -> int:
+        """Re-insert one node at its recorded slot among its siblings."""
+        with self._con:
+            self._con.execute(
+                "UPDATE nodes SET position = position + 1 WHERE parent_id IS ?"
+                " AND kind != 'scratch' AND position >= ?",
+                (parent_id, node.position),
+            )
+            taken = self._con.execute(
+                "SELECT 1 FROM nodes WHERE id=?", (node.id,)
+            ).fetchone()
+            columns = "parent_id, kind, name, position, created_at"
+            values = (parent_id, node.kind, node.name, node.position, node.created_at)
+            if taken:
+                cur = self._con.execute(
+                    f"INSERT INTO nodes ({columns}) VALUES (?, ?, ?, ?, ?)", values
+                )
+            else:
+                cur = self._con.execute(
+                    f"INSERT INTO nodes (id, {columns}) VALUES (?, ?, ?, ?, ?, ?)",
+                    (node.id, *values),
+                )
+            new_id = cur.lastrowid
+            self._renumber_children(parent_id)
+        return new_id
+
     # ----------------------------------------------------------------- search
 
     def search(self, text: str, limit: int = 500) -> list[int]:
