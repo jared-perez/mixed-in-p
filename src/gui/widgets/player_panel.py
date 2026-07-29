@@ -58,6 +58,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QPushButton,
     QScrollArea,
+    QSizePolicy,
     QSlider,
     QStyle,
     QStyledItemDelegate,
@@ -99,7 +100,12 @@ from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
 from .dialogs.duplicate_policy import resolve_additions
 from .dialogs.relocate_dialog import RelocateDialog
 from .drop_zone import AUDIO_EXTENSIONS
-from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin, blank_drag_pixmap
+from .droppable_table import (
+    SOURCE_PAGE_MIME,
+    RubberBandSelectMixin,
+    blank_drag_pixmap,
+    start_file_drag,
+)
 from .player_engine import PlayerEngine
 from .slice_section import SliceSection
 
@@ -960,6 +966,55 @@ class NoElideDelegate(QStyledItemDelegate):
         painter.restore()
 
 
+class NowPlayingLabel(QLabel):
+    """The "Playing: …" line, draggable as the file it names.
+
+    The list below can be showing something else entirely — a search result
+    set, or a different playlist — while a track plays on, and then there is
+    no row to grab. This line always names the loaded track, so it is the one
+    handle that's always there: drag it onto a playlist in the sidebar (or
+    onto a nav button, or out to Finder) exactly like a row.
+
+    Always a copy — the label isn't a list position, so a move drop has
+    nothing to remove. ``set_drag_source`` supplies the path and gets the
+    veto (a file that has moved off disk), mirroring the table's guard.
+    """
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._press_pos: QPoint | None = None
+        self._drag_fn = None
+
+    def set_drag_source(self, fn) -> None:
+        """Install the callback returning the path to drag, or None to veto."""
+        self._drag_fn = fn
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        if event.button() == Qt.MouseButton.LeftButton:
+            self._press_pos = event.position().toPoint()
+        super().mousePressEvent(event)
+
+    def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        if (
+            self._press_pos is not None
+            and event.buttons() & Qt.MouseButton.LeftButton
+            and (event.position().toPoint() - self._press_pos).manhattanLength()
+            >= QApplication.startDragDistance()
+        ):
+            # Cleared before the (blocking) exec so the veto path can't leave a
+            # live press behind and re-fire on the next twitch of the mouse.
+            self._press_pos = None
+            path = self._drag_fn() if self._drag_fn is not None else None
+            if path:
+                start_file_drag(self, "player", [path])
+            return
+        super().mouseMoveEvent(event)
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        self._press_pos = None
+        super().mouseReleaseEvent(event)
+
+
 class PlayerPanel(QWidget):
     """Panel with playlist table, transport controls, seek bar, and volume slider."""
 
@@ -1515,10 +1570,21 @@ class PlayerPanel(QWidget):
         # independent of the visible list (switching playlists doesn't stop
         # it), so while browsing other lists this is the one place that says
         # what's actually playing.
-        self._now_playing_label = QLabel("")
+        # It's also the drag handle for the playing track — see NowPlayingLabel.
+        self._now_playing_label = NowPlayingLabel()
         self._now_playing_label.setObjectName("nowPlayingLabel")
         self._now_playing_label.setStyleSheet(
             f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;"
+        )
+        self._now_playing_label.setCursor(Qt.CursorShape.OpenHandCursor)
+        self._now_playing_label.setToolTip(
+            self.tr("Drag this onto a playlist to add the playing track")
+        )
+        self._now_playing_label.set_drag_source(self._now_playing_drag_path)
+        # Only as wide as the text, so the grab cursor doesn't claim the whole
+        # row's dead space to the right.
+        self._now_playing_label.setSizePolicy(
+            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed
         )
         self._now_playing_label.hide()
         layout.addWidget(self._now_playing_label)
@@ -3224,6 +3290,23 @@ class PlayerPanel(QWidget):
             + self.tr("Right-click the track and choose Locate Missing File…")
         )
         box.exec()
+
+    def _now_playing_drag_path(self) -> str | None:
+        """Path behind the now-playing line, or None to veto the drag.
+
+        Same veto as `_guard_drag`, and for the same reason: the track can be
+        playing out of the PCM cache long after its file moved, so this is the
+        one line that can name a file that is no longer there.
+        """
+        path = self._playing_path
+        if not path:
+            return None
+        if not Path(path).is_file():
+            self._refresh_missing_marks()
+            # Deferred for the same mouse-grab reason as _guard_drag's.
+            QTimer.singleShot(0, lambda: self._warn_files_moved([path]))
+            return None
+        return path
 
     def _drag_data(self):
         """Provide (paths, remove-on-move callback) for an outgoing drag.
