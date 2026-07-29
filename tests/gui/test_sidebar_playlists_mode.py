@@ -49,6 +49,26 @@ def test_collapse_in_playlists_mode_pins_but_keeps_mode(qtbot):
     assert not sidebar._playlists_btn.isHidden()
 
 
+def test_playlists_mode_hides_history_but_keeps_settings(qtbot):
+    """History gives up its row to the tree; Settings stays reachable."""
+    sidebar = _make_sidebar(qtbot)
+    assert not sidebar._history_btn.isHidden()
+
+    sidebar.set_playlists_mode(True)
+    assert sidebar._history_btn.isHidden()
+    assert not sidebar._settings_btn.isHidden()
+
+    sidebar.set_playlists_mode(False)
+    assert not sidebar._history_btn.isHidden()
+
+    # Collapsed shows the icon rail, so History comes back even in the mode.
+    sidebar.set_playlists_mode(True)
+    sidebar.set_collapsed(True)
+    assert not sidebar._history_btn.isHidden()
+    sidebar.set_collapsed(False)
+    assert sidebar._history_btn.isHidden()
+
+
 def test_playlists_button_stays_out_of_nav_group(qtbot):
     sidebar = _make_sidebar(qtbot)
     assert sidebar._playlists_btn not in sidebar._button_group.buttons()

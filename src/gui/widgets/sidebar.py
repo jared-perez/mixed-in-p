@@ -403,6 +403,10 @@ class Sidebar(QFrame):
         self._mode_stack.setCurrentWidget(
             self._playlists_page if show_tree else self._nav_page
         )
+        # History is the one bottom button the tree can spare: hiding it gives
+        # the playlists a full button's worth of extra height. Settings stays,
+        # since it's the only way back to the preferences from this mode.
+        self._history_btn.setVisible(not show_tree)
 
     def _apply_width(self) -> None:
         """One place owns the width constraints for every mode combination.
