@@ -18,11 +18,13 @@ from __future__ import annotations
 
 from PySide6.QtCore import QMimeData, QPointF, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import (
+    QBrush,
     QColor,
     QDrag,
     QFont,
     QIcon,
     QPainter,
+    QPalette,
     QPen,
     QPixmap,
     QPolygonF,
@@ -48,9 +50,18 @@ from .droppable_table import SOURCE_PAGE_MIME, blank_drag_pixmap
 
 NODE_ID_ROLE = Qt.ItemDataRole.UserRole + 1
 KIND_ROLE = Qt.ItemDataRole.UserRole + 2
+#: §10 highlight trail — paint-only roles, read by the delegate at draw time.
+#: HL_PLAYLIST (bool): this playlist contains the searched track(s).
+#: HL_COUNT (int): folder — how many lit playlists sit beneath it.
+HL_PLAYLIST_ROLE = Qt.ItemDataRole.UserRole + 3
+HL_COUNT_ROLE = Qt.ItemDataRole.UserRole + 4
 
 #: Internal drag payload: the dragged node's id, as ASCII digits.
 NODE_MIME = "application/x-mixedinp-node"
+
+#: Background wash behind a highlighted playlist row — a dim neon-yellow so
+#: "arrived" reads solid without drowning the selection highlight.
+_HL_WASH = "#3a3410"
 
 _ICON_DRAW = 40  # painted at 2x, displayed at 20 for HiDPI crispness
 
@@ -95,18 +106,39 @@ def _tree_icon(kind: str) -> QIcon:
     return icon
 
 
-class _RenameEditorDelegate(QStyledItemDelegate):
-    """Give the inline rename editor usable geometry.
+class _TreeItemDelegate(QStyledItemDelegate):
+    """Rename-editor geometry plus the §10 highlight trail's two looks.
 
-    The default editor is confined to the item rect, which is sized to the
-    OLD text and can be shorter than the editor's own chrome — the name
-    being typed ends up invisible. Stretch to the viewport's right edge and
-    floor the height at the editor's size hint.
+    Highlight painting: the two states must never look the same, or the
+    user can't tell "arrived" from "keep digging". A playlist holding the
+    searched track(s) is arrived — bold, neon text on a yellow wash. A
+    folder with lit playlists beneath is keep-going — neon text and a
+    trailing count ("Crates · 2"), no wash. Both are paint-only, driven by
+    data roles the view sets; order, expansion, and selection are never
+    touched here.
+
+    Editor geometry: the default editor is confined to the item rect, which
+    is sized to the OLD text and can be shorter than the editor's own
+    chrome — the name being typed ends up invisible. Stretch to the
+    viewport's right edge and floor the height at the editor's size hint.
     """
 
     def __init__(self, view: QTreeView) -> None:
         super().__init__(view)
         self._view = view
+
+    def initStyleOption(self, option, index) -> None:  # noqa: N802 (Qt override)
+        super().initStyleOption(option, index)
+        if index.data(HL_PLAYLIST_ROLE):
+            option.font.setBold(True)
+            option.backgroundBrush = QBrush(QColor(_HL_WASH))
+        else:
+            count = index.data(HL_COUNT_ROLE)
+            if not count:
+                return
+            option.text = f"{option.text} · {count}"
+        for role in (QPalette.ColorRole.Text, QPalette.ColorRole.HighlightedText):
+            option.palette.setColor(role, QColor(Theme.NEON_YELLOW))
 
     def updateEditorGeometry(self, editor, option, index) -> None:  # noqa: N802
         super().updateEditorGeometry(editor, option, index)
@@ -131,6 +163,10 @@ class PlaylistTree(QTreeView):
         self._library: Library | None = None
         self._loaded = False
         self._building = False
+        # §10 highlight trail state, kept so it survives DB-driven rebuilds
+        # (and a set_highlight arriving before the first load).
+        self._hl_playlists: set[int] = set()
+        self._hl_folders: dict[int, int] = {}
 
         self.setObjectName("playlistTree")
         self._model = QStandardItemModel(self)
@@ -156,7 +192,7 @@ class PlaylistTree(QTreeView):
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
 
-        self.setItemDelegate(_RenameEditorDelegate(self))
+        self.setItemDelegate(_TreeItemDelegate(self))
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._on_context_menu)
         self._model.itemChanged.connect(self._on_item_changed)
@@ -210,6 +246,8 @@ class PlaylistTree(QTreeView):
             item = self._find_item(selected)
             if item is not None:
                 self.setCurrentIndex(item.index())
+        if self._hl_playlists or self._hl_folders:
+            self._apply_highlight()
         self.resizeColumnToContents(0)
 
     def _append_children(self, parent_item: QStandardItem, parent_id: int | None) -> None:
@@ -237,6 +275,58 @@ class PlaylistTree(QTreeView):
         else:
             item.setIcon(_tree_icon("folder"))
         return item
+
+    # -------------------------------------------------- highlight trail (§10)
+
+    def set_highlight(
+        self, playlist_ids: set[int], folder_counts: dict[int, int]
+    ) -> None:
+        """Light the trail for a search selection: every playlist holding the
+        track(s), and every ancestor folder with how many lit playlists sit
+        beneath it.
+
+        Paint only — nothing expands, nothing scrolls, nothing moves, and
+        selection is untouched. The user follows the lit folders down at
+        their own pace (or ignores them). State persists across rebuilds
+        until replaced or cleared.
+        """
+        playlist_ids = set(playlist_ids)
+        folder_counts = dict(folder_counts)
+        if playlist_ids == self._hl_playlists and folder_counts == self._hl_folders:
+            return
+        self._hl_playlists = playlist_ids
+        self._hl_folders = folder_counts
+        if self._loaded:
+            self._apply_highlight()
+
+    def clear_highlight(self) -> None:
+        self.set_highlight(set(), {})
+
+    def _apply_highlight(self, parent: QStandardItem | None = None) -> None:
+        at_root = parent is None
+        parent = parent or self._model.invisibleRootItem()
+        if at_root:
+            self._building = True  # role writes are not rename commits
+        try:
+            for row in range(parent.rowCount()):
+                child = parent.child(row)
+                node_id = child.data(NODE_ID_ROLE)
+                kind = child.data(KIND_ROLE)
+                lit = kind == "playlist" and node_id in self._hl_playlists
+                count = self._hl_folders.get(node_id, 0) if kind == "folder" else 0
+                if bool(child.data(HL_PLAYLIST_ROLE)) != lit:
+                    child.setData(lit or None, HL_PLAYLIST_ROLE)
+                if (child.data(HL_COUNT_ROLE) or 0) != count:
+                    child.setData(count or None, HL_COUNT_ROLE)
+                self._apply_highlight(child)
+        finally:
+            if at_root:
+                self._building = False
+        if at_root:
+            # The " · N" suffixes change row widths; keep the horizontal
+            # scrollbar honest without touching anything positional.
+            self.resizeColumnToContents(0)
+            self.viewport().update()
 
     # ----------------------------------------------------- id <-> item helpers
 

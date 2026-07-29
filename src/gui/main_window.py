@@ -244,6 +244,7 @@ class MainWindow(QMainWindow):
         self._apply_playlists_splitter()  # start with the handle locked
         self._playlists_panel.tree.playlist_activated.connect(self._on_playlist_activated)
         self._player_panel.playlist_saved.connect(self._on_playlist_saved)
+        self._player_panel.tree_highlight_changed.connect(self._on_tree_highlight)
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -347,6 +348,13 @@ class MainWindow(QMainWindow):
         """Save Playlist created a node — make sure the tree shows it."""
         self._playlists_panel.ensure_loaded()
         self._playlists_panel.tree.refresh()
+
+    def _on_tree_highlight(self, playlist_ids, folder_counts) -> None:
+        """A search selection changed — light (or clear) the tree's trail.
+
+        The tree stores the state even before its first load, so there is
+        no ensure_loaded here: opening playlists mode later paints it."""
+        self._playlists_panel.tree.set_highlight(playlist_ids, folder_counts)
 
     def _apply_playlists_splitter(self) -> None:
         """Sync the splitter with the sidebar's mode.

@@ -953,6 +953,10 @@ class PlayerPanel(QWidget):
     slice_expanded = Signal(bool)
     # A new saved playlist was created via Save Playlist (payload: node id).
     playlist_saved = Signal(int)
+    # §10 highlight trail: which tree nodes to light for the current search
+    # selection — (set of playlist ids, {folder id: lit playlists beneath}).
+    # Emitted empty whenever there is nothing to light.
+    tree_highlight_changed = Signal(object, object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -977,9 +981,11 @@ class PlayerPanel(QWidget):
         self._search_scope_all = True
         self._base_entries: list[PlaylistEntry] | None = None
         # Parallel to _playlist while an All-playlists search is showing:
-        # per-row membership counts + tooltip of the playlist names.
+        # per-row membership counts + tooltip of the playlist names, and the
+        # rows' track ids (feeds the tree highlight trail on selection).
         self._search_counts: list[int] | None = None
         self._search_tooltips: list[str] | None = None
+        self._search_track_ids: list[int] | None = None
         self._search_capped = False
         self._count_column_active = False
         self._num_col_width = 40
@@ -1830,6 +1836,7 @@ class PlayerPanel(QWidget):
             self._clear_btn.setEnabled(False)
         counts: list[int] | None = None
         tooltips: list[str] | None = None
+        track_ids: list[int] | None = None
         capped = False
         if self._search_scope_all:
             ids = self._library.search(query, limit=_SEARCH_LIMIT + 1)
@@ -1842,7 +1849,8 @@ class PlayerPanel(QWidget):
             entries = [
                 by_path.get(t.path) or self._entry_from_track(t) for t in found
             ]
-            count_map = self._library.membership_counts([t.id for t in found])
+            track_ids = [t.id for t in found]
+            count_map = self._library.membership_counts(track_ids)
             counts = [count_map.get(t.id, 0) for t in found]
             tooltips = [
                 "\n".join(
@@ -1859,6 +1867,7 @@ class PlayerPanel(QWidget):
         self._playlist = entries
         self._search_counts = counts
         self._search_tooltips = tooltips
+        self._search_track_ids = track_ids
         self._search_capped = capped
         self._set_count_column(counts is not None)
         self._relink_playing_row()
@@ -1866,6 +1875,7 @@ class PlayerPanel(QWidget):
         self._update_stats()
         self._update_transport_state()
         self._update_context_label()
+        self._update_search_highlight()
 
     def _exit_search(self) -> None:
         """Clear the search and put the loaded playlist back on screen."""
@@ -1891,12 +1901,14 @@ class PlayerPanel(QWidget):
         self._base_entries = None
         self._search_counts = None
         self._search_tooltips = None
+        self._search_track_ids = None
         self._search_capped = False
         self._set_count_column(False)
         self._table.setAcceptDrops(True)
         self._table.set_placeholder(None)
         self._save_btn.setEnabled(True)
         self._clear_btn.setEnabled(True)
+        self._update_search_highlight()  # nothing to light — clears the tree
 
     def _set_count_column(self, counts: bool) -> None:
         """Swap column 0 between row numbers ('#') and membership counts
@@ -1961,6 +1973,36 @@ class PlayerPanel(QWidget):
             )
         ).lower()
         return all(token in blob for token in query.lower().split())
+
+    def _update_search_highlight(self) -> None:
+        """Light the sidebar trail for the selected search result(s) (§10).
+
+        Union across a multi-select — the question is "where does any of
+        this live". Each lit playlist adds one to every ancestor folder's
+        count. Emits empty sets whenever there is nothing to light (search
+        over, This-playlist scope, no selection).
+        """
+        playlist_ids: set[int] = set()
+        folder_counts: dict[int, int] = {}
+        if (
+            self._search_active
+            and self._search_track_ids is not None
+            and self._library is not None
+        ):
+            rows = {idx.row() for idx in self._table.selectionModel().selectedRows()}
+            track_ids = {
+                self._search_track_ids[r]
+                for r in rows
+                if 0 <= r < len(self._search_track_ids)
+            }
+            for track_id in track_ids:
+                playlist_ids |= {
+                    n.id for n in self._library.playlists_containing(track_id)
+                }
+            for playlist_id in playlist_ids:
+                for ancestor in self._library.ancestor_ids(playlist_id):
+                    folder_counts[ancestor] = folder_counts.get(ancestor, 0) + 1
+        self.tree_highlight_changed.emit(playlist_ids, folder_counts)
 
     def _refresh_library_track(self, entry: PlaylistEntry) -> None:
         """Write an edited search row's tags to its library track (edits reach
@@ -2646,7 +2688,12 @@ class PlayerPanel(QWidget):
         self._prefetch_index(row)
 
     def _on_selection_changed(self) -> None:
-        if self._rebuilding or not self.isVisible():
+        if self._rebuilding:
+            return
+        # The tree highlight follows the selection regardless of visibility
+        # (the sidebar tree is a different widget and may well be on screen).
+        self._update_search_highlight()
+        if not self.isVisible():
             return
         # While a track is playing, do NOT speculatively decode whatever the user
         # browses to — decoding fights the audio callback for the GIL and is the

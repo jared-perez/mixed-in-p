@@ -217,6 +217,52 @@ class TestPlaybackAcrossSearch:
         assert player._current_index == 0
 
 
+class TestHighlightTrail:
+    @pytest.fixture
+    def crates(self, player, lib, tmp_path):
+        """F > G > P1;  F > P2.  Track a is in P1+P2; track b in P2 only."""
+        a, b = make_files(tmp_path, "cadence_one.wav", "cadence_two.wav")
+        f = lib.create_folder("F")
+        g = lib.create_folder("G", f)
+        p1 = lib.create_playlist("P1", g)
+        p2 = lib.create_playlist("P2", f)
+        ta, tb = lib.add_track(a), lib.add_track(b)
+        lib.set_items(p1, [ta])
+        lib.set_items(p2, [ta, tb])
+        seen = []
+        player.tree_highlight_changed.connect(
+            lambda p, fc: seen.append((set(p), dict(fc)))
+        )
+        return {"paths": (a, b), "nodes": (f, g, p1, p2), "seen": seen}
+
+    def test_selection_lights_playlists_and_ancestors(self, player, crates):
+        f, g, p1, p2 = crates["nodes"]
+        search(player, "cadence")
+        player._table.selectRow(0)  # track a — in P1 (under G under F) and P2
+        assert crates["seen"][-1] == ({p1, p2}, {g: 1, f: 2})
+
+        player._table.selectRow(1)  # track b — in P2 only
+        assert crates["seen"][-1] == ({p2}, {f: 1})
+
+    def test_multi_select_highlights_the_union(self, player, crates):
+        f, g, p1, p2 = crates["nodes"]
+        search(player, "cadence")
+        player._table.selectAll()
+        assert crates["seen"][-1] == ({p1, p2}, {g: 1, f: 2})
+
+    def test_exiting_search_clears_the_trail(self, player, crates):
+        search(player, "cadence")
+        player._table.selectRow(0)
+        player._search_field.setText("")
+        assert crates["seen"][-1] == (set(), {})
+
+    def test_this_playlist_scope_never_lights(self, player, crates):
+        player._select_search_scope(False)
+        search(player, "cadence")  # scratch is empty — no matter; scope check
+        player._table.selectAll()
+        assert crates["seen"][-1] == (set(), {})
+
+
 class TestInlineEditsInSearch:
     def test_edit_updates_library_track_not_loaded_node(
         self, player, lib, seeded, monkeypatch
