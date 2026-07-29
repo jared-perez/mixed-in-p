@@ -164,17 +164,12 @@ class Sidebar(QFrame):
         layout.setContentsMargins(6, 16, 6, 16)
         layout.setSpacing(4)
 
-        # Top row: collapse/expand toggle (1/3) + Playlists mode toggle (2/3).
+        # Top row: Playlists mode toggle (2/3) + collapse/expand toggle (1/3).
+        # Playlists sits on the LEFT so that when the sidebar is dragged
+        # narrow, it's the label's tail that gets covered — the start of the
+        # word stays readable.
         top_row = QHBoxLayout()
         top_row.setSpacing(4)
-
-        self._toggle_btn = QPushButton()
-        self._toggle_btn.setObjectName("sidebarButton")
-        self._toggle_btn.setIcon(nav_icon("collapse"))
-        self._toggle_btn.setIconSize(_NAV_ICON_SIZE)
-        self._toggle_btn.setToolTip(self.tr("Collapse sidebar"))
-        self._toggle_btn.clicked.connect(self._toggle_collapsed)
-        top_row.addWidget(self._toggle_btn, 1)
 
         # Playlists is a *mode* toggle, not a page: it must stay out of
         # _button_group (exclusive), or checking it would deselect the
@@ -185,6 +180,14 @@ class Sidebar(QFrame):
         self._playlists_btn.setToolTip(self.tr("Show playlists"))
         self._playlists_btn.clicked.connect(self._on_playlists_clicked)
         top_row.addWidget(self._playlists_btn, 2)
+
+        self._toggle_btn = QPushButton()
+        self._toggle_btn.setObjectName("sidebarButton")
+        self._toggle_btn.setIcon(nav_icon("collapse"))
+        self._toggle_btn.setIconSize(_NAV_ICON_SIZE)
+        self._toggle_btn.setToolTip(self.tr("Collapse sidebar"))
+        self._toggle_btn.clicked.connect(self._toggle_collapsed)
+        top_row.addWidget(self._toggle_btn, 1)
 
         layout.addLayout(top_row)
 

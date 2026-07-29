@@ -899,6 +899,11 @@ class PlayerPanel(QWidget):
         super().__init__(parent)
         self._playlist: list[PlaylistEntry] = []
         self._current_index: int = -1
+        # Path of the track loaded in the engine. Playback is deliberately
+        # independent of the visible list: switching playlists must not stop
+        # the music. _current_index is just this track's row in the visible
+        # list (-1 when it isn't there).
+        self._playing_path: str | None = None
         # Playlist library binding (set_library): the visible list persists
         # into the loaded node — Scratch by default, or a saved playlist the
         # user clicked in the tree (auto-save: every edit writes through).
@@ -1331,6 +1336,18 @@ class PlayerPanel(QWidget):
 
         layout.addLayout(controls_row)
 
+        # Now-playing line: names the track loaded in the engine. Playback is
+        # independent of the visible list (switching playlists doesn't stop
+        # it), so while browsing other lists this is the one place that says
+        # what's actually playing.
+        self._now_playing_label = QLabel("")
+        self._now_playing_label.setObjectName("nowPlayingLabel")
+        self._now_playing_label.setStyleSheet(
+            f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;"
+        )
+        self._now_playing_label.hide()
+        layout.addWidget(self._now_playing_label)
+
         # Collapsible slice section — shares the engine; builds its waveform
         # lazily on expand. Lets the user trim a slice from the loaded track.
         self._slice = SliceSection(self._engine, self)
@@ -1510,10 +1527,14 @@ class PlayerPanel(QWidget):
         if self._library is None or self._library.get_node(node_id) is None:
             return
         tracks = self._library.get_items(node_id)
+        # Swap only the visible list — the engine keeps playing whatever it
+        # was playing. The now-playing label (above the slicer) carries the
+        # track's identity while it isn't a row in the visible list.
         self._loading_playlist = True
         try:
-            self._on_clear_playlist()
             self._loaded_node_id = node_id
+            self._playlist = []
+            self._current_index = -1
             self.add_tracks(
                 [
                     {"file_path": t.path, "display_name": Path(t.path).name}
@@ -1523,6 +1544,18 @@ class PlayerPanel(QWidget):
             )
         finally:
             self._loading_playlist = False
+        # Re-link the playing track to its row if this list contains it.
+        if self._playing_path is not None:
+            self._current_index = next(
+                (
+                    i
+                    for i, e in enumerate(self._playlist)
+                    if e.file_path == self._playing_path
+                ),
+                -1,
+            )
+            self._highlight_current_row()
+            self._update_transport_state()
         self._update_context_label()
 
     def _persist_playlist(self) -> None:
@@ -1548,6 +1581,16 @@ class PlayerPanel(QWidget):
             for e in self._playlist
         ]
         self._library.set_items(self._loaded_node_id, track_ids)
+
+    def _update_now_playing(self) -> None:
+        """Show the loaded track's filename above the slicer, or hide the line."""
+        if self._playing_path:
+            self._now_playing_label.setText(
+                self.tr("Playing: {0}").format(Path(self._playing_path).name)
+            )
+            self._now_playing_label.show()
+        else:
+            self._now_playing_label.hide()
 
     def _update_context_label(self) -> None:
         if self._library is None:
@@ -1915,11 +1958,7 @@ class PlayerPanel(QWidget):
     def _sync_playlist_from_table(self) -> None:
         """Rebuild the internal playlist list from table row order after drag-drop."""
         new_playlist: list[PlaylistEntry] = []
-        old_current_path = (
-            self._playlist[self._current_index].file_path
-            if 0 <= self._current_index < len(self._playlist)
-            else None
-        )
+        old_current_path = self._playing_path
 
         for row in range(self._table.rowCount()):
             name_item = self._table.item(row, 1)
@@ -2035,6 +2074,8 @@ class PlayerPanel(QWidget):
             return
         self._current_index = index
         entry = self._playlist[index]
+        self._playing_path = entry.file_path
+        self._update_now_playing()
         logger.info(f"Playing: {entry.display_name}")
         self._engine.stop()
         # Reset the seek UI *before* loading. A cache hit calls engine.load()
@@ -2326,9 +2367,9 @@ class PlayerPanel(QWidget):
     # ── Slice section ───────────────────────────────────────────
 
     def _current_path(self) -> str | None:
-        if 0 <= self._current_index < len(self._playlist):
-            return self._playlist[self._current_index].file_path
-        return None
+        """Path of the track loaded in the engine — NOT derived from the
+        visible list, which may be a different playlist entirely."""
+        return self._playing_path
 
     # Number of playlist rows kept visible when the slice section is open.
     _ROWS_VISIBLE_WHEN_SLICING = 12
@@ -2481,11 +2522,7 @@ class PlayerPanel(QWidget):
         if not rows:
             return
 
-        playing_path = (
-            self._playlist[self._current_index].file_path
-            if 0 <= self._current_index < len(self._playlist)
-            else None
-        )
+        playing_path = self._playing_path
 
         for row in rows:
             if 0 <= row < len(self._playlist):
@@ -2498,6 +2535,8 @@ class PlayerPanel(QWidget):
                     self._slice.set_track(None, 0)
                     self._pending_play_path = None
                     playing_path = None
+                    self._playing_path = None
+                    self._update_now_playing()
                     self._current_index = -1
                     self._hide_artwork()
 
@@ -2518,6 +2557,8 @@ class PlayerPanel(QWidget):
         self._engine.unload()
         self._slice.set_track(None, 0)
         self._pending_play_path = None
+        self._playing_path = None
+        self._update_now_playing()
         self._prefetch_queue.clear()
         self._pcm_cache.clear()
         self._playlist.clear()
