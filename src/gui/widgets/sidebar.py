@@ -177,8 +177,8 @@ class Sidebar(QFrame):
         self._playlists_btn = QPushButton(self.tr("Playlists"))
         self._playlists_btn.setObjectName("sidebarButton")
         self._playlists_btn.setCheckable(True)
-        self._playlists_btn.setToolTip(self.tr("Show playlists"))
         self._playlists_btn.clicked.connect(self._on_playlists_clicked)
+        self._sync_playlists_tooltip()
         top_row.addWidget(self._playlists_btn, 2)
 
         self._toggle_btn = QPushButton()
@@ -376,8 +376,22 @@ class Sidebar(QFrame):
         """Switch between the nav rail and the playlists tree."""
         self._playlists_mode = on
         self._playlists_btn.setChecked(on)
+        self._sync_playlists_tooltip()
         self._sync_mode_stack()
         self._apply_width()
+
+    def _sync_playlists_tooltip(self) -> None:
+        """Say what the next click will do, not what the button is named.
+
+        This is a toggle that *replaces* the nav buttons rather than opening a
+        panel, which isn't obvious from a checked button — so the tooltip
+        names the swap in both directions, the way the collapse chevron does.
+        """
+        self._playlists_btn.setToolTip(
+            self.tr("Hide your playlists and show the navigation buttons again")
+            if self._playlists_mode
+            else self.tr("Show your playlists here in place of the navigation buttons")
+        )
 
     def _on_playlists_clicked(self, checked: bool) -> None:
         self.set_playlists_mode(checked)

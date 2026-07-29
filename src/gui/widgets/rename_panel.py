@@ -183,12 +183,12 @@ class RenamePanel(QWidget):
         self._space_dashes = False
         self._space_dashes_btn = QPushButton(self.tr("Space Dashes"))
         self._space_dashes_btn.setCheckable(True)
-        self._space_dashes_btn.setToolTip(self.tr(
-            "Add spaces around a dash that has none "
-            "(Artist-Track → Artist - Track). Dashes that already "
-            "have spaces are left as-is. Helps searching by artist or "
-            "track name in DJ software."
-        ))
+        # Kept to one line on purpose: a tooltip is a reminder, not the manual.
+        # The full behaviour (dashes that already have spaces, and why this
+        # helps DJ-software search) belongs in the docs.
+        self._space_dashes_btn.setToolTip(
+            self.tr("Put spaces around a dash: Artist-Track → Artist - Track")
+        )
 
         # Equal width (sized to the wider label) so the flush-right pair reads
         # as an aligned stack and neither clips in longer-text languages.

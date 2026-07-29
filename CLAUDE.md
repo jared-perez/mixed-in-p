@@ -159,6 +159,11 @@ Compatible keys for mixing: same number (relative major/minor) or +/-1 on same l
 - **A `QMessageBox` button with custom text clips its own label**: the stylesheet's `padding: 8px 16px` on `QPushButton` is invisible to the native size hint, so any label wider than the 80px `QDialogButtonBox QPushButton` minimum is drawn into a contents rect narrower than the text — and QMessageBox centres rather than elides, so it's cut off at *both* ends ("kip Duplicate"). Boxes built from standard buttons are short enough to escape it. Size such buttons from their own font metrics, not a constant, because the labels get translated — see `_fit_buttons` in `dialogs/duplicate_policy.py`.
 - **`pyside6-lupdate` only marks `%n` plurals for `tr()`, not for `QCoreApplication.translate()`**: a module-level function using `translate()` with a count silently ships a string no translator can give plural forms for. Host such strings on a `QObject` so `self.tr(src, "", n)` applies — see `DuplicatePrompt` in `dialogs/duplicate_policy.py`.
 
+## UI copy
+
+- **A tooltip is a reminder, not the manual.** Keep it to roughly one line — what the control does, plus a before/after example where that is the shortest possible explanation (see Space Dashes in `rename_panel.py`). Edge cases and rationale go in the docs, not the hover. Every extra sentence is also a sentence to translate into 11 languages.
+- **A toggle's tooltip says what the next click will do**, in both directions, and updates with the state — a checked button alone doesn't convey that Playlists *replaces* the nav rail rather than opening a panel. See `Sidebar._sync_playlists_tooltip` and the collapse chevron in `set_collapsed`.
+
 ## Internationalization (i18n)
 
 The GUI is translatable via Qt's native translation system. Language is chosen

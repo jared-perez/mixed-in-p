@@ -65,3 +65,18 @@ def test_collapse_signal_fires(qtbot):
     sidebar.set_collapsed(True)
     sidebar.set_collapsed(False)
     assert seen == [True, False]
+
+
+def test_playlists_tooltip_describes_the_next_click(qtbot):
+    """The toggle swaps the nav buttons out rather than opening a panel, which
+    a checked button doesn't convey — so the tooltip names both directions."""
+    sidebar = _make_sidebar(qtbot)
+    off = sidebar._playlists_btn.toolTip()
+    assert "Show" in off and "navigation buttons" in off
+
+    sidebar.set_playlists_mode(True)
+    on = sidebar._playlists_btn.toolTip()
+    assert "Hide" in on and on != off
+
+    sidebar.set_playlists_mode(False)
+    assert sidebar._playlists_btn.toolTip() == off
