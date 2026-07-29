@@ -99,6 +99,11 @@ class AppConfig:
     visualizations_enabled: bool = False
     # Last visual chosen in the Player's visuals dropdown (see _VALID_VIS_MODES).
     visualization_mode: str = "backdrop"
+    # Force absolute paths in exported playlists. Off by default: the
+    # exporter writes relative paths when the tracks sit under the playlist
+    # file's own folder, which is what makes an exported folder portable to
+    # another machine (see src/library/playlist_export.py).
+    export_absolute_paths: bool = False
     language: str = DEFAULT_LANGUAGE
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).

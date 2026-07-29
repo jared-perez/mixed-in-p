@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 from src.analysis import history as analysis_history
 from src import library
+from src.library import playlist_export
 from src.analysis.keycode import render_key
 from src.analysis.result import AnalysisResult
 from src.metadata import update_bpm_key, update_comment_with_energy
@@ -302,6 +303,9 @@ class MainWindow(QMainWindow):
 
         # Settings panel signals
         self._settings_panel.settings_changed.connect(self._on_settings_changed)
+        self._settings_panel.export_all_playlists.connect(
+            self._on_export_all_playlists
+        )
 
     def _load_last_session(self) -> None:
         """Load the most recent rename session for undo."""
@@ -364,6 +368,56 @@ class MainWindow(QMainWindow):
         """Save Playlist created a node — make sure the tree shows it."""
         self._playlists_panel.ensure_loaded()
         self._playlists_panel.tree.refresh()
+
+    def _on_export_all_playlists(self) -> None:
+        """Settings → Export All Playlists… (§7d): the whole tree as files.
+
+        This is the backup story, deliberately made of plain playlist files
+        rather than a proprietary blob — there is nothing to restore *from*,
+        because any app can already read what it writes. Scratch comes along:
+        it survives restarts and can hold real work.
+        """
+        directory = QFileDialog.getExistingDirectory(
+            self, self.tr("Export All Playlists")
+        )
+        if not directory:
+            return
+        try:
+            # Folder name is data, not UI prose — left untranslated so
+            # exports from any language land in the same place.
+            target = playlist_export.unique_path(
+                directory, "Mixed in P Playlists", ""
+            )
+            target.mkdir(parents=True)
+            playlists, tracks = playlist_export.export_tree(
+                self._library,
+                target,
+                absolute=self._config.export_absolute_paths,
+                include_scratch=True,
+            )
+        except (OSError, ValueError) as exc:
+            logger.error("Export all playlists failed: %s", exc)
+            QMessageBox.warning(
+                self,
+                self.tr("Export failed"),
+                self.tr("Could not write the file:\n{0}").format(exc),
+            )
+            return
+        if not playlists:
+            target.rmdir()  # don't leave an empty folder behind
+            QMessageBox.information(
+                self,
+                self.tr("Export All Playlists"),
+                self.tr("There are no playlists to export yet."),
+            )
+            return
+        QMessageBox.information(
+            self,
+            self.tr("Export complete"),
+            self.tr("Exported {0} playlists ({1} tracks) to:\n{2}").format(
+                playlists, tracks, target
+            ),
+        )
 
     def _on_undo_shortcut(self) -> None:
         """Cmd/Ctrl+Z: text editing first, then the playlist undo stack (§11).

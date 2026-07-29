@@ -16,6 +16,10 @@ inside the tree AND exports to Finder or a DJ app.
 
 from __future__ import annotations
 
+import logging
+import shutil
+from pathlib import Path
+
 from PySide6.QtCore import QMimeData, QPointF, QSize, Qt, QUrl, Signal
 from PySide6.QtGui import (
     QBrush,
@@ -33,10 +37,12 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QAbstractItemView,
+    QFileDialog,
     QHBoxLayout,
     QHeaderView,
     QMenu,
     QMessageBox,
+    QProgressDialog,
     QPushButton,
     QStyledItemDelegate,
     QTreeView,
@@ -45,9 +51,23 @@ from PySide6.QtWidgets import (
 )
 
 from src.library import SCRATCH_NODE_ID, Library
+from src.library.playlist_export import (
+    FORMATS,
+    M3U8,
+    TXT,
+    export_tracks,
+    export_tree,
+    safe_filename,
+    unique_path,
+    write_playlist,
+)
+from src.utils.config import load_config
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
+from ..workers.playlist_copy_worker import PlaylistCopyThread
 from .droppable_table import SOURCE_PAGE_MIME, blank_drag_pixmap
+
+logger = logging.getLogger(__name__)
 
 NODE_ID_ROLE = Qt.ItemDataRole.UserRole + 1
 KIND_ROLE = Qt.ItemDataRole.UserRole + 2
@@ -61,6 +81,21 @@ HL_COUNT_ROLE = Qt.ItemDataRole.UserRole + 4
 NODE_MIME = "application/x-mixedinp-node"
 
 _ICON_DRAW = 40  # painted at 2x, displayed at 20 for HiDPI crispness
+
+
+def _with_playlist_suffix(path: str, chosen_filter: str) -> str:
+    """Make sure an exported path carries a format extension.
+
+    Native dialogs append the selected filter's extension; the offscreen and
+    non-native ones don't, and a user who types "Summer Set" would otherwise
+    get an extensionless file that ``write_playlist`` can't type.
+    """
+    if Path(path).suffix.lstrip(".").lower() in FORMATS:
+        return path
+    for fmt in FORMATS:
+        if f"*.{fmt}" in chosen_filter:
+            return f"{path}.{fmt}"
+    return f"{path}.{M3U8}"
 
 
 def _tree_icon(kind: str) -> QIcon:
@@ -168,6 +203,12 @@ class PlaylistTree(QTreeView):
         # Session undo stack (§11), owned by MainWindow. None until
         # set_undo_stack — deletes and moves then simply aren't recorded.
         self._undo: UndoStack | None = None
+        # "Export and Copy Tracks…" runs on a thread (GBs of audio); the
+        # folder is remembered so a cancel or failure can remove exactly the
+        # one we created, and nothing else.
+        self._copy_thread: PlaylistCopyThread | None = None
+        self._copy_dialog: QProgressDialog | None = None
+        self._copy_target: Path | None = None
         # §10 highlight trail state, kept so it survives DB-driven rebuilds
         # (and a set_highlight arriving before the first load).
         self._hl_playlists: set[int] = set()
@@ -456,13 +497,220 @@ class PlaylistTree(QTreeView):
             menu.addSeparator()
             menu.addAction(self.tr("Rename"), lambda: self.edit(index))
             menu.addAction(self.tr("Delete…"), lambda: self._delete_node(node_id))
-        elif kind == "playlist":
-            menu.addAction(self.tr("Rename"), lambda: self.edit(index))
-            menu.addAction(self.tr("Delete…"), lambda: self._delete_node(node_id))
-        else:  # background or Scratch: create at the root
+            menu.addSeparator()
+            menu.addAction(self.tr("Export Folder…"), lambda: self._export_folder(node_id))
+        elif kind in ("playlist", "scratch"):
+            if kind == "playlist":
+                menu.addAction(self.tr("Rename"), lambda: self.edit(index))
+                menu.addAction(self.tr("Delete…"), lambda: self._delete_node(node_id))
+                menu.addSeparator()
+            # Scratch is a real playlist with real contents — exporting it is
+            # how you get a set out without naming it first.
+            menu.addAction(self.tr("Export…"), lambda: self._export_playlist(node_id))
+            menu.addAction(
+                self.tr("Export and Copy Tracks…"),
+                lambda: self._export_with_tracks(node_id),
+            )
+        else:  # empty background: create at the root
             menu.addAction(self.tr("New Playlist"), lambda: self.create_playlist(None))
             menu.addAction(self.tr("New Folder"), lambda: self.create_folder(None))
         menu.exec(self.viewport().mapToGlobal(pos))
+
+    # ------------------------------------------------------------------ export
+
+    def _export_playlist(self, node_id: int) -> None:
+        """Write one playlist out as .m3u8 / .m3u / .txt (§5, §6)."""
+        node = self._library.get_node(node_id)
+        if node is None:
+            return
+        tracks = export_tracks(self._library, node_id)
+        if not tracks:
+            QMessageBox.information(
+                self,
+                self.tr("Export Playlist"),
+                self.tr("This playlist is empty — there is nothing to export."),
+            )
+            return
+        # Filter string is not wrapped: file-glob filters are config, not prose.
+        path, chosen = QFileDialog.getSaveFileName(
+            self,
+            self.tr("Export Playlist"),
+            f"{safe_filename(node.name)}.{M3U8}",
+            "Playlist (*.m3u8);;Playlist (*.m3u);;Tracklist (*.txt)",
+        )
+        if not path:
+            return
+        path = _with_playlist_suffix(path, chosen)
+        try:
+            count = write_playlist(
+                path, tracks, absolute=self._absolute_paths(), title=node.name
+            )
+        except (OSError, ValueError) as exc:
+            self._export_failed(exc)
+            return
+        message = self.tr("Exported {0} tracks to:\n{1}").format(count, path)
+        if Path(path).suffix.lower() != f".{TXT}":
+            message += "\n\n" + self._import_hint()
+        QMessageBox.information(self, self.tr("Export complete"), message)
+
+    def _export_folder(self, node_id: int) -> None:
+        """Write a folder's whole subtree out as a mirrored directory."""
+        node = self._library.get_node(node_id)
+        if node is None:
+            return
+        directory = QFileDialog.getExistingDirectory(self, self.tr("Export Folder"))
+        if not directory:
+            return
+        try:
+            # Everything lands inside a folder of its own rather than
+            # scattering playlists into whatever the user picked.
+            target = unique_path(directory, safe_filename(node.name), "")
+            target.mkdir(parents=True, exist_ok=True)
+            playlists, tracks = export_tree(
+                self._library,
+                target,
+                parent_id=node_id,
+                absolute=self._absolute_paths(),
+            )
+        except (OSError, ValueError) as exc:
+            self._export_failed(exc)
+            return
+        QMessageBox.information(
+            self,
+            self.tr("Export complete"),
+            self.tr("Exported {0} playlists ({1} tracks) to:\n{2}").format(
+                playlists, tracks, target
+            )
+            + "\n\n"
+            + self._import_hint(),
+        )
+
+    def _export_with_tracks(self, node_id: int) -> None:
+        """Copy a playlist's audio into a new folder with a playlist beside it.
+
+        §5's third option, and the one DJs actually want for sharing: one
+        action produces a zip-and-send-ready folder that works on any machine
+        because every path in it is relative.
+        """
+        node = self._library.get_node(node_id)
+        if node is None:
+            return
+        tracks = export_tracks(self._library, node_id)
+        if not tracks:
+            QMessageBox.information(
+                self,
+                self.tr("Export and Copy Tracks"),
+                self.tr("This playlist is empty — there is nothing to export."),
+            )
+            return
+        if self._copy_thread is not None and self._copy_thread.isRunning():
+            QMessageBox.warning(
+                self,
+                self.tr("Export in Progress"),
+                self.tr("An export is already running. Please wait."),
+            )
+            return
+        parent_dir = QFileDialog.getExistingDirectory(
+            self, self.tr("Choose Where to Create the Folder")
+        )
+        if not parent_dir:
+            return
+        try:
+            target = unique_path(parent_dir, safe_filename(node.name), "")
+            target.mkdir(parents=True)
+        except OSError as exc:
+            self._export_failed(exc)
+            return
+
+        self._copy_target = target
+        self._copy_dialog = QProgressDialog(
+            self.tr("Copying tracks…"), self.tr("Cancel"), 0, len(tracks), self
+        )
+        self._copy_dialog.setWindowTitle(self.tr("Export and Copy Tracks"))
+        self._copy_dialog.setWindowModality(Qt.WindowModality.WindowModal)
+        self._copy_dialog.setMinimumDuration(0)
+        self._copy_dialog.setAutoClose(False)
+        self._copy_dialog.setAutoReset(False)
+
+        thread = PlaylistCopyThread(tracks, target, node.name, parent=self)
+        self._copy_dialog.canceled.connect(thread.cancel)
+        thread.progress.connect(self._on_copy_progress)
+        thread.completed.connect(self._on_copy_complete)
+        thread.failed.connect(self._on_copy_failed)
+        thread.cancelled.connect(self._on_copy_cancelled)
+        thread.finished.connect(self._close_copy_dialog)
+        self._copy_thread = thread
+        thread.start()
+
+    def _on_copy_progress(self, progress) -> None:
+        # Held locally: setValue() on a modal QProgressDialog pumps the event
+        # loop, so the copy can finish and clear self._copy_dialog part-way
+        # through this very method.
+        dialog = self._copy_dialog
+        if dialog is None:
+            return
+        dialog.setValue(progress.completed)
+        if progress.current_file:
+            dialog.setLabelText(self.tr("Copying {0}").format(progress.current_file))
+
+    def _close_copy_dialog(self) -> None:
+        if self._copy_dialog is not None:
+            self._copy_dialog.close()
+            self._copy_dialog = None
+        self._copy_thread = None
+
+    def _on_copy_complete(self, path: str, count: int, missing: list) -> None:
+        message = self.tr("Exported {0} tracks to:\n{1}").format(count, path)
+        if missing:
+            # Skipped rather than copied as broken entries — one unresolvable
+            # path would have forced the whole playlist onto absolute paths.
+            # %n + the count argument is Qt's plural form; several target
+            # languages have more than two, so this can't be concatenation.
+            message += "\n\n" + self.tr(
+                "%n track(s) could not be found and were skipped.", "", len(missing)
+            )
+        QMessageBox.information(self, self.tr("Export complete"), message)
+
+    def _on_copy_failed(self, error: str) -> None:
+        self._remove_partial_copy()
+        QMessageBox.warning(
+            self,
+            self.tr("Export failed"),
+            self.tr("Could not write the file:\n{0}").format(error),
+        )
+
+    def _on_copy_cancelled(self) -> None:
+        """Clean up: a half-copied folder is worse than no folder."""
+        self._remove_partial_copy()
+
+    def _remove_partial_copy(self) -> None:
+        """Delete the folder we created, and only ever that one."""
+        target, self._copy_target = self._copy_target, None
+        if target is None:
+            return
+        try:
+            shutil.rmtree(target)
+        except OSError as exc:
+            logger.warning("Could not clean up %s: %s", target, exc)
+
+    def _absolute_paths(self) -> bool:
+        """The Settings override; read per export so it is always current."""
+        return load_config().export_absolute_paths
+
+    def _import_hint(self) -> str:
+        """Where to import the file, since Rekordbox's menu is buried (§6)."""
+        return self.tr(
+            "To import: drag the file onto Serato's crate panel, or use "
+            "File → Import Playlist in Rekordbox and File → Import in Traktor."
+        )
+
+    def _export_failed(self, exc: Exception) -> None:
+        logger.error("Playlist export failed: %s", exc)
+        QMessageBox.warning(
+            self,
+            self.tr("Export failed"),
+            self.tr("Could not write the file:\n{0}").format(exc),
+        )
 
     # -------------------------------------------------------------- activation
 
