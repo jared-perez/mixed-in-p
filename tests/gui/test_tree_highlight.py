@@ -15,6 +15,7 @@ from src.gui.widgets.playlist_tree import (
     HL_PLAYLIST_ROLE,
     PlaylistTreePanel,
 )
+from src.gui.styles.theme import THEMES, Theme
 from src.library import Library
 
 
@@ -109,3 +110,37 @@ class TestPaintNotArrangement:
         tree.set_highlight({nested["p2"]}, {nested["f"]: 1})
         assert tree.library.get_node(nested["f"]).name == "F"
         assert tree._find_item(nested["f"]).text() == "F"
+
+
+class TestTrailColour:
+    """The trail must never collide with the selection colour.
+
+    A selected tree row paints its text NEON_YELLOW (app.qss.template
+    ``#playlistTree::item:selected``). If the trail used the same token the
+    two states would be indistinguishable, which is the whole point of §10.
+    """
+
+    def test_trail_is_not_the_selection_accent_in_every_theme(self):
+        for palette in THEMES.values():
+            assert palette.SEARCH_HIT != palette.NEON_YELLOW, palette.name
+            assert palette.SEARCH_HIT_WASH != palette.BG_LIGHT, palette.name
+
+    def test_delegate_paints_the_trail_tokens(self, tree, nested, qtbot):
+        from PySide6.QtGui import QPalette
+        from PySide6.QtWidgets import QStyleOptionViewItem
+
+        tree.set_highlight({nested["p2"]}, {nested["f"]: 1})
+        delegate = tree.itemDelegate()
+
+        for node_id in (nested["p2"], nested["f"]):
+            opt = QStyleOptionViewItem()
+            delegate.initStyleOption(opt, tree._find_item(node_id).index())
+            for role in (QPalette.ColorRole.Text,
+                         QPalette.ColorRole.HighlightedText):
+                assert opt.palette.color(role).name() == Theme.SEARCH_HIT.lower()
+
+        # Only the playlist gets the wash; the folder stays unwashed.
+        opt = QStyleOptionViewItem()
+        delegate.initStyleOption(opt, tree._find_item(nested["p2"]).index())
+        assert opt.backgroundBrush.color().name() == Theme.SEARCH_HIT_WASH.lower()
+        assert opt.font.bold()

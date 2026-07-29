@@ -185,6 +185,13 @@ class Palette:
     ROW_ALT: str  # alternate (zebra) table row
     ROW_HOVER: str  # table row under the cursor
 
+    # Playlist-tree search trail (§10). Deliberately NOT the primary accent:
+    # a selected tree row already paints its text NEON_YELLOW, so the trail
+    # would be indistinguishable from "the row I clicked". Reads as the
+    # secondary accent's hue in every palette.
+    SEARCH_HIT: str  # trail text (lit playlists + ancestor folder counts)
+    SEARCH_HIT_WASH: str  # row wash behind a lit playlist
+
     # Slicer / waveform surfaces.
     TRAY_BG: str  # recessed "work area" tray behind the slicer detail + controls
     WAVE_AXIS: str  # faint centre reference line drawn through a waveform
@@ -224,6 +231,8 @@ NEON_DARK = Palette(
     ERROR_HOVER="#dd3333",
     ROW_ALT="#333333",
     ROW_HOVER="#383838",
+    SEARCH_HIT="#00ff88",
+    SEARCH_HIT_WASH="#0e3324",
     TRAY_BG="#0d0d0d",
     WAVE_AXIS="#222222",
     WAVEFORM_DEFAULT="#f0ff00",
@@ -258,6 +267,8 @@ NIGHT_DARK = Palette(
     ERROR_HOVER="#c95d60",
     ROW_ALT="#1a1d22",
     ROW_HOVER="#262a32",
+    SEARCH_HIT="#6cc4a1",
+    SEARCH_HIT_WASH="#1e3830",
     TRAY_BG="#101216",
     WAVE_AXIS="#2a2e36",
     WAVEFORM_DEFAULT="#e0b95c",  # muted amber — low-strain at night
@@ -294,6 +305,8 @@ DAYLIGHT = Palette(
     ERROR_HOVER="#ad2a33",
     ROW_ALT="#f2f4f7",
     ROW_HOVER="#eef0f4",
+    SEARCH_HIT="#1f9d57",
+    SEARCH_HIT_WASH="#e2f4ea",
     TRAY_BG="#d9dee5",  # light recessed tray, distinct from the white panels
     WAVE_AXIS="#c4c8cf",  # faint grey centre line on light surfaces
     WAVEFORM_DEFAULT="#006992",  # teal — reads well on the light waveform background
@@ -329,6 +342,8 @@ NUEVO_LEON = Palette(
     ERROR_HOVER="#e04a4a",
     ROW_ALT="#0d1422",
     ROW_HOVER="#16203a",
+    SEARCH_HIT="#1fe98a",
+    SEARCH_HIT_WASH="#0d3328",
     TRAY_BG="#121a2c",  # match the panel (BG_MEDIUM) — no darker recessed box;
     #                     the slice tray + waveform area blend into the panel blue
     WAVE_AXIS="#1c2740",  # faint navy centre line

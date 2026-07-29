@@ -59,10 +59,6 @@ HL_COUNT_ROLE = Qt.ItemDataRole.UserRole + 4
 #: Internal drag payload: the dragged node's id, as ASCII digits.
 NODE_MIME = "application/x-mixedinp-node"
 
-#: Background wash behind a highlighted playlist row — a dim neon-yellow so
-#: "arrived" reads solid without drowning the selection highlight.
-_HL_WASH = "#3a3410"
-
 _ICON_DRAW = 40  # painted at 2x, displayed at 20 for HiDPI crispness
 
 
@@ -111,11 +107,13 @@ class _TreeItemDelegate(QStyledItemDelegate):
 
     Highlight painting: the two states must never look the same, or the
     user can't tell "arrived" from "keep digging". A playlist holding the
-    searched track(s) is arrived — bold, neon text on a yellow wash. A
-    folder with lit playlists beneath is keep-going — neon text and a
-    trailing count ("Crates · 2"), no wash. Both are paint-only, driven by
-    data roles the view sets; order, expansion, and selection are never
-    touched here.
+    searched track(s) is arrived — bold ``SEARCH_HIT`` text on a matching
+    wash. A folder with lit playlists beneath is keep-going — ``SEARCH_HIT``
+    text and a trailing count ("Crates · 2"), no wash. The trail rides the
+    *secondary* accent, never the primary: a selected row already paints its
+    text ``NEON_YELLOW``, and a yellow trail is unreadable against it. Both
+    are paint-only, driven by data roles the view sets; order, expansion,
+    and selection are never touched here.
 
     Editor geometry: the default editor is confined to the item rect, which
     is sized to the OLD text and can be shorter than the editor's own
@@ -131,14 +129,17 @@ class _TreeItemDelegate(QStyledItemDelegate):
         super().initStyleOption(option, index)
         if index.data(HL_PLAYLIST_ROLE):
             option.font.setBold(True)
-            option.backgroundBrush = QBrush(QColor(_HL_WASH))
+            option.backgroundBrush = QBrush(QColor(Theme.SEARCH_HIT_WASH))
         else:
             count = index.data(HL_COUNT_ROLE)
             if not count:
                 return
             option.text = f"{option.text} · {count}"
+        # HighlightedText too, so the trail colour survives selection: a lit
+        # row that is also selected keeps reading as part of the trail, and
+        # selection is carried by the background fill alone.
         for role in (QPalette.ColorRole.Text, QPalette.ColorRole.HighlightedText):
-            option.palette.setColor(role, QColor(Theme.NEON_YELLOW))
+            option.palette.setColor(role, QColor(Theme.SEARCH_HIT))
 
     def updateEditorGeometry(self, editor, option, index) -> None:  # noqa: N802
         super().updateEditorGeometry(editor, option, index)
