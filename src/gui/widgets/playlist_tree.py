@@ -38,12 +38,15 @@ from PySide6.QtGui import (
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QFileDialog,
+    QGridLayout,
     QHBoxLayout,
     QHeaderView,
     QMenu,
     QMessageBox,
     QProgressDialog,
     QPushButton,
+    QSizePolicy,
+    QSpacerItem,
     QStyledItemDelegate,
     QTreeView,
     QVBoxLayout,
@@ -96,6 +99,27 @@ def _with_playlist_suffix(path: str, chosen_filter: str) -> str:
         if f"*.{fmt}" in chosen_filter:
             return f"{path}.{fmt}"
     return f"{path}.{M3U8}"
+
+
+def _widen(box: QMessageBox, width: int) -> None:
+    """Give a message box a minimum width.
+
+    QMessageBox sizes itself to its text and ignores setMinimumWidth, so the
+    only lever is a zero-height spacer stretched across its grid. Worth the
+    hack here: export dialogs carry a full filesystem path and a list of
+    import routes, and at the default width a long path pushes those routes
+    into wrapping against each other. Silently skipped if a future Qt stops
+    using a grid.
+    """
+    layout = box.layout()
+    if isinstance(layout, QGridLayout):
+        layout.addItem(
+            QSpacerItem(width, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed),
+            layout.rowCount(),
+            0,
+            1,
+            layout.columnCount(),
+        )
 
 
 def _tree_icon(kind: str) -> QIcon:
@@ -548,10 +572,11 @@ class PlaylistTree(QTreeView):
         except (OSError, ValueError) as exc:
             self._export_failed(exc)
             return
-        message = self.tr("Exported {0} tracks to:\n{1}").format(count, path)
-        if Path(path).suffix.lower() != f".{TXT}":
-            message += "\n\n" + self._import_hint()
-        QMessageBox.information(self, self.tr("Export complete"), message)
+        self._export_complete(
+            self.tr("Exported {0} tracks to:\n{1}").format(count, path),
+            # A .txt tracklist isn't going into any DJ app — no import routes.
+            hint=Path(path).suffix.lower() != f".{TXT}",
+        )
 
     def _export_folder(self, node_id: int) -> None:
         """Write a folder's whole subtree out as a mirrored directory."""
@@ -575,14 +600,10 @@ class PlaylistTree(QTreeView):
         except (OSError, ValueError) as exc:
             self._export_failed(exc)
             return
-        QMessageBox.information(
-            self,
-            self.tr("Export complete"),
+        self._export_complete(
             self.tr("Exported {0} playlists ({1} tracks) to:\n{2}").format(
                 playlists, tracks, target
             )
-            + "\n\n"
-            + self._import_hint(),
         )
 
     def _export_with_tracks(self, node_id: int) -> None:
@@ -669,7 +690,7 @@ class PlaylistTree(QTreeView):
             message += "\n\n" + self.tr(
                 "%n track(s) could not be found and were skipped.", "", len(missing)
             )
-        QMessageBox.information(self, self.tr("Export complete"), message)
+        self._export_complete(message)
 
     def _on_copy_failed(self, error: str) -> None:
         self._remove_partial_copy()
@@ -698,11 +719,36 @@ class PlaylistTree(QTreeView):
         return load_config().export_absolute_paths
 
     def _import_hint(self) -> str:
-        """Where to import the file, since Rekordbox's menu is buried (§6)."""
-        return self.tr(
-            "To import: drag the file onto Serato's crate panel, or use "
-            "File → Import Playlist in Rekordbox and File → Import in Traktor."
+        """Where to import the file, since Rekordbox's menu is buried (§6).
+
+        One app per line: as a single sentence the three routes wrapped into
+        each other in the dialog and read as one run-on instruction. Kept as
+        separate tr() strings so a translation can grow without re-wrapping
+        the others.
+        """
+        return "\n".join(
+            (
+                self.tr("Serato — drag the file onto the crate panel"),
+                self.tr("Rekordbox — File → Import Playlist"),
+                self.tr("Traktor — File → Import"),
+            )
         )
+
+    def _export_complete(self, message: str, *, hint: bool = True) -> None:
+        """Success dialog, with the import routes as Qt's informative text.
+
+        Informative text renders below the main line in normal weight, which
+        separates "here is your file" from "here is how to use it" without
+        the two becoming one bold paragraph.
+        """
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Information)
+        box.setWindowTitle(self.tr("Export complete"))
+        box.setText(message)
+        if hint:
+            box.setInformativeText(self.tr("To import it:") + "\n" + self._import_hint())
+        _widen(box, 520)
+        box.exec()
 
     def _export_failed(self, exc: Exception) -> None:
         logger.error("Playlist export failed: %s", exc)

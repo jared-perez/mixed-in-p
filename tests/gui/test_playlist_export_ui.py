@@ -46,10 +46,20 @@ def audio(tmp_path):
 
 
 def silence_dialogs(monkeypatch):
-    """Swallow the information/warning boxes so tests don't block."""
+    """Swallow the result boxes so tests don't block, capturing their text.
+
+    Covers both shapes in use: the static helpers, and the constructed
+    QMessageBox the success path builds so it can carry informative text.
+    """
     seen = []
     monkeypatch.setattr(QMessageBox, "information", lambda *a, **k: seen.append(a[2]))
     monkeypatch.setattr(QMessageBox, "warning", lambda *a, **k: seen.append(a[2]))
+
+    def fake_exec(box):
+        seen.append("\n\n".join(t for t in (box.text(), box.informativeText()) if t))
+        return QMessageBox.StandardButton.Ok
+
+    monkeypatch.setattr(QMessageBox, "exec", fake_exec)
     return seen
 
 
@@ -120,6 +130,18 @@ class TestExportPlaylist:
         )
         tree._export_playlist(pl)
         assert "Rekordbox" not in seen[-1]
+
+    def test_each_import_route_gets_its_own_line(self, tree):
+        # As one sentence the three routes wrapped into each other in the
+        # dialog and read as a single run-on instruction.
+        lines = tree._import_hint().splitlines()
+        assert len(lines) == 3
+        assert [line.split(" — ")[0] for line in lines] == [
+            "Serato",
+            "Rekordbox",
+            "Traktor",
+        ]
+        assert all(len(line) < 50 for line in lines)  # short enough not to wrap
 
     def test_cancelling_the_dialog_writes_nothing(self, tree, lib, audio, tmp_path, monkeypatch):
         pl = lib.create_playlist("Set")

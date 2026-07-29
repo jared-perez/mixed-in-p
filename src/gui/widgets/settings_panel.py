@@ -195,53 +195,6 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(vis_frame)
 
-        # ── Section: Playlists ──────────────────────────────────────────────
-        outer.addWidget(self._make_section_label(self.tr("Playlists")))
-
-        playlist_frame = QFrame()
-        playlist_frame.setObjectName("settingsSection")
-        playlist_layout = QVBoxLayout(playlist_frame)
-        playlist_layout.setContentsMargins(16, 10, 16, 10)
-        playlist_layout.setSpacing(8)
-
-        self._export_absolute_cb = QCheckBox(
-            self.tr("Always use full paths in exported playlists")
-        )
-        self._export_absolute_cb.setObjectName("circleCheckLg")
-        self._export_absolute_cb.setChecked(False)
-        playlist_layout.addWidget(self._export_absolute_cb)
-
-        export_hint = QLabel(
-            self.tr(
-                "Exported playlists use paths relative to the playlist file when "
-                "the tracks sit beside it, so a folder you zip and send still "
-                "works on someone else's machine. Turn this on to always write "
-                "the full path instead."
-            )
-        )
-        export_hint.setObjectName("settingsHint")
-        export_hint.setWordWrap(True)
-        playlist_layout.addWidget(export_hint)
-
-        self._export_all_btn = QPushButton(self.tr("Export All Playlists…"))
-        self._export_all_btn.clicked.connect(self.export_all_playlists.emit)
-        export_all_row = self._row_layout()
-        export_all_row.addWidget(self._export_all_btn)
-        export_all_row.addStretch(1)
-        playlist_layout.addLayout(export_all_row)
-
-        export_all_hint = QLabel(
-            self.tr(
-                "Writes one folder of playlist files mirroring your tree — a "
-                "backup any other app can read."
-            )
-        )
-        export_all_hint.setObjectName("settingsHint")
-        export_all_hint.setWordWrap(True)
-        playlist_layout.addWidget(export_all_hint)
-
-        outer.addWidget(playlist_frame)
-
         # ── Section 1: Tempo Range ──────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Tempo Range")))
 
@@ -469,6 +422,54 @@ class SettingsPanel(QWidget):
         self._energy_mode_group.buttonClicked.connect(self._emit_changed)
 
         outer.addWidget(energy_frame)
+
+        # ── Section: Playlists ──────────────────────────────────────────────
+        outer.addWidget(self._make_section_label(self.tr("Playlists")))
+
+        playlist_frame = QFrame()
+        playlist_frame.setObjectName("settingsSection")
+        playlist_layout = QVBoxLayout(playlist_frame)
+        playlist_layout.setContentsMargins(16, 10, 16, 10)
+        playlist_layout.setSpacing(8)
+
+        self._export_absolute_cb = QCheckBox(
+            self.tr("Always use full paths in exported playlists")
+        )
+        self._export_absolute_cb.setObjectName("circleCheckLg")
+        self._export_absolute_cb.setChecked(False)
+        playlist_layout.addWidget(self._export_absolute_cb)
+
+        export_hint = QLabel(
+            self.tr(
+                "Exported playlists use paths relative to the playlist file when "
+                "the tracks sit beside it, so a folder you zip and send still "
+                "works on someone else's machine. Turn this on to always write "
+                "the full path instead."
+            )
+        )
+        export_hint.setObjectName("settingsHint")
+        export_hint.setWordWrap(True)
+        playlist_layout.addWidget(export_hint)
+
+        self._export_all_btn = QPushButton(self.tr("Export All Playlists…"))
+        self._export_all_btn.clicked.connect(self.export_all_playlists.emit)
+        export_all_row = self._row_layout()
+        export_all_row.addWidget(self._export_all_btn)
+        export_all_row.addStretch(1)
+        playlist_layout.addLayout(export_all_row)
+
+        export_all_hint = QLabel(
+            self.tr(
+                "Writes one folder of playlist files mirroring your tree — a "
+                "backup any other app can read."
+            )
+        )
+        export_all_hint.setObjectName("settingsHint")
+        export_all_hint.setWordWrap(True)
+        playlist_layout.addWidget(export_all_hint)
+
+        outer.addWidget(playlist_frame)
+
         outer.addStretch()
 
         scroll.setWidget(container)
