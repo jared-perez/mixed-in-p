@@ -444,6 +444,7 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         self.setDropIndicatorShown(True)
         self._drag_page_id: str | None = None
         self._drag_data_fn = None
+        self._drag_guard_fn = None
         # Predicate set by the panel: when it returns True (slice section open),
         # let S/Q/E bubble up to the panel instead of triggering type-ahead here.
         self._slice_keys_active = None
@@ -500,12 +501,23 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
             return
         super().keyReleaseEvent(event)
 
-    def enable_drag_out(self, page_id: str, drag_data_fn) -> None:
-        """Allow dragging selected rows out as files (see DroppableTableMixin)."""
+    def enable_drag_out(self, page_id: str, drag_data_fn, guard_fn=None) -> None:
+        """Allow dragging selected rows out as files (see DroppableTableMixin).
+
+        ``guard_fn`` (optional) vetoes a drag before it starts — the Player
+        uses it to refuse dragging a file that is no longer on disk.
+        """
         self._drag_page_id = page_id
         self._drag_data_fn = drag_data_fn
+        self._drag_guard_fn = guard_fn
 
     def startDrag(self, supportedActions) -> None:
+        # A veto has to happen here, before any drag exists: a track can be
+        # playing from the PCM cache long after its file moved, and dropping
+        # that nowhere-file into a playlist or onto Finder would only produce
+        # a broken entry.
+        if self._drag_guard_fn is not None and not self._drag_guard_fn():
+            return
         # Build ONE drag the in-list reorder machinery AND the sidebar both
         # understand: the model's internal-move data (so dropping back on this list
         # reorders, and the drop indicator shows) plus file URLs + a source marker
@@ -1590,7 +1602,7 @@ class PlayerPanel(QWidget):
 
         # Drag selected tracks onto a sidebar nav button to route them. A move drop
         # removes them here (stopping playback if a dragged track was playing).
-        self._table.enable_drag_out("player", self._drag_data)
+        self._table.enable_drag_out("player", self._drag_data, self._guard_drag)
 
         # Prefetch the track the user selects so pressing Play is instant.
         self._table.itemSelectionChanged.connect(self._on_selection_changed)
@@ -3122,6 +3134,50 @@ class PlayerPanel(QWidget):
         super().keyReleaseEvent(event)
 
     # ── Drag-out ────────────────────────────────────────────────
+
+    def _guard_drag(self) -> bool:
+        """Veto a drag whose files aren't on disk any more, and say why.
+
+        The case this exists for: a track keeps playing from the PCM cache
+        after its file moves (the audio is in RAM), so the list can look
+        perfectly healthy right up until you try to *do* something with the
+        file. Dragging is that moment — the row gets marked and dimmed here,
+        rather than at the next panel switch.
+        """
+        rows = sorted({idx.row() for idx in self._table.selectionModel().selectedRows()})
+        paths = [self._playlist[r].file_path for r in rows if 0 <= r < len(self._playlist)]
+        # Deliberately not _is_missing: the memo can be stale, and this is
+        # the one moment where being right matters more than being cheap.
+        missing = [p for p in paths if not Path(p).is_file()]
+        if not missing:
+            return True
+        self._refresh_missing_marks()
+        # Deferred: this runs from the view's mouse-move handler with the
+        # button still down, and a modal box opened there fights the drag
+        # machinery for the mouse grab. Let the event unwind first.
+        QTimer.singleShot(0, lambda: self._warn_files_moved(missing))
+        return False
+
+    def _warn_files_moved(self, missing: list[str]) -> None:
+        """Tell the user the file moved, and point at the way to fix it."""
+        if len(missing) == 1:
+            text = self.tr("“{0}” has moved.").format(Path(missing[0]).name)
+        else:
+            text = self.tr("%n of the selected files have moved.", "", len(missing))
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Warning)
+        box.setWindowTitle(self.tr("File Has Moved"))
+        box.setText(text)
+        box.setInformativeText(
+            self.tr(
+                "It is no longer at its saved location, so it can't be added"
+                " to a playlist or dragged out. A track already playing keeps"
+                " playing — it was loaded into memory before the file moved."
+            )
+            + "\n\n"
+            + self.tr("Right-click the track and choose Locate Missing File…")
+        )
+        box.exec()
 
     def _drag_data(self):
         """Provide (paths, remove-on-move callback) for an outgoing drag.

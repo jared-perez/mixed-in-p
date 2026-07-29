@@ -260,6 +260,7 @@ class MainWindow(QMainWindow):
         self._sidebar.collapsed_changed.connect(lambda _c: self._apply_playlists_splitter())
         self._apply_playlists_splitter()  # start with the handle locked
         self._playlists_panel.tree.playlist_activated.connect(self._on_playlist_activated)
+        self._playlists_panel.tree.tracks_added.connect(self._on_tracks_added)
         self._player_panel.playlist_saved.connect(self._on_playlist_saved)
         self._player_panel.tree_highlight_changed.connect(self._on_tree_highlight)
 
@@ -363,6 +364,16 @@ class MainWindow(QMainWindow):
         self._player_panel.load_node(node_id)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
+
+    def _on_tracks_added(self, node_id: int) -> None:
+        """Tracks were dropped into a playlist in the tree.
+
+        Only interesting when it is the list the Player is showing: its
+        visible rows are now stale, and the next auto-save would write them
+        back over the drop, silently undoing it.
+        """
+        if node_id == self._player_panel.loaded_node_id:
+            self._player_panel.load_node(node_id)
 
     def _on_playlist_saved(self, _node_id: int) -> None:
         """Save Playlist created a node — make sure the tree shows it."""

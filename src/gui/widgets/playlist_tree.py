@@ -64,10 +64,12 @@ from src.library.playlist_export import (
     unique_path,
     write_playlist,
 )
+from src.metadata.tags import read_metadata
 from src.utils.config import load_config
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.playlist_copy_worker import PlaylistCopyThread
+from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME, blank_drag_pixmap
 
 logger = logging.getLogger(__name__)
@@ -217,6 +219,10 @@ class PlaylistTree(QTreeView):
     #: Emitted when the user clicks a playlist (or Scratch); the Player
     #: integration step loads the clicked list.
     playlist_activated = Signal(int)
+    #: Tracks were dropped into a node. The window reloads the Player when
+    #: this is the list it is showing — otherwise the Player's next
+    #: auto-save would write its stale visible list back over the drop.
+    tracks_added = Signal(int)
 
     def __init__(self, db_path=None, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -237,6 +243,10 @@ class PlaylistTree(QTreeView):
         # (and a set_highlight arriving before the first load).
         self._hl_playlists: set[int] = set()
         self._hl_folders: dict[int, int] = {}
+        # Row a track drag is currently hovering, painted as the drop target.
+        # Tracks land IN a playlist, never between two, so this replaces Qt's
+        # between-rows indicator for the duration of a file drag.
+        self._track_drop_index = None
 
         self.setObjectName("playlistTree")
         self._model = QStandardItemModel(self)
@@ -810,8 +820,42 @@ class PlaylistTree(QTreeView):
 
     # ------------------------------------------------------------ drop (moves)
 
+    @staticmethod
+    def _is_track_drag(mime) -> bool:
+        """A drag of audio files rather than of a tree node.
+
+        NODE_MIME is checked first everywhere, because the tree's own drags
+        carry file URLs too (§4c) — a playlist dragged onto another playlist
+        must keep meaning "move the node", which the node branch refuses.
+        """
+        if mime.hasFormat(NODE_MIME) or not mime.hasUrls():
+            return False
+        return any(
+            Path(url.toLocalFile()).suffix.lower() in AUDIO_EXTENSIONS
+            for url in mime.urls()
+        )
+
+    def _track_drop_target(self, pos) -> int | None:
+        """The node id a track drop at *pos* would land in, if any.
+
+        Deliberately ignores the drop indicator and just takes the row under
+        the cursor: playlist rows are ``setDropEnabled(False)`` (so nodes
+        can't be dropped into them), which means Qt would only ever report
+        Above/Below over one. Tracks have no meaningful "between" anyway.
+        """
+        index = self.indexAt(pos)
+        if not index.isValid():
+            return None
+        if index.data(KIND_ROLE) not in ("playlist", "scratch"):
+            return None  # a folder holds nodes, not tracks
+        return index.data(NODE_ID_ROLE)
+
     def dragEnterEvent(self, event) -> None:  # noqa: N802 (Qt override)
         if event.mimeData().hasFormat(NODE_MIME):
+            event.acceptProposedAction()
+        elif self._is_track_drag(event.mimeData()):
+            # Our own indicator takes over for the duration of the drag.
+            self.setDropIndicatorShown(False)
             event.acceptProposedAction()
         else:
             event.ignore()
@@ -822,10 +866,27 @@ class PlaylistTree(QTreeView):
         super().dragMoveEvent(event)
         if event.mimeData().hasFormat(NODE_MIME):
             event.acceptProposedAction()
-        else:
-            event.ignore()
+            return
+        if self._is_track_drag(event.mimeData()):
+            pos = event.position().toPoint()
+            target = self._track_drop_target(pos)
+            self._set_track_drop_index(self.indexAt(pos) if target is not None else None)
+            if target is None:
+                event.ignore()
+            else:
+                event.acceptProposedAction()
+            return
+        event.ignore()
+
+    def dragLeaveEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        self._clear_track_drop_row()
+        super().dragLeaveEvent(event)
 
     def dropEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        if self._is_track_drag(event.mimeData()):
+            self._drop_tracks(event)
+            return
+        self._clear_track_drop_row()
         if not event.mimeData().hasFormat(NODE_MIME):
             event.ignore()
             return
@@ -855,6 +916,117 @@ class PlaylistTree(QTreeView):
             event.ignore()
             return
         event.acceptProposedAction()
+
+    # ------------------------------------------------------- drop (add tracks)
+
+    def _set_track_drop_index(self, index) -> None:
+        if index is not None and not index.isValid():
+            index = None
+        current = self._track_drop_index
+        same = (
+            current is not None
+            and index is not None
+            and current.row() == index.row()
+            and current.parent() == index.parent()
+        )
+        if same or (current is None and index is None):
+            return
+        self._track_drop_index = index
+        self.viewport().update()
+
+    def _clear_track_drop_row(self) -> None:
+        self._set_track_drop_index(None)
+        self.setDropIndicatorShown(True)
+
+    def paintEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        super().paintEvent(event)
+        if self._track_drop_index is None:
+            return
+        rect = self.visualRect(self._track_drop_index)
+        if rect.isNull():
+            return
+        # Outline rather than a fill: the row underneath keeps its own text
+        # colours (including a lit search-trail row), and an outline reads as
+        # "into this one" where a wash reads as selection.
+        painter = QPainter(self.viewport())
+        pen = QPen(QColor(Theme.NEON_YELLOW))
+        pen.setWidth(2)
+        painter.setPen(pen)
+        painter.drawRect(rect.adjusted(1, 1, -2, -2))
+        painter.end()
+
+    def _drop_tracks(self, event) -> None:
+        """Add dragged audio files to the playlist under the cursor.
+
+        Always a **copy**: the drop action is downgraded so the source view
+        (the Player's ``startDrag``, which removes rows on a MoveAction)
+        keeps everything it dragged. Removing a track stays an explicit
+        right-click action.
+        """
+        self._clear_track_drop_row()
+        node_id = self._track_drop_target(event.position().toPoint())
+        if node_id is None or self._library is None:
+            event.ignore()
+            return
+        paths = [
+            url.toLocalFile()
+            for url in event.mimeData().urls()
+            if Path(url.toLocalFile()).suffix.lower() in AUDIO_EXTENSIONS
+        ]
+        if not paths or not self._add_paths_to_node(node_id, paths):
+            event.ignore()
+            return
+        # Downgrade to a copy BEFORE accepting: this is the whole "dragging
+        # to another playlist doesn't remove it from this one" behaviour.
+        event.setDropAction(Qt.DropAction.CopyAction)
+        event.accept()
+
+    def _add_paths_to_node(self, node_id: int, paths: list[str]) -> bool:
+        """Append tracks to a playlist, with undo. The one add chokepoint.
+
+        Duplicates are allowed by design (a track can appear twice in a set),
+        so nothing is filtered out here.
+        """
+        library = self._library
+        if library is None or library.get_node(node_id) is None:
+            return False
+        before = library.snapshot_items(node_id)
+        track_ids = [self._track_id_for(path) for path in paths]
+        library.add_items(node_id, track_ids)
+        if self._undo is not None:
+            self._undo.push(
+                "Add Tracks", lambda: library.restore_items(node_id, before)
+            )
+        self._rebuild()
+        self.tracks_added.emit(node_id)
+        return True
+
+    def _track_id_for(self, path: str) -> int:
+        """The library row for a dropped file, reading its tags if it's new.
+
+        A path the library already knows keeps its stored tags untouched —
+        they may have been edited inline in the Player since, and re-reading
+        the file would quietly roll that back.
+        """
+        library = self._library
+        existing = library.get_track_by_path(path)
+        if existing is not None:
+            return existing.id
+        try:
+            meta = read_metadata(path)
+        except Exception as exc:  # noqa: BLE001 — an unreadable tag is not fatal
+            logger.warning("Could not read tags for %s: %s", path, exc)
+            return library.add_track(path)
+        return library.add_track(
+            path,
+            artist=meta.artist or "",
+            title=meta.title or "",
+            album=meta.album or "",
+            genre=meta.genre or "",
+            bpm=meta.bpm,
+            key=meta.key or "",
+            duration=meta.duration,
+        )
 
     def _apply_move(self, node_id: int, parent_id: int | None, row: int) -> bool:
         """Write a drag-move through to the database and refresh the view.
