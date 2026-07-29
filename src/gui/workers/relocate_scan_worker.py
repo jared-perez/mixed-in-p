@@ -31,9 +31,9 @@ logger = logging.getLogger(__name__)
 class RelocateScanThread(QThread):
     """Scan a folder for the files behind a set of missing tracks."""
 
-    #: files examined, files total, current filename
+    # files examined, files total, current filename
     progress = Signal(int, int, str)
-    #: a RelocateResult, ready to apply
+    # a RelocateResult, ready to apply
     completed = Signal(object)
     failed = Signal(str)
     cancelled = Signal()

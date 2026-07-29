@@ -16,6 +16,7 @@ from PySide6.QtWidgets import QMessageBox
 
 from src.gui.main_window import MainWindow
 from src.gui.widgets import playlist_tree as tree_mod
+from src.gui.widgets.dialogs import duplicate_policy as dup_mod
 from src.gui.widgets.player_panel import PlayerPanel
 from src.gui.widgets.playlist_tree import NODE_MIME, PlaylistTreePanel
 from src.gui.models.undo_stack import UndoStack
@@ -116,6 +117,16 @@ class FakeDropEvent:
         self.accepted = False
 
 
+def pump(qtbot):
+    """Let a deferred (zero-delay-timer) duplicate prompt actually run.
+
+    Deliberately not ``qtbot.wait(0)``: that returns without draining the
+    event queue, so a test using it asserts against a prompt that never fired
+    and passes for the wrong reason.
+    """
+    qtbot.wait(10)
+
+
 def aim_at(tree, node_id, monkeypatch):
     """Make indexAt() report the row for *node_id*, whatever the position."""
     item = tree._find_item(node_id)
@@ -198,17 +209,6 @@ class TestDropTracks:
         assert event.accepted is False
         assert lib.track_count() == 0
 
-    def test_duplicates_are_allowed(self, tree, lib, tmp_path, monkeypatch):
-        (a,) = make_files(tmp_path, "a.wav")
-        pl = lib.create_playlist("Set")
-        lib.add_items(pl, [lib.add_track(a)])
-        tree.refresh()
-        aim_at(tree, pl, monkeypatch)
-
-        tree._drop_tracks(FakeDropEvent(url_mime([a])))
-
-        assert [t.path for t in lib.get_items(pl)] == [a, a]
-
     def test_emits_tracks_added(self, tree, lib, tmp_path, monkeypatch, qtbot):
         (a,) = make_files(tmp_path, "a.wav")
         pl = lib.create_playlist("Set")
@@ -231,6 +231,180 @@ class TestDropTracks:
 
         stack.undo()
         assert [t.path for t in lib.get_items(pl)] == [a]
+
+
+class TestDuplicatePolicy:
+    """§22: adding a track a playlist already holds.
+
+    The prompt is deferred off the drop event, so these pump the event loop
+    (``pump(qtbot)``) rather than expecting the add to have happened by the
+    time ``_drop_tracks`` returns. The policy and the box are both patched:
+    the box because a real one would block a headless run forever, and the
+    policy because it is a user setting the suite must not depend on.
+    """
+
+    @staticmethod
+    def answer(monkeypatch, verdict):
+        """Patch the prompt to a fixed answer; returns the recorded calls.
+
+        Overriding ``_prompt`` is also what tells the conftest guard this test
+        means to reach the box.
+        """
+        asked = []
+
+        def stub(parent, collisions, total, playlist_name):
+            asked.append((collisions, total, playlist_name))
+            return verdict
+
+        monkeypatch.setattr(dup_mod, "_prompt", stub)
+        return asked
+
+    @staticmethod
+    def policy(monkeypatch, value):
+        monkeypatch.setattr(dup_mod, "current_policy", lambda: value)
+
+    def seeded(self, tree, lib, tmp_path, monkeypatch, held, dropping):
+        """A playlist already holding *held*, aimed at, ready for *dropping*."""
+        pl = lib.create_playlist("Set")
+        for path in held:
+            lib.add_items(pl, [lib.add_track(path)])
+        tree.refresh()
+        aim_at(tree, pl, monkeypatch)
+        return pl
+
+    def test_a_clean_add_never_asks(self, tree, lib, tmp_path, monkeypatch, qtbot):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [b])
+        asked = self.answer(monkeypatch, True)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([b])))
+        pump(qtbot)
+
+        assert asked == []
+        assert [t.path for t in lib.get_items(pl)] == [a, b]
+
+    def test_add_keeps_the_duplicate(self, tree, lib, tmp_path, monkeypatch, qtbot):
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a])
+        asked = self.answer(monkeypatch, True)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a])))
+        qtbot.waitUntil(lambda: len(lib.get_items(pl)) == 2, timeout=1000)
+
+        assert [t.path for t in lib.get_items(pl)] == [a, a]
+        assert asked == [(1, 1, "Set")]
+
+    def test_skip_drops_only_the_duplicates(
+        self, tree, lib, tmp_path, monkeypatch, qtbot
+    ):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a, b])
+        asked = self.answer(monkeypatch, False)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a, b])))
+        qtbot.waitUntil(lambda: len(lib.get_items(pl)) == 2, timeout=1000)
+
+        assert [t.path for t in lib.get_items(pl)] == [a, b]
+        # The message distinguishes "some of these" from "all of these".
+        assert asked == [(1, 2, "Set")]
+
+    def test_cancel_adds_nothing_and_leaves_undo_alone(
+        self, tree, lib, stack, tmp_path, monkeypatch, qtbot
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a])
+        self.answer(monkeypatch, None)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a])))
+        pump(qtbot)
+
+        assert [t.path for t in lib.get_items(pl)] == [a]
+        # A no-op entry here would swallow the next Cmd+Z.
+        assert not stack.peek_label()
+
+    def test_policy_add_never_asks(self, tree, lib, tmp_path, monkeypatch, qtbot):
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a])
+        self.policy(monkeypatch, "add")
+        asked = self.answer(monkeypatch, True)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a])))
+
+        # Synchronous: no prompt means no deferral, so no pumping needed.
+        assert [t.path for t in lib.get_items(pl)] == [a, a]
+        assert asked == []
+
+    def test_policy_skip_never_asks(self, tree, lib, tmp_path, monkeypatch, qtbot):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a, b])
+        self.policy(monkeypatch, "skip")
+        asked = self.answer(monkeypatch, True)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a, b])))
+
+        assert [t.path for t in lib.get_items(pl)] == [a, b]
+        assert asked == []
+
+    def test_skip_collapses_repeats_inside_one_drop(
+        self, tree, lib, tmp_path, monkeypatch
+    ):
+        """A batch holding the same file twice contributes one copy."""
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [], [a, a])
+        self.policy(monkeypatch, "skip")
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a, a])))
+
+        assert [t.path for t in lib.get_items(pl)] == [a]
+
+    def test_a_skipped_new_file_leaves_no_library_row(
+        self, tree, lib, tmp_path, monkeypatch
+    ):
+        """Resolution runs before _track_id_for, so nothing is created."""
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a, a])
+        self.policy(monkeypatch, "skip")
+        before = lib.track_count()
+
+        # b is dropped twice and is new: the second copy must not create a row.
+        tree._drop_tracks(FakeDropEvent(url_mime([b, b])))
+
+        assert lib.track_count() == before + 1
+
+    def test_a_skipped_file_is_never_tag_read(
+        self, tree, lib, tmp_path, monkeypatch, qtbot
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a])
+        self.answer(monkeypatch, False)
+
+        def explode(_path):
+            raise AssertionError("a skipped file should not be tag-read")
+
+        monkeypatch.setattr(tree_mod, "read_metadata", explode)
+        tree._drop_tracks(FakeDropEvent(url_mime([a])))
+        pump(qtbot)
+
+    def test_the_filter_re_reads_the_playlist_after_the_answer(
+        self, tree, lib, tmp_path, monkeypatch, qtbot
+    ):
+        """Two quick drops: the second must not diff against a stale list.
+
+        The box for the second drop is answered *after* the first one landed,
+        so what it skips has to be judged against the playlist as it is by
+        then, not as it was when the drag started.
+        """
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = self.seeded(tree, lib, tmp_path, monkeypatch, [a], [a, b])
+        self.answer(monkeypatch, False)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([a, b])))  # b is new here
+        tree._drop_tracks(FakeDropEvent(url_mime([b])))  # b is new here too...
+        pump(qtbot)
+
+        # ...but by the time the second box is answered, b has landed, so Skip
+        # drops it rather than adding a second copy.
+        assert [t.path for t in lib.get_items(pl)] == [a, b]
 
 
 class TestRealDropEventRouting:

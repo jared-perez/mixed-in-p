@@ -30,15 +30,15 @@ from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import Iterable, Sequence
 
-#: Formats offered in the export dialog. Extension → filter label stem.
+# Formats offered in the export dialog. Extension → filter label stem.
 M3U8 = "m3u8"
 M3U = "m3u"
 TXT = "txt"
 FORMATS = (M3U8, M3U, TXT)
 
-#: Characters no mainstream filesystem accepts in a name, plus the ones
-#: Windows reserves. Playlist names are free text, so any name that becomes
-#: a filename has to survive this.
+# Characters no mainstream filesystem accepts in a name, plus the ones
+# Windows reserves. Playlist names are free text, so any name that becomes
+# a filename has to survive this.
 _ILLEGAL = '<>:"/\\|?*'
 _RESERVED = {
     "CON", "PRN", "AUX", "NUL",

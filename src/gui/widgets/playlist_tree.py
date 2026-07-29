@@ -69,6 +69,7 @@ from src.utils.config import load_config
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.playlist_copy_worker import PlaylistCopyThread
+from .dialogs.duplicate_policy import resolve_additions
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME, blank_drag_pixmap
 
@@ -76,13 +77,13 @@ logger = logging.getLogger(__name__)
 
 NODE_ID_ROLE = Qt.ItemDataRole.UserRole + 1
 KIND_ROLE = Qt.ItemDataRole.UserRole + 2
-#: §10 highlight trail — paint-only roles, read by the delegate at draw time.
-#: HL_PLAYLIST (bool): this playlist contains the searched track(s).
-#: HL_COUNT (int): folder — how many lit playlists sit beneath it.
+# §10 highlight trail — paint-only roles, read by the delegate at draw time.
+# HL_PLAYLIST (bool): this playlist contains the searched track(s).
+# HL_COUNT (int): folder — how many lit playlists sit beneath it.
 HL_PLAYLIST_ROLE = Qt.ItemDataRole.UserRole + 3
 HL_COUNT_ROLE = Qt.ItemDataRole.UserRole + 4
 
-#: Internal drag payload: the dragged node's id, as ASCII digits.
+# Internal drag payload: the dragged node's id, as ASCII digits.
 NODE_MIME = "application/x-mixedinp-node"
 
 _ICON_DRAW = 40  # painted at 2x, displayed at 20 for HiDPI crispness
@@ -216,12 +217,12 @@ class _TreeItemDelegate(QStyledItemDelegate):
 class PlaylistTree(QTreeView):
     """The tree view itself. Use :class:`PlaylistTreePanel` in layouts."""
 
-    #: Emitted when the user clicks a playlist (or Scratch); the Player
-    #: integration step loads the clicked list.
+    # Emitted when the user clicks a playlist (or Scratch); the Player
+    # integration step loads the clicked list.
     playlist_activated = Signal(int)
-    #: Tracks were dropped into a node. The window reloads the Player when
-    #: this is the list it is showing — otherwise the Player's next
-    #: auto-save would write its stale visible list back over the drop.
+    # Tracks were dropped into a node. The window reloads the Player when
+    # this is the list it is showing — otherwise the Player's next
+    # auto-save would write its stale visible list back over the drop.
     tracks_added = Signal(int)
 
     def __init__(self, db_path=None, parent: QWidget | None = None) -> None:
@@ -968,28 +969,66 @@ class PlaylistTree(QTreeView):
         if node_id is None or self._library is None:
             event.ignore()
             return
+        node = self._library.get_node(node_id)
+        if node is None:
+            event.ignore()
+            return
         paths = [
             url.toLocalFile()
             for url in event.mimeData().urls()
             if Path(url.toLocalFile()).suffix.lower() in AUDIO_EXTENSIONS
         ]
-        if not paths or not self._add_paths_to_node(node_id, paths):
+        if not paths:
             event.ignore()
             return
         # Downgrade to a copy BEFORE accepting: this is the whole "dragging
         # to another playlist doesn't remove it from this one" behaviour.
         event.setDropAction(Qt.DropAction.CopyAction)
         event.accept()
+        # Accept before the add, not after: a duplicate prompt defers the add
+        # past the end of this handler, so there is no verdict to wait for.
+        # Safe precisely because this is a copy — an add that resolves to
+        # nothing simply leaves the source view untouched, as it would anyway.
+        self._add_paths_to_node(node_id, paths)
 
     def _add_paths_to_node(self, node_id: int, paths: list[str]) -> bool:
         """Append tracks to a playlist, with undo. The one add chokepoint.
 
-        Duplicates are allowed by design (a track can appear twice in a set),
-        so nothing is filtered out here.
+        Duplicates the playlist already holds are resolved first — added,
+        skipped, or put to the user, per the ``duplicate_policy`` setting.
+        That resolution can be **asynchronous** (the prompt cannot open inside
+        a drop event), so a ``True`` return means "the add was started", not
+        "the tracks are in". Anything that must run afterwards belongs in
+        ``_commit_added_paths`` or on ``tracks_added``.
+
+        Resolving before ``_track_id_for`` matters: a skipped file must not
+        leave a new library row behind, and must not be tag-read at all.
         """
         library = self._library
-        if library is None or library.get_node(node_id) is None:
+        if library is None:
             return False
+        node = library.get_node(node_id)
+        if node is None:
+            return False
+        resolve_additions(
+            self,
+            paths,
+            lambda: [t.path for t in library.get_items(node_id)],
+            node.name,
+            lambda resolved: self._commit_added_paths(node_id, resolved),
+        )
+        return True
+
+    def _commit_added_paths(self, node_id: int, paths: list[str]) -> None:
+        """Write a resolved add through to the database and refresh the view.
+
+        A resolution of nothing (everything skipped, or the user cancelled) is
+        a no-op down to the undo stack: pushing an entry for an add that added
+        nothing would eat the Cmd+Z the user meant for the edit before it.
+        """
+        library = self._library
+        if library is None or not paths or library.get_node(node_id) is None:
+            return
         before = library.snapshot_items(node_id)
         track_ids = [self._track_id_for(path) for path in paths]
         library.add_items(node_id, track_ids)
@@ -999,7 +1038,6 @@ class PlaylistTree(QTreeView):
             )
         self._rebuild()
         self.tracks_added.emit(node_id)
-        return True
 
     def _track_id_for(self, path: str) -> int:
         """The library row for a dropped file, reading its tags if it's new.

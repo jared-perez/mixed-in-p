@@ -30,7 +30,7 @@ from hashlib import blake2b
 from pathlib import Path
 from typing import Iterable
 
-#: Reserved node id for the Player's pinned working list ("Scratch").
+# Reserved node id for the Player's pinned working list ("Scratch").
 SCRATCH_NODE_ID = 1
 
 _CONTENT_ID_BYTES = 64 * 1024

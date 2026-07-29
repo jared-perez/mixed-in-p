@@ -94,6 +94,9 @@ _BACKDROP_VIS_MAP = {
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
 }
+from .dialogs.duplicate_policy import ADD as DUPLICATES_ADD
+from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
+from .dialogs.duplicate_policy import resolve_additions
 from .dialogs.relocate_dialog import RelocateDialog
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin, blank_drag_pixmap
@@ -1012,7 +1015,7 @@ class PlayerPanel(QWidget):
         # list is reloaded, a file is relocated, or the panel is shown, so a
         # file restored outside the app stops being marked.
         self._missing_cache: dict[str, bool] = {}
-        #: Rows the last rebuild marked as missing (drives the dimming).
+        # Rows the last rebuild marked as missing (drives the dimming).
         self._missing_rows: set[int] = set()
 
         # In-memory PCM playback engine. Decoding the whole track to RAM makes
@@ -1636,19 +1639,65 @@ class PlayerPanel(QWidget):
 
     # ── Public API ──────────────────────────────────────────────
 
-    def add_tracks(self, tracks: list[dict], allow_duplicates: bool = False) -> None:
+    def add_tracks(
+        self, tracks: list[dict], allow_duplicates: bool | None = None
+    ) -> None:
         """Add tracks to the playlist.
 
         Each dict should have: file_path, display_name, and optionally artist, title,
         bpm, key, comment, year (str), duration (float seconds).
 
-        ``allow_duplicates`` bypasses the by-path dedupe — used when loading a
-        saved playlist, where a deliberately repeated track must survive.
+        ``allow_duplicates`` forces the answer to the duplicate question and
+        stays silent: ``True`` keeps every incoming file (used when loading a
+        saved playlist, where a deliberately repeated track must survive),
+        ``False`` drops the ones already here. The default ``None`` consults
+        the ``duplicate_policy`` setting, which may put it to the user — and
+        that prompt is **deferred**, so this can return before the tracks land.
+        Anything that must run afterwards belongs in ``_append_tracks``.
         """
         # Files added while a search is showing target the loaded playlist —
-        # leave the search so the user sees where they landed.
+        # leave the search so the user sees where they landed. Must happen
+        # before the duplicate check: mid-search ``_playlist`` holds the search
+        # results, not the playlist the files are actually going into.
         if self._search_active:
             self._exit_search()
+        by_path: dict[str, dict] = {}
+        for t in tracks:
+            by_path.setdefault(t["file_path"], t)
+        resolve_additions(
+            self,
+            [t["file_path"] for t in tracks],
+            lambda: [e.file_path for e in self._playlist],
+            self._playlist_display_name(),
+            lambda resolved: self._append_tracks(
+                [by_path[p] for p in resolved if p in by_path],
+                proposed=len(tracks),
+            ),
+            # None consults the setting; a forced answer never asks.
+            policy=None
+            if allow_duplicates is None
+            else (DUPLICATES_ADD if allow_duplicates else DUPLICATES_SKIP),
+        )
+
+    def _playlist_display_name(self) -> str:
+        """The loaded playlist's name, for the duplicate prompt."""
+        if self._library is not None:
+            node = self._library.get_node(self._loaded_node_id)
+            if node is not None:
+                return node.name
+        return self.tr("Scratch")
+
+    def _append_tracks(self, tracks: list[dict], *, proposed: int = 0) -> None:
+        """Append resolved tracks to the visible list and refresh around them.
+
+        ``proposed`` is how many were offered before the duplicate filter ran.
+        An add that was *resolved away* — everything skipped, or cancelled —
+        leaves the list and the undo stack alone; an add that was empty to
+        begin with still refreshes, because that is how loading an empty
+        playlist clears the table.
+        """
+        if not tracks and proposed:
+            return
         for t in tracks:
             artist = t.get("artist", "")
             title = t.get("title", "")
@@ -1699,11 +1748,8 @@ class PlayerPanel(QWidget):
                 duration=duration_str,
                 year=year,
             )
-            # Avoid duplicates by file path
-            if not allow_duplicates and any(
-                e.file_path == entry.file_path for e in self._playlist
-            ):
-                continue
+            # Duplicates were already resolved by add_tracks — whatever
+            # reaches here has been cleared to land.
             self._playlist.append(entry)
 
         self._rebuild_table()

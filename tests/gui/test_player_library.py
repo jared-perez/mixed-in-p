@@ -3,6 +3,7 @@
 import pytest
 from PySide6.QtWidgets import QInputDialog
 
+from src.gui.widgets.dialogs import duplicate_policy as dup_mod
 from src.gui.widgets.player_panel import PlayerPanel, _parse_bpm, _parse_duration
 from src.library import SCRATCH_NODE_ID, Library
 
@@ -35,6 +36,16 @@ def track_dicts(paths):
     from pathlib import Path
 
     return [{"file_path": p, "display_name": Path(p).name} for p in paths]
+
+
+def pump(qtbot):
+    """Let a deferred (zero-delay-timer) duplicate prompt actually run.
+
+    Deliberately not ``qtbot.wait(0)``: that returns without draining the
+    event queue, so a test using it asserts against a prompt that never fired
+    and passes for the wrong reason.
+    """
+    qtbot.wait(10)
 
 
 class TestParsers:
@@ -164,6 +175,121 @@ class TestPlaybackDecoupledFromList:
         assert player._playing_path is None
         assert player._now_playing_label.isHidden()
         assert [e.file_path for e in player._playlist] == [b]
+
+
+class TestDuplicatePolicyInThePlayer:
+    """§22: Scratch is a playlist like any other, so the Player asks too.
+
+    This replaces the silent by-path dedupe every Player add used to do. The
+    prompt is patched here because a real modal blocks a headless run; the
+    conftest guard pins the policy to the shipped default ("ask").
+    """
+
+    @staticmethod
+    def answer(monkeypatch, verdict):
+        asked = []
+
+        def stub(parent, collisions, total, playlist_name):
+            asked.append((collisions, total, playlist_name))
+            return verdict
+
+        monkeypatch.setattr(dup_mod, "_prompt", stub)
+        return asked
+
+    def test_a_re_added_file_asks(self, player, lib, tmp_path, monkeypatch, qtbot):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        player.add_tracks(track_dicts([a, b]))
+        asked = self.answer(monkeypatch, True)
+
+        player.add_tracks(track_dicts([a]))
+        qtbot.waitUntil(lambda: len(player._playlist) == 3, timeout=1000)
+
+        assert [e.file_path for e in player._playlist] == [a, b, a]
+        # Named for the list it is going into, not for the panel.
+        assert asked == [(1, 1, "Scratch")]
+
+    def test_skip_keeps_the_list_as_it_was(
+        self, player, lib, tmp_path, monkeypatch, qtbot
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        player.add_tracks(track_dicts([a]))
+        self.answer(monkeypatch, False)
+
+        player.add_tracks(track_dicts([a]))
+        pump(qtbot)
+
+        assert [e.file_path for e in player._playlist] == [a]
+
+    def test_the_prompt_names_the_loaded_playlist(
+        self, player, lib, tmp_path, monkeypatch, qtbot
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = lib.create_playlist("Peak Time")
+        lib.set_items(pl, [lib.add_track(a)])
+        player.load_node(pl)
+        asked = self.answer(monkeypatch, False)
+
+        player.add_tracks(track_dicts([a]))
+        pump(qtbot)
+
+        assert asked == [(1, 1, "Peak Time")]
+
+    def test_a_clean_add_is_synchronous_and_silent(
+        self, player, lib, tmp_path, monkeypatch
+    ):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        player.add_tracks(track_dicts([a]))
+        asked = self.answer(monkeypatch, True)
+
+        player.add_tracks(track_dicts([b]))
+
+        # No pumping: nothing to ask means nothing is deferred.
+        assert [e.file_path for e in player._playlist] == [a, b]
+        assert asked == []
+
+    def test_loading_a_playlist_never_asks(
+        self, player, lib, tmp_path, monkeypatch
+    ):
+        """A load restores a document; its duplicates are the point."""
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = lib.create_playlist("Doubles")
+        tid = lib.add_track(a)
+        lib.set_items(pl, [tid, tid])
+        asked = self.answer(monkeypatch, False)
+
+        player.load_node(pl)
+
+        assert [e.file_path for e in player._playlist] == [a, a]
+        assert asked == []
+
+    def test_a_skipped_file_is_never_tag_read(
+        self, player, lib, tmp_path, monkeypatch, qtbot
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        player.add_tracks(track_dicts([a]))
+        self.answer(monkeypatch, False)
+
+        def explode(_path):
+            raise AssertionError("a skipped file should not be tag-read")
+
+        monkeypatch.setattr("src.metadata.tags.read_metadata", explode)
+        player.add_tracks(track_dicts([a]))
+        pump(qtbot)
+
+        assert [e.file_path for e in player._playlist] == [a]
+
+    def test_loading_an_empty_playlist_still_clears_the_table(
+        self, player, lib, tmp_path
+    ):
+        """An empty *load* must refresh; only a resolved-away add must not."""
+        (a,) = make_files(tmp_path, "a.wav")
+        player.add_tracks(track_dicts([a]))
+        empty = lib.create_playlist("Empty")
+
+        player.load_node(empty)
+
+        assert player._playlist == []
+        assert player._table.rowCount() == 0
 
 
 class TestSavePlaylist:

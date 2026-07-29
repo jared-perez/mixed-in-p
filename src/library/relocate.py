@@ -36,11 +36,11 @@ from .library import Library, Track, compute_content_id
 
 logger = logging.getLogger(__name__)
 
-#: Extensions a folder scan considers. Kept local rather than imported from
-#: the GUI's drop_zone so this module stays Qt-free.
+# Extensions a folder scan considers. Kept local rather than imported from
+# the GUI's drop_zone so this module stays Qt-free.
 AUDIO_EXTENSIONS = {".wav", ".flac", ".aiff", ".aif", ".aifc", ".mp3", ".m4a", ".ogg"}
 
-#: How a track was matched to its new file.
+# How a track was matched to its new file.
 BY_CONTENT = "content"
 BY_FILENAME = "filename"
 

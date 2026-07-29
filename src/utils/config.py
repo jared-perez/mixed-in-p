@@ -31,6 +31,9 @@ HISTORY_DISPLAY_LIMITS = (50, 100, 250, 500, 1000)
 DEFAULT_HISTORY_DISPLAY_LIMIT = 100
 
 _VALID_ENERGY_FORMATS = {"number_only", "with_label"}
+# What happens when tracks are added to a playlist that already holds them.
+# "ask" prompts; the other two are the silent answers to that same prompt.
+_VALID_DUPLICATE_POLICIES = {"ask", "add", "skip"}
 _VALID_ENERGY_MODES = {"prepend", "append", "replace"}
 _VALID_KEY_NOTATIONS = {"keycode", "traditional", "open_key"}
 _VALID_VIS_MODES = {
@@ -104,6 +107,12 @@ class AppConfig:
     # file's own folder, which is what makes an exported folder portable to
     # another machine (see src/library/playlist_export.py).
     export_absolute_paths: bool = False
+    # What to do when tracks are added to a playlist that already contains
+    # them: "ask" (prompt Add/Skip/Cancel), "add" (always keep duplicates) or
+    # "skip" (always drop them). Applies to every playlist including Scratch,
+    # and to every entry point except loading a saved playlist, which restores
+    # its stored duplicates verbatim.
+    duplicate_policy: str = "ask"
     language: str = DEFAULT_LANGUAGE
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).
@@ -179,6 +188,12 @@ def load_config() -> AppConfig:
                 visualization_mode=str(
                     data.get("visualization_mode", AppConfig.visualization_mode)
                 ),
+                export_absolute_paths=bool(
+                    data.get("export_absolute_paths", AppConfig.export_absolute_paths)
+                ),
+                duplicate_policy=str(
+                    data.get("duplicate_policy", AppConfig.duplicate_policy)
+                ),
                 language=data.get("language", AppConfig.language),
                 theme=data.get("theme", AppConfig.theme),
                 history_display_limit=int(
@@ -218,6 +233,8 @@ def load_config() -> AppConfig:
                 cfg.waveform_color = AppConfig.waveform_color
             if cfg.visualization_mode not in _VALID_VIS_MODES:
                 cfg.visualization_mode = AppConfig.visualization_mode
+            if cfg.duplicate_policy not in _VALID_DUPLICATE_POLICIES:
+                cfg.duplicate_policy = AppConfig.duplicate_policy
             if cfg.language not in LANGUAGE_CODES:
                 cfg.language = AppConfig.language
             valid_themes = _valid_theme_ids()

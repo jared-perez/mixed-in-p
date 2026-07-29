@@ -37,8 +37,10 @@ class SettingsPanel(QWidget):
     """Settings panel with tempo range and auto-rename options."""
 
     settings_changed = Signal()
-    #: "Export All Playlists…" clicked. The main window owns the library, so
-    #: the panel only asks; it never touches playlist data itself.
+    # "Export All Playlists…" clicked. The main window owns the library, so
+    # the panel only asks; it never touches playlist data itself.
+    # (Plain "#", not "#:" — lupdate harvests a "#:" comment as an
+    # extracomment and staples it onto the next translatable string.)
     export_all_playlists = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -432,6 +434,34 @@ class SettingsPanel(QWidget):
         playlist_layout.setContentsMargins(16, 10, 16, 10)
         playlist_layout.setSpacing(8)
 
+        dup_row = self._row_layout()
+        dup_row.addWidget(QLabel(self.tr("Duplicate tracks:")))
+        self._duplicate_policy_combo = QComboBox()
+        for label, code in (
+            (self.tr("Ask each time"), "ask"),
+            (self.tr("Always add duplicates"), "add"),
+            (self.tr("Always skip duplicates"), "skip"),
+        ):
+            self._duplicate_policy_combo.addItem(label, code)
+        self._duplicate_policy_combo.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToContents
+        )
+        dup_row.addWidget(self._duplicate_policy_combo)
+        dup_row.addStretch(1)
+        playlist_layout.addLayout(dup_row)
+
+        dup_hint = QLabel(
+            self.tr(
+                "What happens when you add a track a playlist already contains. "
+                "A set list can repeat a track on purpose, so this asks rather "
+                "than deciding for you — pick one of the other options to stop "
+                "being asked."
+            )
+        )
+        dup_hint.setObjectName("settingsHint")
+        dup_hint.setWordWrap(True)
+        playlist_layout.addWidget(dup_hint)
+
         self._export_absolute_cb = QCheckBox(
             self.tr("Always use full paths in exported playlists")
         )
@@ -484,6 +514,7 @@ class SettingsPanel(QWidget):
         self._auto_analyze_cb.stateChanged.connect(self._emit_changed)
         self._visualizations_cb.stateChanged.connect(self._emit_changed)
         self._export_absolute_cb.stateChanged.connect(self._emit_changed)
+        self._duplicate_policy_combo.currentIndexChanged.connect(self._emit_changed)
         self._format_group.buttonClicked.connect(self._emit_changed)
         self._language_combo.currentIndexChanged.connect(self._on_language_changed)
         self._theme_combo.currentIndexChanged.connect(self._on_theme_changed)
@@ -734,6 +765,7 @@ class SettingsPanel(QWidget):
             waveform_color=self._waveform_color,
             visualizations_enabled=self._visualizations_cb.isChecked(),
             export_absolute_paths=self._export_absolute_cb.isChecked(),
+            duplicate_policy=self._duplicate_policy_combo.currentData(),
         )
 
     def load_config(self, cfg: AppConfig) -> None:
@@ -778,6 +810,12 @@ class SettingsPanel(QWidget):
         self._export_absolute_cb.blockSignals(True)
         self._export_absolute_cb.setChecked(cfg.export_absolute_paths)
         self._export_absolute_cb.blockSignals(False)
+
+        self._duplicate_policy_combo.blockSignals(True)
+        dup_index = self._duplicate_policy_combo.findData(cfg.duplicate_policy)
+        if dup_index >= 0:
+            self._duplicate_policy_combo.setCurrentIndex(dup_index)
+        self._duplicate_policy_combo.blockSignals(False)
 
         radio = self._format_radios.get(cfg.naming_preference)
         if radio:

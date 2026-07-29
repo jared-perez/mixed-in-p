@@ -29,9 +29,9 @@ from PySide6.QtCore import QObject, Signal
 
 logger = logging.getLogger(__name__)
 
-#: How many operations back the user can reach. Deep enough to cover a run of
-#: mis-drops, shallow enough that the retained snapshots stay small (a
-#: snapshot holds track rows, not audio).
+# How many operations back the user can reach. Deep enough to cover a run of
+# mis-drops, shallow enough that the retained snapshots stay small (a
+# snapshot holds track rows, not audio).
 MAX_DEPTH = 50
 
 
@@ -45,19 +45,19 @@ class UndoStack(QObject):
     Wrap them at the point something shows them.
     """
 
-    #: Emitted whenever the stack's depth changes (push, undo, or clear), so
-    #: an Edit menu or button can track whether undo is available.
+    # Emitted whenever the stack's depth changes (push, undo, or clear), so
+    # an Edit menu or button can track whether undo is available.
     changed = Signal()
-    #: Emitted after an entry runs, carrying its (untranslated) label. The
-    #: window uses this to refresh the views the restore touched.
+    # Emitted after an entry runs, carrying its (untranslated) label. The
+    # window uses this to refresh the views the restore touched.
     undone = Signal(str)
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
         self._entries: list[tuple[str, Callable[[], None]]] = []
-        #: Set while an entry runs. Mutating code writes through the same
-        #: chokepoints that push entries, so without this an undo would push
-        #: its own inverse and Cmd+Z would toggle between two states forever.
+        # Set while an entry runs. Mutating code writes through the same
+        # chokepoints that push entries, so without this an undo would push
+        # its own inverse and Cmd+Z would toggle between two states forever.
         self._undoing = False
 
     def push(self, label: str, undo: Callable[[], None]) -> None:

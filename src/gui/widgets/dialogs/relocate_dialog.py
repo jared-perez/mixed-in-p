@@ -46,8 +46,8 @@ from ...workers.relocate_scan_worker import RelocateScanThread
 
 logger = logging.getLogger(__name__)
 
-#: Audio types the "Locate…" picker offers. Format codes are data, not UI
-#: prose, so the extensions stay unwrapped; only the label is translated.
+# Audio types the "Locate…" picker offers. Format codes are data, not UI
+# prose, so the extensions stay unwrapped; only the label is translated.
 _AUDIO_GLOB = "*.wav *.flac *.aiff *.aif *.aifc *.mp3 *.m4a *.ogg"
 
 
@@ -66,11 +66,11 @@ class RelocateDialog(QDialog):
         self._track = library.get_track_by_path(file_path)
         self._scan_thread: RelocateScanThread | None = None
         self._progress: QProgressDialog | None = None
-        #: Rows relinked in the database — the caller reloads when non-zero.
+        # Rows relinked in the database — the caller reloads when non-zero.
         self.relinked = 0
-        #: Where the clicked track went, when it was relinked here. Set even
-        #: if the library had no row for it, so a caller holding only the
-        #: visible list can still repoint its own entry.
+        # Where the clicked track went, when it was relinked here. Set even
+        # if the library had no row for it, so a caller holding only the
+        # visible list can still repoint its own entry.
         self.new_path: str | None = None
 
         self.setWindowTitle(self.tr("File Not Found"))

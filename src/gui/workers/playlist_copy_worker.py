@@ -40,7 +40,7 @@ class PlaylistCopyThread(QThread):
     """Copy a playlist's audio into a folder, then write the playlist file."""
 
     progress = Signal(CopyProgress)
-    #: playlist file path, tracks written, paths that could not be found
+    # playlist file path, tracks written, paths that could not be found
     completed = Signal(str, int, list)
     failed = Signal(str)
     cancelled = Signal()
