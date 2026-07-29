@@ -94,6 +94,7 @@ _BACKDROP_VIS_MAP = {
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
 }
+from .dialogs.relocate_dialog import RelocateDialog
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME, RubberBandSelectMixin, blank_drag_pixmap
 from .player_engine import PlayerEngine
@@ -993,6 +994,14 @@ class PlayerPanel(QWidget):
         self._search_capped = False
         self._count_column_active = False
         self._num_col_width = 40
+        # path -> "the file is gone", for the "!" marker (step 10). Memoised
+        # because the table rebuilds on every list edit and a stat per row
+        # per rebuild is wasted work; invalidated wholesale whenever the
+        # list is reloaded, a file is relocated, or the panel is shown, so a
+        # file restored outside the app stops being marked.
+        self._missing_cache: dict[str, bool] = {}
+        #: Rows the last rebuild marked as missing (drives the dimming).
+        self._missing_rows: set[int] = set()
 
         # In-memory PCM playback engine. Decoding the whole track to RAM makes
         # seeking instant (just an integer offset) — QMediaPlayer's setPosition
@@ -1078,6 +1087,9 @@ class PlayerPanel(QWidget):
         # Give the playlist keyboard focus when the panel becomes visible so the
         # Space play/pause shortcut is active without requiring a click first.
         self._table.setFocus(Qt.FocusReason.OtherFocusReason)
+        # Coming back to the Player is the moment a remounted drive should
+        # stop being marked as missing (and a newly unplugged one start).
+        self._refresh_missing_marks()
         # Warm the track they're most likely to hit Play on next.
         self._prefetch_default_target()
 
@@ -2125,6 +2137,55 @@ class PlayerPanel(QWidget):
 
     # ── Table management ────────────────────────────────────────
 
+    # ── Missing files (step 10) ─────────────────────────────────
+
+    def _is_missing(self, file_path: str) -> bool:
+        """Whether this track's file is gone, memoised for the rebuild."""
+        cached = self._missing_cache.get(file_path)
+        if cached is None:
+            cached = not Path(file_path).is_file()
+            self._missing_cache[file_path] = cached
+        return cached
+
+    def _refresh_missing_marks(self) -> None:
+        """Re-stat the visible rows; rebuild only if a mark actually changed.
+
+        The rebuild is conditional because it is not free (and it re-reads
+        the current row highlight); the common case is that nothing moved
+        and this is just a handful of stat calls.
+        """
+        before = {e.file_path: self._missing_cache.get(e.file_path) for e in self._playlist}
+        self._missing_cache = {}
+        if any(before[path] != self._is_missing(path) for path in before):
+            self._rebuild_table()
+
+    def _locate_missing(self, row: int) -> None:
+        """Open the relocate dialog for a row whose file has gone (§1)."""
+        if not (0 <= row < len(self._playlist)) or self._library is None:
+            return
+        entry = self._playlist[row]
+        dialog = RelocateDialog(self._library, entry.file_path, self)
+        dialog.exec()
+        if dialog.new_path is None and not dialog.relinked:
+            return
+        self._missing_cache = {}
+        # The library rows moved under us, so the visible list has to come
+        # from the library again — otherwise the next auto-save would write
+        # the old, missing paths straight back in via add_track().
+        if dialog.new_path is not None:
+            entry.file_path = dialog.new_path
+            entry.display_name = Path(dialog.new_path).name
+        if self._search_active:
+            self._run_search()
+        elif dialog.relinked:
+            self.load_node(self._loaded_node_id)
+        else:
+            # No library row existed for the old path (so nothing was
+            # relinked); the visible entry now points at the new file and
+            # auto-save writes that through.
+            self._rebuild_table()
+            self._persist_playlist()
+
     def _rebuild_table(self) -> None:
         self._rebuilding = True
         try:
@@ -2149,6 +2210,7 @@ class PlayerPanel(QWidget):
         # doesn't look like user edits.
         self._table.blockSignals(True)
         try:
+            self._missing_rows = set()
             for row, entry in enumerate(self._playlist):
                 # All-playlists search: column 0 is the membership count, with
                 # the playlist names as its tooltip (§10 — the answer without
@@ -2163,7 +2225,23 @@ class PlayerPanel(QWidget):
                 num_item.setFlags(non_drop_flags)
                 self._table.setItem(row, 0, num_item)
 
-                name_item = QTableWidgetItem(entry.display_name)
+                # A missing file is marked in the Name column: "!" in front
+                # of the name, the row dimmed by _highlight_current_row, and
+                # the last known path in the tooltip. The entry's index rides
+                # along in UserRole because the marker makes the cell text an
+                # unreliable way to identify the row again after a drag —
+                # see _sync_playlist_from_table.
+                missing = self._is_missing(entry.file_path)
+                if missing:
+                    self._missing_rows.add(row)
+                name_item = QTableWidgetItem(
+                    f"! {entry.display_name}" if missing else entry.display_name
+                )
+                name_item.setData(Qt.ItemDataRole.UserRole, row)
+                if missing:
+                    name_item.setToolTip(
+                        self.tr("File not found:\n{0}").format(entry.file_path)
+                    )
                 name_item.setFlags(non_drop_flags)
                 self._table.setItem(row, 1, name_item)
 
@@ -2207,12 +2285,18 @@ class PlayerPanel(QWidget):
         try:
             for row in range(self._table.rowCount()):
                 is_current = row == self._current_index
+                # A missing file reads as dimmed, except while it is the
+                # playing row: that highlight is about where playback is,
+                # and losing it would be the more confusing of the two.
+                is_missing = row in self._missing_rows
                 for col in range(self._table.columnCount()):
                     item = self._table.item(row, col)
                     if item is None:
                         continue
                     if is_current:
                         item.setForeground(QColor(Theme.NEON_YELLOW))
+                    elif is_missing:
+                        item.setForeground(QColor(Theme.TEXT_DISABLED))
                     else:
                         item.setForeground(QColor(Theme.TEXT_PRIMARY))
                     if col == 1:
@@ -2470,17 +2554,23 @@ class PlayerPanel(QWidget):
     def _sync_playlist_from_table(self) -> None:
         """Rebuild the internal playlist list from table row order after drag-drop."""
         new_playlist: list[PlaylistEntry] = []
+        taken: set[int] = set()
         old_current_path = self._playing_path
 
+        # Rows carry their pre-drag index in UserRole (the drop handler moves
+        # the QTableWidgetItems themselves, so the role rides along). Matching
+        # on that rather than on the displayed name keeps two copies of one
+        # track distinct, and survives the "!" that marks a missing file.
         for row in range(self._table.rowCount()):
             name_item = self._table.item(row, 1)
             if name_item is None:
                 continue
-            name = name_item.text()
-            for entry in self._playlist:
-                if entry.display_name == name and entry not in new_playlist:
-                    new_playlist.append(entry)
-                    break
+            index = name_item.data(Qt.ItemDataRole.UserRole)
+            if isinstance(index, int) and 0 <= index < len(self._playlist):
+                if index in taken:
+                    continue  # a row Qt copied rather than moved
+                taken.add(index)
+                new_playlist.append(self._playlist[index])
 
         self._playlist = new_playlist
 
@@ -3120,6 +3210,12 @@ class PlayerPanel(QWidget):
         entry = self._playlist[row]
 
         menu = QMenu(self._table)
+        # Only when the file is actually gone: an always-present "Locate…"
+        # would read as an invitation to repoint tracks that are fine.
+        locate_action = None
+        if self._library is not None and self._is_missing(entry.file_path):
+            locate_action = menu.addAction(self.tr("Locate Missing File…"))
+            menu.addSeparator()
         open_folder_action = menu.addAction(self.tr("Open File Location"))
         open_metadata_action = menu.addAction(self.tr("Open in Metadata Panel"))
         reload_action = menu.addAction(self.tr("Reload Metadata from File"))
@@ -3127,7 +3223,9 @@ class PlayerPanel(QWidget):
         remove_action = menu.addAction(self.tr("Remove from Playlist"))
 
         chosen = menu.exec(self._table.viewport().mapToGlobal(pos))
-        if chosen is open_folder_action:
+        if locate_action is not None and chosen is locate_action:
+            self._locate_missing(row)
+        elif chosen is open_folder_action:
             self._reveal_in_explorer(entry.file_path)
         elif chosen is open_metadata_action:
             self.open_in_metadata.emit(entry.file_path)

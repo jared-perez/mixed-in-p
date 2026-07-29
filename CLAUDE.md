@@ -145,6 +145,8 @@ Compatible keys for mixing: same number (relative major/minor) or +/-1 on same l
 - **Cross-platform paths**: Use `src/utils/app_dirs.py` for all persistent data (config, history). Never hardcode OS-specific paths.
 - **PyInstaller**: Use `sys._MEIPASS` for bundled resource paths when frozen. See `_get_base_path()` in `src/gui/app.py`.
 - **Panel routing**: Panels connect via "Send To" dropdowns (Rename → Analyze/Convert, Convert → Analyze) and sidebar drag-and-drop (drop files onto nav buttons).
+- **Bare `QWidget` containers are opaque**: `app.qss.template` opens with a global `QWidget { background-color: @BG_DARK@ }`, so any plain `QWidget` (or `QStackedWidget`) used purely as a layout container paints `BG_DARK` over whatever panel it sits on. Give such a container an object name and a `background-color: transparent` rule. `QStackedWidget` is also a `QFrame`, so it inherits the global 1px frame border too — add `border: none` unless a box is wanted. See `#sidebarModeStack` / `#playlistTreePanel`.
+- **Moving a layout into a widget changes its spacing**: a nested layout inherits the parent layout's spacing; a widget's own layout falls back to the Qt style default (6px, not `Theme.SPACING`'s 8). Call `setSpacing(Theme.SPACING)` explicitly when wrapping an existing row in a container.
 
 ## Internationalization (i18n)
 

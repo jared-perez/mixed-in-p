@@ -364,6 +364,13 @@ class Library:
         ).fetchall()
         return [row["id"] for row in rows]
 
+    def all_tracks(self) -> list[Track]:
+        """Every track row, display-ordered — the relocate scan's input."""
+        rows = self._con.execute(
+            "SELECT * FROM tracks ORDER BY artist, title, id"
+        ).fetchall()
+        return [_track(row) for row in rows]
+
     def update_track_tags(self, track_id: int, **fields: object) -> None:
         """Update tag columns (artist/title/album/genre/bpm/key/energy/duration)."""
         unknown = set(fields) - set(_TAG_COLUMNS)
@@ -428,6 +435,69 @@ class Library:
                     )
                 updated += 1
         return updated
+
+    def relink_track(self, track_id: int, new_path: str | Path) -> int:
+        """Point a track row at a file that moved *outside* the app (§1).
+
+        Unlike :meth:`update_paths` (the in-app rename hook), this
+        recomputes the fingerprint from the new file: a relocated file is
+        the authority for what it now contains, since the fallback match
+        also covers a file that was re-encoded rather than merely moved.
+
+        If another row already owns *new_path* the two rows describe one
+        file, so they are merged — memberships move to the surviving row
+        and the relinked row is dropped. Returns the surviving track id,
+        which is *not* ``track_id`` in the merge case.
+        """
+        new_path = str(new_path)
+        row = self._con.execute(
+            "SELECT * FROM tracks WHERE id=?", (track_id,)
+        ).fetchone()
+        if row is None:
+            raise ValueError(f"No track with id {track_id}")
+        clash = self._con.execute(
+            "SELECT id FROM tracks WHERE path=? AND id!=?", (new_path, track_id)
+        ).fetchone()
+        with self._con:
+            if clash:
+                # playlist_items is keyed on (node_id, position), so a
+                # playlist that held both rows simply ends up holding the
+                # survivor twice — duplicates are allowed by design.
+                survivor = int(clash["id"])
+                self._con.execute(
+                    "UPDATE playlist_items SET track_id=? WHERE track_id=?",
+                    (survivor, track_id),
+                )
+                if self._has_fts:
+                    self._con.execute(
+                        "DELETE FROM tracks_fts WHERE rowid=?", (track_id,)
+                    )
+                self._con.execute("DELETE FROM tracks WHERE id=?", (track_id,))
+                return survivor
+            filename = Path(new_path).name
+            blob = _make_search_blob(
+                row["artist"], row["title"], row["album"], filename
+            )
+            size, mtime = _stat(new_path)
+            self._con.execute(
+                "UPDATE tracks SET path=?, filename=?, search_blob=?, size=?,"
+                " mtime=?, content_id=? WHERE id=?",
+                (
+                    new_path,
+                    filename,
+                    blob,
+                    size,
+                    mtime,
+                    compute_content_id(new_path),
+                    track_id,
+                ),
+            )
+            if self._has_fts:
+                self._con.execute(
+                    "UPDATE tracks_fts SET filename=? WHERE rowid=?",
+                    (filename, track_id),
+                )
+        return track_id
 
     # ------------------------------------------------------------------ nodes
 
