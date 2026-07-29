@@ -129,6 +129,7 @@ class PlaylistTree(QTreeView):
         super().__init__(parent)
         self._db_path = db_path
         self._library: Library | None = None
+        self._loaded = False
         self._building = False
 
         self.setObjectName("playlistTree")
@@ -166,11 +167,23 @@ class PlaylistTree(QTreeView):
 
     # ----------------------------------------------------------------- loading
 
+    def set_library(self, library: Library) -> None:
+        """Use a shared library instance (the main window's) instead of
+        opening our own connection."""
+        self._library = library
+
     def ensure_loaded(self) -> None:
-        """Open the library and populate on first use (lazy so the database
-        isn't created for users who never open playlists mode)."""
+        """Populate on first use. Opens its own library connection only if a
+        shared one wasn't attached via set_library()."""
         if self._library is None:
             self._library = Library(self._db_path)
+        if not self._loaded:
+            self._loaded = True
+            self._rebuild()
+
+    def refresh(self) -> None:
+        """Re-read the tree from the database (no-op before first load)."""
+        if self._loaded:
             self._rebuild()
 
     @property
@@ -489,3 +502,6 @@ class PlaylistTreePanel(QWidget):
 
     def ensure_loaded(self) -> None:
         self.tree.ensure_loaded()
+
+    def set_library(self, library: Library) -> None:
+        self.tree.set_library(library)

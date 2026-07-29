@@ -51,9 +51,11 @@ from PySide6.QtWidgets import (
     QCheckBox,
     QHBoxLayout,
     QHeaderView,
+    QInputDialog,
     QLabel,
     QLineEdit,
     QMenu,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QSlider,
@@ -68,6 +70,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from src.library import SCRATCH_NODE_ID, Library
 from src.metadata.tags import (
     TrackMetadata,
     delete_metadata_fields,
@@ -272,6 +275,23 @@ class PlaylistEntry:
     comment: str = ""
     duration: str = ""  # formatted "m:ss"
     year: str = ""
+
+
+def _parse_bpm(text: str) -> float | None:
+    """Entry BPM string -> float for the library row, or None if unparsable."""
+    try:
+        return float(text)
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_duration(text: str) -> float | None:
+    """Entry 'm:ss' duration -> seconds for the library row."""
+    try:
+        minutes, seconds = text.split(":")
+        return int(minutes) * 60 + int(seconds)
+    except (AttributeError, ValueError):
+        return None
 
 
 class SeparatorHeaderView(QHeaderView):
@@ -872,11 +892,19 @@ class PlayerPanel(QWidget):
     # Re-emits the slicer's expand/collapse so the window sizer can widen the
     # window's minimum to fit the slicer controls while it is open.
     slice_expanded = Signal(bool)
+    # A new saved playlist was created via Save Playlist (payload: node id).
+    playlist_saved = Signal(int)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._playlist: list[PlaylistEntry] = []
         self._current_index: int = -1
+        # Playlist library binding (set_library): the visible list persists
+        # into the loaded node — Scratch by default, or a saved playlist the
+        # user clicked in the tree (auto-save: every edit writes through).
+        self._library: Library | None = None
+        self._loaded_node_id: int = SCRATCH_NODE_ID
+        self._loading_playlist = False
 
         # In-memory PCM playback engine. Decoding the whole track to RAM makes
         # seeking instant (just an integer offset) — QMediaPlayer's setPosition
@@ -1023,6 +1051,14 @@ class PlayerPanel(QWidget):
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
         title_row.addWidget(title)
+
+        # Breadcrumb: which list the Player is showing ("› Scratch",
+        # "› Summer Set"). Quieter color so the panel identity stays "Player".
+        self._context_label = QLabel("")
+        self._context_label.setStyleSheet(
+            f"font-size: 24px; color: {Theme.TEXT_SECONDARY};"
+        )
+        title_row.addWidget(self._context_label)
         title_row.addSpacing(12)
 
         self._art_label = QLabel()
@@ -1282,6 +1318,13 @@ class PlayerPanel(QWidget):
         self._stats_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         controls_row.addWidget(self._stats_label)
 
+        # Hidden until a library is attached (set_library) — saving needs
+        # somewhere to save to.
+        self._save_btn = QPushButton(self.tr("Save Playlist"))
+        self._save_btn.clicked.connect(self._on_save_playlist)
+        self._save_btn.hide()
+        controls_row.addWidget(self._save_btn)
+
         self._clear_btn = QPushButton(self.tr("Clear Playlist"))
         self._clear_btn.clicked.connect(self._on_clear_playlist)
         controls_row.addWidget(self._clear_btn)
@@ -1361,11 +1404,14 @@ class PlayerPanel(QWidget):
 
     # ── Public API ──────────────────────────────────────────────
 
-    def add_tracks(self, tracks: list[dict]) -> None:
+    def add_tracks(self, tracks: list[dict], allow_duplicates: bool = False) -> None:
         """Add tracks to the playlist.
 
         Each dict should have: file_path, display_name, and optionally artist, title,
         bpm, key, comment, year (str), duration (float seconds).
+
+        ``allow_duplicates`` bypasses the by-path dedupe — used when loading a
+        saved playlist, where a deliberately repeated track must survive.
         """
         for t in tracks:
             artist = t.get("artist", "")
@@ -1412,7 +1458,9 @@ class PlayerPanel(QWidget):
                 year=year,
             )
             # Avoid duplicates by file path
-            if any(e.file_path == entry.file_path for e in self._playlist):
+            if not allow_duplicates and any(
+                e.file_path == entry.file_path for e in self._playlist
+            ):
                 continue
             self._playlist.append(entry)
 
@@ -1425,6 +1473,7 @@ class PlayerPanel(QWidget):
         # Start decoding the first track in the background so the first Play is
         # instant instead of waiting on a full decode.
         self._prefetch_default_target()
+        self._persist_playlist()
 
     def stop_playback(self) -> None:
         """Stop playback (called on nav-away from the Player and on app close)."""
@@ -1435,6 +1484,104 @@ class PlayerPanel(QWidget):
         self._rebuild_table()
         self._update_stats()
         self._update_transport_state()
+
+    # ── Playlist library binding ─────────────────────────────────
+
+    def set_library(self, library: Library) -> None:
+        """Attach the playlist library.
+
+        From here on the visible list persists into the loaded node (Scratch
+        by default) and Save Playlist becomes available.
+        """
+        self._library = library
+        self._save_btn.show()
+        self._update_context_label()
+
+    @property
+    def loaded_node_id(self) -> int:
+        return self._loaded_node_id
+
+    def load_node(self, node_id: int) -> None:
+        """Show a saved playlist (or Scratch) in the Player.
+
+        Replaces the visible list only — the previous node keeps its saved
+        contents; edits from now on write through to *this* node.
+        """
+        if self._library is None or self._library.get_node(node_id) is None:
+            return
+        tracks = self._library.get_items(node_id)
+        self._loading_playlist = True
+        try:
+            self._on_clear_playlist()
+            self._loaded_node_id = node_id
+            self.add_tracks(
+                [
+                    {"file_path": t.path, "display_name": Path(t.path).name}
+                    for t in tracks
+                ],
+                allow_duplicates=True,  # a saved list may repeat a track on purpose
+            )
+        finally:
+            self._loading_playlist = False
+        self._update_context_label()
+
+    def _persist_playlist(self) -> None:
+        """Auto-save: write the visible list through to the loaded node."""
+        if self._library is None or self._loading_playlist:
+            return
+        if self._library.get_node(self._loaded_node_id) is None:
+            # The loaded playlist was deleted from the tree; fall back to
+            # Scratch rather than writing into a void.
+            self._loaded_node_id = SCRATCH_NODE_ID
+            self._update_context_label()
+        # Entry fields mirror the file's tags (read at add time), so they're
+        # passed through even when empty — clearing a tag clears the row.
+        track_ids = [
+            self._library.add_track(
+                e.file_path,
+                artist=e.artist,
+                title=e.title,
+                bpm=_parse_bpm(e.bpm),
+                key=e.key,
+                duration=_parse_duration(e.duration),
+            )
+            for e in self._playlist
+        ]
+        self._library.set_items(self._loaded_node_id, track_ids)
+
+    def _update_context_label(self) -> None:
+        if self._library is None:
+            self._context_label.setText("")
+            return
+        if self._loaded_node_id == SCRATCH_NODE_ID:
+            name = self.tr("Scratch")
+        else:
+            node = self._library.get_node(self._loaded_node_id)
+            name = node.name if node is not None else ""
+        self._context_label.setText(f"› {name}")
+
+    def _on_save_playlist(self) -> None:
+        """Save the visible list as a new named playlist at the top of the tree."""
+        if self._library is None:
+            return
+        if not self._playlist:
+            QMessageBox.information(
+                self,
+                self.tr("Save Playlist"),
+                self.tr("The playlist is empty — add some tracks first."),
+            )
+            return
+        name, ok = QInputDialog.getText(
+            self, self.tr("Save Playlist"), self.tr("Playlist name:")
+        )
+        name = name.strip()
+        if not ok or not name:
+            return
+        self._persist_playlist()  # library rows current before copying
+        track_ids = self._library.get_item_track_ids(self._loaded_node_id)
+        node_id = self._library.create_playlist(name)
+        self._library.set_items(node_id, track_ids)
+        self.playlist_saved.emit(node_id)
 
     # ── Table management ────────────────────────────────────────
 
@@ -1735,6 +1882,8 @@ class PlayerPanel(QWidget):
         # Reflect any normalization (e.g. BPM "128.0" -> "128") back into the cell.
         if new_text != item.text():
             self._revert_cell(row, item.column(), new_text)
+        # Refresh the library row so playlists/search see the edited tags.
+        self._persist_playlist()
 
     def _reload_selected_metadata(self, fallback_row: int) -> None:
         """Re-read tags from disk for the selected rows (or the clicked row)."""
@@ -1792,6 +1941,7 @@ class PlayerPanel(QWidget):
                     break
 
         self._rebuild_table()
+        self._persist_playlist()
 
     def _update_stats(self) -> None:
         count = len(self._playlist)
@@ -2361,6 +2511,7 @@ class PlayerPanel(QWidget):
         self._rebuild_table()
         self._update_stats()
         self._update_transport_state()
+        self._persist_playlist()
 
     def _on_clear_playlist(self) -> None:
         # Unload to release the audio device and free the decoded buffer.
@@ -2375,6 +2526,7 @@ class PlayerPanel(QWidget):
         self._rebuild_table()
         self._update_stats()
         self._update_transport_state()
+        self._persist_playlist()
 
     # ── Context menu ────────────────────────────────────────────
 

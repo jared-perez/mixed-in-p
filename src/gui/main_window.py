@@ -115,6 +115,13 @@ class MainWindow(QMainWindow):
         self._apply_visualization_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
         self._spectrum_panel.set_dynamic_range(self._config.spectrum_dynamic_range)
+        # Playlist library: one shared main-thread connection. Opened at
+        # startup (creating the database on first run) because Scratch
+        # persistence — the Player's list surviving a restart — needs it.
+        self._library = library.Library()
+        self._playlists_panel.set_library(self._library)
+        self._player_panel.set_library(self._library)
+        self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._load_last_session()
 
     def _setup_ui(self) -> None:
@@ -235,6 +242,8 @@ class MainWindow(QMainWindow):
         self._sidebar.playlists_toggled.connect(self._on_playlists_toggled)
         self._sidebar.collapsed_changed.connect(lambda _c: self._apply_playlists_splitter())
         self._apply_playlists_splitter()  # start with the handle locked
+        self._playlists_panel.tree.playlist_activated.connect(self._on_playlist_activated)
+        self._player_panel.playlist_saved.connect(self._on_playlist_saved)
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -327,6 +336,17 @@ class MainWindow(QMainWindow):
         if on:
             self._playlists_panel.ensure_loaded()
         self._apply_playlists_splitter()
+
+    def _on_playlist_activated(self, node_id: int) -> None:
+        """A playlist (or Scratch) clicked in the tree loads into the Player."""
+        self._player_panel.load_node(node_id)
+        self._sidebar.set_current_page("player")
+        self._on_page_changed("player")
+
+    def _on_playlist_saved(self, _node_id: int) -> None:
+        """Save Playlist created a node — make sure the tree shows it."""
+        self._playlists_panel.ensure_loaded()
+        self._playlists_panel.tree.refresh()
 
     def _apply_playlists_splitter(self) -> None:
         """Sync the splitter with the sidebar's mode.
