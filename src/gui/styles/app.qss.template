@@ -333,6 +333,15 @@ QTreeView#playlistTree::item:selected {
     color: @NEON_YELLOW@;
 }
 
+/* Inline rename editor: the global QLineEdit 8px padding + border leaves a
+   ~26px tree row with no room for text (it renders as a squished sliver).
+   Slim the chrome so the name is visible while editing. */
+QTreeView#playlistTree QLineEdit {
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-size: 14px;
+}
+
 /* Compact create buttons above the tree. */
 QPushButton#treeCreateButton {
     background-color: transparent;

@@ -36,6 +36,7 @@ from PySide6.QtWidgets import (
     QMenu,
     QMessageBox,
     QPushButton,
+    QStyledItemDelegate,
     QTreeView,
     QVBoxLayout,
     QWidget,
@@ -94,6 +95,29 @@ def _tree_icon(kind: str) -> QIcon:
     return icon
 
 
+class _RenameEditorDelegate(QStyledItemDelegate):
+    """Give the inline rename editor usable geometry.
+
+    The default editor is confined to the item rect, which is sized to the
+    OLD text and can be shorter than the editor's own chrome — the name
+    being typed ends up invisible. Stretch to the viewport's right edge and
+    floor the height at the editor's size hint.
+    """
+
+    def __init__(self, view: QTreeView) -> None:
+        super().__init__(view)
+        self._view = view
+
+    def updateEditorGeometry(self, editor, option, index) -> None:  # noqa: N802
+        super().updateEditorGeometry(editor, option, index)
+        rect = editor.geometry()
+        rect.setRight(self._view.viewport().width() - 4)
+        min_h = editor.sizeHint().height()
+        if rect.height() < min_h:
+            rect.setHeight(min_h)
+        editor.setGeometry(rect)
+
+
 class PlaylistTree(QTreeView):
     """The tree view itself. Use :class:`PlaylistTreePanel` in layouts."""
 
@@ -131,6 +155,7 @@ class PlaylistTree(QTreeView):
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
 
+        self.setItemDelegate(_RenameEditorDelegate(self))
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._on_context_menu)
         self._model.itemChanged.connect(self._on_item_changed)
