@@ -7,8 +7,10 @@ from PySide6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDro
 from PySide6.QtWidgets import (
     QButtonGroup,
     QFrame,
+    QHBoxLayout,
     QLabel,
     QPushButton,
+    QStackedWidget,
     QVBoxLayout,
     QWidget,
 )
@@ -139,6 +141,8 @@ class Sidebar(QFrame):
 
     page_changed = Signal(str)
     files_dropped_on_page = Signal(str, list)
+    playlists_toggled = Signal(bool)
+    collapsed_changed = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -149,6 +153,7 @@ class Sidebar(QFrame):
         # and back without losing the original translated string.
         self._labels: dict[QPushButton, str] = {}
         self._collapsed = False
+        self._playlists_mode = False
         self._auto_badge: QLabel | None = None
         self._auto_dot: QLabel | None = None
         self._auto_badge_enabled = False
@@ -159,14 +164,31 @@ class Sidebar(QFrame):
         layout.setContentsMargins(6, 16, 6, 16)
         layout.setSpacing(4)
 
-        # Collapse/expand toggle, aligned with the nav icons below it.
+        # Top row: collapse/expand toggle (1/3) + Playlists mode toggle (2/3).
+        top_row = QHBoxLayout()
+        top_row.setSpacing(4)
+
         self._toggle_btn = QPushButton()
         self._toggle_btn.setObjectName("sidebarButton")
         self._toggle_btn.setIcon(nav_icon("collapse"))
         self._toggle_btn.setIconSize(_NAV_ICON_SIZE)
         self._toggle_btn.setToolTip(self.tr("Collapse sidebar"))
         self._toggle_btn.clicked.connect(self._toggle_collapsed)
-        layout.addWidget(self._toggle_btn)
+        top_row.addWidget(self._toggle_btn, 1)
+
+        # Playlists is a *mode* toggle, not a page: it must stay out of
+        # _button_group (exclusive), or checking it would deselect the
+        # active panel's nav button.
+        self._playlists_btn = QPushButton(self.tr("Playlists"))
+        self._playlists_btn.setObjectName("sidebarButton")
+        self._playlists_btn.setIcon(nav_icon("playlists"))
+        self._playlists_btn.setIconSize(_NAV_ICON_SIZE)
+        self._playlists_btn.setCheckable(True)
+        self._playlists_btn.setToolTip(self.tr("Show playlists"))
+        self._playlists_btn.clicked.connect(self._on_playlists_clicked)
+        top_row.addWidget(self._playlists_btn, 2)
+
+        layout.addLayout(top_row)
 
         # Thin divider separating the toggle from the nav buttons.
         divider = QFrame()
@@ -174,6 +196,15 @@ class Sidebar(QFrame):
         divider.setFixedHeight(1)
         layout.addWidget(divider)
         layout.addSpacing(4)
+
+        # Below the divider the sidebar swaps between the nav rail and the
+        # playlists tree (the tree itself lands in a later step; the page
+        # exists now so the mode mechanics are final).
+        self._mode_stack = QStackedWidget()
+        self._nav_page = QWidget()
+        nav_layout = QVBoxLayout(self._nav_page)
+        nav_layout.setContentsMargins(0, 0, 0, 0)
+        nav_layout.setSpacing(4)
 
         # Button group for exclusive selection
         self._button_group = QButtonGroup(self)
@@ -206,7 +237,7 @@ class Sidebar(QFrame):
             self._button_group.addButton(btn)
             self._buttons[page_id] = btn
             self._labels[btn] = label
-            layout.addWidget(btn)
+            nav_layout.addWidget(btn)
 
         # Select first button by default (Player, now at the top)
         self._buttons["player"].setChecked(True)
@@ -221,8 +252,18 @@ class Sidebar(QFrame):
             rename_btn.setProperty("compactLabel", True)
             self._repolish(rename_btn)
 
-        # Spacer
-        layout.addStretch()
+        # Spacer (inside the nav page, so the playlists page gets full height)
+        nav_layout.addStretch()
+        self._mode_stack.addWidget(self._nav_page)
+
+        # Playlists page: empty container the tree drops into (next step).
+        self._playlists_page = QWidget()
+        self.playlists_layout = QVBoxLayout(self._playlists_page)
+        self.playlists_layout.setContentsMargins(0, 0, 0, 0)
+        self.playlists_layout.setSpacing(4)
+        self._mode_stack.addWidget(self._playlists_page)
+
+        layout.addWidget(self._mode_stack, 1)
 
         # Bottom section
         # Settings button (no drop support)
@@ -304,14 +345,57 @@ class Sidebar(QFrame):
             self.tr("Expand sidebar") if collapsed else self.tr("Collapse sidebar")
         )
 
-        self.setFixedWidth(
-            Theme.SIDEBAR_WIDTH_COLLAPSED if collapsed else Theme.SIDEBAR_WIDTH
-        )
+        # The Playlists toggle doesn't fit beside the chevron on the 56px
+        # rail, so it hides while collapsed. The mode itself survives —
+        # re-expanding brings the tree straight back.
+        self._playlists_btn.setVisible(not collapsed)
+        self._sync_mode_stack()
+        self._apply_width()
         if self._auto_badge is not None:
             self._auto_badge.setVisible(self._auto_badge_enabled and not collapsed)
         if self._auto_dot is not None:
             self._auto_dot.setVisible(self._auto_badge_enabled and collapsed)
         self._position_auto_badge()
+        self.collapsed_changed.emit(collapsed)
+
+    # ------------------------------------------------------------ playlists mode
+
+    @property
+    def playlists_mode(self) -> bool:
+        """Whether the sidebar is showing the playlists tree instead of nav."""
+        return self._playlists_mode
+
+    def set_playlists_mode(self, on: bool) -> None:
+        """Switch between the nav rail and the playlists tree."""
+        self._playlists_mode = on
+        self._playlists_btn.setChecked(on)
+        self._sync_mode_stack()
+        self._apply_width()
+
+    def _on_playlists_clicked(self, checked: bool) -> None:
+        self.set_playlists_mode(checked)
+        self.playlists_toggled.emit(checked)
+
+    def _sync_mode_stack(self) -> None:
+        # Collapsed always shows the icon rail — a 56px tree would be useless.
+        show_tree = self._playlists_mode and not self._collapsed
+        self._mode_stack.setCurrentWidget(
+            self._playlists_page if show_tree else self._nav_page
+        )
+
+    def _apply_width(self) -> None:
+        """One place owns the width constraints for every mode combination.
+
+        Fixed width keeps the splitter handle immobile in nav mode; playlists
+        mode releases the pin so the user can drag the handle.
+        """
+        if self._collapsed:
+            self.setFixedWidth(Theme.SIDEBAR_WIDTH_COLLAPSED)
+        elif self._playlists_mode:
+            self.setMinimumWidth(Theme.SIDEBAR_PLAYLISTS_MIN)
+            self.setMaximumWidth(Theme.SIDEBAR_PLAYLISTS_MAX)
+        else:
+            self.setFixedWidth(Theme.SIDEBAR_WIDTH)
 
     @staticmethod
     def _repolish(widget: QWidget) -> None:

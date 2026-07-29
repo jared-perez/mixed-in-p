@@ -166,6 +166,21 @@ def _paint_history(p: QPainter, c: str) -> None:
     p.drawLine(QPointF(cx, cy), QPointF(cx + r * 0.52, cy + r * 0.12))
 
 
+def _paint_playlists(p: QPainter, c: str) -> None:
+    """Stacked list lines with a musical note (playlists)."""
+    s = _DRAW
+    p.setPen(_pen(c, 0.085))
+    p.setBrush(Qt.BrushStyle.NoBrush)
+    for yf in (0.30, 0.48):
+        p.drawLine(QPointF(s * 0.22, s * yf), QPointF(s * 0.78, s * yf))
+    p.drawLine(QPointF(s * 0.22, s * 0.66), QPointF(s * 0.46, s * 0.66))
+    # Note: head + stem tucked into the bottom-right corner.
+    p.drawLine(QPointF(s * 0.68, s * 0.52), QPointF(s * 0.68, s * 0.76))
+    p.setPen(Qt.PenStyle.NoPen)
+    p.setBrush(QColor(c))
+    p.drawEllipse(QPointF(s * 0.615, s * 0.78), s * 0.075, s * 0.062)
+
+
 def _paint_collapse(p: QPainter, c: str) -> None:
     """Double chevron pointing left (collapse the rail)."""
     s = _DRAW
@@ -204,6 +219,7 @@ _PAINTERS = {
     "spectrum": _paint_spectrum,
     "settings": _paint_settings,
     "history": _paint_history,
+    "playlists": _paint_playlists,
     "collapse": _paint_collapse,
     "expand": _paint_expand,
 }

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
     QMessageBox,
+    QSplitter,
     QTableWidget,
     QVBoxLayout,
     QWidget,
@@ -99,6 +100,10 @@ class MainWindow(QMainWindow):
         # first showEvent (so it measures a laid-out sidebar).
         self._sizer = WindowSizer(self)
         self._geometry_restored = False
+        # Sidebar width while in playlists mode. Deliberately session-only
+        # (not in config): also sidesteps restoring an oversized sidebar
+        # onto a smaller screen.
+        self._playlists_sidebar_w = Theme.SIDEBAR_PLAYLISTS_DEFAULT
         self._connect_signals()
         self._analysis_panel.set_auto_analyze(self._config.auto_analyze)
         self._analysis_panel.set_auto_write_bpm(self._config.auto_write_bpm)
@@ -126,23 +131,25 @@ class MainWindow(QMainWindow):
         self._header = HeaderBar()
         main_layout.addWidget(self._header)
 
-        # Content area (horizontal: sidebar + pages)
-        content_widget = QWidget()
-        content_layout = QHBoxLayout(content_widget)
-        content_layout.setContentsMargins(0, 0, 0, 0)
-        content_layout.setSpacing(0)
-
-        # Sidebar
+        # Content area (horizontal: sidebar | pages). A splitter rather than a
+        # box layout so the sidebar is user-resizable in playlists mode; in nav
+        # mode the sidebar's fixed width keeps the handle immobile, preserving
+        # the old behavior exactly.
         self._sidebar = Sidebar()
-        content_layout.addWidget(self._sidebar)
 
         # Stacked widget for pages. CurrentPageStack reports only the active
         # page's size hints so a hidden large panel (the keyboard) can't inflate
         # the window minimum on every other page.
         self._pages = CurrentPageStack()
-        content_layout.addWidget(self._pages)
 
-        main_layout.addWidget(content_widget)
+        self._splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._splitter.setChildrenCollapsible(False)
+        self._splitter.addWidget(self._sidebar)
+        self._splitter.addWidget(self._pages)
+        self._splitter.setStretchFactor(0, 0)
+        self._splitter.setStretchFactor(1, 1)
+        self._splitter.splitterMoved.connect(self._on_splitter_moved)
+        main_layout.addWidget(self._splitter)
 
         # Create pages
         self._create_pages()
@@ -222,6 +229,9 @@ class MainWindow(QMainWindow):
         # Sidebar signals
         self._sidebar.page_changed.connect(self._on_page_changed)
         self._sidebar.files_dropped_on_page.connect(self._on_sidebar_drop)
+        self._sidebar.playlists_toggled.connect(lambda _on: self._apply_playlists_splitter())
+        self._sidebar.collapsed_changed.connect(lambda _c: self._apply_playlists_splitter())
+        self._apply_playlists_splitter()  # start with the handle locked
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -309,6 +319,36 @@ class MainWindow(QMainWindow):
         # after the page is current so size hints reflect the new panel.
         if self._geometry_restored:
             self._sizer.on_page_changed(page_id)
+
+    def _apply_playlists_splitter(self) -> None:
+        """Sync the splitter with the sidebar's mode.
+
+        Expanded playlists mode gets a live handle and the session's
+        remembered width; every other state locks the handle and lets the
+        sidebar's fixed width dictate the split.
+        """
+        live = self._sidebar.playlists_mode and not self._sidebar.collapsed
+        handle = self._splitter.handle(1)
+        if handle is not None:
+            handle.setEnabled(live)
+        total = sum(self._splitter.sizes())
+        if live:
+            width = min(
+                max(self._playlists_sidebar_w, Theme.SIDEBAR_PLAYLISTS_MIN),
+                Theme.SIDEBAR_PLAYLISTS_MAX,
+            )
+        elif self._sidebar.collapsed:
+            width = Theme.SIDEBAR_WIDTH_COLLAPSED
+        else:
+            width = Theme.SIDEBAR_WIDTH
+        # Explicit setSizes even in the pinned states: changing a child's
+        # fixed width does not make the splitter re-layout on its own.
+        self._splitter.setSizes([width, max(0, total - width)])
+
+    def _on_splitter_moved(self, _pos: int, _index: int) -> None:
+        """Remember the user's chosen sidebar width (session only)."""
+        if self._sidebar.playlists_mode and not self._sidebar.collapsed:
+            self._playlists_sidebar_w = self._splitter.sizes()[0]
 
     def _on_sidebar_drop(self, page_id: str, file_paths: list[str]) -> None:
         """Handle files dropped on a sidebar button."""

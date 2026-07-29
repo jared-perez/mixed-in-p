@@ -124,7 +124,10 @@ class WindowSizer:
             base = _PANEL_MIN_WIDTH["player"]
             if self._slice_expanded:
                 row = self.window._player_panel.slice_time_row_min_width()
-                base = max(base, Theme.SIDEBAR_WIDTH + row + _SLACK)
+                # Actual width, not Theme.SIDEBAR_WIDTH: in playlists mode the
+                # sidebar can be up to 600px wide and the constant would
+                # understate the window minimum by the difference.
+                base = max(base, self.window._sidebar.width() + row + _SLACK)
         else:
             base = _PANEL_MIN_WIDTH.get(page_id, 600)
         return max(base, self.window._header.minimumSizeHint().width())

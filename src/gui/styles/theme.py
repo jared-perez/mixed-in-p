@@ -362,6 +362,11 @@ class Theme:
     HEADER_HEIGHT = 60
     SIDEBAR_WIDTH = 176
     SIDEBAR_WIDTH_COLLAPSED = 56
+    # Playlists mode: the sidebar becomes user-resizable between these bounds
+    # (session-only width memory; see MainWindow._playlists_sidebar_w).
+    SIDEBAR_PLAYLISTS_MIN = 140
+    SIDEBAR_PLAYLISTS_MAX = 600
+    SIDEBAR_PLAYLISTS_DEFAULT = 320
     BORDER_RADIUS = 4
     SPACING = 8
     PADDING = 12
