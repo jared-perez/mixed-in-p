@@ -114,7 +114,7 @@ class TestThisPlaylistScope:
         lib.set_items(pl, [ta, tb, ta])  # cadence.wav deliberately twice
         player.load_node(pl)
 
-        player._scope_combo.setCurrentIndex(0)  # This playlist
+        player._select_search_scope(False)  # This playlist
         search(player, "cadence")
 
         assert [e.file_path for e in player._playlist] == [a, a]
@@ -126,7 +126,7 @@ class TestThisPlaylistScope:
         a, b, c = seeded["paths"]
         search(player, "alpha")
         assert [e.file_path for e in player._playlist] == [a]
-        player._scope_combo.setCurrentIndex(0)  # rerun over scratch ([a])
+        player._select_search_scope(False)  # rerun over scratch ([a])
         assert [e.file_path for e in player._playlist] == [a]
         assert player._table.horizontalHeaderItem(0).text() == "#"
 

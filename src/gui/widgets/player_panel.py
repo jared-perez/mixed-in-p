@@ -49,7 +49,6 @@ from PySide6.QtWidgets import (
     QAbstractItemView,
     QApplication,
     QCheckBox,
-    QComboBox,
     QHBoxLayout,
     QHeaderView,
     QInputDialog,
@@ -263,6 +262,54 @@ def _make_eye_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon:
         p.setPen(Qt.PenStyle.NoPen)
         p.setBrush(c)
         p.drawEllipse(QPointF(mid, mid), r, r)
+    finally:
+        p.end()
+    return QIcon(pm)
+
+
+def _make_scope_this_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon:
+    """A single box — the 'This playlist' search scope."""
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        p.setPen(QPen(QColor(color), max(1.0, size * 0.09)))
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        m = size * 0.22
+        p.drawRoundedRect(QRectF(m, m, size - 2 * m, size - 2 * m), 2, 2)
+    finally:
+        p.end()
+    return QIcon(pm)
+
+
+def _make_scope_all_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon:
+    """Stacked boxes — the 'All playlists' search scope."""
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        pen = QPen(QColor(color), max(1.0, size * 0.09))
+        m = size * 0.14
+        off = size * 0.18  # diagonal offset between the stacked boxes
+        side = size - 2 * m - off
+        back = QRectF(m + off, m, side, side)
+        front = QRectF(m, m + off, side, side)
+        p.setPen(pen)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(back, 2, 2)
+        # Punch the front box's footprint out of the back one so the stack
+        # reads as layered cards, not a lattice of crossing lines.
+        p.setCompositionMode(QPainter.CompositionMode.CompositionMode_Clear)
+        p.setPen(Qt.PenStyle.NoPen)
+        p.setBrush(QColor(0, 0, 0))
+        pad = pen.widthF()
+        p.drawRoundedRect(front.adjusted(-pad, -pad, pad, pad), 2, 2)
+        p.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+        p.setPen(pen)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawRoundedRect(front, 2, 2)
     finally:
         p.end()
     return QIcon(pm)
@@ -1063,10 +1110,10 @@ class PlayerPanel(QWidget):
             f" border: 2px solid {Theme.NEON_YELLOW}; border-radius: 6px; }}"
             f"QCheckBox#editLockCheck::indicator:unchecked {{ background-color: {Theme.BG_LIGHT};"
             f" border: 2px solid {Theme.CHROME_DARK}; border-radius: 6px; }}"
-            # Visuals eye button: keep the default (Clear Playlist-style) light
-            # fill/border but drop the wide text padding so the icon centres in
-            # its compact fixed size.
-            "QPushButton#visMenuButton { padding: 2px; }"
+            # Icon menu buttons (visuals eye, search scope): keep the default
+            # (Clear Playlist-style) light fill/border but drop the wide text
+            # padding so the icon centres in its compact fixed size.
+            "QPushButton#visMenuButton, QPushButton#scopeMenuButton { padding: 2px; }"
         )
         layout = QVBoxLayout(content)
         layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, Theme.PADDING)
@@ -1112,13 +1159,36 @@ class PlayerPanel(QWidget):
         self._search_field.hide()
         title_row.addWidget(self._search_field, 0, Qt.AlignmentFlag.AlignVCenter)
 
-        self._scope_combo = QComboBox()
-        self._scope_combo.addItems(
-            [self.tr("This playlist"), self.tr("All playlists")]
-        )
-        self._scope_combo.setCurrentIndex(1)
-        self._scope_combo.hide()
-        title_row.addWidget(self._scope_combo, 0, Qt.AlignmentFlag.AlignVCenter)
+        # Scope picker: a compact icon button (mirroring the visuals eye
+        # button) whose glyph shows the current scope — one box for "This
+        # playlist", stacked boxes for "All playlists" — with the words in
+        # its checkable menu and tooltip.
+        self._scope_this_icon = _make_scope_this_icon()
+        self._scope_all_icon = _make_scope_all_icon()
+        self._scope_btn = QPushButton()
+        self._scope_btn.setObjectName("scopeMenuButton")
+        self._scope_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._scope_btn.setFixedSize(40, 26)
+        self._scope_menu = QMenu(self)
+        scope_group = QActionGroup(self)
+        scope_group.setExclusive(True)
+        self._scope_actions: dict[bool, QAction] = {}
+        for scope_all, label in (
+            (False, self.tr("This playlist")),
+            (True, self.tr("All playlists")),
+        ):
+            action = QAction(label, self)
+            action.setCheckable(True)
+            action.triggered.connect(
+                lambda _=False, s=scope_all: self._select_search_scope(s)
+            )
+            scope_group.addAction(action)
+            self._scope_menu.addAction(action)
+            self._scope_actions[scope_all] = action
+        self._scope_btn.clicked.connect(self._show_scope_menu)
+        self._scope_btn.hide()
+        title_row.addWidget(self._scope_btn, 0, Qt.AlignmentFlag.AlignVCenter)
+        self._apply_search_scope(True)  # default: All playlists
 
         title_row.addStretch()
 
@@ -1476,7 +1546,6 @@ class PlayerPanel(QWidget):
         self._search_timer.setInterval(150)
         self._search_timer.timeout.connect(self._run_search)
         self._search_field.textChanged.connect(self._on_search_text_changed)
-        self._scope_combo.currentIndexChanged.connect(self._on_search_scope_changed)
         # Escape backs out of a search from the field or the table. Widget-
         # scoped so it never fires while an inline cell editor has focus
         # (there Escape must keep meaning "cancel the edit").
@@ -1589,7 +1658,7 @@ class PlayerPanel(QWidget):
         self._library = library
         self._save_btn.show()
         self._search_field.show()
-        self._scope_combo.show()
+        self._scope_btn.show()
         self._update_context_label()
 
     @property
@@ -1717,13 +1786,31 @@ class PlayerPanel(QWidget):
             self._search_timer.stop()
             self._exit_search()
 
-    def _on_search_scope_changed(self, index: int) -> None:
-        self._search_scope_all = index == 1
+    def _show_scope_menu(self) -> None:
+        """Open the scope menu just below its button."""
+        self._scope_menu.exec(
+            self._scope_btn.mapToGlobal(self._scope_btn.rect().bottomLeft())
+        )
+
+    def _apply_search_scope(self, scope_all: bool) -> None:
+        """Reflect a scope everywhere it shows: state, glyph, tooltip,
+        checked menu action, and the field's placeholder."""
+        self._search_scope_all = scope_all
+        self._scope_actions[scope_all].setChecked(True)
+        self._scope_btn.setIcon(
+            self._scope_all_icon if scope_all else self._scope_this_icon
+        )
+        self._scope_btn.setToolTip(
+            self.tr("Search scope: {0}").format(self._scope_actions[scope_all].text())
+        )
         self._search_field.setPlaceholderText(
             self.tr("Search all playlists…")
-            if self._search_scope_all
+            if scope_all
             else self.tr("Search this playlist…")
         )
+
+    def _select_search_scope(self, scope_all: bool) -> None:
+        self._apply_search_scope(scope_all)
         if self._search_field.text().strip():
             self._search_timer.stop()
             self._run_search()
