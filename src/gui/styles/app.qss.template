@@ -311,6 +311,19 @@ QPushButton#sidebarButton:checked {
     border-left: 3px solid @NEON_YELLOW@;
 }
 
+/* Mode-swap containers inside the sidebar. These are plain QWidgets, so the
+   global QWidget rule would paint them BG_DARK and hide the sidebar frame's
+   own BG_MEDIUM. They are pure layout scaffolding — keep them invisible. */
+QStackedWidget#sidebarModeStack,
+QWidget#sidebarNavPage,
+QWidget#sidebarPlaylistsPage,
+QWidget#playlistTreePanel {
+    background-color: transparent;
+    /* QStackedWidget is a QFrame, so it also picks up the global 1px frame
+       border — which draws a box around the whole rail. */
+    border: none;
+}
+
 /* ===== Playlists tree (sidebar playlists mode) ===== */
 QTreeView#playlistTree {
     background-color: @BG_MEDIUM@;
@@ -342,9 +355,11 @@ QTreeView#playlistTree QLineEdit {
     font-size: 14px;
 }
 
-/* Compact create buttons above the tree. */
+/* Compact create buttons above the tree. The recessed fill belongs to the
+   buttons themselves, not to the row behind them (which is transparent), so
+   the darker tone stops at the button edge instead of banding the sidebar. */
 QPushButton#treeCreateButton {
-    background-color: transparent;
+    background-color: @BG_DARK@;
     color: @TEXT_SECONDARY@;
     border: 1px solid @BG_LIGHT@;
     border-radius: 4px;

@@ -201,8 +201,13 @@ class Sidebar(QFrame):
         # Below the divider the sidebar swaps between the nav rail and the
         # playlists tree (the tree itself lands in a later step; the page
         # exists now so the mode mechanics are final).
+        # Object names so the stylesheet can make these containers
+        # transparent: the global `QWidget` rule paints BG_DARK, which would
+        # otherwise cover the sidebar frame's own BG_MEDIUM.
         self._mode_stack = QStackedWidget()
+        self._mode_stack.setObjectName("sidebarModeStack")
         self._nav_page = QWidget()
+        self._nav_page.setObjectName("sidebarNavPage")
         nav_layout = QVBoxLayout(self._nav_page)
         nav_layout.setContentsMargins(0, 0, 0, 0)
         nav_layout.setSpacing(4)
@@ -259,6 +264,7 @@ class Sidebar(QFrame):
 
         # Playlists page: empty container the tree drops into (next step).
         self._playlists_page = QWidget()
+        self._playlists_page.setObjectName("sidebarPlaylistsPage")
         self.playlists_layout = QVBoxLayout(self._playlists_page)
         self.playlists_layout.setContentsMargins(0, 0, 0, 0)
         self.playlists_layout.setSpacing(4)

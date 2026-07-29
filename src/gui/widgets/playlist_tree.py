@@ -896,6 +896,10 @@ class PlaylistTreePanel(QWidget):
 
     def __init__(self, db_path=None, parent: QWidget | None = None) -> None:
         super().__init__(parent)
+        # Transparent in the stylesheet: the global `QWidget` rule paints
+        # BG_DARK, and the tree only covers the lower part of this panel — the
+        # remainder would read as a dark strip banding the create buttons.
+        self.setObjectName("playlistTreePanel")
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
         layout.setSpacing(4)
