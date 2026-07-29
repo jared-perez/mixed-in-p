@@ -651,8 +651,16 @@ QSplitter::handle {
     background-color: @BG_LIGHT@;
 }
 
-QSplitter::handle:horizontal {
-    width: 2px;
+/* Handle width is set in code (MainWindow._apply_playlists_splitter): a 2px
+   sliver while locked, widening to a comfortable grab target while the
+   sidebar is resizable (playlists mode). A QSS width rule here would
+   override setHandleWidth(), so only the colors live in the stylesheet. */
+QSplitter[playlistsLive="true"]::handle:horizontal {
+    background-color: @BG_MEDIUM@;
+}
+
+QSplitter[playlistsLive="true"]::handle:horizontal:hover {
+    background-color: @NEON_YELLOW@;
 }
 
 QSplitter::handle:vertical {

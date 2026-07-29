@@ -331,6 +331,14 @@ class MainWindow(QMainWindow):
         handle = self._splitter.handle(1)
         if handle is not None:
             handle.setEnabled(live)
+        # Widen the handle's grab area while it's draggable — a 2px sliver is
+        # too fiddly to hit. Width lives here (QSS width would override it);
+        # the playlistsLive property drives the handle's colors in the QSS.
+        self._splitter.setHandleWidth(10 if live else 2)
+        if self._splitter.property("playlistsLive") != live:
+            self._splitter.setProperty("playlistsLive", live)
+            self._splitter.style().unpolish(self._splitter)
+            self._splitter.style().polish(self._splitter)
         total = sum(self._splitter.sizes())
         if live:
             width = min(
