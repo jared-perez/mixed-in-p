@@ -50,6 +50,7 @@ from .widgets.history_panel import HistoryPanel
 from .widgets.metadata_panel import MetadataPanel
 from .widgets.keyboard_panel import KeyboardPanel
 from .widgets.player_panel import PlayerPanel
+from .widgets.playlist_tree import PlaylistTreePanel
 from .widgets.rename_panel import RenamePanel
 from .widgets.settings_panel import SettingsPanel
 from .widgets.sidebar import Sidebar
@@ -136,6 +137,8 @@ class MainWindow(QMainWindow):
         # mode the sidebar's fixed width keeps the handle immobile, preserving
         # the old behavior exactly.
         self._sidebar = Sidebar()
+        self._playlists_panel = PlaylistTreePanel()
+        self._sidebar.playlists_layout.addWidget(self._playlists_panel)
 
         # Stacked widget for pages. CurrentPageStack reports only the active
         # page's size hints so a hidden large panel (the keyboard) can't inflate
@@ -229,7 +232,7 @@ class MainWindow(QMainWindow):
         # Sidebar signals
         self._sidebar.page_changed.connect(self._on_page_changed)
         self._sidebar.files_dropped_on_page.connect(self._on_sidebar_drop)
-        self._sidebar.playlists_toggled.connect(lambda _on: self._apply_playlists_splitter())
+        self._sidebar.playlists_toggled.connect(self._on_playlists_toggled)
         self._sidebar.collapsed_changed.connect(lambda _c: self._apply_playlists_splitter())
         self._apply_playlists_splitter()  # start with the handle locked
 
@@ -319,6 +322,11 @@ class MainWindow(QMainWindow):
         # after the page is current so size hints reflect the new panel.
         if self._geometry_restored:
             self._sizer.on_page_changed(page_id)
+
+    def _on_playlists_toggled(self, on: bool) -> None:
+        if on:
+            self._playlists_panel.ensure_loaded()
+        self._apply_playlists_splitter()
 
     def _apply_playlists_splitter(self) -> None:
         """Sync the splitter with the sidebar's mode.

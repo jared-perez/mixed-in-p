@@ -311,6 +311,44 @@ QPushButton#sidebarButton:checked {
     border-left: 3px solid @NEON_YELLOW@;
 }
 
+/* ===== Playlists tree (sidebar playlists mode) ===== */
+QTreeView#playlistTree {
+    background-color: @BG_MEDIUM@;
+    border: none;
+    font-size: 14px;
+    color: @TEXT_PRIMARY@;
+}
+
+QTreeView#playlistTree::item {
+    padding: 5px 2px;
+    border-radius: 4px;
+}
+
+QTreeView#playlistTree::item:hover {
+    background-color: @BG_LIGHT@;
+}
+
+QTreeView#playlistTree::item:selected {
+    background-color: @BG_LIGHT@;
+    color: @NEON_YELLOW@;
+}
+
+/* Compact create buttons above the tree. */
+QPushButton#treeCreateButton {
+    background-color: transparent;
+    color: @TEXT_SECONDARY@;
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    padding: 5px 6px;
+    font-size: 13px;
+}
+
+QPushButton#treeCreateButton:hover {
+    color: @TEXT_PRIMARY@;
+    border-color: @TEXT_SECONDARY@;
+    background-color: @BG_LIGHT@;
+}
+
 /* ===== Tables ===== */
 QTableView, QTableWidget {
     background-color: @BG_MEDIUM@;
