@@ -181,8 +181,6 @@ class Sidebar(QFrame):
         # active panel's nav button.
         self._playlists_btn = QPushButton(self.tr("Playlists"))
         self._playlists_btn.setObjectName("sidebarButton")
-        self._playlists_btn.setIcon(nav_icon("playlists"))
-        self._playlists_btn.setIconSize(_NAV_ICON_SIZE)
         self._playlists_btn.setCheckable(True)
         self._playlists_btn.setToolTip(self.tr("Show playlists"))
         self._playlists_btn.clicked.connect(self._on_playlists_clicked)
