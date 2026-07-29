@@ -1134,7 +1134,19 @@ class PlayerPanel(QWidget):
         # follows the end of the text with a little padding so the header stays
         # legible no matter how wide the translated title is; the trailing stretch
         # keeps both left-aligned.
-        title_row = QHBoxLayout()
+        #
+        # It lives in its own widget so its width can be pinned to the visible
+        # viewport (see _sync_title_row_width). Without that pin the row inherits
+        # the content width, which the transport row below holds at ~690px — so
+        # on a narrow window the right-hand group would stop moving left while a
+        # dead gap sat between it and the scope button.
+        self._title_row_widget = QWidget()
+        self._title_row_widget.setObjectName("playerTitleRow")
+        title_row = QHBoxLayout(self._title_row_widget)
+        title_row.setContentsMargins(0, 0, 0, 0)
+        # Explicit: a nested layout inherited Theme.SPACING from the parent
+        # layout, but a widget's own layout falls back to the style default.
+        title_row.setSpacing(Theme.SPACING)
         title = QLabel(self.tr("Player"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
@@ -1255,7 +1267,7 @@ class PlayerPanel(QWidget):
         self._edit_lock_cb.setChecked(self._edit_locked)
         self._edit_lock_cb.toggled.connect(self._on_edit_lock_toggled)
         title_row.addWidget(self._edit_lock_cb, 0, Qt.AlignmentFlag.AlignVCenter)
-        layout.addLayout(title_row)
+        layout.addWidget(self._title_row_widget)
 
         # Playlist table
         self._table = ReorderableTableWidget()
@@ -1492,6 +1504,34 @@ class PlayerPanel(QWidget):
         self._table.set_slice_keys_active(self._slice.is_expanded)
 
         self._scroll.setWidget(content)
+        # Keep the header inside the visible width (see _sync_title_row_width).
+        # The panel's own resize covers the window being dragged; the scrollbar
+        # signal covers the vertical bar appearing when the slicer expands,
+        # which narrows the viewport without resizing the panel.
+        self._scroll.verticalScrollBar().rangeChanged.connect(
+            lambda *_: self._sync_title_row_width()
+        )
+        self._sync_title_row_width()
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._sync_title_row_width()
+
+    def _sync_title_row_width(self) -> None:
+        """Cap the header at the visible width so it never rides the scroll.
+
+        Everything below it (transport row, table) may be wider than the
+        viewport and scroll horizontally; the header is chrome and should
+        stay put. Capping it also makes its trailing stretch collapse when
+        space runs short, so the visuals button settles one layout spacing
+        from the scope button instead of stranding a gap.
+        """
+        visible = self._scroll.viewport().width() - 2 * Theme.PADDING
+        # Never below the row's own minimum: squeezing past it makes the
+        # fixed-width search field and scope button overlap instead of
+        # clipping. Past this point the header overflows like any other row.
+        floor = self._title_row_widget.minimumSizeHint().width()
+        self._title_row_widget.setMaximumWidth(max(visible, floor))
 
     # ── Signal wiring ───────────────────────────────────────────
 
