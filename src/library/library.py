@@ -34,7 +34,7 @@ from typing import Iterable
 SCRATCH_NODE_ID = 1
 
 _CONTENT_ID_BYTES = 64 * 1024
-_SCHEMA_VERSION = 1
+_SCHEMA_VERSION = 2
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -64,7 +64,8 @@ CREATE TABLE IF NOT EXISTS nodes (
     kind TEXT NOT NULL CHECK (kind IN ('folder', 'playlist', 'scratch')),
     name TEXT NOT NULL,
     position INTEGER NOT NULL DEFAULT 0,
-    created_at TEXT NOT NULL
+    created_at TEXT NOT NULL,
+    expanded INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_nodes_parent ON nodes(parent_id);
 
@@ -111,6 +112,9 @@ class Node:
     name: str
     position: int
     created_at: str
+    # Folders only: whether the tree was showing this one's children. Stored
+    # so the shape the user left the tree in comes back next session.
+    expanded: bool = False
 
 
 def default_db_path() -> Path:
@@ -205,6 +209,7 @@ class Library:
     def _init_schema(self) -> None:
         with self._con:
             self._con.executescript(_SCHEMA)
+            self._migrate()
             self._con.execute(
                 """
                 INSERT OR IGNORE INTO nodes (id, parent_id, kind, name, position, created_at)
@@ -219,6 +224,23 @@ class Library:
                 )
                 self._sync_fts()
             self._con.execute(f"PRAGMA user_version={_SCHEMA_VERSION}")
+
+    def _migrate(self) -> None:
+        """Bring an older database up to `_SCHEMA_VERSION`.
+
+        ``CREATE TABLE IF NOT EXISTS`` leaves an existing table exactly as it
+        was, so every column added after v1 needs an ALTER here. Keyed on the
+        columns actually present rather than on ``user_version``: a database
+        touched by a build that pre-dates the pragma bump would otherwise be
+        skipped, and re-adding a column is the one error we can't recover from.
+        """
+        columns = {
+            row["name"] for row in self._con.execute("PRAGMA table_info(nodes)")
+        }
+        if "expanded" not in columns:  # v2 — remembered folder expansion
+            self._con.execute(
+                "ALTER TABLE nodes ADD COLUMN expanded INTEGER NOT NULL DEFAULT 0"
+            )
 
     def _sync_fts(self) -> None:
         """Rebuild the FTS index if it disagrees with the tracks table.
@@ -612,6 +634,23 @@ class Library:
                 [(i, nid) for i, nid in enumerate(ordered_ids)],
             )
 
+    def set_node_expanded(self, node_id: int, expanded: bool) -> None:
+        """Remember whether a folder is showing its children.
+
+        Deliberately unvalidated and outside a `_require_node` check: this is
+        view state written on every expand/collapse, including ones that race
+        a delete, and a folder that vanished simply updates nothing.
+        """
+        with self._con:
+            self._con.execute(
+                "UPDATE nodes SET expanded=? WHERE id=?", (int(bool(expanded)), node_id)
+            )
+
+    def expanded_node_ids(self) -> set[int]:
+        """Folders the tree should open on load."""
+        rows = self._con.execute("SELECT id FROM nodes WHERE expanded=1").fetchall()
+        return {row["id"] for row in rows}
+
     def ancestor_ids(self, node_id: int) -> list[int]:
         """Ancestors of a node, nearest first (for cycle checks and the
         highlight-trail roll-up)."""
@@ -855,15 +894,22 @@ class Library:
             taken = self._con.execute(
                 "SELECT 1 FROM nodes WHERE id=?", (node.id,)
             ).fetchone()
-            columns = "parent_id, kind, name, position, created_at"
-            values = (parent_id, node.kind, node.name, node.position, node.created_at)
+            columns = "parent_id, kind, name, position, created_at, expanded"
+            values = (
+                parent_id,
+                node.kind,
+                node.name,
+                node.position,
+                node.created_at,
+                int(node.expanded),
+            )
             if taken:
                 cur = self._con.execute(
-                    f"INSERT INTO nodes ({columns}) VALUES (?, ?, ?, ?, ?)", values
+                    f"INSERT INTO nodes ({columns}) VALUES (?, ?, ?, ?, ?, ?)", values
                 )
             else:
                 cur = self._con.execute(
-                    f"INSERT INTO nodes (id, {columns}) VALUES (?, ?, ?, ?, ?, ?)",
+                    f"INSERT INTO nodes (id, {columns}) VALUES (?, ?, ?, ?, ?, ?, ?)",
                     (node.id, *values),
                 )
             new_id = cur.lastrowid
@@ -971,4 +1017,5 @@ def _node(row: sqlite3.Row) -> Node:
         name=row["name"],
         position=row["position"],
         created_at=row["created_at"],
+        expanded=bool(row["expanded"]),
     )

@@ -72,6 +72,61 @@ class TestModel:
         assert tree.isExpanded(tree._find_item(outer).index())
 
 
+class TestExpansionPersistence:
+    """The tree comes back the shape the user left it in."""
+
+    def test_expanding_writes_through(self, tree):
+        lib = tree.library
+        outer = lib.create_folder("Outer")
+        lib.create_playlist("P", parent_id=outer)
+        tree._rebuild()
+
+        tree.setExpanded(tree._find_item(outer).index(), True)
+        assert lib.expanded_node_ids() == {outer}
+
+        tree.setExpanded(tree._find_item(outer).index(), False)
+        assert lib.expanded_node_ids() == set()
+
+    def test_a_rebuild_does_not_clobber_the_stored_set(self, tree):
+        """The replay inside _rebuild is us restoring, not the user acting —
+        it must leave the stored state exactly as it found it."""
+        lib = tree.library
+        outer = lib.create_folder("Outer")
+        lib.create_folder("Other")
+        lib.create_playlist("P", parent_id=outer)
+        tree._rebuild()
+        tree.setExpanded(tree._find_item(outer).index(), True)
+
+        for _ in range(3):
+            tree._rebuild()
+
+        assert lib.expanded_node_ids() == {outer}
+
+    def test_a_new_tree_on_the_same_database_opens_the_same_folders(
+        self, qtbot, tmp_path
+    ):
+        """The point of the whole feature: quit with a folder open, come back
+        to it open."""
+        db = tmp_path / "library.db"
+        first = PlaylistTreePanel(db_path=db)
+        qtbot.addWidget(first)
+        first.ensure_loaded()
+        outer = first.tree.library.create_folder("Outer")
+        closed = first.tree.library.create_folder("Closed")
+        first.tree.library.create_playlist("P", parent_id=outer)
+        first.tree._rebuild()
+        first.tree.setExpanded(first.tree._find_item(outer).index(), True)
+        first.tree.library.close()  # the "quit"
+
+        second = PlaylistTreePanel(db_path=db)
+        qtbot.addWidget(second)
+        second.ensure_loaded()
+
+        assert second.tree.isExpanded(second.tree._find_item(outer).index())
+        assert not second.tree.isExpanded(second.tree._find_item(closed).index())
+        second.tree.library.close()
+
+
 class TestCrud:
     def test_create_buttons_write_to_db(self, panel, tree):
         panel._new_playlist_btn.click()

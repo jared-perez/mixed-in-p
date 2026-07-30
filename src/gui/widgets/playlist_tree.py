@@ -248,6 +248,10 @@ class PlaylistTree(QTreeView):
         # Tracks land IN a playlist, never between two, so this replaces Qt's
         # between-rows indicator for the duration of a file drag.
         self._track_drop_index = None
+        # True while _rebuild replays the stored expansion — those setExpanded
+        # calls are us restoring the database's state, not the user opening
+        # anything, and must not be written back.
+        self._restoring_expansion = False
 
         self.setObjectName("playlistTree")
         self._model = QStandardItemModel(self)
@@ -278,9 +282,10 @@ class PlaylistTree(QTreeView):
         self.customContextMenuRequested.connect(self._on_context_menu)
         self._model.itemChanged.connect(self._on_item_changed)
         self.clicked.connect(self._on_clicked)
-        # Column width tracks content so the horizontal scrollbar stays honest.
-        self.expanded.connect(lambda _i: self.resizeColumnToContents(0))
-        self.collapsed.connect(lambda _i: self.resizeColumnToContents(0))
+        # Column width tracks content so the horizontal scrollbar stays honest;
+        # the same two signals are where expansion is persisted.
+        self.expanded.connect(lambda index: self._on_expansion_changed(index, True))
+        self.collapsed.connect(lambda index: self._on_expansion_changed(index, False))
 
     # ----------------------------------------------------------------- loading
 
@@ -312,8 +317,16 @@ class PlaylistTree(QTreeView):
         return self._library
 
     def _rebuild(self) -> None:
-        """Repopulate from the database, preserving expansion + selection."""
-        expanded = self._expanded_ids()
+        """Repopulate from the database, preserving expansion + selection.
+
+        Expansion comes from the database, not from the view we are about to
+        clear: every expand/collapse writes through as it happens, so the
+        stored set is always current, and reading it here is also what makes
+        the tree come back the way it was left in the previous session.
+        """
+        expanded = (
+            self._library.expanded_node_ids() if self._library is not None else set()
+        )
         selected = self._current_id()
         self._building = True
         try:
@@ -323,10 +336,14 @@ class PlaylistTree(QTreeView):
             self._append_children(root, None)
         finally:
             self._building = False
-        for node_id in expanded:
-            item = self._find_item(node_id)
-            if item is not None:
-                self.setExpanded(item.index(), True)
+        self._restoring_expansion = True
+        try:
+            for node_id in expanded:
+                item = self._find_item(node_id)
+                if item is not None:
+                    self.setExpanded(item.index(), True)
+        finally:
+            self._restoring_expansion = False
         if selected is not None:
             item = self._find_item(selected)
             if item is not None:
@@ -427,6 +444,8 @@ class PlaylistTree(QTreeView):
         return None
 
     def _expanded_ids(self, parent: QStandardItem | None = None) -> set[int]:
+        """Which folders the VIEW currently has open (the database is the
+        record of it — see `_on_expansion_changed`)."""
         parent = parent or self._model.invisibleRootItem()
         ids: set[int] = set()
         for row in range(parent.rowCount()):
@@ -435,6 +454,20 @@ class PlaylistTree(QTreeView):
                 ids.add(child.data(NODE_ID_ROLE))
             ids |= self._expanded_ids(child)
         return ids
+
+    def _on_expansion_changed(self, index, expanded: bool) -> None:
+        """Persist a folder's open/closed state, so it survives a restart.
+
+        Written on every toggle rather than at shutdown: there is no reliable
+        close hook for a panel, and a crash or a force-quit should not be the
+        difference between remembering the tree's shape and losing it.
+        """
+        self.resizeColumnToContents(0)
+        if self._restoring_expansion or self._building or self._library is None:
+            return
+        node_id = index.data(NODE_ID_ROLE)
+        if node_id is not None:
+            self._library.set_node_expanded(node_id, expanded)
 
     def _current_id(self) -> int | None:
         index = self.currentIndex()

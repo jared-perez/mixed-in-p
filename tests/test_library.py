@@ -48,6 +48,47 @@ class TestSchema:
         with pytest.raises(ValueError):
             lib.move_node(SCRATCH_NODE_ID, None, 0)
 
+    def test_v1_database_gains_the_expanded_column(self, tmp_path):
+        """A library written before v2 must open, not crash.
+
+        CREATE TABLE IF NOT EXISTS leaves an existing nodes table exactly as
+        it was, so the ALTER in _migrate is the only thing standing between
+        an upgrading user and an unreadable library.
+        """
+        db = tmp_path / "library.db"
+        con = sqlite3.connect(db)
+        con.executescript(
+            """
+            CREATE TABLE nodes (
+                id INTEGER PRIMARY KEY,
+                parent_id INTEGER REFERENCES nodes(id) ON DELETE CASCADE,
+                kind TEXT NOT NULL CHECK (kind IN ('folder', 'playlist', 'scratch')),
+                name TEXT NOT NULL,
+                position INTEGER NOT NULL DEFAULT 0,
+                created_at TEXT NOT NULL
+            );
+            INSERT INTO nodes (id, parent_id, kind, name, position, created_at)
+            VALUES (1, NULL, 'scratch', 'Scratch', -1, 'then'),
+                   (2, NULL, 'folder', 'Gigs', 0, 'then');
+            PRAGMA user_version=1;
+            """
+        )
+        con.commit()
+        con.close()
+
+        with Library(db) as lib:
+            folder = lib.get_node(2)
+            assert folder.name == "Gigs"
+            assert folder.expanded is False  # pre-v2 rows default to collapsed
+            lib.set_node_expanded(2, True)
+            assert lib.expanded_node_ids() == {2}
+
+    def test_migration_is_idempotent(self, tmp_path):
+        db = tmp_path / "library.db"
+        for _ in range(3):
+            with Library(db) as lib:
+                assert lib.get_node(SCRATCH_NODE_ID) is not None
+
     def test_invalid_kind_rejected_by_schema(self, lib):
         with pytest.raises(sqlite3.IntegrityError):
             lib._con.execute(
@@ -126,6 +167,26 @@ class TestTree:
             lib.move_node(inner, playlist, 0)
         with pytest.raises(ValueError):
             lib.create_playlist("Q", parent_id=playlist)
+
+    def test_expansion_survives_a_restart(self, tmp_path):
+        db = tmp_path / "library.db"
+        with Library(db) as lib:
+            outer = lib.create_folder("Outer")
+            inner = lib.create_folder("Inner", parent_id=outer)
+            lib.set_node_expanded(outer, True)
+            lib.set_node_expanded(inner, True)
+            lib.set_node_expanded(inner, False)
+        with Library(db) as lib:
+            assert lib.expanded_node_ids() == {outer}
+            assert lib.get_node(outer).expanded is True
+            assert lib.get_node(inner).expanded is False
+
+    def test_expanding_a_deleted_folder_is_a_no_op(self, lib):
+        """The write races a delete on the drop/undo paths; it must not raise."""
+        folder = lib.create_folder("Gone")
+        lib.delete_node(folder)
+        lib.set_node_expanded(folder, True)
+        assert lib.expanded_node_ids() == set()
 
     def test_delete_folder_cascades(self, lib, tmp_path):
         (path,) = make_files(tmp_path, "one.aiff")

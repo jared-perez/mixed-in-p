@@ -100,6 +100,20 @@ class TestSubtreeSnapshots:
         assert [t.path for t in lib.get_items(peak)] == files
         assert [t.path for t in lib.get_items(warm)] == [files[0]]
 
+    def test_restore_brings_back_the_expansion_state(self, lib):
+        """Undoing a delete should give back the tree the user had, open
+        folders included — not a subtree collapsed flat."""
+        outer = lib.create_folder("Outer")
+        inner = lib.create_folder("Inner", outer)
+        lib.set_node_expanded(outer, True)
+
+        snap = lib.snapshot_subtree(outer)
+        lib.delete_node(outer)
+        lib.restore_subtree(snap)
+
+        assert lib.expanded_node_ids() == {outer}
+        assert lib.get_node(inner).expanded is False
+
     def test_restore_lands_between_the_right_siblings(self, lib):
         # Newest-first creation means these sit [c, b, a]; deleting the
         # middle one and undoing must put it back in the middle.
