@@ -34,7 +34,7 @@ from typing import Iterable
 SCRATCH_NODE_ID = 1
 
 _CONTENT_ID_BYTES = 64 * 1024
-_SCHEMA_VERSION = 2
+_SCHEMA_VERSION = 4
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -45,6 +45,7 @@ CREATE TABLE IF NOT EXISTS tracks (
     title TEXT NOT NULL DEFAULT '',
     album TEXT NOT NULL DEFAULT '',
     genre TEXT NOT NULL DEFAULT '',
+    comment TEXT NOT NULL DEFAULT '',
     bpm REAL,
     "key" TEXT NOT NULL DEFAULT '',
     energy INTEGER,
@@ -78,7 +79,24 @@ CREATE TABLE IF NOT EXISTS playlist_items (
 CREATE INDEX IF NOT EXISTS idx_items_track ON playlist_items(track_id);
 """
 
-_TAG_COLUMNS = ("artist", "title", "album", "genre", "bpm", "key", "energy", "duration")
+_TAG_COLUMNS = (
+    "artist",
+    "title",
+    "album",
+    "genre",
+    "comment",
+    "bpm",
+    "key",
+    "energy",
+    "duration",
+)
+
+# Indexed search fields, in the order the FTS table declares them. Every name
+# is also a `tracks` column, so the index statements are generated from this
+# list rather than spelled out — adding a field here is the whole change.
+# Changing it rebuilds tracks_fts (see _ensure_fts_schema) and, on the next
+# open, every row's search_blob (see _migrate).
+_FTS_COLUMNS = ("artist", "title", "album", "filename", "comment", "key")
 
 
 @dataclass(frozen=True)
@@ -92,6 +110,7 @@ class Track:
     title: str
     album: str
     genre: str
+    comment: str
     bpm: float | None
     key: str
     energy: int | None
@@ -165,8 +184,37 @@ def _probe_fts5(con: sqlite3.Connection) -> bool:
         return False
 
 
-def _make_search_blob(artist: str, title: str, album: str, filename: str) -> str:
-    return " ".join(part for part in (artist, title, album, filename) if part).lower()
+def _make_search_blob(**fields: str) -> str:
+    """The LIKE-fallback haystack: every indexed field, lowercased.
+
+    Takes the same field names as the FTS index (`_FTS_COLUMNS`) so the two
+    search paths can never drift apart; a field left out defaults to empty.
+    """
+    return " ".join(
+        part for part in (fields.get(c) or "" for c in _FTS_COLUMNS) if part
+    ).lower()
+
+
+def _indexed_from_row(row: sqlite3.Row, **overrides: str) -> dict[str, str]:
+    """Indexed field values read off a `tracks` row, with optional overrides.
+
+    Used by every path that rewrites `search_blob` from what is already
+    stored (a rename, a relink, an upgrade) — the row must therefore have
+    been selected with `_quoted(_FTS_COLUMNS)`, or `SELECT *`.
+    """
+    fields = {c: row[c] or "" for c in _FTS_COLUMNS}
+    fields.update(overrides)
+    return fields
+
+
+def _fts_values(**fields: str) -> tuple[str, ...]:
+    """Indexed field values in `_FTS_COLUMNS` order, for the index statements."""
+    return tuple(fields.get(c) or "" for c in _FTS_COLUMNS)
+
+
+def _quoted(columns: tuple[str, ...]) -> str:
+    """Column list for SQL. Quoted because "key" is a keyword in places."""
+    return ", ".join(f'"{c}"' for c in columns)
 
 
 def _escape_like(term: str) -> str:
@@ -218,10 +266,7 @@ class Library:
                 (SCRATCH_NODE_ID, _now()),
             )
             if self._has_fts:
-                self._con.execute(
-                    "CREATE VIRTUAL TABLE IF NOT EXISTS tracks_fts"
-                    " USING fts5(artist, title, album, filename)"
-                )
+                self._ensure_fts_schema()
                 self._sync_fts()
             self._con.execute(f"PRAGMA user_version={_SCHEMA_VERSION}")
 
@@ -229,17 +274,68 @@ class Library:
         """Bring an older database up to `_SCHEMA_VERSION`.
 
         ``CREATE TABLE IF NOT EXISTS`` leaves an existing table exactly as it
-        was, so every column added after v1 needs an ALTER here. Keyed on the
-        columns actually present rather than on ``user_version``: a database
-        touched by a build that pre-dates the pragma bump would otherwise be
-        skipped, and re-adding a column is the one error we can't recover from.
+        was, so every column added after v1 needs an ALTER here.
+
+        Two different triggers, deliberately: a **column** is keyed on the
+        columns actually present, because a database touched by a build that
+        pre-dates the pragma bump would be skipped by a version check, and
+        re-adding a column is the one error we can't recover from. **Stored
+        data** that needs recomputing has no such tell, so it is keyed on
+        ``user_version`` — which also keeps it one-shot instead of running on
+        every open.
         """
-        columns = {
-            row["name"] for row in self._con.execute("PRAGMA table_info(nodes)")
-        }
-        if "expanded" not in columns:  # v2 — remembered folder expansion
+        nodes = {row["name"] for row in self._con.execute("PRAGMA table_info(nodes)")}
+        if "expanded" not in nodes:  # v2 — remembered folder expansion
             self._con.execute(
                 "ALTER TABLE nodes ADD COLUMN expanded INTEGER NOT NULL DEFAULT 0"
+            )
+        tracks = {row["name"] for row in self._con.execute("PRAGMA table_info(tracks)")}
+        if "comment" not in tracks:  # v3 — comment is a searchable field
+            self._con.execute(
+                "ALTER TABLE tracks ADD COLUMN comment TEXT NOT NULL DEFAULT ''"
+            )
+            # No blob rebuild needed for this one on its own: the blob skips
+            # empty parts, so every existing blob already equals what it would
+            # be with a blank comment. The comments themselves arrive with the
+            # tag reads that adding, loading, or editing a track performs.
+        (version,) = self._con.execute("PRAGMA user_version").fetchone()
+        if version and version < 4:  # v4 — the key became a searchable field
+            # Here a rebuild IS required: existing rows have a stored key that
+            # their blob doesn't include, so the LIKE fallback would miss it
+            # forever. (The FTS index needs no equivalent — _ensure_fts_schema
+            # notices its column list changed and repopulates from `tracks`.)
+            self._rebuild_search_blobs()
+
+    def _rebuild_search_blobs(self) -> None:
+        """Recompute every row's LIKE haystack from the columns it indexes."""
+        rows = self._con.execute(
+            f"SELECT id, {_quoted(_FTS_COLUMNS)} FROM tracks"
+        ).fetchall()
+        self._con.executemany(
+            "UPDATE tracks SET search_blob=? WHERE id=?",
+            [
+                (_make_search_blob(**_indexed_from_row(row)), row["id"])
+                for row in rows
+            ],
+        )
+
+    def _ensure_fts_schema(self) -> None:
+        """Create tracks_fts, rebuilding it if its columns are out of date.
+
+        An FTS5 table's columns are fixed at creation, so adding a searchable
+        field means dropping and recreating it. Cheap: it is a pure index over
+        `tracks`, and `_sync_fts` repopulates it from there straight after.
+        """
+        existing = [
+            row["name"] for row in self._con.execute("PRAGMA table_info(tracks_fts)")
+        ]
+        if existing and tuple(existing) != _FTS_COLUMNS:
+            self._con.execute("DROP TABLE tracks_fts")
+            existing = []
+        if not existing:
+            self._con.execute(
+                "CREATE VIRTUAL TABLE IF NOT EXISTS tracks_fts"
+                f" USING fts5({_quoted(_FTS_COLUMNS)})"
             )
 
     def _sync_fts(self) -> None:
@@ -252,9 +348,10 @@ class Library:
         (n_fts,) = self._con.execute("SELECT count(*) FROM tracks_fts").fetchone()
         if n_tracks != n_fts:
             self._con.execute("DELETE FROM tracks_fts")
+            columns = _quoted(_FTS_COLUMNS)
             self._con.execute(
-                "INSERT INTO tracks_fts (rowid, artist, title, album, filename)"
-                " SELECT id, artist, title, album, filename FROM tracks"
+                f"INSERT INTO tracks_fts (rowid, {columns})"
+                f" SELECT id, {columns} FROM tracks"
             )
 
     @property
@@ -284,6 +381,7 @@ class Library:
         title: str | None = None,
         album: str | None = None,
         genre: str | None = None,
+        comment: str | None = None,
         bpm: float | None = None,
         key: str | None = None,
         energy: int | None = None,
@@ -301,6 +399,7 @@ class Library:
             "title": title,
             "album": album,
             "genre": genre,
+            "comment": comment,
             "bpm": bpm,
             "key": key,
             "energy": energy,
@@ -317,14 +416,17 @@ class Library:
 
         size, mtime = _stat(path)
         filename = Path(path).name
-        blob = _make_search_blob(tags["artist"] or "", tags["title"] or "", tags["album"] or "", filename)
+        indexed = {c: tags.get(c) or "" for c in _FTS_COLUMNS}
+        indexed["filename"] = filename
+        blob = _make_search_blob(**indexed)
         with self._con:
             cur = self._con.execute(
                 """
                 INSERT INTO tracks
-                    (path, filename, artist, title, album, genre, bpm, "key",
-                     energy, duration, size, mtime, content_id, search_blob, added_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    (path, filename, artist, title, album, genre, comment, bpm,
+                     "key", energy, duration, size, mtime, content_id, search_blob,
+                     added_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     path,
@@ -333,6 +435,7 @@ class Library:
                     tags["title"] or "",
                     tags["album"] or "",
                     tags["genre"] or "",
+                    tags["comment"] or "",
                     tags["bpm"],
                     tags["key"] or "",
                     tags["energy"],
@@ -346,10 +449,11 @@ class Library:
             )
             track_id = cur.lastrowid
             if self._has_fts:
+                marks = ", ".join("?" * len(_FTS_COLUMNS))
                 self._con.execute(
-                    "INSERT INTO tracks_fts (rowid, artist, title, album, filename)"
-                    " VALUES (?, ?, ?, ?, ?)",
-                    (track_id, tags["artist"] or "", tags["title"] or "", tags["album"] or "", filename),
+                    f"INSERT INTO tracks_fts (rowid, {_quoted(_FTS_COLUMNS)})"
+                    f" VALUES (?, {marks})",
+                    (track_id, *_fts_values(**indexed)),
                 )
         return track_id
 
@@ -394,7 +498,7 @@ class Library:
         return [_track(row) for row in rows]
 
     def update_track_tags(self, track_id: int, **fields: object) -> None:
-        """Update tag columns (artist/title/album/genre/bpm/key/energy/duration)."""
+        """Update tag columns (see `_TAG_COLUMNS`)."""
         unknown = set(fields) - set(_TAG_COLUMNS)
         if unknown:
             raise ValueError(f"Unknown tag column(s): {sorted(unknown)}")
@@ -404,9 +508,9 @@ class Library:
         if row is None:
             raise ValueError(f"No track with id {track_id}")
         merged = {c: fields.get(c, row[c]) for c in _TAG_COLUMNS}
-        blob = _make_search_blob(
-            str(merged["artist"]), str(merged["title"]), str(merged["album"]), row["filename"]
-        )
+        indexed = {c: merged.get(c, row[c]) for c in _FTS_COLUMNS}
+        indexed = {c: "" if v is None else str(v) for c, v in indexed.items()}
+        blob = _make_search_blob(**indexed)
         assignments = ", ".join(f'"{c}"=?' for c in fields)
         with self._con:
             self._con.execute(
@@ -414,9 +518,10 @@ class Library:
                 [*fields.values(), blob, track_id],
             )
             if self._has_fts:
+                assignments = ", ".join(f'"{c}"=?' for c in _FTS_COLUMNS)
                 self._con.execute(
-                    "UPDATE tracks_fts SET artist=?, title=?, album=? WHERE rowid=?",
-                    (merged["artist"], merged["title"], merged["album"], track_id),
+                    f"UPDATE tracks_fts SET {assignments} WHERE rowid=?",
+                    (*_fts_values(**indexed), track_id),
                 )
 
     def update_paths(self, pairs: Iterable[tuple[str, str]]) -> int:
@@ -431,7 +536,7 @@ class Library:
         with self._con:
             for old_path, new_path in pairs:
                 row = self._con.execute(
-                    "SELECT id, artist, title, album FROM tracks WHERE path=?",
+                    f"SELECT id, {_quoted(_FTS_COLUMNS)} FROM tracks WHERE path=?",
                     (str(old_path),),
                 ).fetchone()
                 if row is None:
@@ -443,7 +548,7 @@ class Library:
                 if clash:
                     continue
                 filename = Path(new_path).name
-                blob = _make_search_blob(row["artist"], row["title"], row["album"], filename)
+                blob = _make_search_blob(**_indexed_from_row(row, filename=filename))
                 size, mtime = _stat(new_path)
                 self._con.execute(
                     "UPDATE tracks SET path=?, filename=?, search_blob=?, size=?, mtime=?"
@@ -497,9 +602,7 @@ class Library:
                 self._con.execute("DELETE FROM tracks WHERE id=?", (track_id,))
                 return survivor
             filename = Path(new_path).name
-            blob = _make_search_blob(
-                row["artist"], row["title"], row["album"], filename
-            )
+            blob = _make_search_blob(**_indexed_from_row(row, filename=filename))
             size, mtime = _stat(new_path)
             self._con.execute(
                 "UPDATE tracks SET path=?, filename=?, search_blob=?, size=?,"
@@ -823,6 +926,7 @@ class Library:
                     title=t.title,
                     album=t.album,
                     genre=t.genre,
+                    comment=t.comment,
                     bpm=t.bpm,
                     key=t.key,
                     energy=t.energy,
@@ -998,6 +1102,7 @@ def _track(row: sqlite3.Row) -> Track:
         title=row["title"],
         album=row["album"],
         genre=row["genre"],
+        comment=row["comment"],
         bpm=row["bpm"],
         key=row["key"],
         energy=row["energy"],

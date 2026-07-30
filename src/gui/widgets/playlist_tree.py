@@ -1094,6 +1094,7 @@ class PlaylistTree(QTreeView):
             title=meta.title or "",
             album=meta.album or "",
             genre=meta.genre or "",
+            comment=meta.comment or "",
             bpm=meta.bpm,
             key=meta.key or "",
             duration=meta.duration,

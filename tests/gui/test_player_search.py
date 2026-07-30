@@ -106,6 +106,77 @@ class TestAllPlaylistsScope:
         assert player._stats_label.text() == f"{_SEARCH_LIMIT}+ results"
 
 
+class TestCommentSearch:
+    """DJ notes live in the comment tag, so search has to reach them."""
+
+    def test_all_playlists_scope_finds_a_comment(self, player, lib, seeded):
+        a, b, c = seeded["paths"]
+        lib.update_track_tags(seeded["ids"][1], comment="peak time roller")
+
+        search(player, "roller")
+
+        assert [e.file_path for e in player._playlist] == [c]
+        # The result row shows the comment it matched on, not a blank cell.
+        assert player._table.item(0, 6).text() == "peak time roller"
+
+    def test_added_tracks_carry_their_comment_into_the_library(
+        self, player, lib, tmp_path
+    ):
+        """Auto-save writes the comment through, so a track added in the
+        Player is comment-searchable without any further step."""
+        (path,) = make_files(tmp_path, "one.wav")
+        player.add_tracks(track_dicts([path], artist="Anz", comment="dubby stepper"))
+
+        assert lib.get_track_by_path(path).comment == "dubby stepper"
+        search(player, "stepper")
+        assert [e.file_path for e in player._playlist] == [path]
+
+    def test_a_comment_edit_on_a_result_reaches_the_library(
+        self, player, lib, seeded, monkeypatch
+    ):
+        a, b, c = seeded["paths"]
+        monkeypatch.setattr(
+            "src.gui.widgets.player_panel.write_comment", lambda *args, **kw: None
+        )
+        search(player, "cadence")
+        player._table.item(0, 6).setText("late set only")  # Comment column
+
+        assert lib.get_track_by_path(b).comment == "late set only"
+        assert lib.search("late set") == [lib.get_track_by_path(b).id]
+
+    def test_a_load_backfills_a_comment_the_library_never_had(
+        self, player, lib, seeded, monkeypatch
+    ):
+        """How rows that predate the comment column catch up: opening their
+        playlist reads whatever tags the database lacks, and auto-save writes
+        the result back — so a comment becomes searchable after one visit."""
+        from src.metadata.tags import TrackMetadata
+
+        one = seeded["nodes"][0]
+        b = seeded["paths"][1]
+        assert lib.get_items(one)[0].comment == ""  # never read from the file
+        monkeypatch.setattr(
+            "src.metadata.tags.read_metadata",
+            lambda path: TrackMetadata(comment="from the file" if path == b else None),
+        )
+
+        player.load_node(one)
+
+        assert lib.get_items(one)[0].comment == "from the file"
+        assert lib.search("from the file") == [lib.get_track_by_path(b).id]
+
+    def test_a_load_does_not_wipe_a_stored_comment(self, player, lib, seeded):
+        """Loading a playlist re-persists it. The comment has to make the
+        round trip, or opening a list would blank what search indexed."""
+        one = seeded["nodes"][0]
+        lib.update_track_tags(seeded["ids"][0], comment="peak time roller")
+
+        player.load_node(one)
+
+        assert lib.get_items(one)[0].comment == "peak time roller"
+        assert player._playlist[0].comment == "peak time roller"
+
+
 class TestThisPlaylistScope:
     def test_filters_visible_list_and_keeps_duplicates(self, player, lib, tmp_path):
         a, b = make_files(tmp_path, "cadence.wav", "other.wav")

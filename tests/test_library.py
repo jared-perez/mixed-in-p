@@ -1,6 +1,7 @@
 """Tests for the playlist library data layer."""
 
 import sqlite3
+from pathlib import Path
 
 import pytest
 
@@ -82,6 +83,35 @@ class TestSchema:
             assert folder.expanded is False  # pre-v2 rows default to collapsed
             lib.set_node_expanded(2, True)
             assert lib.expanded_node_ids() == {2}
+
+    def test_pre_v3_database_gains_a_searchable_comment(self, tmp_path):
+        """An FTS5 table's columns are fixed at creation, so the upgrade has
+        to drop and rebuild the index — otherwise the new field is stored but
+        never searchable for anyone who already had a library."""
+        db = tmp_path / "library.db"
+        with Library(db) as lib:
+            if not lib.has_fts:
+                pytest.skip("FTS5 unavailable in this Python build")
+        # Roll the tracks table and its index back to their pre-v3 shape.
+        con = sqlite3.connect(db)
+        con.executescript(
+            """
+            ALTER TABLE tracks DROP COLUMN comment;
+            DROP TABLE tracks_fts;
+            CREATE VIRTUAL TABLE tracks_fts USING fts5(artist, title, album, filename);
+            PRAGMA user_version=2;
+            """
+        )
+        con.commit()
+        con.close()
+
+        (path,) = make_files(tmp_path, "one.aiff")
+        with Library(db) as lib:
+            playlist = lib.create_playlist("Set")
+            tid = lib.add_track(path, artist="Anz", comment="peak time roller")
+            lib.add_items(playlist, [tid])
+            assert lib.get_track(tid).comment == "peak time roller"
+            assert lib.search("roller") == [tid]
 
     def test_migration_is_idempotent(self, tmp_path):
         db = tmp_path / "library.db"
@@ -295,6 +325,107 @@ class TestSearch:
         lib.update_track_tags(anz, title="Loos in Twos")
         assert lib.search("loos") == [anz]
         assert anz not in lib.search("cadence.aiff") or lib.get_track(anz).filename == "cadence.aiff"
+
+    def test_search_matches_the_comment(self, lib, tmp_path):
+        """DJs keep their working notes in the comment tag — energy, cue
+        points, who they got it from — so it has to be searchable."""
+        anz, sway, _ = self._seed(lib, tmp_path)
+        lib.update_track_tags(anz, comment="peak time roller - 8A")
+        lib.update_track_tags(sway, comment="opener, deep")
+
+        assert lib.search("roller") == [anz]
+        assert lib.search("peak time") == [anz]
+        assert lib.search("opener") == [sway]
+        # Still ANDs across fields: one word from the comment, one from a tag.
+        assert lib.search("anz roller") == [anz]
+        assert lib.search("sway roller") == []
+
+    def test_comment_is_searchable_from_the_moment_a_track_is_added(
+        self, lib, tmp_path
+    ):
+        (path,) = make_files(tmp_path, "one.aiff")
+        playlist = lib.create_playlist("Set")
+        tid = lib.add_track(path, artist="Anz", comment="dubby stepper")
+        lib.add_items(playlist, [tid])
+        assert lib.search("stepper") == [tid]
+
+    def test_clearing_the_comment_removes_it_from_the_index(self, lib, tmp_path):
+        anz, _, _ = self._seed(lib, tmp_path)
+        lib.update_track_tags(anz, comment="banger")
+        assert lib.search("banger") == [anz]
+        lib.update_track_tags(anz, comment="")
+        assert lib.search("banger") == []
+
+    def test_a_rename_keeps_the_comment_searchable(self, lib, tmp_path):
+        """update_paths rebuilds search_blob from the stored columns, so it
+        has to carry the comment across or the rename would silently drop it
+        out of the LIKE index."""
+        (old,) = make_files(tmp_path, "one.aiff")
+        playlist = lib.create_playlist("Set")
+        tid = lib.add_track(old, artist="Anz", comment="dubby stepper")
+        lib.add_items(playlist, [tid])
+
+        new = str(tmp_path / "renamed.aiff")
+        Path(old).rename(new)
+        assert lib.update_paths([(old, new)]) == 1
+        assert lib.search("stepper") == [tid]
+
+    def test_search_matches_the_key(self, lib, tmp_path):
+        """Key search used to work only by accident — via a filename that
+        happened to carry the code, or a comment the app wrote it into."""
+        anz, sway, _ = self._seed(lib, tmp_path)
+        lib.update_track_tags(anz, key="8A")
+        lib.update_track_tags(sway, key="12B")
+
+        assert lib.search("8A") == [anz]
+        assert lib.search("8a") == [anz]  # case-insensitive
+        assert lib.search("12b") == [sway]
+        assert lib.search("anz 8a") == [anz]  # ANDs with the other fields
+        assert lib.search("sway 8a") == []
+
+    def test_changing_the_key_updates_the_index(self, lib, tmp_path):
+        anz, _, _ = self._seed(lib, tmp_path)
+        lib.update_track_tags(anz, key="8A")
+        assert lib.search("8A") == [anz]
+        lib.update_track_tags(anz, key="9A")
+        assert lib.search("8A") == []
+        assert lib.search("9A") == [anz]
+
+    def test_key_search_works_on_the_like_fallback(self, tmp_path):
+        """The two search paths must agree: FTS indexes the column, and the
+        blob has to carry it too or a no-FTS build silently loses the field."""
+        (path,) = make_files(tmp_path, "one.aiff")
+        with Library(tmp_path / "library.db", enable_fts=False) as lib:
+            playlist = lib.create_playlist("Set")
+            tid = lib.add_track(path, artist="Anz", key="8A")
+            lib.add_items(playlist, [tid])
+            assert lib.search("8a") == [tid]
+
+    def test_upgrade_makes_an_existing_key_searchable(self, tmp_path):
+        """A pre-v4 row has a stored key its blob predates, so the upgrade has
+        to recompute the blobs — otherwise the LIKE path misses it forever."""
+        db = tmp_path / "library.db"
+        (path,) = make_files(tmp_path, "one.aiff")
+        with Library(db) as lib:
+            playlist = lib.create_playlist("Set")
+            tid = lib.add_track(path, artist="Anz", key="8A")
+            lib.add_items(playlist, [tid])
+        # Roll this row back to how a pre-v4 build would have left it: key
+        # stored, blob and FTS index without it.
+        con = sqlite3.connect(db)
+        con.execute(
+            "UPDATE tracks SET search_blob=? WHERE id=?", ("anz one.aiff", tid)
+        )
+        con.execute("DROP TABLE IF EXISTS tracks_fts")
+        con.execute("PRAGMA user_version=3")
+        con.commit()
+        con.close()
+
+        with Library(db, enable_fts=False) as lib:  # LIKE path: needs the blob
+            assert lib.search("8a") == [tid]
+        with Library(db) as lib:  # FTS path: needs the rebuilt index
+            if lib.has_fts:
+                assert lib.search("8a") == [tid]
 
     def test_fts_index_resyncs_after_fallback_session(self, tmp_path):
         db = tmp_path / "library.db"

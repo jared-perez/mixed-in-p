@@ -1886,8 +1886,9 @@ class PlayerPanel(QWidget):
             # Hand add_tracks everything the library row already carries, so
             # a load doesn't depend on (or wait for) per-file tag reads —
             # and a track whose file is missing still shows its stored tags.
-            # The tag-read fallback then only fills what the DB lacks
-            # (comment/year).
+            # The tag-read fallback then only fills what the DB lacks: year
+            # always (no column for it), and the comment for rows written
+            # before there was one — see _store_read_comments.
             self.add_tracks(
                 [
                     {
@@ -1897,6 +1898,7 @@ class PlayerPanel(QWidget):
                         "title": t.title,
                         "bpm": str(int(round(t.bpm))) if t.bpm else "",
                         "key": t.key,
+                        "comment": t.comment,
                         "duration": t.duration,
                     }
                     for t in tracks
@@ -1905,12 +1907,35 @@ class PlayerPanel(QWidget):
             )
         finally:
             self._loading_playlist = False
+        self._store_read_comments(tracks)
         # Re-link the playing track to its row if this list contains it.
         if self._playing_path is not None:
             self._relink_playing_row()
             self._highlight_current_row()
             self._update_transport_state()
         self._update_context_label()
+
+    def _store_read_comments(self, tracks) -> None:
+        """Keep comments the load just read from the files.
+
+        The comment column arrived after the library did, so rows written by
+        an earlier build carry none — and a field the database doesn't hold is
+        a field search can't find. A load already reads tags for whatever the
+        row lacks, so storing that one column costs nothing and makes the
+        playlist comment-searchable from the first time it is opened.
+
+        Deliberately not `_persist_playlist`: that is suppressed during a load
+        (it would rewrite the list it is loading, and push undo). This writes
+        tags only — never membership, never the undo stack. It also only ever
+        fills a comment in, so a file that failed to read can't blank one.
+        """
+        if self._library is None:
+            return
+        by_path = {t.path: t for t in tracks}
+        for entry in self._playlist:
+            track = by_path.get(entry.file_path)
+            if track is not None and entry.comment and entry.comment != track.comment:
+                self._library.update_track_tags(track.id, comment=entry.comment)
 
     def _persist_playlist(self) -> None:
         """Auto-save: write the visible list through to the loaded node."""
@@ -1936,6 +1961,7 @@ class PlayerPanel(QWidget):
                 e.file_path,
                 artist=e.artist,
                 title=e.title,
+                comment=e.comment,
                 bpm=_parse_bpm(e.bpm),
                 key=e.key,
                 duration=_parse_duration(e.duration),
@@ -2082,8 +2108,8 @@ class PlayerPanel(QWidget):
             capped = len(ids) > _SEARCH_LIMIT
             found = self._library.get_tracks(ids[:_SEARCH_LIMIT])
             # A track already in the loaded list reuses that entry, keeping
-            # file-only fields (comment/year) the library rows don't carry —
-            # and letting inline edits flow back to the loaded list for free.
+            # year (the one displayed field with no library column) — and
+            # letting inline edits flow back to the loaded list for free.
             by_path = {e.file_path: e for e in self._base_entries or []}
             entries = [
                 by_path.get(t.path) or self._entry_from_track(t) for t in found
@@ -2182,7 +2208,7 @@ class PlayerPanel(QWidget):
 
     def _entry_from_track(self, track) -> PlaylistEntry:
         """A displayable entry for a library track that isn't in the loaded
-        list. Comment/year stay blank — the library rows don't carry them."""
+        list. Year stays blank — the library rows don't carry it."""
         bpm = str(int(round(track.bpm))) if track.bpm else ""
         duration = (
             self._format_time(int(track.duration * 1000)) if track.duration else ""
@@ -2194,6 +2220,7 @@ class PlayerPanel(QWidget):
             title=track.title,
             bpm=bpm,
             key=track.key,
+            comment=track.comment,
             duration=duration,
         )
 
@@ -2255,6 +2282,7 @@ class PlayerPanel(QWidget):
             track.id,
             artist=entry.artist,
             title=entry.title,
+            comment=entry.comment,
             bpm=_parse_bpm(entry.bpm),
             key=entry.key,
         )
