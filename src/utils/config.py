@@ -113,6 +113,13 @@ class AppConfig:
     # and to every entry point except loading a saved playlist, which restores
     # its stored duplicates verbatim.
     duplicate_policy: str = "ask"
+    # Whether Scratch survives a restart. Off by default: Scratch is the
+    # disposable working list the Player opens on, so each session starts
+    # empty and a list worth keeping is kept with Save Playlist. Turning this
+    # on makes Scratch behave like every other playlist. Only the contents are
+    # cleared (at startup, so a crash can't strand a half-written list) — the
+    # node itself is reserved and always exists.
+    persist_scratch: bool = False
     language: str = DEFAULT_LANGUAGE
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).
@@ -193,6 +200,9 @@ def load_config() -> AppConfig:
                 ),
                 duplicate_policy=str(
                     data.get("duplicate_policy", AppConfig.duplicate_policy)
+                ),
+                persist_scratch=bool(
+                    data.get("persist_scratch", AppConfig.persist_scratch)
                 ),
                 language=data.get("language", AppConfig.language),
                 theme=data.get("theme", AppConfig.theme),

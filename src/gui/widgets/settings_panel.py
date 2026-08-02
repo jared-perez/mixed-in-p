@@ -462,6 +462,22 @@ class SettingsPanel(QWidget):
         dup_hint.setWordWrap(True)
         playlist_layout.addWidget(dup_hint)
 
+        self._persist_scratch_cb = QCheckBox(self.tr("Keep Scratch between sessions"))
+        self._persist_scratch_cb.setObjectName("circleCheckLg")
+        self._persist_scratch_cb.setChecked(False)
+        playlist_layout.addWidget(self._persist_scratch_cb)
+
+        scratch_hint = QLabel(
+            self.tr(
+                "Scratch is the working list the Player opens on, and it starts "
+                "empty each time you launch. Turn this on to have it reopen with "
+                "whatever was in it — either way, Save Playlist keeps a copy."
+            )
+        )
+        scratch_hint.setObjectName("settingsHint")
+        scratch_hint.setWordWrap(True)
+        playlist_layout.addWidget(scratch_hint)
+
         self._export_absolute_cb = QCheckBox(
             self.tr("Always use full paths in exported playlists")
         )
@@ -514,6 +530,7 @@ class SettingsPanel(QWidget):
         self._auto_analyze_cb.stateChanged.connect(self._emit_changed)
         self._visualizations_cb.stateChanged.connect(self._emit_changed)
         self._export_absolute_cb.stateChanged.connect(self._emit_changed)
+        self._persist_scratch_cb.stateChanged.connect(self._emit_changed)
         self._duplicate_policy_combo.currentIndexChanged.connect(self._emit_changed)
         self._format_group.buttonClicked.connect(self._emit_changed)
         self._language_combo.currentIndexChanged.connect(self._on_language_changed)
@@ -765,6 +782,7 @@ class SettingsPanel(QWidget):
             waveform_color=self._waveform_color,
             visualizations_enabled=self._visualizations_cb.isChecked(),
             export_absolute_paths=self._export_absolute_cb.isChecked(),
+            persist_scratch=self._persist_scratch_cb.isChecked(),
             duplicate_policy=self._duplicate_policy_combo.currentData(),
         )
 
@@ -810,6 +828,9 @@ class SettingsPanel(QWidget):
         self._export_absolute_cb.blockSignals(True)
         self._export_absolute_cb.setChecked(cfg.export_absolute_paths)
         self._export_absolute_cb.blockSignals(False)
+        self._persist_scratch_cb.blockSignals(True)
+        self._persist_scratch_cb.setChecked(cfg.persist_scratch)
+        self._persist_scratch_cb.blockSignals(False)
 
         self._duplicate_policy_combo.blockSignals(True)
         dup_index = self._duplicate_policy_combo.findData(cfg.duplicate_policy)

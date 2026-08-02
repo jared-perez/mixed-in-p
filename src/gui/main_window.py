@@ -73,6 +73,18 @@ from .workers import (
 )
 
 
+def apply_scratch_policy(lib: "library.Library", persist: bool) -> None:
+    """Empty Scratch at startup unless the user asked to keep it.
+
+    Scratch is the disposable working list the Player opens on, so a session
+    starts clean and anything worth keeping is kept with Save Playlist. Only
+    its membership rows go: the node is reserved and always exists, and the
+    library's own GC keeps any track that a saved playlist still holds.
+    """
+    if not persist:
+        lib.set_items(library.SCRATCH_NODE_ID, [])
+
+
 class MainWindow(QMainWindow):
     """Main application window for Mixed in P."""
 
@@ -138,6 +150,12 @@ class MainWindow(QMainWindow):
         self._undo_stack.undone.connect(self._on_undone)
         undo_sc = QShortcut(QKeySequence.StandardKey.Undo, self)
         undo_sc.activated.connect(self._on_undo_shortcut)
+        # Cleared before the Player reads it, so the session opens on an empty
+        # working list. Done at startup rather than on close so a crash can't
+        # strand yesterday's list, and through the library API rather than the
+        # panel so it lands before the undo stack is live — otherwise the
+        # clear would be undoable and yesterday's Scratch could come back.
+        apply_scratch_policy(self._library, self._config.persist_scratch)
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._load_last_session()
 

@@ -40,3 +40,18 @@ class TestExportAbsolutePaths:
     def test_the_default_still_survives_a_round_trip(self):
         save_config(AppConfig())
         assert load_config().export_absolute_paths is False
+
+
+class TestPersistScratch:
+    def test_default_is_off(self):
+        """Scratch is disposable by design — the name promises it."""
+        assert AppConfig().persist_scratch is False
+
+    def test_it_round_trips(self):
+        """The same read-back that export_absolute_paths originally missed."""
+        save_config(AppConfig(persist_scratch=True))
+        assert load_config().persist_scratch is True
+
+    def test_the_default_still_survives_a_round_trip(self):
+        save_config(AppConfig())
+        assert load_config().persist_scratch is False
