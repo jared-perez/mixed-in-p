@@ -49,15 +49,17 @@ class TestReadMetadata:
             read_metadata("/nonexistent/file.mp3")
 
     def test_unsupported_format(self):
+        # Read and unlink OUTSIDE the with-block: Windows refuses to delete a
+        # file that still has an open handle (WinError 32), so the temp file
+        # must be closed before it is used and removed.
         with tempfile.NamedTemporaryFile(suffix=".txt", delete=False) as f:
             f.write(b"not an audio file")
-            f.flush()
 
-            try:
-                with pytest.raises(ValueError, match="Unsupported"):
-                    read_metadata(f.name)
-            finally:
-                Path(f.name).unlink()
+        try:
+            with pytest.raises(ValueError, match="Unsupported"):
+                read_metadata(f.name)
+        finally:
+            Path(f.name).unlink()
 
 
 class TestWriteMetadata:
@@ -77,14 +79,15 @@ class TestUpdateBpmKey:
         with tempfile.NamedTemporaryFile(suffix=".mp3", delete=False) as f:
             # Create a minimal MP3-like file (won't have valid tags but tests the path)
             f.write(b"\xff\xfb\x90\x00" + b"\x00" * 100)
-            f.flush()
 
-            try:
-                # This should succeed even though the file isn't a real MP3
-                result = update_bpm_key(f.name, bpm=None, key=None)
-                assert result is True
-            finally:
-                Path(f.name).unlink()
+        # Closed before use: mutagen opens the file itself, and Windows will not
+        # unlink it while this handle is still open (WinError 32).
+        try:
+            # This should succeed even though the file isn't a real MP3
+            result = update_bpm_key(f.name, bpm=None, key=None)
+            assert result is True
+        finally:
+            Path(f.name).unlink()
 
 
 class TestMetadataIntegration:

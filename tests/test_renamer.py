@@ -93,7 +93,9 @@ class TestAddPrefix:
 
     def test_add_prefix_with_path(self):
         result = apply_operation("/music/Track.mp3", AddPrefix(prefix="01 "))
-        assert result == "/music/01 Track.mp3"
+        # apply_operation rebuilds the name with Path, so the separator is the
+        # platform's — compare against a Path, not a hardcoded POSIX string.
+        assert result == str(Path("/music/01 Track.mp3"))
 
 
 class TestAddSuffix:
@@ -109,7 +111,7 @@ class TestAddSuffix:
 
     def test_add_suffix_with_path(self):
         result = apply_operation("/music/Track.mp3", AddSuffix(suffix=" v2"))
-        assert result == "/music/Track v2.mp3"
+        assert result == str(Path("/music/Track v2.mp3"))
 
 
 class TestReplace:
