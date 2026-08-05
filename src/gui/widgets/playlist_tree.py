@@ -66,6 +66,7 @@ from src.library.playlist_export import (
 )
 from src.metadata.tags import read_metadata
 from src.utils.config import load_config
+from src.utils.paths import normalize_track_path
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.playlist_copy_worker import PlaylistCopyThread
@@ -1006,8 +1007,12 @@ class PlaylistTree(QTreeView):
         if node is None:
             event.ignore()
             return
+        # Normalized, not raw: on Windows toLocalFile() hands back forward
+        # slashes, and a path that disagrees with the one every other add
+        # route stores is a second library row for the same file — with
+        # duplicate detection blind to it. See src/utils/paths.py.
         paths = [
-            url.toLocalFile()
+            normalize_track_path(url.toLocalFile())
             for url in event.mimeData().urls()
             if Path(url.toLocalFile()).suffix.lower() in AUDIO_EXTENSIONS
         ]

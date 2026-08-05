@@ -516,6 +516,100 @@ class TestTagsOnDrop:
         assert [t.path for t in lib.get_items(pl)] == [a]
 
 
+class TestPathSpelling:
+    """A dropped path is stored the way every other add route stores it.
+
+    Path identity in the library is exact-string, so a drop that spells a file
+    differently from the file dialog or a folder scan makes one file into two
+    rows and blinds the duplicate check. That is exactly what Windows hit:
+    ``QUrl.toLocalFile()`` returns ``C:/music/a.mp3`` there while the other
+    routes return ``C:\\music\\a.mp3``.
+
+    Separators can't be reproduced on a Mac, but the property under test isn't
+    about separators — it is "two spellings of one file resolve to one row".
+    A redundant ``sub/..`` segment gives a second spelling on every platform
+    (QUrl passes dot segments through untouched, verified).
+    """
+
+    @staticmethod
+    def detour(path):
+        """The same file, spelled with a pointless round trip through a dir."""
+        p = Path(path)
+        (p.parent / "sub").mkdir(exist_ok=True)
+        return str(p.parent / "sub" / ".." / p.name)
+
+    def test_a_detoured_path_is_stored_canonically(
+        self, tree, lib, tmp_path, monkeypatch
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = lib.create_playlist("Set")
+        tree.refresh()
+        aim_at(tree, pl, monkeypatch)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([self.detour(a)])))
+
+        assert [t.path for t in lib.get_items(pl)] == [a]
+
+    def test_a_detoured_path_is_the_same_library_row(
+        self, tree, lib, tmp_path, monkeypatch
+    ):
+        (a,) = make_files(tmp_path, "a.wav")
+        known = lib.add_track(a, artist="Edited By Hand")
+        pl = lib.create_playlist("Set")
+        tree.refresh()
+        aim_at(tree, pl, monkeypatch)
+
+        tree._drop_tracks(FakeDropEvent(url_mime([self.detour(a)])))
+
+        # One row, not two — and the row already there, tags intact.
+        assert lib.track_count() == 1
+        assert [t.id for t in lib.get_items(pl)] == [known]
+        assert lib.get_items(pl)[0].artist == "Edited By Hand"
+
+    def test_the_add_files_route_normalizes_too(self, tmp_path):
+        """The other half of the bug, and the half no test covered.
+
+        QFileDialog returns forward slashes on every platform, so on Windows
+        Add Files hands the Player ``C:/music/a.mp3`` while a folder scan hands
+        it ``C:\\music\\a.mp3``. Driven as an unbound method against a stub —
+        the same trick TestPlayerRefreshHandoff uses — because the routing is
+        all this needs, not a whole MainWindow.
+        """
+        (a,) = make_files(tmp_path, "a.wav")
+
+        class StubPanel:
+            def __init__(self):
+                self.tracks = None
+
+            def add_tracks(self, tracks):
+                self.tracks = tracks
+
+        class StubWindow:
+            def __init__(self):
+                self._player_panel = StubPanel()
+
+        window = StubWindow()
+        MainWindow._add_files_to_player(window, [self.detour(a)])
+
+        assert [t["file_path"] for t in window._player_panel.tracks] == [a]
+
+    def test_a_detoured_path_counts_as_a_duplicate(
+        self, tree, lib, tmp_path, monkeypatch, qtbot
+    ):
+        """The Windows symptom: 'skip' saw no duplicates and added them all."""
+        (a,) = make_files(tmp_path, "a.wav")
+        pl = lib.create_playlist("Set")
+        lib.add_items(pl, [lib.add_track(a)])
+        tree.refresh()
+        aim_at(tree, pl, monkeypatch)
+        monkeypatch.setattr(dup_mod, "current_policy", lambda: "skip")
+
+        tree._drop_tracks(FakeDropEvent(url_mime([self.detour(a)])))
+        pump(qtbot)
+
+        assert [t.path for t in lib.get_items(pl)] == [a]
+
+
 class TestPlayerRefreshHandoff:
     """MainWindow reloads the Player only when the drop hit its list."""
 

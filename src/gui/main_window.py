@@ -43,6 +43,7 @@ from src.renamer import (
 )
 
 from src.utils.config import AppConfig, load_config, save_config
+from src.utils.paths import normalize_track_path
 
 from .models import TrackState, TrackStore
 from .models.undo_stack import UndoStack
@@ -591,11 +592,19 @@ class MainWindow(QMainWindow):
             self._on_page_changed("rename")
 
     def _add_files_to_player(self, file_paths: list[str]) -> None:
-        """Add files directly to the player panel, reading metadata from tags."""
+        """Add files directly to the player panel, reading metadata from tags.
+
+        Paths are normalized here because this is where the un-normalized ones
+        arrive: QFileDialog returns forward slashes on every platform (so
+        ``C:/music/a.mp3`` on Windows) while ``find_audio_files`` returns
+        native separators, and both land in the library as literal strings.
+        Drops already normalize in their own handlers. See src/utils/paths.py.
+        """
         from src.metadata.tags import read_metadata
 
         tracks = []
-        for p in file_paths:
+        for raw in file_paths:
+            p = normalize_track_path(raw)
             track: dict[str, str] = {
                 "file_path": p,
                 "display_name": Path(p).name,
