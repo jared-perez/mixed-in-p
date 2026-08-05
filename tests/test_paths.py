@@ -4,6 +4,15 @@ The library keys tracks on the literal path string, so the value of this
 helper is that every add route hands it the same file and gets back the same
 string. These tests state that as a property rather than as a table of
 expected strings, because the canonical form is platform-specific.
+
+**Known coverage gap: symlink collapsing is unverified on Windows.**
+``test_a_symlinked_directory_collapses`` skips there, because ``symlink_to``
+needs Developer Mode or an elevated shell. That matters more than it looks:
+resolving symlinks is *why* ``normalize_track_path`` calls ``resolve()``
+rather than just rebuilding through ``Path``, so on Windows the reason for
+the design choice is the one property not being checked. The separator and
+dot-segment properties are covered on both platforms. Running the suite from
+an elevated Windows shell would close the gap.
 """
 
 import sys

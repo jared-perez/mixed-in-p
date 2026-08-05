@@ -1833,18 +1833,28 @@ class PlayerPanel(QWidget):
         """Stop playback (called on nav-away from the Player and on app close)."""
         self._engine.stop()
 
+    def wait_for_readers(self, timeout_ms: int = 5000) -> bool:
+        """Block until nothing here has an audio file open. False on timeout.
+
+        Adding tracks warms the likely-next one (``_prefetch_default_target``)
+        on a background thread, so for a short window after ``add_tracks`` the
+        panel holds a read handle on a file the caller has no way to know
+        about. On POSIX that is invisible — an open handle does not block an
+        unlink or a rename. On Windows it is ``WinError 32``.
+
+        This is the panel's way of saying "I am done with that path". Public
+        because the alternative for a caller is to guess at a sleep.
+        """
+        return wait_for_threads(self._thread_keep, timeout_ms)
+
     def shutdown_workers(self) -> None:
         """Wait for any decode or waveform thread still reading a file.
 
         Separate from ``stop_playback``: that ends the audio output, this ends
-        the *readers*. A prefetch queued behind the track the user is playing
-        keeps a file handle open long after they have navigated away, which on
-        Windows blocks that file from being renamed or deleted. Called from
-        ``closeEvent`` so a panel torn down by a test gets it too — that is
-        where the collision shows up first (``WinError 32`` unlinking a
-        ``tmp_path`` fixture file).
+        the *readers*. Called from ``closeEvent``, which is what stops a
+        running QThread being destroyed under Qt when the panel goes away.
         """
-        wait_for_threads(self._thread_keep)
+        self.wait_for_readers()
 
     def closeEvent(self, event) -> None:
         self.shutdown_workers()

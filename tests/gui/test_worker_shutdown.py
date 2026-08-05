@@ -15,6 +15,7 @@ output was reporting.
 import threading
 
 import pytest
+import shiboken6
 from PySide6.QtCore import QObject, QThread, Signal, Slot
 
 from src.gui.widgets.player_panel import PlayerPanel
@@ -84,6 +85,71 @@ class TestWaitForThreads:
         # Safe to call twice, and after the C++ side is gone.
         assert wait_for_threads(store) is True
         assert wait_for_threads(store) is True
+
+
+class TestReaderHandles:
+    """`add_tracks` leaves a file open, and `wait_for_readers` closes it.
+
+    This is the half of the Windows flake that `closeEvent` could never
+    reach: the tests that failed there delete the file *mid-test*, a line or
+    two after adding it, while the prefetch this pins is still in flight. The
+    WinError 32 itself cannot be reproduced on POSIX — an open handle does not
+    block an unlink here — so what is pinned is the mechanism underneath it.
+    """
+
+    @staticmethod
+    def running(panel):
+        return [
+            o
+            for group in panel._thread_keep
+            for o in group
+            if isinstance(o, QThread) and shiboken6.isValid(o) and o.isRunning()
+        ]
+
+    def test_adding_tracks_starts_a_reader(self, qtbot, tmp_path):
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        panel.set_library(Library(tmp_path / "library.db"))
+        track = tmp_path / "a.wav"
+        track.write_bytes(b"audio-a.wav")
+
+        panel.add_tracks([{"file_path": str(track), "display_name": "a.wav"}])
+
+        # Whether it is still *running* by now is a race — that it was started
+        # is not, and that is what leaves the handle open.
+        assert panel._thread_keep, "no prefetch was started"
+
+    def test_wait_for_readers_leaves_nothing_running(self, qtbot, tmp_path):
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        panel.set_library(Library(tmp_path / "library.db"))
+        track = tmp_path / "a.wav"
+        track.write_bytes(b"audio-a.wav")
+        panel.add_tracks([{"file_path": str(track), "display_name": "a.wav"}])
+
+        assert panel.wait_for_readers() is True
+        assert self.running(panel) == []
+
+    def test_only_the_prefetched_track_is_held(self, qtbot, tmp_path):
+        """Why a test deleting the *second* of two files never flaked.
+
+        Only one track is ever warmed — the selection, else row 0 — so the
+        rest of the playlist is untouched on disk.
+        """
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        panel.set_library(Library(tmp_path / "library.db"))
+        tracks = []
+        for name in ("a.wav", "b.wav"):
+            f = tmp_path / name
+            f.write_bytes(b"audio-" + name.encode())
+            tracks.append({"file_path": str(f), "display_name": name})
+
+        panel.add_tracks(tracks)
+
+        # Read before the event loop spins, so _on_decode_thread_finished has
+        # not cleared it yet.
+        assert panel._decode_current_path == str(tmp_path / "a.wav")
 
 
 class TestPlayerPanelShutdown:

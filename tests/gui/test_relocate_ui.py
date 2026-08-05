@@ -17,6 +17,8 @@ from src.gui.widgets.dialogs.relocate_dialog import RelocateDialog
 from src.gui.widgets.player_panel import PlayerPanel
 from src.library import SCRATCH_NODE_ID, Library
 
+from .helpers import unlink_when_released
+
 
 @pytest.fixture
 def lib(tmp_path):
@@ -59,7 +61,7 @@ class TestMissingMarker:
     def test_missing_row_is_marked_dimmed_and_explained(self, player, tmp_path):
         here, gone = make_files(tmp_path / "audio", "here.wav", "gone.wav")
         player.add_tracks(track_dicts([here, gone]))
-        Path(gone).unlink()
+        unlink_when_released(player, gone)
         player._refresh_missing_marks()
 
         assert player._table.item(0, 1).text() == "here.wav"
@@ -74,7 +76,7 @@ class TestMissingMarker:
     def test_mark_clears_when_the_file_comes_back(self, player, tmp_path):
         (gone,) = make_files(tmp_path / "audio", "gone.wav")
         player.add_tracks(track_dicts([gone]))
-        Path(gone).unlink()
+        unlink_when_released(player, gone)
         player._refresh_missing_marks()
         assert player._table.item(0, 1).text() == "! gone.wav"
 
@@ -85,7 +87,7 @@ class TestMissingMarker:
     def test_playing_row_keeps_its_highlight_while_missing(self, player, tmp_path):
         (gone,) = make_files(tmp_path / "audio", "gone.wav")
         player.add_tracks(track_dicts([gone]))
-        Path(gone).unlink()
+        unlink_when_released(player, gone)
         player._current_index = 0
         player._refresh_missing_marks()
         player._highlight_current_row()
@@ -98,7 +100,7 @@ class TestMissingMarker:
         """Regression: the '!' makes the cell text a bad row identity."""
         a, b = make_files(tmp_path / "audio", "a.wav", "b.wav")
         player.add_tracks(track_dicts([a, b]))
-        Path(a).unlink()
+        unlink_when_released(player, a)
         player._refresh_missing_marks()
 
         # Simulate the drop handler's move: take the rows and swap them.
@@ -117,7 +119,7 @@ class TestContextMenu:
     def test_locate_is_offered_only_for_a_missing_file(self, player, tmp_path):
         here, gone = make_files(tmp_path / "audio", "here.wav", "gone.wav")
         player.add_tracks(track_dicts([here, gone]))
-        Path(gone).unlink()
+        unlink_when_released(player, gone)
         player._missing_cache = {}
 
         assert player._is_missing(gone) is True
@@ -229,7 +231,7 @@ class TestPlayerIntegration:
         (original,) = make_files(tmp_path / "old", "song.wav")
         player.add_tracks(track_dicts([original]))
         (moved,) = make_files(tmp_path / "new", "song.wav")
-        Path(original).unlink()
+        unlink_when_released(player, original)
         player._refresh_missing_marks()
 
         monkeypatch.setattr(
@@ -248,7 +250,7 @@ class TestPlayerIntegration:
     ):
         (original,) = make_files(tmp_path / "old", "song.wav")
         player.add_tracks(track_dicts([original]))
-        Path(original).unlink()
+        unlink_when_released(player, original)
         player._refresh_missing_marks()
 
         monkeypatch.setattr(RelocateDialog, "exec", lambda self: None)

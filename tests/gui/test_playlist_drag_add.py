@@ -23,6 +23,8 @@ from src.gui.models.undo_stack import UndoStack
 from src.library import SCRATCH_NODE_ID, Library
 from src.metadata.tags import TrackMetadata, read_metadata
 
+from .helpers import unlink_when_released
+
 
 @pytest.fixture(scope="module", autouse=True)
 def warm_tag_reader(tmp_path_factory):
@@ -652,7 +654,7 @@ class TestPlayerDragGuard:
         (a,) = make_files(tmp_path, "a.wav")
         player.add_tracks(track_dicts([a]))
         assert player._table.item(0, 1).text() == "a.wav"
-        Path(a).unlink()
+        unlink_when_released(player, a)
 
         shown = []
         monkeypatch.setattr(QMessageBox, "exec", lambda box: shown.append(box.text()))
@@ -669,7 +671,7 @@ class TestPlayerDragGuard:
     ):
         a, b = make_files(tmp_path, "a.wav", "b.wav")
         player.add_tracks(track_dicts([a, b]))
-        Path(b).unlink()
+        unlink_when_released(player, b)
 
         monkeypatch.setattr(QMessageBox, "exec", lambda box: None)
         player._table.selectAll()
