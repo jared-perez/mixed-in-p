@@ -16,6 +16,7 @@ import pytest
 from src.gui.styles.theme import Theme
 from src.gui.widgets.player_panel import PlayerPanel
 from src.library import Library
+from src.utils.config import load_config, save_config
 
 
 @pytest.fixture
@@ -26,12 +27,21 @@ def lib(tmp_path):
 
 
 @pytest.fixture
-def player(qtbot, lib):
+def player(qtbot, lib, isolated_app_data):
+    # The visuals button is the right-hand end of the row these tests measure,
+    # and PlayerPanel hides it unless visualizations are on — a user setting,
+    # off by default. Written to the isolated config before construction, not
+    # patched onto load_config: player_panel binds that name at import time.
+    cfg = load_config()
+    cfg.visualizations_enabled = True
+    save_config(cfg)
+
     panel = PlayerPanel()
     qtbot.addWidget(panel)
     panel.set_library(lib)  # reveals the search field + scope button
     panel.show()
     qtbot.waitExposed(panel)
+    assert panel._vis_button.isVisible(), "the row under test is not laid out"
     return panel
 
 
