@@ -34,7 +34,7 @@ from PySide6.QtWidgets import (
 from src.metadata.tags import read_metadata
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from ..workers.spectrum_worker import DYNAMIC_RANGE_DB, _COLORMAP, colorize, SpectrumWorker
-from ..workers.thread_keeper import keep_alive
+from ..workers.thread_keeper import keep_alive, wait_for_threads
 from .drop_zone import AUDIO_EXTENSIONS
 
 logger = logging.getLogger(__name__)
@@ -501,3 +501,11 @@ class SpectrumPanel(QWidget):
         self._spec_pending_path = None
         if next_path is not None:
             self._start_render(next_path)
+
+    def shutdown_workers(self) -> None:
+        """Wait for a render thread still reading a file. See PlayerPanel."""
+        wait_for_threads(self._thread_keep)
+
+    def closeEvent(self, event) -> None:
+        self.shutdown_workers()
+        super().closeEvent(event)

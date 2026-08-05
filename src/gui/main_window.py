@@ -1342,6 +1342,13 @@ class MainWindow(QMainWindow):
         self._player_panel.stop_playback()
         self._keyboard_panel.stop_audio()
 
+        # ...and the threads still *reading* files. Stopping playback does not
+        # stop a decode or a render in flight, and a QThread destroyed while
+        # running is undefined behaviour (plus, on Windows, an open handle on a
+        # file the user may be about to rename).
+        self._player_panel.shutdown_workers()
+        self._spectrum_panel.shutdown_workers()
+
         # Cancel any running analysis
         if self._analysis_thread is not None and self._analysis_thread.isRunning():
             self._analysis_thread.cancel()

@@ -84,7 +84,7 @@ from src.utils.config import load_config, save_config
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
-from ..workers.thread_keeper import keep_alive
+from ..workers.thread_keeper import keep_alive, wait_for_threads
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
 from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, VisualizerWindow
 
@@ -1832,6 +1832,23 @@ class PlayerPanel(QWidget):
     def stop_playback(self) -> None:
         """Stop playback (called on nav-away from the Player and on app close)."""
         self._engine.stop()
+
+    def shutdown_workers(self) -> None:
+        """Wait for any decode or waveform thread still reading a file.
+
+        Separate from ``stop_playback``: that ends the audio output, this ends
+        the *readers*. A prefetch queued behind the track the user is playing
+        keeps a file handle open long after they have navigated away, which on
+        Windows blocks that file from being renamed or deleted. Called from
+        ``closeEvent`` so a panel torn down by a test gets it too — that is
+        where the collision shows up first (``WinError 32`` unlinking a
+        ``tmp_path`` fixture file).
+        """
+        wait_for_threads(self._thread_keep)
+
+    def closeEvent(self, event) -> None:
+        self.shutdown_workers()
+        super().closeEvent(event)
 
     def refresh(self) -> None:
         """Refresh UI state."""
