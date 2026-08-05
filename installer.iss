@@ -29,6 +29,9 @@ ArchitecturesInstallIn64BitMode=x64compatible
 DisableProgramGroupPage=yes
 WizardImageFile=resources\installer_wizard.png
 WizardSmallImageFile=resources\installer_p_logo.png
+; Tells Explorer to refresh its association cache when [Registry] changes
+; land. Without it the "Open with" entry can take a logoff to appear.
+ChangesAssociations=yes
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -43,6 +46,46 @@ Source: "dist\MixedInP\_internal\*"; DestDir: "{app}\_internal"; Flags: ignoreve
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+
+[Registry]
+; --- "Open with Mixed in P" ----------------------------------------------
+; HKA resolves to HKLM for an admin install (the default here, since
+; DefaultDirName is {autopf}) and to HKCU otherwise. Never hardcode HKLM.
+;
+; This buys presence in the Open with submenu only. Windows 10/11 does not
+; let an installer take a file type's *default* silently — attempting it gets
+; the association reset. Becoming the default is user-driven; see the
+; Capabilities block below, which is what makes that a single journey.
+Root: HKA; Subkey: "Software\Classes\MixedInP.Audio"; ValueType: string; ValueData: "Audio File"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\Classes\MixedInP.Audio\DefaultIcon"; ValueType: string; ValueData: "{app}\{#MyAppExeName},0"
+; %1 quoted exactly so paths with spaces arrive as one argument.
+Root: HKA; Subkey: "Software\Classes\MixedInP.Audio\shell\open\command"; ValueType: string; ValueData: """{app}\{#MyAppExeName}"" ""%1"""
+
+; One entry per type the GUI accepts (src/gui/widgets/drop_zone.py).
+Root: HKA; Subkey: "Software\Classes\.mp3\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.wav\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.flac\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.aiff\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.aif\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.m4a\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+Root: HKA; Subkey: "Software\Classes\.ogg\OpenWithProgids"; ValueType: string; ValueName: "MixedInP.Audio"; ValueData: ""; Flags: uninsdeletevalue
+
+; --- Default apps: one grouped entry, not seven separate journeys --------
+; Without Capabilities + RegisteredApplications the user must hunt each
+; extension individually in Settings. With it, Windows lists Mixed in P once
+; with its file types grouped, so they set them from a single screen.
+Root: HKA; Subkey: "Software\MixedInP"; Flags: uninsdeletekey
+Root: HKA; Subkey: "Software\MixedInP\Capabilities"; ValueType: string; ValueName: "ApplicationName"; ValueData: "{#MyAppName}"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities"; ValueType: string; ValueName: "ApplicationDescription"; ValueData: "Harmonic-mixing analysis and player for DJs"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities"; ValueType: string; ValueName: "ApplicationIcon"; ValueData: "{app}\{#MyAppExeName},0"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".mp3"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".wav"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".flac"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".aiff"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".aif"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".m4a"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\MixedInP\Capabilities\FileAssociations"; ValueType: string; ValueName: ".ogg"; ValueData: "MixedInP.Audio"
+Root: HKA; Subkey: "Software\RegisteredApplications"; ValueType: string; ValueName: "{#MyAppName}"; ValueData: "Software\MixedInP\Capabilities"; Flags: uninsdeletevalue
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
