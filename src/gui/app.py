@@ -246,7 +246,12 @@ def run_app(argv: list[str] | None = None) -> int:
     # empty and the files arrive through the relay instead.
     if paths:
         window.open_files(paths)
+    # Both of these replay what arrived before there was a window to answer
+    # it: the relay for a macOS QFileOpenEvent, the instance server for a
+    # secondary that handed off during the claim — which, in a multi-select
+    # race, is most of them.
     relay.go_live()
+    instance.start_delivering()
 
     elapsed = time.perf_counter() - t0
     logger.info(f"Startup time: {elapsed:.2f}s")

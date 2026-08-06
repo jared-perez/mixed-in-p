@@ -13,39 +13,44 @@ There are two separable jobs here, and conflating them is a bug:
 * **The transport** — how everyone else hands it their files.
 
 The transport is a ``QLocalServer`` on both platforms: a named pipe on
-Windows, a Unix domain socket elsewhere. **The claim cannot be, because
-``listen()`` is only exclusive on one of them.**
+Windows, a Unix domain socket elsewhere. **The claim cannot be a QLocalServer
+on either platform**, and both halves of that were learned the hard way, by
+launching five processes at once and counting the primaries.
 
-On macOS and Linux a bound socket path *is* exclusive: a second ``listen()``
-on a live name fails, so winning the bind is a genuine claim. The only
-complication is the opposite one — the socket file outlives the process that
-made it, so after a crash ``listen()`` fails forever and every later launch
-misroutes. ``removeServer()`` clears that, and ``_claim_posix`` only reaches
-for it after a connect has failed, a listen has failed, *and* a second connect
-has failed too, which between them rule out a live primary. Removing it on the
-first failed probe would let a momentarily unresponsive primary be evicted,
-which manufactures the very outcome this module prevents.
+**Windows: a named pipe permits many server instances of one name**, so a
+second ``listen()`` on a *live* name succeeds. Measured on Windows 11 with Qt
+6.11, with a primary demonstrably alive and answering. A claim built on the
+loser of a listen race retrying is dead code there — nobody ever loses. Five
+launches forced to contend: **five primaries, zero handoffs, 5 of 5.**
 
-**On Windows a named pipe permits many server instances of one name, so a
-second ``listen()`` on a live name SUCCEEDS.** Measured on Windows 11 with Qt
-6.11: with a primary demonstrably alive and answering, a second ``listen()``
-returned true. A claim built on "the loser of the listen race retries the
-connect" is therefore dead code there — nobody ever loses. Probing first
-narrows the hole to the gap between "my probe found nobody" and "my pipe is
-up" (measured at ~0.3 ms), but does not close it: five launches forced to
-contend produced **five primaries, zero handoffs, five times out of five**.
-Low probability, worst possible consequence.
+**POSIX: the bind really is exclusive — and that is not enough.** A second
+``listen()`` on a live path fails with ``EEXIST``, so winning the bind looks
+like a genuine claim. The trap is what a loser does next. There is a window in
+which a primary has *created* its socket file but is not yet accepting, and a
+connect during it is refused exactly as it would be for a file left behind by
+a crash. Code that probes, sees a refusal, and clears the path to recover from
+the stale case will instead **unlink a live primary's socket** — after which
+its own bind succeeds and it becomes a second primary. Each loser evicts the
+previous winner in turn. Measured on macOS: **five primaries, 5 of 5,
+deterministically.** The bug is not the probe being too slow; it is that a
+refused connect cannot distinguish "dead" from "not ready yet", and the
+recovery for one is fatal to the other.
 
-So on Windows the claim is a **named mutex**, which is exclusive by contract.
-It has the property this module already depends on elsewhere: the kernel
-object dies with the process, so there is no stale-lock story to mirror the
-stale-socket one. ``listen()`` is demoted to what it should always have been —
-how the winner receives files.
+So on both platforms the claim is an OS primitive that is exclusive *by
+contract* and that the kernel releases when the process ends, however it ends:
+a **named mutex** on Windows, an **flock** on POSIX. No probing, no guessing
+about liveness, and nothing another process can take away. ``listen()`` is
+demoted to what it should always have been — how the winner receives files.
 
-One consequence for the loser: having lost the mutex it must connect to a
-primary that may not have called ``listen()`` yet (~0.25 ms behind). So
-``send`` retries the connect until its deadline rather than concluding from a
-single failure that nobody is home.
+That also makes the stale-socket problem trivial rather than delicate.
+Holding the claim proves no other process is primary, so a socket file at our
+path can only be one a dead process left; ``removeServer`` is called there and
+nowhere else, and cannot evict anybody.
+
+One consequence for the loser: having lost the claim it must connect to a
+primary that may not have called ``listen()`` yet. So ``send`` retries the
+connect until its deadline rather than concluding from a single failure that
+nobody is home.
 
 Timeouts are deliberately generous. The primary may be mid-decode when a
 secondary knocks, and the secondary is a process the user never sees — a
@@ -67,6 +72,8 @@ import time
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, QThread, Signal
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
+from ..utils.app_dirs import get_app_data_dir
+
 logger = logging.getLogger(__name__)
 
 APP_ID = "MixedInP"
@@ -85,11 +92,6 @@ _CONNECT_BACKOFF_MS = 20
 # One connect attempt's own timeout. Kept small so a retry loop stays
 # responsive; the overall budget is CONNECT_TIMEOUT_MS.
 _CONNECT_ATTEMPT_MS = 200
-
-# POSIX only: how many times to re-probe after losing a listen() race before
-# concluding the socket file is stale rather than live.
-_LISTEN_RETRIES = 3
-_LISTEN_BACKOFF_MS = 50
 
 # A frame longer than this is garbage or hostile, not a file list; drop the
 # connection rather than allocate for it.
@@ -150,7 +152,11 @@ class SingleInstance(QObject):
         self._name = server_name(app_id)
         self._server: QLocalServer | None = None
         self._mutex = None  # Windows HANDLE, held for the process's lifetime
+        self._lock_fd: int | None = None  # POSIX flock fd, likewise
         self._buffers: dict[QLocalSocket, bytearray] = {}
+        self._pending: list[str] = []
+        self._pending_any = False
+        self._delivering = False
 
     @property
     def name(self) -> str:
@@ -170,13 +176,42 @@ class SingleInstance(QObject):
         not claim and could not connect" — see ``send``, which is the call
         that finds out, and whose failure is the one the caller must surface.
 
-        The two platforms genuinely need different primitives here; the
-        asymmetry is deliberate, not an accident of history. See the module
-        docstring for the measurement that forced it.
+        One flow, with one platform-specific primitive inside it. Both
+        primitives have the property the claim actually needs: exclusive by
+        contract, and released by the kernel when the process ends, so a crash
+        leaves nothing behind to clean up or misread.
         """
+        if not self._acquire_claim():
+            return False
+
+        # Holding the claim means no other process can be primary, and that
+        # is the *only* thing that makes this safe. A socket file at our path
+        # now can only be one a dead process left behind, so clearing it
+        # cannot evict anybody. Called from nowhere else, for that reason.
+        # A no-op on Windows, where a pipe dies with its process.
+        QLocalServer.removeServer(self._name)
+
+        server = self._new_server()
+        if self._listen(server):
+            return True
+
+        # We hold a claim we cannot serve. Sitting on it would be the worst
+        # failure available: every later launch would lose the claim, conclude
+        # a primary exists, fail to reach it, and refuse to open — a dead
+        # primary nothing can dislodge. Give it back instead.
+        logger.warning("Won the instance claim but could not listen on '%s'.", self._name)
+        self._release_claim()
+        server.deleteLater()
+        return False
+
+    def _acquire_claim(self) -> bool:
+        return self._acquire_mutex() if _WINDOWS else self._acquire_lock_file()
+
+    def _release_claim(self) -> None:
         if _WINDOWS:
-            return self._claim_windows()
-        return self._claim_posix()
+            self._release_mutex()
+        else:
+            self._release_lock_file()
 
     def _new_server(self) -> QLocalServer:
         server = QLocalServer(self)
@@ -185,75 +220,78 @@ class SingleInstance(QObject):
         server.setSocketOptions(QLocalServer.SocketOption.UserAccessOption)
         return server
 
-    def _claim_windows(self) -> bool:
-        """The mutex decides; the pipe is only how the winner is reached."""
-        if not self._acquire_mutex():
-            return False
-
-        server = self._new_server()
-        if self._listen(server):
-            return True
-
-        # We hold the claim but cannot serve it. A stale pipe cannot exist on
-        # Windows, so this is not the Unix case — it is unexpected. Give the
-        # mutex back rather than sit on a claim we cannot honour, so the next
-        # launch gets a clean try instead of inheriting a dead primary.
-        logger.warning("Won the instance mutex but could not listen on '%s'.", self._name)
-        self._release_mutex()
-        server.deleteLater()
-        return False
-
-    def _claim_posix(self) -> bool:
-        """Winning the socket bind *is* the claim; the risk is a stale file."""
-        if self._probe():
-            return False
-
-        server = self._new_server()
-        if self._listen(server):
-            return True
-
-        # listen() failed. Either a socket file was left behind by a process
-        # that died, or another launch claimed the name in the moment since
-        # the probe. Tell them apart by asking again rather than by guessing:
-        # removeServer on a live primary's socket would be the bug.
-        for _ in range(_LISTEN_RETRIES):
-            if self._probe():
-                return False
-            QLocalServer.removeServer(self._name)
-            if self._listen(server):
-                return True
-            QThread.msleep(_LISTEN_BACKOFF_MS)
-
-        logger.warning(
-            "Could not claim or reach the single-instance server '%s'.", self._name
-        )
-        server.deleteLater()
-        return False
-
     def _listen(self, server: QLocalServer) -> bool:
+        """Open the door, with somebody already standing at it.
+
+        The receiver is wired **before** ``listen()`` rather than after, and
+        then the queue is drained once by hand. Both halves are needed, and
+        for the same reason the socket-level drain is: ``newConnection`` is a
+        one-shot edge, so a connection accepted while nothing is attached
+        leaves the signal fired to nobody and the connection sitting in the
+        pending queue — where it stays, because the only thing that would
+        collect it is the slot that missed the announcement.
+
+        The window between ``listen()`` returning and the next statement
+        reads as impossibly small, and on macOS it is. On Windows it was wide
+        enough for an entire five-way race to pass through: every secondary
+        connected, wrote, disconnected and reported success, and the primary
+        recorded *zero* deliveries.
+        """
+        server.newConnection.connect(self._on_new_connection)
         if not server.listen(self._name):
+            server.newConnection.disconnect(self._on_new_connection)
             return False
         self._server = server
-        server.newConnection.connect(self._on_new_connection)
+        self._on_new_connection()
         return True
 
-    def _probe(self) -> bool:
-        """True if something is listening on our name right now.
+    # ── The claim primitives ────────────────────────────────────
 
-        POSIX only. On Windows this question cannot decide the claim — a live
-        answer proves a primary exists, but silence proves nothing, because a
-        rival may be microseconds from binding the same name successfully.
+    def _acquire_lock_file(self) -> bool:
+        """POSIX: take an exclusive ``flock``, or find that somebody has it.
+
+        ``flock`` is the counterpart of the Windows mutex and was chosen for
+        the same property: the kernel drops it when the process ends, however
+        it ends, so a crash leaves no stale claim to misread. It also works
+        between two objects in one process, because the lock belongs to the
+        open file description rather than the process — which POSIX record
+        locks (``lockf``) do not, and which the tests depend on.
+
+        The lock lives in the app data directory rather than beside the
+        socket in ``/tmp``: a temp cleaner deleting the file out from under a
+        held lock would let the next launch create a fresh one and win it,
+        which is two primaries again by a slower route.
         """
-        # Unparented on purpose: Python then owns it and destroys it when this
-        # returns, which is deterministic. Parenting to self would defer the
-        # delete to an event loop that a probe at startup has not started yet.
-        sock = QLocalSocket()
-        sock.connectToServer(self._name)
-        alive = sock.waitForConnected(CONNECT_TIMEOUT_MS)
-        sock.close()
-        return alive
+        import fcntl
 
-    # ── The Windows claim primitive ─────────────────────────────
+        try:
+            path = str(get_app_data_dir() / f"{self._name}.lock")
+            fd = os.open(path, os.O_CREAT | os.O_RDWR, 0o600)
+        except OSError:
+            logger.exception("Could not open the single-instance lock file.")
+            return False
+
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError:
+            os.close(fd)
+            return False
+
+        self._lock_fd = fd
+        return True
+
+    def _release_lock_file(self) -> None:
+        if self._lock_fd is None:
+            return
+        try:
+            import fcntl
+
+            fcntl.flock(self._lock_fd, fcntl.LOCK_UN)
+        except OSError:
+            logger.exception("Could not release the single-instance lock.")
+        finally:
+            os.close(self._lock_fd)
+            self._lock_fd = None
 
     def _acquire_mutex(self) -> bool:
         """Create the named mutex, or discover someone else already has it.
@@ -342,6 +380,14 @@ class SingleInstance(QObject):
             # progress", which is indistinguishable from "already finished".
             while sock.bytesToWrite() > 0:
                 if not sock.waitForBytesWritten(WRITE_TIMEOUT_MS):
+                    # A failed wait is not proof of a failed write. The primary
+                    # reads the frame and closes at once, so the peer can be
+                    # gone by the time this returns — reporting False then
+                    # tells the user a handoff failed for a file that actually
+                    # opened, which per rule 4 is a visible error message about
+                    # nothing. Believe the byte count, not the wait.
+                    if sock.bytesToWrite() == 0:
+                        break
                     logger.warning("Timed out handing files to the primary instance.")
                     return False
 
@@ -389,10 +435,27 @@ class SingleInstance(QObject):
                 return None
             QThread.msleep(_CONNECT_BACKOFF_MS)
 
+    def start_delivering(self) -> None:
+        """Emit from now on, and replay whatever arrived before a receiver did.
+
+        Call once, on the primary, after connecting ``files_received``.
+        Nothing is emitted until this runs — a handoff can complete during
+        the claim itself, which is long before the window that answers it
+        exists. Safe to call when nothing was buffered; that is the ordinary
+        launch.
+        """
+        self._delivering = True
+        if self._pending_any:
+            pending, self._pending = self._pending, []
+            self._pending_any = False
+            logger.info("Replaying %d file(s) handed over during startup.", len(pending))
+            self.files_received.emit(pending)
+
     # ── Primary side ────────────────────────────────────────────
 
     def _on_new_connection(self) -> None:
-        assert self._server is not None
+        if self._server is None:
+            return
         while self._server.hasPendingConnections():
             sock = self._server.nextPendingConnection()
             if sock is None:
@@ -454,7 +517,39 @@ class SingleInstance(QObject):
             return
         if not isinstance(paths, list):
             return
-        self.files_received.emit([p for p in paths if isinstance(p, str)])
+        self._deliver([p for p in paths if isinstance(p, str)])
+
+    def _deliver(self, paths: list[str]) -> None:
+        """Emit *paths*, or hold them until somebody is listening.
+
+        The third place the same "the event already happened" shape shows up,
+        and the one no amount of Windows testing would have found yet, because
+        it is upstairs in ``run_app``::
+
+            instance.try_claim()                            # can deliver here
+            window = MainWindow()                           # ~500 ms
+            instance.files_received.connect(window.open_files)
+
+        ``try_claim`` now drains the pending queue itself, so a handoff that
+        arrives during the race is read *before* the window exists — and an
+        emission with nothing connected to it is a file silently discarded.
+        That is the same fate the signal-wiring fixes below just rescued it
+        from, two levels down.
+
+        So this holds early arrivals and ``start_delivering`` replays them,
+        exactly as ``FileOpenRelay`` does for the macOS event that can beat
+        the window into existence. Batching them into one emission is also
+        deliberate: five secondaries during one race should raise the window
+        and load Scratch once, not five times.
+        """
+        if self._delivering:
+            self.files_received.emit(paths)
+            return
+        self._pending.extend(paths)
+        # Tracked separately from the list because a bare relaunch carries no
+        # files and would otherwise be indistinguishable from nothing having
+        # happened — and "come to the front" is still a message.
+        self._pending_any = True
 
     def _drop(self, sock: QLocalSocket) -> None:
         """Finish with *sock*. Idempotent, and it has to be.
@@ -505,4 +600,4 @@ class SingleInstance(QObject):
 
         # Unix leaves the socket file behind even on an orderly close.
         QLocalServer.removeServer(self._name)
-        self._release_mutex()
+        self._release_claim()
