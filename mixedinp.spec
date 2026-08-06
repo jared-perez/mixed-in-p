@@ -44,6 +44,8 @@ hiddenimports = [
     'PySide6.QtGui',
     'PySide6.QtWidgets',
     'PySide6.QtMultimedia',
+    # QLocalServer/QLocalSocket for the single-instance file handoff
+    'PySide6.QtNetwork',
     # Audio analysis
     'librosa',
     'librosa.core',
@@ -149,10 +151,12 @@ a = Analysis(
     noarchive=False,
 )
 
-# Remove unnecessary Qt files to reduce size
+# Remove unnecessary Qt files to reduce size.
+# NOT Qt6Network: the single-instance handoff behind "Open with Mixed in P"
+# is a QLocalServer/QLocalSocket, both of which live there. Stripping it made
+# a frozen build that ran fine until the first file was opened from the OS.
 a.binaries = [x for x in a.binaries if not x[0].startswith('libQt6Quick')]
 a.binaries = [x for x in a.binaries if not x[0].startswith('libQt6Qml')]
-a.binaries = [x for x in a.binaries if not x[0].startswith('libQt6Network')]
 
 # PYZ archive
 pyz = PYZ(a.pure, a.zipped_data)
