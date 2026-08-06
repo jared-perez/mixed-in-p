@@ -20,7 +20,7 @@ from src.gui.file_open_relay import FileOpenRelay
 from src.gui.main_window import MainWindow
 from src.gui.widgets.player_panel import PlayerPanel
 from src.library import SCRATCH_NODE_ID, Library
-from src.utils.paths import normalize_track_path
+from src.utils.paths import normalize_track_path as norm
 
 
 def make_files(tmp_path, *names):
@@ -115,7 +115,7 @@ class TestOpenFiles:
         window.open_files([a])
 
         assert [t["file_path"] for t in window._player_panel.added] == [
-            normalize_track_path(a)
+            norm(a)
         ]
 
     def test_it_plays_the_first_file_and_asks_for_the_stored_spelling(self, tmp_path):
@@ -126,7 +126,7 @@ class TestOpenFiles:
 
         window.open_files([a, b])
 
-        assert window._player_panel.played == [normalize_track_path(a)]
+        assert window._player_panel.played == [norm(a)]
 
     def test_unsupported_files_are_dropped_not_refused(self, tmp_path):
         """A folder's worth of files should add the audio and ignore the art."""
@@ -136,7 +136,7 @@ class TestOpenFiles:
         window.open_files([art, a, notes])
 
         assert [t["file_path"] for t in window._player_panel.added] == [
-            normalize_track_path(a)
+            norm(a)
         ]
 
     def test_it_switches_to_the_player(self, tmp_path):
@@ -316,7 +316,7 @@ class TestFileOpenRelay:
         assert got == []
 
         rly.go_live()
-        assert got == [["/music/a.mp3", "/music/b.mp3"]]
+        assert got == [[norm("/music/a.mp3"), norm("/music/b.mp3")]]
 
     def test_after_go_live_events_pass_straight_through(self, relay):
         rly, _ = relay
@@ -327,7 +327,7 @@ class TestFileOpenRelay:
         rly._deliver("/music/a.mp3")
         rly._deliver("/music/b.mp3")
 
-        assert got == [["/music/a.mp3"], ["/music/b.mp3"]]
+        assert got == [[norm("/music/a.mp3")], [norm("/music/b.mp3")]]
 
     def test_go_live_on_an_ordinary_launch_emits_nothing(self, relay):
         """Nothing was buffered — the common case must stay silent."""
@@ -356,7 +356,7 @@ class TestFileOpenRelay:
         handled = rly.eventFilter(host, QFileOpenEvent(QUrl.fromLocalFile(a)))
 
         assert handled is True
-        assert got == [[a]]
+        assert got == [[norm(a)]]
 
     def test_a_non_local_url_is_ignored(self, qtbot):
         """An http:// URL is not a file this app has any business opening."""

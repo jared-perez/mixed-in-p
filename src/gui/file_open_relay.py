@@ -25,6 +25,8 @@ import logging
 
 from PySide6.QtCore import QEvent, QObject, Signal
 
+from ..utils.paths import normalize_track_path
+
 logger = logging.getLogger(__name__)
 
 
@@ -61,6 +63,14 @@ class FileOpenRelay(QObject):
         return super().eventFilter(obj, event)
 
     def _deliver(self, path: str) -> None:
+        # Normalized here because this is a point where a path enters from the
+        # OS, and every such point owes the library one spelling — Qt hands
+        # back forward slashes while argv and a folder scan hand back native
+        # separators, and library identity is exact-string. Inert on macOS,
+        # where this event only fires, but leaving it out would make this the
+        # one entry point that spells files differently from all the others.
+        # See src/utils/paths.py.
+        path = normalize_track_path(path)
         if self._live:
             self.files_opened.emit([path])
         else:
