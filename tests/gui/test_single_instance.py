@@ -37,14 +37,33 @@ def hand_off(inst, paths, qtbot, timeout_ms=3000):
     (or socket) buffer, which is exactly why the production bug was silent —
     the sender saw success for a file that was then discarded.
 
+    **The pump before the disconnect is load-bearing, and its absence was a
+    Unix assumption.** This used to hang up immediately, on the premise that
+    the connection was already accepted and the bytes already buffered. That
+    premise is false in one process: accepting is event-loop mediated and the
+    primary's loop is *this thread*, which is busy running the test. On Unix
+    the listen backlog holds the completed connection until somebody gets
+    round to accepting it, so it passed. On Windows a client that connects and
+    fully disconnects before the server accepts leaves nothing to accept, and
+    seven tests reported an empty inbox.
+
+    It is the mirror image of the production bug this file is mostly about —
+    there the server missed an event that had already happened; here the
+    client finishes before the server can have an event at all — which is why
+    it was easy to write and easy to miss.
+
+    The pump goes *before* the disconnect on purpose, so the server accepts
+    while the client is still connected. It must not creep further down: what
+    the callers are testing is a connection that is **complete on arrival**,
+    and a pump after the hang-up would let the primary service it early and
+    quietly delete the teeth. Verified on Windows: with the pre-fix ``_listen``
+    ordering restored underneath this helper, three tests still fail.
+
     The socket is fully torn down before returning, rather than handed back
     for the test to hold. A half-disconnected QLocalSocket collected by Python
     at the end of a test leaves a notifier pointing at freed memory, which
     surfaces as a segfault inside the *next* test's event loop — a genuinely
-    horrible thing to debug, and it cost a run here to find. The delivery does
-    not need the socket alive: the connection is already accepted and the
-    bytes are already in the buffer, which is the whole point of the shape
-    being reproduced.
+    horrible thing to debug, and it cost a run here to find.
     """
     payload = json.dumps(paths).encode("utf-8")
     sock = QLocalSocket()
@@ -52,6 +71,7 @@ def hand_off(inst, paths, qtbot, timeout_ms=3000):
     assert sock.waitForConnected(timeout_ms), "test setup: no primary answered"
     sock.write(_HEADER.pack(len(payload)) + payload)
     sock.flush()
+    qtbot.wait(20)
     sock.disconnectFromServer()
     if sock.state() != QLocalSocket.LocalSocketState.UnconnectedState:
         sock.waitForDisconnected(timeout_ms)
