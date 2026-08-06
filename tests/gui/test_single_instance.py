@@ -10,49 +10,90 @@ processes, and only the Windows machine can test that (plan §8 item 4).
 from __future__ import annotations
 
 import itertools
+import json
 import os
 
 import pytest
 from PySide6.QtCore import QThread
-from PySide6.QtNetwork import QLocalServer
+from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
-from src.gui.single_instance import SingleInstance, server_name
+from src.gui.single_instance import _HEADER, SingleInstance, server_name
 
 _ids = itertools.count()
 
 
-def send_off_the_main_thread(inst, paths, qtbot, timeout_ms=5000):
-    """Run ``send()`` on a worker thread so the primary's loop can serve it.
+def hand_off(inst, paths, qtbot, timeout_ms=3000):
+    """Deliver a handoff frame the way a secondary really does, then pump.
 
-    In the app these are two processes, each with its own event loop. In one
-    process a blocking ``send()`` from the main thread deadlocks on Windows: a
-    named-pipe write completes only once the server end *reads* it, and here
-    the server end is this very thread, which is busy blocking on the write.
+    A raw client socket rather than ``SingleInstance.send()``, for two
+    reasons. ``send()`` blocks until the primary drains the pipe, and in one
+    process the primary is this very thread — so a main-thread ``send()`` is a
+    deadlock on Windows dressed up as a test. And writing directly reproduces
+    the shape that actually broke in the field: a tiny payload written and
+    disconnected at once, so the connection is **already complete** by the
+    time the primary services it, with ``readyRead`` fired and gone.
 
-    It is worth being precise about why the naive version passed on macOS, so
-    nobody restores it: on a Unix socket the write lands in the kernel buffer
-    with no peer involvement at all, so ``bytesToWrite()`` reaches zero
-    without anyone reading. The test was asserting Unix semantics, not
-    behaviour — the product call was always fine, as two real Windows
-    processes showed.
+    The write completes without a reader because the payload fits the pipe
+    (or socket) buffer, which is exactly why the production bug was silent —
+    the sender saw success for a file that was then discarded.
 
-    ``qtbot.waitUntil`` is doing the load-bearing work here: it pumps the main
-    event loop, which is what lets the primary accept the connection and drain
-    the pipe while the worker writes into it.
+    The socket is fully torn down before returning, rather than handed back
+    for the test to hold. A half-disconnected QLocalSocket collected by Python
+    at the end of a test leaves a notifier pointing at freed memory, which
+    surfaces as a segfault inside the *next* test's event loop — a genuinely
+    horrible thing to debug, and it cost a run here to find. The delivery does
+    not need the socket alive: the connection is already accepted and the
+    bytes are already in the buffer, which is the whole point of the shape
+    being reproduced.
+    """
+    payload = json.dumps(paths).encode("utf-8")
+    sock = QLocalSocket()
+    sock.connectToServer(inst.name)
+    assert sock.waitForConnected(timeout_ms), "test setup: no primary answered"
+    sock.write(_HEADER.pack(len(payload)) + payload)
+    sock.flush()
+    sock.disconnectFromServer()
+    if sock.state() != QLocalSocket.LocalSocketState.UnconnectedState:
+        sock.waitForDisconnected(timeout_ms)
+    sock.close()
+
+
+def run_off_the_main_thread(fn, qtbot, timeout_ms=5000):
+    """Run a blocking call on a worker thread while the main loop pumps.
+
+    In the app the two sides of a handoff are two processes, each with its own
+    event loop. In one process they are not, so any blocking call that needs
+    the *other* side to make progress has to be driven from somewhere other
+    than the thread that would provide it.
+
+    Worth being precise about why the naive main-thread version passed on
+    macOS, so nobody restores it: a Windows named-pipe write completes only
+    once the server end reads, while a Unix socket write lands in the kernel
+    buffer with no peer involvement at all. The test was asserting Unix
+    semantics rather than behaviour — the product call was always fine, as two
+    real Windows processes showed.
+
+    ``qtbot.waitUntil`` does the load-bearing work: it pumps the main event
+    loop, which is what lets the primary serve the worker.
     """
     result = {}
 
-    class Sender(QThread):
+    class Worker(QThread):
         def run(self):
-            result["ok"] = inst.send(paths)
+            result["value"] = fn()
 
-    thread = Sender()
+    thread = Worker()
     thread.start()
     try:
-        qtbot.waitUntil(lambda: "ok" in result, timeout=timeout_ms)
+        qtbot.waitUntil(lambda: "value" in result, timeout=timeout_ms)
     finally:
-        assert thread.wait(timeout_ms), "the sending thread never finished"
-    return result["ok"]
+        assert thread.wait(timeout_ms), "the worker thread never finished"
+    return result["value"]
+
+
+def send_off_the_main_thread(inst, paths, qtbot, timeout_ms=5000):
+    """``send()``, driven so the primary can serve it. See the note above."""
+    return run_off_the_main_thread(lambda: inst.send(paths), qtbot, timeout_ms)
 
 
 @pytest.fixture
@@ -101,6 +142,66 @@ def test_paths_round_trip_to_the_primary(qtbot, instances):
     assert received == [["/music/a.mp3", "/music/b.mp3"]]
 
 
+def test_a_connection_that_completed_before_we_looked_is_still_read(qtbot, instances):
+    """The regression test for a payload acknowledged and then silently lost.
+
+    A handoff is tiny and the sender disconnects at once, so the primary
+    routinely gets a connection whose data has *already* arrived. On Windows
+    ``readyRead`` has fired before ``nextPendingConnection()`` even returns
+    the socket, so wiring the signal afterwards means waiting for something
+    in the past — and the buffer is then discarded on disconnect. Silent,
+    because it fails on the *success* path: across processes the write fits
+    the pipe buffer and completes with no reader, so ``send()`` returns True
+    for a file that never lands. ~15% of handoffs in a five-way race, and one
+    trial where only one file of five arrived.
+
+    **The exact signal ordering is a Windows behaviour and does not reproduce
+    on macOS**, where the server-side socket does not exist until it is handed
+    over, so its first ``readyRead`` necessarily comes later. Timing alone
+    would therefore make this test vacuous here. What is asserted instead is
+    the invariant that makes the platform difference stop mattering: a
+    connection holding a complete frame is drained **at the moment we take
+    it**, not on a later signal.
+
+    Hence the deliberate absence of a ``waitUntil`` before the assertion — the
+    delivery must already have happened. Adding one would restore the vacuity.
+    The primary is made to look away during the handoff, which is what a
+    process still starting its event loop is really doing.
+    """
+    primary = instances()
+    assert primary.try_claim()
+    received: list[list[str]] = []
+    primary.files_received.connect(received.append)
+
+    # Look away while the whole handoff happens: connect, write, hang up.
+    primary._server.newConnection.disconnect()
+    hand_off(primary, ["/music/a.mp3", "/music/b.mp3"], qtbot)
+    qtbot.wait(50)
+    assert not received, "test setup: the primary was not actually looking away"
+
+    primary._on_new_connection()
+
+    assert received == [["/music/a.mp3", "/music/b.mp3"]]
+
+
+def test_disconnect_takes_a_last_read_before_letting_go(instances, monkeypatch):
+    """The other half: a peer can finish and hang up before we service it.
+
+    Dropping on disconnect without reading throws away a payload the sender
+    already watched succeed. Asserted as an ordering because the timing that
+    provokes it is, again, not reproducible on this platform — but the order
+    of these two calls is ordinary logic and is where the mistake would live.
+    """
+    inst = instances()
+    order: list[str] = []
+    monkeypatch.setattr(inst, "_on_ready_read", lambda s: order.append("read"))
+    monkeypatch.setattr(inst, "_drop", lambda s: order.append("drop"))
+
+    inst._on_disconnected(object())
+
+    assert order == ["read", "drop"]
+
+
 def test_non_ascii_and_spaces_survive_the_wire(qtbot, instances):
     """The payload is UTF-8 JSON, so the names Windows verified stay intact."""
     primary = instances()
@@ -109,9 +210,7 @@ def test_non_ascii_and_spaces_survive_the_wire(qtbot, instances):
     primary.files_received.connect(received.append)
 
     paths = ["/music/with spaces.mp3", "/music/café-日本.mp3"]
-    secondary = instances()
-    secondary.try_claim()
-    assert send_off_the_main_thread(secondary, paths, qtbot)
+    hand_off(primary, paths, qtbot)
 
     qtbot.waitUntil(lambda: bool(received), timeout=3000)
     assert received == [paths]
@@ -124,9 +223,7 @@ def test_a_bare_relaunch_still_reaches_the_primary(qtbot, instances):
     received: list[list[str]] = []
     primary.files_received.connect(received.append)
 
-    secondary = instances()
-    secondary.try_claim()
-    assert send_off_the_main_thread(secondary, [], qtbot)
+    hand_off(primary, [], qtbot)
 
     qtbot.waitUntil(lambda: bool(received), timeout=3000)
     assert received == [[]]
@@ -167,34 +264,35 @@ def test_the_claim_does_not_rely_on_listen_being_exclusive(instances, app_id):
     assert second.try_claim() is False
 
 
-def test_send_waits_for_a_primary_that_is_still_coming_up(qtbot, instances):
+def test_connect_retries_until_a_late_primary_appears(qtbot, instances):
     """Losing the claim means a primary exists, not that it can be reached yet.
 
     On Windows the mutex elects a winner *before* that winner calls
     ``listen()``, so a secondary can reach the pipe a fraction of a
     millisecond before it exists. The connect fails outright rather than
-    blocking, so one failure must not be read as "nobody is home" — ``send``
-    retries until its deadline.
+    blocking, so one failure must not be read as "nobody is home" — the
+    connect retries until its deadline.
 
-    Simulated by starting the send first and bringing the server up only
-    afterwards, which is the same ordering with the gap widened to something
-    a test can observe.
+    Simulated by starting the connect first and bringing the server up only
+    afterwards: the same ordering, with the gap widened to something a test
+    can observe.
+
+    Only the connect is exercised, deliberately. The write is what needs the
+    primary to be *reading*, and dragging that in would couple this test to
+    the receive path it is not about.
     """
     from PySide6.QtCore import QTimer
 
     sender = instances()
     primary = instances()
-    received: list[list[str]] = []
 
-    def bring_up():
-        assert primary.try_claim() is True
-        primary.files_received.connect(received.append)
+    QTimer.singleShot(150, lambda: primary.try_claim())
 
-    QTimer.singleShot(150, bring_up)
-
-    assert send_off_the_main_thread(sender, ["/music/late.mp3"], qtbot) is True
-    qtbot.waitUntil(lambda: bool(received), timeout=3000)
-    assert received == [["/music/late.mp3"]]
+    sock = run_off_the_main_thread(
+        lambda: sender._connect_to_primary(3000), qtbot
+    )
+    assert sock is not None, "gave up on a primary that was merely slow to listen"
+    sock.close()
 
 
 class TestWindowsClaimSequencing:

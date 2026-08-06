@@ -64,7 +64,7 @@ import struct
 import sys
 import time
 
-from PySide6.QtCore import QObject, QThread, Signal
+from PySide6.QtCore import QCoreApplication, QEvent, QObject, QThread, Signal
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
 logger = logging.getLogger(__name__)
@@ -399,7 +399,34 @@ class SingleInstance(QObject):
                 break
             self._buffers[sock] = bytearray()
             sock.readyRead.connect(lambda s=sock: self._on_ready_read(s))
-            sock.disconnected.connect(lambda s=sock: self._drop(s))
+            sock.disconnected.connect(lambda s=sock: self._on_disconnected(s))
+            # Read what is already here before waiting for a signal to say so.
+            #
+            # A handoff is tiny and the sender writes it and disconnects at
+            # once, so a connection routinely arrives *already complete*: the
+            # bytes are sitting in the socket and readyRead has already fired
+            # before this slot ever ran. It will not fire again — nothing more
+            # is coming — so waiting for it means waiting forever, and the
+            # payload is discarded when the socket disconnects.
+            #
+            # That failure is silent on the success path, which is what makes
+            # it nasty: across processes the payload fits the pipe buffer, so
+            # the sender's write completes and send() returns True for a file
+            # that never arrives. Measured at ~15% of handoffs during a
+            # five-way race, where secondaries connect while the winner is
+            # still starting its event loop.
+            self._on_ready_read(sock)
+
+    def _on_disconnected(self, sock: QLocalSocket) -> None:
+        """Take a last read before letting the socket go.
+
+        The peer can write everything and hang up before this side services
+        the connection at all, so dropping on disconnect without reading
+        throws away a payload the sender already saw succeed. Anything still
+        incomplete after this really is a truncated frame, and is dropped.
+        """
+        self._on_ready_read(sock)
+        self._drop(sock)
 
     def _on_ready_read(self, sock: QLocalSocket) -> None:
         buf = self._buffers.get(sock)
@@ -430,7 +457,20 @@ class SingleInstance(QObject):
         self.files_received.emit([p for p in paths if isinstance(p, str)])
 
     def _drop(self, sock: QLocalSocket) -> None:
-        self._buffers.pop(sock, None)
+        """Finish with *sock*. Idempotent, and it has to be.
+
+        A complete frame drops the socket from ``_on_ready_read``, and the
+        disconnect that follows drops it again. The buffer is the record of
+        whether we still own it: past the first call the C++ object is already
+        queued for deletion, and touching it then is how a double-drop turns
+        into a crash rather than a no-op.
+
+        ``deleteLater`` rather than an immediate delete because this is often
+        reached from inside the socket's own signal handler, which is the case
+        deferred deletion exists for.
+        """
+        if self._buffers.pop(sock, None) is None:
+            return
         sock.close()
         sock.deleteLater()
 
@@ -450,6 +490,19 @@ class SingleInstance(QObject):
             self._server.close()
             self._server.deleteLater()
             self._server = None
+
+        # Run the deletions we just asked for, rather than leaving them to an
+        # event loop that may never come round again.
+        #
+        # Connection sockets are children of the server, so a pending delete
+        # on a socket plus a pending delete on the server is a trap: whichever
+        # destroys the server first takes its children with it, and the
+        # socket's own delete then lands on freed memory. Flushing here runs
+        # them in the order they were posted — sockets first, then their
+        # parent — which is the order that is safe. Only DeferredDelete is
+        # sent, so nothing else about the caller's state moves.
+        QCoreApplication.sendPostedEvents(None, QEvent.Type.DeferredDelete)
+
         # Unix leaves the socket file behind even on an orderly close.
         QLocalServer.removeServer(self._name)
         self._release_mutex()
