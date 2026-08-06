@@ -583,7 +583,7 @@ class TestPathSpelling:
             def __init__(self):
                 self.tracks = None
 
-            def add_tracks(self, tracks):
+            def add_tracks(self, tracks, allow_duplicates=None):
                 self.tracks = tracks
 
         class StubWindow:

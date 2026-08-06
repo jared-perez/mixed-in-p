@@ -916,74 +916,74 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="93"/>
+        <location filename="../main_window.py" line="94"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="410"/>
-        <location filename="../main_window.py" line="439"/>
+        <location filename="../main_window.py" line="411"/>
+        <location filename="../main_window.py" line="440"/>
         <source>Export All Playlists</source>
         <translation>Esporta tutte le playlist</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="431"/>
+        <location filename="../main_window.py" line="432"/>
         <source>Export failed</source>
         <translation>Esportazione non riuscita</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="432"/>
+        <location filename="../main_window.py" line="433"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Impossibile scrivere il file:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="440"/>
+        <location filename="../main_window.py" line="441"/>
         <source>There are no playlists to export yet.</source>
         <translation>Non c’è ancora nessuna playlist da esportare.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="445"/>
+        <location filename="../main_window.py" line="446"/>
         <source>Export complete</source>
         <translation>Esportazione completata</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="446"/>
+        <location filename="../main_window.py" line="447"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Esportate {0} playlist ({1} tracce) in:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="537"/>
+        <location filename="../main_window.py" line="538"/>
         <source>Select Audio Files</source>
         <translation>Seleziona file audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="548"/>
+        <location filename="../main_window.py" line="549"/>
         <source>Select Folder</source>
         <translation>Seleziona cartella</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="635"/>
+        <location filename="../main_window.py" line="715"/>
         <source>No Audio Files</source>
         <translation>Nessun file audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="636"/>
+        <location filename="../main_window.py" line="716"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Nessun file audio trovato in:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="641"/>
+        <location filename="../main_window.py" line="721"/>
         <source>Invalid Folder</source>
         <translation>Cartella non valida</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="642"/>
+        <location filename="../main_window.py" line="722"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Directory non valida:
@@ -999,73 +999,73 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Un&apos;analisi è già in corso. Attendi o annullala prima.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="740"/>
+        <location filename="../main_window.py" line="820"/>
         <source>Analyzing...</source>
         <translation>Analisi in corso...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="765"/>
+        <location filename="../main_window.py" line="845"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Completato: {0} analizzati, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="769"/>
+        <location filename="../main_window.py" line="849"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Completato: {0} file analizzati</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="809"/>
+        <location filename="../main_window.py" line="889"/>
         <source>Cancelled</source>
         <translation>Annullato</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="896"/>
+        <location filename="../main_window.py" line="976"/>
         <source>Conversion in Progress</source>
         <translation>Conversione in corso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="897"/>
+        <location filename="../main_window.py" line="977"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Una conversione è già in corso. Attendi.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="927"/>
+        <location filename="../main_window.py" line="1007"/>
         <source>Converting...</source>
         <translation>Conversione in corso...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="943"/>
+        <location filename="../main_window.py" line="1023"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Completato: {0} convertiti, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="947"/>
+        <location filename="../main_window.py" line="1027"/>
         <source>Complete: {0} files converted</source>
         <translation>Completato: {0} file convertiti</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1116"/>
+        <location filename="../main_window.py" line="1196"/>
         <source>Rename in Progress</source>
         <translation>Rinomina in corso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1117"/>
+        <location filename="../main_window.py" line="1197"/>
         <source>A rename operation is already running.</source>
         <translatorcomment>Elision applied: &apos;Un&apos;operazione&apos;.</translatorcomment>
         <translation>Un&apos;operazione di rinomina è già in corso.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1175"/>
+        <location filename="../main_window.py" line="1255"/>
         <source>Rename Failed</source>
         <translation>Rinomina non riuscita</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1209"/>
+        <location filename="../main_window.py" line="1289"/>
         <source>Undo Rename</source>
         <translation>Annulla rinomina</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1240"/>
+        <location filename="../main_window.py" line="1320"/>
         <source>Undo Failed</source>
         <translation>Annullamento non riuscito</translation>
     </message>
@@ -1079,22 +1079,22 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Rinominati {0} file</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1181"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>No Session</source>
         <translation>Nessuna sessione</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1181"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>No rename session to undo.</source>
         <translation>Nessuna sessione di rinomina da annullare.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1190"/>
+        <location filename="../main_window.py" line="1270"/>
         <source>Confirm Undo</source>
         <translation>Conferma annullamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1191"/>
+        <location filename="../main_window.py" line="1271"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Annullare la rinomina di {0} file?</translation>
     </message>
@@ -1103,7 +1103,7 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Annullamento della rinomina...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1210"/>
+        <location filename="../main_window.py" line="1290"/>
         <source>Undone: {0} files, {1} errors</source>
         <translatorcomment>Reviewed (it pass): &apos;Annullati&apos; agrees with &apos;file&apos; (m.pl) - confirmed.</translatorcomment>
         <translation>Annullati: {0} file, {1} errori</translation>
@@ -1227,7 +1227,7 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1262"/>
-        <location filename="../widgets/player_panel.py" line="2078"/>
+        <location filename="../widgets/player_panel.py" line="2137"/>
         <source>Search all playlists…</source>
         <translation>Cerca in tutte le playlist…</translation>
     </message>
@@ -1308,7 +1308,7 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1361"/>
-        <location filename="../widgets/player_panel.py" line="2191"/>
+        <location filename="../widgets/player_panel.py" line="2250"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -1355,7 +1355,7 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1443"/>
-        <location filename="../widgets/player_panel.py" line="2188"/>
+        <location filename="../widgets/player_panel.py" line="2247"/>
         <source>Playlists</source>
         <translation>Playlist</translation>
     </message>
@@ -1381,8 +1381,8 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1558"/>
-        <location filename="../widgets/player_panel.py" line="2035"/>
-        <location filename="../widgets/player_panel.py" line="2040"/>
+        <location filename="../widgets/player_panel.py" line="2094"/>
+        <location filename="../widgets/player_panel.py" line="2099"/>
         <source>Save Playlist</source>
         <translation>Salva playlist</translation>
     </message>
@@ -1407,84 +1407,84 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1754"/>
-        <location filename="../widgets/player_panel.py" line="2022"/>
+        <location filename="../widgets/player_panel.py" line="2081"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2007"/>
+        <location filename="../widgets/player_panel.py" line="2066"/>
         <source>Playing: {0}</source>
         <translation>In riproduzione: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2019"/>
+        <location filename="../widgets/player_panel.py" line="2078"/>
         <source>Search: {0}</source>
         <translation>Ricerca: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2036"/>
+        <location filename="../widgets/player_panel.py" line="2095"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>La playlist è vuota: aggiungi prima qualche traccia.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2040"/>
+        <location filename="../widgets/player_panel.py" line="2099"/>
         <source>Playlist name:</source>
         <translation>Nome della playlist:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2075"/>
+        <location filename="../widgets/player_panel.py" line="2134"/>
         <source>Search scope: {0}</source>
         <translation>Ambito di ricerca: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2080"/>
+        <location filename="../widgets/player_panel.py" line="2139"/>
         <source>Search this playlist…</source>
         <translation>Cerca in questa playlist…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2099"/>
+        <location filename="../widgets/player_panel.py" line="2158"/>
         <source>No matching tracks</source>
         <translation>Nessuna traccia corrispondente</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2395"/>
+        <location filename="../widgets/player_panel.py" line="2454"/>
         <source>File not found:
 {0}</source>
         <translation>File non trovato:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2743"/>
+        <location filename="../widgets/player_panel.py" line="2802"/>
         <source>{0}+ results</source>
         <translation>{0}+ risultati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2746"/>
+        <location filename="../widgets/player_panel.py" line="2805"/>
         <source>{0} result</source>
         <translation>{0} risultato</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2748"/>
+        <location filename="../widgets/player_panel.py" line="2807"/>
         <source>{0} results</source>
         <translation>{0} risultati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2752"/>
+        <location filename="../widgets/player_panel.py" line="2811"/>
         <source>{0} track</source>
         <translation>{0} traccia</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2754"/>
+        <location filename="../widgets/player_panel.py" line="2813"/>
         <source>{0} tracks</source>
         <translation>{0} tracce</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3304"/>
+        <location filename="../widgets/player_panel.py" line="3363"/>
         <source>“{0}” has moved.</source>
         <translation>«{0}» è stato spostato.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="3306"/>
+        <location filename="../widgets/player_panel.py" line="3365"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n dei file selezionati è stato spostato.</numerusform>
@@ -1492,42 +1492,42 @@ o tocca “Aggiungi copertina…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3309"/>
+        <location filename="../widgets/player_panel.py" line="3368"/>
         <source>File Has Moved</source>
         <translation>Il file è stato spostato</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3313"/>
+        <location filename="../widgets/player_panel.py" line="3372"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Non si trova più nella posizione salvata, quindi non può essere aggiunto a una playlist né trascinato fuori. Una traccia già in riproduzione continua a suonare: è stata caricata in memoria prima che il file venisse spostato.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3318"/>
+        <location filename="../widgets/player_panel.py" line="3377"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Fai clic destro sulla traccia e scegli «Individua il file mancante…»</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3430"/>
+        <location filename="../widgets/player_panel.py" line="3489"/>
         <source>Locate Missing File…</source>
         <translation>Individua il file mancante…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3432"/>
+        <location filename="../widgets/player_panel.py" line="3491"/>
         <source>Open File Location</source>
         <translation>Apri posizione del file</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3433"/>
+        <location filename="../widgets/player_panel.py" line="3492"/>
         <source>Open in Metadata Panel</source>
         <translation>Apri nel pannello Metadati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3434"/>
+        <location filename="../widgets/player_panel.py" line="3493"/>
         <source>Reload Metadata from File</source>
         <translation>Ricarica i metadati dal file</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3436"/>
+        <location filename="../widgets/player_panel.py" line="3495"/>
         <source>Remove from Playlist</source>
         <translation>Rimuovi dalla playlist</translation>
     </message>
@@ -1535,136 +1535,136 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>PlaylistTree</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="335"/>
+        <location filename="../widgets/playlist_tree.py" line="336"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="486"/>
-        <location filename="../widgets/playlist_tree.py" line="563"/>
-        <location filename="../widgets/playlist_tree.py" line="583"/>
+        <location filename="../widgets/playlist_tree.py" line="487"/>
+        <location filename="../widgets/playlist_tree.py" line="564"/>
+        <location filename="../widgets/playlist_tree.py" line="584"/>
         <source>New Playlist</source>
         <translation>Nuova playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="486"/>
-        <location filename="../widgets/playlist_tree.py" line="564"/>
-        <location filename="../widgets/playlist_tree.py" line="584"/>
+        <location filename="../widgets/playlist_tree.py" line="487"/>
+        <location filename="../widgets/playlist_tree.py" line="565"/>
+        <location filename="../widgets/playlist_tree.py" line="585"/>
         <source>New Folder</source>
         <translation>Nuova cartella</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="528"/>
+        <location filename="../widgets/playlist_tree.py" line="529"/>
         <source>Delete folder &quot;{0}&quot; and everything inside it?</source>
         <translation>Eliminare la cartella «{0}» e tutto il suo contenuto?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="530"/>
+        <location filename="../widgets/playlist_tree.py" line="531"/>
         <source>Delete playlist &quot;{0}&quot;?</source>
         <translation>Eliminare la playlist «{0}»?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="533"/>
+        <location filename="../widgets/playlist_tree.py" line="534"/>
         <source>Delete</source>
         <translation>Elimina</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="566"/>
-        <location filename="../widgets/playlist_tree.py" line="572"/>
+        <location filename="../widgets/playlist_tree.py" line="567"/>
+        <location filename="../widgets/playlist_tree.py" line="573"/>
         <source>Rename</source>
         <translation>Rinomina</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="567"/>
-        <location filename="../widgets/playlist_tree.py" line="573"/>
+        <location filename="../widgets/playlist_tree.py" line="568"/>
+        <location filename="../widgets/playlist_tree.py" line="574"/>
         <source>Delete…</source>
         <translation>Elimina…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="569"/>
+        <location filename="../widgets/playlist_tree.py" line="570"/>
         <source>Export Folder…</source>
         <translation>Esporta cartella…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="577"/>
+        <location filename="../widgets/playlist_tree.py" line="578"/>
         <source>Export…</source>
         <translation>Esporta…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="579"/>
+        <location filename="../widgets/playlist_tree.py" line="580"/>
         <source>Export and Copy Tracks…</source>
         <translation>Esporta e copia le tracce…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="598"/>
-        <location filename="../widgets/playlist_tree.py" line="605"/>
+        <location filename="../widgets/playlist_tree.py" line="599"/>
+        <location filename="../widgets/playlist_tree.py" line="606"/>
         <source>Export Playlist</source>
         <translation>Esporta playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="599"/>
-        <location filename="../widgets/playlist_tree.py" line="668"/>
+        <location filename="../widgets/playlist_tree.py" line="600"/>
+        <location filename="../widgets/playlist_tree.py" line="669"/>
         <source>This playlist is empty — there is nothing to export.</source>
         <translation>Questa playlist è vuota: non c’è nulla da esportare.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="620"/>
-        <location filename="../widgets/playlist_tree.py" line="728"/>
+        <location filename="../widgets/playlist_tree.py" line="621"/>
+        <location filename="../widgets/playlist_tree.py" line="729"/>
         <source>Exported {0} tracks to:
 {1}</source>
         <translation>Esportate {0} tracce in:
 {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="630"/>
+        <location filename="../widgets/playlist_tree.py" line="631"/>
         <source>Export Folder</source>
         <translation>Esporta cartella</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="648"/>
+        <location filename="../widgets/playlist_tree.py" line="649"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Esportate {0} playlist ({1} tracce) in:
 {2}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="667"/>
-        <location filename="../widgets/playlist_tree.py" line="694"/>
+        <location filename="../widgets/playlist_tree.py" line="668"/>
+        <location filename="../widgets/playlist_tree.py" line="695"/>
         <source>Export and Copy Tracks</source>
         <translation>Esporta e copia le tracce</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="674"/>
+        <location filename="../widgets/playlist_tree.py" line="675"/>
         <source>Export in Progress</source>
         <translation>Esportazione in corso</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="675"/>
+        <location filename="../widgets/playlist_tree.py" line="676"/>
         <source>An export is already running. Please wait.</source>
         <translation>È già in corso un’esportazione. Attendi.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="679"/>
+        <location filename="../widgets/playlist_tree.py" line="680"/>
         <source>Choose Where to Create the Folder</source>
         <translation>Scegli dove creare la cartella</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="692"/>
+        <location filename="../widgets/playlist_tree.py" line="693"/>
         <source>Copying tracks…</source>
         <translation>Copia delle tracce…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="692"/>
+        <location filename="../widgets/playlist_tree.py" line="693"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="719"/>
+        <location filename="../widgets/playlist_tree.py" line="720"/>
         <source>Copying {0}</source>
         <translation>Copia di {0}</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/playlist_tree.py" line="735"/>
+        <location filename="../widgets/playlist_tree.py" line="736"/>
         <source>%n track(s) could not be found and were skipped.</source>
         <translation>
             <numerusform>%n traccia non è stata trovata ed è stata saltata.</numerusform>
@@ -1672,41 +1672,41 @@ o tocca “Aggiungi copertina…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="743"/>
-        <location filename="../widgets/playlist_tree.py" line="801"/>
+        <location filename="../widgets/playlist_tree.py" line="744"/>
+        <location filename="../widgets/playlist_tree.py" line="802"/>
         <source>Export failed</source>
         <translation>Esportazione non riuscita</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="744"/>
-        <location filename="../widgets/playlist_tree.py" line="802"/>
+        <location filename="../widgets/playlist_tree.py" line="745"/>
+        <location filename="../widgets/playlist_tree.py" line="803"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Impossibile scrivere il file:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="775"/>
+        <location filename="../widgets/playlist_tree.py" line="776"/>
         <source>Serato — drag the file onto the crate panel</source>
         <translation>Serato: trascina il file sul pannello dei crate</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="776"/>
+        <location filename="../widgets/playlist_tree.py" line="777"/>
         <source>Rekordbox — File → Import Playlist</source>
         <translation>Rekordbox: File → Import Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="777"/>
+        <location filename="../widgets/playlist_tree.py" line="778"/>
         <source>Traktor — File → Import</source>
         <translation>Traktor: File → Import</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="790"/>
+        <location filename="../widgets/playlist_tree.py" line="791"/>
         <source>Export complete</source>
         <translation>Esportazione completata</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="793"/>
+        <location filename="../widgets/playlist_tree.py" line="794"/>
         <source>To import it:</source>
         <translation>Per importarla:</translation>
     </message>
@@ -1714,12 +1714,12 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>PlaylistTreePanel</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1153"/>
+        <location filename="../widgets/playlist_tree.py" line="1158"/>
         <source>+ Playlist</source>
         <translation>+ Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1154"/>
+        <location filename="../widgets/playlist_tree.py" line="1159"/>
         <source>+ Folder</source>
         <translation>+ Cartella</translation>
     </message>
@@ -2793,6 +2793,19 @@ o tocca “Aggiungi copertina…”</translation>
         <location filename="../widgets/vis_canvas.py" line="370"/>
         <source>Visualizer</source>
         <translation>Visualizzatore</translation>
+    </message>
+</context>
+<context>
+    <name>run_app</name>
+    <message>
+        <location filename="../app.py" line="186"/>
+        <source>Mixed in P is already running</source>
+        <translation>Mixed in P è già in esecuzione</translation>
+    </message>
+    <message>
+        <location filename="../app.py" line="187"/>
+        <source>The running copy didn&apos;t respond, so those files weren&apos;t opened. Bring it to the front and add them there.</source>
+        <translation>La copia in esecuzione non ha risposto, quindi quei file non sono stati aperti. Portala in primo piano e aggiungili da lì.</translation>
     </message>
 </context>
 </TS>

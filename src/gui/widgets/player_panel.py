@@ -1829,6 +1829,38 @@ class PlayerPanel(QWidget):
         self._prefetch_default_target()
         self._persist_playlist()
 
+    def play_path_if_idle(self, path: str) -> bool:
+        """Start playing *path*, but only if nothing is under way. True if it did.
+
+        This is what "Open with Mixed in P" needs and why it is public rather
+        than the caller reaching into ``_play_track``: on a cold start playing
+        the file *is* the whole point, while a file arriving mid-set must not
+        cut the DJ off. Idle is the deciding question, and it is a wider
+        question than ``is_playing``:
+
+        - **Paused counts as busy.** A paused track still holds a position the
+          user chose and expects to resume from; replacing it loses that as
+          surely as interrupting playback does.
+        - **A pending decode counts as busy.** Between ``_play_track`` and the
+          PCM arriving, the engine is genuinely stopped — acting on that would
+          hijack a track that is a few hundred milliseconds from starting.
+
+        The search runs from the end of the list because additions force
+        duplicates: if the file was already here, the copy that just landed is
+        the last one, and that is the one the user asked for.
+        """
+        if (
+            self._engine.is_playing()
+            or self._engine.is_paused()
+            or self._pending_play_path is not None
+        ):
+            return False
+        for index in range(len(self._playlist) - 1, -1, -1):
+            if self._playlist[index].file_path == path:
+                self._play_track(index)
+                return True
+        return False
+
     def stop_playback(self) -> None:
         """Stop playback (called on nav-away from the Player and on app close)."""
         self._engine.stop()

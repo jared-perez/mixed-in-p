@@ -222,6 +222,29 @@ if is_macos:
             'CFBundleShortVersionString': APP_VERSION,
             'NSHighResolutionCapable': True,
             'NSRequiresAquaSystemAppearance': False,
+            # "Open with Mixed in P" in Finder. LSHandlerRank 'Alternate'
+            # deliberately: it puts us in the Open With submenu without
+            # claiming to be the default handler for every audio file on the
+            # machine. Becoming the default stays strictly opt-in, initiated
+            # by the user — Finder's Get Info → Change All, or a Settings
+            # button — and is never taken at install or first launch.
+            'CFBundleDocumentTypes': [
+                {
+                    'CFBundleTypeName': 'Audio File',
+                    'CFBundleTypeRole': 'Viewer',
+                    'LSHandlerRank': 'Alternate',
+                    'LSItemContentTypes': [
+                        'public.mp3',
+                        'com.microsoft.waveform-audio',
+                        'org.xiph.flac',
+                        'public.aiff-audio',
+                        'public.aifc-audio',
+                        'com.apple.m4a-audio',
+                        'public.mpeg-4-audio',
+                        'org.xiph.ogg-audio',
+                    ],
+                }
+            ],
         },
     )
 else:

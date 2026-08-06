@@ -6,11 +6,20 @@ import logging
 import sys
 from pathlib import Path
 
-from PySide6.QtCore import QFile, QLibraryInfo, QTextStream, QTranslator
+from PySide6.QtCore import (
+    QCoreApplication,
+    QFile,
+    QLibraryInfo,
+    QTextStream,
+    QTranslator,
+)
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
+from .file_open_relay import FileOpenRelay
+from .single_instance import SingleInstance
 from .styles.theme import DEFAULT_THEME, THEMES, Theme
+from ..utils.args import parse_audio_args
 from ..utils.config import load_config
 
 # NOTE: widget modules (via .main_window) are imported lazily inside
@@ -96,14 +105,16 @@ def install_translators(app: QApplication, language: str) -> None:
         app.installTranslator(qt_translator)
 
 
-def create_app(argv: list[str] | None = None) -> tuple[QApplication, MainWindow]:
-    """Create and configure the application.
+def create_qapplication(argv: list[str] | None = None) -> QApplication:
+    """Build the QApplication and everything a widget needs to exist correctly.
+
+    Split out from :func:`create_app` because the single-instance handshake in
+    :func:`run_app` has to run *between* the two: a secondary process needs a
+    QApplication (Qt's socket calls want an event dispatcher) but must exit
+    before a ``MainWindow`` — and before ``library.db`` is opened.
 
     Args:
         argv: Command line arguments. If None, uses sys.argv.
-
-    Returns:
-        Tuple of (QApplication, MainWindow).
     """
     if argv is None:
         argv = sys.argv
@@ -123,9 +134,6 @@ def create_app(argv: list[str] | None = None) -> tuple[QApplication, MainWindow]
     # the theme takes effect on the next restart (like the language setting).
     Theme.apply(THEMES.get(config.theme, THEMES[DEFAULT_THEME]))
 
-    # Import widgets only now (see module-level note on import ordering).
-    from .main_window import MainWindow
-
     # Set application icon
     base = _get_base_path()
     icon_path = base / "src" / "gui" / "assets" / "icon.png"
@@ -137,14 +145,59 @@ def create_app(argv: list[str] | None = None) -> tuple[QApplication, MainWindow]
     if stylesheet:
         app.setStyleSheet(stylesheet)
 
-    # Create main window
+    return app
+
+
+def create_app(argv: list[str] | None = None) -> tuple[QApplication, MainWindow]:
+    """Create and configure the application.
+
+    Args:
+        argv: Command line arguments. If None, uses sys.argv.
+
+    Returns:
+        Tuple of (QApplication, MainWindow).
+    """
+    app = create_qapplication(argv)
+
+    # Import widgets only now (see module-level note on import ordering).
+    from .main_window import MainWindow
+
     window = MainWindow()
 
     return app, window
 
 
+def _warn_handoff_failed(paths: list[str]) -> None:
+    """Tell the user their files went nowhere, having refused to open twice.
+
+    Reached only when another instance holds the single-instance server but
+    cannot be reached through it. The tempting response — open a window
+    anyway — is the one thing that must not happen: two processes with two
+    connections to one ``library.db``, both auto-saving Scratch over each
+    other, is a worse outcome than the files not opening. So this fails
+    visibly instead, and the app exits non-zero.
+    """
+    from PySide6.QtWidgets import QMessageBox
+
+    logger.error("Handoff to the running instance failed; %d file(s) not opened.",
+                 len(paths))
+    QMessageBox.warning(
+        None,
+        QCoreApplication.translate("run_app", "Mixed in P is already running"),
+        QCoreApplication.translate(
+            "run_app",
+            "The running copy didn't respond, so those files weren't opened. "
+            "Bring it to the front and add them there.",
+        ),
+    )
+
+
 def run_app(argv: list[str] | None = None) -> int:
     """Create and run the application.
+
+    Also the gate for "Open with Mixed in P": files named on the command line
+    are parsed here, and this is where a launch decides whether it is the app
+    or merely a courier for one that already exists.
 
     Args:
         argv: Command line arguments. If None, uses sys.argv.
@@ -158,14 +211,49 @@ def run_app(argv: list[str] | None = None) -> int:
     # Set up logging first
     setup_logging()
 
-    app, window = create_app(argv)
+    if argv is None:
+        argv = sys.argv
+
+    # Parsed before anything expensive: a secondary process does this, hands
+    # the result over and exits without ever building a window.
+    paths = parse_audio_args(argv)
+
+    app = create_qapplication(argv)
+
+    # Installed before MainWindow is built, because on macOS a QFileOpenEvent
+    # can be delivered during startup and would otherwise be dropped.
+    relay = FileOpenRelay(app)
+
+    # Claim the instance server before MainWindow, whose constructor opens
+    # library.db — a secondary must never make a second connection to it.
+    instance = SingleInstance()
+    if not instance.try_claim():
+        if instance.send(paths):
+            logger.info("Handed %d file(s) to the running instance.", len(paths))
+            return 0
+        _warn_handoff_failed(paths)
+        return 1
+
+    # Import widgets only now (see module-level note on import ordering).
+    from .main_window import MainWindow
+
+    window = MainWindow()
+    instance.files_received.connect(window.open_files)
+    relay.files_opened.connect(window.open_files)
     window.show()
 
+    # Cold start: whatever the command line named. On macOS this is normally
+    # empty and the files arrive through the relay instead.
+    if paths:
+        window.open_files(paths)
+    relay.go_live()
+
     elapsed = time.perf_counter() - t0
-    logger = logging.getLogger(__name__)
     logger.info(f"Startup time: {elapsed:.2f}s")
 
-    return app.exec()
+    exit_code = app.exec()
+    instance.close()
+    return exit_code
 
 
 if __name__ == "__main__":

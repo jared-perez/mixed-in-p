@@ -28,7 +28,7 @@ from src.analysis import history as analysis_history
 from src import library
 from src.library import playlist_export
 from src.analysis.keycode import render_key
-from src.analysis.result import AnalysisResult
+from src.analysis.result import SUPPORTED_EXTENSIONS, AnalysisResult
 from src.metadata import update_bpm_key, update_comment_with_energy
 from src.renamer import (
     AddPrefix,
@@ -591,14 +591,85 @@ class MainWindow(QMainWindow):
             self._sidebar.set_current_page("rename")
             self._on_page_changed("rename")
 
-    def _add_files_to_player(self, file_paths: list[str]) -> None:
+    def open_files(self, file_paths: list[str]) -> None:
+        """Take on files handed to us by the OS. The one funnel for every route.
+
+        Everything that means "the user picked these in Finder or Explorer"
+        ends here — argv on a cold start, a ``QFileOpenEvent`` on macOS, and a
+        secondary process's handoff on a warm one — so the behaviour cannot
+        drift between them.
+
+        The order of the steps is the substance:
+
+        1. **Load Scratch first.** Without this, a file arriving while a saved
+           playlist is showing would append to the user's set list and
+           auto-save it. Scratch is the disposable working list; that is what
+           makes this feature safe to trigger from a right-click.
+        2. **Force duplicates.** The alternative is the duplicate prompt, and
+           that prompt is deferred off a zero-delay timer — during app launch
+           it could land before the window is even mapped. A modal nobody
+           asked for is worse than a repeated row in a disposable list.
+        3. **Come to the front regardless.** A relaunch carrying no files at
+           all (double-clicking the app while it runs) still means "show me",
+           so this happens before the early return.
+        4. **Play only if idle.** A cold start always plays, because that is
+           the point. A file arriving mid-track does not, because cutting off
+           playback in a DJ app is a real-world harm.
+
+        Unsupported files are dropped rather than refused: a selection of a
+        folder's worth of files should add the audio and ignore the artwork,
+        not fail. argv arrivals were filtered already — this repeats it
+        because ``QFileOpenEvent`` and the IPC handoff have no such guarantee.
+        """
+        paths = [
+            p for p in file_paths if Path(p).suffix.lower() in SUPPORTED_EXTENSIONS
+        ]
+
+        self._raise_to_front()
+        if not paths:
+            return
+
+        self._player_panel.load_node(library.SCRATCH_NODE_ID)
+        self._sidebar.set_current_page("player")
+        self._on_page_changed("player")
+        self._add_files_to_player(paths, allow_duplicates=True)
+
+        # add_tracks resolves synchronously when the policy is forced, so the
+        # tracks are in the list by now and this can act on the first of them.
+        # Normalized separately, and identically, to the copy _add_files_to_player
+        # stored — matching on the raw string would silently never find the row.
+        self._player_panel.play_path_if_idle(normalize_track_path(paths[0]))
+
+    def _raise_to_front(self) -> None:
+        """Bring the window up and give it focus, from whatever state it is in.
+
+        ``show()`` alone leaves a minimized window minimized, and ``raise_()``
+        alone leaves a raised window unfocused — a file opened from Finder has
+        to land somewhere the user is actually looking.
+        """
+        if self.isMinimized():
+            self.showNormal()
+        else:
+            self.show()
+        self.raise_()
+        self.activateWindow()
+
+    def _add_files_to_player(
+        self, file_paths: list[str], allow_duplicates: bool | None = None
+    ) -> None:
         """Add files directly to the player panel, reading metadata from tags.
 
         Paths are normalized here because this is where the un-normalized ones
         arrive: QFileDialog returns forward slashes on every platform (so
-        ``C:/music/a.mp3`` on Windows) while ``find_audio_files`` returns
-        native separators, and both land in the library as literal strings.
-        Drops already normalize in their own handlers. See src/utils/paths.py.
+        ``C:/music/a.mp3`` on Windows) while ``find_audio_files`` and argv
+        return native separators, and both land in the library as literal
+        strings. Drops already normalize in their own handlers. See
+        src/utils/paths.py.
+
+        ``allow_duplicates`` is passed straight through to ``add_tracks``; the
+        default ``None`` consults the user's setting, which may put the
+        question to them in a modal. ``open_files`` forces ``True`` — see
+        there for why a prompt is unacceptable on that path.
         """
         from src.metadata.tags import read_metadata
 
@@ -628,7 +699,7 @@ class MainWindow(QMainWindow):
             except Exception:
                 pass  # proceed without metadata
             tracks.append(track)
-        self._player_panel.add_tracks(tracks)
+        self._player_panel.add_tracks(tracks, allow_duplicates=allow_duplicates)
 
     def _add_folder(self, folder_path: str) -> None:
         """Add all audio files from folder."""
