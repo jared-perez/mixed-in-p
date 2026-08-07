@@ -7,12 +7,66 @@ original and new paths in session files.
 from __future__ import annotations
 
 import json
+import logging
 import os
 import uuid
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
+
+
+#: Written once the ``~/.musickey`` import has run, so it never runs twice.
+#: See _migrate_from_musickey for why a marker and not a file-by-file check.
+_MIGRATED_MARKER = ".migrated"
+
+
+def _migrate_from_musickey(history_dir: Path) -> None:
+    """Bring rename sessions over from the app's old ``~/.musickey`` home.
+
+    **Guarded by a marker file, and that is the whole point.** This used to
+    re-run on every call, deciding what to copy with ``if not dest.exists()``
+    — which reads "this file has not been migrated yet" but, after the first
+    run, actually means "the user deleted it".
+
+    So Delete in the History panel did nothing at all, and did it invisibly:
+    ``delete_session`` unlinked the file, then the panel's own refresh called
+    back in here and copied it straight back from the old directory, inside
+    the same click. Every history operation goes through ``get_history_dir``,
+    so there was no way out of it — and the session file was never really
+    gone, so nothing looked broken from the outside.
+
+    Only ever seen by someone upgrading from when the app was called
+    musickey; a fresh install has no ``~/.musickey`` and skips all of this,
+    which is why it went unnoticed.
+
+    The marker is written even when the old directory holds nothing, so the
+    check settles to one ``exists()`` call rather than a glob per operation.
+    A crash midway leaves it unwritten and the import simply runs again.
+    Copies rather than moves, so an older build pointed at the old directory
+    still finds its own history.
+    """
+    marker = history_dir / _MIGRATED_MARKER
+    if marker.exists():
+        return
+
+    old_dir = Path.home() / ".musickey" / "history"
+    if old_dir.exists():
+        import shutil
+
+        for f in old_dir.glob("session_*.json"):
+            dest = history_dir / f.name
+            if not dest.exists():
+                shutil.copy2(f, dest)
+
+    try:
+        marker.touch()
+    except OSError:
+        # An unwritable history dir is a bigger problem than a repeated
+        # import, and the caller is about to hit it either way.
+        logger.warning("Could not mark the musickey import as done.")
 
 
 def get_history_dir() -> Path:
@@ -21,16 +75,7 @@ def get_history_dir() -> Path:
 
     history_dir = get_app_data_dir() / "history"
     history_dir.mkdir(parents=True, exist_ok=True)
-
-    # One-time migration from old path
-    old_dir = Path.home() / ".musickey" / "history"
-    if old_dir.exists() and any(old_dir.glob("session_*.json")):
-        import shutil
-        for f in old_dir.glob("session_*.json"):
-            dest = history_dir / f.name
-            if not dest.exists():
-                shutil.copy2(f, dest)
-
+    _migrate_from_musickey(history_dir)
     return history_dir
 
 
