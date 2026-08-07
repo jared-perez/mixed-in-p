@@ -80,11 +80,28 @@ APP_ID = "MixedInP"
 
 _WINDOWS = sys.platform == "win32"
 
-# Wait this long for a connect (retries included), and for bytes to reach the
-# pipe. Generous on purpose — see the module note. If Windows testing shows a
-# busy primary being missed, this is the number to raise.
+# How long to keep trying to reach the primary. Only ever spent when we have
+# already lost the claim, so a primary demonstrably exists and is merely slow
+# to call listen() — measured in fractions of a millisecond.
 CONNECT_TIMEOUT_MS = 2000
-WRITE_TIMEOUT_MS = 2000
+
+# How long to wait for the bytes to land. Much larger than the connect budget,
+# and the asymmetry is the point.
+#
+# A named-pipe write completes only once the server end *reads*, and the
+# primary does not read anything between claiming the instance and reaching
+# app.exec() — the whole of MainWindow construction, measured at 1.08 s warm on
+# Windows. Five cold starts at once (which is exactly what a five-file
+# multi-select is) import PySide6, librosa and numpy simultaneously from a cold
+# file cache, and that is the slowest this phase ever gets. At 2 s the margin
+# was under a second and a cold first run really did blow it.
+#
+# Overshooting costs almost nothing: the waiter is a process the user never
+# sees, and a primary that has actually died fails the write with an error
+# rather than a timeout, so this bound is only reached by one that is alive and
+# busy. Undershooting costs a visible "those files weren't opened" dialog for
+# files that would have arrived. Prefer the invisible cost.
+WRITE_TIMEOUT_MS = 30000
 
 # Gap between connect attempts while waiting for a just-elected primary to
 # finish calling listen(). Short: the wait being measured is sub-millisecond.

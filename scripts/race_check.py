@@ -99,23 +99,40 @@ def scratch_paths() -> list[str]:
 
 
 def classify(log: str) -> str:
-    """What a process decided it was, read from its own output."""
+    """What a process decided it was, read from its own output.
+
+    Keyed on log lines rather than on whether the process exited, and
+    ``failed-handoff`` is tested first. A secondary whose handoff failed raises
+    a **modal**, so it never exits and nothing dismisses it under the offscreen
+    platform — judged by liveness it looks like a second primary, and judged by
+    the dialog's text it looks like nothing at all, because that text is
+    translated and never reaches the log. The log line is the only honest
+    signal, and getting this wrong sends the reader to the logs to rediscover a
+    failure mode the summary could have named.
+    """
+    if "Handoff to the running instance failed" in log or "Timed out handing" in log:
+        return "failed-handoff"
     if "Startup time" in log:
         return "primary"
     if "Handed" in log and "running instance" in log:
         return "secondary"
-    if "already running" in log or "did not respond" in log:
-        return "failed-handoff"
     return "unknown"
 
 
-def trial(files: list[str], n: int) -> bool:
+def trial(files: list[str], n: int, number: int) -> bool:
     for leftover in app_data_dir().glob("library.db*"):
         leftover.unlink()
 
+    # A directory per trial: a single set of proc*.log files gets overwritten
+    # by every later trial, so a failure in trial 1 of a 5-trial run leaves no
+    # evidence by the time the run finishes — which forces whoever is chasing
+    # it to re-run trials one at a time to catch one.
+    log_dir = ROOT / f"trial{number:02d}"
+    log_dir.mkdir(parents=True, exist_ok=True)
+
     procs, logs = [], []
     for i, f in enumerate(files):
-        handle = open(ROOT / f"proc{i}.log", "wb")
+        handle = open(log_dir / f"proc{i}.log", "wb")
         logs.append(handle)
         procs.append(
             subprocess.Popen(
@@ -140,7 +157,10 @@ def trial(files: list[str], n: int) -> bool:
     for handle in logs:
         handle.close()
 
-    roles = [classify((ROOT / f"proc{i}.log").read_text(errors="replace")) for i in range(n)]
+    roles = [
+        classify((log_dir / f"proc{i}.log").read_text(errors="replace"))
+        for i in range(n)
+    ]
     primaries = roles.count("primary")
     ok = primaries == 1 and len(collected) == n
     print(
@@ -150,6 +170,7 @@ def trial(files: list[str], n: int) -> bool:
     if not ok:
         print(f"     roles: {roles}")
         print(f"     landed: {[Path(p).name for p in collected]}")
+        print(f"     logs: {log_dir}")
     return ok
 
 
@@ -162,7 +183,7 @@ def main() -> int:
     results = []
     for i in range(trials):
         print(f"trial {i + 1}:")
-        results.append(trial(files, n))
+        results.append(trial(files, n, i + 1))
 
     clean = sum(results)
     print(f"\n{clean} of {len(results)} trials clean")
