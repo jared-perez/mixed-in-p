@@ -72,7 +72,7 @@
     <a href="#install">2 · Install &amp; first run</a>
     <a href="#interface">3 · Interface at a glance</a>
     <a href="#workflows">4 · Core workflows</a>
-    <a href="#routing">5 · Moving files</a>
+    <a href="#routing">5 · Getting files in &amp; out</a>
     <a href="#settings">6 · Settings</a>
     <a href="#history">7 · History</a>
     <a href="#shortcuts">8 · Keyboard shortcuts</a>
@@ -135,6 +135,8 @@
       <tr><td>Convert</td><td>Convert between WAV, FLAC, AIFF, and MP3.</td></tr>
       <tr><td>Rename</td><td>Batch-rename with live preview.</td></tr>
       <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform Loop Slicer).</td></tr>
+      <tr><td>Playlists</td><td>A tree of folders and saved playlists, opened from the sidebar's
+        <b>Playlists</b> button rather than the nav rail.</td></tr>
       <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
       <tr><td>Keyboard</td><td>3-octave piano + harmonic reference grid.</td></tr>
       <tr><td>Spectrum</td><td>Spek-style frequency view of a track.</td></tr>
@@ -163,6 +165,13 @@
       <li><b>Trim</b> characters from the start and/or end of every name.</li>
       <li><b>Prepend</b> or <b>Append</b> custom text (one or the other). Add text to the beginning or end of ALL the filenames being renamed.</li>
       <li><b>Remove underscores</b> replaces <code>_</code> with spaces.</li>
+      <li><b>Space Dashes</b> puts a space on each side of a bare dash:
+        <code>Artist-Track</code> becomes <code>Artist - Track</code>. Some DJ software searches
+        artist and track names poorly when a dash is wedged between them with no spaces, and this
+        fixes a whole folder of them at once. It only touches a dash with a non-space character on
+        <i>both</i> sides — names that already read <code>a - b</code>, one-sided ones like
+        <code>a -b</code>, and a dash at the very start or end are left exactly as they are, so it
+        is safe to run over a mixed folder.</li>
       <li>Changes show in <span class="green">green</span>; <span class="red">conflicts</span>
         (duplicate results) block <b>Apply Rename</b> until resolved.</li>
       <li><b>Undo Last</b> reverts the most recent batch; older batches undo from <b>History</b>.</li>
@@ -209,6 +218,75 @@
     <img class="shot-img" src="../assets/player.webp" alt="Player with playlist and transport">
     <img class="shot-img" src="../assets/slicer.webp" alt="Waveform Loop Slicer — A–B markers and export">
 
+    <h3>Build &amp; manage playlists</h3>
+    <p>Click <b>Playlists</b> at the top of the sidebar. The nav rail is <i>replaced</i> by your
+      playlist tree — click it again to get the panel buttons back. The tree holds <b>folders</b>,
+      <b>saved playlists</b>, and <b>Scratch</b>; click any playlist to load it into the Player.</p>
+
+    <div class="callout"><b>Scratch is the working list.</b> It is where the Player starts, where
+      dragged-in files land, and where anything you open from Finder or Explorer goes. Treat it as a
+      scribble pad: it <b>empties every time you launch</b> unless you turn on <b>Keep Scratch
+      between sessions</b> in Settings. Anything worth keeping gets <b>Save Playlist</b>.</div>
+
+    <ul>
+      <li><b>Save Playlist</b> in the Player turns whatever is currently listed into a saved
+        playlist in the tree.</li>
+      <li><b>Saved playlists auto-save.</b> Once a playlist is loaded, adding, removing, or
+        reordering tracks is written immediately — there is no Save button and no "unsaved changes"
+        prompt. That is why undo matters: <b>Ctrl+Z</b> (<b>Cmd+Z</b> on macOS) steps back through
+        this session's list edits, in both the Player and the tree.</li>
+      <li><b>Add tracks by dragging</b> — drag rows from the Player, Analysis, or Convert onto a
+        playlist in the tree. You can also drag the <b>“Playing: …”</b> line itself, which is the
+        handle for the current track when its row isn't on screen.</li>
+      <li><b>Organize by dragging</b> — move playlists into folders, and folders into folders.
+        Which folders you left open is remembered between sessions.</li>
+      <li><b>Right-click</b> a folder — or empty space, to work at the top level — for <b>New
+        Playlist</b> and <b>New Folder</b>. Right-clicking a folder or playlist also offers
+        <b>Rename</b>, <b>Delete…</b>, and the export actions below. Scratch can be exported like
+        any other playlist, but not renamed or deleted.</li>
+    </ul>
+
+    <p><b>Search.</b> The Player's search box has a scope button beside it: search
+      <b>this playlist</b> or <b>all playlists</b>. Searching everything highlights the folders and
+      playlists containing matches, so you can see the trail through the tree to a track you only
+      half-remember.</p>
+    <table>
+      <tr><th>Search looks at</th><th>It does not look at</th></tr>
+      <tr>
+        <td>Artist, title, album, filename, comment, key</td>
+        <td>BPM</td>
+      </tr>
+    </table>
+    <p>BPM is left out deliberately — as free text it is more noise than help, since a search for
+      <code>128</code> would also match a comment, a year, or a filename that happens to contain
+      those digits.</p>
+
+    <p><b>Export.</b> Right-click a playlist for <b>Export…</b>, a folder for <b>Export Folder…</b>,
+      or use <b>Export All Playlists…</b> in Settings to write your whole tree out as a folder of
+      playlist files. Formats are <code>.m3u8</code>, <code>.m3u</code>, and a readable
+      <code>.txt</code>.</p>
+    <ul>
+      <li><b>Prefer <code>.m3u8</code></b> — it is UTF-8, so accented and non-Latin filenames
+        survive. <code>.m3u</code> uses the system codepage and can mangle them.</li>
+      <li>Paths are written <b>relative</b> to the playlist file when the tracks sit beside it, so a
+        folder you zip and send still works on someone else's machine. <b>Always use full paths in
+        exported playlists</b> in Settings overrides that.</li>
+      <li><b>Export and Copy Tracks…</b> writes the playlist <i>and</i> copies the audio files
+        alongside it — the one to use for a USB stick.</li>
+    </ul>
+
+    <p><b>Moved or missing files.</b> A track whose file has gone is prefixed with <b>!</b> in the
+      list, and hovering it shows the last known path. Right-click and choose <b>Locate Missing
+      File…</b> to point at its new home. Mixed in P then matches your other missing tracks against
+      that folder, which makes a relocated folder one job rather than one per track. It matches on
+      the file's contents rather than its name, so tracks you renamed as well as moved are still
+      found; a file that was re-encoded (new contents) is matched by filename instead, and only when
+      exactly one candidate carries that name.</p>
+
+    <p><b>Duplicates.</b> Adding a track a playlist already contains asks what you want by default —
+      a set list can repeat a track on purpose. Change it once in <b>Settings → Playlists</b> to
+      always add or always skip.</p>
+
     <h3>Keyboard &amp; harmonic reference</h3>
     <p>A 3-octave piano you can play with the mouse or QWERTY keys (<b>Z / X</b> shift the octave),
       with <b>Minor</b>/<b>Major</b> chord modes. A <b>linear key strip</b> and <b>hex grid</b> light up
@@ -222,7 +300,9 @@
       transcodes.</p>
     <img class="shot-img" src="../assets/spectrum.webp" alt="Spectrum view — frequency spectrogram">
 
-    <h2 id="routing"><span class="num">05</span>Moving files between panels</h2><hr>
+    <h2 id="routing"><span class="num">05</span>Getting files in and out</h2><hr>
+
+    <h3>Between panels</h3>
     <ul>
       <li><b>Send To menus</b> — Rename → Analyze / Convert; Convert → Analyze / Rename / Player;
         Analysis → Convert / Player.</li>
@@ -236,9 +316,48 @@
       </li>
     </ul>
 
+    <h3>Open with Mixed in P</h3>
+    <p>Right-click an audio file in Finder or Explorer and choose <b>Open with → Mixed in P</b>. The
+      app launches if it isn't running, the file lands in <b>Scratch</b>, and it starts playing.</p>
+    <ul>
+      <li><b>Files always go to Scratch</b> — never into the playlist you happen to have open, which
+        would quietly edit a set list you were in the middle of.</li>
+      <li><b>It never opens a second copy.</b> If Mixed in P is already running, the file goes to the
+        window you already have, and that window comes to the front.</li>
+      <li><b>It won't cut off what's playing.</b> A file opened mid-track is added to the list and
+        waits its turn. Only an idle player starts playing straight away — which is the point when
+        you open a file to hear it.</li>
+      <li><b>Several files at once</b> arrive as one batch, sorted by name, and the first one plays.
+        Drag-and-drop is still the way to add tracks <i>without</i> playing anything.</li>
+    </ul>
+
+    <div class="callout"><b>On Windows, "Open with" only appears for one file at a time.</b> That is
+      Windows itself, not Mixed in P — its Open with submenu doesn't offer multi-selection for any
+      app. To open several at once, make Mixed in P your default audio player (below), then select
+      the files and press <b>Enter</b>.</div>
+
+    <h3>Becoming the default audio player</h3>
+    <p><b>Settings → Default Audio Player → Make Mixed in P your default audio player.</b> After
+      that, double-clicking an audio file opens it here. This is always your choice: Mixed in P never
+      claims your file types when it installs or on first launch.</p>
+    <p>What the button does differs by platform, because the two systems allow different things:</p>
+    <table>
+      <tr><th>Platform</th><th>What happens</th></tr>
+      <tr><td><b>macOS</b></td><td>Set immediately, for every audio type Mixed in P handles. To undo
+        it, select a file in Finder, press <b>Cmd+I</b>, pick another app under <b>Open with</b>, and
+        click <b>Change All</b>.</td></tr>
+      <tr><td><b>Windows</b></td><td>Opens <b>Settings → Apps → Default apps</b> on the Mixed in P
+        entry, where all its file types are listed together. Windows only lets <i>you</i> make that
+        choice — no app can set it for you — so this takes you to the right screen and you confirm
+        there.</td></tr>
+    </table>
+
     <h2 id="settings"><span class="num">06</span>Settings reference</h2><hr>
     <ul>
       <li><b>Language</b> — many languages supported; <i>restart to apply</i>.</li>
+      <li><b>Default Audio Player</b> — make Mixed in P the app that opens audio files when you
+        double-click them. See <a href="#routing">Getting files in and out</a> for what the button
+        does on each platform.</li>
       <li><b>Theme</b> — choose a color scheme; <i>restart to apply</i>:
         <ul>
           <li><b>Neon Dark</b> (default) — the original dark look with neon-yellow accents.</li>
@@ -298,6 +417,21 @@
     <p>Visualizations use your <b>Waveform color</b> setting. Switch modes any time from the same
       eye-icon menu; the choice applies live. (The moving waveform in the Analyze and Convert panels
       is always shown and isn't affected by this switch.)</p>
+    <p><b>Playlists</b> gathers the settings for the playlist tree and the Player's list:</p>
+    <ul>
+      <li><b>When a track is already in the playlist</b> — <i>Ask each time</i> (default),
+        <i>Always add duplicates</i>, or <i>Always skip duplicates</i>. A set list can repeat a
+        track on purpose, so this asks rather than deciding for you; pick one of the others to stop
+        being asked.</li>
+      <li><b>Keep Scratch between sessions</b> — off by default, so the working list starts empty
+        each launch. Turn it on to have Scratch reopen with whatever was in it. Either way,
+        <b>Save Playlist</b> keeps a copy.</li>
+      <li><b>Always use full paths in exported playlists</b> — off by default, so exports use paths
+        relative to the playlist file when the tracks sit beside it, and a folder you zip and send
+        still works elsewhere.</li>
+      <li><b>Export All Playlists…</b> — writes one folder of playlist files mirroring your whole
+        tree; a backup any other app can read.</li>
+    </ul>
     <p>All settings save instantly — there's no Save button.</p>
 
     <h2 id="history"><span class="num">07</span>History</h2><hr>
@@ -316,6 +450,7 @@
     <table>
       <tr><th>Keys</th><th>Action</th><th>Where</th></tr>
       <tr><td>Space</td><td>Play / Pause</td><td>Player (when focused)</td></tr>
+      <tr><td>Ctrl+Z / Cmd+Z</td><td>Undo the last playlist edit (this session)</td><td>Player, Playlists</td></tr>
       <tr><td>Delete / Backspace</td><td>Remove selected rows</td><td>Player, Rename, Analysis</td></tr>
       <tr><td>Z / X</td><td>Shift octave down / up</td><td>Keyboard</td></tr>
       <tr><td>A–L, ;</td><td>Play notes</td><td>Keyboard</td></tr>
@@ -377,6 +512,27 @@
       confidence means it's a harder call. Correct the key in the <b>Metadata</b> panel.</p>
     <p><b>I renamed files by mistake.</b> Use <b>Undo Last</b> in the Rename panel, or open
       <b>History</b> to undo any recent batch.</p>
+    <p><b>My playlist emptied itself.</b> That will have been <b>Scratch</b>, the working list the
+      Player opens on, which starts empty every launch by design. Turn on <b>Keep Scratch between
+      sessions</b> in <b>Settings → Playlists</b>, and use <b>Save Playlist</b> for anything you want
+      to keep — saved playlists are never cleared.</p>
+    <p><b>I deleted tracks from a playlist by accident.</b> Press <b>Ctrl+Z</b> (<b>Cmd+Z</b>). Saved
+      playlists write changes immediately, so undo — not a Save button — is the way back. It covers
+      the current session only.</p>
+    <p><b>Search can't find a track by its BPM.</b> That's deliberate. Search covers artist, title,
+      album, filename, comment, and key, but not BPM: as free text a search for <code>128</code>
+      would also match years, comments, and filenames containing those digits. Sort by the BPM
+      column in the Player instead.</p>
+    <p><b>I opened a file from Finder/Explorer and it went somewhere I didn't expect.</b> Files
+      opened from your file manager always go to <b>Scratch</b>, so they can't disturb a playlist you
+      have open. If something was already playing, the file is added to the list without
+      interrupting it.</p>
+    <p><b>Double-clicking an audio file doesn't open Mixed in P.</b> It isn't your default player
+      yet — Mixed in P doesn't claim your file types on its own. Use <b>Settings → Default Audio
+      Player</b>.</p>
+    <p><b>"Open with" doesn't appear when I select several files on Windows.</b> Windows doesn't
+      offer that submenu for multiple files, for any app. Make Mixed in P the default audio player,
+      then select the files and press <b>Enter</b>.</p>
     <p><b>My language change didn't take effect.</b> Language applies on the next launch — restart the app.</p>
     <p><b>My theme change didn't take effect.</b> Like language, the color theme applies on the next
       launch — restart the app.</p>
