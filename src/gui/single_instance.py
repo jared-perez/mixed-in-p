@@ -120,8 +120,31 @@ _HEADER = struct.Struct(">I")
 _ERROR_ALREADY_EXISTS = 183
 
 
+def _windows_session_id() -> int | None:
+    """The Terminal Services session this process belongs to, or None.
+
+    ``ProcessIdToSessionId`` on our own process needs no privileges. None on
+    failure, which costs the session scoping below rather than the launch.
+    """
+    if not _WINDOWS:
+        return None
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
+        session = wintypes.DWORD()
+        ok = kernel32.ProcessIdToSessionId(
+            kernel32.GetCurrentProcessId(), ctypes.byref(session)
+        )
+        return int(session.value) if ok else None
+    except Exception:
+        logger.exception("Could not read the Terminal Services session id.")
+        return None
+
+
 def server_name(app_id: str = APP_ID) -> str:
-    """The pipe/socket name for *app_id*, scoped to the current user.
+    """The pipe/socket name for *app_id*, scoped to the user and the session.
 
     The user is folded in because named pipes are visible across a whole
     Windows machine: on a shared PC or a Remote Desktop host, two people
@@ -132,6 +155,20 @@ def server_name(app_id: str = APP_ID) -> str:
     name fragment — a Windows domain account reads ``DOMAIN\\user``, and the
     backslash is a path separator in a pipe name — while on Unix the socket
     lives at a filesystem path with a length limit worth staying well under.
+
+    **The session is folded in on Windows, and the user alone was not enough.**
+    Hashing the username handles two *different* accounts, but not one account
+    signed in twice — console plus Remote Desktop. Those two sessions each get
+    their own claim, because the mutex is ``Local\\``-prefixed and that really
+    is per-session, so both are legitimately primary. The pipe was not scoped
+    to match: a named pipe lives in one machine-wide namespace, so both
+    primaries listened on **one name**, which Windows permits. Measured
+    2026-08-07: with two servers on one name the handoff goes to whichever
+    listened first, 3 of 3, and the sender is told it succeeded. A file opened
+    on the Remote Desktop session appeared on the console desktop.
+
+    Not applied off Windows. macOS has no equivalent case — fast user switching
+    is a *different* user, which the hash already separates.
     """
     try:
         user = getpass.getuser()
@@ -140,7 +177,11 @@ def server_name(app_id: str = APP_ID) -> str:
         # can be absent in a stripped-down or service context.
         user = str(os.getuid()) if hasattr(os, "getuid") else "unknown"
     digest = hashlib.sha256(user.encode("utf-8", "replace")).hexdigest()[:12]
-    return f"{app_id}-{digest}"
+
+    session = _windows_session_id()
+    if session is None:
+        return f"{app_id}-{digest}"
+    return f"{app_id}-{digest}-s{session}"
 
 
 class SingleInstance(QObject):
@@ -342,14 +383,12 @@ class SingleInstance(QObject):
             # session gets its own app rather than the second one handing files
             # to a window on someone else's desktop.
             #
-            # NB the pipe is NOT scoped the same way: a named pipe lives in one
-            # machine-wide namespace, and only the *user* is folded into its
-            # name (see server_name). Two sessions of the same account —
-            # console plus RDP — would therefore each hold their own mutex and
-            # each be primary, while sharing one pipe name that Windows lets
-            # both listen on. Untested; it is the open RDP question, not a
-            # settled design. If it bites, the fix is to fold the session id
-            # into server_name rather than to change this line.
+            # The name already carries the session id too (see server_name),
+            # which is redundant here and load-bearing for the *pipe* — a named
+            # pipe has no per-session namespace to inherit. Confirmed the hard
+            # way: before that, two sessions of one account were each primary
+            # on one pipe name, and the handoff went to whichever listened
+            # first.
             handle = kernel32.CreateMutexW(None, False, f"Local\\{self._name}")
             err = ctypes.get_last_error()
         except Exception:

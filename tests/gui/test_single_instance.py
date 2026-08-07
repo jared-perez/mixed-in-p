@@ -747,7 +747,7 @@ def test_a_stale_socket_file_does_not_block_the_next_launch(instances, app_id):
 
 
 def test_the_name_is_scoped_to_the_user(app_id):
-    """Named pipes are machine-wide; two sessions must not share one.
+    """Named pipes are machine-wide; two users must not share one.
 
     Hashed rather than appended raw because a Windows domain account reads
     ``DOMAIN\\user`` and a backslash is a separator in a pipe name.
@@ -756,6 +756,35 @@ def test_the_name_is_scoped_to_the_user(app_id):
     assert name.startswith(f"{app_id}-")
     assert "\\" not in name and "/" not in name
     assert server_name(app_id) == name  # stable across calls
+
+
+@pytest.mark.skipif(os.name != "nt", reason="Terminal Services sessions")
+def test_the_name_is_scoped_to_the_session_too(app_id):
+    """The user alone was not enough, and this is the regression test.
+
+    Hashing the username separates two *accounts*, but not one account signed
+    in twice — console plus Remote Desktop. Both sessions hold their own
+    ``Local\\`` mutex and are legitimately primary; the pipe has no per-session
+    namespace to inherit, so before this they listened on **one name**, which
+    Windows allows. Measured: the handoff went to whichever listened first,
+    3 of 3, and the sender was told it succeeded — a file opened on the Remote
+    Desktop session landed on the console desktop.
+    """
+    from src.gui.single_instance import _windows_session_id
+
+    session = _windows_session_id()
+    assert session is not None, "ProcessIdToSessionId failed on Windows"
+    assert server_name(app_id).endswith(f"-s{session}")
+
+
+@pytest.mark.skipif(os.name == "nt", reason="the non-Windows answer")
+def test_the_session_is_not_folded_in_off_windows(app_id):
+    """macOS has no equivalent case: fast user switching is a different user,
+    which the username hash already separates."""
+    from src.gui.single_instance import _windows_session_id
+
+    assert _windows_session_id() is None
+    assert not server_name(app_id).rpartition("-")[2].startswith("s")
 
 
 def test_closing_the_primary_frees_the_name(qtbot, instances):
