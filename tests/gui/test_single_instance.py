@@ -12,10 +12,9 @@ from __future__ import annotations
 import itertools
 import json
 import os
-import time
 
 import pytest
-from PySide6.QtCore import QSemaphore, QThread, QTimer
+from PySide6.QtCore import QEventLoop, QSemaphore, QThread, QTimer
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
 from src.gui.single_instance import _HEADER, SingleInstance, server_name
@@ -95,14 +94,52 @@ _GRACE_MS = 10000
 _WAIT_MS = 20000
 
 
-def _pump_until(qtbot, predicate, budget_ms) -> bool:
-    """Run the main event loop until *predicate* holds or the budget is spent."""
-    deadline = time.monotonic() + budget_ms / 1000
-    while not predicate():
-        if time.monotonic() >= deadline:
-            return False
-        qtbot.wait(10)
-    return True
+def _run_the_loop_until_finished(thread, budget_ms) -> bool:
+    """Run a **real** event loop until *thread* finishes or the budget expires.
+
+    ``QEventLoop.exec()`` rather than a ``qtbot.wait(10)`` spin, and the
+    difference is the point rather than a tidy-up.
+
+    A spin loop calls ``processEvents`` and then sleeps, over and over. A real
+    loop blocks *inside* the platform's dispatcher, which on Windows is where
+    a pipe's native notifier gets waited on — and servicing an incoming local
+    connection is exactly that kind of native event. It is also what the app
+    itself runs: ``app.exec()``, not a spin. So a test standing in for the
+    primary's event loop should stand in for the real one.
+
+    This is a hypothesis with a measurement behind it, not a style preference.
+    Windows reported the handoff failing with **36 of 36 bytes still queued
+    after 12 s** — the primary had not read a single byte, under a loop that
+    was nominally pumping the whole time. Load-proportional in whether it
+    fired, absolute in how it failed: a starved loop should sometimes get
+    partway, and this never did. "The connection was never serviced at all"
+    fits that shape, and a spin loop is the thing here most able to miss a
+    native notification that a real loop would have waited on.
+
+    If it turns out not to be the cause, the fallback is to stop driving
+    ``send()`` against a live in-process primary at all and use ``hand_off``,
+    which every other test in this file already does — the real cross-process
+    path is covered by ``scripts/race_check.py`` either way.
+    """
+    if thread.isFinished():
+        return True
+
+    loop = QEventLoop()
+    # Queued, because finished() is emitted on the worker: the post is what
+    # wakes the loop out of its native wait. Safe against the worker finishing
+    # between the check above and exec() below — the event is already queued by
+    # then, so exec() returns immediately rather than waiting out the budget.
+    thread.finished.connect(loop.quit)
+    guard = QTimer()
+    guard.setSingleShot(True)
+    guard.timeout.connect(loop.quit)
+    guard.start(budget_ms)
+    try:
+        loop.exec()
+    finally:
+        guard.stop()
+        thread.finished.disconnect(loop.quit)
+    return thread.isFinished()
 
 
 def run_off_the_main_thread(fn, qtbot, timeout_ms=_WAIT_MS):
@@ -133,9 +170,13 @@ def run_off_the_main_thread(fn, qtbot, timeout_ms=_WAIT_MS):
     was unlucky enough to be running by then. Order-dependent, Windows-only,
     and blamed on the wrong test.
 
-    So the wait is one pumped loop, and an overrun keeps pumping for
+    So the wait is one real event loop, and an overrun keeps running it for
     ``_GRACE_MS`` so the worker can unwind before the failure is reported. The
     test still fails; it just fails cleanly and takes its thread with it.
+
+    *qtbot* is still required even though nothing here spins on it: it is what
+    guarantees a QApplication exists, without which ``QEventLoop.exec()`` has
+    no dispatcher to run.
     """
     result = {}
 
@@ -145,9 +186,9 @@ def run_off_the_main_thread(fn, qtbot, timeout_ms=_WAIT_MS):
 
     thread = Worker()
     thread.start()
-    in_time = _pump_until(qtbot, thread.isFinished, timeout_ms)
+    in_time = _run_the_loop_until_finished(thread, timeout_ms)
     if not in_time:
-        _pump_until(qtbot, thread.isFinished, _GRACE_MS)
+        _run_the_loop_until_finished(thread, _GRACE_MS)
     assert thread.wait(1000), "the worker thread never finished"
     assert in_time, f"the worker needed longer than {timeout_ms}ms"
     return result["value"]
