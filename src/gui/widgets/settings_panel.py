@@ -1,5 +1,7 @@
 """Settings panel widget."""
 
+import logging
+
 from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
@@ -19,11 +21,15 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+import sys
 from dataclasses import replace
 
+from ...utils import default_app
 from ...utils.config import AppConfig
 from ...utils.i18n import LANGUAGES
 from ..styles.theme import THEMES, Theme
+
+logger = logging.getLogger(__name__)
 
 # Preset waveform colors offered in Settings. The first entry is the "default"
 # sentinel: selecting it makes the waveform follow the active theme's own
@@ -86,6 +92,48 @@ class SettingsPanel(QWidget):
         language_layout.addWidget(language_hint)
 
         outer.addWidget(language_frame)
+
+        # ── Section: Default audio player ──────────────────────────────────
+        # Sits with Language rather than at the bottom because both are
+        # one-time setup, and because on Windows this button is the only route
+        # to opening several files at once: Explorer's "Open with" submenu
+        # does not appear for a multi-selection at all, so multi-file opening
+        # happens through the default handler or not at all.
+        if default_app.available():
+            outer.addWidget(self._make_section_label(self.tr("Default Audio Player")))
+
+            default_frame = QFrame()
+            default_frame.setObjectName("settingsSection")
+            default_layout = QVBoxLayout(default_frame)
+            default_layout.setContentsMargins(16, 10, 16, 10)
+            default_layout.setSpacing(8)
+
+            self._default_app_btn = QPushButton(
+                self.tr("Make Mixed in P your default audio player")
+            )
+            self._default_app_btn.clicked.connect(self._on_make_default_clicked)
+            default_row = self._row_layout()
+            default_row.addWidget(self._default_app_btn)
+            default_row.addStretch(1)
+            default_layout.addLayout(default_row)
+
+            default_hint = QLabel(
+                self.tr(
+                    "Opens Windows Settings on the Mixed in P entry, where you "
+                    "can hand it your audio file types. Windows only lets you "
+                    "make that choice yourself."
+                )
+                if sys.platform == "win32"
+                else self.tr(
+                    "Double-clicking an audio file will open it here. Finder's "
+                    "Get Info panel puts it back."
+                )
+            )
+            default_hint.setObjectName("settingsHint")
+            default_hint.setWordWrap(True)
+            default_layout.addWidget(default_hint)
+
+            outer.addWidget(default_frame)
 
         # ── Section: Theme ─────────────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Theme")))
@@ -540,6 +588,53 @@ class SettingsPanel(QWidget):
         self.setStyleSheet(self._build_stylesheet())
 
     # ── Helpers ────────────────────────────────────────────────────────────
+
+    def _on_make_default_clicked(self) -> None:
+        """Ask the OS, then say only what actually happened.
+
+        The silent case is the Windows one: Settings comes to the front on our
+        entry, and a message box on top of it would be telling the user
+        something they can already see. Everything else gets a sentence,
+        because nothing visible happened.
+        """
+        result = default_app.make_default()
+        logger.info("Default audio player: %s %s", result.outcome.value, result.detail)
+
+        title = self.tr("Default Audio Player")
+        if result.outcome is default_app.Outcome.HANDED_OFF:
+            return
+        if result.outcome is default_app.Outcome.DONE:
+            QMessageBox.information(
+                self, title, self.tr("Mixed in P now opens your audio files.")
+            )
+            return
+
+        # Both remaining outcomes need the same thing from the user: the route
+        # that always works. Only macOS has one worth spelling out, so the two
+        # are told apart by platform rather than by outcome — the severity is
+        # what the outcome decides, since not-installed-yet is not a fault.
+        if sys.platform == "win32":
+            text = (
+                self.tr(
+                    "Mixed in P is not registered with Windows. Reinstalling "
+                    "it will register it."
+                )
+                if result.outcome is default_app.Outcome.UNSUPPORTED
+                else self.tr(
+                    "Windows Settings did not open. You can set this yourself "
+                    "there, under Apps → Default apps."
+                )
+            )
+        else:
+            text = self.tr(
+                "Select an audio file in Finder, press Command-I, choose Mixed "
+                "in P under “Open with”, then click Change All."
+            )
+
+        if result.outcome is default_app.Outcome.UNSUPPORTED:
+            QMessageBox.information(self, title, text)
+        else:
+            QMessageBox.warning(self, title, text)
 
     @staticmethod
     def _row_layout():
