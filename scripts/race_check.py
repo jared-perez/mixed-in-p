@@ -22,8 +22,11 @@ Isolated from the developer's real library: the app data directory is
 redirected per run, so ``library.db`` and ``config.json`` here are throwaway.
 
 Reads as PASS only when exactly one process became primary AND every file
-landed in Scratch. Both halves matter: one primary with four lost files is the
-transport failing, and five primaries is the claim failing.
+landed in Scratch **in name order**. All three halves matter: five primaries is
+the claim failing, one primary with four lost files is the transport failing,
+and the right files in the wrong order is the batch window failing — the files
+arrived, but not close enough together to be sorted as one open, so the app
+committed to playing whichever process won the race.
 """
 
 from __future__ import annotations
@@ -38,6 +41,10 @@ import time
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(REPO))
+
+from src.utils.args import shell_sorted  # noqa: E402 — needs REPO on the path
+
 ROOT = Path(tempfile.gettempdir()) / "mixedinp-race-check"
 DATA = ROOT / "appdata"
 SETTLE_SECONDS = 14
@@ -54,7 +61,10 @@ def make_fixtures(n: int) -> list[str]:
     files = []
     for i in range(n):
         # A space in the name on purpose: quoting is the classic failure here.
-        p = ROOT / f"race track {i}.wav"
+        # Powers of two, so the expected order is a *natural* sort and not
+        # merely an alphabetical one — "16" sorts before "2" as text, and a
+        # sort that got that wrong would otherwise pass unnoticed at n=5.
+        p = ROOT / f"race track {2 ** i}.wav"
         sf.write(p, np.zeros((sr // 2, 2), dtype="float32"), sr)
         files.append(str(p))
     return files
@@ -162,14 +172,24 @@ def trial(files: list[str], n: int, number: int) -> bool:
         for i in range(n)
     ]
     primaries = roles.count("primary")
-    ok = primaries == 1 and len(collected) == n
+    # Compared by the app's own rule rather than a hand-rolled sort here: the
+    # question is whether Scratch matches what the shell showed the user, and
+    # shell_sorted is the definition of that. Names only — the DB stores
+    # normalized paths and the fixtures do not.
+    landed = [Path(p).name for p in collected]
+    expected = [Path(p).name for p in shell_sorted(files)]
+    ordered = landed == expected
+    ok = primaries == 1 and len(collected) == n and ordered
     print(
         f"  primaries={primaries}  secondaries={roles.count('secondary')}  "
-        f"collected={len(collected)}/{n}  {'OK' if ok else '<-- FAIL'}"
+        f"collected={len(collected)}/{n}  order={'ok' if ordered else 'WRONG'}  "
+        f"{'OK' if ok else '<-- FAIL'}"
     )
     if not ok:
         print(f"     roles: {roles}")
-        print(f"     landed: {[Path(p).name for p in collected]}")
+        print(f"     landed: {landed}")
+        if not ordered:
+            print(f"     wanted: {expected}")
         print(f"     logs: {log_dir}")
     return ok
 

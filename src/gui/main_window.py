@@ -3,7 +3,7 @@
 import logging
 from pathlib import Path
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QTimer, Qt
 from PySide6.QtGui import QKeySequence, QShortcut
 from PySide6.QtWidgets import (
     QAbstractSpinBox,
@@ -42,6 +42,7 @@ from src.renamer import (
     preview_rename,
 )
 
+from src.utils.args import shell_sorted
 from src.utils.config import AppConfig, load_config, save_config
 from src.utils.paths import normalize_track_path
 
@@ -72,6 +73,18 @@ from .workers import (
     RenameThread,
     UndoThread,
 )
+
+
+# How long ``open_files`` waits for the rest of a multi-file open before
+# acting on what it has. The measured spread on Windows was 43 ms for five
+# files, so this is roughly seven times the gap it exists to close — chosen
+# because the two failure directions are wildly asymmetric. Too long is a
+# pause before playback on a single-file open, and 300 ms is already lost in a
+# 5.5 s cold start; too short splits one selection into two batches, which
+# reloads Scratch, re-sorts around a file that is already in the list and
+# starts playing the wrong track. Not user-configurable: it is a property of
+# how the shells launch us, not a preference.
+OPEN_BATCH_MS = 300
 
 
 def apply_scratch_policy(lib: "library.Library", persist: bool) -> None:
@@ -112,6 +125,9 @@ class MainWindow(QMainWindow):
 
         # Track current page for context-aware file routing
         self._current_page: str = "player"
+
+        # Files the OS hands us arrive one at a time; this collects them.
+        self._setup_open_batch()
 
         # Load persisted config
         self._config: AppConfig = load_config()
@@ -591,6 +607,17 @@ class MainWindow(QMainWindow):
             self._sidebar.set_current_page("rename")
             self._on_page_changed("rename")
 
+    def _setup_open_batch(self) -> None:
+        """The buffer that turns several one-file arrivals into one batch.
+
+        Wired in one place so the tests can stand up the same machinery
+        against a stub instead of re-describing it.
+        """
+        self._open_batch: list[str] = []
+        self._open_batch_timer = QTimer(self)
+        self._open_batch_timer.setSingleShot(True)
+        self._open_batch_timer.timeout.connect(self._flush_open_batch)
+
     def open_files(self, file_paths: list[str]) -> None:
         """Take on files handed to us by the OS. The one funnel for every route.
 
@@ -599,33 +626,62 @@ class MainWindow(QMainWindow):
         secondary process's handoff on a warm one — so the behaviour cannot
         drift between them.
 
-        The order of the steps is the substance:
+        **A multi-file open is not one call.** Windows spawns one process per
+        file (measured 2026-08-06: five files, five processes, 25–43 ms apart)
+        and macOS sends one event per file, so the files land here a few
+        milliseconds apart, in a racing order. Rather than act on each, the
+        paths are collected for ``OPEN_BATCH_MS`` and handled once, in
+        ``_flush_open_batch`` — which is what lets the list be sorted and the
+        *first* file be the one that plays. Without the wait the app would
+        commit to playing whichever process happened to win.
 
-        1. **Load Scratch first.** Without this, a file arriving while a saved
-           playlist is showing would append to the user's set list and
-           auto-save it. Scratch is the disposable working list; that is what
-           makes this feature safe to trigger from a right-click.
-        2. **Force duplicates.** The alternative is the duplicate prompt, and
-           that prompt is deferred off a zero-delay timer — during app launch
-           it could land before the window is even mapped. A modal nobody
-           asked for is worse than a repeated row in a disposable list.
-        3. **Come to the front regardless.** A relaunch carrying no files at
-           all (double-clicking the app while it runs) still means "show me",
-           so this happens before the early return.
-        4. **Play only if idle.** A cold start always plays, because that is
-           the point. A file arriving mid-track does not, because cutting off
-           playback in a DJ app is a real-world harm.
+        Coming to the front is the exception and happens immediately: a
+        relaunch carrying no files at all (double-clicking the app while it
+        runs) means "show me", and that answer should not wait on a batch that
+        will turn out to be empty.
 
         Unsupported files are dropped rather than refused: a selection of a
         folder's worth of files should add the audio and ignore the artwork,
         not fail. argv arrivals were filtered already — this repeats it
         because ``QFileOpenEvent`` and the IPC handoff have no such guarantee.
         """
+        self._raise_to_front()
+
         paths = [
             p for p in file_paths if Path(p).suffix.lower() in SUPPORTED_EXTENSIONS
         ]
+        if not paths:
+            return
 
-        self._raise_to_front()
+        self._open_batch.extend(paths)
+        # Started, not restarted: the window runs from the *first* file, so a
+        # steady trickle of arrivals cannot postpone playback indefinitely.
+        if not self._open_batch_timer.isActive():
+            self._open_batch_timer.start(OPEN_BATCH_MS)
+
+    def _flush_open_batch(self) -> None:
+        """Add everything that arrived in the window, and play the first.
+
+        The order of the steps is the substance:
+
+        1. **Load Scratch first.** Without this, a file arriving while a saved
+           playlist is showing would append to the user's set list and
+           auto-save it. Scratch is the disposable working list; that is what
+           makes this feature safe to trigger from a right-click.
+        2. **Sort as the shell showed them.** Arrival order is a race result
+           and means nothing to the user; see ``shell_sorted``.
+        3. **Force duplicates.** The alternative is the duplicate prompt, and
+           that prompt is deferred off a zero-delay timer — during app launch
+           it could land before the window is even mapped. A modal nobody
+           asked for is worse than a repeated row in a disposable list.
+        4. **Play only if idle.** A cold start always plays, because that is
+           the point — the owner's words: "the user wants to listen to them
+           right away, which is what Open with is supposed to provide". A file
+           arriving mid-track does not, because cutting off playback in a DJ
+           app is a real-world harm.
+        """
+        paths = shell_sorted(self._open_batch)
+        self._open_batch = []
         if not paths:
             return
 

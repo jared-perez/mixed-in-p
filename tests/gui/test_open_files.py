@@ -65,17 +65,26 @@ class SidebarStub:
         self.pages.append(page_id)
 
 
-class WindowStub:
-    """Just enough MainWindow to run the real open_files against."""
+class WindowStub(QObject):
+    """Just enough MainWindow to run the real open_files against.
+
+    A QObject because the batch timer wants a parent, and it is set up by
+    MainWindow's own method rather than a copy of it — the wiring between
+    ``open_files`` and ``_flush_open_batch`` is part of what is being tested.
+    """
 
     open_files = MainWindow.open_files
+    _flush_open_batch = MainWindow._flush_open_batch
+    _setup_open_batch = MainWindow._setup_open_batch
     _add_files_to_player = MainWindow._add_files_to_player
 
     def __init__(self, loaded=SCRATCH_NODE_ID):
+        super().__init__()
         self._player_panel = PanelStub(loaded)
         self._sidebar = SidebarStub()
         self.pages = []
         self.raised = 0
+        self._setup_open_batch()
 
     def _raise_to_front(self):
         self.raised += 1
@@ -84,7 +93,22 @@ class WindowStub:
         self.pages.append(page_id)
 
 
+def open_now(window, paths):
+    """Open *paths* and close the batch window by hand.
+
+    For the tests that are about what ``open_files`` decides rather than when
+    it decides it — the timing itself is covered by TestOpenBatching.
+    """
+    window.open_files(paths)
+    window._open_batch_timer.stop()
+    window._flush_open_batch()
+
+
 class TestOpenFiles:
+    @pytest.fixture(autouse=True)
+    def _app(self, qapp):
+        """WindowStub owns a QTimer, which wants an application to live in."""
+
     def test_it_targets_scratch_even_with_a_playlist_loaded(self, tmp_path):
         """Otherwise a file from Finder appends to the user's set list.
 
@@ -94,7 +118,7 @@ class TestOpenFiles:
         (a,) = make_files(tmp_path, "a.mp3")
         window = WindowStub(loaded=42)
 
-        window.open_files([a])
+        open_now(window, [a])
 
         assert window._player_panel.loaded == [SCRATCH_NODE_ID]
 
@@ -104,7 +128,7 @@ class TestOpenFiles:
         (a,) = make_files(tmp_path, "a.mp3")
         window = WindowStub()
 
-        window.open_files([a])
+        open_now(window, [a])
 
         assert window._player_panel.allow_duplicates is True
 
@@ -112,7 +136,7 @@ class TestOpenFiles:
         (a,) = make_files(tmp_path, "a.mp3")
         window = WindowStub()
 
-        window.open_files([a])
+        open_now(window, [a])
 
         assert [t["file_path"] for t in window._player_panel.added] == [
             norm(a)
@@ -124,7 +148,7 @@ class TestOpenFiles:
         a, b = make_files(tmp_path, "a.mp3", "b.mp3")
         window = WindowStub()
 
-        window.open_files([a, b])
+        open_now(window, [a, b])
 
         assert window._player_panel.played == [norm(a)]
 
@@ -133,7 +157,7 @@ class TestOpenFiles:
         a, art, notes = make_files(tmp_path, "a.mp3", "cover.jpg", "notes.txt")
         window = WindowStub()
 
-        window.open_files([art, a, notes])
+        open_now(window, [art, a, notes])
 
         assert [t["file_path"] for t in window._player_panel.added] == [
             norm(a)
@@ -144,7 +168,7 @@ class TestOpenFiles:
         (a,) = make_files(tmp_path, "a.mp3")
         window = WindowStub()
 
-        window.open_files([a])
+        open_now(window, [a])
 
         assert window._sidebar.pages == ["player"]
         assert window.pages == ["player"]
@@ -153,7 +177,7 @@ class TestOpenFiles:
         (a,) = make_files(tmp_path, "a.mp3")
         window = WindowStub()
 
-        window.open_files([a])
+        open_now(window, [a])
 
         assert window.raised == 1
 
@@ -165,7 +189,7 @@ class TestOpenFiles:
         """
         window = WindowStub(loaded=42)
 
-        window.open_files([])
+        open_now(window, [])
 
         assert window.raised == 1
         assert window._player_panel.loaded == []
@@ -176,10 +200,129 @@ class TestOpenFiles:
         art, notes = make_files(tmp_path, "cover.jpg", "notes.txt")
         window = WindowStub(loaded=42)
 
-        window.open_files([art, notes])
+        open_now(window, [art, notes])
 
         assert window.raised == 1
         assert window._player_panel.loaded == []
+        assert window._player_panel.added == []
+
+    def test_the_batch_is_sorted_not_left_in_arrival_order(self, tmp_path):
+        """Windows hands these over in whatever order five processes race in —
+        measured as a different order on all three runs of the same files."""
+        one, two, three = make_files(tmp_path, "1 one.mp3", "2 two.mp3", "3 three.mp3")
+        window = WindowStub()
+
+        open_now(window, [three, one, two])
+
+        assert [t["file_path"] for t in window._player_panel.added] == [
+            norm(one),
+            norm(two),
+            norm(three),
+        ]
+
+    def test_the_track_that_plays_is_the_first_by_name(self, tmp_path):
+        """The whole point of waiting for the batch: without it the app plays
+        whichever process won the race, which is row 3 as often as row 1."""
+        one, two, three = make_files(tmp_path, "1 one.mp3", "2 two.mp3", "3 three.mp3")
+        window = WindowStub()
+
+        open_now(window, [three, one, two])
+
+        assert window._player_panel.played == [norm(one)]
+
+
+# ── The batch window ────────────────────────────────────────────
+
+
+class TestOpenBatching:
+    """Several one-file arrivals, milliseconds apart, are one open.
+
+    This is the machinery that lets the sort above mean anything: on Windows
+    the five files of a multi-select arrive as five separate calls, so a
+    version of this that acted on each call would sort lists of one.
+    """
+
+    @pytest.fixture(autouse=True)
+    def quick_batch(self, qapp, monkeypatch):
+        """Shrink the window so the timing tests cost milliseconds.
+
+        The real 300 ms is a property of how the shells launch us, not of
+        anything these tests assert — they are about *whether* arrivals
+        coalesce and the timer fires, not about the number.
+        """
+        monkeypatch.setattr("src.gui.main_window.OPEN_BATCH_MS", 10)
+
+    def test_arrivals_in_the_window_become_one_add(self, qtbot, tmp_path):
+        """One reload of Scratch, one add, one play decision — not five."""
+        a, b, c = make_files(tmp_path, "a.mp3", "b.mp3", "c.mp3")
+        window = WindowStub()
+
+        for path in (c, a, b):
+            window.open_files([path])
+        qtbot.waitUntil(lambda: bool(window._player_panel.added), timeout=1000)
+
+        assert window._player_panel.loaded == [SCRATCH_NODE_ID]
+        assert [t["file_path"] for t in window._player_panel.added] == [
+            norm(a),
+            norm(b),
+            norm(c),
+        ]
+        assert window._player_panel.played == [norm(a)]
+
+    def test_the_timer_fires_without_being_flushed_by_hand(self, qtbot, tmp_path):
+        """The wiring itself: nothing else in the app calls the flush."""
+        (a,) = make_files(tmp_path, "a.mp3")
+        window = WindowStub()
+
+        window.open_files([a])
+        assert window._player_panel.added == []  # still waiting
+
+        qtbot.waitUntil(lambda: bool(window._player_panel.added), timeout=1000)
+
+    def test_the_window_does_not_slide_with_each_arrival(self, qtbot, tmp_path):
+        """Started, not restarted. A trickle of arrivals must not be able to
+        postpone playback indefinitely."""
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        window = WindowStub()
+        starts: list[int] = []
+        real_start = window._open_batch_timer.start
+
+        def spy(ms):
+            starts.append(ms)
+            real_start(ms)
+
+        window._open_batch_timer.start = spy
+
+        window.open_files([a])
+        window.open_files([b])
+
+        assert starts == [10]
+
+    def test_a_later_open_starts_a_fresh_batch(self, qtbot, tmp_path):
+        """Two separate gestures are two opens — the second must not be
+        swallowed by a buffer that was never emptied."""
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        window = WindowStub()
+
+        window.open_files([a])
+        qtbot.waitUntil(lambda: bool(window._player_panel.added), timeout=1000)
+        window.open_files([b])
+        qtbot.waitUntil(
+            lambda: len(window._player_panel.added) == 2, timeout=1000
+        )
+
+        assert window._player_panel.loaded == [SCRATCH_NODE_ID, SCRATCH_NODE_ID]
+        assert window._player_panel.played == [norm(a), norm(b)]
+
+    def test_coming_to_the_front_does_not_wait_for_the_batch(self, qtbot, tmp_path):
+        """A relaunch means "show me" now, not in 300 ms — and a bare one
+        carries no files to wait for at all."""
+        (a,) = make_files(tmp_path, "a.mp3")
+        window = WindowStub()
+
+        window.open_files([a])
+
+        assert window.raised == 1
         assert window._player_panel.added == []
 
 

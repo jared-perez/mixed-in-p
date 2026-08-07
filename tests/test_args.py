@@ -1,4 +1,8 @@
-"""parse_audio_args: what a command line from the OS actually yields."""
+"""parse_audio_args: what a command line from the OS actually yields.
+
+Plus ``shell_sorted``, which answers the other half of the same question —
+the order to show them in, once they have all arrived.
+"""
 
 from __future__ import annotations
 
@@ -6,7 +10,7 @@ import os
 
 import pytest
 
-from src.utils.args import parse_audio_args
+from src.utils.args import parse_audio_args, shell_sorted
 from src.utils.paths import normalize_track_path
 
 
@@ -78,8 +82,10 @@ def test_a_directory_is_not_a_track(tmp_path):
 def test_order_is_preserved_and_not_sorted(tmp_path):
     """One invocation's argument order is the order given (verified on Windows).
 
-    Deliberately NOT sorted: whether an Explorer multi-select even arrives as
-    one process is still unknown, so a sort here would invent a guarantee.
+    Deliberately NOT sorted here: a Windows multi-select arrives as one
+    process *per file*, so there is no list at this level whose order could
+    mean anything. Ordering is decided once, on the assembled batch, by
+    ``shell_sorted``.
     """
     b = make(tmp_path, "b.mp3")
     a = make(tmp_path, "a.mp3")
@@ -113,3 +119,59 @@ def test_an_empty_command_line_is_not_an_error():
     """The ordinary launch: no files, no complaints."""
     assert parse_audio_args(["prog"]) == []
     assert parse_audio_args([]) == []
+
+
+# ── shell_sorted ────────────────────────────────────────────────
+
+
+class TestShellSorted:
+    """The order a file manager would have shown them in."""
+
+    def test_it_sorts_by_name(self):
+        assert shell_sorted(["/m/c.mp3", "/m/a.mp3", "/m/b.mp3"]) == [
+            "/m/a.mp3",
+            "/m/b.mp3",
+            "/m/c.mp3",
+        ]
+
+    def test_digits_compare_as_numbers(self):
+        """``Track 10`` after ``Track 2``, as both Explorer and Finder show it.
+
+        Plain string order puts 10 first, which for a DJ opening a numbered
+        set is visibly wrong in the only case where the numbering matters.
+        """
+        got = shell_sorted(["/m/Track 10.mp3", "/m/Track 2.mp3", "/m/Track 1.mp3"])
+        assert got == ["/m/Track 1.mp3", "/m/Track 2.mp3", "/m/Track 10.mp3"]
+
+    def test_case_does_not_split_the_list(self):
+        """Both shells are case-insensitive; sorting by codepoint would put
+        every capital ahead of every lowercase."""
+        assert shell_sorted(["/m/beta.mp3", "/m/Alpha.mp3", "/m/Gamma.mp3"]) == [
+            "/m/Alpha.mp3",
+            "/m/beta.mp3",
+            "/m/Gamma.mp3",
+        ]
+
+    def test_the_folder_is_not_part_of_the_comparison(self):
+        """The user was reading filenames, not paths."""
+        assert shell_sorted(["/zzz/a.mp3", "/aaa/b.mp3"]) == ["/zzz/a.mp3", "/aaa/b.mp3"]
+
+    def test_the_same_name_twice_falls_back_to_the_path(self):
+        """Otherwise a tie leaves the result depending on arrival order, which
+        is the exact nondeterminism this function exists to remove."""
+        first = shell_sorted(["/b/x.mp3", "/a/x.mp3"])
+        second = shell_sorted(["/a/x.mp3", "/b/x.mp3"])
+        assert first == second == ["/a/x.mp3", "/b/x.mp3"]
+
+    def test_non_ascii_names_sort_without_blowing_up(self):
+        """`explorer five café.wav` is a real fixture on the Windows machine."""
+        assert shell_sorted(["/m/café.wav", "/m/apple.wav"]) == [
+            "/m/apple.wav",
+            "/m/café.wav",
+        ]
+
+    def test_a_name_that_is_all_digits_is_fine(self):
+        assert shell_sorted(["/m/10.mp3", "/m/9.mp3"]) == ["/m/9.mp3", "/m/10.mp3"]
+
+    def test_empty_in_empty_out(self):
+        assert shell_sorted([]) == []

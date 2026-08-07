@@ -1,4 +1,4 @@
-"""The audio files a command line names.
+"""The audio files the OS hands us, and the order to show them in.
 
 "Open with Mixed in P" reaches the app as command-line arguments: the OS
 launches the executable with the chosen files appended to argv. This is the
@@ -6,6 +6,10 @@ argv half of that entry point, kept as a pure function so it can be tested
 without a QApplication — and so it can run *before* one exists, which the
 single-instance handshake needs (a secondary process parses its arguments,
 hands them to the primary and exits without ever building a window).
+
+``shell_sorted`` is the other half of the same question — not which files, but
+in what order — and lives here because the answer is about what the file
+manager showed the user, not about playlists.
 
 Verified on Windows against a frozen windowed onedir build (2026-08-05): argv
 carries real paths there, spaces stay a single argument, and non-ASCII names
@@ -17,7 +21,8 @@ is exactly why everything here goes through ``normalize_track_path`` — see
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+import re
+from collections.abc import Iterable, Sequence
 from pathlib import Path
 
 # The canonical extension set, shared with the folder scanner rather than
@@ -45,11 +50,13 @@ def parse_audio_args(argv: Sequence[str]) -> list[str]:
       been moved, and a file that cannot be read would otherwise become a dead
       library row that only the relocate flow can clear.
 
-    Order is preserved exactly as given, and *not* sorted. Within one process
-    the order is the order of the arguments (verified on Windows), but whether
-    a multi-select in Explorer even produces one process is still unknown — so
-    imposing a sort here would be inventing an ordering guarantee we cannot
-    honour anyway. That decision belongs upstairs once the association exists.
+    Order is preserved exactly as given, and *not* sorted here. Measured on
+    Windows 11 (2026-08-06): opening five files spawns **five processes with
+    one path each**, 25–43 ms apart, so argv order carries no information at
+    all about a multi-select — the order the user ends up seeing is decided by
+    which handoff arrives first, which was different on every run. Sorting is
+    therefore done once, on the assembled batch, by ``shell_sorted``; doing it
+    here as well would only reorder lists of one.
 
     Duplicates within one command line collapse to the first occurrence. This
     is not the duplicate *policy* question — additions force
@@ -77,3 +84,42 @@ def parse_audio_args(argv: Sequence[str]) -> list[str]:
         files.append(path)
 
     return files
+
+
+_DIGITS = re.compile(r"(\d+)")
+
+
+def _shell_key(path: str) -> tuple:
+    """Sort key for one path: filename first, natural order, ties by full path.
+
+    Digit runs compare as numbers so ``Track 2`` precedes ``Track 10`` — both
+    Explorer and Finder sort that way, and matching them is the entire point.
+    ``casefold`` because both are case-insensitive about it too.
+
+    The ``(kind, value)`` pairs exist only to keep the tuple comparable: a
+    chunk is either text or a number and Python will not compare the two.
+    """
+    chunks = _DIGITS.split(Path(path).name.casefold())
+    natural = tuple(
+        (1, int(chunk)) if chunk.isdigit() else (0, chunk) for chunk in chunks
+    )
+    # Two files of the same name in different folders would otherwise tie, and
+    # a tie makes the result depend on arrival order again.
+    return (natural, path)
+
+
+def shell_sorted(paths: Iterable[str]) -> list[str]:
+    """Put *paths* in the order the file manager showed them to the user.
+
+    A multi-file "open" does not arrive as a list. Windows spawns one process
+    per file and the primary receives them in whatever order they win a race —
+    measured as different on all three runs of the same five files, matching
+    neither the visual selection nor the alphabet. macOS sends one
+    ``QFileOpenEvent`` per file. So *something* has to impose an order, and the
+    only one that means anything to the person who clicked is the one they were
+    looking at: by name, the way the shell lists it.
+
+    Only the filename is compared, not the directory, because that is what the
+    user was reading. The full path breaks ties.
+    """
+    return sorted(paths, key=_shell_key)
