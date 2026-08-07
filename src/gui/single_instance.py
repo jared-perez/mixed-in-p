@@ -392,7 +392,8 @@ class SingleInstance(QObject):
 
         try:
             payload = json.dumps(list(paths)).encode("utf-8")
-            sock.write(_HEADER.pack(len(payload)) + payload)
+            frame = _HEADER.pack(len(payload)) + payload
+            sock.write(frame)
             # Loop rather than a single wait: waitForBytesWritten reports "no
             # progress", which is indistinguishable from "already finished".
             while sock.bytesToWrite() > 0:
@@ -405,7 +406,18 @@ class SingleInstance(QObject):
                     # nothing. Believe the byte count, not the wait.
                     if sock.bytesToWrite() == 0:
                         break
-                    logger.warning("Timed out handing files to the primary instance.")
+                    # The byte count is the diagnosis, not decoration: the whole
+                    # frame still queued means the primary never read a thing
+                    # (busy, or wedged), while a partial count means it was
+                    # reading and stopped. Those are different faults and the
+                    # log is the only place anyone can tell them apart.
+                    logger.warning(
+                        "Timed out handing files to the primary instance: "
+                        "%d of %d bytes still queued after %d ms.",
+                        sock.bytesToWrite(),
+                        len(frame),
+                        WRITE_TIMEOUT_MS,
+                    )
                     return False
 
             sock.disconnectFromServer()

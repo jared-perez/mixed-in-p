@@ -80,11 +80,19 @@ def hand_off(inst, paths, qtbot, timeout_ms=3000):
 
 
 # After the budget is spent, keep pumping this much longer before giving up.
-# Not slack in the deadline — the test still fails — but the difference
-# between failing and *abandoning a running thread*. See run_off_the_main_thread.
-# Must stay comfortably above the patched write budget in ``bounded_write``, so
-# a worker that overruns always unwinds before anything joins it.
-_GRACE_MS = 8000
+# Not slack in the deadline — the test still fails — but the difference between
+# failing and *abandoning a running thread*. See run_off_the_main_thread.
+#
+# Only ever reached if something other than the write budget hangs, since a
+# write gives up inside bounded_write's budget, which is inside _WAIT_MS. So it
+# is the backstop for the unforeseen, and bounded rather than generous: a real
+# hang should fail the suite, not stall it.
+_GRACE_MS = 10000
+
+# Default ceiling for a pumped wait. Never waited on when things are healthy —
+# every wait returns the moment the worker finishes — so it is sized to sit
+# above the write budget rather than to be "long enough for a fast machine".
+_WAIT_MS = 20000
 
 
 def _pump_until(qtbot, predicate, budget_ms) -> bool:
@@ -97,7 +105,7 @@ def _pump_until(qtbot, predicate, budget_ms) -> bool:
     return True
 
 
-def run_off_the_main_thread(fn, qtbot, timeout_ms=5000):
+def run_off_the_main_thread(fn, qtbot, timeout_ms=_WAIT_MS):
     """Run a blocking call on a worker thread while the main loop pumps.
 
     In the app the two sides of a handoff are two processes, each with its own
@@ -145,7 +153,7 @@ def run_off_the_main_thread(fn, qtbot, timeout_ms=5000):
     return result["value"]
 
 
-def send_off_the_main_thread(inst, paths, qtbot, timeout_ms=5000):
+def send_off_the_main_thread(inst, paths, qtbot, timeout_ms=_WAIT_MS):
     """``send()``, driven so the primary can serve it. See the note above."""
     return run_off_the_main_thread(lambda: inst.send(paths), qtbot, timeout_ms)
 
@@ -158,21 +166,27 @@ def bounded_write(monkeypatch):
     only once the primary reads, and a cold frozen start measured 5.53 s with
     no event loop running at all, so the budget has to outlast it.
 
-    In-process it is three orders of magnitude past anything legitimate, and
-    the cost is not just a slow suite — a worker blocked for 30 s outlives the
-    test that started it, so a failure here surfaces as a stray log line
-    against some unrelated test half a minute later.
+    What has to be bounded is not the duration but the *abandonment*: a worker
+    blocked for 30 s outlives the test that started it, so a failure surfaces
+    as a stray log line against some unrelated test half a minute later.
 
-    3000 is chosen to sit *between* nothing-legitimate and the harness's own
-    5000 budget, which decides which failure the reader sees. Should the main
-    loop ever be starved this long (a loaded full run on Windows is the case
-    that prompted all this), the write gives up first, ``send`` returns False,
-    and the test fails on its own assertion with the warning logged against
-    the right test — rather than the harness timing out around it and saying
-    something vaguer. And it is well inside ``_GRACE_MS``, so an overrunning
-    worker always unwinds before anything joins it.
+    **The number was 3000 for one round, and Windows proved that too tight.**
+    It failed ~50% of the time under a loaded full run — cleanly and correctly
+    attributed, which was the point of the round, but on the write budget
+    rather than on anything real. That is the same mistake the shipped 30000
+    exists to avoid, argued in its own comment: overshooting a budget nobody
+    waits on is nearly free, undershooting turns a slow machine into a failure.
+    In-process the main loop is a test pumping in 10 ms slices while the rest
+    of the suite competes for the machine, which is *slower* than the app's
+    real case, not faster — so the test wants headroom, not less of it.
+
+    12000 keeps the one property the 3000 was chosen for: it is under the
+    harness's own budget, so a genuinely starved loop still fails on the
+    test's assertion with the warning attributed here, rather than the harness
+    timing out around it and saying something vaguer. A healthy run waits none
+    of it — every wait exits the moment the worker finishes.
     """
-    monkeypatch.setattr("src.gui.single_instance.WRITE_TIMEOUT_MS", 3000)
+    monkeypatch.setattr("src.gui.single_instance.WRITE_TIMEOUT_MS", 12000)
 
 
 @pytest.fixture
