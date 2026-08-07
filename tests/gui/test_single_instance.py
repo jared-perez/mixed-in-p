@@ -12,9 +12,10 @@ from __future__ import annotations
 import itertools
 import json
 import os
+import time
 
 import pytest
-from PySide6.QtCore import QThread
+from PySide6.QtCore import QSemaphore, QThread, QTimer
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
 from src.gui.single_instance import _HEADER, SingleInstance, server_name
@@ -78,6 +79,24 @@ def hand_off(inst, paths, qtbot, timeout_ms=3000):
     sock.close()
 
 
+# After the budget is spent, keep pumping this much longer before giving up.
+# Not slack in the deadline — the test still fails — but the difference
+# between failing and *abandoning a running thread*. See run_off_the_main_thread.
+# Must stay comfortably above the patched write budget in ``bounded_write``, so
+# a worker that overruns always unwinds before anything joins it.
+_GRACE_MS = 8000
+
+
+def _pump_until(qtbot, predicate, budget_ms) -> bool:
+    """Run the main event loop until *predicate* holds or the budget is spent."""
+    deadline = time.monotonic() + budget_ms / 1000
+    while not predicate():
+        if time.monotonic() >= deadline:
+            return False
+        qtbot.wait(10)
+    return True
+
+
 def run_off_the_main_thread(fn, qtbot, timeout_ms=5000):
     """Run a blocking call on a worker thread while the main loop pumps.
 
@@ -93,8 +112,22 @@ def run_off_the_main_thread(fn, qtbot, timeout_ms=5000):
     semantics rather than behaviour — the product call was always fine, as two
     real Windows processes showed.
 
-    ``qtbot.waitUntil`` does the load-bearing work: it pumps the main event
-    loop, which is what lets the primary serve the worker.
+    **Never stop pumping while the worker is still running, and never join it
+    from this thread until it has finished.** This used to spend its budget in
+    ``qtbot.waitUntil`` and then, in a ``finally``, call ``thread.wait()`` —
+    which does *not* run the event loop. So the instant the worker was late,
+    the loop it depends on stopped, and it could no longer finish by
+    construction: the join waited for a thread that was waiting for the join to
+    stop. On POSIX nothing noticed, because the write needs no reader. On
+    Windows a merely-slow run turned into a hard failure plus a worker
+    abandoned mid-write, holding the full ``WRITE_TIMEOUT_MS`` — which then
+    logged "Timed out handing files" half a minute later, into whichever test
+    was unlucky enough to be running by then. Order-dependent, Windows-only,
+    and blamed on the wrong test.
+
+    So the wait is one pumped loop, and an overrun keeps pumping for
+    ``_GRACE_MS`` so the worker can unwind before the failure is reported. The
+    test still fails; it just fails cleanly and takes its thread with it.
     """
     result = {}
 
@@ -104,16 +137,42 @@ def run_off_the_main_thread(fn, qtbot, timeout_ms=5000):
 
     thread = Worker()
     thread.start()
-    try:
-        qtbot.waitUntil(lambda: "value" in result, timeout=timeout_ms)
-    finally:
-        assert thread.wait(timeout_ms), "the worker thread never finished"
+    in_time = _pump_until(qtbot, thread.isFinished, timeout_ms)
+    if not in_time:
+        _pump_until(qtbot, thread.isFinished, _GRACE_MS)
+    assert thread.wait(1000), "the worker thread never finished"
+    assert in_time, f"the worker needed longer than {timeout_ms}ms"
     return result["value"]
 
 
 def send_off_the_main_thread(inst, paths, qtbot, timeout_ms=5000):
     """``send()``, driven so the primary can serve it. See the note above."""
     return run_off_the_main_thread(lambda: inst.send(paths), qtbot, timeout_ms)
+
+
+@pytest.fixture(autouse=True)
+def bounded_write(monkeypatch):
+    """Stop these tests inheriting the shipped 30-second write budget.
+
+    30000 is right for the product: on Windows a named-pipe write completes
+    only once the primary reads, and a cold frozen start measured 5.53 s with
+    no event loop running at all, so the budget has to outlast it.
+
+    In-process it is three orders of magnitude past anything legitimate, and
+    the cost is not just a slow suite — a worker blocked for 30 s outlives the
+    test that started it, so a failure here surfaces as a stray log line
+    against some unrelated test half a minute later.
+
+    3000 is chosen to sit *between* nothing-legitimate and the harness's own
+    5000 budget, which decides which failure the reader sees. Should the main
+    loop ever be starved this long (a loaded full run on Windows is the case
+    that prompted all this), the write gives up first, ``send`` returns False,
+    and the test fails on its own assertion with the warning logged against
+    the right test — rather than the harness timing out around it and saying
+    something vaguer. And it is well inside ``_GRACE_MS``, so an overrunning
+    worker always unwinds before anything joins it.
+    """
+    monkeypatch.setattr("src.gui.single_instance.WRITE_TIMEOUT_MS", 3000)
 
 
 @pytest.fixture
@@ -135,6 +194,51 @@ def instances(qtbot, app_id):
     yield make
     for inst in made:
         inst.close()
+
+
+class TestTheHarnessItself:
+    """The helper every handoff test is driven through, tested on its own.
+
+    Asserted as an *invariant* rather than by timing, because the bug it
+    guards against is Windows-only and a timing-based version of this would be
+    silently vacuous everywhere else. The invariant — the main loop keeps
+    running until the worker is done — is what makes the platform difference
+    stop mattering.
+    """
+
+    @staticmethod
+    def _gated_worker(delay_ms):
+        """A call that can only finish if the main event loop keeps running.
+
+        Exactly the dependency a Windows named-pipe write has on the primary's
+        loop, reproduced with a semaphore so it holds on every platform.
+        """
+        gate = QSemaphore(0)
+        QTimer.singleShot(delay_ms, gate.release)
+        done = []
+
+        def worker():
+            gate.tryAcquire(1, 5000)
+            done.append(1)
+            return "finished"
+
+        return worker, done
+
+    def test_it_pumps_until_the_worker_is_done(self, qtbot):
+        worker, _ = self._gated_worker(200)
+        assert run_off_the_main_thread(worker, qtbot, timeout_ms=3000) == "finished"
+
+    def test_an_overrun_fails_without_abandoning_the_worker(self, qtbot):
+        """The one that matters. A worker left running past its test is how a
+        30-second write timeout ends up logged against an innocent test three
+        files later — the failure this whole harness note is about.
+        """
+        worker, done = self._gated_worker(400)
+
+        with pytest.raises(AssertionError, match="needed longer"):
+            run_off_the_main_thread(worker, qtbot, timeout_ms=100)
+
+        assert done == [1], "the worker was abandoned rather than unwound"
 
 
 def test_the_first_claim_wins_and_the_second_does_not(instances):
