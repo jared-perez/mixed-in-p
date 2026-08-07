@@ -338,8 +338,18 @@ class SingleInstance(QObject):
                 wintypes.LPCWSTR,
             ]
             kernel32.CreateMutexW.restype = wintypes.HANDLE
-            # "Local\" scopes the object to this login session, matching the
-            # per-session pipe and the per-user name.
+            # "Local\" scopes the object to this login session, so each signed-in
+            # session gets its own app rather than the second one handing files
+            # to a window on someone else's desktop.
+            #
+            # NB the pipe is NOT scoped the same way: a named pipe lives in one
+            # machine-wide namespace, and only the *user* is folded into its
+            # name (see server_name). Two sessions of the same account —
+            # console plus RDP — would therefore each hold their own mutex and
+            # each be primary, while sharing one pipe name that Windows lets
+            # both listen on. Untested; it is the open RDP question, not a
+            # settled design. If it bites, the fix is to fold the session id
+            # into server_name rather than to change this line.
             handle = kernel32.CreateMutexW(None, False, f"Local\\{self._name}")
             err = ctypes.get_last_error()
         except Exception:
