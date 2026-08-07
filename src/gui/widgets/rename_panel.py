@@ -39,6 +39,7 @@ from src.renamer import (
 
 from ..models import TrackState, TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableWidget
 
 
@@ -122,7 +123,7 @@ class RenamePanel(QWidget):
         title = QLabel(self.tr("Rename"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(self.tr("Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames."))
+        desc = ElidedLabel(self.tr("Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames."))
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         layout.addLayout(panel_header_row(title, desc))
 

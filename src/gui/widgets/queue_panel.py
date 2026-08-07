@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
 
 from ..models import TrackState, TrackStore, TrackTableModel
 from ..styles.theme import Theme, panel_header_row
+from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableView
 
 
@@ -41,7 +42,7 @@ class QueuePanel(QWidget):
         title = QLabel(self.tr("Queue"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(self.tr("Add files here to queue them for analysis. Use the buttons below to send them to analysis."))
+        desc = ElidedLabel(self.tr("Add files here to queue them for analysis. Use the buttons below to send them to analysis."))
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         layout.addLayout(panel_header_row(title, desc))
 

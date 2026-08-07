@@ -164,33 +164,33 @@ Funciones:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="201"/>
-        <location filename="../widgets/analysis_panel.py" line="280"/>
+        <location filename="../widgets/analysis_panel.py" line="202"/>
+        <location filename="../widgets/analysis_panel.py" line="281"/>
         <source>Analyze</source>
         <translation>Analizar</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="204"/>
+        <location filename="../widgets/analysis_panel.py" line="205"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>Suelta archivos para analizarlos, salvo que lo cambies en los ajustes. Los resultados se actualizan en tiempo real.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="211"/>
+        <location filename="../widgets/analysis_panel.py" line="212"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="217"/>
+        <location filename="../widgets/analysis_panel.py" line="218"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>Analizar automáticamente al soltar o enviar al panel Analizar</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="230"/>
+        <location filename="../widgets/analysis_panel.py" line="231"/>
         <source>Drop files here to analyze immediately</source>
         <translation>Suelta archivos aquí para analizarlos al instante</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="276"/>
+        <location filename="../widgets/analysis_panel.py" line="277"/>
         <source>Clear Results</source>
         <translation>Limpiar resultados</translation>
     </message>
@@ -199,48 +199,48 @@ Funciones:
         <translation type="vanished">Eliminar seleccionados</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="287"/>
+        <location filename="../widgets/analysis_panel.py" line="288"/>
         <source>Send To</source>
         <translatorcomment>FIXED: localize &quot;Send To&quot; in all languages per updated glossary</translatorcomment>
         <translation>Enviar a</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="290"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="290"/>
+        <location filename="../widgets/analysis_panel.py" line="291"/>
         <source>Player</source>
         <translation>Reproductor</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="363"/>
         <source>{n} analyzed</source>
         <translation>{n} analizados</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="364"/>
+        <location filename="../widgets/analysis_panel.py" line="365"/>
         <source>{n} errors</source>
         <translation>{n} errores</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="366"/>
+        <location filename="../widgets/analysis_panel.py" line="367"/>
         <source>{n} pending</source>
         <translation>{n} pendientes</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="368"/>
+        <location filename="../widgets/analysis_panel.py" line="369"/>
         <source>{n} in progress</source>
         <translation>{n} en curso</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="370"/>
+        <location filename="../widgets/analysis_panel.py" line="371"/>
         <source>No results yet</source>
         <translation>Aún no hay resultados</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="426"/>
+        <location filename="../widgets/analysis_panel.py" line="427"/>
         <source>Open File Location</source>
         <translation>Abrir ubicación del archivo</translation>
     </message>
@@ -253,7 +253,7 @@ Funciones:
         <translation type="vanished">Enviar a Reproductor</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="428"/>
+        <location filename="../widgets/analysis_panel.py" line="429"/>
         <source>Remove</source>
         <translation>Eliminar</translation>
     </message>
@@ -261,49 +261,49 @@ Funciones:
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="36"/>
+        <location filename="../widgets/analysis_panel.py" line="37"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="37"/>
+        <location filename="../widgets/analysis_panel.py" line="38"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="38"/>
-        <location filename="../widgets/analysis_panel.py" line="40"/>
+        <location filename="../widgets/analysis_panel.py" line="39"/>
+        <location filename="../widgets/analysis_panel.py" line="41"/>
         <source>Conf</source>
         <translatorcomment>Abbreviation of &apos;Confidence&apos; (analysis confidence); kept short as &apos;Conf&apos; to fit the narrow table column, matching the English abbreviation length.</translatorcomment>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="39"/>
+        <location filename="../widgets/analysis_panel.py" line="40"/>
         <source>Key</source>
         <translation>Tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="41"/>
+        <location filename="../widgets/analysis_panel.py" line="42"/>
         <source>Key Code</source>
         <translation>Código de tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="42"/>
+        <location filename="../widgets/analysis_panel.py" line="43"/>
         <source>Alt Keys</source>
         <translation>Tonalidades alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="43"/>
+        <location filename="../widgets/analysis_panel.py" line="44"/>
         <source>Energy</source>
         <translation>Energía</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="44"/>
+        <location filename="../widgets/analysis_panel.py" line="45"/>
         <source>Status</source>
         <translation>Estado</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="86"/>
+        <location filename="../widgets/analysis_panel.py" line="87"/>
         <source>Other likely keys: {keys}</source>
         <translation>Otras tonalidades probables: {keys}</translation>
     </message>
@@ -326,110 +326,110 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="66"/>
-        <location filename="../widgets/conversion_panel.py" line="176"/>
+        <location filename="../widgets/conversion_panel.py" line="67"/>
+        <location filename="../widgets/conversion_panel.py" line="177"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="69"/>
+        <location filename="../widgets/conversion_panel.py" line="70"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>Convierte archivos de audio entre formatos (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="75"/>
+        <location filename="../widgets/conversion_panel.py" line="76"/>
         <source>Target Format:</source>
         <translation>Formato de destino:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="82"/>
+        <location filename="../widgets/conversion_panel.py" line="83"/>
         <source>Sample Rate:</source>
         <translation>Frecuencia de muestreo:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="85"/>
+        <location filename="../widgets/conversion_panel.py" line="86"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="86"/>
+        <location filename="../widgets/conversion_panel.py" line="87"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="87"/>
+        <location filename="../widgets/conversion_panel.py" line="88"/>
         <source>44.1 kHz (CD)</source>
         <translatorcomment>Decimal localized to Spanish comma convention: &apos;44,1 kHz&apos;.</translatorcomment>
         <translation>44,1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="88"/>
+        <location filename="../widgets/conversion_panel.py" line="89"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="98"/>
+        <location filename="../widgets/conversion_panel.py" line="99"/>
         <source>Bit Depth:</source>
         <translation>Profundidad de bits:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="101"/>
+        <location filename="../widgets/conversion_panel.py" line="102"/>
         <source>32 bit</source>
         <translation>32 bits</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="102"/>
+        <location filename="../widgets/conversion_panel.py" line="103"/>
         <source>24 bit (DVD)</source>
         <translation>24 bits (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="103"/>
+        <location filename="../widgets/conversion_panel.py" line="104"/>
         <source>16 bit (CD)</source>
         <translation>16 bits (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="104"/>
+        <location filename="../widgets/conversion_panel.py" line="105"/>
         <source>8 bit</source>
         <translation>8 bits</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="114"/>
+        <location filename="../widgets/conversion_panel.py" line="115"/>
         <source>Bitrate:</source>
         <translation>Tasa de bits:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="134"/>
+        <location filename="../widgets/conversion_panel.py" line="135"/>
         <source>Files</source>
         <translation>Archivos</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="137"/>
+        <location filename="../widgets/conversion_panel.py" line="138"/>
         <source>Drop audio files here to add them</source>
         <translation>Suelta archivos de audio aquí para añadirlos</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="140"/>
+        <location filename="../widgets/conversion_panel.py" line="141"/>
         <source>Filename</source>
         <translation>Nombre de archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="142"/>
         <source>From</source>
         <translation>De</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="142"/>
+        <location filename="../widgets/conversion_panel.py" line="143"/>
         <source>To</source>
         <translation>A</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="143"/>
+        <location filename="../widgets/conversion_panel.py" line="144"/>
         <source>Status</source>
         <translation>Estado</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="170"/>
-        <location filename="../widgets/conversion_panel.py" line="488"/>
+        <location filename="../widgets/conversion_panel.py" line="171"/>
+        <location filename="../widgets/conversion_panel.py" line="489"/>
         <source>No files</source>
         <translation>Sin archivos</translation>
     </message>
@@ -438,94 +438,94 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Eliminar seleccionados</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="184"/>
         <source>Send To</source>
         <translatorcomment>FIXED: localize &quot;Send To&quot; in all languages per updated glossary</translatorcomment>
         <translation>Enviar a</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="186"/>
         <source>Select at least one file to send.</source>
         <translation>Selecciona al menos un archivo para enviarlo.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="188"/>
         <source>Analyze</source>
         <translation>Analizar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="188"/>
+        <location filename="../widgets/conversion_panel.py" line="189"/>
         <source>Rename</source>
         <translation>Renombrar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="189"/>
+        <location filename="../widgets/conversion_panel.py" line="190"/>
         <source>Player</source>
         <translation>Reproductor</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="198"/>
+        <location filename="../widgets/conversion_panel.py" line="199"/>
         <source>Lossy files not allowed</source>
         <translation>No se permiten archivos con pérdida</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="373"/>
+        <location filename="../widgets/conversion_panel.py" line="374"/>
         <source>Open File Location</source>
         <translation>Abrir ubicación del archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="375"/>
+        <location filename="../widgets/conversion_panel.py" line="376"/>
         <source>Remove</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="456"/>
-        <location filename="../widgets/conversion_panel.py" line="646"/>
+        <location filename="../widgets/conversion_panel.py" line="457"/>
+        <location filename="../widgets/conversion_panel.py" line="647"/>
         <source>Done</source>
         <translatorcomment>Completion label; rendered &apos;Listo&apos; to distinguish from &apos;Complete&apos;/&apos;Completado&apos; used elsewhere as a process-finished status.</translatorcomment>
         <translation>Listo</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="465"/>
+        <location filename="../widgets/conversion_panel.py" line="466"/>
         <source>Same format</source>
         <translation>Mismo formato</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="472"/>
-        <location filename="../widgets/conversion_panel.py" line="638"/>
-        <location filename="../widgets/conversion_panel.py" line="668"/>
+        <location filename="../widgets/conversion_panel.py" line="473"/>
+        <location filename="../widgets/conversion_panel.py" line="639"/>
+        <location filename="../widgets/conversion_panel.py" line="669"/>
         <source>Ready</source>
         <translatorcomment>Status label for a file pending conversion; &apos;Preparado&apos; chosen over &apos;Listo&apos; which is reserved for the completed &apos;Done&apos; state.</translatorcomment>
         <translation>Preparado</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="483"/>
+        <location filename="../widgets/conversion_panel.py" line="484"/>
         <source>{count} files</source>
         <translation>{count} archivos</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="485"/>
+        <location filename="../widgets/conversion_panel.py" line="486"/>
         <source>{count} to convert</source>
         <translation>{count} por convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="487"/>
+        <location filename="../widgets/conversion_panel.py" line="488"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>&apos;lossy&apos; = lossy-encoded sources skipped to avoid upsampling; translated as &apos;con pérdida&apos;.</translatorcomment>
         <translation>({count} con pérdida omitidos)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="610"/>
+        <location filename="../widgets/conversion_panel.py" line="611"/>
         <source>Converting</source>
         <translation>Convirtiendo</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="631"/>
+        <location filename="../widgets/conversion_panel.py" line="632"/>
         <source>Incomplete</source>
         <translation>Incompleto</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="631"/>
+        <location filename="../widgets/conversion_panel.py" line="632"/>
         <source>Error</source>
         <translation>Error</translation>
     </message>
@@ -627,148 +627,148 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="156"/>
-        <location filename="../widgets/history_panel.py" line="377"/>
+        <location filename="../widgets/history_panel.py" line="178"/>
+        <location filename="../widgets/history_panel.py" line="404"/>
         <source>Rename History</source>
         <translation>Historial de renombrado</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="160"/>
-        <location filename="../widgets/history_panel.py" line="379"/>
+        <location filename="../widgets/history_panel.py" line="182"/>
+        <location filename="../widgets/history_panel.py" line="406"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>Consulta las operaciones de renombrado recientes. Selecciona una sesión para deshacerla.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
         <source>Session ID</source>
         <translation>ID de sesión</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
-        <location filename="../widgets/history_panel.py" line="212"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
+        <location filename="../widgets/history_panel.py" line="234"/>
         <source>Date/Time</source>
         <translation>Fecha y hora</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
         <source>Files</source>
         <translation>Archivos</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
         <source>Description</source>
         <translation>Descripción</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="204"/>
+        <location filename="../widgets/history_panel.py" line="226"/>
         <source>Name</source>
         <translation>Nombre</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="205"/>
+        <location filename="../widgets/history_panel.py" line="227"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="206"/>
-        <location filename="../widgets/history_panel.py" line="208"/>
+        <location filename="../widgets/history_panel.py" line="228"/>
+        <location filename="../widgets/history_panel.py" line="230"/>
         <source>Conf</source>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="207"/>
+        <location filename="../widgets/history_panel.py" line="229"/>
         <source>Key</source>
         <translation>Tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="209"/>
+        <location filename="../widgets/history_panel.py" line="231"/>
         <source>Key Code</source>
         <translation>Código de tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="210"/>
+        <location filename="../widgets/history_panel.py" line="232"/>
         <source>Alt Keys</source>
         <translation>Tonalidades alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="211"/>
+        <location filename="../widgets/history_panel.py" line="233"/>
         <source>Energy</source>
         <translation>Energía</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="260"/>
-        <location filename="../widgets/history_panel.py" line="563"/>
+        <location filename="../widgets/history_panel.py" line="282"/>
+        <location filename="../widgets/history_panel.py" line="591"/>
         <source>{0} Rename Sessions</source>
         <translation>{0} sesiones de renombrado</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="267"/>
-        <location filename="../widgets/history_panel.py" line="508"/>
+        <location filename="../widgets/history_panel.py" line="290"/>
+        <location filename="../widgets/history_panel.py" line="535"/>
         <source>{0} Song Keys</source>
         <translation>{0} tonalidades</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="285"/>
+        <location filename="../widgets/history_panel.py" line="309"/>
         <source>Show</source>
         <translation>Mostrar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="307"/>
-        <location filename="../widgets/history_panel.py" line="723"/>
-        <location filename="../widgets/history_panel.py" line="736"/>
+        <location filename="../widgets/history_panel.py" line="331"/>
+        <location filename="../widgets/history_panel.py" line="752"/>
+        <location filename="../widgets/history_panel.py" line="765"/>
         <source>Export CSV</source>
         <translation>Exportar CSV</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="309"/>
+        <location filename="../widgets/history_panel.py" line="333"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>Exporta la tabla de abajo a un archivo CSV compatible con hojas de cálculo.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="422"/>
+        <location filename="../widgets/history_panel.py" line="449"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>Confianza baja: conviene comprobar esta tonalidad.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="425"/>
+        <location filename="../widgets/history_panel.py" line="452"/>
         <source>Low confidence — the tempo may be half or double time.</source>
         <translation>Confianza baja: el tempo podría ser la mitad o el doble.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="620"/>
-        <location filename="../widgets/history_panel.py" line="635"/>
+        <location filename="../widgets/history_panel.py" line="649"/>
+        <location filename="../widgets/history_panel.py" line="664"/>
         <source>Open File Location</source>
         <translation>Abrir ubicación del archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="637"/>
+        <location filename="../widgets/history_panel.py" line="666"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>No se encuentra este archivo: puede que se haya movido, renombrado o eliminado.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="724"/>
+        <location filename="../widgets/history_panel.py" line="753"/>
         <source>There is nothing to export yet.</source>
         <translation>Todavía no hay nada que exportar.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="746"/>
+        <location filename="../widgets/history_panel.py" line="775"/>
         <source>Export failed</source>
         <translation>Error al exportar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="747"/>
+        <location filename="../widgets/history_panel.py" line="776"/>
         <source>Could not write the file:
 {0}</source>
         <translation>No se pudo escribir el archivo:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="753"/>
+        <location filename="../widgets/history_panel.py" line="782"/>
         <source>Export complete</source>
         <translation>Exportación completada</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="754"/>
+        <location filename="../widgets/history_panel.py" line="783"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>Se han exportado {0} filas a:
@@ -783,27 +783,27 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Actualizar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="317"/>
+        <location filename="../widgets/history_panel.py" line="342"/>
         <source>Delete</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="322"/>
+        <location filename="../widgets/history_panel.py" line="348"/>
         <source>Undo Selected</source>
         <translation>Deshacer selección</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="372"/>
+        <location filename="../widgets/history_panel.py" line="399"/>
         <source>Key History</source>
         <translation>Historial de tonalidades</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="374"/>
+        <location filename="../widgets/history_panel.py" line="401"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>Pistas analizadas recientemente y sus tonalidades detectadas.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="553"/>
+        <location filename="../widgets/history_panel.py" line="581"/>
         <source>Renamed {0} files: {1}</source>
         <translation>{0} archivos renombrados: {1}</translation>
     </message>
@@ -812,7 +812,7 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">{0} archivos renombrados</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="557"/>
+        <location filename="../widgets/history_panel.py" line="585"/>
         <source>No description</source>
         <translation>Sin descripción</translation>
     </message>
@@ -852,58 +852,58 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="582"/>
+        <location filename="../widgets/keyboard_panel.py" line="583"/>
         <source>Keyboard</source>
         <translation>Teclado</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="585"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Toca acordes para comparar tonalidades. Haz clic en las teclas o usa los atajos QWERTY (A-J, K-L-;). Z/X para cambiar de octava.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="595"/>
+        <location filename="../widgets/keyboard_panel.py" line="596"/>
         <source>Notation can be changed in settings</source>
         <translation>La notación se puede cambiar en Ajustes</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="609"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Minor Chord</source>
         <translation>Acorde menor</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="610"/>
+        <location filename="../widgets/keyboard_panel.py" line="611"/>
         <source>Major Chord</source>
         <translation>Acorde mayor</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="677"/>
+        <location filename="../widgets/keyboard_panel.py" line="678"/>
         <source>View</source>
         <translation>Vista</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="682"/>
+        <location filename="../widgets/keyboard_panel.py" line="683"/>
         <source>Circle of Fifths</source>
         <translation>Círculo de quintas</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="681"/>
+        <location filename="../widgets/keyboard_panel.py" line="682"/>
         <source>Hex Grid</source>
         <translation>Cuadrícula hexagonal</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="845"/>
-        <location filename="../widgets/keyboard_panel.py" line="848"/>
+        <location filename="../widgets/keyboard_panel.py" line="846"/>
+        <location filename="../widgets/keyboard_panel.py" line="849"/>
         <source>👑 Key Codes</source>
         <translation>👑 Códigos de tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="846"/>
+        <location filename="../widgets/keyboard_panel.py" line="847"/>
         <source>Traditional Key Notation</source>
         <translation>Notación tradicional de tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="847"/>
+        <location filename="../widgets/keyboard_panel.py" line="848"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -1107,98 +1107,98 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="43"/>
+        <location filename="../widgets/metadata_panel.py" line="44"/>
         <source>Title</source>
         <translation>Título</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="44"/>
+        <location filename="../widgets/metadata_panel.py" line="45"/>
         <source>Artist</source>
         <translation>Artista</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="45"/>
+        <location filename="../widgets/metadata_panel.py" line="46"/>
         <source>Album</source>
         <translation>Álbum</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="46"/>
+        <location filename="../widgets/metadata_panel.py" line="47"/>
         <source>Label</source>
         <translation>Sello</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="47"/>
+        <location filename="../widgets/metadata_panel.py" line="48"/>
         <source>Genre</source>
         <translation>Género</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="48"/>
+        <location filename="../widgets/metadata_panel.py" line="49"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="49"/>
+        <location filename="../widgets/metadata_panel.py" line="50"/>
         <source>Key</source>
         <translation>Tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="50"/>
+        <location filename="../widgets/metadata_panel.py" line="51"/>
         <source>Year</source>
         <translation>Año</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="51"/>
+        <location filename="../widgets/metadata_panel.py" line="52"/>
         <source>Track #</source>
         <translation>N.º de pista</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="52"/>
+        <location filename="../widgets/metadata_panel.py" line="53"/>
         <source>Comment</source>
         <translation>Comentario</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="111"/>
+        <location filename="../widgets/metadata_panel.py" line="112"/>
         <source>Metadata Editor</source>
         <translation>Editor de metadatos</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="114"/>
+        <location filename="../widgets/metadata_panel.py" line="115"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>Arrastra un único archivo de audio para visualizar y editar sus metadatos.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="185"/>
-        <location filename="../widgets/metadata_panel.py" line="305"/>
+        <location filename="../widgets/metadata_panel.py" line="186"/>
+        <location filename="../widgets/metadata_panel.py" line="306"/>
         <source>Add field...</source>
         <translation>Añadir campo...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="190"/>
+        <location filename="../widgets/metadata_panel.py" line="191"/>
         <source>Add Artwork…</source>
         <translation>Añadir carátula…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="195"/>
+        <location filename="../widgets/metadata_panel.py" line="196"/>
         <source>Remove</source>
         <translation>Eliminar</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="214"/>
+        <location filename="../widgets/metadata_panel.py" line="215"/>
         <source>Reload</source>
         <translation>Recargar</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="219"/>
+        <location filename="../widgets/metadata_panel.py" line="220"/>
         <source>Eject</source>
         <translation>Expulsar</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="273"/>
+        <location filename="../widgets/metadata_panel.py" line="274"/>
         <source>Error: {0}</source>
         <translation>Error: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="484"/>
+        <location filename="../widgets/metadata_panel.py" line="485"/>
         <source>Select cover art</source>
         <translation>Seleccionar carátula</translation>
     </message>
@@ -1730,47 +1730,47 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>QueuePanel</name>
     <message>
-        <location filename="../widgets/queue_panel.py" line="41"/>
+        <location filename="../widgets/queue_panel.py" line="42"/>
         <source>Queue</source>
         <translation>Cola</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="44"/>
+        <location filename="../widgets/queue_panel.py" line="45"/>
         <source>Add files here to queue them for analysis. Use the buttons below to send them to analysis.</source>
         <translation>Añade archivos aquí para ponerlos en cola para su análisis. Usa los botones de abajo para enviarlos al análisis.</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="49"/>
+        <location filename="../widgets/queue_panel.py" line="50"/>
         <source>Drop audio files here to add to queue</source>
         <translation>Suelta archivos de audio aquí para añadirlos a la cola</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="78"/>
+        <location filename="../widgets/queue_panel.py" line="79"/>
         <source>0 files in queue</source>
         <translation>0 archivos en cola</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="84"/>
+        <location filename="../widgets/queue_panel.py" line="85"/>
         <source>Clear Queue</source>
         <translation>Vaciar cola</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="88"/>
+        <location filename="../widgets/queue_panel.py" line="89"/>
         <source>Analyze Selected</source>
         <translation>Analizar selección</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="92"/>
+        <location filename="../widgets/queue_panel.py" line="93"/>
         <source>Analyze All</source>
         <translation>Analizar todo</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="112"/>
+        <location filename="../widgets/queue_panel.py" line="113"/>
         <source>{total} files in queue</source>
         <translation>{total} archivos en cola</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="115"/>
+        <location filename="../widgets/queue_panel.py" line="116"/>
         <source>{queued} queued / {total} total files</source>
         <translation>{queued} en cola / {total} archivos en total</translation>
     </message>
@@ -1905,12 +1905,12 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="122"/>
+        <location filename="../widgets/rename_panel.py" line="123"/>
         <source>Rename</source>
         <translation>Renombrar</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="125"/>
+        <location filename="../widgets/rename_panel.py" line="126"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>Recorta caracteres del principio y del final de TODOS los nombres de archivo de abajo. Añade texto al principio (Prefijo) o al final (Sufijo) de TODOS los nombres de archivo.</translation>
     </message>
@@ -1919,177 +1919,177 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Operaciones</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="143"/>
+        <location filename="../widgets/rename_panel.py" line="144"/>
         <source>Trim Start:</source>
         <translation>Recortar inicio:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
-        <location filename="../widgets/rename_panel.py" line="159"/>
+        <location filename="../widgets/rename_panel.py" line="148"/>
+        <location filename="../widgets/rename_panel.py" line="160"/>
         <source> chars</source>
         <translation> caracteres</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="148"/>
+        <location filename="../widgets/rename_panel.py" line="149"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>Quitar caracteres del principio del nombre de archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="155"/>
+        <location filename="../widgets/rename_panel.py" line="156"/>
         <source>Trim End:</source>
         <translation>Recortar final:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="160"/>
+        <location filename="../widgets/rename_panel.py" line="161"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>Quitar caracteres del final del nombre de archivo (antes de la extensión)</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="165"/>
+        <location filename="../widgets/rename_panel.py" line="166"/>
         <source>Clear</source>
         <translation>Limpiar</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
+        <location filename="../widgets/rename_panel.py" line="181"/>
         <source>Remove Underscores</source>
         <translation>Quitar guiones bajos</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="184"/>
+        <location filename="../widgets/rename_panel.py" line="185"/>
         <source>Space Dashes</source>
         <translation>Espaciar guiones</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="190"/>
+        <location filename="../widgets/rename_panel.py" line="191"/>
         <source>Put spaces around a dash: Artist-Track → Artist - Track</source>
         <translation>Pone espacios alrededor del guion: Artist-Track → Artist - Track</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="215"/>
+        <location filename="../widgets/rename_panel.py" line="216"/>
         <source>Prepend Text</source>
         <translatorcomment>Rename op to add text at the start; &apos;Añadir texto al principio&apos; (no concise single-word Spanish equivalent for &apos;prepend&apos;).</translatorcomment>
         <translation>Añadir texto al principio</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="219"/>
         <source>Append Text</source>
         <translatorcomment>Rename op to add text at the end; &apos;Añadir texto al final&apos;.</translatorcomment>
         <translation>Añadir texto al final</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="247"/>
-        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="248"/>
+        <location filename="../widgets/rename_panel.py" line="256"/>
         <source>Preview</source>
         <translation>Previsualización</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="250"/>
+        <location filename="../widgets/rename_panel.py" line="251"/>
         <source>Drop audio files here to add them</source>
         <translation>Suelta archivos de audio aquí para añadirlos</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="256"/>
         <source>Original</source>
         <translation>Original</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="256"/>
         <source>Status</source>
         <translation>Estado</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="301"/>
+        <location filename="../widgets/rename_panel.py" line="302"/>
         <source>No files to rename</source>
         <translation>No hay archivos para renombrar</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="307"/>
+        <location filename="../widgets/rename_panel.py" line="308"/>
         <source>Undo Last</source>
         <translation>Deshacer último</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="312"/>
+        <location filename="../widgets/rename_panel.py" line="313"/>
         <source>Remove All</source>
         <translation>Quitar todo</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="317"/>
+        <location filename="../widgets/rename_panel.py" line="318"/>
         <source>Apply Rename</source>
         <translation>Aplicar renombrado</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="324"/>
+        <location filename="../widgets/rename_panel.py" line="325"/>
         <source>Send To</source>
         <translatorcomment>FIXED: localize &quot;Send To&quot; in all languages per updated glossary</translatorcomment>
         <translation>Enviar a</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="327"/>
+        <location filename="../widgets/rename_panel.py" line="328"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="328"/>
+        <location filename="../widgets/rename_panel.py" line="329"/>
         <source>Analyze</source>
         <translation>Analizar</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="389"/>
+        <location filename="../widgets/rename_panel.py" line="390"/>
         <source>Text to add at end of filename</source>
         <translation>Texto para añadir al final del nombre de archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="391"/>
+        <location filename="../widgets/rename_panel.py" line="392"/>
         <source>Text to add at start of filename</source>
         <translation>Texto para añadir al principio del nombre de archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="432"/>
+        <location filename="../widgets/rename_panel.py" line="433"/>
         <source>No files</source>
         <translation>Sin archivos</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="476"/>
+        <location filename="../widgets/rename_panel.py" line="477"/>
         <source>Conflict</source>
         <translation>Conflicto</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="493"/>
+        <location filename="../widgets/rename_panel.py" line="494"/>
         <source>{0} files</source>
         <translation>{0} archivos</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="495"/>
+        <location filename="../widgets/rename_panel.py" line="496"/>
         <source>{0} to rename</source>
         <translation>{0} por renombrar</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="497"/>
+        <location filename="../widgets/rename_panel.py" line="498"/>
         <source>{0} conflicts</source>
         <translation>{0} conflictos</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="635"/>
+        <location filename="../widgets/rename_panel.py" line="636"/>
         <source>Changed</source>
         <translation>Modificado</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="710"/>
+        <location filename="../widgets/rename_panel.py" line="711"/>
         <source>Copy text</source>
         <translation>Copiar texto</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="710"/>
+        <location filename="../widgets/rename_panel.py" line="711"/>
         <source>Copy {0} names</source>
         <translation>Copiar {0} nombres</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="716"/>
+        <location filename="../widgets/rename_panel.py" line="717"/>
         <source>Remove from list</source>
         <translation>Quitar de la lista</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="716"/>
+        <location filename="../widgets/rename_panel.py" line="717"/>
         <source>Remove {0} from list</source>
         <translation>Quitar {0} de la lista</translation>
     </message>
@@ -2735,7 +2735,7 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>SpectrogramView</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="83"/>
+        <location filename="../widgets/spectrum_panel.py" line="84"/>
         <source>Drop a single audio file to view its spectrum</source>
         <translation>Suelta un único archivo de audio para ver su espectro</translation>
     </message>
@@ -2743,12 +2743,12 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>SpectrumPanel</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="254"/>
+        <location filename="../widgets/spectrum_panel.py" line="255"/>
         <source>Spectrum</source>
         <translation>Espectro</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="259"/>
+        <location filename="../widgets/spectrum_panel.py" line="260"/>
         <source>Drop a single audio file to see its acoustic spectrum. Frequency runs bottom (0 Hz) to top (Nyquist); time runs left to right; colour shows magnitude. Handy for spotting lossy-encode low-pass cutoffs.</source>
         <translation>Suelta un único archivo de audio para ver su espectro acústico. La frecuencia va de abajo (0 Hz) a arriba (Nyquist); el tiempo va de izquierda a derecha; el color indica la magnitud. Útil para detectar los cortes de paso bajo de las codificaciones con pérdida.</translation>
     </message>
@@ -2757,45 +2757,45 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="313"/>
+        <location filename="../widgets/spectrum_panel.py" line="314"/>
         <source>Sample rate</source>
         <translation>Frecuencia de muestreo</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="314"/>
+        <location filename="../widgets/spectrum_panel.py" line="315"/>
         <source>Key</source>
         <translation>Tonalidad</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="315"/>
+        <location filename="../widgets/spectrum_panel.py" line="316"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="335"/>
+        <location filename="../widgets/spectrum_panel.py" line="336"/>
         <source>Sensitivity:</source>
         <translation>Sensibilidad:</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="346"/>
-        <location filename="../widgets/spectrum_panel.py" line="428"/>
-        <location filename="../widgets/spectrum_panel.py" line="443"/>
+        <location filename="../widgets/spectrum_panel.py" line="347"/>
+        <location filename="../widgets/spectrum_panel.py" line="429"/>
+        <location filename="../widgets/spectrum_panel.py" line="444"/>
         <source>{0} dB range</source>
         <translation>Rango de {0} dB</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="402"/>
         <location filename="../widgets/spectrum_panel.py" line="403"/>
+        <location filename="../widgets/spectrum_panel.py" line="404"/>
         <source>Analyzing…</source>
         <translation>Analizando…</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="492"/>
+        <location filename="../widgets/spectrum_panel.py" line="493"/>
         <source>Could not analyze this file.</source>
         <translation>No se pudo analizar este archivo.</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="493"/>
+        <location filename="../widgets/spectrum_panel.py" line="494"/>
         <source>Error: {0}</source>
         <translation>Error: {0}</translation>
     </message>

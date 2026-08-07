@@ -24,6 +24,7 @@ from PySide6.QtWidgets import (
 from src.analysis.keycode import KEYCODE_TO_KEY, render_key
 
 from ..styles.theme import Theme, panel_header_row
+from .elided_label import ElidedLabel
 from .circle_of_fifths_grid import CircleOfFifthsGrid
 from .hex_key_grid import HexKeyGrid
 from .key_info_box import KeyInfoBox
@@ -582,7 +583,7 @@ class KeyboardPanel(QWidget):
         title = QLabel(self.tr("Keyboard"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(self.tr("Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave."))
+        desc = ElidedLabel(self.tr("Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave."))
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;")
         # Current key-notation indicator. Reflects the Settings notation;
         # updated live. Its right edge lines up with the keyboard's right edge

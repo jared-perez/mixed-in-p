@@ -35,6 +35,7 @@ from src.metadata.tags import read_metadata
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from ..workers.spectrum_worker import DYNAMIC_RANGE_DB, _COLORMAP, colorize, SpectrumWorker
 from ..workers.thread_keeper import keep_alive, wait_for_threads
+from .elided_label import ElidedLabel
 from .drop_zone import AUDIO_EXTENSIONS
 
 logger = logging.getLogger(__name__)
@@ -254,7 +255,7 @@ class SpectrumPanel(QWidget):
         title = QLabel(self.tr("Spectrum"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(
+        desc = ElidedLabel(
             self.tr(
                 "Drop a single audio file to see its acoustic spectrum. Frequency runs "
                 "bottom (0 Hz) to top (Nyquist); time runs left to right; colour shows "

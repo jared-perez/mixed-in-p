@@ -31,6 +31,7 @@ from src.metadata.tags import (
     delete_metadata_fields,
 )
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+from .elided_label import ElidedLabel
 from .artwork_widget import ArtworkWidget, mime_for_path
 from .drop_zone import AUDIO_EXTENSIONS
 
@@ -111,7 +112,7 @@ class MetadataPanel(QWidget):
         title = QLabel(self.tr("Metadata Editor"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(self.tr("Drop a single audio file to view and edit its metadata tags."))
+        desc = ElidedLabel(self.tr("Drop a single audio file to view and edit its metadata tags."))
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         layout.addLayout(panel_header_row(title, desc))
 

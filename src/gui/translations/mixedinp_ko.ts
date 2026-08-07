@@ -132,36 +132,36 @@ Features:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="201"/>
-        <location filename="../widgets/analysis_panel.py" line="280"/>
+        <location filename="../widgets/analysis_panel.py" line="202"/>
+        <location filename="../widgets/analysis_panel.py" line="281"/>
         <source>Analyze</source>
         <translatorcomment>Dual-use as panel title and action button → bare noun 분석 (works for both); &quot;분석하기&quot; would read oddly as a title. Flag for native review.</translatorcomment>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="204"/>
+        <location filename="../widgets/analysis_panel.py" line="205"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translatorcomment>해요체 descriptive sentence. &quot;unless changed in settings&quot; rendered as &quot;설정에서 변경한 경우는 예외예요&quot;. Flag for native review (phrasing + spacing).</translatorcomment>
         <translation>파일을 끌어다 놓으면 분석해요. 설정에서 변경한 경우는 예외예요. 결과는 실시간으로 업데이트돼요.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="211"/>
+        <location filename="../widgets/analysis_panel.py" line="212"/>
         <source>Auto</source>
         <translation>자동</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="217"/>
+        <location filename="../widgets/analysis_panel.py" line="218"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translatorcomment>Checkbox label → noun phrase. &quot;sending&quot; refers to the Send To (보내기) routing. Flag for native review.</translatorcomment>
         <translation>분석 패널에 끌어다 놓거나 보낼 때 자동 분석</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="230"/>
+        <location filename="../widgets/analysis_panel.py" line="231"/>
         <source>Drop files here to analyze immediately</source>
         <translation>여기에 끌어다 놓으면 바로 분석해요</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="276"/>
+        <location filename="../widgets/analysis_panel.py" line="277"/>
         <source>Clear Results</source>
         <translatorcomment>Action button → -기 nominalization (지우기) per Apple Korean UI convention.</translatorcomment>
         <translation>결과 지우기</translation>
@@ -171,55 +171,55 @@ Features:
         <translation type="vanished">선택 항목 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="287"/>
+        <location filename="../widgets/analysis_panel.py" line="288"/>
         <source>Send To</source>
         <translatorcomment>Localized per CLAUDE.md (not left as a Latin island). 보내기 = Apple Korean nominalized form.</translatorcomment>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="290"/>
         <source>Convert</source>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="290"/>
+        <location filename="../widgets/analysis_panel.py" line="291"/>
         <source>Player</source>
         <translatorcomment>플레이어 (Hangul loanword) per glossary.</translatorcomment>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="363"/>
         <source>{n} analyzed</source>
         <translatorcomment>Counter 개 for files. &quot;분석됨&quot; passive. Flag counter choice for native review.</translatorcomment>
         <translation>{n}개 분석됨</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="364"/>
+        <location filename="../widgets/analysis_panel.py" line="365"/>
         <source>{n} errors</source>
         <translation>오류 {n}개</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="366"/>
+        <location filename="../widgets/analysis_panel.py" line="367"/>
         <source>{n} pending</source>
         <translation>대기 중 {n}개</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="368"/>
+        <location filename="../widgets/analysis_panel.py" line="369"/>
         <source>{n} in progress</source>
         <translation>진행 중 {n}개</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="370"/>
+        <location filename="../widgets/analysis_panel.py" line="371"/>
         <source>No results yet</source>
         <translation>아직 결과가 없어요</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="426"/>
+        <location filename="../widgets/analysis_panel.py" line="427"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="428"/>
+        <location filename="../widgets/analysis_panel.py" line="429"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
@@ -227,51 +227,51 @@ Features:
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="36"/>
+        <location filename="../widgets/analysis_panel.py" line="37"/>
         <source>Name</source>
         <translation>이름</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="37"/>
+        <location filename="../widgets/analysis_panel.py" line="38"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="38"/>
-        <location filename="../widgets/analysis_panel.py" line="40"/>
+        <location filename="../widgets/analysis_panel.py" line="39"/>
+        <location filename="../widgets/analysis_panel.py" line="41"/>
         <source>Conf</source>
         <translatorcomment>&quot;Conf&quot; = confidence → 신뢰도. Column header; longer than the English abbreviation — verify it fits the column width. Flag for native review.</translatorcomment>
         <translation>신뢰도</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="39"/>
+        <location filename="../widgets/analysis_panel.py" line="40"/>
         <source>Key</source>
         <translatorcomment>조성 = musical key (music-theory term, not casual 키). Column shows the detected key. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="41"/>
+        <location filename="../widgets/analysis_panel.py" line="42"/>
         <source>Key Code</source>
         <translatorcomment>The harmonic key-code label → 키 코드 (Hangul). Distinct from 조성 (the musical key itself).</translatorcomment>
         <translation>키 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="42"/>
+        <location filename="../widgets/analysis_panel.py" line="43"/>
         <source>Alt Keys</source>
         <translation>대체 조성</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="43"/>
+        <location filename="../widgets/analysis_panel.py" line="44"/>
         <source>Energy</source>
         <translation>에너지</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="44"/>
+        <location filename="../widgets/analysis_panel.py" line="45"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="86"/>
+        <location filename="../widgets/analysis_panel.py" line="87"/>
         <source>Other likely keys: {keys}</source>
         <translation>가능성 있는 다른 조성: {keys}</translation>
     </message>
@@ -295,205 +295,205 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="66"/>
-        <location filename="../widgets/conversion_panel.py" line="176"/>
+        <location filename="../widgets/conversion_panel.py" line="67"/>
+        <location filename="../widgets/conversion_panel.py" line="177"/>
         <source>Convert</source>
         <translatorcomment>Dual-use title/button → bare noun 변환.</translatorcomment>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="69"/>
+        <location filename="../widgets/conversion_panel.py" line="70"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>오디오 파일을 다른 형식으로 변환해요 (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="75"/>
+        <location filename="../widgets/conversion_panel.py" line="76"/>
         <source>Target Format:</source>
         <translation>대상 형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="82"/>
+        <location filename="../widgets/conversion_panel.py" line="83"/>
         <source>Sample Rate:</source>
         <translatorcomment>DSP term &quot;sample rate&quot; (not the producer &quot;sample&quot;) → 샘플 레이트, the standard loanword in Korean audio software. Flag for native review.</translatorcomment>
         <translation>샘플 레이트:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="85"/>
+        <location filename="../widgets/conversion_panel.py" line="86"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="86"/>
+        <location filename="../widgets/conversion_panel.py" line="87"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="87"/>
+        <location filename="../widgets/conversion_panel.py" line="88"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="88"/>
+        <location filename="../widgets/conversion_panel.py" line="89"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="98"/>
+        <location filename="../widgets/conversion_panel.py" line="99"/>
         <source>Bit Depth:</source>
         <translatorcomment>bit depth → 비트 심도 (standard Korean DSP term).</translatorcomment>
         <translation>비트 심도:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="101"/>
+        <location filename="../widgets/conversion_panel.py" line="102"/>
         <source>32 bit</source>
         <translation>32비트</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="102"/>
+        <location filename="../widgets/conversion_panel.py" line="103"/>
         <source>24 bit (DVD)</source>
         <translation>24비트 (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="103"/>
+        <location filename="../widgets/conversion_panel.py" line="104"/>
         <source>16 bit (CD)</source>
         <translation>16비트 (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="104"/>
+        <location filename="../widgets/conversion_panel.py" line="105"/>
         <source>8 bit</source>
         <translation>8비트</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="114"/>
+        <location filename="../widgets/conversion_panel.py" line="115"/>
         <source>Bitrate:</source>
         <translation>비트레이트:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="134"/>
+        <location filename="../widgets/conversion_panel.py" line="135"/>
         <source>Files</source>
         <translatorcomment>파일 (Hangul) per glossary — Apple Korean Finder standard, never 문서.</translatorcomment>
         <translation>파일</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="137"/>
+        <location filename="../widgets/conversion_panel.py" line="138"/>
         <source>Drop audio files here to add them</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="140"/>
+        <location filename="../widgets/conversion_panel.py" line="141"/>
         <source>Filename</source>
         <translation>파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="142"/>
         <source>From</source>
         <translatorcomment>Column = source format → 원본 (rather than literal &quot;~에서&quot;). Pairs with 대상 below. Flag for native review.</translatorcomment>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="142"/>
+        <location filename="../widgets/conversion_panel.py" line="143"/>
         <source>To</source>
         <translatorcomment>Column = target format → 대상. Pairs with 원본 above.</translatorcomment>
         <translation>대상</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="143"/>
+        <location filename="../widgets/conversion_panel.py" line="144"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="170"/>
-        <location filename="../widgets/conversion_panel.py" line="488"/>
+        <location filename="../widgets/conversion_panel.py" line="171"/>
+        <location filename="../widgets/conversion_panel.py" line="489"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="184"/>
         <source>Send To</source>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="186"/>
         <source>Select at least one file to send.</source>
         <translation>보낼 파일을 하나 이상 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="188"/>
         <source>Analyze</source>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="188"/>
+        <location filename="../widgets/conversion_panel.py" line="189"/>
         <source>Rename</source>
         <translatorcomment>이름 변경 = Apple Korean Finder term for Rename.</translatorcomment>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="189"/>
+        <location filename="../widgets/conversion_panel.py" line="190"/>
         <source>Player</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="198"/>
+        <location filename="../widgets/conversion_panel.py" line="199"/>
         <source>Lossy files not allowed</source>
         <translatorcomment>lossy → 손실 (audio term). Flag for native review.</translatorcomment>
         <translation>손실 파일은 허용되지 않아요</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="373"/>
+        <location filename="../widgets/conversion_panel.py" line="374"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="375"/>
+        <location filename="../widgets/conversion_panel.py" line="376"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="456"/>
-        <location filename="../widgets/conversion_panel.py" line="646"/>
+        <location filename="../widgets/conversion_panel.py" line="457"/>
+        <location filename="../widgets/conversion_panel.py" line="647"/>
         <source>Done</source>
         <translation>완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="465"/>
+        <location filename="../widgets/conversion_panel.py" line="466"/>
         <source>Same format</source>
         <translation>동일한 형식</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="472"/>
-        <location filename="../widgets/conversion_panel.py" line="638"/>
-        <location filename="../widgets/conversion_panel.py" line="668"/>
+        <location filename="../widgets/conversion_panel.py" line="473"/>
+        <location filename="../widgets/conversion_panel.py" line="639"/>
+        <location filename="../widgets/conversion_panel.py" line="669"/>
         <source>Ready</source>
         <translation>준비됨</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="483"/>
+        <location filename="../widgets/conversion_panel.py" line="484"/>
         <source>{count} files</source>
         <translation>파일 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="485"/>
+        <location filename="../widgets/conversion_panel.py" line="486"/>
         <source>{count} to convert</source>
         <translation>변환 대상 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="487"/>
+        <location filename="../widgets/conversion_panel.py" line="488"/>
         <source>({count} lossy skipped)</source>
         <translation>(손실 {count}개 건너뜀)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="610"/>
+        <location filename="../widgets/conversion_panel.py" line="611"/>
         <source>Converting</source>
         <translation>변환 중</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="631"/>
+        <location filename="../widgets/conversion_panel.py" line="632"/>
         <source>Incomplete</source>
         <translation>미완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="631"/>
+        <location filename="../widgets/conversion_panel.py" line="632"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
@@ -594,150 +594,150 @@ or click “Add Artwork…”</source>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="156"/>
-        <location filename="../widgets/history_panel.py" line="377"/>
+        <location filename="../widgets/history_panel.py" line="178"/>
+        <location filename="../widgets/history_panel.py" line="404"/>
         <source>Rename History</source>
         <translatorcomment>History → 기록 (more native/polished than the loanword 히스토리), per glossary. Flag for native review.</translatorcomment>
         <translation>이름 변경 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="160"/>
-        <location filename="../widgets/history_panel.py" line="379"/>
+        <location filename="../widgets/history_panel.py" line="182"/>
+        <location filename="../widgets/history_panel.py" line="406"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translatorcomment>Undo → 실행 취소 (Apple/MS/Samsung Korean standard). 해요체.</translatorcomment>
         <translation>최근 이름 변경 작업을 확인해요. 실행을 취소하려면 세션을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
         <source>Session ID</source>
         <translation>세션 ID</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
-        <location filename="../widgets/history_panel.py" line="212"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
+        <location filename="../widgets/history_panel.py" line="234"/>
         <source>Date/Time</source>
         <translation>날짜/시간</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
         <source>Files</source>
         <translation>파일</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="174"/>
+        <location filename="../widgets/history_panel.py" line="196"/>
         <source>Description</source>
         <translation>설명</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="204"/>
+        <location filename="../widgets/history_panel.py" line="226"/>
         <source>Name</source>
         <translation>이름</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="205"/>
+        <location filename="../widgets/history_panel.py" line="227"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="206"/>
-        <location filename="../widgets/history_panel.py" line="208"/>
+        <location filename="../widgets/history_panel.py" line="228"/>
+        <location filename="../widgets/history_panel.py" line="230"/>
         <source>Conf</source>
         <translation>신뢰도</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="207"/>
+        <location filename="../widgets/history_panel.py" line="229"/>
         <source>Key</source>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="209"/>
+        <location filename="../widgets/history_panel.py" line="231"/>
         <source>Key Code</source>
         <translation>키 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="210"/>
+        <location filename="../widgets/history_panel.py" line="232"/>
         <source>Alt Keys</source>
         <translation>대체 조성</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="211"/>
+        <location filename="../widgets/history_panel.py" line="233"/>
         <source>Energy</source>
         <translation>에너지</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="260"/>
-        <location filename="../widgets/history_panel.py" line="563"/>
+        <location filename="../widgets/history_panel.py" line="282"/>
+        <location filename="../widgets/history_panel.py" line="591"/>
         <source>{0} Rename Sessions</source>
         <translation>이름 변경 세션 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="267"/>
-        <location filename="../widgets/history_panel.py" line="508"/>
+        <location filename="../widgets/history_panel.py" line="290"/>
+        <location filename="../widgets/history_panel.py" line="535"/>
         <source>{0} Song Keys</source>
         <translation>곡 조성 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="285"/>
+        <location filename="../widgets/history_panel.py" line="309"/>
         <source>Show</source>
         <translation>표시</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="307"/>
-        <location filename="../widgets/history_panel.py" line="723"/>
-        <location filename="../widgets/history_panel.py" line="736"/>
+        <location filename="../widgets/history_panel.py" line="331"/>
+        <location filename="../widgets/history_panel.py" line="752"/>
+        <location filename="../widgets/history_panel.py" line="765"/>
         <source>Export CSV</source>
         <translation>CSV 내보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="309"/>
+        <location filename="../widgets/history_panel.py" line="333"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>아래 표를 스프레드시트에서 열 수 있는 CSV 파일로 내보냅니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="422"/>
+        <location filename="../widgets/history_panel.py" line="449"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>신뢰도가 낮습니다. 이 키는 다시 확인하는 것이 좋습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="425"/>
+        <location filename="../widgets/history_panel.py" line="452"/>
         <source>Low confidence — the tempo may be half or double time.</source>
         <translation>신뢰도가 낮습니다. 템포가 절반 또는 두 배일 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="620"/>
-        <location filename="../widgets/history_panel.py" line="635"/>
+        <location filename="../widgets/history_panel.py" line="649"/>
+        <location filename="../widgets/history_panel.py" line="664"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="637"/>
+        <location filename="../widgets/history_panel.py" line="666"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>파일을 찾을 수 없습니다. 이동, 이름 변경 또는 삭제되었을 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="724"/>
+        <location filename="../widgets/history_panel.py" line="753"/>
         <source>There is nothing to export yet.</source>
         <translation>아직 내보낼 항목이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="746"/>
+        <location filename="../widgets/history_panel.py" line="775"/>
         <source>Export failed</source>
         <translation>내보내기 실패</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="747"/>
+        <location filename="../widgets/history_panel.py" line="776"/>
         <source>Could not write the file:
 {0}</source>
         <translation>파일을 쓸 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="753"/>
+        <location filename="../widgets/history_panel.py" line="782"/>
         <source>Export complete</source>
         <translation>내보내기 완료</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="754"/>
+        <location filename="../widgets/history_panel.py" line="783"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>{0}개 행을 내보냈습니다:
@@ -753,27 +753,27 @@ or click “Add Artwork…”</source>
         <translation type="vanished">새로 고침</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="317"/>
+        <location filename="../widgets/history_panel.py" line="342"/>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="322"/>
+        <location filename="../widgets/history_panel.py" line="348"/>
         <source>Undo Selected</source>
         <translation>선택 항목 실행 취소</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="372"/>
+        <location filename="../widgets/history_panel.py" line="399"/>
         <source>Key History</source>
         <translation>조성 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="374"/>
+        <location filename="../widgets/history_panel.py" line="401"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>최근 분석한 트랙과 감지된 조성입니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="553"/>
+        <location filename="../widgets/history_panel.py" line="581"/>
         <source>Renamed {0} files: {1}</source>
         <translation>파일 {0}개 이름 변경 완료: {1}</translation>
     </message>
@@ -782,7 +782,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="557"/>
+        <location filename="../widgets/history_panel.py" line="585"/>
         <source>No description</source>
         <translation>설명 없음</translation>
     </message>
@@ -826,63 +826,63 @@ or click “Add Artwork…”</source>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="582"/>
+        <location filename="../widgets/keyboard_panel.py" line="583"/>
         <source>Keyboard</source>
         <translatorcomment>The piano panel → 건반 (musical keyboard), NOT 키보드 (computer keyboard), per glossary.</translatorcomment>
         <translation>건반</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="585"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translatorcomment>chords → 코드, musical keys → 조성, &quot;keys&quot; (the things you click) → 건반, octave → 옥타브. QWERTY/letter shortcuts kept Latin. 해요체. Flag for native review.</translatorcomment>
         <translation>코드를 연주해 조성을 비교해요. 건반을 클릭하거나 QWERTY 단축키(A–J, K–L–;)를 사용하세요. Z/X로 옥타브를 이동해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="595"/>
+        <location filename="../widgets/keyboard_panel.py" line="596"/>
         <source>Notation can be changed in settings</source>
         <translation>표기법은 설정에서 변경할 수 있습니다</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="609"/>
+        <location filename="../widgets/keyboard_panel.py" line="610"/>
         <source>Minor Chord</source>
         <translatorcomment>Chord button → 마이너 코드 (producer-context loanword, widely used). Note: distinct from the mode label 단조. Flag for native review.</translatorcomment>
         <translation>마이너 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="610"/>
+        <location filename="../widgets/keyboard_panel.py" line="611"/>
         <source>Major Chord</source>
         <translatorcomment>Chord button → 메이저 코드 (producer-context loanword). Flag for native review.</translatorcomment>
         <translation>메이저 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="677"/>
+        <location filename="../widgets/keyboard_panel.py" line="678"/>
         <source>View</source>
         <translation>보기</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="682"/>
+        <location filename="../widgets/keyboard_panel.py" line="683"/>
         <source>Circle of Fifths</source>
         <translation>5도권</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="681"/>
+        <location filename="../widgets/keyboard_panel.py" line="682"/>
         <source>Hex Grid</source>
         <translation>육각 그리드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="845"/>
-        <location filename="../widgets/keyboard_panel.py" line="848"/>
+        <location filename="../widgets/keyboard_panel.py" line="846"/>
+        <location filename="../widgets/keyboard_panel.py" line="849"/>
         <source>👑 Key Codes</source>
         <translation>👑 키 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="846"/>
+        <location filename="../widgets/keyboard_panel.py" line="847"/>
         <source>Traditional Key Notation</source>
         <translatorcomment>&quot;Traditional key notation&quot; → 전통 조성 표기 (key → 조성, notation → 표기). Flag for native review.</translatorcomment>
         <translation>전통 조성 표기</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="847"/>
+        <location filename="../widgets/keyboard_panel.py" line="848"/>
         <source>Traktor Open Key</source>
         <translatorcomment>Proper name of Traktor&apos;s notation system — kept in English (product term). Flag for native review.</translatorcomment>
         <translation>Traktor Open Key</translation>
@@ -1089,102 +1089,102 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="43"/>
+        <location filename="../widgets/metadata_panel.py" line="44"/>
         <source>Title</source>
         <translation>제목</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="44"/>
+        <location filename="../widgets/metadata_panel.py" line="45"/>
         <source>Artist</source>
         <translation>아티스트</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="45"/>
+        <location filename="../widgets/metadata_panel.py" line="46"/>
         <source>Album</source>
         <translation>앨범</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="46"/>
+        <location filename="../widgets/metadata_panel.py" line="47"/>
         <source>Label</source>
         <translation>레이블</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="47"/>
+        <location filename="../widgets/metadata_panel.py" line="48"/>
         <source>Genre</source>
         <translation>장르</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="48"/>
+        <location filename="../widgets/metadata_panel.py" line="49"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="49"/>
+        <location filename="../widgets/metadata_panel.py" line="50"/>
         <source>Key</source>
         <translatorcomment>Metadata tag for the musical key → 조성. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="50"/>
+        <location filename="../widgets/metadata_panel.py" line="51"/>
         <source>Year</source>
         <translation>연도</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="51"/>
+        <location filename="../widgets/metadata_panel.py" line="52"/>
         <source>Track #</source>
         <translatorcomment>Track → 트랙 (music-production context). &quot;Track #&quot; → 트랙 번호.</translatorcomment>
         <translation>트랙 번호</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="52"/>
+        <location filename="../widgets/metadata_panel.py" line="53"/>
         <source>Comment</source>
         <translatorcomment>ID3 comment tag → 코멘트 (loanword DJs recognize); used consistently with the Settings &quot;Comment tag&quot; strings. Flag for native review (vs 설명).</translatorcomment>
         <translation>코멘트</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="111"/>
+        <location filename="../widgets/metadata_panel.py" line="112"/>
         <source>Metadata Editor</source>
         <translation>메타데이터 편집기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="114"/>
+        <location filename="../widgets/metadata_panel.py" line="115"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>오디오 파일 하나를 끌어다 놓으면 메타데이터 태그를 보고 편집할 수 있어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="185"/>
-        <location filename="../widgets/metadata_panel.py" line="305"/>
+        <location filename="../widgets/metadata_panel.py" line="186"/>
+        <location filename="../widgets/metadata_panel.py" line="306"/>
         <source>Add field...</source>
         <translation>필드 추가...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="190"/>
+        <location filename="../widgets/metadata_panel.py" line="191"/>
         <source>Add Artwork…</source>
         <translation>아트워크 추가…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="195"/>
+        <location filename="../widgets/metadata_panel.py" line="196"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="214"/>
+        <location filename="../widgets/metadata_panel.py" line="215"/>
         <source>Reload</source>
         <translation>다시 불러오기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="219"/>
+        <location filename="../widgets/metadata_panel.py" line="220"/>
         <source>Eject</source>
         <translatorcomment>Eject → 꺼내기 (Apple Korean). Flag for native review.</translatorcomment>
         <translation>꺼내기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="273"/>
+        <location filename="../widgets/metadata_panel.py" line="274"/>
         <source>Error: {0}</source>
         <translation>오류: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="484"/>
+        <location filename="../widgets/metadata_panel.py" line="485"/>
         <source>Select cover art</source>
         <translation>커버 아트 선택</translation>
     </message>
@@ -1717,48 +1717,48 @@ or click “Add Artwork…”</source>
 <context>
     <name>QueuePanel</name>
     <message>
-        <location filename="../widgets/queue_panel.py" line="41"/>
+        <location filename="../widgets/queue_panel.py" line="42"/>
         <source>Queue</source>
         <translatorcomment>Queue → 대기열 (standard Korean computing term).</translatorcomment>
         <translation>대기열</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="44"/>
+        <location filename="../widgets/queue_panel.py" line="45"/>
         <source>Add files here to queue them for analysis. Use the buttons below to send them to analysis.</source>
         <translation>여기에 파일을 추가하면 분석 대기열에 들어가요. 아래 버튼으로 분석에 보낼 수 있어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="49"/>
+        <location filename="../widgets/queue_panel.py" line="50"/>
         <source>Drop audio files here to add to queue</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 대기열에 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="78"/>
+        <location filename="../widgets/queue_panel.py" line="79"/>
         <source>0 files in queue</source>
         <translation>대기열에 파일 0개</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="84"/>
+        <location filename="../widgets/queue_panel.py" line="85"/>
         <source>Clear Queue</source>
         <translation>대기열 비우기</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="88"/>
+        <location filename="../widgets/queue_panel.py" line="89"/>
         <source>Analyze Selected</source>
         <translation>선택 항목 분석</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="92"/>
+        <location filename="../widgets/queue_panel.py" line="93"/>
         <source>Analyze All</source>
         <translation>전체 분석</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="112"/>
+        <location filename="../widgets/queue_panel.py" line="113"/>
         <source>{total} files in queue</source>
         <translation>대기열에 파일 {total}개</translation>
     </message>
     <message>
-        <location filename="../widgets/queue_panel.py" line="115"/>
+        <location filename="../widgets/queue_panel.py" line="116"/>
         <source>{queued} queued / {total} total files</source>
         <translation>대기 {queued}개 / 전체 파일 {total}개</translation>
     </message>
@@ -1889,12 +1889,12 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="122"/>
+        <location filename="../widgets/rename_panel.py" line="123"/>
         <source>Rename</source>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="125"/>
+        <location filename="../widgets/rename_panel.py" line="126"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translatorcomment>해요체 descriptive text. Prepend/Append rendered inline as 앞에 추가 / 뒤에 추가. Flag for native review (spacing + clarity).</translatorcomment>
         <translation>아래 모든 파일명의 앞뒤에서 문자를 잘라내요. 모든 파일명의 앞(앞에 추가) 또는 뒤(뒤에 추가)에 텍스트를 추가해요.</translation>
@@ -1904,177 +1904,177 @@ or click “Add Artwork…”</source>
         <translation type="vanished">작업</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="143"/>
+        <location filename="../widgets/rename_panel.py" line="144"/>
         <source>Trim Start:</source>
         <translation>앞 잘라내기:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="147"/>
-        <location filename="../widgets/rename_panel.py" line="159"/>
+        <location filename="../widgets/rename_panel.py" line="148"/>
+        <location filename="../widgets/rename_panel.py" line="160"/>
         <source> chars</source>
         <translatorcomment>Suffix after a number (e.g. &quot;5자&quot;). Korean uses the counter 자 for characters with no preceding space, so the English leading space is intentionally dropped. Flag for native review (spacing).</translatorcomment>
         <translation>자</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="148"/>
+        <location filename="../widgets/rename_panel.py" line="149"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>파일명 앞부분의 문자를 제거해요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="155"/>
+        <location filename="../widgets/rename_panel.py" line="156"/>
         <source>Trim End:</source>
         <translation>뒤 잘라내기:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="160"/>
+        <location filename="../widgets/rename_panel.py" line="161"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>파일명 뒷부분(확장자 앞)의 문자를 제거해요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="165"/>
+        <location filename="../widgets/rename_panel.py" line="166"/>
         <source>Clear</source>
         <translation>지우기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="180"/>
+        <location filename="../widgets/rename_panel.py" line="181"/>
         <source>Remove Underscores</source>
         <translatorcomment>underscore → 밑줄. Flag for native review.</translatorcomment>
         <translation>밑줄 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="184"/>
+        <location filename="../widgets/rename_panel.py" line="185"/>
         <source>Space Dashes</source>
         <translation>하이픈 앞뒤 공백</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="190"/>
+        <location filename="../widgets/rename_panel.py" line="191"/>
         <source>Put spaces around a dash: Artist-Track → Artist - Track</source>
         <translation>하이픈 앞뒤에 공백을 넣어요: Artist-Track → Artist - Track</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="215"/>
+        <location filename="../widgets/rename_panel.py" line="216"/>
         <source>Prepend Text</source>
         <translation>앞에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="218"/>
+        <location filename="../widgets/rename_panel.py" line="219"/>
         <source>Append Text</source>
         <translation>뒤에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="247"/>
-        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="248"/>
+        <location filename="../widgets/rename_panel.py" line="256"/>
         <source>Preview</source>
         <translatorcomment>Preview → 미리 보기 (Apple Korean Finder exact term).</translatorcomment>
         <translation>미리 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="250"/>
+        <location filename="../widgets/rename_panel.py" line="251"/>
         <source>Drop audio files here to add them</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="256"/>
         <source>Original</source>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="256"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="301"/>
+        <location filename="../widgets/rename_panel.py" line="302"/>
         <source>No files to rename</source>
         <translation>이름 변경할 파일이 없어요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="307"/>
+        <location filename="../widgets/rename_panel.py" line="308"/>
         <source>Undo Last</source>
         <translation>마지막 작업 실행 취소</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="312"/>
+        <location filename="../widgets/rename_panel.py" line="313"/>
         <source>Remove All</source>
         <translation>전체 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="317"/>
+        <location filename="../widgets/rename_panel.py" line="318"/>
         <source>Apply Rename</source>
         <translation>이름 변경 적용</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="324"/>
+        <location filename="../widgets/rename_panel.py" line="325"/>
         <source>Send To</source>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="327"/>
+        <location filename="../widgets/rename_panel.py" line="328"/>
         <source>Convert</source>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="328"/>
+        <location filename="../widgets/rename_panel.py" line="329"/>
         <source>Analyze</source>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="389"/>
+        <location filename="../widgets/rename_panel.py" line="390"/>
         <source>Text to add at end of filename</source>
         <translation>파일명 끝에 추가할 텍스트</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="391"/>
+        <location filename="../widgets/rename_panel.py" line="392"/>
         <source>Text to add at start of filename</source>
         <translation>파일명 앞에 추가할 텍스트</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="432"/>
+        <location filename="../widgets/rename_panel.py" line="433"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="476"/>
+        <location filename="../widgets/rename_panel.py" line="477"/>
         <source>Conflict</source>
         <translation>충돌</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="493"/>
+        <location filename="../widgets/rename_panel.py" line="494"/>
         <source>{0} files</source>
         <translation>파일 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="495"/>
+        <location filename="../widgets/rename_panel.py" line="496"/>
         <source>{0} to rename</source>
         <translation>이름 변경 대상 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="497"/>
+        <location filename="../widgets/rename_panel.py" line="498"/>
         <source>{0} conflicts</source>
         <translation>충돌 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="635"/>
+        <location filename="../widgets/rename_panel.py" line="636"/>
         <source>Changed</source>
         <translation>변경됨</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="710"/>
+        <location filename="../widgets/rename_panel.py" line="711"/>
         <source>Copy text</source>
         <translation>텍스트 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="710"/>
+        <location filename="../widgets/rename_panel.py" line="711"/>
         <source>Copy {0} names</source>
         <translation>이름 {0}개 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="716"/>
+        <location filename="../widgets/rename_panel.py" line="717"/>
         <source>Remove from list</source>
         <translation>목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="716"/>
+        <location filename="../widgets/rename_panel.py" line="717"/>
         <source>Remove {0} from list</source>
         <translatorcomment>{0} (a filename) placed before 제거 with a space to avoid attaching a particle to a variable. Flag for native review.</translatorcomment>
         <translation>목록에서 {0} 제거</translation>
@@ -2728,7 +2728,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>SpectrogramView</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="83"/>
+        <location filename="../widgets/spectrum_panel.py" line="84"/>
         <source>Drop a single audio file to view its spectrum</source>
         <translation>오디오 파일 하나를 끌어다 놓으면 스펙트럼을 볼 수 있어요</translation>
     </message>
@@ -2736,12 +2736,12 @@ or click “Add Artwork…”</source>
 <context>
     <name>SpectrumPanel</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="254"/>
+        <location filename="../widgets/spectrum_panel.py" line="255"/>
         <source>Spectrum</source>
         <translation>스펙트럼</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="259"/>
+        <location filename="../widgets/spectrum_panel.py" line="260"/>
         <source>Drop a single audio file to see its acoustic spectrum. Frequency runs bottom (0 Hz) to top (Nyquist); time runs left to right; colour shows magnitude. Handy for spotting lossy-encode low-pass cutoffs.</source>
         <translatorcomment>Technical terms: frequency → 주파수, Nyquist → 나이퀴스트, magnitude → 크기, lossy-encode → 손실 인코딩, low-pass → 저역 통과, cutoff → 컷오프. Hz kept Latin. 해요체. Flag for native review.</translatorcomment>
         <translation>오디오 파일 하나를 끌어다 놓으면 음향 스펙트럼을 볼 수 있어요. 주파수는 아래(0 Hz)에서 위(나이퀴스트)로, 시간은 왼쪽에서 오른쪽으로 흐르고, 색상은 크기를 나타내요. 손실 인코딩의 저역 통과 컷오프를 찾을 때 유용해요.</translation>
@@ -2751,47 +2751,47 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="313"/>
+        <location filename="../widgets/spectrum_panel.py" line="314"/>
         <source>Sample rate</source>
         <translatorcomment>DSP term → 샘플 레이트 (not the producer &quot;sample&quot;). Consistent with the Conversion panel. Flag for native review.</translatorcomment>
         <translation>샘플 레이트</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="314"/>
+        <location filename="../widgets/spectrum_panel.py" line="315"/>
         <source>Key</source>
         <translatorcomment>Musical key → 조성. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="315"/>
+        <location filename="../widgets/spectrum_panel.py" line="316"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="335"/>
+        <location filename="../widgets/spectrum_panel.py" line="336"/>
         <source>Sensitivity:</source>
         <translation>감도:</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="346"/>
-        <location filename="../widgets/spectrum_panel.py" line="428"/>
-        <location filename="../widgets/spectrum_panel.py" line="443"/>
+        <location filename="../widgets/spectrum_panel.py" line="347"/>
+        <location filename="../widgets/spectrum_panel.py" line="429"/>
+        <location filename="../widgets/spectrum_panel.py" line="444"/>
         <source>{0} dB range</source>
         <translation>{0} dB 범위</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="402"/>
         <location filename="../widgets/spectrum_panel.py" line="403"/>
+        <location filename="../widgets/spectrum_panel.py" line="404"/>
         <source>Analyzing…</source>
         <translation>분석 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="492"/>
+        <location filename="../widgets/spectrum_panel.py" line="493"/>
         <source>Could not analyze this file.</source>
         <translation>이 파일을 분석할 수 없어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="493"/>
+        <location filename="../widgets/spectrum_panel.py" line="494"/>
         <source>Error: {0}</source>
         <translation>오류: {0}</translation>
     </message>

@@ -32,6 +32,28 @@ from src.utils.export import write_csv
 from src.utils.reveal import reveal_in_file_manager
 
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+from .elided_label import ElidedLabel
+
+# The app stylesheet gives every QPushButton ``padding: 8px 16px``, which the
+# native style does not know about when it computes a width — so a button left
+# to its own size hint is drawn into a contents rect narrower than its label.
+# Same constant and same reason as ``_fit_buttons`` in dialogs/duplicate_policy.
+_BUTTON_CHROME = 44
+
+
+def _fit(button: QPushButton) -> None:
+    """Widen *button* to fit its own label.
+
+    Measured from the text rather than pinned to a constant, because these
+    labels are translated and two of them also carry a count that changes at
+    runtime. Without it the footer clipped at *both* ends in German and Russian
+    — "сы переименован" for "Сеансы переименования: 0" — since a QPushButton
+    centres its label rather than eliding it.
+    """
+    label = button.text().replace("&", "")
+    needed = button.fontMetrics().horizontalAdvance(label) + _BUTTON_CHROME
+    button.setMinimumWidth(needed)
+
 
 _KEYCODE_RE = re.compile(r"(\d{1,2})([AB])", re.IGNORECASE)
 
@@ -156,7 +178,7 @@ class HistoryPanel(QWidget):
         self._title_label = QLabel(self.tr("Rename History"))
         self._title_label.setObjectName("sectionTitle")
         self._title_label.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        self._desc_label = QLabel(
+        self._desc_label = ElidedLabel(
             self.tr("View recent rename operations. Select a session to undo it.")
         )
         self._desc_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
@@ -262,12 +284,14 @@ class HistoryPanel(QWidget):
         self._sessions_btn.setCheckable(True)
         self._sessions_btn.setChecked(True)
         self._sessions_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        _fit(self._sessions_btn)
         button_layout.addWidget(self._sessions_btn)
 
         self._keys_btn = QPushButton(self.tr("{0} Song Keys").format(0))
         self._keys_btn.setObjectName("autoToggle")
         self._keys_btn.setCheckable(True)
         self._keys_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        _fit(self._keys_btn)
         button_layout.addWidget(self._keys_btn)
 
         view_group = QButtonGroup(self)
@@ -309,6 +333,7 @@ class HistoryPanel(QWidget):
             self.tr("Export the table below to a spreadsheet-friendly CSV file.")
         )
         self._export_btn.clicked.connect(self._on_export_clicked)
+        _fit(self._export_btn)
         button_layout.addWidget(self._export_btn)
 
         # No manual Refresh button: MainWindow calls refresh() every time the
@@ -317,12 +342,14 @@ class HistoryPanel(QWidget):
         self._delete_btn = QPushButton(self.tr("Delete"))
         self._delete_btn.clicked.connect(self._on_delete_clicked)
         self._delete_btn.setEnabled(False)
+        _fit(self._delete_btn)
         button_layout.addWidget(self._delete_btn)
 
         self._undo_btn = QPushButton(self.tr("Undo Selected"))
         self._undo_btn.setObjectName("primaryButton")
         self._undo_btn.clicked.connect(self._on_undo_clicked)
         self._undo_btn.setEnabled(False)
+        _fit(self._undo_btn)
         button_layout.addWidget(self._undo_btn)
 
         layout.addLayout(button_layout)
@@ -506,6 +533,7 @@ class HistoryPanel(QWidget):
         # Count reflects what's shown, matching the table (may be capped by the
         # display limit below the number actually retained on disk).
         self._keys_btn.setText(self.tr("{0} Song Keys").format(len(visible)))
+        _fit(self._keys_btn)
 
     def _refresh_sessions(self) -> None:
         """Refresh the sessions list from disk."""
@@ -562,6 +590,7 @@ class HistoryPanel(QWidget):
         self._sessions_btn.setText(
             self.tr("{0} Rename Sessions").format(len(self._sessions))
         )
+        _fit(self._sessions_btn)
         self._update_buttons()
 
     def _on_selection_changed(self) -> None:

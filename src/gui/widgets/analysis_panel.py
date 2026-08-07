@@ -25,6 +25,7 @@ from src.analysis.keycode import render_key
 
 from ..models import TrackState, TrackStore, TrackTableModel
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableView
 from .progress_bar import ProgressPanel
 
@@ -201,7 +202,7 @@ class AnalysisPanel(QWidget):
         title = QLabel(self.tr("Analyze"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(self.tr("Drop files to analyze, unless changed in settings. Results update in real-time."))
+        desc = ElidedLabel(self.tr("Drop files to analyze, unless changed in settings. Results update in real-time."))
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         header_row = panel_header_row(title, desc)
 

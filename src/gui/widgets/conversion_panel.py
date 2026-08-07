@@ -22,6 +22,7 @@ from src.utils.config import load_config, save_config
 
 from ..models import TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableWidget
 from .progress_bar import ProgressPanel
 
@@ -66,7 +67,7 @@ class ConversionPanel(QWidget):
         title = QLabel(self.tr("Convert"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = QLabel(self.tr("Convert audio files between formats (WAV, FLAC, AIFF, MP3)."))
+        desc = ElidedLabel(self.tr("Convert audio files between formats (WAV, FLAC, AIFF, MP3)."))
         desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         layout.addLayout(panel_header_row(title, desc))
 
