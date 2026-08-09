@@ -10,6 +10,8 @@ The full audio file preparation workflow for DJs.
 - Audio conversion (MP3/WAV/FLAC/AIFF)
 - Acoustic spectrum analyzer
 - Audio Player + Slicer for sample lifting
+- Playlist library — folders, saved playlists, search across all of them, and export to `.m3u8`/`.m3u`/tracklist
+- "Open with Mixed in P" from Finder or Explorer, and an option to become your default audio player
 - Keyboard to play chords for key comparison
 - BPM detection using beat tracking (librosa)
 - Key detection using chroma analysis
