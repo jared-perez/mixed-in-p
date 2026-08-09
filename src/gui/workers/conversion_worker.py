@@ -27,6 +27,7 @@ class ConversionWorker(QObject):
     progress = Signal(ConversionProgress)
     finished = Signal(list)  # list[ConversionResult]
     error = Signal(str)
+    cancelled = Signal()
 
     def __init__(
         self,
@@ -66,7 +67,8 @@ class ConversionWorker(QObject):
         for i, file_path in enumerate(self._file_paths):
             if self._cancelled:
                 logger.info("Conversion cancelled")
-                break
+                self.cancelled.emit()
+                return
 
             result = convert_file(
                 file_path,
@@ -86,6 +88,13 @@ class ConversionWorker(QObject):
                 )
             )
 
+        # Final gate: a cancel arriving while the last file was converting must
+        # still report cancelled, not "Complete: N converted".
+        if self._cancelled:
+            logger.info("Conversion cancelled")
+            self.cancelled.emit()
+            return
+
         self.finished.emit(results)
 
 
@@ -96,6 +105,7 @@ class ConversionThread(QThread):
     conversion_progress = Signal(ConversionProgress)
     conversion_finished = Signal(list)
     conversion_error = Signal(str)
+    conversion_cancelled = Signal()
 
     def __init__(
         self,
@@ -133,5 +143,6 @@ class ConversionThread(QThread):
         self._worker.progress.connect(self.conversion_progress.emit)
         self._worker.finished.connect(self.conversion_finished.emit)
         self._worker.error.connect(self.conversion_error.emit)
+        self._worker.cancelled.connect(self.conversion_cancelled.emit)
 
         self._worker.run()

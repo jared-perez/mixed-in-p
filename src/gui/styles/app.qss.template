@@ -228,6 +228,31 @@ QPushButton#dangerButton:hover {
     background-color: @ERROR_HOVER@;
 }
 
+/* Cancel button in the Analyze/Convert progress panels. Quiet while idle —
+   it sits next to a live progress readout, where a solid red fill reads as an
+   error state rather than an available action — and commits to red on hover,
+   where the destructive intent belongs. */
+QPushButton#cancelButton {
+    background-color: transparent;
+    color: @TEXT_SECONDARY@;
+    border: 1px solid @CHROME_DARK@;
+    border-radius: 4px;
+    padding: 4px 14px;
+    font-weight: 500;
+    min-height: 0;
+}
+
+QPushButton#cancelButton:hover {
+    background-color: @ERROR@;
+    color: @TEXT_PRIMARY@;
+    border-color: @ERROR@;
+}
+
+QPushButton#cancelButton:pressed {
+    background-color: @ERROR_HOVER@;
+    border-color: @ERROR_HOVER@;
+}
+
 /* "Auto" toggle in the Analyze panel header — mirrors the auto-analyze
    setting. Chrome-outlined when off; fills neon yellow when on. */
 QPushButton#autoToggle {

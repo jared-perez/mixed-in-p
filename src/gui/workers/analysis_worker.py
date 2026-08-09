@@ -51,8 +51,17 @@ class AnalysisWorker(QObject):
         return self._cancelled
 
     def run(self) -> None:
-        """Run the analysis on all files."""
+        """Run the analysis on all files.
+
+        Cancellation is checked at the top of each file *and* again after each
+        file returns. Checking only at the top meant the last file of a batch —
+        and therefore the only file of a single-file batch — could never be
+        cancelled: the flag was set while analyze_file was blocked, the loop
+        ended, and the run reported success. ``should_cancel`` additionally
+        unwinds analyze_file at its internal stage boundaries.
+        """
         from src.analysis.analyzer import analyze_file
+        from src.analysis.cancellation import AnalysisCancelled
 
         self.started.emit()
         self._results = []
@@ -78,7 +87,12 @@ class AnalysisWorker(QObject):
                     file_path,
                     min_bpm=self._min_bpm,
                     max_bpm=self._max_bpm,
+                    should_cancel=lambda: self._cancelled,
                 )
+                # A file abandoned partway through has no result to keep.
+                if self._cancelled:
+                    self.cancelled.emit()
+                    return
                 self._results.append(result)
 
                 # Emit progress with result
@@ -90,6 +104,10 @@ class AnalysisWorker(QObject):
                         result=result,
                     )
                 )
+            except AnalysisCancelled:
+                self.cancelled.emit()
+                return
+
             except Exception as e:
                 # Create error result
                 error_result = AnalysisResult(
@@ -111,6 +129,12 @@ class AnalysisWorker(QObject):
                         result=error_result,
                     )
                 )
+
+        # Final gate: a cancel landing in the gap between the last file
+        # finishing and here must still report cancelled, not complete.
+        if self._cancelled:
+            self.cancelled.emit()
+            return
 
         self.finished.emit(self._results)
 

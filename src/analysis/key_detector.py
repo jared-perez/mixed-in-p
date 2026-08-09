@@ -29,6 +29,8 @@ Pipeline tuned for DJ/electronic material:
 import librosa
 import numpy as np
 
+from .cancellation import ShouldCancel, check_cancelled
+
 # edma/edmm key profiles: relative pitch-class weights for major and minor
 # keys, trained on electronic dance music (Faraldo et al. / Essentia).
 # Index 0 = tonic, then ascending semitones.
@@ -107,20 +109,22 @@ def detect_key(file_path: str) -> tuple[str, float]:
 
 
 def detect_key_with_alternatives(
-    file_path: str, top_n: int = 3
+    file_path: str, top_n: int = 3, should_cancel: ShouldCancel | None = None
 ) -> tuple[str, float, list[tuple[str, float]]]:
     """Detect the key and runner-up candidates in a single analysis pass.
 
     Args:
         file_path: Path to the audio file
         top_n: Total number of keys to score, including the primary
+        should_cancel: Optional predicate polled between the underlying librosa
+            passes; raises AnalysisCancelled when it returns True
 
     Returns:
         Tuple of (key, confidence, alternatives) where key/confidence match
         detect_key() and alternatives holds the 2nd..top_n ranked keys as
         (key, confidence) tuples (empty for silent/atonal audio).
     """
-    ranked, agreement = _rank_keys(file_path)
+    ranked, agreement = _rank_keys(file_path, should_cancel=should_cancel)
     if not ranked:
         return "", 0.0, []
     scored = _score_ranked(ranked, agreement, top_n)
@@ -172,11 +176,14 @@ def _score_ranked(
     return scored
 
 
-def _rank_keys(file_path: str) -> tuple[list[tuple[str, float]], float]:
+def _rank_keys(
+    file_path: str, should_cancel: ShouldCancel | None = None
+) -> tuple[list[tuple[str, float]], float]:
     """Score all 24 keys against segment-wise harmonic chroma.
 
     Args:
         file_path: Path to the audio file
+        should_cancel: Optional predicate polled between librosa passes
 
     Returns:
         Tuple of (ranked, agreement) where ranked is a list of
@@ -188,10 +195,17 @@ def _rank_keys(file_path: str) -> tuple[list[tuple[str, float]], float]:
     if not np.any(y):
         return [], 0.0
 
+    # The HPSS call below is a single uninterruptible block that dominates the
+    # whole pipeline (~77% of a file's analysis time), so this boundary — after
+    # the decode, before the expensive part — is the one that pays.
+    check_cancelled(should_cancel)
+
     # margin=4 suppresses percussive bleed more aggressively than the
     # default; residual harmonic level doesn't matter since chroma is
     # correlated per segment, not compared across segments.
     y_harm = librosa.effects.harmonic(y, margin=4.0)
+
+    check_cancelled(should_cancel)
 
     tuning = librosa.estimate_tuning(y=y_harm, sr=sr)
     if not np.isfinite(tuning):

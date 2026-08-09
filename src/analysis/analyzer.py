@@ -8,6 +8,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from typing import Callable
 
 from .bpm_detector import detect_bpm
+from .cancellation import AnalysisCancelled, ShouldCancel, check_cancelled
 from .energy_detector import detect_energy
 from .key_detector import detect_key_with_alternatives
 from .keycode import key_to_keycode
@@ -18,6 +19,7 @@ def analyze_file(
     file_path: str,
     min_bpm: float = 85.0,
     max_bpm: float = 175.0,
+    should_cancel: ShouldCancel | None = None,
 ) -> AnalysisResult:
     """Analyze a single audio file for BPM and key.
 
@@ -25,16 +27,31 @@ def analyze_file(
         file_path: Path to the audio file
         min_bpm: Minimum expected BPM for range adjustment
         max_bpm: Maximum expected BPM for range adjustment
+        should_cancel: Optional predicate polled at stage boundaries; when it
+            returns True the analysis unwinds with AnalysisCancelled rather
+            than running the remaining stages
 
     Returns:
         AnalysisResult with detected BPM, key, and key code
+
+    Raises:
+        AnalysisCancelled: If should_cancel returned True at a stage boundary
     """
     try:
+        check_cancelled(should_cancel)
+
         # Detect BPM
         bpm, bpm_confidence = detect_bpm(file_path, min_bpm, max_bpm)
 
+        # The key stage is by far the most expensive (~79% of a file, nearly
+        # all of it one uninterruptible HPSS call), so the boundary in front of
+        # it is the most valuable cancellation point in the pipeline.
+        check_cancelled(should_cancel)
+
         # Detect key (primary + runner-up candidates in one pass)
-        key, key_confidence, alternatives = detect_key_with_alternatives(file_path)
+        key, key_confidence, alternatives = detect_key_with_alternatives(
+            file_path, should_cancel=should_cancel
+        )
 
         # Convert to Key Code
         try:
@@ -51,6 +68,8 @@ def analyze_file(
             key_alternatives.append(
                 {"key": alt_key, "keycode": alt_keycode, "confidence": alt_confidence}
             )
+
+        check_cancelled(should_cancel)
 
         # Detect energy level
         try:
@@ -69,6 +88,11 @@ def analyze_file(
             energy_confidence=energy_confidence,
             key_alternatives=key_alternatives,
         )
+
+    except AnalysisCancelled:
+        # Not a failure — must not become an error result, or a cancelled run
+        # is reported to the user as a broken file.
+        raise
 
     except Exception as e:
         return AnalysisResult(

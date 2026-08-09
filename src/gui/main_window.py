@@ -86,6 +86,14 @@ from .workers import (
 # how the shells launch us, not a preference.
 OPEN_BATCH_MS = 300
 
+# How long closeEvent waits for an analysis thread to unwind. A cancel is only
+# honoured between librosa passes, and the HPSS pass alone measured 5.6 s on a
+# 4-minute track — so the old 3 s budget expired mid-call on any full-length
+# file and the QThread was then destroyed while still running, which is
+# undefined behaviour. Sized for a long track on a slow machine; it is an upper
+# bound, not a delay, since the wait returns as soon as the thread does.
+_ANALYSIS_JOIN_MS = 15000
+
 
 def apply_scratch_policy(lib: "library.Library", persist: bool) -> None:
     """Empty Scratch at startup unless the user asked to keep it.
@@ -111,6 +119,9 @@ class MainWindow(QMainWindow):
 
         # Analysis thread reference
         self._analysis_thread: AnalysisThread | None = None
+        # Cancelled analysis threads, detached from the UI but still running
+        # out their current file. Held only so closeEvent can join them.
+        self._orphaned_analysis_threads: list[AnalysisThread] = []
         self._analyzing_track_ids: list[str] = []
 
         # Conversion thread reference
@@ -305,6 +316,7 @@ class MainWindow(QMainWindow):
 
         # Conversion panel signals
         self._conversion_panel.start_conversion.connect(self._start_conversion)
+        self._conversion_panel.cancel_conversion.connect(self._cancel_conversion)
         self._conversion_panel.send_to_analyze.connect(self._send_convert_to_analyze)
         self._conversion_panel.send_to_rename.connect(self._send_convert_to_rename)
         self._conversion_panel.send_to_player.connect(self._on_send_to_player)
@@ -867,9 +879,52 @@ class MainWindow(QMainWindow):
         self._start_analysis(track_ids)
 
     def _cancel_analysis(self) -> None:
-        """Cancel the current analysis."""
-        if self._analysis_thread is not None and self._analysis_thread.isRunning():
-            self._analysis_thread.cancel()
+        """Cancel the current analysis and report it cancelled immediately.
+
+        The worker cannot be stopped promptly. On a warm run roughly 97% of a
+        file's analysis is one uninterruptible HPSS call inside librosa, so a
+        cancel landing mid-file is not honoured until that call returns — several
+        seconds on a full-length track. Blocking the UI on that is the bug this
+        fixes: the button looked dead and the run then reported success.
+
+        So the UI is detached from the worker here. Its signals are disconnected,
+        the run is reported cancelled at once, and the orphaned thread winds down
+        in the background with its results discarded. The cooperative checkpoints
+        in analyze_file still stop it before it starts on another file, so a
+        cancelled batch does not chew through the rest of the queue.
+        """
+        thread = self._analysis_thread
+        if thread is None or not thread.isRunning():
+            return
+
+        # Detach before anything else: whatever this thread emits from here on
+        # describes a run the user has already ended, and _on_analysis_finished
+        # would otherwise overwrite the cancelled state with "Complete".
+        # These are always connected in _start_analysis and this runs at most
+        # once per thread (the guard above returns on the second call), so the
+        # disconnects succeed; the guard is for a thread whose C++ side has
+        # already gone, which raises RuntimeError.
+        for signal in (
+            thread.analysis_started,
+            thread.analysis_progress,
+            thread.analysis_finished,
+            thread.analysis_cancelled,
+        ):
+            try:
+                signal.disconnect()
+            except RuntimeError:
+                pass
+
+        thread.cancel()
+        # Keep a reference so closeEvent can join it; a QThread destroyed while
+        # still running is undefined behaviour. Earlier orphans that have since
+        # unwound are dropped here so repeated cancelling can't grow the list.
+        self._orphaned_analysis_threads = [
+            t for t in self._orphaned_analysis_threads if t.isRunning()
+        ]
+        self._orphaned_analysis_threads.append(thread)
+        self._analysis_thread = None
+        self._on_analysis_cancelled()
 
     def _on_analysis_started(self) -> None:
         """Handle analysis started."""
@@ -942,7 +997,7 @@ class MainWindow(QMainWindow):
 
     def _on_analysis_cancelled(self) -> None:
         """Handle analysis cancelled."""
-        self._analysis_panel.progress_panel.set_error(self.tr("Cancelled"))
+        self._analysis_panel.progress_panel.cancelled()
 
         # Reset pending tracks back to queued
         for track_id in self._analyzing_track_ids:
@@ -1056,7 +1111,27 @@ class MainWindow(QMainWindow):
         self._conversion_thread.conversion_progress.connect(self._on_conversion_progress)
         self._conversion_thread.conversion_finished.connect(self._on_conversion_finished)
         self._conversion_thread.conversion_error.connect(self._on_conversion_error)
+        self._conversion_thread.conversion_cancelled.connect(self._on_conversion_cancelled)
         self._conversion_thread.start()
+
+    def _cancel_conversion(self) -> None:
+        """Cancel the current conversion.
+
+        Unlike analysis, one file's conversion is a bounded encode rather than a
+        multi-second uninterruptible library call, so this waits for the worker
+        to reach its own cancellation check rather than detaching from it.
+        """
+        if self._conversion_thread is not None and self._conversion_thread.isRunning():
+            self._conversion_thread.cancel()
+
+    def _on_conversion_cancelled(self) -> None:
+        """Handle conversion cancelled."""
+        self._conversion_panel.progress_panel.cancelled()
+        # Empty results: rows that finished before the cancel keep their Done
+        # status (they were discarded from _converting as they landed), and
+        # rows still marked Converting revert to Ready.
+        self._conversion_panel.mark_converted([])
+        self._conversion_thread = None
 
     def _on_conversion_started(self) -> None:
         """Handle conversion started."""
@@ -1476,10 +1551,14 @@ class MainWindow(QMainWindow):
         self._player_panel.shutdown_workers()
         self._spectrum_panel.shutdown_workers()
 
-        # Cancel any running analysis
-        if self._analysis_thread is not None and self._analysis_thread.isRunning():
-            self._analysis_thread.cancel()
-            self._analysis_thread.wait(3000)
+        # Cancel any running analysis — including runs the user already
+        # cancelled, which are detached from the UI but may still be inside the
+        # HPSS call they were cancelled during.
+        for thread in [self._analysis_thread, *self._orphaned_analysis_threads]:
+            if thread is not None and thread.isRunning():
+                thread.cancel()
+                thread.wait(_ANALYSIS_JOIN_MS)
+        self._orphaned_analysis_threads.clear()
 
         # Cancel and wait for conversion thread
         if self._conversion_thread is not None and self._conversion_thread.isRunning():

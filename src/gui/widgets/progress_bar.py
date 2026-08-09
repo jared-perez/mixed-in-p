@@ -14,6 +14,10 @@ from PySide6.QtWidgets import (
 from ..styles.theme import Theme
 from .vis_activity_waveform import VisActivityWaveform
 
+# Same constant and same reason as ``_fit`` in history_panel: stylesheet
+# padding plus a little slack, invisible to the native size hint.
+_BUTTON_CHROME = 44
+
 
 class ProgressPanel(QFrame):
     """A progress panel with label, progress bar, and cancel button."""
@@ -44,10 +48,15 @@ class ProgressPanel(QFrame):
 
         top_row.addStretch()
 
+        # Quiet by default and red on hover: it sits beside a running progress
+        # readout, where a solid red block reads as an error rather than an
+        # option. Hidden whenever nothing is running — see _set_cancel_visible.
         self._cancel_btn = QPushButton(self.tr("Cancel"))
-        self._cancel_btn.setObjectName("dangerButton")
+        self._cancel_btn.setObjectName("cancelButton")
+        self._cancel_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._cancel_btn.clicked.connect(self.cancel_clicked.emit)
-        self._cancel_btn.setMinimumWidth(80)
+        self._fit_cancel_button()
+        self._cancel_btn.hide()
         top_row.addWidget(self._cancel_btn)
 
         layout.addLayout(top_row)
@@ -75,6 +84,27 @@ class ProgressPanel(QFrame):
         self._file_label.setWordWrap(True)
         self._reset_file_label_style()
         layout.addWidget(self._file_label)
+
+    def _fit_cancel_button(self) -> None:
+        """Widen the Cancel button to fit its own translated label.
+
+        Same reason as ``_fit`` in history_panel: the stylesheet padding is
+        invisible to the native size hint and a QPushButton centres rather than
+        elides, so a longer translation ("Отменить", "Abbrechen") would be cut
+        at both ends.
+        """
+        label = self._cancel_btn.text().replace("&", "")
+        needed = self._cancel_btn.fontMetrics().horizontalAdvance(label) + _BUTTON_CHROME
+        self._cancel_btn.setMinimumWidth(needed)
+
+    def _set_cancel_visible(self, visible: bool) -> None:
+        """Show the Cancel button only while a run is actually cancellable.
+
+        Left visible after a run it is a control that does nothing when
+        clicked, since there is no longer a thread to cancel.
+        """
+        self._cancel_btn.setVisible(visible)
+        self._cancel_btn.setEnabled(visible)
 
     def _reset_file_label_style(self) -> None:
         """Style the detail line as a muted current-file caption."""
@@ -126,6 +156,7 @@ class ProgressPanel(QFrame):
         if self._show_activity:
             self._activity.show()
             self._activity.start()
+        self._set_cancel_visible(True)
         self.show()
 
     def complete(self, message: str | None = None) -> None:
@@ -138,10 +169,31 @@ class ProgressPanel(QFrame):
         self._progress_bar.setValue(100)
         self._reset_file_label_style()
         self._file_label.setText("")
+        self._set_cancel_visible(False)
         # Freeze the wave fully lit rather than yanking it away mid-look.
         self._activity.set_fraction(1.0)
         self._activity.stop()
         self._activity.update()
+
+    def cancelled(self, message: str | None = None) -> None:
+        """Mark the run as cancelled — a neutral outcome, not an error.
+
+        Styled muted rather than red: the user asked for this, so it is not a
+        failure to report. The activity waveform is frozen where it got to
+        rather than reset, which shows how far the run had progressed.
+        """
+        if message is None:
+            message = self.tr("Cancelled")
+        self._status_label.setText(message)
+        self._status_label.setToolTip("")
+        self._status_label.setStyleSheet(
+            f"color: {Theme.TEXT_SECONDARY}; font-weight: bold;"
+        )
+        self._reset_file_label_style()
+        self._file_label.setText("")
+        self._activity.stop()
+        self._activity.update()
+        self._set_cancel_visible(False)
 
     def set_error(self, message: str) -> None:
         """Show an error state. Full message is available on hover (tooltip).
@@ -152,6 +204,7 @@ class ProgressPanel(QFrame):
         falls back to the top status label, as before.
         """
         self._activity.stop()
+        self._set_cancel_visible(False)
         if self._show_activity:
             self._file_label.setStyleSheet(f"color: {Theme.ERROR}; font-weight: bold;")
             self._file_label.setToolTip(message)

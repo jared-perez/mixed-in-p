@@ -31,6 +31,7 @@ class ConversionPanel(QWidget):
     """Panel for converting audio files between lossless formats."""
 
     start_conversion = Signal(list, str, int, int, int)  # (file_paths, target_format, bitrate, sample_rate, bit_depth)
+    cancel_conversion = Signal()
     send_to_analyze = Signal(list)  # list of file path strings
     send_to_rename = Signal(list)  # list of file path strings
     send_to_player = Signal(list)  # list of track dicts for player
@@ -129,6 +130,7 @@ class ConversionPanel(QWidget):
 
         # Progress panel (initially hidden)
         self._progress_panel = ProgressPanel(show_activity=True)
+        self._progress_panel.cancel_clicked.connect(self.cancel_conversion.emit)
         layout.addWidget(self._progress_panel)
 
         # File table
