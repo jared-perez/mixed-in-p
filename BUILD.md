@@ -10,6 +10,38 @@ This project produces three distribution artifacts per release:
 
 All three are built from the same source — only the build environment differs.
 
+## Before building
+
+Two checks that are **not** part of `pytest tests/`, both of which have caught
+release-blocking defects. Run them from a checkout, not against a build:
+
+```bash
+python scripts/race_check.py     # single-instance / multi-file-open races
+python scripts/visual_pass.py    # translated labels that overflow their widget
+```
+
+`visual_pass.py` **isolates its own app data** — it redirects `HOME`
+(`%APPDATA%` on Windows) at import for itself and every child process, so it
+cannot touch your real Settings. That matters because it deliberately *persists*
+a language to `config.json` before rendering each one (widgets branch on
+`load_config().language`, not just the installed translator). It used to tell
+you to guard that yourself with a `HOME=/tmp/vp` prefix, and forgetting it once
+leaves the app launching in whichever language ran last — Korean, since `ko`
+sorts last — with nothing to connect the symptom back to the cause. Fixed in
+`a8b4e6b`; do not reintroduce a manual prefix as the mitigation.
+
+The isolation also decides what the numbers mean: inheriting a real config also
+inherits **your saved window geometry**, so the harness measures whatever size
+you last left the window. Isolated, it measures the shipped default — which is
+the reproducible figure, and the reason the finding count dropped from 46 to 12
+without any code changing. Compare a run against the previous release tag rather
+than trusting an absolute count, and ground-truth anything it flags against a
+screenshot before acting on it.
+
+Neither script ships: `datas` in `mixedinp.spec` bundles only
+`app.qss.template`, `assets/` and `translations/`, so nothing under `scripts/`
+reaches a user.
+
 ## Filenames are version-less on purpose
 
 The artifact names carry **no version number** — the version lives in the
