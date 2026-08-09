@@ -164,33 +164,33 @@ Recursos:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="273"/>
-        <location filename="../widgets/analysis_panel.py" line="352"/>
+        <location filename="../widgets/analysis_panel.py" line="337"/>
+        <location filename="../widgets/analysis_panel.py" line="419"/>
         <source>Analyze</source>
         <translation>Analisar</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="276"/>
+        <location filename="../widgets/analysis_panel.py" line="340"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>Solte arquivos para analisar, a menos que alterado nos ajustes. Os resultados são atualizados em tempo real.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="283"/>
+        <location filename="../widgets/analysis_panel.py" line="347"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="353"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>Analisar automaticamente ao soltar ou enviar para o painel Analisar</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="302"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>Drop files here to analyze immediately</source>
         <translation>Solte arquivos aqui para analisar imediatamente</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="348"/>
+        <location filename="../widgets/analysis_panel.py" line="415"/>
         <source>Clear Results</source>
         <translation>Limpar resultados</translation>
     </message>
@@ -199,48 +199,48 @@ Recursos:
         <translation type="vanished">Remover selecionados</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="359"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Send To</source>
         <translation>Enviar para</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Convert</source>
         <translation>Converter</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="429"/>
         <source>Player</source>
         <translatorcomment>Kept &apos;Player&apos; in English (producer judgment, consistent with PLAYER heading kept English in help block). Common in Brazilian audio/DJ usage.</translatorcomment>
         <translation>Player</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="434"/>
+        <location filename="../widgets/analysis_panel.py" line="501"/>
         <source>{n} analyzed</source>
         <translation>{n} analisados</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="436"/>
+        <location filename="../widgets/analysis_panel.py" line="503"/>
         <source>{n} errors</source>
         <translation>{n} erros</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="438"/>
+        <location filename="../widgets/analysis_panel.py" line="505"/>
         <source>{n} pending</source>
         <translation>{n} pendentes</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="440"/>
+        <location filename="../widgets/analysis_panel.py" line="507"/>
         <source>{n} in progress</source>
         <translation>{n} em andamento</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="442"/>
+        <location filename="../widgets/analysis_panel.py" line="509"/>
         <source>No results yet</source>
         <translation>Nenhum resultado ainda</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="498"/>
+        <location filename="../widgets/analysis_panel.py" line="565"/>
         <source>Open File Location</source>
         <translation>Abrir local do arquivo</translation>
     </message>
@@ -253,7 +253,7 @@ Recursos:
         <translation type="vanished">Enviar para o Player</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="500"/>
+        <location filename="../widgets/analysis_panel.py" line="567"/>
         <source>Remove</source>
         <translation>Remover</translation>
     </message>
@@ -261,80 +261,98 @@ Recursos:
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="37"/>
+        <location filename="../widgets/analysis_panel.py" line="58"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="38"/>
+        <location filename="../widgets/analysis_panel.py" line="59"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="39"/>
-        <location filename="../widgets/analysis_panel.py" line="41"/>
+        <location filename="../widgets/analysis_panel.py" line="60"/>
+        <location filename="../widgets/analysis_panel.py" line="62"/>
         <source>Conf</source>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="40"/>
+        <location filename="../widgets/analysis_panel.py" line="61"/>
         <source>Key</source>
         <translatorcomment>Musical key -&gt; &apos;Tonalidade&apos; per glossary (never &apos;chave&apos;). Used as analysis-results column header.</translatorcomment>
         <translation>Tonalidade</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="42"/>
+        <location filename="../widgets/analysis_panel.py" line="63"/>
         <source>Key Code</source>
         <translatorcomment>Kept English &apos;Key Code&apos; — it is the harmonic key-code data token (1A-12B), per CLAUDE.md data tokens are not translated.</translatorcomment>
         <translation>Key Code</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="43"/>
+        <location filename="../widgets/analysis_panel.py" line="64"/>
         <source>Alt Keys</source>
         <translation>Tonalidades alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="44"/>
+        <location filename="../widgets/analysis_panel.py" line="65"/>
         <source>Energy</source>
         <translation>Energia</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="45"/>
+        <location filename="../widgets/analysis_panel.py" line="66"/>
         <source>Status</source>
         <translatorcomment>Kept &apos;Status&apos; — standard loanword in pt_BR UI.</translatorcomment>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="127"/>
+        <location filename="../widgets/analysis_panel.py" line="139"/>
+        <source>WAV files do not store metadata, but the filename can still be changed.</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>Arquivos WAV não armazenam metadados, mas o nome do arquivo pode ser alterado.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="153"/>
         <source>Queued</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>Na fila</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="128"/>
+        <location filename="../widgets/analysis_panel.py" line="154"/>
         <source>Pending</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>Pendente</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="129"/>
+        <location filename="../widgets/analysis_panel.py" line="155"/>
         <source>Analyzing</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>Analisando</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="130"/>
+        <location filename="../widgets/analysis_panel.py" line="156"/>
         <source>Analyzed</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>Analisado</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="131"/>
+        <location filename="../widgets/analysis_panel.py" line="157"/>
         <source>Error</source>
         <translation>Erro</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="158"/>
+        <location filename="../widgets/analysis_panel.py" line="174"/>
+        <source>WAV file</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>Arquivo WAV</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="176"/>
+        <source>Analyzed, no tags</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>Analisado, sem tags</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="202"/>
         <source>Other likely keys: {keys}</source>
         <translation>Outras tonalidades prováveis: {keys}</translation>
     </message>
@@ -1069,27 +1087,27 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Concluído: {0} arquivos convertidos</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1367"/>
+        <location filename="../main_window.py" line="1382"/>
         <source>Rename in Progress</source>
         <translation>Renomeação em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1368"/>
+        <location filename="../main_window.py" line="1383"/>
         <source>A rename operation is already running.</source>
         <translation>Uma operação de renomeação já está em execução.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1426"/>
+        <location filename="../main_window.py" line="1441"/>
         <source>Rename Failed</source>
         <translation>Falha ao renomear</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1460"/>
+        <location filename="../main_window.py" line="1475"/>
         <source>Undo Rename</source>
         <translation>Desfazer renomeação</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1491"/>
+        <location filename="../main_window.py" line="1506"/>
         <source>Undo Failed</source>
         <translation>Falha ao desfazer</translation>
     </message>
@@ -1102,22 +1120,22 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">{0} arquivos renomeados</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No Session</source>
         <translation>Nenhuma sessão</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No rename session to undo.</source>
         <translation>Nenhuma sessão de renomeação para desfazer.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1441"/>
+        <location filename="../main_window.py" line="1456"/>
         <source>Confirm Undo</source>
         <translation>Confirmar Desfazer</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1442"/>
+        <location filename="../main_window.py" line="1457"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Desfazer a renomeação de {0} arquivos?</translation>
     </message>
@@ -1126,7 +1144,7 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Desfazendo renomeação...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1461"/>
+        <location filename="../main_window.py" line="1476"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Desfeito: {0} arquivos, {1} erros</translation>
     </message>

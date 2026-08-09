@@ -164,33 +164,33 @@ Features:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="273"/>
-        <location filename="../widgets/analysis_panel.py" line="352"/>
+        <location filename="../widgets/analysis_panel.py" line="337"/>
+        <location filename="../widgets/analysis_panel.py" line="419"/>
         <source>Analyze</source>
         <translation>解析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="276"/>
+        <location filename="../widgets/analysis_panel.py" line="340"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>設定で変更しない限り、ファイルをドロップすると解析します。結果はリアルタイムで更新されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="283"/>
+        <location filename="../widgets/analysis_panel.py" line="347"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="353"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>解析パネルにドロップまたは送ったときに自動的に解析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="302"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>Drop files here to analyze immediately</source>
         <translation>すぐに解析するにはここにファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="348"/>
+        <location filename="../widgets/analysis_panel.py" line="415"/>
         <source>Clear Results</source>
         <translation>結果をクリア</translation>
     </message>
@@ -199,48 +199,48 @@ Features:
         <translation type="vanished">選択項目を削除</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="359"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Send To</source>
         <translatorcomment>送る per glossary (not 送信). Plain verb. Confirmed.</translatorcomment>
         <translation>送る</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Convert</source>
         <translation>変換</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="429"/>
         <source>Player</source>
         <translation>プレイヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="434"/>
+        <location filename="../widgets/analysis_panel.py" line="501"/>
         <source>{n} analyzed</source>
         <translation>{n}件解析済み</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="436"/>
+        <location filename="../widgets/analysis_panel.py" line="503"/>
         <source>{n} errors</source>
         <translation>{n}件のエラー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="438"/>
+        <location filename="../widgets/analysis_panel.py" line="505"/>
         <source>{n} pending</source>
         <translation>{n}件待機中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="440"/>
+        <location filename="../widgets/analysis_panel.py" line="507"/>
         <source>{n} in progress</source>
         <translation>{n}件処理中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="442"/>
+        <location filename="../widgets/analysis_panel.py" line="509"/>
         <source>No results yet</source>
         <translation>まだ結果はありません</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="498"/>
+        <location filename="../widgets/analysis_panel.py" line="565"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
@@ -253,7 +253,7 @@ Features:
         <translation type="vanished">プレイヤーに送る</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="500"/>
+        <location filename="../widgets/analysis_panel.py" line="567"/>
         <source>Remove</source>
         <translation>削除</translation>
     </message>
@@ -261,80 +261,98 @@ Features:
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="37"/>
+        <location filename="../widgets/analysis_panel.py" line="58"/>
         <source>Name</source>
         <translation>名前</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="38"/>
+        <location filename="../widgets/analysis_panel.py" line="59"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="39"/>
-        <location filename="../widgets/analysis_panel.py" line="41"/>
+        <location filename="../widgets/analysis_panel.py" line="60"/>
+        <location filename="../widgets/analysis_panel.py" line="62"/>
         <source>Conf</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>信頼度</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="40"/>
+        <location filename="../widgets/analysis_panel.py" line="61"/>
         <source>Key</source>
         <translatorcomment>Chose キー (katakana) over 調性/調 per glossary, since this is a DJ/producer app. Used consistently everywhere &apos;key&apos; = musical key.</translatorcomment>
         <translation>キー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="42"/>
+        <location filename="../widgets/analysis_panel.py" line="63"/>
         <source>Key Code</source>
         <translation>キーコード</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="43"/>
+        <location filename="../widgets/analysis_panel.py" line="64"/>
         <source>Alt Keys</source>
         <translation>代替キー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="44"/>
+        <location filename="../widgets/analysis_panel.py" line="65"/>
         <source>Energy</source>
         <translatorcomment>Translated as エナジー (katakana) to match DJ-app jargon and the &apos;Energy Tag&apos; tagging convention. &apos;エネルギー&apos; is the standard physics term; review which fits the UI tone.</translatorcomment>
         <translation>エナジー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="45"/>
+        <location filename="../widgets/analysis_panel.py" line="66"/>
         <source>Status</source>
         <translation>ステータス</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="127"/>
+        <location filename="../widgets/analysis_panel.py" line="139"/>
+        <source>WAV files do not store metadata, but the filename can still be changed.</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>WAVファイルはメタデータを保存できませんが、ファイル名は変更できます。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="153"/>
         <source>Queued</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>待機中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="128"/>
+        <location filename="../widgets/analysis_panel.py" line="154"/>
         <source>Pending</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>保留中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="129"/>
+        <location filename="../widgets/analysis_panel.py" line="155"/>
         <source>Analyzing</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>解析中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="130"/>
+        <location filename="../widgets/analysis_panel.py" line="156"/>
         <source>Analyzed</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>解析済み</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="131"/>
+        <location filename="../widgets/analysis_panel.py" line="157"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="158"/>
+        <location filename="../widgets/analysis_panel.py" line="174"/>
+        <source>WAV file</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>WAVファイル</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="176"/>
+        <source>Analyzed, no tags</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>解析済み、タグなし</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="202"/>
         <source>Other likely keys: {keys}</source>
         <translation>他の可能性のあるキー: {keys}</translation>
     </message>
@@ -1072,27 +1090,27 @@ or click “Add Artwork…”</source>
         <translation>完了: {0}個のファイルを変換しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1367"/>
+        <location filename="../main_window.py" line="1382"/>
         <source>Rename in Progress</source>
         <translation>名前変更を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1368"/>
+        <location filename="../main_window.py" line="1383"/>
         <source>A rename operation is already running.</source>
         <translation>すでに名前変更操作を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1426"/>
+        <location filename="../main_window.py" line="1441"/>
         <source>Rename Failed</source>
         <translation>名前の変更に失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1460"/>
+        <location filename="../main_window.py" line="1475"/>
         <source>Undo Rename</source>
         <translation>名前の変更を取り消す</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1491"/>
+        <location filename="../main_window.py" line="1506"/>
         <source>Undo Failed</source>
         <translation>取り消しに失敗しました</translation>
     </message>
@@ -1105,22 +1123,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No Session</source>
         <translation>セッションなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No rename session to undo.</source>
         <translation>取り消す名前変更セッションがありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1441"/>
+        <location filename="../main_window.py" line="1456"/>
         <source>Confirm Undo</source>
         <translation>取り消しの確認</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1442"/>
+        <location filename="../main_window.py" line="1457"/>
         <source>Undo renaming of {0} files?</source>
         <translation>{0}個のファイルの名前変更を取り消しますか？</translation>
     </message>
@@ -1129,7 +1147,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">名前変更を取り消し中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1461"/>
+        <location filename="../main_window.py" line="1476"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>取り消し完了: {0}個のファイル、{1}件のエラー</translation>
     </message>

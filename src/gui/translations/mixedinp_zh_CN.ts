@@ -162,33 +162,33 @@ Features:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="273"/>
-        <location filename="../widgets/analysis_panel.py" line="352"/>
+        <location filename="../widgets/analysis_panel.py" line="337"/>
+        <location filename="../widgets/analysis_panel.py" line="419"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="276"/>
+        <location filename="../widgets/analysis_panel.py" line="340"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>拖入文件即可分析（除非在设置中更改）。结果实时更新。</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="283"/>
+        <location filename="../widgets/analysis_panel.py" line="347"/>
         <source>Auto</source>
         <translation>自动</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="353"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>拖入或发送到分析面板时自动分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="302"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>Drop files here to analyze immediately</source>
         <translation>将文件拖到此处立即分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="348"/>
+        <location filename="../widgets/analysis_panel.py" line="415"/>
         <source>Clear Results</source>
         <translation>清除结果</translation>
     </message>
@@ -197,51 +197,51 @@ Features:
         <translation type="vanished">移除所选</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="359"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Send To</source>
         <translation>发送到</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="429"/>
         <source>Player</source>
         <translation>播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="434"/>
+        <location filename="../widgets/analysis_panel.py" line="501"/>
         <source>{n} analyzed</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>已分析{n}个</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="436"/>
+        <location filename="../widgets/analysis_panel.py" line="503"/>
         <source>{n} errors</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>{n}个错误</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="438"/>
+        <location filename="../widgets/analysis_panel.py" line="505"/>
         <source>{n} pending</source>
         <translatorcomment>Measure word 个: {n}个待处理.</translatorcomment>
         <translation>{n}个待处理</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="440"/>
+        <location filename="../widgets/analysis_panel.py" line="507"/>
         <source>{n} in progress</source>
         <translatorcomment>Measure word 个: {n}个进行中.</translatorcomment>
         <translation>{n}个进行中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="442"/>
+        <location filename="../widgets/analysis_panel.py" line="509"/>
         <source>No results yet</source>
         <translation>暂无结果</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="498"/>
+        <location filename="../widgets/analysis_panel.py" line="565"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
@@ -254,7 +254,7 @@ Features:
         <translation type="vanished">发送到播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="500"/>
+        <location filename="../widgets/analysis_panel.py" line="567"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
@@ -262,80 +262,98 @@ Features:
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="37"/>
+        <location filename="../widgets/analysis_panel.py" line="58"/>
         <source>Name</source>
         <translation>名称</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="38"/>
+        <location filename="../widgets/analysis_panel.py" line="59"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="39"/>
-        <location filename="../widgets/analysis_panel.py" line="41"/>
+        <location filename="../widgets/analysis_panel.py" line="60"/>
+        <location filename="../widgets/analysis_panel.py" line="62"/>
         <source>Conf</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>置信度</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="40"/>
+        <location filename="../widgets/analysis_panel.py" line="61"/>
         <source>Key</source>
         <translatorcomment>Reviewed (zh pass): 调 for compact key labels per glossary (调性 used in full sentences).</translatorcomment>
         <translation>调</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="42"/>
+        <location filename="../widgets/analysis_panel.py" line="63"/>
         <source>Key Code</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>键码</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="43"/>
+        <location filename="../widgets/analysis_panel.py" line="64"/>
         <source>Alt Keys</source>
         <translation>备选调</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="44"/>
+        <location filename="../widgets/analysis_panel.py" line="65"/>
         <source>Energy</source>
         <translation>能量</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="45"/>
+        <location filename="../widgets/analysis_panel.py" line="66"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="127"/>
+        <location filename="../widgets/analysis_panel.py" line="139"/>
+        <source>WAV files do not store metadata, but the filename can still be changed.</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>WAV 文件不存储元数据，但仍可更改文件名。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="153"/>
         <source>Queued</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>队列中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="128"/>
+        <location filename="../widgets/analysis_panel.py" line="154"/>
         <source>Pending</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>等待中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="129"/>
+        <location filename="../widgets/analysis_panel.py" line="155"/>
         <source>Analyzing</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>分析中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="130"/>
+        <location filename="../widgets/analysis_panel.py" line="156"/>
         <source>Analyzed</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>已分析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="131"/>
+        <location filename="../widgets/analysis_panel.py" line="157"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="158"/>
+        <location filename="../widgets/analysis_panel.py" line="174"/>
+        <source>WAV file</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>WAV 文件</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="176"/>
+        <source>Analyzed, no tags</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>已分析，无标签</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="202"/>
         <source>Other likely keys: {keys}</source>
         <translation>其他可能的调：{keys}</translation>
     </message>
@@ -1073,27 +1091,27 @@ or click “Add Artwork…”</source>
         <translation>完成：已转换{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1367"/>
+        <location filename="../main_window.py" line="1382"/>
         <source>Rename in Progress</source>
         <translation>重命名进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1368"/>
+        <location filename="../main_window.py" line="1383"/>
         <source>A rename operation is already running.</source>
         <translation>已有重命名操作正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1426"/>
+        <location filename="../main_window.py" line="1441"/>
         <source>Rename Failed</source>
         <translation>重命名失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1460"/>
+        <location filename="../main_window.py" line="1475"/>
         <source>Undo Rename</source>
         <translation>撤销重命名</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1491"/>
+        <location filename="../main_window.py" line="1506"/>
         <source>Undo Failed</source>
         <translation>撤销失败</translation>
     </message>
@@ -1106,22 +1124,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No Session</source>
         <translation>无会话</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No rename session to undo.</source>
         <translation>没有可撤销的重命名会话。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1441"/>
+        <location filename="../main_window.py" line="1456"/>
         <source>Confirm Undo</source>
         <translation>确认撤销</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1442"/>
+        <location filename="../main_window.py" line="1457"/>
         <source>Undo renaming of {0} files?</source>
         <translation>撤销{0}个文件的重命名？</translation>
     </message>
@@ -1130,7 +1148,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">正在撤销重命名……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1461"/>
+        <location filename="../main_window.py" line="1476"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>已撤销：{0}个文件，{1}个错误</translation>
     </message>

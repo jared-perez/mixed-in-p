@@ -161,33 +161,33 @@ Fonctionnalités :
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="273"/>
-        <location filename="../widgets/analysis_panel.py" line="352"/>
+        <location filename="../widgets/analysis_panel.py" line="337"/>
+        <location filename="../widgets/analysis_panel.py" line="419"/>
         <source>Analyze</source>
         <translation>Analyser</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="276"/>
+        <location filename="../widgets/analysis_panel.py" line="340"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>Déposez des fichiers à analyser, sauf modification dans les réglages. Les résultats se mettent à jour en temps réel.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="283"/>
+        <location filename="../widgets/analysis_panel.py" line="347"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="289"/>
+        <location filename="../widgets/analysis_panel.py" line="353"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>Analyser automatiquement lors du dépôt ou de l&apos;envoi vers le panneau Analyser</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="302"/>
+        <location filename="../widgets/analysis_panel.py" line="366"/>
         <source>Drop files here to analyze immediately</source>
         <translation>Déposez des fichiers ici pour les analyser immédiatement</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="348"/>
+        <location filename="../widgets/analysis_panel.py" line="415"/>
         <source>Clear Results</source>
         <translation>Effacer les résultats</translation>
     </message>
@@ -196,47 +196,47 @@ Fonctionnalités :
         <translation type="vanished">Supprimer la sélection</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="359"/>
+        <location filename="../widgets/analysis_panel.py" line="426"/>
         <source>Send To</source>
         <translation>Envoyer vers</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="361"/>
+        <location filename="../widgets/analysis_panel.py" line="428"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="429"/>
         <source>Player</source>
         <translation>Lecteur</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="434"/>
+        <location filename="../widgets/analysis_panel.py" line="501"/>
         <source>{n} analyzed</source>
         <translation>{n} analysés</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="436"/>
+        <location filename="../widgets/analysis_panel.py" line="503"/>
         <source>{n} errors</source>
         <translation>{n} erreurs</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="438"/>
+        <location filename="../widgets/analysis_panel.py" line="505"/>
         <source>{n} pending</source>
         <translation>{n} en attente</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="440"/>
+        <location filename="../widgets/analysis_panel.py" line="507"/>
         <source>{n} in progress</source>
         <translation>{n} en cours</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="442"/>
+        <location filename="../widgets/analysis_panel.py" line="509"/>
         <source>No results yet</source>
         <translation>Aucun résultat pour l&apos;instant</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="498"/>
+        <location filename="../widgets/analysis_panel.py" line="565"/>
         <source>Open File Location</source>
         <translation>Ouvrir l&apos;emplacement du fichier</translation>
     </message>
@@ -249,7 +249,7 @@ Fonctionnalités :
         <translation type="vanished">Envoyer vers le lecteur</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="500"/>
+        <location filename="../widgets/analysis_panel.py" line="567"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
@@ -257,77 +257,95 @@ Fonctionnalités :
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="37"/>
+        <location filename="../widgets/analysis_panel.py" line="58"/>
         <source>Name</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="38"/>
+        <location filename="../widgets/analysis_panel.py" line="59"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="39"/>
-        <location filename="../widgets/analysis_panel.py" line="41"/>
+        <location filename="../widgets/analysis_panel.py" line="60"/>
+        <location filename="../widgets/analysis_panel.py" line="62"/>
         <source>Conf</source>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="40"/>
+        <location filename="../widgets/analysis_panel.py" line="61"/>
         <source>Key</source>
         <translation>Tonalité</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="42"/>
+        <location filename="../widgets/analysis_panel.py" line="63"/>
         <source>Key Code</source>
         <translation>Code de tonalité</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="43"/>
+        <location filename="../widgets/analysis_panel.py" line="64"/>
         <source>Alt Keys</source>
         <translation>Tonalités alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="44"/>
+        <location filename="../widgets/analysis_panel.py" line="65"/>
         <source>Energy</source>
         <translation>Énergie</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="45"/>
+        <location filename="../widgets/analysis_panel.py" line="66"/>
         <source>Status</source>
         <translation>État</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="127"/>
+        <location filename="../widgets/analysis_panel.py" line="139"/>
+        <source>WAV files do not store metadata, but the filename can still be changed.</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>Les fichiers WAV ne stockent pas de métadonnées, mais le nom du fichier peut être modifié.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="153"/>
         <source>Queued</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>En file d&apos;attente</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="128"/>
+        <location filename="../widgets/analysis_panel.py" line="154"/>
         <source>Pending</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>En attente</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="129"/>
+        <location filename="../widgets/analysis_panel.py" line="155"/>
         <source>Analyzing</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>Analyse en cours</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="130"/>
+        <location filename="../widgets/analysis_panel.py" line="156"/>
         <source>Analyzed</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>Analysé</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="131"/>
+        <location filename="../widgets/analysis_panel.py" line="157"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="158"/>
+        <location filename="../widgets/analysis_panel.py" line="174"/>
+        <source>WAV file</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>Fichier WAV</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="176"/>
+        <source>Analyzed, no tags</source>
+        <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
+        <translation>Analysé, sans tags</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="202"/>
         <source>Other likely keys: {keys}</source>
         <translation>Autres tonalités probables : {keys}</translation>
     </message>
@@ -1056,27 +1074,27 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation>Terminé : {0} fichiers convertis</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1367"/>
+        <location filename="../main_window.py" line="1382"/>
         <source>Rename in Progress</source>
         <translation>Renommage en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1368"/>
+        <location filename="../main_window.py" line="1383"/>
         <source>A rename operation is already running.</source>
         <translation>Une opération de renommage est déjà en cours.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1426"/>
+        <location filename="../main_window.py" line="1441"/>
         <source>Rename Failed</source>
         <translation>Échec du renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1460"/>
+        <location filename="../main_window.py" line="1475"/>
         <source>Undo Rename</source>
         <translation>Annuler le renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1491"/>
+        <location filename="../main_window.py" line="1506"/>
         <source>Undo Failed</source>
         <translation>Échec de l’annulation</translation>
     </message>
@@ -1089,22 +1107,22 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">{0} fichiers renommés</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No Session</source>
         <translation>Aucune session</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1432"/>
+        <location filename="../main_window.py" line="1447"/>
         <source>No rename session to undo.</source>
         <translation>Aucune session de renommage à annuler.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1441"/>
+        <location filename="../main_window.py" line="1456"/>
         <source>Confirm Undo</source>
         <translation>Confirmer l&apos;annulation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1442"/>
+        <location filename="../main_window.py" line="1457"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Annuler le renommage de {0} fichiers ?</translation>
     </message>
@@ -1113,7 +1131,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Annulation du renommage...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1461"/>
+        <location filename="../main_window.py" line="1476"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Annulé : {0} fichiers, {1} erreurs</translation>
     </message>
