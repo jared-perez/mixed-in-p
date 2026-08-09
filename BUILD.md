@@ -20,15 +20,28 @@ python scripts/race_check.py     # single-instance / multi-file-open races
 python scripts/visual_pass.py    # translated labels that overflow their widget
 ```
 
-`visual_pass.py` **isolates its own app data** — it redirects `HOME`
-(`%APPDATA%` on Windows) at import for itself and every child process, so it
-cannot touch your real Settings. That matters because it deliberately *persists*
-a language to `config.json` before rendering each one (widgets branch on
-`load_config().language`, not just the installed translator). It used to tell
-you to guard that yourself with a `HOME=/tmp/vp` prefix, and forgetting it once
-leaves the app launching in whichever language ran last — Korean, since `ko`
-sorts last — with nothing to connect the symptom back to the cause. Fixed in
-`a8b4e6b`; do not reintroduce a manual prefix as the mitigation.
+**Both isolate their own app data**, so run them plainly — no `HOME=` prefix,
+and do not reintroduce one as the mitigation. Each redirects `HOME`
+(`%APPDATA%` on Windows) **at import**, covering the script process, everything
+it spawns, and any import added to either later. `get_app_data_dir()` derives
+from those variables, so import time is the only point still ahead of every
+reader.
+
+Redirecting the parent — not just the spawned children — is the part that
+matters. It makes the isolation structural instead of remembered: a spawn that
+forgets `env=` inherits the redirect anyway, and the parent can safely import
+something that reads config. `race_check.py` was previously correct only
+because its one spawn site happened to pass `env=` and its parent happened not
+to import anything that reads app data; both were one edit from breaking
+(`db18a4c`).
+
+`visual_pass.py` is the reason this is written down. It deliberately *persists*
+a language to `config.json` before rendering each one — widgets branch on
+`load_config().language`, not just the installed translator — and its isolation
+used to be a documented `HOME=/tmp/vp` prefix you had to remember. Forgetting it
+once leaves the app launching in whichever language ran last (Korean, since `ko`
+sorts last), with nothing connecting the symptom back to the cause. Fixed in
+`a8b4e6b`.
 
 The isolation also decides what the numbers mean: inheriting a real config also
 inherits **your saved window geometry**, so the harness measures whatever size

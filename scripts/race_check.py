@@ -19,7 +19,14 @@ the window where connections must survive un-accepted, and where a handoff
 arrives long before ``files_received`` has anything connected to it.
 
 Isolated from the developer's real library: the app data directory is
-redirected per run, so ``library.db`` and ``config.json`` here are throwaway.
+redirected **at import, for this process and everything it spawns**, so
+``library.db`` and ``config.json`` here are throwaway. Redirecting the parent
+too is not decoration — it is what makes the isolation structural rather than
+remembered. Otherwise it holds only while nothing in the parent imports
+anything that reads app data and every spawn site remembers ``env=``, and both
+of those are one edit away. ``visual_pass.py`` learned this the expensive way:
+its isolation was a documented manual prefix, and forgetting it once left the
+real Settings on another language.
 
 Reads as PASS only when exactly one process became primary AND every file
 landed in Scratch **in name order**. All three halves matter: five primaries is
@@ -43,11 +50,23 @@ from pathlib import Path
 REPO = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(REPO))
 
-from src.utils.args import shell_sorted  # noqa: E402 — needs REPO on the path
-
+# Rooted in TMPDIR, which is read from the environment and so is unaffected by
+# the HOME redirect immediately below.
 ROOT = Path(tempfile.gettempdir()) / "mixedinp-race-check"
 DATA = ROOT / "appdata"
 SETTLE_SECONDS = 14
+
+# Redirect app data before anything can read it. get_app_data_dir() derives
+# from HOME (%APPDATA% on Windows), so setting it here covers this process, the
+# `src.main` children, and any import added to either later. Done at import,
+# above the first `src.` import, because that is the only point that is still
+# ahead of every reader.
+if sys.platform == "win32":
+    os.environ["APPDATA"] = str(DATA)
+else:
+    os.environ["HOME"] = str(DATA)
+
+from src.utils.args import shell_sorted  # noqa: E402 — needs REPO on the path
 
 
 def make_fixtures(n: int) -> list[str]:
@@ -71,14 +90,17 @@ def make_fixtures(n: int) -> list[str]:
 
 
 def child_env() -> dict:
-    """Redirect app data so a run cannot touch the developer's own library."""
+    """Environment for a child app process.
+
+    The app-data redirect is inherited rather than re-applied — it is set on
+    ``os.environ`` at import and there is deliberately only one place that
+    defines it. The consequence worth knowing: a spawn that forgets ``env=``
+    entirely still inherits the redirect, so forgetting it can no longer put a
+    run on the developer's real library.
+    """
     env = dict(os.environ)
     env["QT_QPA_PLATFORM"] = "offscreen"
     env["PYTHONPATH"] = str(REPO)
-    if sys.platform == "win32":
-        env["APPDATA"] = str(DATA)
-    else:
-        env["HOME"] = str(DATA)
     return env
 
 
