@@ -935,9 +935,16 @@ class MainWindow(QMainWindow):
         self._analysis_panel.progress_panel.set_progress(progress.completed, progress.total)
         self._analysis_panel.progress_panel.set_current_file(progress.current_file)
 
-        # Update track state if we have a result
         if progress.result:
             self._update_track_from_result(progress.result)
+        else:
+            # No result yet means this file is just starting. TrackState.ANALYSING
+            # was styled, filtered and counted everywhere but never actually
+            # assigned, so the Status column sat on "Pending" for the whole run
+            # and nothing showed which file was being worked on.
+            track = self._store.get_by_path(progress.current_file)
+            if track is not None and track.state == TrackState.PENDING:
+                self._store.update(track.id, state=TrackState.ANALYSING)
 
     def _on_analysis_finished(self, results: list[AnalysisResult]) -> None:
         """Handle analysis finished."""
@@ -996,18 +1003,51 @@ class MainWindow(QMainWindow):
             self._start_analysis(pending_ids)
 
     def _on_analysis_cancelled(self) -> None:
-        """Handle analysis cancelled."""
+        """Handle analysis cancelled.
+
+        A cancel stops the *remaining* work; it does not undo what already
+        finished. Files analysed before the cancel have had their tags written
+        by _update_track_from_result already, so they must also go through
+        auto-rename — otherwise cancelling left them tagged with BPM and key
+        but still under their original filename, which is a half-applied result
+        the user never asked for.
+        """
         self._analysis_panel.progress_panel.cancelled()
 
-        # Reset pending tracks back to queued
-        for track_id in self._analyzing_track_ids:
-            track = self._store.get(track_id)
-            if track and track.state in (TrackState.PENDING, TrackState.ANALYSING):
-                self._store.update(track_id, state=TrackState.QUEUED)
+        batch = [
+            track
+            for track in (self._store.get(tid) for tid in self._analyzing_track_ids)
+            if track is not None
+        ]
+        completed = [t for t in batch if t.state == TrackState.ANALYSED]
+
+        # Whatever never ran stays PENDING — it is still queued in the Analyze
+        # panel and has to stay visible there. Resetting it to QUEUED (as this
+        # used to) made the tracks vanish from the panel mid-batch: QUEUED is
+        # the *Rename* panel's working set, and the Analyze table filters it
+        # out, so a cancelled batch silently emptied the list it was shown in.
+        for track in batch:
+            if track.state == TrackState.ANALYSING:
+                self._store.update(track.id, state=TrackState.PENDING)
 
         self._analyzing_track_ids = []
         self._analysis_thread = None
         self._analysis_panel.set_analyzing(False)
+        self._analysis_panel.refresh_table()
+
+        # Same auto-rename gate as the finished path, over just what completed.
+        if completed and self._pending_rename_operations is not None and self._config.auto_rename:
+            self._auto_rename_after_analysis(
+                [AnalysisResult(
+                    file_path=t.file_path,
+                    bpm=t.bpm or 0.0,
+                    bpm_confidence=t.bpm_confidence or 0.0,
+                    key=t.key or "",
+                    key_confidence=t.key_confidence or 0.0,
+                    keycode=t.keycode or "",
+                ) for t in completed]
+            )
+        self._pending_rename_operations = None
 
     def _auto_rename_after_analysis(self, current_results: list[AnalysisResult]) -> None:
         """Build rename previews for the current analysis batch and start rename thread."""

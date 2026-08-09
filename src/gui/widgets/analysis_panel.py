@@ -49,9 +49,61 @@ class AnalysisTableModel(TrackTableModel):
         "keycode", "key_alternatives", "energy", "state",
     ]
 
+    # Set before the base constructor's signal wiring can reach refresh().
+    _known_rows = -1
+
     def __init__(self, store: TrackStore, parent=None):
         super().__init__(store, parent)
         self._key_notation = "keycode"
+        self._known_rows = len(self._get_filtered_tracks())
+
+    def reset_rows(self) -> None:
+        """Rebuild every row, keeping the cached row count in step."""
+        self.beginResetModel()
+        self._known_rows = len(self._get_filtered_tracks())
+        self.endResetModel()
+
+    def refresh(self) -> None:
+        """Re-read the store after the tracks changed.
+
+        A state change can move a track into or out of the filtered set, so the
+        row count has to be re-checked: when it moved, only a full reset is
+        correct. When it did not, repainting the existing rows is enough and
+        avoids resetting the view — a reset drops the user's selection and
+        scroll position, which during a batch would fight them on every file.
+        """
+        rows = len(self._get_filtered_tracks())
+        if rows != self._known_rows:
+            self.beginResetModel()
+            self._known_rows = rows
+            self.endResetModel()
+        elif rows:
+            self.dataChanged.emit(
+                self.index(0, 0),
+                self.index(rows - 1, len(self.COLUMN_KEYS) - 1),
+            )
+
+    # The base class keys its incremental updates off _get_row_for_id, which
+    # indexes the *unfiltered* store — but this model's rowCount and data come
+    # from _get_filtered_tracks. Every one of those row numbers is therefore
+    # wrong here: dataChanged repainted an unrelated row, and beginInsertRows
+    # announced a row the view's own rowCount disagreed with. This is why the
+    # Status column only ever updated when something forced a full reset.
+    # Route them all through the filter-aware refresh instead.
+    def _on_track_added(self, track_id: str) -> None:
+        self.refresh()
+
+    def _on_track_removed(self, track_id: str) -> None:
+        self.refresh()
+
+    def _on_track_updated(self, track_id: str) -> None:
+        self.refresh()
+
+    def _on_tracks_cleared(self) -> None:
+        self.refresh()
+
+    def _on_batch_finished(self) -> None:
+        self.refresh()
 
     def set_key_notation(self, notation: str) -> None:
         """Set the display notation for alternative keys and repaint."""
@@ -60,6 +112,25 @@ class AnalysisTableModel(TrackTableModel):
         self._key_notation = notation
         self.beginResetModel()
         self.endResetModel()
+
+    def _state_label(self, state) -> str:
+        """Render a track's state for the Status column.
+
+        Was ``state.value.title()``, which shipped the raw enum: untranslated in
+        every language, and spelled "Analysed"/"Analysing" while the rest of the
+        panel says "analyzed". The enum values stay as they are — they are
+        persisted data, not display text.
+        """
+        if state is None:
+            return ""
+        labels = {
+            TrackState.QUEUED: self.tr("Queued"),
+            TrackState.PENDING: self.tr("Pending"),
+            TrackState.ANALYSING: self.tr("Analyzing"),
+            TrackState.ANALYSED: self.tr("Analyzed"),
+            TrackState.ERROR: self.tr("Error"),
+        }
+        return labels.get(state, "")
 
     def _format_alternatives(self, alternatives) -> str:
         """Render runner-up keys compactly in the configured notation."""
@@ -124,7 +195,7 @@ class AnalysisTableModel(TrackTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             value = getattr(track, column, None)
             if column == "state":
-                return value.value.title() if value else ""
+                return self._state_label(value)
             if column == "bpm" and value is not None:
                 return f"{value:.1f}"
             if column in ("bpm_confidence", "key_confidence") and value is not None:
@@ -253,7 +324,11 @@ class AnalysisPanel(QWidget):
         # Alt Keys sizes to its contents so the alternatives are never elided
         header.setSectionResizeMode(6, QHeaderView.ResizeMode.ResizeToContents)
         header.setSectionResizeMode(7, QHeaderView.ResizeMode.Fixed)  # Energy
-        header.setSectionResizeMode(8, QHeaderView.ResizeMode.Fixed)  # Status
+        # Status likewise sizes to its contents: the labels are translated, and
+        # five languages need more than the 100px this used to be fixed at
+        # ("Проанализирован" measures 126px, "In Warteschlange" 115px), which
+        # silently clipped the one column whose whole job is to be readable.
+        header.setSectionResizeMode(8, QHeaderView.ResizeMode.ResizeToContents)
         self._table.setColumnWidth(0, 360)  # Name
         self._table.setColumnWidth(1, 80)   # BPM
         self._table.setColumnWidth(2, 75)   # BPM Conf
@@ -261,7 +336,6 @@ class AnalysisPanel(QWidget):
         self._table.setColumnWidth(4, 75)   # Key Conf
         self._table.setColumnWidth(5, 80)   # Key Code
         self._table.setColumnWidth(7, 60)   # Energy
-        self._table.setColumnWidth(8, 100)  # Status
 
         layout.addWidget(self._table, 1)
 
@@ -514,6 +588,5 @@ class AnalysisPanel(QWidget):
         return self._progress_panel
 
     def refresh_table(self) -> None:
-        """Force a refresh of the table model."""
-        self._model.beginResetModel()
-        self._model.endResetModel()
+        """Force a full rebuild of the table model."""
+        self._model.reset_rows()
