@@ -15,13 +15,34 @@ from PySide6.QtWidgets import (
 
 
 class _NoFocusDelegate(QStyledItemDelegate):
-    """Delegate that suppresses the focus rectangle on items."""
+    """Suppresses the focus rectangle, and paints the row tint itself."""
 
     def initStyleOption(self, option, index) -> None:
         super().initStyleOption(option, index)
         option.state &= ~QStyle.StateFlag.State_HasFocus
 
+    def paint(self, painter, option, index) -> None:
+        """Draw the model's BackgroundRole under the item.
+
+        ``app.qss.template`` has a ``QTableView::item`` rule, and once a
+        stylesheet targets items Qt paints their background from the stylesheet
+        and ignores the model's BackgroundRole entirely — so returning a brush
+        from ``data()`` alone drew nothing at all. Skipped while selected, so
+        the selection highlight still reads over a tinted row.
+        """
+        brush = index.data(Qt.ItemDataRole.BackgroundRole)
+        if brush is not None and not (option.state & QStyle.StateFlag.State_Selected):
+            painter.fillRect(option.rect, brush)
+        super().paint(painter, option, index)
+
 from src.analysis.keycode import render_key
+from src.metadata import stores_tags
+
+# Row tint for a file that cannot store tags, painted by _NoFocusDelegate.
+# Calibrated against a rendered panel: much below 30 stops reading as a
+# deliberate highlight on the alternate rows, and much above 45 turns olive
+# under the green "Analyzed" text and costs it contrast.
+_TAGLESS_TINT_ALPHA = 36
 
 from ..models import TrackState, TrackStore, TrackTableModel
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
@@ -113,6 +134,11 @@ class AnalysisTableModel(TrackTableModel):
         self.beginResetModel()
         self.endResetModel()
 
+    def _tagless_tooltip(self) -> str:
+        return self.tr(
+            "WAV files do not store metadata, but the filename can still be changed."
+        )
+
     def _state_label(self, state) -> str:
         """Render a track's state for the Status column.
 
@@ -131,6 +157,24 @@ class AnalysisTableModel(TrackTableModel):
             TrackState.ERROR: self.tr("Error"),
         }
         return labels.get(state, "")
+
+    def _status_text(self, track) -> str:
+        """Status cell text, flagging a file that cannot hold what we detect.
+
+        A WAV says so up front — before it runs, where the user can still decide
+        it isn't worth analysing — and again once analysed, which is the moment
+        the limitation actually bites and the tags silently went nowhere. In
+        between, the live state matters more than the caveat, and the row tint
+        carries it.
+        """
+        label = self._state_label(track.state)
+        if stores_tags(track.file_path):
+            return label
+        if track.state == TrackState.PENDING:
+            return self.tr("WAV file")
+        if track.state == TrackState.ANALYSED:
+            return self.tr("Analyzed, no tags")
+        return label
 
     def _format_alternatives(self, alternatives) -> str:
         """Render runner-up keys compactly in the configured notation."""
@@ -195,7 +239,7 @@ class AnalysisTableModel(TrackTableModel):
         if role == Qt.ItemDataRole.DisplayRole:
             value = getattr(track, column, None)
             if column == "state":
-                return self._state_label(value)
+                return self._status_text(track)
             if column == "bpm" and value is not None:
                 return f"{value:.1f}"
             if column in ("bpm_confidence", "key_confidence") and value is not None:
@@ -204,8 +248,28 @@ class AnalysisTableModel(TrackTableModel):
                 return self._format_alternatives(value)
             return str(value) if value is not None else ""
 
-        if role == Qt.ItemDataRole.ToolTipRole and column == "key_alternatives":
-            return self._alternatives_tooltip(track.key_alternatives)
+        if role == Qt.ItemDataRole.ToolTipRole:
+            if column == "key_alternatives":
+                # Falls through when there are no alternatives to describe —
+                # returning its empty string would leave that one column as the
+                # only part of a tinted row with nothing explaining the tint.
+                alternatives = self._alternatives_tooltip(track.key_alternatives)
+                if alternatives:
+                    return alternatives
+            # On every other cell too: the row is tinted as a whole, so the
+            # explanation has to be reachable wherever the pointer lands on it.
+            if not stores_tags(track.file_path):
+                return self._tagless_tooltip()
+
+        if role == Qt.ItemDataRole.BackgroundRole:
+            # Tint the whole row for a file that cannot hold the tags we write.
+            # Background rather than text colour, so the state colouring below
+            # (green analysed / yellow analysing / red error) still reads.
+            if not stores_tags(track.file_path):
+                from PySide6.QtGui import QColor
+                tint = QColor(Theme.NEON_YELLOW)
+                tint.setAlpha(_TAGLESS_TINT_ALPHA)
+                return tint
 
         if role == Qt.ItemDataRole.ForegroundRole:
             # Color based on state

@@ -37,6 +37,9 @@ def model(store, qtbot):
 
 
 def _add(store, name: str, state: TrackState) -> TrackItem:
+    # Deliberately a taggable format: a .wav row is additionally flagged as
+    # unable to store tags, which is test_analysis_panel_tagless's subject and
+    # would mask the state label these tests are about.
     track = store.add_from_path(f"/music/{name}")
     assert track is not None
     store.update(track.id, state=state)
@@ -51,7 +54,7 @@ def _statuses(model) -> list[str]:
 
 def test_pending_tracks_are_listed(store, model):
     """A track waiting its turn must be visible, not just the finished ones."""
-    _add(store, "a.wav", TrackState.PENDING)
+    _add(store, "a.mp3", TrackState.PENDING)
     assert model.rowCount() == 1
     assert _statuses(model) == ["Pending"]
 
@@ -63,7 +66,7 @@ def test_status_follows_state_without_a_manual_refresh(store, model):
     filter), so the view is repainted via dataChanged — and it must actually be
     emitted, and must cover the Status column.
     """
-    track = _add(store, "a.wav", TrackState.PENDING)
+    track = _add(store, "a.mp3", TrackState.PENDING)
 
     changes = QSignalSpy(model.dataChanged)
     store.update(track.id, state=TrackState.ANALYSING)
@@ -85,7 +88,7 @@ def test_row_count_tracks_a_state_change_into_the_filter(store, model):
     row set changed — which was the actual defect. Only a reset makes the view
     re-ask.
     """
-    track = _add(store, "a.wav", TrackState.QUEUED)
+    track = _add(store, "a.mp3", TrackState.QUEUED)
     assert model.rowCount() == 0
 
     resets = QSignalSpy(model.modelReset)
@@ -97,12 +100,12 @@ def test_row_count_tracks_a_state_change_into_the_filter(store, model):
 
 def test_queued_tracks_stay_out_of_the_analyze_table(store, model):
     """QUEUED belongs to the Rename panel — it must not leak in here."""
-    _add(store, "rename-me.wav", TrackState.QUEUED)
+    _add(store, "rename-me.mp3", TrackState.QUEUED)
     assert model.rowCount() == 0
 
 
 def test_error_state_is_shown(store, model):
-    _add(store, "bad.wav", TrackState.ERROR)
+    _add(store, "bad.mp3", TrackState.ERROR)
     assert _statuses(model) == ["Error"]
 
 
@@ -112,15 +115,15 @@ def test_status_labels_are_translatable(store, model):
     Also pins the spelling to the panel's own "analyzed", not the enum's
     British "analysed".
     """
-    track = _add(store, "a.wav", TrackState.ANALYSED)
+    track = _add(store, "a.mp3", TrackState.ANALYSED)
     assert model.data(model.index(0, STATUS_COLUMN)) == "Analyzed"
     store.update(track.id, state=TrackState.ANALYSING)
     assert model.data(model.index(0, STATUS_COLUMN)) == "Analyzing"
 
 
 def test_removal_updates_the_row_count(store, model):
-    a = _add(store, "a.wav", TrackState.PENDING)
-    _add(store, "b.wav", TrackState.PENDING)
+    a = _add(store, "a.mp3", TrackState.PENDING)
+    _add(store, "b.mp3", TrackState.PENDING)
     assert model.rowCount() == 2
 
     store.remove(a.id)
@@ -131,7 +134,7 @@ def test_batch_add_is_visible_once_the_batch_ends(store, model):
     """Adds inside a batch are signal-suppressed; the end-of-batch reset shows
     them. Without it a drop of several files listed nothing at all."""
     store.begin_batch_update()
-    for name in ("a.wav", "b.wav", "c.wav"):
+    for name in ("a.mp3", "b.mp3", "c.mp3"):
         track = store.add_from_path(f"/music/{name}")
         store.update(track.id, state=TrackState.PENDING)
     store.end_batch_update()

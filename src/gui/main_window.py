@@ -29,7 +29,7 @@ from src import library
 from src.library import playlist_export
 from src.analysis.keycode import render_key
 from src.analysis.result import SUPPORTED_EXTENSIONS, AnalysisResult
-from src.metadata import update_bpm_key, update_comment_with_energy
+from src.metadata import stores_tags, update_bpm_key, update_comment_with_energy
 from src.renamer import (
     AddPrefix,
     AddSuffix,
@@ -1313,8 +1313,14 @@ class MainWindow(QMainWindow):
                 logger.warning(f"Failed to record analysis history: {e}")
 
             # Auto-write metadata — BPM and key are independently toggleable.
+            # Skipped outright for a format with nowhere to put them: the write
+            # otherwise reports success while discarding the value, which logged
+            # a run of "Failed to set bpm tag" warnings for a file that was
+            # never going to keep them. The Analyze panel flags such rows.
             write_bpm = self._analysis_panel.auto_write_bpm
             write_key = self._analysis_panel.auto_write_key
+            if not stores_tags(result.file_path):
+                write_bpm = write_key = False
             if write_bpm or write_key:
                 try:
                     bpm_value = result.bpm if write_bpm else None
@@ -1334,9 +1340,18 @@ class MainWindow(QMainWindow):
                     import traceback
                     logger.debug(traceback.format_exc())
 
-            # Write energy and/or key to comment tag based on independent settings
-            energy_on = self._config.energy_tag_enabled and result.energy is not None
-            key_on = self._config.key_in_comment_enabled and (result.key or result.keycode)
+            # Write energy and/or key to comment tag based on independent
+            # settings — skipped for the same reason as the BPM/key write above.
+            energy_on = (
+                self._config.energy_tag_enabled
+                and result.energy is not None
+                and stores_tags(result.file_path)
+            )
+            key_on = (
+                self._config.key_in_comment_enabled
+                and (result.key or result.keycode)
+                and stores_tags(result.file_path)
+            )
             if energy_on or key_on:
                 try:
                     key_value = None

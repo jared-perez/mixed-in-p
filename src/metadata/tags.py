@@ -97,6 +97,24 @@ def _parse_track_number(value: str | None) -> int | None:
         return None
 
 
+# Extensions whose files cannot carry the tags this app writes. WAV has no
+# slot for BPM or key in mutagen's easy interface, so a write is accepted and
+# silently discarded: update_bpm_key returns True and the value never comes
+# back. Verified by round-trip against every supported format — WAV is the only
+# one that drops them; FLAC, AIFF and MP3 all read back what was written.
+TAGLESS_EXTENSIONS = frozenset({".wav"})
+
+
+def stores_tags(file_path: str) -> bool:
+    """Whether writing BPM/key to this file would actually persist.
+
+    Answered from the extension rather than by attempting a write, because the
+    write reports success either way — which is exactly why a WAV analysed with
+    auto-write on looked like it had been tagged and had not.
+    """
+    return Path(file_path).suffix.lower() not in TAGLESS_EXTENSIONS
+
+
 def read_metadata(file_path: str) -> TrackMetadata:
     """Read metadata tags from an audio file.
 
