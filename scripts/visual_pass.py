@@ -31,17 +31,22 @@ and where clipping bites first.
     python scripts/visual_pass.py                # all languages, diffed against en
     python scripts/visual_pass.py --shots DIR    # also save a PNG per language/page
 
-Run it against a redirected HOME so it cannot overwrite your real Settings —
-it persists a language to config on purpose (see run()):
-
-    HOME=/tmp/vp python scripts/visual_pass.py
+It redirects its own app data and cannot touch your real Settings. It used to
+say to do that yourself (``HOME=/tmp/vp python scripts/visual_pass.py``) and
+that is not good enough: it persists a language to config on purpose (see
+run()), so forgetting the prefix once leaves the app launching in whichever
+language happened to run last — Korean, since ``ko`` sorts last. Which is
+exactly what happened, twice, before this was made automatic.
 """
 
 from __future__ import annotations
 
+import atexit
 import os
+import shutil
 import subprocess
 import sys
+import tempfile
 from dataclasses import replace
 from pathlib import Path
 
@@ -49,6 +54,22 @@ REPO = str(Path(__file__).resolve().parent.parent)
 sys.path.insert(0, REPO)
 
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+
+# Redirect app data for this process *and* every child, at import — before
+# anything can call get_app_data_dir(), which derives from HOME/%APPDATA%. The
+# same trick as race_check.child_env, done here rather than only in child() so
+# that a direct `--one <lang>` run is protected too. Children inherit VP_HOME
+# and so reuse this directory instead of making their own.
+_VP_HOME = os.environ.get("VP_HOME")
+if not _VP_HOME:
+    _VP_HOME = tempfile.mkdtemp(prefix="visual-pass-")
+    os.environ["VP_HOME"] = _VP_HOME
+    # Only the process that created it cleans it up, after its children exit.
+    atexit.register(shutil.rmtree, _VP_HOME, ignore_errors=True)
+if sys.platform == "win32":
+    os.environ["APPDATA"] = _VP_HOME
+else:
+    os.environ["HOME"] = _VP_HOME
 
 BUTTON_PADDING = 32      # qss: padding 8px 16px
 CHECK_INDICATOR = 34     # indicator + spacing
