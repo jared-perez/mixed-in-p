@@ -7,7 +7,7 @@ The full audio file preparation workflow for DJs.
 ## Features
 
 - Batch file renaming with undo
-- Audio conversion (MP3/WAV/FLAC/AIFF)
+- Audio conversion (MP3/WAV/FLAC/AIFF) — quality is only ever kept or lowered, including same-format downgrades (96k/24-bit FLAC → 44.1k/16-bit FLAC)
 - Acoustic spectrum analyzer
 - Audio Player + Slicer for sample lifting
 - Playlist library — folders, saved playlists, search across all of them, and export to `.m3u8`/`.m3u`/tracklist

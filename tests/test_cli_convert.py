@@ -101,6 +101,27 @@ class TestConvertDryRun:
         report = json.loads(capsys.readouterr().out)
         assert report[0]["status"] == "skipped"
 
+    def test_upsample_is_blocked_not_planned(self, wav_file, capsys):
+        """The planner runs the same quality rule the engine does, so the
+        preview can't promise a conversion that will come back an error."""
+        cli.run_convert(_make_args(
+            path=str(wav_file), to="FLAC", sample_rate=96000, bit_depth=24,
+            dry_run=True, format="json",
+        ))
+        report = json.loads(capsys.readouterr().out)
+        assert report[0]["status"] == "blocked"
+        assert "upsample" in report[0]["error"]
+
+    def test_same_format_downgrade_is_planned(self, wav_file, capsys):
+        """wav_file is 44.1 kHz/16-bit; 32 kHz WAV is a real job, not a skip."""
+        cli.run_convert(_make_args(
+            path=str(wav_file), to="WAV", sample_rate=32000,
+            dry_run=True, format="json",
+        ))
+        report = json.loads(capsys.readouterr().out)
+        assert report[0]["status"] == "planned"
+        assert report[0]["output_path"].endswith("tone (1).wav")
+
     def test_dry_run_predicts_deduped_name(self, tmp_path, capsys):
         # An existing tone.flac forces the real run to write "tone (1).flac";
         # the dry run must predict that exact name, not "tone.flac".

@@ -225,7 +225,11 @@ def main():
         "-t", "--to",
         required=True,
         choices=["WAV", "FLAC", "AIFF", "MP3"],
-        help="Target format",
+        help=(
+            "Target format. Quality is never raised: --sample-rate/--bit-depth above "
+            "the source's are refused, and the source's own format needs one of them "
+            "lower to be worth converting"
+        ),
     )
     convert_parser.add_argument(
         "-o", "--output-dir",
@@ -243,13 +247,19 @@ def main():
         "--sample-rate",
         type=int,
         metavar="HZ",
-        help="Resample to this rate (e.g. 44100); lossless targets only",
+        help=(
+            "Resample to this rate (e.g. 44100); lossless targets only, and never "
+            "above the source's (default: keep the source's)"
+        ),
     )
     convert_parser.add_argument(
         "--bit-depth",
         type=int,
         choices=[8, 16, 24, 32],
-        help="Output bit depth; lossless targets only (FLAC clamps 32->24, 8->16)",
+        help=(
+            "Output bit depth; lossless targets only, and never above the source's "
+            "(FLAC clamps 32->24, 8->16; default: keep the source's)"
+        ),
     )
     convert_parser.add_argument(
         "-f", "--format",
@@ -597,6 +607,10 @@ def run_convert(args):
         FORMAT_EXTENSION,
         LOSSLESS_EXTENSIONS,
         LOSSY_EXTENSIONS,
+        is_quality_downgrade,
+        is_same_format,
+        raises_quality,
+        read_audio_quality,
         resolve_output_path,
     )
 
@@ -620,23 +634,31 @@ def run_convert(args):
     target_ext = FORMAT_EXTENSION[args.to]
 
     # Dry run: classify each file without touching disk. Blocks (lossy/
-    # unsupported source) and skips (same-format) are predicted exactly, and
-    # planned output names go through the same resolve_output_path() the real
-    # conversion uses, so the preview matches the names that will be written
-    # (for output names already present on disk).
+    # unsupported source) and skips (same-format that isn't a downgrade) are
+    # predicted exactly — same helpers convert_file uses — and planned output
+    # names go through the same resolve_output_path() the real conversion uses,
+    # so the preview matches the names that will be written (for output names
+    # already present on disk).
     if args.dry_run:
         planned = []
         skipped = []
         blocked = []
         for fp in file_paths:
             ext = Path(fp).suffix.lower()
-            normalised = ".aiff" if ext == ".aif" else ext
+            # MP3 ignores rate/depth, so it is exempt from the quality tests.
+            rate, bits = (None, None) if args.to == "MP3" else read_audio_quality(fp)
             if ext in LOSSY_EXTENSIONS:
                 blocked.append((fp, "lossy source — lossless-to-lossy only"))
             elif ext not in LOSSLESS_EXTENSIONS:
                 blocked.append((fp, f"unsupported source format: {ext}"))
-            elif normalised == target_ext:
-                skipped.append(fp)
+            elif is_same_format(fp, target_ext):
+                if is_quality_downgrade(rate, bits, target_ext, args.sample_rate, args.bit_depth):
+                    out_path = resolve_output_path(fp, target_ext, args.output_dir)
+                    planned.append((fp, str(out_path)))
+                else:
+                    skipped.append(fp)
+            elif raises_quality(rate, bits, target_ext, args.sample_rate, args.bit_depth):
+                blocked.append((fp, "would upsample — quality is never raised"))
             else:
                 out_path = resolve_output_path(fp, target_ext, args.output_dir)
                 planned.append((fp, str(out_path)))
@@ -685,7 +707,7 @@ def _report_convert_plan(planned, skipped, blocked, target_format):
     for source, out_path in planned:
         print(f"  PLAN   {Path(source).name}  ->  {Path(out_path).name}")
     for source in skipped:
-        print(f"  SKIP   {Path(source).name}  (already {target_format})")
+        print(f"  SKIP   {Path(source).name}  (already {target_format} at these settings)")
     for source, why in blocked:
         print(f"  BLOCK  {Path(source).name}  ->  {why}")
     print(

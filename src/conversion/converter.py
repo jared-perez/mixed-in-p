@@ -2,7 +2,9 @@
 
 Converts between WAV, FLAC, and AIFF using soundfile.
 Supports encoding to MP3 via lameenc.
-Blocks lossy-to-lossless conversions entirely.
+Quality only ever goes down: lossy sources are blocked entirely, a conversion
+that would raise the sample rate or bit depth is refused, and converting a
+file into its own format runs only when it lowers one of them.
 """
 
 from __future__ import annotations
@@ -17,7 +19,12 @@ from .result import (
     LOSSY_EXTENSIONS,
     FORMAT_EXTENSION,
     ConversionResult,
+    effective_bit_depth,
     is_lossless,
+    is_quality_downgrade,
+    is_same_format,
+    raises_quality,
+    read_audio_quality,
     resolve_output_path,
 )
 
@@ -103,18 +110,19 @@ def _diagnose_truncation(source_path: str) -> str | None:
 
 
 def _resolve_subtype(bit_depth: int | None, target_ext: str, source_subtype: str) -> str:
-    """Map (bit_depth, target format) -> a soundfile subtype, with FLAC fallbacks."""
+    """Map (bit_depth, target format) -> a soundfile subtype, with FLAC fallbacks.
+
+    The clamping lives in effective_bit_depth so the skip rule and the writer
+    can never disagree about what a request actually produces.
+    """
     if bit_depth is None:
         return source_subtype
-    subtype = _BIT_DEPTH_SUBTYPE.get(bit_depth, source_subtype)
-    if target_ext == ".flac":
-        if bit_depth == 32:
-            logger.warning("FLAC does not support 32-bit PCM; falling back to 24-bit")
-            subtype = "PCM_24"
-        elif bit_depth == 8:
-            logger.warning("FLAC does not support 8-bit PCM; falling back to 16-bit")
-            subtype = "PCM_16"
-    return subtype
+    effective = effective_bit_depth(bit_depth, target_ext)
+    if effective != bit_depth:
+        logger.warning(
+            f"FLAC does not support {bit_depth}-bit PCM; falling back to {effective}-bit"
+        )
+    return _BIT_DEPTH_SUBTYPE.get(effective, source_subtype)
 
 
 def convert_file(
@@ -165,15 +173,34 @@ def convert_file(
             error=f"Unsupported source format: {src_ext}",
         )
 
-    # Skip same-format (including .aif -> .aiff)
-    normalised_src = ".aiff" if src_ext == ".aif" else src_ext
-    if normalised_src == target_ext:
-        return ConversionResult(
-            source_path=source_path,
-            output_path="",
-            target_format=target_format,
-            skipped=True,
-        )
+    # Quality only ever goes down. MP3 is exempt: its own axis is the bitrate,
+    # and _convert_to_mp3 ignores sample_rate/bit_depth entirely.
+    #
+    # Into the source's own format (including .aif -> .aiff) that means a
+    # strict downgrade — anything else is a no-op rewrite or an upsample, and
+    # both are skipped. Into a different format, equal settings are the point
+    # (the everyday container change), so only a raise is refused.
+    if target_format != "MP3":
+        source_rate, source_bits = read_audio_quality(source_path)
+        if is_same_format(source_path, target_ext):
+            if not is_quality_downgrade(
+                source_rate, source_bits, target_ext, sample_rate, bit_depth
+            ):
+                return ConversionResult(
+                    source_path=source_path,
+                    output_path="",
+                    target_format=target_format,
+                    skipped=True,
+                )
+        elif raises_quality(source_rate, source_bits, target_ext, sample_rate, bit_depth):
+            return ConversionResult(
+                source_path=source_path,
+                output_path="",
+                target_format=target_format,
+                error=(
+                    "Upsampling to a higher sample rate or bit depth is not supported"
+                ),
+            )
 
     # Build output path. Dedupes against existing files; shared with the CLI
     # dry-run (resolve_output_path) so the preview shows the exact name written.

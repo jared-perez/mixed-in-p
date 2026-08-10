@@ -17,7 +17,16 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from src.conversion.result import LOSSLESS_EXTENSIONS, LOSSY_EXTENSIONS, ConversionResult
+from src.conversion.result import (
+    FORMAT_EXTENSION,
+    LOSSLESS_EXTENSIONS,
+    LOSSY_EXTENSIONS,
+    ConversionResult,
+    is_quality_downgrade,
+    is_same_format,
+    raises_quality,
+    read_audio_quality,
+)
 from src.utils.config import load_config, save_config
 
 from ..models import TrackStore
@@ -46,7 +55,10 @@ class ConversionPanel(QWidget):
         self._file_paths: list[str] = []  # local file list, independent of TrackStore
         self._converted_outputs: dict[str, str] = {}  # source path -> converted output path
         self._converting: set[str] = set()  # source paths currently mid-conversion
-        self._file_info_cache: dict[str, str] = {}
+        # source path -> (sample rate, bit depth); (None, None) if unreadable.
+        # Feeds both the "From" label and the same-format downgrade test, so one
+        # sf.info() per file covers both.
+        self._quality_cache: dict[str, tuple[int | None, int | None]] = {}
         self._config = load_config()
         self._loading_settings = True
         self._setup_ui()
@@ -220,6 +232,10 @@ class ConversionPanel(QWidget):
         self._format_combo.currentTextChanged.connect(self._save_convert_settings)
         self._samplerate_combo.currentIndexChanged.connect(self._save_convert_settings)
         self._bitdepth_combo.currentIndexChanged.connect(self._save_convert_settings)
+        # Rate/depth decide whether a same-format row is a downgrade, so they
+        # change Ready/Same format the same way the target format does.
+        self._samplerate_combo.currentIndexChanged.connect(self._refresh_table)
+        self._bitdepth_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitrate_combo.currentTextChanged.connect(self._save_convert_settings)
         self._file_table.files_dropped.connect(self.add_files)
         self._file_table.itemSelectionChanged.connect(self._on_selection_changed)
@@ -237,33 +253,57 @@ class ConversionPanel(QWidget):
         effective = [self._effective_path(s) for s in sources]
         return effective, lambda: self._remove_sources(sources)
 
-    _SUBTYPE_BITS = {
-        "PCM_S8": 8,
-        "PCM_U8": 8,
-        "PCM_16": 16,
-        "PCM_24": 24,
-        "PCM_32": 32,
-        "FLOAT": 32,
-        "DOUBLE": 64,
-    }
+    def _quality(self, file_path: str) -> tuple[int | None, int | None]:
+        """The file's (sample rate, bit depth), read once and cached."""
+        cached = self._quality_cache.get(file_path)
+        if cached is None:
+            cached = read_audio_quality(file_path)
+            self._quality_cache[file_path] = cached
+        return cached
 
     def _get_from_label(self, file_path: str, src_ext: str) -> str:
         """Build a 'From' label like 'FLAC 44.1k/16' for the given file."""
-        cached = self._file_info_cache.get(file_path)
-        if cached is not None:
-            return cached
         ext_label = src_ext.upper().lstrip(".")
-        try:
-            import soundfile as sf
-            info = sf.info(file_path)
-            sr_khz = info.samplerate / 1000.0
-            sr_str = f"{sr_khz:.1f}".rstrip("0").rstrip(".") + "k"
-            bits = self._SUBTYPE_BITS.get(info.subtype)
-            label = f"{ext_label} {sr_str}/{bits}" if bits else f"{ext_label} {sr_str}"
-        except Exception:
-            label = ext_label
-        self._file_info_cache[file_path] = label
-        return label
+        rate, bits = self._quality(file_path)
+        if rate is None:
+            return ext_label
+        sr_str = f"{rate / 1000.0:.1f}".rstrip("0").rstrip(".") + "k"
+        return f"{ext_label} {sr_str}/{bits}" if bits else f"{ext_label} {sr_str}"
+
+    def _target_ext(self) -> str:
+        """Extension for the currently selected target format."""
+        return FORMAT_EXTENSION.get(self._format_combo.currentText(), ".aiff")
+
+    # Row verdicts. READY is the only one that converts; the other two each
+    # need their own status text, because "there is nothing to lower" and
+    # "that would be an upsample" call for opposite corrections.
+    READY = "ready"
+    SAME_FORMAT = "same_format"
+    UPSAMPLE = "upsample"
+
+    def _verdict(self, file_path: str, target_ext: str, is_mp3: bool) -> str:
+        """What the current settings would do to this file.
+
+        Quality only ever goes down. Into its own format that means a strict
+        downgrade — a 96 kHz/24-bit FLAC to 44.1 kHz/16-bit FLAC for older
+        players; matching settings would just rewrite it. Into another format,
+        equal settings are the whole point, so only a raise is refused. MP3 is
+        exempt: the rate/depth selectors don't apply to it.
+
+        Ignores whether the file was already converted; callers handle that.
+        """
+        if is_mp3:
+            return self.READY
+        rate, bits = self._quality(file_path)
+        sample_rate = self._samplerate_combo.currentData()
+        bit_depth = self._bitdepth_combo.currentData()
+        if is_same_format(file_path, target_ext):
+            if is_quality_downgrade(rate, bits, target_ext, sample_rate, bit_depth):
+                return self.READY
+            return self.SAME_FORMAT
+        if raises_quality(rate, bits, target_ext, sample_rate, bit_depth):
+            return self.UPSAMPLE
+        return self.READY
 
     def add_files(self, paths: list[str]) -> None:
         """Add files to the conversion list."""
@@ -358,7 +398,7 @@ class ConversionPanel(QWidget):
         self._file_paths = [p for p in self._file_paths if p not in to_remove]
         for p in to_remove:
             self._converted_outputs.pop(p, None)
-            self._file_info_cache.pop(p, None)
+            self._quality_cache.pop(p, None)
         self._refresh_table()
 
     def _on_remove_selected(self) -> None:
@@ -408,12 +448,7 @@ class ConversionPanel(QWidget):
     def _refresh_table(self) -> None:
         """Rebuild the file table from the local file list."""
         target_format = self._format_combo.currentText()
-        target_ext = {
-            "WAV": ".wav",
-            "FLAC": ".flac",
-            "AIFF": ".aiff",
-            "MP3": ".mp3",
-        }.get(target_format, ".aiff")
+        target_ext = self._target_ext()
         is_mp3 = target_format == "MP3"
 
         # Separate lossless from lossy
@@ -432,7 +467,6 @@ class ConversionPanel(QWidget):
         for row, file_path in enumerate(lossless_paths):
             src_path = Path(file_path)
             src_ext = src_path.suffix.lower()
-            normalised_src = ".aiff" if src_ext == ".aif" else src_ext
 
             # Filename — once converted, show the output's name (new extension) so
             # the user can see the result and knows that's what a drag / Send To
@@ -464,18 +498,30 @@ class ConversionPanel(QWidget):
                     " font-weight: bold;"
                 )
                 self._file_table.setCellWidget(row, 3, label)
-            elif not is_mp3 and normalised_src == target_ext:
-                status_text = self.tr("Same format")
-                status_item = QTableWidgetItem(status_text)
-                status_item.setForeground(Qt.GlobalColor.darkYellow)
-                status_item.setFlags(status_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
-                status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
-                self._file_table.setItem(row, 3, status_item)
             else:
-                status_text = self.tr("Ready")
+                # A row that won't convert says which way to move the
+                # selectors, since the status alone can't.
+                verdict = self._verdict(file_path, target_ext, is_mp3)
+                if verdict == self.SAME_FORMAT:
+                    status_text = self.tr("Same format")
+                    colour = Qt.GlobalColor.darkYellow
+                    tooltip = self.tr(
+                        "Choose a lower sample rate or bit depth to convert this file."
+                    )
+                elif verdict == self.UPSAMPLE:
+                    status_text = self.tr("Would upsample")
+                    colour = Qt.GlobalColor.darkYellow
+                    tooltip = self.tr(
+                        "Choose a sample rate and bit depth no higher than this file's."
+                    )
+                else:
+                    status_text = self.tr("Ready")
+                    colour = Qt.GlobalColor.green
+                    tooltip = ""
+                    convertible_count += 1
                 status_item = QTableWidgetItem(status_text)
-                status_item.setForeground(Qt.GlobalColor.green)
-                convertible_count += 1
+                status_item.setForeground(colour)
+                status_item.setToolTip(tooltip)
                 status_item.setFlags(status_item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 status_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
                 self._file_table.setItem(row, 3, status_item)
@@ -499,22 +545,17 @@ class ConversionPanel(QWidget):
     def _on_convert_clicked(self) -> None:
         """Handle convert button click."""
         target_format = self._format_combo.currentText()
-        target_ext = {
-            "WAV": ".wav",
-            "FLAC": ".flac",
-            "AIFF": ".aiff",
-            "MP3": ".mp3",
-        }.get(target_format, ".aiff")
+        target_ext = self._target_ext()
         is_mp3 = target_format == "MP3"
 
-        # Collect only convertible file paths (skip already converted)
-        file_paths = []
-        for p in self._file_paths:
-            ext = Path(p).suffix.lower()
-            normalised = ".aiff" if ext == ".aif" else ext
-            if ext in LOSSLESS_EXTENSIONS and p not in self._converted_outputs:
-                if is_mp3 or normalised != target_ext:
-                    file_paths.append(p)
+        # Collect only convertible file paths (skip already converted). Shares
+        # _verdict with the table so what runs matches what says "Ready".
+        file_paths = [
+            p for p in self._file_paths
+            if Path(p).suffix.lower() in LOSSLESS_EXTENSIONS
+            and p not in self._converted_outputs
+            and self._verdict(p, target_ext, is_mp3) == self.READY
+        ]
 
         if file_paths:
             bitrate = int(self._bitrate_combo.currentText())
