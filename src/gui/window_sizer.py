@@ -128,6 +128,17 @@ class WindowSizer:
                 # sidebar can be up to 600px wide and the constant would
                 # understate the window minimum by the difference.
                 base = max(base, self.window._sidebar.width() + row + _SLACK)
+        elif page_id == "convert":
+            # Measured, not assumed: the format selectors are labelled in the
+            # user's language, and a constant left the longest of them clipped
+            # instead of widening the window. Same shape as the player's slice
+            # row above, including the live sidebar width.
+            base = max(
+                _PANEL_MIN_WIDTH["convert"],
+                self.window._sidebar.width()
+                + self.window._conversion_panel.format_row_min_width()
+                + _SLACK,
+            )
         else:
             base = _PANEL_MIN_WIDTH.get(page_id, 600)
         return max(base, self.window._header.minimumSizeHint().width())

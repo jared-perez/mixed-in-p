@@ -90,8 +90,10 @@ class AppConfig:
     energy_written_first: bool = True
     convert_target_format: str = "AIFF"
     convert_mp3_bitrate: int = 320
-    convert_sample_rate: int = 44100
-    convert_bit_depth: int = 16
+    # None is the "Keep source" selection — the engine reads it as "don't
+    # change this axis", which is what the CLI passes when the flag is omitted.
+    convert_sample_rate: int | None = 44100
+    convert_bit_depth: int | None = 16
     spectrum_dynamic_range: float = 110.0
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
@@ -144,6 +146,24 @@ def _config_path() -> Path:
     return get_app_data_dir() / "config.json"
 
 
+def _optional_int(data: dict, key: str, default: int | None) -> int | None:
+    """Read a setting that is either a number or null.
+
+    A missing key falls back to the default; an explicit null stays None
+    ("Keep source"), which a bare int() would raise on. A non-numeric value
+    falls back rather than propagating a broken config.
+    """
+    if key not in data:
+        return default
+    value = data[key]
+    if value is None:
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return default
+
+
 def load_config() -> AppConfig:
     """Load config from disk, returning defaults if missing or corrupt."""
     path = _config_path()
@@ -180,8 +200,14 @@ def load_config() -> AppConfig:
                 ),
                 convert_target_format=data.get("convert_target_format", AppConfig.convert_target_format),
                 convert_mp3_bitrate=int(data.get("convert_mp3_bitrate", AppConfig.convert_mp3_bitrate)),
-                convert_sample_rate=int(data.get("convert_sample_rate", AppConfig.convert_sample_rate)),
-                convert_bit_depth=int(data.get("convert_bit_depth", AppConfig.convert_bit_depth)),
+                # null in the JSON is "Keep source" and must survive as None,
+                # so these can't go through a bare int().
+                convert_sample_rate=_optional_int(
+                    data, "convert_sample_rate", AppConfig.convert_sample_rate
+                ),
+                convert_bit_depth=_optional_int(
+                    data, "convert_bit_depth", AppConfig.convert_bit_depth
+                ),
                 spectrum_dynamic_range=float(
                     data.get("spectrum_dynamic_range", AppConfig.spectrum_dynamic_range)
                 ),
@@ -234,9 +260,10 @@ def load_config() -> AppConfig:
                 cfg.convert_target_format = AppConfig.convert_target_format
             if cfg.convert_mp3_bitrate not in {128, 192, 256, 320}:
                 cfg.convert_mp3_bitrate = AppConfig.convert_mp3_bitrate
-            if cfg.convert_sample_rate not in {32000, 44100, 48000, 96000}:
+            # None is valid on both: it is the "Keep source" selection.
+            if cfg.convert_sample_rate not in {None, 32000, 44100, 48000, 96000}:
                 cfg.convert_sample_rate = AppConfig.convert_sample_rate
-            if cfg.convert_bit_depth not in {8, 16, 24, 32}:
+            if cfg.convert_bit_depth not in {None, 8, 16, 24, 32}:
                 cfg.convert_bit_depth = AppConfig.convert_bit_depth
             cfg.spectrum_dynamic_range = max(60.0, min(cfg.spectrum_dynamic_range, 150.0))
             if not _HEX_COLOR_RE.match(cfg.waveform_color):

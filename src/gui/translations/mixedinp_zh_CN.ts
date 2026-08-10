@@ -376,111 +376,118 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="80"/>
-        <location filename="../widgets/conversion_panel.py" line="191"/>
+        <location filename="../widgets/conversion_panel.py" line="83"/>
+        <location filename="../widgets/conversion_panel.py" line="199"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="83"/>
+        <location filename="../widgets/conversion_panel.py" line="86"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>在不同格式之间转换音频文件（WAV、FLAC、AIFF、MP3）。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="89"/>
+        <location filename="../widgets/conversion_panel.py" line="92"/>
         <source>Target Format:</source>
         <translation>目标格式：</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="96"/>
+        <location filename="../widgets/conversion_panel.py" line="99"/>
         <source>Sample Rate:</source>
         <translation>采样率：</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="99"/>
+        <location filename="../widgets/conversion_panel.py" line="105"/>
+        <location filename="../widgets/conversion_panel.py" line="122"/>
+        <source>Keep source</source>
+        <translatorcomment>Combo item: keep the source file&apos;s own sample rate / bit depth (the engine leaves that axis alone).</translatorcomment>
+        <translation>保持源文件</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="106"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="100"/>
+        <location filename="../widgets/conversion_panel.py" line="107"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="101"/>
+        <location filename="../widgets/conversion_panel.py" line="108"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="102"/>
+        <location filename="../widgets/conversion_panel.py" line="109"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="112"/>
+        <location filename="../widgets/conversion_panel.py" line="119"/>
         <source>Bit Depth:</source>
         <translation>位深度：</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="115"/>
+        <location filename="../widgets/conversion_panel.py" line="123"/>
         <source>32 bit</source>
         <translation>32 bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="116"/>
+        <location filename="../widgets/conversion_panel.py" line="124"/>
         <source>24 bit (DVD)</source>
         <translation>24 bit (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="117"/>
+        <location filename="../widgets/conversion_panel.py" line="125"/>
         <source>16 bit (CD)</source>
         <translation>16 bit (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="118"/>
+        <location filename="../widgets/conversion_panel.py" line="126"/>
         <source>8 bit</source>
         <translation>8 bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="128"/>
+        <location filename="../widgets/conversion_panel.py" line="136"/>
         <source>Bitrate:</source>
         <translation>比特率：</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="149"/>
+        <location filename="../widgets/conversion_panel.py" line="157"/>
         <source>Files</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="152"/>
+        <location filename="../widgets/conversion_panel.py" line="160"/>
         <source>Drop audio files here to add them</source>
         <translation>将音频文件拖到此处以添加</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="155"/>
+        <location filename="../widgets/conversion_panel.py" line="163"/>
         <source>Filename</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="156"/>
+        <location filename="../widgets/conversion_panel.py" line="164"/>
         <source>From</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>源</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="157"/>
+        <location filename="../widgets/conversion_panel.py" line="165"/>
         <source>To</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>目标</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="158"/>
+        <location filename="../widgets/conversion_panel.py" line="166"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
-        <location filename="../widgets/conversion_panel.py" line="537"/>
+        <location filename="../widgets/conversion_panel.py" line="193"/>
+        <location filename="../widgets/conversion_panel.py" line="545"/>
         <source>No files</source>
         <translation>无文件</translation>
     </message>
@@ -489,109 +496,109 @@ or click “Add Artwork…”</source>
         <translation type="vanished">移除所选</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="198"/>
+        <location filename="../widgets/conversion_panel.py" line="206"/>
         <source>Send To</source>
         <translation>发送到</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="200"/>
+        <location filename="../widgets/conversion_panel.py" line="208"/>
         <source>Select at least one file to send.</source>
         <translation>请至少选择一个文件以发送。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="202"/>
+        <location filename="../widgets/conversion_panel.py" line="210"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="203"/>
+        <location filename="../widgets/conversion_panel.py" line="211"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="204"/>
+        <location filename="../widgets/conversion_panel.py" line="212"/>
         <source>Player</source>
         <translation>播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="213"/>
+        <location filename="../widgets/conversion_panel.py" line="221"/>
         <source>Lossy files not allowed</source>
         <translation>不允许有损文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="416"/>
+        <location filename="../widgets/conversion_panel.py" line="424"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="418"/>
+        <location filename="../widgets/conversion_panel.py" line="426"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="493"/>
-        <location filename="../widgets/conversion_panel.py" line="690"/>
+        <location filename="../widgets/conversion_panel.py" line="501"/>
+        <location filename="../widgets/conversion_panel.py" line="702"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="506"/>
+        <location filename="../widgets/conversion_panel.py" line="514"/>
         <source>Same format</source>
         <translation>相同格式</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="509"/>
+        <location filename="../widgets/conversion_panel.py" line="517"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>选择更低的采样率或位深度即可转换此文件。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="512"/>
+        <location filename="../widgets/conversion_panel.py" line="520"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>高于源文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="515"/>
+        <location filename="../widgets/conversion_panel.py" line="523"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>请选择不高于此文件的采样率和位深度。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="518"/>
-        <location filename="../widgets/conversion_panel.py" line="682"/>
-        <location filename="../widgets/conversion_panel.py" line="712"/>
+        <location filename="../widgets/conversion_panel.py" line="526"/>
+        <location filename="../widgets/conversion_panel.py" line="694"/>
+        <location filename="../widgets/conversion_panel.py" line="724"/>
         <source>Ready</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="532"/>
+        <location filename="../widgets/conversion_panel.py" line="540"/>
         <source>{count} files</source>
         <translatorcomment>File count measure word 个: {count}个文件.</translatorcomment>
         <translation>{count}个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="534"/>
+        <location filename="../widgets/conversion_panel.py" line="542"/>
         <source>{count} to convert</source>
         <translatorcomment>Measure word 个: {count}个待转换.</translatorcomment>
         <translation>{count}个待转换</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="536"/>
+        <location filename="../widgets/conversion_panel.py" line="544"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>（已跳过{count}个有损文件）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="654"/>
+        <location filename="../widgets/conversion_panel.py" line="666"/>
         <source>Converting</source>
         <translation>转换中</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="675"/>
+        <location filename="../widgets/conversion_panel.py" line="687"/>
         <source>Incomplete</source>
         <translation>未完成</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="675"/>
+        <location filename="../widgets/conversion_panel.py" line="687"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
@@ -1082,52 +1089,52 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已取消</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1127"/>
+        <location filename="../main_window.py" line="1131"/>
         <source>Conversion in Progress</source>
         <translation>转换进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1128"/>
+        <location filename="../main_window.py" line="1132"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>已有转换正在运行。请稍候。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1178"/>
+        <location filename="../main_window.py" line="1182"/>
         <source>Converting...</source>
         <translation>转换中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1194"/>
+        <location filename="../main_window.py" line="1198"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完成：已转换{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1198"/>
+        <location filename="../main_window.py" line="1202"/>
         <source>Complete: {0} files converted</source>
         <translation>完成：已转换{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1382"/>
+        <location filename="../main_window.py" line="1386"/>
         <source>Rename in Progress</source>
         <translation>重命名进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1383"/>
+        <location filename="../main_window.py" line="1387"/>
         <source>A rename operation is already running.</source>
         <translation>已有重命名操作正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1441"/>
+        <location filename="../main_window.py" line="1445"/>
         <source>Rename Failed</source>
         <translation>重命名失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1475"/>
+        <location filename="../main_window.py" line="1479"/>
         <source>Undo Rename</source>
         <translation>撤销重命名</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1506"/>
+        <location filename="../main_window.py" line="1510"/>
         <source>Undo Failed</source>
         <translation>撤销失败</translation>
     </message>
@@ -1140,22 +1147,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1447"/>
+        <location filename="../main_window.py" line="1451"/>
         <source>No Session</source>
         <translation>无会话</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1447"/>
+        <location filename="../main_window.py" line="1451"/>
         <source>No rename session to undo.</source>
         <translation>没有可撤销的重命名会话。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1456"/>
+        <location filename="../main_window.py" line="1460"/>
         <source>Confirm Undo</source>
         <translation>确认撤销</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1457"/>
+        <location filename="../main_window.py" line="1461"/>
         <source>Undo renaming of {0} files?</source>
         <translation>撤销{0}个文件的重命名？</translation>
     </message>
@@ -1164,7 +1171,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">正在撤销重命名……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1476"/>
+        <location filename="../main_window.py" line="1480"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>已撤销：{0}个文件，{1}个错误</translation>
     </message>

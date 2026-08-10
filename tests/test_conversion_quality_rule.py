@@ -213,6 +213,60 @@ class TestSameFormatConversion:
         assert not result.skipped and result.error is None
 
 
+class TestKeepSource:
+    """bit_depth=None hands the source's own subtype to the writer, and the
+    containers do not all hold the same ones."""
+
+    def test_float_wav_to_flac_falls_back_to_24_bit(self, tmp_path):
+        """FLAC has no FLOAT, and 32-bit float is what a DAW exports. Without
+        a fallback this is the everyday file that "Keep source" would fail on."""
+        sf = pytest.importorskip("soundfile")
+        src = _write(tmp_path / "render.wav", 44100, "FLOAT")
+
+        result = convert_file(src, "FLAC")
+
+        assert result.error is None and not result.skipped
+        assert sf.info(result.output_path).subtype == "PCM_24"
+
+    def test_eight_bit_wav_to_flac_stays_eight_bit(self, tmp_path):
+        """FLAC has no PCM_U8 but does have PCM_S8 — match the width, don't
+        jump to 24-bit just because it is the first thing that fits."""
+        sf = pytest.importorskip("soundfile")
+        src = _write(tmp_path / "old.wav", 22050, "PCM_U8")
+
+        result = convert_file(src, "FLAC")
+
+        assert result.error is None
+        assert sf.info(result.output_path).subtype == "PCM_S8"
+
+    def test_rate_is_untouched(self, tmp_path):
+        """The rescue case: 22.05 kHz is below every rate the GUI offers."""
+        sf = pytest.importorskip("soundfile")
+        src = _write(tmp_path / "old.wav", 22050, "PCM_16")
+
+        result = convert_file(src, "FLAC", sample_rate=None, bit_depth=None)
+
+        assert result.error is None
+        info = sf.info(result.output_path)
+        assert info.samplerate == 22050
+        assert info.subtype == "PCM_16"
+
+    def test_one_axis_kept_one_lowered(self, tmp_path):
+        sf = pytest.importorskip("soundfile")
+        src = _write(tmp_path / "tone.flac", 96000, "PCM_24")
+
+        result = convert_file(src, "AIFF", sample_rate=None, bit_depth=16)
+
+        assert result.error is None
+        info = sf.info(result.output_path)
+        assert info.samplerate == 96000
+        assert info.subtype == "PCM_16"
+
+    def test_keeping_both_into_the_same_format_is_a_no_op(self, tmp_path):
+        src = _write(tmp_path / "tone.flac", 96000, "PCM_24")
+        assert convert_file(src, "FLAC", sample_rate=None, bit_depth=None).skipped
+
+
 class TestCrossFormatUpsample:
     """A different format is free to keep the quality — never to raise it."""
 

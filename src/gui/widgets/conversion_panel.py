@@ -39,7 +39,10 @@ from .progress_bar import ProgressPanel
 class ConversionPanel(QWidget):
     """Panel for converting audio files between lossless formats."""
 
-    start_conversion = Signal(list, str, int, int, int)  # (file_paths, target_format, bitrate, sample_rate, bit_depth)
+    # (file_paths, target_format, bitrate, sample_rate, bit_depth). The last
+    # two are `object`, not `int`: None is the "Keep source" selection and a
+    # Signal(int) would quietly deliver it as 0.
+    start_conversion = Signal(list, str, int, object, object)
     cancel_conversion = Signal()
     send_to_analyze = Signal(list)  # list of file path strings
     send_to_rename = Signal(list)  # list of file path strings
@@ -66,6 +69,38 @@ class ConversionPanel(QWidget):
         self._connect_signals()
         self._bg_overlay = BackgroundOverlay("bg_convert.png", self)
 
+    def format_row_min_width(self) -> int:
+        """Panel width the format selectors need, including the panel's padding.
+
+        The window minimum for Convert was a constant, so a translation that
+        widened these controls pushed the row past the window and the labels
+        were squeezed rather than the window grown — 'Frequenza di
+        campionamento:' clipped by 25px once "Keep source" widened the combos.
+
+        Measured over the lossless controls whichever are currently showing:
+        hidden widgets contribute nothing to a layout's own hint, so asking the
+        row would shrink the minimum the moment MP3 hid the rate and depth, and
+        the window would jump about as the target format changed. The bitrate
+        pair is excluded because it is narrower and never shares the row.
+        """
+        row = self._format_row_widget.layout()
+        widgets = (
+            self._format_label,
+            self._format_combo,
+            self._samplerate_label,
+            self._samplerate_combo,
+            self._bitdepth_label,
+            self._bitdepth_combo,
+        )
+        margins = row.contentsMargins()
+        return (
+            sum(w.sizeHint().width() for w in widgets)
+            + row.spacing() * (len(widgets) - 1)
+            + margins.left()
+            + margins.right()
+            + Theme.PADDING * 2  # the panel's own contents margins
+        )
+
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         self._bg_overlay.setGeometry(self.rect())
@@ -86,7 +121,8 @@ class ConversionPanel(QWidget):
 
         # Target format selector
         format_row = QHBoxLayout()
-        format_row.addWidget(QLabel(self.tr("Target Format:")))
+        self._format_label = QLabel(self.tr("Target Format:"))
+        format_row.addWidget(self._format_label)
         self._format_combo = QComboBox()
         self._format_combo.addItems(["AIFF", "WAV", "FLAC", "MP3"])
         self._format_combo.setCurrentText(self._config.convert_target_format)
@@ -95,7 +131,11 @@ class ConversionPanel(QWidget):
         # Sample rate selector (visible for lossless targets)
         self._samplerate_label = QLabel(self.tr("Sample Rate:"))
         self._samplerate_combo = QComboBox()
+        # "Keep source" (None) leaves the axis alone, the way the CLI does with
+        # the flag omitted. It is the only setting that suits a mixed batch,
+        # and the only one available to a source below the lowest rate here.
         for label, hz in [
+            (self.tr("Keep source"), None),
             (self.tr("96 kHz (DVD)"), 96000),
             (self.tr("48 kHz (DAT)"), 48000),
             (self.tr("44.1 kHz (CD)"), 44100),
@@ -112,6 +152,7 @@ class ConversionPanel(QWidget):
         self._bitdepth_label = QLabel(self.tr("Bit Depth:"))
         self._bitdepth_combo = QComboBox()
         for label, bits in [
+            (self.tr("Keep source"), None),
             (self.tr("32 bit"), 32),
             (self.tr("24 bit (DVD)"), 24),
             (self.tr("16 bit (CD)"), 16),
@@ -365,12 +406,12 @@ class ConversionPanel(QWidget):
         cfg = load_config()
         cfg.convert_target_format = self._format_combo.currentText()
         cfg.convert_mp3_bitrate = int(self._bitrate_combo.currentText())
+        # None is a real choice here ("Keep source"), so it is stored, not
+        # treated as "nothing selected".
         sr = self._samplerate_combo.currentData()
         bd = self._bitdepth_combo.currentData()
-        if sr is not None:
-            cfg.convert_sample_rate = int(sr)
-        if bd is not None:
-            cfg.convert_bit_depth = int(bd)
+        cfg.convert_sample_rate = None if sr is None else int(sr)
+        cfg.convert_bit_depth = None if bd is None else int(bd)
         save_config(cfg)
         self._config = cfg
 
@@ -559,10 +600,14 @@ class ConversionPanel(QWidget):
 
         if file_paths:
             bitrate = int(self._bitrate_combo.currentText())
-            sample_rate = int(self._samplerate_combo.currentData() or 44100)
-            bit_depth = int(self._bitdepth_combo.currentData() or 16)
+            # Passed through as-is: None means "Keep source" all the way down
+            # to the writer, so no `or` default here.
             self.start_conversion.emit(
-                file_paths, target_format, bitrate, sample_rate, bit_depth
+                file_paths,
+                target_format,
+                bitrate,
+                self._samplerate_combo.currentData(),
+                self._bitdepth_combo.currentData(),
             )
 
     def _on_send_to_analyze(self) -> None:

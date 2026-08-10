@@ -1117,10 +1117,14 @@ class MainWindow(QMainWindow):
         file_paths: list[str],
         target_format: str,
         bitrate: int = 320,
-        sample_rate: int = 44100,
-        bit_depth: int = 16,
+        sample_rate: int | None = 44100,
+        bit_depth: int | None = 16,
     ) -> None:
-        """Start the conversion operation."""
+        """Start the conversion operation.
+
+        sample_rate / bit_depth are None for "Keep source", which the engine
+        reads as "leave this axis alone" — don't coerce them to a number.
+        """
         if self._conversion_thread is not None and self._conversion_thread.isRunning():
             QMessageBox.warning(
                 self,

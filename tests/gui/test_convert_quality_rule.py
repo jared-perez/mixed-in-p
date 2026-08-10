@@ -222,6 +222,132 @@ def test_a_refused_row_is_not_sent_to_the_worker(panel, wav_44k_16, flac_96k_24)
     assert emitted == [[flac_96k_24]]
 
 
+class TestKeepSource:
+    """"Keep source" (None) leaves an axis alone, the way the CLI does when
+    the flag is omitted. It is the only setting that suits a mixed batch, and
+    the only one a source below 32 kHz can use at all."""
+
+    @staticmethod
+    def _keep_both(panel):
+        _set_sample_rate(panel, None)
+        _set_bit_depth(panel, None)
+
+    def test_it_is_the_first_choice_in_both(self, panel):
+        assert panel._samplerate_combo.itemData(0) is None
+        assert panel._bitdepth_combo.itemData(0) is None
+        assert panel._samplerate_combo.itemText(0) == "Keep source"
+
+    def test_cross_format_converts_untouched(self, panel, flac_96k_24):
+        self._keep_both(panel)
+        panel._format_combo.setCurrentText("AIFF")
+        panel.add_files([flac_96k_24])
+
+        assert _status(panel) == "Ready"
+
+    def test_it_is_passed_through_as_none(self, panel, flac_96k_24):
+        """A Signal(int) would have delivered these as 0."""
+        self._keep_both(panel)
+        panel._format_combo.setCurrentText("AIFF")
+        panel.add_files([flac_96k_24])
+
+        emitted = []
+        panel.start_conversion.connect(lambda *args: emitted.append(args))
+        panel._convert_btn.click()
+
+        assert emitted[0][3] is None and emitted[0][4] is None
+
+    def test_a_low_rate_source_is_no_longer_stranded(self, panel, tmp_path):
+        """22.05 kHz is below every rate offered, so before this option every
+        one of them was an upsample and the file could not be converted."""
+        low = _write(tmp_path / "old.wav", 22050, "PCM_16")
+        panel._format_combo.setCurrentText("FLAC")
+        _set_sample_rate(panel, 44100)
+        panel.add_files([low])
+        assert _status(panel) == "Would upsample"
+
+        _set_sample_rate(panel, None)
+
+        assert _status(panel) == "Ready"
+
+    def test_it_rescues_only_the_axis_it_is_set_on(self, panel, tmp_path):
+        """Keeping the rate doesn't excuse a bit depth that still climbs."""
+        low = _write(tmp_path / "old.wav", 22050, "PCM_16")
+        panel._format_combo.setCurrentText("FLAC")
+        _set_sample_rate(panel, None)
+        _set_bit_depth(panel, 24)
+        panel.add_files([low])
+
+        assert _status(panel) == "Would upsample"
+
+    def test_same_format_with_both_kept_has_nothing_to_do(self, panel, flac_96k_24):
+        self._keep_both(panel)
+        panel._format_combo.setCurrentText("FLAC")
+        panel.add_files([flac_96k_24])
+
+        assert _status(panel) == "Same format"
+
+    def test_mixed_batch_converts_whole(self, panel, flac_96k_24, wav_44k_16):
+        """The point of the option: one setting that fits every source."""
+        self._keep_both(panel)
+        panel._format_combo.setCurrentText("AIFF")
+        panel.add_files([flac_96k_24, wav_44k_16])
+
+        assert [_status(panel, r) for r in range(2)] == ["Ready", "Ready"]
+
+    def test_the_choice_is_persisted(self, panel, qtbot):
+        """It survives a restart like every other convert setting."""
+        from src.utils.config import load_config
+
+        self._keep_both(panel)
+
+        cfg = load_config()
+        assert cfg.convert_sample_rate is None and cfg.convert_bit_depth is None
+
+        rebuilt = ConversionPanel(TrackStore())
+        qtbot.addWidget(rebuilt)
+        assert rebuilt._samplerate_combo.currentData() is None
+        assert rebuilt._bitdepth_combo.currentData() is None
+
+
+class TestFormatRowWidth:
+    """Adding "Keep source" widened the selectors, and the window minimum for
+    Convert was a constant — so the row overflowed and the longest label was
+    clipped instead (visual_pass: 'Frequenza di campionamento:' by 25px)."""
+
+    def test_it_does_not_shrink_when_mp3_hides_the_selectors(self, panel):
+        """Hidden widgets contribute nothing to a layout's own hint, so asking
+        the row directly would drop the minimum and bounce the window."""
+        lossless = panel.format_row_min_width()
+        panel._format_combo.setCurrentText("MP3")
+
+        assert not panel._samplerate_combo.isVisibleTo(panel)
+        assert panel.format_row_min_width() == lossless
+
+    def test_it_grows_with_a_longer_label(self, panel):
+        before = panel.format_row_min_width()
+        panel._samplerate_label.setText("Frequenza di campionamento molto lunga:")
+        assert panel.format_row_min_width() > before
+
+    def test_the_window_minimum_is_measured_from_it(self, panel):
+        """The wiring, without standing up a whole MainWindow."""
+        from types import SimpleNamespace
+
+        from PySide6.QtCore import QSize
+
+        from src.gui.window_sizer import WindowSizer
+
+        window = SimpleNamespace(
+            _sidebar=SimpleNamespace(width=lambda: 220),
+            _conversion_panel=panel,
+            _header=SimpleNamespace(minimumSizeHint=lambda: QSize(0, 0)),
+        )
+        sizer = WindowSizer(window)
+
+        panel._samplerate_label.setText("A very long localized sample rate label:")
+
+        assert sizer._min_width_for("convert") >= 220 + panel.format_row_min_width()
+
+
 def test_unreadable_same_format_file_is_not_offered(panel, tmp_path):
     """An unmeasurable file keeps the old behaviour rather than guessing."""
     broken = tmp_path / "broken.flac"

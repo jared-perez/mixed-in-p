@@ -19,6 +19,7 @@ from .result import (
     LOSSY_EXTENSIONS,
     FORMAT_EXTENSION,
     ConversionResult,
+    SUBTYPE_BITS,
     effective_bit_depth,
     is_lossless,
     is_quality_downgrade,
@@ -79,6 +80,33 @@ _SUBTYPE_BYTES = {
     "FLOAT": 4,
     "DOUBLE": 8,
 }
+
+
+# Widest PCM subtype first. Used to land a source subtype the target cannot
+# store on one it can, without ever widening it.
+_PCM_BY_BITS = ((32, "PCM_32"), (24, "PCM_24"), (16, "PCM_16"), (8, "PCM_S8"), (8, "PCM_U8"))
+
+
+def _storable_subtype(target_format: str, subtype: str, sf) -> str:
+    """Return `subtype` if the target format accepts it, else the widest PCM
+    subtype it does accept that is no wider.
+
+    "Keep source" (bit_depth=None) hands the source's own subtype straight to
+    the writer, and the containers do not all hold the same ones: FLAC has no
+    FLOAT, DOUBLE, PCM_32 or PCM_U8 — so a 32-bit float WAV, which is what a
+    DAW exports by default, would fail outright — and WAV has no PCM_S8. Asking
+    libsndfile (check_format) beats keeping our own table of what fits where.
+    """
+    if sf.check_format(target_format, subtype):
+        return subtype
+    source_bits = SUBTYPE_BITS.get(subtype, 32)
+    for bits, candidate in _PCM_BY_BITS:
+        if bits <= source_bits and sf.check_format(target_format, candidate):
+            logger.warning(
+                f"{target_format} cannot store {subtype}; writing {candidate}"
+            )
+            return candidate
+    return "PCM_16"
 
 
 def _diagnose_truncation(source_path: str) -> str | None:
@@ -242,8 +270,10 @@ def convert_file(
                 ).T
                 samplerate = sample_rate
 
-            # Resolve target subtype (bit depth)
+            # Resolve target subtype (bit depth), then make sure the container
+            # can actually hold it — "Keep source" passes the source's own.
             subtype = _resolve_subtype(bit_depth, target_ext, source_subtype)
+            subtype = _storable_subtype(target_format, subtype, sf)
 
             # Write to target format
             sf.write(str(output_path), data, samplerate, subtype=subtype)

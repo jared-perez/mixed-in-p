@@ -183,6 +183,9 @@
       <li>Pick a <b>target format</b>: AIFF, WAV, FLAC, or MP3.</li>
       <li>Lossless targets offer <b>sample rate</b> (96 / 48 / 44.1 / 32 kHz) and <b>bit depth</b>
         (32 / 24 / 16 / 8-bit);<br>MP3 offers a <b>bitrate</b> (128 / 192 / 256 / 320 kbps).</li>
+      <li><b>Keep source</b> — the first choice on both — leaves that setting exactly as the file
+        already has it. It's the one that suits a <b>mixed batch</b>, where a single rate can't fit
+        every source, and the only one available to a file below 32 kHz.</li>
       <li>Sources must be lossless (WAV, FLAC, AIFF) — lossy files are rejected as sources.</li>
       <li><b>Quality only ever goes down.</b> A sample rate or bit depth <i>higher</i> than the
         source's is refused — the row reads <b>Would upsample</b> — because nothing can put back
@@ -522,9 +525,9 @@
     <p><b>A file says "Would upsample".</b> The chosen sample rate or bit depth is higher than that
       file's own, shown in the <b>From</b> column. Since a 44.1 kHz/16-bit track can't be made into a
       96 kHz/24-bit one, the row is refused rather than inflated. Lower the selectors to match the
-      source (or below) and it converts. In a mixed batch this can hit some files and not others —
-      the settings apply to the whole list, so set them to the <i>lowest</i> source you're
-      converting.</p>
+      source (or below) and it converts. In a mixed batch this can hit some files and not others,
+      since the settings apply to the whole list — pick <b>Keep source</b> on the axis you don't
+      need to change and every file converts at its own quality.</p>
     <p><b>The BPM looks half or double what I expect.</b> Set a tighter <b>tempo range</b> in Settings
       (e.g. 90–180) so detection stays in DJ-typical territory.</p>
     <p><b>The detected key seems off.</b> Key detection reports a <b>confidence</b> score — low
