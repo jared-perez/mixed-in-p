@@ -41,6 +41,7 @@ class PanelStub:
         self.loaded = []
         self.added = []
         self.allow_duplicates = None
+        self.scroll_to_end = None
         self.played = []
         self.play_result = True
 
@@ -48,9 +49,10 @@ class PanelStub:
         self.loaded.append(node_id)
         self.loaded_node_id = node_id
 
-    def add_tracks(self, tracks, allow_duplicates=None):
+    def add_tracks(self, tracks, allow_duplicates=None, *, scroll_to_end=True):
         self.added.extend(tracks)
         self.allow_duplicates = allow_duplicates
+        self.scroll_to_end = scroll_to_end
 
     def play_path_if_idle(self, path):
         self.played.append(path)
@@ -131,6 +133,16 @@ class TestOpenFiles:
         open_now(window, [a])
 
         assert window._player_panel.allow_duplicates is True
+
+    def test_the_view_stays_at_the_track_that_starts_playing(self, tmp_path):
+        """An add normally scrolls to the end. Not this one: the first of
+        these files is about to play, and its row is at the top."""
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        window = WindowStub()
+
+        open_now(window, [a, b])
+
+        assert window._player_panel.scroll_to_end is False
 
     def test_the_file_lands_normalized(self, tmp_path):
         (a,) = make_files(tmp_path, "a.mp3")

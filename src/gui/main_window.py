@@ -700,7 +700,9 @@ class MainWindow(QMainWindow):
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
-        self._add_files_to_player(paths, allow_duplicates=True)
+        # No scroll to the end: the first of these files is about to start
+        # playing, and its row is at the top.
+        self._add_files_to_player(paths, allow_duplicates=True, scroll_to_end=False)
 
         # add_tracks resolves synchronously when the policy is forced, so the
         # tracks are in the list by now and this can act on the first of them.
@@ -723,7 +725,11 @@ class MainWindow(QMainWindow):
         self.activateWindow()
 
     def _add_files_to_player(
-        self, file_paths: list[str], allow_duplicates: bool | None = None
+        self,
+        file_paths: list[str],
+        allow_duplicates: bool | None = None,
+        *,
+        scroll_to_end: bool = True,
     ) -> None:
         """Add files directly to the player panel, reading metadata from tags.
 
@@ -738,6 +744,10 @@ class MainWindow(QMainWindow):
         default ``None`` consults the user's setting, which may put the
         question to them in a modal. ``open_files`` forces ``True`` — see
         there for why a prompt is unacceptable on that path.
+
+        ``scroll_to_end`` likewise goes straight through. ``open_files`` turns
+        it off: that path plays the first of the files it just added, and the
+        row that is playing is the one the user must be able to see.
         """
         from src.metadata.tags import read_metadata
 
@@ -767,7 +777,9 @@ class MainWindow(QMainWindow):
             except Exception:
                 pass  # proceed without metadata
             tracks.append(track)
-        self._player_panel.add_tracks(tracks, allow_duplicates=allow_duplicates)
+        self._player_panel.add_tracks(
+            tracks, allow_duplicates=allow_duplicates, scroll_to_end=scroll_to_end
+        )
 
     def _add_folder(self, folder_path: str) -> None:
         """Add all audio files from folder."""

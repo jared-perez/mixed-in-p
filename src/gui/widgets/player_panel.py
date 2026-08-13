@@ -1706,7 +1706,11 @@ class PlayerPanel(QWidget):
     # ── Public API ──────────────────────────────────────────────
 
     def add_tracks(
-        self, tracks: list[dict], allow_duplicates: bool | None = None
+        self,
+        tracks: list[dict],
+        allow_duplicates: bool | None = None,
+        *,
+        scroll_to_end: bool = True,
     ) -> None:
         """Add tracks to the playlist.
 
@@ -1720,6 +1724,14 @@ class PlayerPanel(QWidget):
         the ``duplicate_policy`` setting, which may put it to the user — and
         that prompt is **deferred**, so this can return before the tracks land.
         Anything that must run afterwards belongs in ``_append_tracks``.
+
+        ``scroll_to_end`` brings the newly appended rows into view, which is
+        what an *add* means. It rides along to ``_append_tracks`` rather than
+        being done here for the same deferral reason: when the policy is ASK
+        the rows do not exist yet when this returns. Two callers turn it off,
+        and both want the top of the list instead — ``load_node`` (opening a
+        playlist shows its beginning) and the file-open path (which plays row
+        1, so scrolling away would hide the track that just started).
         """
         # Files added while a search is showing target the loaded playlist —
         # leave the search so the user sees where they landed. Must happen
@@ -1738,6 +1750,7 @@ class PlayerPanel(QWidget):
             lambda resolved: self._append_tracks(
                 [by_path[p] for p in resolved if p in by_path],
                 proposed=len(tracks),
+                scroll_to_end=scroll_to_end,
             ),
             # None consults the setting; a forced answer never asks.
             policy=None
@@ -1753,7 +1766,9 @@ class PlayerPanel(QWidget):
                 return node.name
         return self.tr("Scratch")
 
-    def _append_tracks(self, tracks: list[dict], *, proposed: int = 0) -> None:
+    def _append_tracks(
+        self, tracks: list[dict], *, proposed: int = 0, scroll_to_end: bool = True
+    ) -> None:
         """Append resolved tracks to the visible list and refresh around them.
 
         ``proposed`` is how many were offered before the duplicate filter ran.
@@ -1761,6 +1776,9 @@ class PlayerPanel(QWidget):
         leaves the list and the undo stack alone; an add that was empty to
         begin with still refreshes, because that is how loading an empty
         playlist clears the table.
+
+        ``scroll_to_end`` is the end of the deferred path from ``add_tracks``:
+        this is the first moment the new rows exist to scroll to.
         """
         if not tracks and proposed:
             return
@@ -1819,6 +1837,11 @@ class PlayerPanel(QWidget):
             self._playlist.append(entry)
 
         self._rebuild_table()
+        # Show where they landed. Only when rows were actually added — the
+        # empty-refresh case above is a clear, not an add. Scroll only: the
+        # selection stays where the user left it.
+        if scroll_to_end and tracks:
+            self._table.scrollToBottom()
         self._update_stats()
         # Re-enable Play/Stop now that the playlist is non-empty. Without this the
         # Play button stays disabled until a playback-state change (e.g. a double
@@ -1963,7 +1986,9 @@ class PlayerPanel(QWidget):
                     for t in tracks
                 ],
                 allow_duplicates=True,  # a saved list may repeat a track on purpose
+                scroll_to_end=False,  # a playlist opens at its top, not its end
             )
+            self._table.scrollToTop()
         finally:
             self._loading_playlist = False
         self._store_read_comments(tracks)
