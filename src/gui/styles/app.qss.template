@@ -280,6 +280,35 @@ QPushButton#autoToggle:checked:hover {
     border-color: @ACCENT_HOVER@;
 }
 
+/* "Freeze" toggle beside it — analysis stops writing to disk for the session.
+   Same chrome outline when off, but fills WARNING rather than the accent when
+   on: "frozen" must not read as one more thing switched on. */
+QPushButton#freezeToggle {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_SECONDARY@;
+    border: 1px solid @CHROME_DARK@;
+    border-radius: 4px;
+    padding: 6px 18px;
+    font-weight: bold;
+}
+
+QPushButton#freezeToggle:hover {
+    border-color: @CHROME@;
+    color: @TEXT_PRIMARY@;
+}
+
+QPushButton#freezeToggle:checked {
+    background-color: @WARNING@;
+    color: @BG_DARK@;
+    border-color: @WARNING@;
+}
+
+QPushButton#freezeToggle:checked:hover {
+    background-color: @WARNING@;
+    color: @BG_DARK@;
+    border-color: @TEXT_PRIMARY@;
+}
+
 QPushButton#sidebarButton {
     background-color: transparent;
     border: none;

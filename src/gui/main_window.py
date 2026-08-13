@@ -153,6 +153,13 @@ class MainWindow(QMainWindow):
         # (not in config): also sidesteps restoring an oversized sidebar
         # onto a smaller screen.
         self._playlists_sidebar_w = Theme.SIDEBAR_PLAYLISTS_DEFAULT
+        # Session write-freeze (Analyze panel's Freeze toggle). Deliberately
+        # session-only and never read from or written to AppConfig: because the
+        # stored settings are never touched, "restore what was on when the
+        # freeze ends" is satisfied by construction — there is nothing to
+        # restore, and a crash mid-freeze cannot strand a half-restored setting.
+        # Always starts unfrozen.
+        self._analysis_writes_frozen = False
         self._connect_signals()
         self._analysis_panel.set_auto_analyze(self._config.auto_analyze)
         self._analysis_panel.set_auto_write_bpm(self._config.auto_write_bpm)
@@ -328,6 +335,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.send_to_convert.connect(self._send_analyze_to_convert)
         self._analysis_panel.start_analysis.connect(self._on_manual_analyze)
         self._analysis_panel.auto_analyze_toggled.connect(self._on_auto_analyze_toggled)
+        self._analysis_panel.write_freeze_toggled.connect(self._on_write_freeze_toggled)
 
         # Rename panel signals
         self._rename_panel.apply_rename.connect(self._start_rename)
@@ -990,7 +998,11 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_analyzing(False)
 
         # Auto-rename pipeline: only for tracks just analyzed in this batch
-        if self._pending_rename_operations is not None and self._config.auto_rename:
+        if (
+            self._pending_rename_operations is not None
+            and self._config.auto_rename
+            and not self._analysis_writes_frozen
+        ):
             self._auto_rename_after_analysis(results)
         self._pending_rename_operations = None
 
@@ -1047,8 +1059,15 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_analyzing(False)
         self._analysis_panel.refresh_table()
 
-        # Same auto-rename gate as the finished path, over just what completed.
-        if completed and self._pending_rename_operations is not None and self._config.auto_rename:
+        # Same auto-rename gate as the finished path, over just what completed
+        # — including the write-freeze, since a cancel's follow-through writes
+        # to disk exactly like a normal finish does.
+        if (
+            completed
+            and self._pending_rename_operations is not None
+            and self._config.auto_rename
+            and not self._analysis_writes_frozen
+        ):
             self._auto_rename_after_analysis(
                 [AnalysisResult(
                     file_path=t.file_path,
@@ -1245,6 +1264,17 @@ class MainWindow(QMainWindow):
         self._settings_panel.set_auto_analyze(enabled)
         self._sidebar.set_auto_analyze_badge(enabled)
 
+    def _on_write_freeze_toggled(self, frozen: bool) -> None:
+        """Handle the Analyze panel's Freeze toggle.
+
+        Nothing is persisted and no setting is changed: this bool is the single
+        gate in front of every write the analysis flow makes to a file (BPM/key
+        tags, the energy/key comment, and auto-rename on both the finished and
+        the cancelled path). Manual edits in the Metadata panel and Apply in the
+        Rename panel are untouched — the user clicked those.
+        """
+        self._analysis_writes_frozen = frozen
+
     def _effective_waveform_color(self) -> str:
         """The full-length waveform colour to actually paint.
 
@@ -1327,6 +1357,14 @@ class MainWindow(QMainWindow):
                 })
             except Exception as e:
                 logger.warning(f"Failed to record analysis history: {e}")
+
+            # Session write-freeze (the Analyze panel's Freeze toggle): hold
+            # every file-touching side effect of analysis. Everything above
+            # still happens — the track row, the results table and the history
+            # JSON are not writes to the user's files. Everything below this
+            # point is, so the freeze is one gate here.
+            if self._analysis_writes_frozen:
+                return
 
             # Auto-write metadata — BPM and key are independently toggleable.
             # Skipped outright for a format with nowhere to put them: the write

@@ -307,6 +307,7 @@ class AnalysisPanel(QWidget):
     send_to_convert = Signal(list)  # List of file path strings
     start_analysis = Signal()  # Manual analyze button clicked
     auto_analyze_toggled = Signal(bool)  # Auto button toggled (syncs with Settings)
+    write_freeze_toggled = Signal(bool)  # Freeze button toggled (session-only)
 
     def __init__(
         self,
@@ -319,6 +320,7 @@ class AnalysisPanel(QWidget):
         self._auto_write_bpm = True
         self._auto_write_key = True
         self._auto_analyze = True
+        self._writes_frozen = False
         self._analyzing = False
         self._setup_ui()
         self._connect_signals()
@@ -354,6 +356,19 @@ class AnalysisPanel(QWidget):
         )
         self._auto_btn.clicked.connect(self._on_auto_toggled)
         header_row.addWidget(self._auto_btn, 0, Qt.AlignmentFlag.AlignBottom)
+
+        # "Freeze" toggle beside it: pauses everything analysis writes to disk
+        # (BPM/key tags, the energy/key comment, auto-rename) for this session
+        # only. It deliberately never touches the stored settings, so there is
+        # nothing to restore when it is switched off or the app closes.
+        self._freeze_btn = QPushButton(self.tr("Freeze"))
+        self._freeze_btn.setObjectName("freezeToggle")
+        self._freeze_btn.setCheckable(True)
+        self._freeze_btn.setChecked(self._writes_frozen)
+        self._freeze_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._freeze_btn.clicked.connect(self._on_freeze_toggled)
+        self._sync_freeze_tooltip()
+        header_row.addWidget(self._freeze_btn, 0, Qt.AlignmentFlag.AlignBottom)
 
         layout.addLayout(header_row)
 
@@ -541,6 +556,25 @@ class AnalysisPanel(QWidget):
         self._auto_analyze = checked
         self._update_stats()
         self.auto_analyze_toggled.emit(checked)
+
+    @property
+    def writes_frozen(self) -> bool:
+        """Whether analysis is currently barred from writing to files."""
+        return self._writes_frozen
+
+    def _sync_freeze_tooltip(self) -> None:
+        """Say what the next click does — the state alone doesn't convey it."""
+        self._freeze_btn.setToolTip(
+            self.tr("Let analysis write tags and rename files again")
+            if self._writes_frozen
+            else self.tr("Stop analysis writing tags or renaming files, until you unfreeze")
+        )
+
+    def _on_freeze_toggled(self, checked: bool) -> None:
+        """Handle the Freeze toggle — session state only, never a setting."""
+        self._writes_frozen = checked
+        self._sync_freeze_tooltip()
+        self.write_freeze_toggled.emit(checked)
 
     def _on_analyze_clicked(self) -> None:
         """Handle manual Analyze button click."""
