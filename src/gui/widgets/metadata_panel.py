@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMessageBox,
     QPushButton,
     QScrollArea,
     QSizePolicy,
@@ -30,12 +31,20 @@ from src.metadata.tags import (
     write_comment,
     delete_metadata_fields,
 )
+from src.utils.reveal import reveal_in_file_manager
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .elided_label import ElidedLabel
 from .artwork_widget import ArtworkWidget, mime_for_path
 from .drop_zone import AUDIO_EXTENSIONS
 
 logger = logging.getLogger(__name__)
+
+# Horizontal room a button needs beyond its text: the stylesheet's
+# "padding: 8px 16px", its 1px border, and a little slack. The stylesheet is
+# invisible to the native size hint, so a translated label would otherwise be
+# cut at both ends — a QPushButton centres rather than elides.
+# (Plain "#", not "#:" — lupdate harvests the latter as a note to translators.)
+_BUTTON_CHROME = 44
 
 # Fields displayed in the editor and their display labels.
 # Labels are marked for translation extraction here (QT_TRANSLATE_NOOP returns
@@ -141,8 +150,44 @@ class MetadataPanel(QWidget):
 
         file_row.addStretch()
 
+        # Second line: where the file actually is. The filename above is not
+        # enough to tell two copies of a track apart, and the panel writes to
+        # disk — so the path is worth showing, and worth being able to open.
+        path_row = QHBoxLayout()
+        path_row.setContentsMargins(0, 0, 0, 0)
+        path_row.setSpacing(Theme.SPACING)
+
+        # ElidedLabel, not QLabel: a path's length is not ours to control, and
+        # a QLabel simply draws past its own edge. It also manages its own
+        # tooltip from here on — full text while cut off, none while it fits.
+        self._path_label = ElidedLabel("")
+        self._path_label.setStyleSheet(
+            f"color: {Theme.TEXT_SECONDARY}; font-size: 13px; background: transparent;"
+        )
+        path_row.addWidget(self._path_label, 1)
+
+        self._reveal_btn = QPushButton(self.tr("Open File Location"))
+        self._reveal_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._reveal_btn.setToolTip(
+            self.tr("Show this file in Finder / File Explorer.")
+        )
+        self._reveal_btn.setMinimumWidth(
+            self._reveal_btn.fontMetrics().horizontalAdvance(self._reveal_btn.text())
+            + _BUTTON_CHROME
+        )
+        self._reveal_btn.clicked.connect(self._on_reveal_clicked)
+        path_row.addWidget(self._reveal_btn)
+
+        header_col = QVBoxLayout()
+        header_col.setContentsMargins(0, 0, 0, 0)
+        # Explicit: a widget's own layout falls back to the Qt default (6px),
+        # not Theme.SPACING — and these two lines are one block about one file.
+        header_col.setSpacing(2)
+        header_col.addLayout(file_row)
+        header_col.addLayout(path_row)
+
         self._file_header_widget = QWidget()
-        self._file_header_widget.setLayout(file_row)
+        self._file_header_widget.setLayout(header_col)
         # Transparent so the panel's background shows through instead of the dark
         # #1a1a1a fill the global QWidget QSS rule would otherwise paint here.
         self._file_header_widget.setObjectName("fileHeader")
@@ -264,6 +309,11 @@ class MetadataPanel(QWidget):
         """Load metadata from *path* and populate the form."""
         self._file_path = path
         self._file_label.setText(Path(path).name)
+        self._path_label.setText(path)
+        # Set here rather than left to the label's own resize handling, which
+        # only runs on a resize — otherwise a shorter path inherits the
+        # previous file's tooltip until the panel happens to change width.
+        self._path_label.setToolTip(path)
         self._info_label.setText(_format_audio_props(path))
         self._file_header_widget.setVisible(True)
 
@@ -450,6 +500,29 @@ class MetadataPanel(QWidget):
         if self._file_path is not None:
             self._load_file(self._file_path)
 
+    # --------------------------------------------------------------- reveal
+
+    def _on_reveal_clicked(self) -> None:
+        """Show the loaded file in the OS file manager, selected.
+
+        ``reveal_in_file_manager`` selects the file itself; the ``openUrl``
+        variant in three other panels only opens the containing folder, which
+        leaves the user hunting for it in a directory of a thousand tracks.
+        A miss means the file moved since it was loaded — an explanation, not
+        an error.
+        """
+        if not self._file_path:
+            return
+        if not reveal_in_file_manager(self._file_path):
+            QMessageBox.information(
+                self,
+                self.tr("Open File Location"),
+                self.tr(
+                    "This file can't be found — it may have been moved, "
+                    "renamed, or deleted."
+                ),
+            )
+
     # --------------------------------------------------------------- clear
 
     def _clear(self) -> None:
@@ -463,6 +536,8 @@ class MetadataPanel(QWidget):
         self._artwork.clear_artwork(emit=False)
         self._file_header_widget.setVisible(False)
         self._info_label.setText("")
+        self._path_label.setText("")
+        self._path_label.setToolTip("")
         self._scroll_area.setVisible(False)
         self._add_field_widget.setVisible(False)
         self._reload_btn.setVisible(False)
