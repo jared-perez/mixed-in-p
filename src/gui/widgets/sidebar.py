@@ -216,15 +216,19 @@ class Sidebar(QFrame):
         self._button_group = QButtonGroup(self)
         self._button_group.setExclusive(True)
 
-        # Navigation buttons
+        # Navigation buttons, top to bottom. This order is the rail's alone:
+        # every consumer (the page stack's index map in main_window, the icons,
+        # _no_drop_pages, the Analyze badge) keys off the string id, and the
+        # stack is deliberately in a *different* order — so moving a row here
+        # must not be "tidied up" by reordering _create_pages to match.
         pages = [
             ("player", self.tr("Player")),
             ("rename", self.tr("Rename")),
             ("convert", self.tr("Convert")),
             ("analysis", self.tr("Analyze")),
-            ("keyboard", self.tr("Keyboard")),
             ("metadata", self.tr("Metadata")),
             ("spectrum", self.tr("Spectrum")),
+            ("keyboard", self.tr("Keyboard")),
         ]
 
         _no_drop_pages = {"keyboard"}
