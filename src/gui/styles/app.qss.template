@@ -398,6 +398,35 @@ QPushButton#treeCreateButton:hover {
     background-color: @BG_LIGHT@;
 }
 
+/* Name-filter toggle, in the same row. Borderless and unpadded because this
+   row is the narrowest in the app: any width it takes comes out of the two
+   translated button labels beside it, which centre-clip rather than elide. */
+QPushButton#treeSearchButton {
+    background-color: transparent;
+    border: none;
+    padding: 0px;
+}
+
+QPushButton#treeSearchButton:hover {
+    background-color: @BG_LIGHT@;
+    border-radius: 4px;
+}
+
+/* Lit while the box is open, so an open filter is never invisible. */
+QPushButton#treeSearchButton:checked {
+    background-color: @BG_LIGHT@;
+    border-radius: 4px;
+}
+
+/* The filter box takes the create buttons' place, so it wears their chrome:
+   the global QLineEdit 8px padding would make the row jump taller the moment
+   the box opened. */
+QLineEdit#treeSearchField {
+    padding: 4px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
 /* ===== Tables ===== */
 QTableView, QTableWidget {
     background-color: @BG_MEDIUM@;

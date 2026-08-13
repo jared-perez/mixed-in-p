@@ -20,18 +20,20 @@ import logging
 import shutil
 from pathlib import Path
 
-from PySide6.QtCore import QMimeData, QPointF, QSize, Qt, QUrl, Signal
+from PySide6.QtCore import QMimeData, QPointF, QRectF, QSize, Qt, QTimer, QUrl, Signal
 from PySide6.QtGui import (
     QBrush,
     QColor,
     QDrag,
     QFont,
     QIcon,
+    QKeySequence,
     QPainter,
     QPalette,
     QPen,
     QPixmap,
     QPolygonF,
+    QShortcut,
     QStandardItem,
     QStandardItemModel,
 )
@@ -41,6 +43,7 @@ from PySide6.QtWidgets import (
     QGridLayout,
     QHBoxLayout,
     QHeaderView,
+    QLineEdit,
     QMenu,
     QMessageBox,
     QProgressDialog,
@@ -88,6 +91,11 @@ HL_COUNT_ROLE = Qt.ItemDataRole.UserRole + 4
 NODE_MIME = "application/x-mixedinp-node"
 
 _ICON_DRAW = 40  # painted at 2x, displayed at 20 for HiDPI crispness
+
+# The filter toggle beside "+ Playlist" / "+ Folder". Icon-only and flat: this
+# row is the narrowest in the app and every pixel here is taken from a
+# translated button label that would centre-clip rather than elide.
+_SEARCH_BTN_WIDTH = 22
 
 
 def _with_playlist_suffix(path: str, chosen_filter: str) -> str:
@@ -159,6 +167,28 @@ def _tree_icon(kind: str) -> QIcon:
             p.setPen(Qt.PenStyle.NoPen)
             p.setBrush(QColor(Theme.TEXT_SECONDARY))
             p.drawEllipse(QPointF(s * 0.645, s * 0.76), s * 0.085, s * 0.07)
+    finally:
+        p.end()
+    icon = QIcon()
+    icon.addPixmap(pm)
+    return icon
+
+
+def _make_search_icon() -> QIcon:
+    """A magnifier for the tree's filter toggle, drawn to match _tree_icon."""
+    pm = QPixmap(_ICON_DRAW, _ICON_DRAW)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        s = _ICON_DRAW
+        pen = QPen(QColor(Theme.TEXT_SECONDARY))
+        pen.setWidthF(s * 0.09)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        p.setPen(pen)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        p.drawEllipse(QRectF(s * 0.16, s * 0.16, s * 0.48, s * 0.48))
+        p.drawLine(QPointF(s * 0.62, s * 0.62), QPointF(s * 0.84, s * 0.84))
     finally:
         p.end()
     icon = QIcon()
@@ -253,6 +283,14 @@ class PlaylistTree(QTreeView):
         # calls are us restoring the database's state, not the user opening
         # anything, and must not be written back.
         self._restoring_expansion = False
+        # Name filter (§5): the lower-cased query, and the view's expansion as
+        # it was before the first keystroke. Revealing a match force-expands
+        # its ancestors, so without the snapshot a search would silently
+        # rewrite the tree's shape — and those expands must not reach the
+        # database either, which is what _filtering guards.
+        self._name_filter = ""
+        self._pre_filter_expanded: set[int] | None = None
+        self._filtering = False
 
         self.setObjectName("playlistTree")
         self._model = QStandardItemModel(self)
@@ -351,6 +389,11 @@ class PlaylistTree(QTreeView):
                 self.setCurrentIndex(item.index())
         if self._hl_playlists or self._hl_folders:
             self._apply_highlight()
+        # A rebuild replaces every row, and hidden-ness belongs to the row, so
+        # an active filter has to be re-applied or a rename mid-search brings
+        # the whole tree back.
+        if self._name_filter:
+            self._apply_name_filter()
         self.resizeColumnToContents(0)
 
     def _append_children(self, parent_item: QStandardItem, parent_id: int | None) -> None:
@@ -431,6 +474,86 @@ class PlaylistTree(QTreeView):
             self.resizeColumnToContents(0)
             self.viewport().update()
 
+    # ------------------------------------------------- name filter (§5)
+
+    def set_name_filter(self, text: str) -> None:
+        """Show only nodes whose name contains *text*, plus their ancestors.
+
+        A different feature from the highlight trail above, which lights
+        playlists holding a searched *track*. This one filters by node name
+        and hides what doesn't match; the two coexist untouched.
+
+        Hiding rows, never sorting or re-parenting them: manual order is the
+        truth here (see ``setSortingEnabled(False)``), so a filtered tree is
+        the same tree with rows missing.
+        """
+        query = text.strip().lower()
+        if query == self._name_filter:
+            return
+        if query and self._pre_filter_expanded is None:
+            # Before the first keystroke only: mid-search expansions are the
+            # filter's doing and must not become the state we restore to.
+            self._pre_filter_expanded = self._expanded_ids()
+        self._name_filter = query
+        self._apply_name_filter()
+
+    def clear_name_filter(self) -> None:
+        """Drop the filter and put the tree back the way the user had it."""
+        self.set_name_filter("")
+
+    def _apply_name_filter(self) -> None:
+        if not self._loaded:
+            return
+        root = self._model.invisibleRootItem()
+        # Nothing in here is a user gesture, so none of it is persisted.
+        self._filtering = True
+        try:
+            if self._name_filter:
+                self._filter_children(root, self._name_filter, forced=False)
+            else:
+                self._show_all(root)
+                snapshot, self._pre_filter_expanded = self._pre_filter_expanded, None
+                if snapshot is not None:
+                    self._restore_expansion(root, snapshot)
+        finally:
+            self._filtering = False
+        self.resizeColumnToContents(0)
+
+    def _filter_children(
+        self, parent_item: QStandardItem, query: str, *, forced: bool
+    ) -> bool:
+        """Hide non-matching rows under *parent_item*. True if any is shown.
+
+        ``forced`` means an ancestor matched, so everything below it stays
+        visible — searching for a folder shows what is in it.
+        """
+        parent_index = parent_item.index()  # invalid at the root, as Qt wants
+        any_shown = False
+        for row in range(parent_item.rowCount()):
+            child = parent_item.child(row)
+            matches = forced or query in child.text().lower()
+            below = self._filter_children(child, query, forced=matches)
+            shown = matches or below
+            self.setRowHidden(row, parent_index, not shown)
+            if below and not forced:
+                # Open the folder the match is buried in — otherwise the
+                # filter reports a hit the user cannot see.
+                self.setExpanded(child.index(), True)
+            any_shown = any_shown or shown
+        return any_shown
+
+    def _show_all(self, parent_item: QStandardItem) -> None:
+        parent_index = parent_item.index()
+        for row in range(parent_item.rowCount()):
+            self.setRowHidden(row, parent_index, False)
+            self._show_all(parent_item.child(row))
+
+    def _restore_expansion(self, parent_item: QStandardItem, open_ids: set[int]) -> None:
+        for row in range(parent_item.rowCount()):
+            child = parent_item.child(row)
+            self.setExpanded(child.index(), child.data(NODE_ID_ROLE) in open_ids)
+            self._restore_expansion(child, open_ids)
+
     # ----------------------------------------------------- id <-> item helpers
 
     def _find_item(self, node_id: int, parent: QStandardItem | None = None) -> QStandardItem | None:
@@ -464,7 +587,12 @@ class PlaylistTree(QTreeView):
         difference between remembering the tree's shape and losing it.
         """
         self.resizeColumnToContents(0)
-        if self._restoring_expansion or self._building or self._library is None:
+        if (
+            self._restoring_expansion
+            or self._filtering
+            or self._building
+            or self._library is None
+        ):
             return
         node_id = index.data(NODE_ID_ROLE)
         if node_id is not None:
@@ -1160,13 +1288,88 @@ class PlaylistTreePanel(QWidget):
         for btn in (self._new_playlist_btn, self._new_folder_btn):
             btn.setObjectName("treeCreateButton")
             buttons.addWidget(btn)
+
+        # Name filter, expandable: the sidebar is too narrow to carry a box
+        # and both create buttons at once, so the box takes the row over while
+        # it is open and gives it back on Escape.
+        self._search_btn = QPushButton()
+        self._search_btn.setObjectName("treeSearchButton")
+        self._search_btn.setIcon(_make_search_icon())
+        self._search_btn.setCheckable(True)
+        self._search_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        # Icon-only and borderless, so it takes the smallest sliver the row
+        # can spare: the two create buttons carry translated text and a
+        # QPushButton centres rather than elides, so anything this one takes
+        # comes straight out of their labels.
+        self._search_btn.setFixedWidth(_SEARCH_BTN_WIDTH)
+        buttons.addWidget(self._search_btn)
+
+        self._search_field = QLineEdit()
+        self._search_field.setObjectName("treeSearchField")
+        self._search_field.setClearButtonEnabled(True)
+        self._search_field.setPlaceholderText(self.tr("Playlist name…"))
+        self._search_field.hide()
+        buttons.addWidget(self._search_field, 1)
         layout.addLayout(buttons)
 
         self.tree = PlaylistTree(db_path)
         layout.addWidget(self.tree, 1)
 
+        # Debounced like the player's search, so a fast typist gets one filter
+        # pass per pause rather than one per keystroke.
+        self._filter_timer = QTimer(self)
+        self._filter_timer.setSingleShot(True)
+        self._filter_timer.setInterval(150)
+        self._filter_timer.timeout.connect(self._apply_filter)
+
         self._new_playlist_btn.clicked.connect(lambda: self.tree.create_playlist(None))
         self._new_folder_btn.clicked.connect(lambda: self.tree.create_folder(None))
+        self._search_btn.toggled.connect(self._set_search_open)
+        self._search_field.textChanged.connect(self._on_filter_text_changed)
+        # Widget-scoped, so Escape still means "cancel the edit" while a node
+        # is being renamed in the tree.
+        esc = QShortcut(QKeySequence(Qt.Key.Key_Escape), self._search_field)
+        esc.setContext(Qt.ShortcutContext.WidgetShortcut)
+        esc.activated.connect(lambda: self._search_btn.setChecked(False))
+        self._sync_search_tooltip()
+
+    # ------------------------------------------------------- name filter
+
+    def _set_search_open(self, open_: bool) -> None:
+        """Swap the create buttons for the filter box, or back.
+
+        Closing always drops the filter: a box that is out of sight must not
+        still be hiding half the user's playlists.
+        """
+        self._new_playlist_btn.setVisible(not open_)
+        self._new_folder_btn.setVisible(not open_)
+        self._search_field.setVisible(open_)
+        self._sync_search_tooltip()
+        if open_:
+            self._search_field.setFocus()
+        else:
+            self._filter_timer.stop()
+            self._search_field.clear()
+            self.tree.clear_name_filter()
+
+    def _sync_search_tooltip(self) -> None:
+        self._search_btn.setToolTip(
+            self.tr("Close the playlist filter")
+            if self._search_btn.isChecked()
+            else self.tr("Filter playlists by name")
+        )
+
+    def _on_filter_text_changed(self, text: str) -> None:
+        if text.strip():
+            self._filter_timer.start()
+        else:
+            # Emptying the box shows everything again at once — there is no
+            # query to debounce, and waiting reads as lag.
+            self._filter_timer.stop()
+            self.tree.clear_name_filter()
+
+    def _apply_filter(self) -> None:
+        self.tree.set_name_filter(self._search_field.text())
 
     def ensure_loaded(self) -> None:
         self.tree.ensure_loaded()
