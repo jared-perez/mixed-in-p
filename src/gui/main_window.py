@@ -780,6 +780,12 @@ class MainWindow(QMainWindow):
                     track["comment"] = meta.comment
                 if meta.year:
                     track["year"] = str(meta.year)
+                if meta.track_number:
+                    track["track_number"] = str(meta.track_number)
+                if meta.label:
+                    track["label"] = meta.label
+                if meta.bitrate:
+                    track["bitrate"] = str(meta.bitrate)
                 if meta.duration and meta.duration > 0:
                     track["duration"] = meta.duration
             except Exception:

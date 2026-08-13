@@ -1230,6 +1230,10 @@ class PlaylistTree(QTreeView):
             comment=meta.comment or "",
             bpm=meta.bpm,
             key=meta.key or "",
+            year=str(meta.year) if meta.year else None,
+            track_number=str(meta.track_number) if meta.track_number else None,
+            label=meta.label or None,
+            bitrate=meta.bitrate,
             duration=meta.duration,
         )
 

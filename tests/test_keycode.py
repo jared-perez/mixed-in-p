@@ -63,6 +63,22 @@ class TestKeyToKeyCode:
         assert key_to_keycode("Eb") == "5B"
         assert key_to_keycode("Bb") == "6B"
 
+    def test_a_key_code_is_accepted_and_canonicalized(self):
+        """A stored key is as likely to be a code as a note name — plenty of
+        DJ tools write "8A" into the key tag — so a caller normalizing a mixed
+        library shouldn't have to know which spelling it is holding. This used
+        to raise, which left every such row in the library with no keycode."""
+        assert key_to_keycode("8A") == "8A"
+        assert key_to_keycode("12a") == "12A"
+        assert key_to_keycode(" 3b ") == "3B"
+
+    def test_a_number_alone_is_not_a_code(self):
+        """Guards the energy backfill, which asks this question of a bare
+        comment segment: "6" must not read as a key."""
+        for not_a_key in ("6", "12", "0A", "13A", "8C"):
+            with pytest.raises(ValueError):
+                key_to_keycode(not_a_key)
+
     def test_invalid_key_raises(self):
         """Test that invalid keys raise ValueError."""
         with pytest.raises(ValueError, match="Unknown key"):

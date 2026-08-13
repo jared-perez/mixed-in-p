@@ -23,6 +23,7 @@ Design rules (settled in the playlist feature research, 2026-07-26):
 
 from __future__ import annotations
 
+import re
 import sqlite3
 from dataclasses import dataclass
 from datetime import datetime
@@ -34,7 +35,7 @@ from typing import Iterable
 SCRATCH_NODE_ID = 1
 
 _CONTENT_ID_BYTES = 64 * 1024
-_SCHEMA_VERSION = 4
+_SCHEMA_VERSION = 5
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -48,7 +49,15 @@ CREATE TABLE IF NOT EXISTS tracks (
     comment TEXT NOT NULL DEFAULT '',
     bpm REAL,
     "key" TEXT NOT NULL DEFAULT '',
+    -- Derived from "key", never set by a caller: the canonical key code the
+    -- compatible-tracks query matches on, so "8A", "Am" and "A min" are one
+    -- thing without an IN-list of every spelling. Empty when unparseable.
+    keycode TEXT NOT NULL DEFAULT '',
     energy INTEGER,
+    year TEXT,
+    track_number TEXT,
+    label TEXT,
+    bitrate INTEGER,
     duration REAL,
     size INTEGER,
     mtime REAL,
@@ -88,8 +97,16 @@ _TAG_COLUMNS = (
     "bpm",
     "key",
     "energy",
+    "year",
+    "track_number",
+    "label",
+    "bitrate",
     "duration",
 )
+
+# `keycode` is deliberately NOT a tag column: it is derived from "key" inside
+# add_track/update_track_tags so no call site can write one without the other,
+# or write a spelling of it the query would miss.
 
 # Indexed search fields, in the order the FTS table declares them. Every name
 # is also a `tracks` column, so the index statements are generated from this
@@ -113,7 +130,12 @@ class Track:
     comment: str
     bpm: float | None
     key: str
+    keycode: str
     energy: int | None
+    year: str | None
+    track_number: str | None
+    label: str | None
+    bitrate: int | None
     duration: float | None
     size: int | None
     mtime: float | None
@@ -212,6 +234,60 @@ def _fts_values(**fields: str) -> tuple[str, ...]:
     return tuple(fields.get(c) or "" for c in _FTS_COLUMNS)
 
 
+def _derive_keycode(key: object) -> str:
+    """The canonical key code for a stored key, or '' if it isn't one.
+
+    Accepts every spelling the app and other DJ tools produce — 'Am',
+    'A min', 'a minor', and a code such as '8a' — because the stored key is
+    whatever a file's tag happened to say.
+    """
+    if not key:
+        return ""
+    from src.analysis.keycode import key_to_keycode
+
+    try:
+        return key_to_keycode(str(key))
+    except ValueError:
+        return ""
+
+
+_ENERGY_LABELLED = re.compile(r"^energy\s*(10|[1-9])$", re.IGNORECASE)
+_ENERGY_BARE = re.compile(r"^(10|[1-9])$")
+
+
+def _energy_from_comment(comment: str) -> int | None:
+    """The energy this app wrote into a comment, when it can be read safely.
+
+    ``update_comment_with_energy`` writes a " - "-joined prefix (or suffix) of
+    the energy and/or the key, in either order: "6 - 8A - visit my webpage",
+    "Energy 6 - 8A - …", "8A - 6 - …". So only the two segments at each end
+    can hold it.
+
+    Deliberately conservative, because the bare-number format is genuinely
+    ambiguous — "7 - Heaven" is a real comment, not an energy of 7. A labelled
+    "Energy 7" is unmistakable and always taken; a bare number counts only
+    when the segment beside it parses as a key, which is the shape this app
+    writes. Anything else reads as "no energy recorded" and stays NULL.
+    """
+    segments = [s.strip() for s in comment.split(" - ")]
+    if not segments:
+        return None
+    edges = {0, 1, len(segments) - 2, len(segments) - 1}
+    for i in sorted(e for e in edges if 0 <= e < len(segments)):
+        segment = segments[i]
+        labelled = _ENERGY_LABELLED.match(segment)
+        if labelled:
+            return int(labelled.group(1))
+        bare = _ENERGY_BARE.match(segment)
+        if bare and any(
+            _derive_keycode(segments[j])
+            for j in (i - 1, i + 1)
+            if 0 <= j < len(segments)
+        ):
+            return int(bare.group(1))
+    return None
+
+
 def _quoted(columns: tuple[str, ...]) -> str:
     """Column list for SQL. Quoted because "key" is a keyword in places."""
     return ", ".join(f'"{c}"' for c in columns)
@@ -298,6 +374,20 @@ class Library:
             # empty parts, so every existing blob already equals what it would
             # be with a blank comment. The comments themselves arrive with the
             # tag reads that adding, loading, or editing a track performs.
+        # v5 — the consolidated migration: a derived keycode for the
+        # compatible-tracks query, and four columns the Player can show as
+        # optional table columns. None of them is searchable, so _FTS_COLUMNS
+        # and the search blobs are untouched.
+        for column, decl in (
+            ("keycode", "TEXT NOT NULL DEFAULT ''"),
+            ("year", "TEXT"),
+            ("track_number", "TEXT"),
+            ("label", "TEXT"),
+            ("bitrate", "INTEGER"),
+        ):
+            if column not in tracks:
+                self._con.execute(f"ALTER TABLE tracks ADD COLUMN {column} {decl}")
+
         (version,) = self._con.execute("PRAGMA user_version").fetchone()
         if version and version < 4:  # v4 — the key became a searchable field
             # Here a rebuild IS required: existing rows have a stored key that
@@ -305,6 +395,51 @@ class Library:
             # forever. (The FTS index needs no equivalent — _ensure_fts_schema
             # notices its column list changed and repopulates from `tracks`.)
             self._rebuild_search_blobs()
+        if version and version < 5:
+            # Recomputes, so keyed on the version rather than on the columns:
+            # both read data the database already holds, and both must run
+            # exactly once. Year, track number, label and bitrate get NO
+            # backfill on purpose — they live only in the files' tags, and
+            # reading thousands of files during a migration is not something
+            # a first launch may do. They populate forward, as files are
+            # added, reloaded or analysed.
+            self._backfill_keycodes()
+            self._backfill_energy_from_comments()
+
+    def _backfill_keycodes(self) -> None:
+        """Fill `keycode` for rows that already carry a key. Cheap: the data
+        is in the row, so this is a parse, not a file read."""
+        rows = self._con.execute(
+            "SELECT id, \"key\" FROM tracks WHERE \"key\" != '' AND keycode = ''"
+        ).fetchall()
+        updates = [
+            (code, row["id"])
+            for row in rows
+            if (code := _derive_keycode(row["key"]))
+        ]
+        self._con.executemany(
+            "UPDATE tracks SET keycode=? WHERE id=?", updates
+        )
+
+    def _backfill_energy_from_comments(self) -> None:
+        """Recover the energy this app itself wrote into the comment tag.
+
+        Only rows with no energy yet, and only where the read is unambiguous
+        (see `_energy_from_comment`) — a wrong energy is worse than a blank
+        one here, because the compatible-tracks ranking would quietly order
+        by it.
+        """
+        rows = self._con.execute(
+            "SELECT id, comment FROM tracks WHERE energy IS NULL AND comment != ''"
+        ).fetchall()
+        updates = [
+            (energy, row["id"])
+            for row in rows
+            if (energy := _energy_from_comment(row["comment"])) is not None
+        ]
+        self._con.executemany(
+            "UPDATE tracks SET energy=? WHERE id=?", updates
+        )
 
     def _rebuild_search_blobs(self) -> None:
         """Recompute every row's LIKE haystack from the columns it indexes."""
@@ -385,6 +520,10 @@ class Library:
         bpm: float | None = None,
         key: str | None = None,
         energy: int | None = None,
+        year: str | None = None,
+        track_number: str | None = None,
+        label: str | None = None,
+        bitrate: int | None = None,
         duration: float | None = None,
     ) -> int:
         """Insert a track, or update the existing row for the same path.
@@ -403,6 +542,10 @@ class Library:
             "bpm": bpm,
             "key": key,
             "energy": energy,
+            "year": year,
+            "track_number": track_number,
+            "label": label,
+            "bitrate": bitrate,
             "duration": duration,
         }
         existing = self._con.execute(
@@ -424,9 +567,10 @@ class Library:
                 """
                 INSERT INTO tracks
                     (path, filename, artist, title, album, genre, comment, bpm,
-                     "key", energy, duration, size, mtime, content_id, search_blob,
+                     "key", keycode, energy, year, track_number, label, bitrate,
+                     duration, size, mtime, content_id, search_blob,
                      added_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     path,
@@ -438,7 +582,12 @@ class Library:
                     tags["comment"] or "",
                     tags["bpm"],
                     tags["key"] or "",
+                    _derive_keycode(tags["key"]),
                     tags["energy"],
+                    tags["year"],
+                    tags["track_number"],
+                    tags["label"],
+                    tags["bitrate"],
                     tags["duration"],
                     size,
                     mtime,
@@ -511,11 +660,17 @@ class Library:
         indexed = {c: merged.get(c, row[c]) for c in _FTS_COLUMNS}
         indexed = {c: "" if v is None else str(v) for c, v in indexed.items()}
         blob = _make_search_blob(**indexed)
-        assignments = ", ".join(f'"{c}"=?' for c in fields)
+        # The key never moves without its derived code following it — doing
+        # this here rather than at the call sites is what keeps the two from
+        # drifting apart on whichever path someone forgets.
+        writes = dict(fields)
+        if "key" in writes:
+            writes["keycode"] = _derive_keycode(writes["key"])
+        assignments = ", ".join(f'"{c}"=?' for c in writes)
         with self._con:
             self._con.execute(
                 f"UPDATE tracks SET {assignments}, search_blob=? WHERE id=?",
-                [*fields.values(), blob, track_id],
+                [*writes.values(), blob, track_id],
             )
             if self._has_fts:
                 assignments = ", ".join(f'"{c}"=?' for c in _FTS_COLUMNS)
@@ -930,6 +1085,10 @@ class Library:
                     bpm=t.bpm,
                     key=t.key,
                     energy=t.energy,
+                    year=t.year,
+                    track_number=t.track_number,
+                    label=t.label,
+                    bitrate=t.bitrate,
                     duration=t.duration,
                 )
             )
@@ -1105,7 +1264,12 @@ def _track(row: sqlite3.Row) -> Track:
         comment=row["comment"],
         bpm=row["bpm"],
         key=row["key"],
+        keycode=row["keycode"],
         energy=row["energy"],
+        year=row["year"],
+        track_number=row["track_number"],
+        label=row["label"],
+        bitrate=row["bitrate"],
         duration=row["duration"],
         size=row["size"],
         mtime=row["mtime"],

@@ -31,6 +31,7 @@ class TrackMetadata:
     artwork: bytes | None = None
     artwork_mime: str | None = None
     duration: float | None = None  # seconds
+    bitrate: int | None = None  # kbps
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
@@ -156,11 +157,37 @@ def read_metadata(file_path: str) -> TrackMetadata:
         try:
             if audio.info is not None:
                 metadata.duration = float(audio.info.length)
+                metadata.bitrate = _read_bitrate(audio.info)
         except Exception:
             pass
         return metadata
     finally:
         del audio
+
+
+def _read_bitrate(info: Any) -> int | None:
+    """Bitrate in kbps from an already-open mutagen stream info, or None.
+
+    Read here rather than opened for separately: this is the file handle the
+    tag read already holds, so the library gets a bitrate at no extra I/O.
+
+    A **lossless** stream is measured as its format rate — sample rate x bit
+    depth x channels — not as the size its compression happened to achieve.
+    mutagen will report the compressed figure for a FLAC, and that number is
+    misleading in a column beside MP3s: a quiet, highly compressible FLAC
+    measured 17 kbps in a real library, which reads as far worse than a 320
+    kbps MP3 when it is in fact better. Bit depth is the tell — a lossy
+    container has none.
+    """
+    rate = getattr(info, "sample_rate", 0)
+    depth = getattr(info, "bits_per_sample", 0)
+    channels = getattr(info, "channels", 0)
+    if rate and depth and channels:
+        return round(rate * depth * channels / 1000)
+    reported = getattr(info, "bitrate", None)
+    if reported:
+        return round(reported / 1000)
+    return None
 
 
 def _read_metadata_from(audio, file_path: str, suffix: str) -> TrackMetadata:

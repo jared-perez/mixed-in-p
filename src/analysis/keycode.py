@@ -117,8 +117,13 @@ def normalize_key(key: str) -> str:
 def key_to_keycode(key: str) -> str:
     """Convert a musical key to its key code.
 
+    A key code is accepted as input and returned canonicalized ('8a' -> '8A'):
+    the stored key of a track tagged by another DJ tool is as likely to be a
+    code as a note name, and a caller normalizing a mixed library shouldn't
+    have to ask which spelling it is holding first.
+
     Args:
-        key: Musical key (e.g., 'Am', 'F#', 'Bbm', 'C major')
+        key: Musical key (e.g., 'Am', 'F#', 'Bbm', 'C major') or a key code
 
     Returns:
         key code (e.g., '8A', '2B', '3A', '8B')
@@ -126,6 +131,9 @@ def key_to_keycode(key: str) -> str:
     Raises:
         ValueError: If the key is not recognized
     """
+    already_a_code = key.upper().strip()
+    if already_a_code in KEYCODE_TO_KEY:
+        return already_a_code
     normalized = normalize_key(key)
     if normalized not in KEY_TO_KEYCODE:
         raise ValueError(f"Unknown key: {key}")

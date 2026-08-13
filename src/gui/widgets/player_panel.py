@@ -347,12 +347,23 @@ class PlaylistEntry:
     comment: str = ""
     duration: str = ""  # formatted "m:ss"
     year: str = ""
+    track_number: str = ""
+    label: str = ""
+    bitrate: str = ""  # kbps, unformatted
 
 
 def _parse_bpm(text: str) -> float | None:
     """Entry BPM string -> float for the library row, or None if unparsable."""
     try:
         return float(text)
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_int(text: str) -> int | None:
+    """Entry bitrate string -> int for the library row, or None if unparsable."""
+    try:
+        return int(text)
     except (TypeError, ValueError):
         return None
 
@@ -1797,10 +1808,18 @@ class PlayerPanel(QWidget):
             key = t.get("key", "")
             comment = t.get("comment", "")
             year = t.get("year", "")
+            track_number = t.get("track_number", "")
+            label = t.get("label", "")
+            bitrate = t.get("bitrate", "")
             duration_sec = t.get("duration")
             # Fall back to reading these from the file's tags when a caller didn't
             # supply them (e.g. tracks sent from the Analyze panel, which only
             # passes BPM/key), so the columns populate regardless of entry point.
+            #
+            # Track number, label and bitrate are filled by this read but do NOT
+            # trigger it: plenty of files have no label or track number at all,
+            # so testing them here would open every such file on every add,
+            # forever, to learn nothing.
             if (
                 not artist
                 or not title
@@ -1820,6 +1839,11 @@ class PlayerPanel(QWidget):
                     key = key or (meta.key or "")
                     comment = comment or (meta.comment or "")
                     year = year or (str(meta.year) if meta.year else "")
+                    track_number = track_number or (
+                        str(meta.track_number) if meta.track_number else ""
+                    )
+                    label = label or (meta.label or "")
+                    bitrate = bitrate or (str(meta.bitrate) if meta.bitrate else "")
                     if duration_sec is None:
                         duration_sec = meta.duration
                 except Exception:
@@ -1839,6 +1863,9 @@ class PlayerPanel(QWidget):
                 comment=comment,
                 duration=duration_str,
                 year=year,
+                track_number=track_number,
+                label=label,
+                bitrate=bitrate,
             )
             # Duplicates were already resolved by add_tracks — whatever
             # reaches here has been cleared to land.
@@ -1976,9 +2003,10 @@ class PlayerPanel(QWidget):
             # Hand add_tracks everything the library row already carries, so
             # a load doesn't depend on (or wait for) per-file tag reads —
             # and a track whose file is missing still shows its stored tags.
-            # The tag-read fallback then only fills what the DB lacks: year
-            # always (no column for it), and the comment for rows written
-            # before there was one — see _store_read_comments.
+            # The tag-read fallback then only fills what the DB lacks: the
+            # comment for rows written before there was a column for it (see
+            # _store_read_comments), and year/track number/label/bitrate for
+            # rows added before schema v5 gave them one.
             self.add_tracks(
                 [
                     {
@@ -1989,6 +2017,10 @@ class PlayerPanel(QWidget):
                         "bpm": str(int(round(t.bpm))) if t.bpm else "",
                         "key": t.key,
                         "comment": t.comment,
+                        "year": t.year or "",
+                        "track_number": t.track_number or "",
+                        "label": t.label or "",
+                        "bitrate": str(t.bitrate) if t.bitrate else "",
                         "duration": t.duration,
                     }
                     for t in tracks
@@ -2056,6 +2088,10 @@ class PlayerPanel(QWidget):
                 comment=e.comment,
                 bpm=_parse_bpm(e.bpm),
                 key=e.key,
+                year=e.year,
+                track_number=e.track_number,
+                label=e.label,
+                bitrate=_parse_int(e.bitrate),
                 duration=_parse_duration(e.duration),
             )
             for e in self._playlist
@@ -2300,7 +2336,8 @@ class PlayerPanel(QWidget):
 
     def _entry_from_track(self, track) -> PlaylistEntry:
         """A displayable entry for a library track that isn't in the loaded
-        list. Year stays blank — the library rows don't carry it."""
+        list. Every field comes from the row — no file is opened for a search
+        result, however many of them come back."""
         bpm = str(int(round(track.bpm))) if track.bpm else ""
         duration = (
             self._format_time(int(track.duration * 1000)) if track.duration else ""
@@ -2314,6 +2351,10 @@ class PlayerPanel(QWidget):
             key=track.key,
             comment=track.comment,
             duration=duration,
+            year=track.year or "",
+            track_number=track.track_number or "",
+            label=track.label or "",
+            bitrate=str(track.bitrate) if track.bitrate else "",
         )
 
     @staticmethod
@@ -2789,6 +2830,9 @@ class PlayerPanel(QWidget):
             entry.key = meta.key or ""
             entry.comment = meta.comment or ""
             entry.year = str(meta.year) if meta.year else ""
+            entry.track_number = str(meta.track_number) if meta.track_number else ""
+            entry.label = meta.label or ""
+            entry.bitrate = str(meta.bitrate) if meta.bitrate else ""
             if meta.duration:
                 entry.duration = self._format_time(int(meta.duration * 1000))
             changed = True
