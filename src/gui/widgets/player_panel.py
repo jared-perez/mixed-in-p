@@ -138,10 +138,18 @@ _BACKDROP_VIS_OPACITY = 0.40
 # frames so bars fall and fire burns down, then stop its timer.
 _VIS_DECAY_FRAMES = 60
 
-# Most search matches shown at once. Populating this many QTableWidget rows
-# measures a few ms; past the cap the stats label reads "500+ results" so the
-# count never lies about how many tracks matched.
-_SEARCH_LIMIT = 500
+# Most search matches shown at once. Past the cap the stats label reads
+# "2000+ results", so the count never lies about how many tracks matched.
+#
+# 2000 rather than the original 500 because a real library outgrew it: a
+# common word matched more tracks than the search would show. Measured before
+# raising it, at the cap, against a 20,000-track library in All-playlists
+# scope — the expensive path, which also fetches membership counts and builds
+# a tooltip per row: 70-85 ms end to end. The queries are not the cost (search
+# 5 ms, get_tracks 6 ms, counts 2 ms, and all 2000 playlists_containing calls
+# together 16 ms); the rest is the table rebuild. So the tooltips stay eager —
+# there is nothing here to optimise. See the batch plan §4.
+_SEARCH_LIMIT = 2000
 
 
 def _make_play_icon(color: str = _TRANSPORT_GLYPH, size: int = 14) -> QIcon:

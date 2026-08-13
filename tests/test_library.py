@@ -239,6 +239,22 @@ class TestItems:
         assert lib.get_item_track_ids(playlist) == [t1, t2, t1]
         assert lib.item_count(playlist) == 3
 
+    def test_a_playlist_has_no_size_limit(self, lib, tmp_path):
+        """Playlists are unbounded end to end, and must stay that way.
+
+        The cap a user can actually run into is the *search* result cap in
+        the Player; nothing here counts. Guarding it because "add a playlist
+        limit" is the obvious wrong reading of that complaint.
+        """
+        (one,) = make_files(tmp_path, "one.aiff")
+        track = lib.add_track(one)
+        playlist = lib.create_playlist("Marathon")
+
+        lib.set_items(playlist, [track] * 5000)
+
+        assert lib.item_count(playlist) == 5000
+        assert len(lib.get_item_track_ids(playlist)) == 5000
+
     def test_splice_remove_and_move(self, lib, tmp_path):
         paths = make_files(tmp_path, "a.wav", "b.wav", "c.wav")
         playlist = lib.create_playlist("Set")

@@ -98,6 +98,12 @@ class TestAllPlaylistsScope:
         search(player, "cadence")
         assert [t.path for t in lib.get_items(SCRATCH_NODE_ID)] == [a]
 
+    def test_the_cap_is_two_thousand(self):
+        """The reported "playlist limit" was this cap and nothing else: at
+        500, a common word matched more of a real library than the search
+        would show. Measured at 2000 before raising it — see the constant."""
+        assert _SEARCH_LIMIT == 2000
+
     def test_capped_results_are_labelled_honestly(self, player, lib):
         for i in range(_SEARCH_LIMIT + 5):
             lib.add_track(f"/nowhere/track{i:04}.wav", title=f"cad {i:04}")
