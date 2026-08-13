@@ -83,6 +83,10 @@ class AppConfig:
     auto_write_bpm: bool = True
     auto_write_key: bool = True
     energy_tag_enabled: bool = True
+    # The dedicated energy field (TXXX:EnergyLevel and friends), independent of
+    # the comment above: a comment is prose and "4" in one is ambiguous, so a
+    # field of its own is what makes the energy readable back without guessing.
+    energy_field_enabled: bool = True
     energy_tag_format: str = "number_only"
     energy_tag_mode: str = "prepend"
     key_in_comment_enabled: bool = False
@@ -190,6 +194,9 @@ def load_config() -> AppConfig:
                     data.get("auto_write_key", data.get("auto_write_metadata", AppConfig.auto_write_key))
                 ),
                 energy_tag_enabled=bool(data.get("energy_tag_enabled", AppConfig.energy_tag_enabled)),
+                energy_field_enabled=bool(
+                    data.get("energy_field_enabled", AppConfig.energy_field_enabled)
+                ),
                 energy_tag_format=data.get("energy_tag_format", AppConfig.energy_tag_format),
                 energy_tag_mode=data.get("energy_tag_mode", AppConfig.energy_tag_mode),
                 key_in_comment_enabled=bool(data.get("key_in_comment_enabled", AppConfig.key_in_comment_enabled)),

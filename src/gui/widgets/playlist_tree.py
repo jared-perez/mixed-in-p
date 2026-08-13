@@ -1234,6 +1234,7 @@ class PlaylistTree(QTreeView):
             track_number=str(meta.track_number) if meta.track_number else None,
             label=meta.label or None,
             bitrate=meta.bitrate,
+            energy=meta.energy,
             duration=meta.duration,
         )
 

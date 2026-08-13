@@ -29,7 +29,12 @@ from src import library
 from src.library import playlist_export
 from src.analysis.keycode import render_key
 from src.analysis.result import SUPPORTED_EXTENSIONS, AnalysisResult
-from src.metadata import stores_tags, update_bpm_key, update_comment_with_energy
+from src.metadata import (
+    stores_tags,
+    update_bpm_key,
+    update_comment_with_energy,
+    write_energy,
+)
 from src.renamer import (
     AddPrefix,
     AddSuffix,
@@ -786,6 +791,8 @@ class MainWindow(QMainWindow):
                     track["label"] = meta.label
                 if meta.bitrate:
                     track["bitrate"] = str(meta.bitrate)
+                if meta.energy:
+                    track["energy"] = str(meta.energy)
                 if meta.duration and meta.duration > 0:
                     track["duration"] = meta.duration
             except Exception:
@@ -1431,6 +1438,21 @@ class MainWindow(QMainWindow):
                     )
                 except Exception as e:
                     logger.error(f"Failed to write comment tag to {Path(result.file_path).name}: {e}")
+
+            # The energy's own field, independent of the comment above and of
+            # its format settings — this one is never parsed back out of prose,
+            # which is the whole reason it exists.
+            if (
+                self._config.energy_field_enabled
+                and result.energy is not None
+                and stores_tags(result.file_path)
+            ):
+                try:
+                    write_energy(result.file_path, result.energy)
+                except Exception as e:
+                    logger.error(
+                        f"Failed to write energy field to {Path(result.file_path).name}: {e}"
+                    )
 
     # Rename operations
 

@@ -350,6 +350,7 @@ class PlaylistEntry:
     track_number: str = ""
     label: str = ""
     bitrate: str = ""  # kbps, unformatted
+    energy: str = ""  # 1-10, read from the file's own energy field
 
 
 def _parse_bpm(text: str) -> float | None:
@@ -1811,6 +1812,7 @@ class PlayerPanel(QWidget):
             track_number = t.get("track_number", "")
             label = t.get("label", "")
             bitrate = t.get("bitrate", "")
+            energy = t.get("energy", "")
             duration_sec = t.get("duration")
             # Fall back to reading these from the file's tags when a caller didn't
             # supply them (e.g. tracks sent from the Analyze panel, which only
@@ -1844,6 +1846,7 @@ class PlayerPanel(QWidget):
                     )
                     label = label or (meta.label or "")
                     bitrate = bitrate or (str(meta.bitrate) if meta.bitrate else "")
+                    energy = energy or (str(meta.energy) if meta.energy else "")
                     if duration_sec is None:
                         duration_sec = meta.duration
                 except Exception:
@@ -1866,6 +1869,7 @@ class PlayerPanel(QWidget):
                 track_number=track_number,
                 label=label,
                 bitrate=bitrate,
+                energy=energy,
             )
             # Duplicates were already resolved by add_tracks — whatever
             # reaches here has been cleared to land.
@@ -2021,6 +2025,7 @@ class PlayerPanel(QWidget):
                         "track_number": t.track_number or "",
                         "label": t.label or "",
                         "bitrate": str(t.bitrate) if t.bitrate else "",
+                        "energy": str(t.energy) if t.energy else "",
                         "duration": t.duration,
                     }
                     for t in tracks
@@ -2092,6 +2097,7 @@ class PlayerPanel(QWidget):
                 track_number=e.track_number,
                 label=e.label,
                 bitrate=_parse_int(e.bitrate),
+                energy=_parse_int(e.energy),
                 duration=_parse_duration(e.duration),
             )
             for e in self._playlist
@@ -2355,6 +2361,7 @@ class PlayerPanel(QWidget):
             track_number=track.track_number or "",
             label=track.label or "",
             bitrate=str(track.bitrate) if track.bitrate else "",
+            energy=str(track.energy) if track.energy else "",
         )
 
     @staticmethod
@@ -2418,6 +2425,7 @@ class PlayerPanel(QWidget):
             comment=entry.comment,
             bpm=_parse_bpm(entry.bpm),
             key=entry.key,
+            energy=_parse_int(entry.energy),
         )
 
     # ── Table management ────────────────────────────────────────
@@ -2833,6 +2841,7 @@ class PlayerPanel(QWidget):
             entry.track_number = str(meta.track_number) if meta.track_number else ""
             entry.label = meta.label or ""
             entry.bitrate = str(meta.bitrate) if meta.bitrate else ""
+            entry.energy = str(meta.energy) if meta.energy else ""
             if meta.duration:
                 entry.duration = self._format_time(int(meta.duration * 1000))
             changed = True

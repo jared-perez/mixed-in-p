@@ -471,6 +471,21 @@ class SettingsPanel(QWidget):
         self._energy_format_group.buttonClicked.connect(self._emit_changed)
         self._energy_mode_group.buttonClicked.connect(self._emit_changed)
 
+        # Last in the section, and deliberately not next to the comment
+        # checkbox: everything above this line — written-first, format, write
+        # mode — describes the *comment*, and a control placed between them
+        # would read as one more of those. This one is independent of all of
+        # it. On by default: a comment is prose, so an energy read back out of
+        # one has to be guessed at, while a field of its own round-trips.
+        energy_layout.addSpacing(8)
+        self._energy_field_cb = QCheckBox(self.tr("Write energy level to its own tag field"))
+        self._energy_field_cb.setChecked(True)
+        self._energy_field_cb.setToolTip(
+            self.tr("Stores the energy where it can be read back exactly, instead of parsed out of the comment.")
+        )
+        self._energy_field_cb.stateChanged.connect(self._emit_changed)
+        energy_layout.addWidget(self._energy_field_cb)
+
         outer.addWidget(energy_frame)
 
         # ── Section: Playlists ──────────────────────────────────────────────
@@ -870,6 +885,7 @@ class SettingsPanel(QWidget):
             auto_write_bpm=self._auto_write_bpm_cb.isChecked(),
             auto_write_key=self._auto_write_key_cb.isChecked(),
             energy_tag_enabled=self._energy_enabled_cb.isChecked(),
+            energy_field_enabled=self._energy_field_cb.isChecked(),
             energy_tag_format=energy_format,
             energy_tag_mode=energy_mode,
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
@@ -939,6 +955,7 @@ class SettingsPanel(QWidget):
 
         # Energy tag settings
         self._energy_enabled_cb.setChecked(cfg.energy_tag_enabled)
+        self._energy_field_cb.setChecked(cfg.energy_field_enabled)
         self._energy_written_first_cb.setChecked(cfg.energy_written_first)
         if cfg.energy_tag_format == "with_label":
             self._radio_with_label.setChecked(True)

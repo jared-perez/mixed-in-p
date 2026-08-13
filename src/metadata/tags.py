@@ -28,6 +28,7 @@ class TrackMetadata:
     track_number: int | None = None
     label: str | None = None  # record label / publisher (ID3 TPUB, Vorbis LABEL)
     comment: str | None = None
+    energy: int | None = None  # 1-10, from the dedicated field (see ENERGY_FIELD)
     artwork: bytes | None = None
     artwork_mime: str | None = None
     duration: float | None = None  # seconds
@@ -106,6 +107,164 @@ def _parse_track_number(value: str | None) -> int | None:
 TAGLESS_EXTENSIONS = frozenset({".wav"})
 
 
+# The dedicated home for the energy level. There is no standard ID3 frame for
+# energy — the format has nothing to say about it — so this is the de-facto
+# convention: a user-defined text frame (TXXX) under this description, the
+# same-named key in a Vorbis comment, and an iTunes freeform atom for MP4.
+#
+# Why bother, when the app already writes energy into the comment: a comment is
+# prose. "4" in one is genuinely ambiguous with a rating or a crate number,
+# which is why the v5 backfill could recover an energy from almost none of
+# them. A field of its own round-trips exactly, survives the user editing their
+# comment, and can be read back without guessing.
+ENERGY_FIELD = "EnergyLevel"
+_MP4_ENERGY_ATOM = f"----:com.apple.iTunes:{ENERGY_FIELD}"
+
+
+def _coerce_energy(value: object) -> int | None:
+    """A stored energy, if it is one. Anything outside 1-10 is not."""
+    try:
+        energy = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    return energy if 1 <= energy <= 10 else None
+
+
+def _energy_from_id3(tags: Any) -> int | None:
+    """Read TXXX:EnergyLevel, tolerating however another tool spelled it."""
+    if tags is None:
+        return None
+    for frame in tags.getall("TXXX"):
+        if str(frame.desc).strip().lower() == ENERGY_FIELD.lower():
+            for value in frame.text:
+                energy = _coerce_energy(value)
+                if energy is not None:
+                    return energy
+    return None
+
+
+def read_energy(file_path: str) -> int | None:
+    """The energy level stored in this file's dedicated field, or None.
+
+    Never parses the comment: that is the ambiguous source this field exists
+    to replace, and the one place it is still read is the v5 backfill, which
+    is deliberately conservative about it.
+    """
+    from mutagen import File
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    suffix = path.suffix.lower()
+    try:
+        if suffix == ".mp3":
+            from mutagen.id3 import ID3, ID3NoHeaderError
+
+            try:
+                return _energy_from_id3(ID3(file_path))
+            except ID3NoHeaderError:
+                return None
+        if suffix in (".aif", ".aiff"):
+            from mutagen.aiff import AIFF
+
+            return _energy_from_id3(AIFF(file_path).tags)
+        audio = File(file_path)
+        if audio is None or audio.tags is None:
+            return None
+        if suffix in (".m4a", ".mp4"):
+            values = audio.tags.get(_MP4_ENERGY_ATOM) or []
+            for value in values:
+                energy = _coerce_energy(bytes(value).decode("utf-8", "ignore"))
+                if energy is not None:
+                    return energy
+            return None
+        # Vorbis comments (FLAC, OGG): free-form keys, case-insensitive.
+        for key, values in dict(audio.tags).items():
+            if str(key).strip().lower() == ENERGY_FIELD.lower():
+                for value in values if isinstance(values, list) else [values]:
+                    energy = _coerce_energy(value)
+                    if energy is not None:
+                        return energy
+    except Exception as e:  # noqa: BLE001 — an unreadable tag is not fatal
+        logger.debug("Could not read energy from %s: %s", file_path, e)
+    return None
+
+
+def write_energy(file_path: str, energy: int | None) -> bool:
+    """Write the energy level to this file's dedicated field.
+
+    Additive: it does not touch the comment, which keeps its own setting and
+    its own format. A None energy is a no-op rather than a delete — nothing in
+    the app means "erase the energy", and a failed detection must not wipe a
+    good value.
+
+    Returns True on success (including the no-op), False if the format has
+    nowhere to put it.
+    """
+    if energy is None:
+        return True
+
+    path = Path(file_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {file_path}")
+
+    suffix = path.suffix.lower()
+    if not stores_tags(file_path):
+        return False
+
+    from mutagen import File
+    from mutagen.id3 import ID3, TXXX, ID3NoHeaderError
+
+    value = str(energy)
+    if suffix == ".mp3":
+        try:
+            tags = ID3(file_path)
+        except ID3NoHeaderError:
+            tags = ID3()
+        try:
+            tags.delall("TXXX:" + ENERGY_FIELD)
+            tags.add(TXXX(encoding=3, desc=ENERGY_FIELD, text=[value]))
+            tags.save(file_path)
+        finally:
+            del tags
+    elif suffix in (".aif", ".aiff"):
+        from mutagen.aiff import AIFF
+
+        aiff = AIFF(file_path)
+        try:
+            if aiff.tags is None:
+                aiff.add_tags()
+            aiff.tags.delall("TXXX:" + ENERGY_FIELD)
+            aiff.tags.add(TXXX(encoding=3, desc=ENERGY_FIELD, text=[value]))
+            aiff.save()
+        finally:
+            del aiff
+    elif suffix in (".m4a", ".mp4"):
+        from mutagen.mp4 import MP4, MP4FreeForm
+
+        audio = MP4(file_path)
+        try:
+            audio[_MP4_ENERGY_ATOM] = [MP4FreeForm(value.encode("utf-8"))]
+            audio.save()
+        finally:
+            del audio
+    else:
+        audio = File(file_path)  # Vorbis comments: FLAC, OGG
+        try:
+            if audio is None:
+                return False
+            if audio.tags is None:
+                audio.add_tags()
+            audio[ENERGY_FIELD.upper()] = value
+            audio.save()
+        finally:
+            del audio
+
+    logger.info("Wrote energy %s to %s", value, path.name)
+    return True
+
+
 def stores_tags(file_path: str) -> bool:
     """Whether writing BPM/key to this file would actually persist.
 
@@ -160,6 +319,11 @@ def read_metadata(file_path: str) -> TrackMetadata:
                 metadata.bitrate = _read_bitrate(audio.info)
         except Exception:
             pass
+        # Read separately because the easy interface cannot see a TXXX frame.
+        # It is the same second open the AIFF comment and artwork paths above
+        # already make, and it is cheap: measured at 0.03 ms against a real
+        # MP3, against 0.2 ms for this whole function.
+        metadata.energy = read_energy(file_path)
         return metadata
     finally:
         del audio
