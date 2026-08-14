@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import logging
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
 
+import shiboken6
 from PySide6.QtCore import (
     QT_TRANSLATE_NOOP,
     QByteArray,
@@ -85,6 +87,7 @@ from src.utils.config import load_config, save_config
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
+from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
 from ..workers.thread_keeper import keep_alive, wait_for_threads
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
 from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, VisualizerWindow
@@ -1083,8 +1086,11 @@ class PlayerPanel(QWidget):
         QT_TRANSLATE_NOOP("PlayerPanel", "Label"),
         QT_TRANSLATE_NOOP("PlayerPanel", "Bitrate"),
         QT_TRANSLATE_NOOP("PlayerPanel", "Energy"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Art"),
     )
-    # Optional columns: (logical index, PlaylistEntry attribute).
+    # Optional columns: (logical index, PlaylistEntry attribute). A None
+    # attribute has no text of its own — Art carries a thumbnail instead, read
+    # in the background for the rows on screen.
     _OPTIONAL_COLUMNS = (
         (9, "album"),
         (10, "genre"),
@@ -1092,7 +1098,9 @@ class PlayerPanel(QWidget):
         (12, "label"),
         (13, "bitrate"),
         (14, "energy"),
+        (15, None),
     )
+    _ARTWORK_COLUMN = 15
     # Never offered in the hide menu. Filename is the row's identity, and '#'
     # doubles as the membership-count column during an All-playlists search
     # (_set_count_column) — hiding either would leave a table you cannot read
@@ -1137,6 +1145,16 @@ class PlayerPanel(QWidget):
         self._columns_changed_while_searching = False
         # Playlist text size; the table's inline QSS is rebuilt from it.
         self._text_size = DEFAULT_TEXT_SIZE
+        # Artwork thumbnails, for the optional Art column. Keyed (path, mtime)
+        # so a file re-tagged elsewhere shows its new cover; _art_missing
+        # remembers the files that simply have none, which is most of them in
+        # a lot of libraries and the difference between one wasted tag read
+        # and one per scroll.
+        self._art_cache: "OrderedDict[tuple[str, float], QPixmap]" = OrderedDict()
+        self._art_missing: set[tuple[str, float]] = set()
+        self._art_size_loaded = 0
+        self._art_worker: ArtworkWorker | None = None
+        self._art_thread: ArtworkThread | None = None
         self._num_col_width = 40
         # path -> "the file is gone", for the "!" marker (step 10). Memoised
         # because the table rebuilds on every list edit and a stat per row
@@ -1481,6 +1499,7 @@ class PlayerPanel(QWidget):
             2: 180,   # Artist
             3: 180,   # Title
             6: 200,   # Comment
+            15: 60,   # Art
             9: 180,   # Album
             10: 120,  # Genre
             11: 70,   # Track #
@@ -1713,6 +1732,18 @@ class PlayerPanel(QWidget):
         header.sectionResized.connect(self._schedule_column_save)
         header.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         header.customContextMenuRequested.connect(self._show_column_menu)
+
+        # Artwork thumbnails are read for the rows on screen only, so the
+        # triggers are "the visible range may have changed": scrolling, and
+        # anything that resizes the viewport. Debounced — both fire
+        # continuously, and a thread per scrolled pixel is not a plan.
+        self._art_timer = QTimer(self)
+        self._art_timer.setSingleShot(True)
+        self._art_timer.setInterval(120)
+        self._art_timer.timeout.connect(self._load_visible_artwork)
+        self._table.verticalScrollBar().valueChanged.connect(
+            self._schedule_artwork_load
+        )
 
         # Playback engine
         self._engine.positionChanged.connect(self._on_position_changed)
@@ -2007,7 +2038,12 @@ class PlayerPanel(QWidget):
         Separate from ``stop_playback``: that ends the audio output, this ends
         the *readers*. Called from ``closeEvent``, which is what stops a
         running QThread being destroyed under Qt when the panel goes away.
+
+        The artwork reader is asked to stop first: its run() is a plain loop,
+        not an event loop, so quit() means nothing to it and the wait would
+        otherwise sit through every remaining file in the batch.
         """
+        self._cancel_artwork_worker()
         self.wait_for_readers()
 
     def closeEvent(self, event) -> None:
@@ -2556,6 +2592,9 @@ class PlayerPanel(QWidget):
             self._rebuild_table_rows()
         finally:
             self._rebuilding = False
+        # Different rows are on screen now; cached thumbnails were applied as
+        # the rows were built, so this only reads what is genuinely new.
+        self._schedule_artwork_load()
 
     def _rebuild_table_rows(self) -> None:
         self._table.setRowCount(len(self._playlist))
@@ -2644,8 +2683,14 @@ class PlayerPanel(QWidget):
                 # editable set above is a deliberate list, and widening it is
                 # its own conversation.
                 for col, attribute in self._OPTIONAL_COLUMNS:
-                    item = QTableWidgetItem(getattr(entry, attribute))
+                    item = QTableWidgetItem(
+                        getattr(entry, attribute) if attribute else ""
+                    )
                     item.setFlags(non_drop_flags)
+                    if col == self._ARTWORK_COLUMN:
+                        thumb = self._art_cache.get(self._art_key(entry.file_path))
+                        if thumb is not None and not thumb.isNull():
+                            item.setData(Qt.ItemDataRole.DecorationRole, thumb)
                     self._table.setItem(row, col, item)
         finally:
             self._table.blockSignals(False)
@@ -3046,6 +3091,157 @@ class PlayerPanel(QWidget):
             if self._table.columnWidth(col) < min_width:
                 self._table.setColumnWidth(col, min_width)
 
+    # ── Artwork thumbnails ──────────────────────────────────────
+
+    # Enough thumbnails for a long scroll without the cache itself becoming a
+    # memory question: a few hundred ~30px images is well under a megabyte.
+    _ART_CACHE_MAX = 512
+    # Breathing room between the thumbnail and the row's edges.
+    _ART_ROW_INSET = 6
+
+    def _art_key(self, path: str) -> tuple[str, float]:
+        """Cache key. The mtime is in it so re-tagging a file in another app
+        shows the new cover rather than the one we happened to read first."""
+        try:
+            return (path, Path(path).stat().st_mtime)
+        except OSError:
+            return (path, 0.0)
+
+    def _art_size(self) -> int:
+        """Thumbnail edge in px, following the row height (and so the text size)."""
+        return max(
+            16,
+            self._table.verticalHeader().defaultSectionSize() - self._ART_ROW_INSET,
+        )
+
+    def _artwork_showing(self) -> bool:
+        return not self._table.isColumnHidden(self._ARTWORK_COLUMN)
+
+    def _apply_art_icon_size(self) -> None:
+        """The view's icon size is what actually bounds a decoration, so it
+        has to follow the row height too — a thumbnail scaled to 30px still
+        paints at Qt's 16px default without this."""
+        size = self._art_size()
+        self._table.setIconSize(QSize(size, size))
+
+    def _schedule_artwork_load(self) -> None:
+        """Ask for the visible rows' art, debounced.
+
+        Debounced because the triggers are a scrollbar and a resize, which fire
+        continuously: without it a drag down a long playlist would start a
+        thread per pixel of travel.
+        """
+        if not self._artwork_showing():
+            return
+        self._art_timer.start()
+
+    def _visible_rows(self) -> range:
+        """The rows currently on screen, as a range. Empty if the table isn't
+        laid out yet — asking Qt before that returns -1 for both ends."""
+        viewport = self._table.viewport()
+        first = self._table.rowAt(0)
+        last = self._table.rowAt(viewport.height() - 1)
+        if first < 0:
+            return range(0)
+        if last < 0:  # the last row is taller than the remaining viewport
+            last = self._table.rowCount() - 1
+        return range(first, min(last, self._table.rowCount() - 1) + 1)
+
+    def _load_visible_artwork(self) -> None:
+        """Read art for whatever is on screen and isn't already known."""
+        if not self._artwork_showing() or not self._playlist:
+            return
+        size = self._art_size()
+        if size != self._art_size_loaded:
+            # A text-size change invalidates every scaled thumbnail, but not
+            # the knowledge of which files have no art at all.
+            self._art_cache.clear()
+            self._art_size_loaded = size
+        wanted = []
+        for row in self._visible_rows():
+            if not (0 <= row < len(self._playlist)):
+                continue
+            path = self._playlist[row].file_path
+            key = self._art_key(path)
+            if key in self._art_cache or key in self._art_missing:
+                continue
+            if path not in wanted:
+                wanted.append(path)
+        if not wanted:
+            return
+        self._start_artwork_worker(wanted, size)
+
+    def _start_artwork_worker(self, paths: list[str], size: int) -> None:
+        """Run one reader at a time; a new request cancels the one in flight.
+
+        Cancelling rather than queueing because the old request is by
+        definition for rows the user has already scrolled past.
+        """
+        self._cancel_artwork_worker()
+        worker = ArtworkWorker(paths, size)
+        thread = ArtworkThread(worker)
+        self._art_worker = worker
+        self._art_thread = thread
+        # Same reason as the decode workers: the previous run's deleteLater may
+        # still be queued when these attributes are reassigned.
+        keep_alive(self._thread_keep, thread, worker)
+        worker.loaded.connect(self._on_artwork_loaded)
+        worker.empty.connect(self._on_artwork_missing)
+        worker.finished.connect(thread.quit)
+        thread.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(lambda t=thread: self._on_artwork_thread_finished(t))
+        thread.start()
+
+    def _cancel_artwork_worker(self) -> None:
+        """Ask the reader in flight to stop, if there is still one to ask.
+
+        Guarded by isValid: the attribute can outlive the C++ object it names
+        — deleteLater has run but keep_alive still holds the wrapper — and
+        calling into that is not a no-op, it is a crash.
+        """
+        worker = self._art_worker
+        if worker is not None and shiboken6.isValid(worker):
+            worker.cancel()
+
+    def _on_artwork_thread_finished(self, thread) -> None:
+        """Drop the references, unless a newer request has already taken them.
+
+        Without the check, the *previous* reader finishing (which is normal —
+        it was just cancelled by the new one) would clear the new reader's
+        references out from under it.
+        """
+        if self._art_thread is thread:
+            self._art_thread = None
+            self._art_worker = None
+
+    def _on_artwork_loaded(self, path: str, image) -> None:
+        """A thumbnail arrived: cache it and paint it into every matching row."""
+        pixmap = QPixmap.fromImage(image)
+        key = self._art_key(path)
+        self._art_cache[key] = pixmap
+        while len(self._art_cache) > self._ART_CACHE_MAX:
+            self._art_cache.pop(next(iter(self._art_cache)))
+        self._apply_artwork(path, pixmap)
+
+    def _on_artwork_missing(self, path: str) -> None:
+        """Remember that this file has no cover, so scrolling past it again
+        doesn't queue the same fruitless tag read."""
+        self._art_missing.add(self._art_key(path))
+
+    def _apply_artwork(self, path: str, pixmap: QPixmap) -> None:
+        """Set the decoration on every visible row showing this file."""
+        self._table.blockSignals(True)
+        try:
+            for row, entry in enumerate(self._playlist):
+                if entry.file_path != path:
+                    continue
+                item = self._table.item(row, self._ARTWORK_COLUMN)
+                if item is not None:
+                    item.setData(Qt.ItemDataRole.DecorationRole, pixmap)
+        finally:
+            self._table.blockSignals(False)
+
     def _table_stylesheet(self) -> str:
         """The playlist table's inline QSS — the one and only owner of it.
 
@@ -3097,6 +3293,10 @@ class PlayerPanel(QWidget):
             round(self._base_row_height * TEXT_SIZES[size] / TEXT_SIZES[DEFAULT_TEXT_SIZE])
         )
         self._remeasure_word_fit_widths()
+        # Thumbnails are square to the row height, so every cached one is now
+        # the wrong size; _load_visible_artwork notices and re-reads.
+        self._apply_art_icon_size()
+        self._schedule_artwork_load()
         # Row heights follow from the padding plus the new font metrics, but a
         # table pinned to N rows for the slicer was sized against the old ones.
         if self._table.maximumHeight() < 16_777_215:
@@ -3188,6 +3388,11 @@ class PlayerPanel(QWidget):
         if shown and self._table.columnWidth(col) <= 0:
             # A section hidden at zero width would come back invisible.
             self._table.setColumnWidth(col, self._default_column_widths.get(col, 100))
+        if col == self._ARTWORK_COLUMN and shown:
+            # Nothing was read while it was hidden — that is the point of it
+            # being optional — so the first reveal starts from nothing.
+            self._apply_art_icon_size()
+            self._schedule_artwork_load()
         self._schedule_column_save()
 
     def _schedule_column_save(self, *args) -> None:

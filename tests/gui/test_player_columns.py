@@ -1,12 +1,13 @@
 """Optional Player columns: what shows, what persists, what upgrades cleanly.
 
-Six columns join the shipped nine, hidden until asked for from the header's
+Seven columns join the shipped nine (six of data, plus Art — see
+test_player_artwork.py for what that one carries), hidden until asked for from the header's
 right-click menu. Most of the risk is not in showing them — it is in what a
 *saved* header state means once the table is wider than the state is.
 
 The trap, measured rather than assumed: Qt accepts a nine-column state into
-this fifteen-column table (it returns True and applies the nine), but what
-becomes of the six sections the state never knew about is unspecified — and
+this wider table (it returns True and applies the nine), but what
+becomes of the sections the state never knew about is unspecified — and
 observably inconsistent. A bare QTableWidget has them un-hidden by the
 restore; this panel's header keeps the flag it was given. Neither behaviour
 is relied on: `player_column_count` records what the state covers and
@@ -30,7 +31,7 @@ from src.library import Library
 from src.utils.config import AppConfig, load_config, save_config
 
 FIRST_OPTIONAL = 9
-TOTAL_COLUMNS = 15
+TOTAL_COLUMNS = 16
 
 
 @pytest.fixture
@@ -101,7 +102,8 @@ class TestTheHeaderMenu:
         assert len(actions) == TOTAL_COLUMNS - len(player._LOCKED_COLUMNS)
         labels = [a.text() for a in actions]
         assert "Filename" not in labels and "#" not in labels
-        assert {"Album", "Genre", "Track #", "Label", "Bitrate", "Energy"} <= set(labels)
+        assert {"Album", "Genre", "Track #", "Label", "Bitrate", "Energy",
+                "Art"} <= set(labels)
 
     def test_the_checkmarks_report_the_current_state(self, player, qtbot):
         actions = self._menu_actions(player, qtbot)
@@ -377,10 +379,13 @@ class TestTheDataReachesThem:
         )
         qtbot.wait(10)
 
+        # Art is excluded: it carries a thumbnail, not text, and is covered
+        # in test_player_artwork.py.
         shown = {
             player._table.horizontalHeaderItem(col).text():
                 player._table.item(0, col).text()
-            for col, _ in player._OPTIONAL_COLUMNS
+            for col, attribute in player._OPTIONAL_COLUMNS
+            if attribute is not None
         }
         assert shown == {
             "Album": "Modus Operandi",
