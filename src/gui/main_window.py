@@ -1675,12 +1675,16 @@ class MainWindow(QMainWindow):
         self._config.convert_sample_rate = disk.convert_sample_rate
         self._config.convert_bit_depth = disk.convert_bit_depth
         self._config.player_edit_locked = disk.player_edit_locked
-        # These two are one value in two fields and must always be copied
-        # together: the count says how many sections the state describes, and
-        # a state carried across with a stale count is read next launch as
-        # covering the wrong columns.
+        # These three are one value in three fields and must always be copied
+        # together: the count says how many sections the state describes (a
+        # state carried across with a stale count is read next launch as
+        # covering the wrong columns), and the version says which generation of
+        # the shipped defaults it sits on top of — reverted to the startup
+        # value, the one-time layout migration would run again on every launch,
+        # discarding the layout of the session that just ended.
         self._config.player_column_state = disk.player_column_state
         self._config.player_column_count = disk.player_column_count
+        self._config.player_column_defaults_version = disk.player_column_defaults_version
         self._config.visualization_mode = disk.visualization_mode
         save_config(self._config)
 

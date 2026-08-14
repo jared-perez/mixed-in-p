@@ -129,12 +129,15 @@ def pump_art(player, qtbot):
 
 
 class TestItStaysOutOfTheWayUntilAsked:
-    def test_the_column_is_hidden_to_begin_with(self, player):
-        assert player._table.isColumnHidden(ART_COLUMN)
+    def test_the_column_is_shown_to_begin_with(self, player):
+        """It ships visible, second only to the row number. The reads it costs
+        are still only ever the rows on screen — see TestOnlyTheRowsOnScreen."""
+        assert not player._table.isColumnHidden(ART_COLUMN)
 
     def test_nothing_is_read_while_it_is_hidden(self, player, qtbot, sf, tmp_path, cover_bytes):
-        """The whole point of it being optional: a thousand-track playlist
-        should not pay a thousand tag parses for a column nobody opened."""
+        """Turned off, it costs nothing: a thousand-track playlist should not
+        pay a thousand tag parses for a column nobody is looking at."""
+        player._set_column_visible(ART_COLUMN, False)
         add(player, qtbot, make_track(sf, tmp_path, "a.flac", cover_bytes))
         qtbot.wait(50)
 
@@ -142,6 +145,7 @@ class TestItStaysOutOfTheWayUntilAsked:
         assert not player._art_cache
 
     def test_revealing_it_starts_the_read(self, player, qtbot, sf, tmp_path, cover_bytes):
+        player._set_column_visible(ART_COLUMN, False)
         add(player, qtbot, make_track(sf, tmp_path, "a.flac", cover_bytes))
 
         show_art(player, qtbot)

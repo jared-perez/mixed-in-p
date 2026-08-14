@@ -261,6 +261,7 @@ class TestOnlyFullChangesTheLayout:
         )
 
     def test_revealing_it_again_brings_the_height_back(self, player):
+        player._set_column_visible(ART_COLUMN, False)
         player.set_artwork_view("full")
         assert player._table.verticalHeader().defaultSectionSize() == (
             player._text_row_height()

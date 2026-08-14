@@ -1109,6 +1109,20 @@ class PlayerPanel(QWidget):
         (15, None),
     )
     _ARTWORK_COLUMN = 15
+    # The shipped layout, as a *visual* order over those fixed logical indexes:
+    # #, Art, Artist, Title, BPM, Key, Comment, Duration, Year, Filename, and
+    # then the optional ones in their own order. Expressed this way because the
+    # logical order can never change (a saved state addresses sections by
+    # number, and every existing user has one), so "the default order" is a
+    # separate thing from "the order the columns were declared in".
+    _DEFAULT_COLUMN_ORDER = (0, 15, 2, 3, 4, 5, 6, 7, 8, 1, 9, 10, 11, 12, 13, 14)
+    # Optional columns that are nonetheless shown out of the box. Art earns it:
+    # it is the one column that says what a track *is* at a glance.
+    _DEFAULT_SHOWN_OPTIONAL = frozenset({_ARTWORK_COLUMN})
+    # Bumped whenever the two constants above change. A saved state beats the
+    # defaults, so without this a new default layout would only ever be seen by
+    # someone who had never opened the app — see _restore_column_state.
+    _COLUMN_DEFAULTS_VERSION = 1
     # Starting widths for the columns that are not sized from their own header
     # word. Measured against the English labels, so they are a *base* rather
     # than the answer: _apply_header_fit_floor raises any that a translation
@@ -1577,6 +1591,16 @@ class PlayerPanel(QWidget):
         # never passes through _set_column_visible, and so would otherwise
         # paint its strips at Qt's 16px default icon size.
         self._apply_art_icon_size()
+        if self._default_columns_applied:
+            # Art is shown out of the box, so nobody has dragged it and it has
+            # no saved width — but it does have Qt's default section size,
+            # which is wider than the band. _apply_art_icon_size only ever
+            # widens (a width the user chose is theirs to keep), so the exact
+            # default is set here, where it is known that there isn't one.
+            self._table.setColumnWidth(
+                self._ARTWORK_COLUMN,
+                self._default_column_widths[self._ARTWORK_COLUMN],
+            )
 
         layout.addWidget(self._table, 1)
 
@@ -3086,12 +3110,27 @@ class PlayerPanel(QWidget):
         second. Re-seating the header fixes it, keeping their widths.
         """
         header = self._table.horizontalHeader()
+        self._apply_default_column_order()
         # Taken while the header is definitely healthy: fifteen sections, just
         # built, nothing restored into it yet.
         pristine = header.saveState()
         cfg = load_config()
         state = cfg.player_column_state
+        migrating = bool(state) and (
+            cfg.player_column_defaults_version < self._COLUMN_DEFAULTS_VERSION
+        )
+        if migrating:
+            # The shipped layout changed, and a saved state would hide that
+            # from everyone who has ever opened the app. Applied once: the
+            # state is dropped, the defaults above stand, and the new version
+            # is written back at the end so this never runs again.
+            logger.info("Applying the new default player column layout (once)")
+            state = ""
         covered = 0
+        # Whether what is on screen is the shipped layout rather than a
+        # restored one — true for a fresh install, for the migration above, and
+        # for a state Qt refused, all of which end up on the defaults.
+        self._default_columns_applied = True
         if state:
             restored = False
             try:
@@ -3102,6 +3141,7 @@ class PlayerPanel(QWidget):
                 logger.warning("Could not restore player column layout: %s", exc)
             if restored:
                 covered = cfg.player_column_count
+                self._default_columns_applied = False
                 if covered < self._table.columnCount():
                     self._normalize_header(pristine)
             else:
@@ -3114,13 +3154,34 @@ class PlayerPanel(QWidget):
                     self._table.setColumnWidth(col, width)
         for col, _ in self._OPTIONAL_COLUMNS:
             if col >= covered:
-                self._table.setColumnHidden(col, True)
+                self._table.setColumnHidden(
+                    col, col not in self._DEFAULT_SHOWN_OPTIONAL
+                )
         # Floor the word-fit columns so a previously-saved (or freshly dragged)
         # narrow width never reopens with the BPM/Key/Year/Duration header word
         # clipped. Wider saved widths are kept; the user can still widen freely.
         for col, min_width in self._word_fit_widths.items():
             if self._table.columnWidth(col) < min_width:
                 self._table.setColumnWidth(col, min_width)
+        if migrating:
+            # Written back now, not at the next column change: a user who never
+            # touches the header would otherwise be migrated on every launch,
+            # and each one would throw away the layout of the session before.
+            self._save_column_state()
+
+    def _apply_default_column_order(self) -> None:
+        """Put the sections in the shipped visual order.
+
+        Left to right, so every move lands against an already-settled prefix —
+        the same reason _normalize_header applies its order that way. Called
+        before any saved state is restored, so it is what a fresh install (or
+        a refused state) is left wearing, and what a restore overwrites.
+        """
+        header = self._table.horizontalHeader()
+        for target, col in enumerate(self._DEFAULT_COLUMN_ORDER):
+            current = header.visualIndex(col)
+            if current != target:
+                header.moveSection(current, target)
 
     # ── Artwork thumbnails ──────────────────────────────────────
 
@@ -3589,13 +3650,22 @@ class PlayerPanel(QWidget):
         state = bytes(self._table.horizontalHeader().saveState().toBase64()).decode("ascii")
         count = self._table.columnCount()
         cfg = load_config()
-        if cfg.player_column_state == state and cfg.player_column_count == count:
+        version = self._COLUMN_DEFAULTS_VERSION
+        if (
+            cfg.player_column_state == state
+            and cfg.player_column_count == count
+            and cfg.player_column_defaults_version == version
+        ):
             return
         cfg.player_column_state = state
         # Saved together, always: the state alone cannot say how many sections
         # it covers, and that is what tells a later build which columns it is
         # allowed to have an opinion about (see _restore_column_state).
         cfg.player_column_count = count
+        # And the generation of defaults this layout was built on top of, so a
+        # future change to the shipped order can tell "the user arranged this"
+        # from "this is just the old default, carried forward".
+        cfg.player_column_defaults_version = version
         save_config(cfg)
 
     # ── Transport handlers ──────────────────────────────────────

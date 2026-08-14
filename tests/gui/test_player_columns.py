@@ -73,9 +73,17 @@ class TestTheColumnSet:
             range(FIRST_OPTIONAL, TOTAL_COLUMNS)
         )
 
-    def test_they_start_hidden(self, player):
+    def test_they_start_hidden_except_art(self, player):
+        """Art is the one optional column shipped visible — it says what a
+        track is at a glance, which none of the others do."""
         for col, _ in player._OPTIONAL_COLUMNS:
-            assert player._table.isColumnHidden(col), col
+            if col in player._DEFAULT_SHOWN_OPTIONAL:
+                assert not player._table.isColumnHidden(col), col
+            else:
+                assert player._table.isColumnHidden(col), col
+
+    def test_art_is_the_only_one_of_them(self, player):
+        assert player._DEFAULT_SHOWN_OPTIONAL == frozenset({player._ARTWORK_COLUMN})
 
     def test_the_shipped_nine_start_visible(self, player):
         for col in range(9):
@@ -188,17 +196,26 @@ class TestUpgradingFromNineColumns:
         cfg = AppConfig()
         cfg.player_column_state = state
         cfg.player_column_count = 0  # older builds never wrote one
+        # Already migrated to the current defaults. Without this the one-time
+        # layout migration discards the state before _normalize_header ever
+        # sees it, and these tests would pass while testing nothing — the
+        # short-state handling stays live for the *next* column added.
+        cfg.player_column_defaults_version = PlayerPanel._COLUMN_DEFAULTS_VERSION
         save_config(cfg)
 
-    def test_the_new_columns_do_not_appear(self, qtbot, lib):
+    def test_the_new_columns_take_their_defaults(self, qtbot, lib):
+        """A nine-column state has no opinion about the columns that came
+        later, so each one takes its shipped default — which for everything
+        except Art is hidden. What must never happen is Qt's un-hiding of
+        sections the state predates deciding this instead."""
         self._save_nine_column_state()
 
         player = make_player(qtbot, lib)
 
         for col, _ in player._OPTIONAL_COLUMNS:
-            assert player._table.isColumnHidden(col), (
-                f"column {col} was un-hidden by restoring a 9-column state"
-            )
+            assert player._table.isColumnHidden(col) is (
+                col not in player._DEFAULT_SHOWN_OPTIONAL
+            ), f"column {col} did not take its default visibility"
 
     def test_the_saved_widths_are_still_honoured(self, qtbot, lib):
         """The upgrade must not cost the user their existing layout."""
@@ -239,6 +256,7 @@ class TestUpgradingFromNineColumns:
             table.horizontalHeader().saveState().toBase64()
         ).decode("ascii")
         cfg.player_column_count = 0
+        cfg.player_column_defaults_version = PlayerPanel._COLUMN_DEFAULTS_VERSION
         save_config(cfg)
 
         player = make_player(qtbot, lib)
@@ -352,7 +370,9 @@ class TestARefusedState:
 
         assert player._table.columnWidth(1) == 300  # the default Filename width
         for col, _ in player._OPTIONAL_COLUMNS:
-            assert player._table.isColumnHidden(col), col
+            assert player._table.isColumnHidden(col) is (
+                col not in player._DEFAULT_SHOWN_OPTIONAL
+            ), col
 
 
 class TestTheDataReachesThem:

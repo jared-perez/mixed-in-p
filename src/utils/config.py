@@ -148,6 +148,12 @@ class AppConfig:
     # column was added would silently show it. This says which sections the
     # state has an opinion about; the rest take their default visibility.
     player_column_count: int = 0
+    # Which generation of the shipped column layout this config has seen. A
+    # saved state always wins over the defaults, so a change to the *default*
+    # order or visibility would never reach anyone who has used the app — this
+    # is what lets such a change be applied once and then never again. 0 means
+    # "written before the field existed", i.e. every config in the wild.
+    player_column_defaults_version: int = 0
     # Playlist text size: small/medium/large. Applied live, no restart —
     # unlike the theme, nothing caches a font the way widgets cache colours.
     player_text_size: str = "medium"
@@ -266,6 +272,11 @@ def load_config() -> AppConfig:
                 player_column_count=_optional_int(
                     data, "player_column_count", AppConfig.player_column_count
                 ) or AppConfig.player_column_count,
+                player_column_defaults_version=_optional_int(
+                    data,
+                    "player_column_defaults_version",
+                    AppConfig.player_column_defaults_version,
+                ) or AppConfig.player_column_defaults_version,
                 player_text_size=data.get(
                     "player_text_size", AppConfig.player_text_size
                 ),
