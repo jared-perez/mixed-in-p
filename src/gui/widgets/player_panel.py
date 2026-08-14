@@ -335,6 +335,13 @@ def _make_scope_all_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon
     return QIcon(pm)
 
 
+# Playlist text-size presets, in px. Small/medium/large rather than a free
+# number: the row height, the column minimums and the header all follow the
+# font, so three tested sizes beat an unbounded one.
+TEXT_SIZES = {"small": 12, "medium": 14, "large": 17}
+DEFAULT_TEXT_SIZE = "medium"
+
+
 @dataclass
 class PlaylistEntry:
     """A single track in the playlist."""
@@ -1128,6 +1135,8 @@ class PlayerPanel(QWidget):
         # A column show/hide made during a search: the save is suppressed
         # while '#' wears its temporary search width, so it waits here.
         self._columns_changed_while_searching = False
+        # Playlist text size; the table's inline QSS is rebuilt from it.
+        self._text_size = DEFAULT_TEXT_SIZE
         self._num_col_width = 40
         # path -> "the file is gone", for the "!" marker (step 10). Memoised
         # because the table rebuilds on every list edit and a stat per row
@@ -1438,20 +1447,11 @@ class PlayerPanel(QWidget):
         # Transparent (not BG_MEDIUM) so the backdrop waveform painted in
         # paintEvent isn't covered by the style's background fill; the panel
         # behind the table is BG_MEDIUM, so the resting look is identical.
-        self._table.setStyleSheet(
-            "QTableWidget { background-color: transparent; border: none; }"
-            f"QHeaderView::section {{ background-color: {Theme.BG_MEDIUM}; }}"
-            "QTableWidget::item { padding: 8px 0px; }"
-            # The inline edit field otherwise inherits the global pill-shaped
-            # QLineEdit (8px padding + rounded border), which clips the text in
-            # a short row. Flatten it to a plain rectangle that fills the cell.
-            "QTableWidget QLineEdit {"
-            f" border: 1px solid {Theme.NEON_YELLOW}; border-radius: 0px;"
-            f" background-color: #1e1e1e; color: {Theme.TEXT_PRIMARY};"
-            " padding: 0px 4px; margin: 0px;"
-            f" selection-background-color: {Theme.NEON_YELLOW}; selection-color: {Theme.BG_DARK}; }}"
-        )
+        self._table.setStyleSheet(self._table_stylesheet())
         self._table.verticalHeader().setVisible(False)
+        # The shipped row height, captured before anything scales it: the
+        # text-size presets are multiples of this, so Medium is exactly today.
+        self._base_row_height = self._table.verticalHeader().defaultSectionSize()
         # SelectedClicked gives Finder-style "slow double-click" editing (click an
         # already-selected cell to edit) without stealing the double-click-to-play
         # gesture. Gated by the Edit Lock toggle via _apply_edit_triggers().
@@ -3045,6 +3045,87 @@ class PlayerPanel(QWidget):
         for col, min_width in self._word_fit_widths.items():
             if self._table.columnWidth(col) < min_width:
                 self._table.setColumnWidth(col, min_width)
+
+    def _table_stylesheet(self) -> str:
+        """The playlist table's inline QSS — the one and only owner of it.
+
+        Both the row padding and the text size live here on purpose. The app
+        stylesheet sets a global ``QWidget { font-size: 14px }``, which beats a
+        plain ``setFont()`` on the table, so the size has to be QSS; and since
+        a second ``setStyleSheet`` would replace this one rather than add to
+        it, there is a single sheet built in a single place.
+        """
+        px = TEXT_SIZES[self._text_size]
+        return (
+            "QTableWidget { background-color: transparent; border: none;"
+            f" font-size: {px}px; }}"
+            # On QHeaderView itself, not on ::section. A sub-control rule is
+            # honoured when the section is *painted* but never reaches
+            # header.font() — and _title_font() (which the column widths are
+            # measured from) reads exactly that. Styling the sub-control alone
+            # therefore drew a larger header word and kept the old, too-narrow
+            # column to put it in.
+            f"QHeaderView {{ font-size: {px}px; }}"
+            f"QHeaderView::section {{ background-color: {Theme.BG_MEDIUM}; }}"
+            "QTableWidget::item { padding: 8px 0px; }"
+            # The inline edit field otherwise inherits the global pill-shaped
+            # QLineEdit (8px padding + rounded border), which clips the text in
+            # a short row. Flatten it to a plain rectangle that fills the cell.
+            "QTableWidget QLineEdit {"
+            f" border: 1px solid {Theme.NEON_YELLOW}; border-radius: 0px;"
+            f" background-color: #1e1e1e; color: {Theme.TEXT_PRIMARY};"
+            f" padding: 0px 4px; margin: 0px; font-size: {px}px;"
+            f" selection-background-color: {Theme.NEON_YELLOW}; selection-color: {Theme.BG_DARK}; }}"
+        )
+
+    def set_text_size(self, size: str) -> None:
+        """Set the playlist's text size preset, live. Unknown names are ignored.
+
+        Applied immediately rather than at restart: the theme needs a restart
+        because widgets cache palette colours, and nothing here does.
+        """
+        if size not in TEXT_SIZES or size == self._text_size:
+            return
+        self._text_size = size
+        self._table.setStyleSheet(self._table_stylesheet())
+        # Rows do not follow the font on their own — they sit at the vertical
+        # header's default section size and nothing re-measures them. Scaling
+        # that explicitly (rather than resizeRowsToContents, which sizes to the
+        # delegate hint plus the QSS padding and made every row half again as
+        # tall at the *current* size) keeps Medium pixel-identical to today.
+        self._table.verticalHeader().setDefaultSectionSize(
+            round(self._base_row_height * TEXT_SIZES[size] / TEXT_SIZES[DEFAULT_TEXT_SIZE])
+        )
+        self._remeasure_word_fit_widths()
+        # Row heights follow from the padding plus the new font metrics, but a
+        # table pinned to N rows for the slicer was sized against the old ones.
+        if self._table.maximumHeight() < 16_777_215:
+            self._apply_table_height(True)
+
+    def _remeasure_word_fit_widths(self) -> None:
+        """Re-measure the columns sized to fit their own header word.
+
+        ensurePolished() first: the width has to be measured with the font the
+        header will actually paint with, and the inline sheet has only just
+        changed. Columns the user has widened past the new minimum keep their
+        width — this only ever raises a floor.
+        """
+        header = self._table.horizontalHeader()
+        header.ensurePolished()
+        header_fm = QFontMetrics(header._title_font())
+        for col in list(self._word_fit_widths):
+            item = self._table.horizontalHeaderItem(col)
+            if item is None:
+                continue
+            width = (
+                header_fm.horizontalAdvance(item.text())
+                + 2 * SeparatorHeaderView._TEXT_PAD
+                + 4
+            )
+            self._word_fit_widths[col] = width
+            self._default_column_widths[col] = width
+            if self._table.columnWidth(col) < width:
+                self._table.setColumnWidth(col, width)
 
     def _normalize_header(self, pristine: QByteArray) -> None:
         """Re-seat the header after it restored a state shorter than itself.

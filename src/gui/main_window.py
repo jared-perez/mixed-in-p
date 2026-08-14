@@ -172,6 +172,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_key_notation(self._config.key_notation)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
+        self._player_panel.set_text_size(self._config.player_text_size)
         self._apply_visualization_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
         self._spectrum_panel.set_dynamic_range(self._config.spectrum_dynamic_range)
@@ -1314,6 +1315,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_key_notation(self._config.key_notation)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
+        self._player_panel.set_text_size(self._config.player_text_size)
         self._apply_visualization_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
 

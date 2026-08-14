@@ -219,6 +219,44 @@ class SettingsPanel(QWidget):
         outer.addWidget(wave_frame)
         self._restyle_waveform_swatches()
 
+        # ── Section: Playlist text size ────────────────────────────────────
+        outer.addWidget(self._make_section_label(self.tr("Playlist Text Size")))
+
+        text_frame = QFrame()
+        text_frame.setObjectName("settingsSection")
+        text_layout = QVBoxLayout(text_frame)
+        text_layout.setContentsMargins(16, 10, 16, 10)
+        text_layout.setSpacing(10)
+
+        text_hint = QLabel(
+            self.tr("Size of the track rows in the player. Applies straight away.")
+        )
+        text_hint.setObjectName("settingsHint")
+        text_hint.setWordWrap(True)
+        text_layout.addWidget(text_hint)
+
+        self._text_size_group = QButtonGroup(self)
+        self._text_size_group.setExclusive(True)
+        self._text_size_radios: dict[str, QRadioButton] = {}
+        size_row = self._row_layout()
+        for index, (size, label) in enumerate(
+            (
+                ("small", self.tr("Small")),
+                ("medium", self.tr("Medium")),
+                ("large", self.tr("Large")),
+            )
+        ):
+            radio = QRadioButton(label)
+            self._text_size_group.addButton(radio, index)
+            self._text_size_radios[size] = radio
+            size_row.addWidget(radio)
+        self._text_size_radios["medium"].setChecked(True)
+        size_row.addStretch(1)
+        text_layout.addLayout(size_row)
+        self._text_size_group.buttonClicked.connect(self._emit_changed)
+
+        outer.addWidget(text_frame)
+
         # ── Section: Visualizations ────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Visualizations")))
 
@@ -762,6 +800,13 @@ class SettingsPanel(QWidget):
             self._min_bpm_spin.setValue(value - 1)
         self.settings_changed.emit()
 
+    def _selected_text_size(self) -> str:
+        """The checked playlist text-size preset."""
+        for size, radio in self._text_size_radios.items():
+            if radio.isChecked():
+                return size
+        return "medium"
+
     def _emit_changed(self) -> None:
         self.settings_changed.emit()
 
@@ -886,6 +931,7 @@ class SettingsPanel(QWidget):
             auto_write_key=self._auto_write_key_cb.isChecked(),
             energy_tag_enabled=self._energy_enabled_cb.isChecked(),
             energy_field_enabled=self._energy_field_cb.isChecked(),
+            player_text_size=self._selected_text_size(),
             energy_tag_format=energy_format,
             energy_tag_mode=energy_mode,
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
@@ -956,6 +1002,9 @@ class SettingsPanel(QWidget):
         # Energy tag settings
         self._energy_enabled_cb.setChecked(cfg.energy_tag_enabled)
         self._energy_field_cb.setChecked(cfg.energy_field_enabled)
+        radio = self._text_size_radios.get(cfg.player_text_size)
+        if radio is not None:
+            radio.setChecked(True)
         self._energy_written_first_cb.setChecked(cfg.energy_written_first)
         if cfg.energy_tag_format == "with_label":
             self._radio_with_label.setChecked(True)
