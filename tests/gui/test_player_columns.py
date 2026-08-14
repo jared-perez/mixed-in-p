@@ -107,8 +107,9 @@ class TestTheHeaderMenu:
     def test_it_offers_every_unlocked_column(self, player, qtbot):
         actions = self._menu_actions(player, qtbot)
 
-        assert len(actions) == TOTAL_COLUMNS - len(player._LOCKED_COLUMNS)
-        labels = [a.text() for a in actions]
+        toggles = [a for a in actions if a.isCheckable()]
+        assert len(toggles) == TOTAL_COLUMNS - len(player._LOCKED_COLUMNS)
+        labels = [a.text() for a in toggles]
         assert "Filename" not in labels and "#" not in labels
         assert {"Album", "Genre", "Track #", "Label", "Bitrate", "Energy",
                 "Art"} <= set(labels)

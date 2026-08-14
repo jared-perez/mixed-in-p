@@ -1128,7 +1128,14 @@ class PlayerPanel(QWidget):
     # migrated, which left the shipped order in place but four of the ten
     # default columns switched off. Version 1 never shipped, so re-running the
     # migration costs nobody anything and repairs those.
-    _COLUMN_DEFAULTS_VERSION = 2
+    #
+    # 3 for the same reason one step on: a layout saved between those builds
+    # could have Art switched off, which the migration then had no reason to
+    # touch — a column hidden before the defaults changed is indistinguishable
+    # from one the user hid on purpose. Neither 1 nor 2 shipped. `Reset
+    # Columns` in the header menu exists so this is the last time a bump is
+    # the only way back.
+    _COLUMN_DEFAULTS_VERSION = 3
     # Starting widths for the columns that are not sized from their own header
     # word. Measured against the English labels, so they are a *base* rather
     # than the answer: _apply_header_fit_floor raises any that a translation
@@ -3614,7 +3621,44 @@ class PlayerPanel(QWidget):
             action.toggled.connect(
                 lambda shown, c=col: self._set_column_visible(c, shown)
             )
+        menu.addSeparator()
+        reset = menu.addAction(self.tr("Reset Columns"))
+        reset.triggered.connect(self.reset_columns_to_defaults)
         return menu
+
+    def reset_columns_to_defaults(self) -> None:
+        """Put the playlist back to the shipped order, open set and widths.
+
+        The way back. A saved layout outranks the defaults — that is what makes
+        it a saved layout — so without this the only route to the shipped
+        arrangement is a defaults-version bump, i.e. a new build. Which is one
+        release too slow for someone who hid a column and wants it back.
+
+        Every column is given a width, not just the ones that were hidden: a
+        section that was hidden reports a width of 0 whatever it is set to, so
+        the width it comes back at is whatever it last held — which for a
+        column restored from an old saved state can itself be 0. (Measured:
+        setting the width before or after un-hiding gives the same result, so
+        the order of those two is not the trap it looks like.)
+        """
+        optional = {col for col, _ in self._OPTIONAL_COLUMNS}
+        for col in range(self._table.columnCount()):
+            self._table.setColumnHidden(
+                col, col in optional and col not in self._DEFAULT_SHOWN_OPTIONAL
+            )
+        for col in range(self._table.columnCount()):
+            self._table.setColumnWidth(col, self._default_column_widths.get(col, 100))
+        self._apply_default_column_order()
+        # Art's width follows the row height and the header word, neither of
+        # which _default_column_widths knows about until this has run.
+        self._apply_art_icon_size()
+        self._table.setColumnWidth(
+            self._ARTWORK_COLUMN, self._default_column_widths[self._ARTWORK_COLUMN]
+        )
+        # Art is back on, and in the Full view that means taller rows again.
+        self._apply_row_height()
+        self._schedule_artwork_load()
+        self._save_column_state()
 
     def _show_column_menu(self, pos) -> None:
         """Right-click the header: which columns to show."""

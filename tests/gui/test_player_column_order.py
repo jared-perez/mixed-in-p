@@ -155,6 +155,75 @@ class TestAllTenAreOpen:
         assert second._table.isColumnHidden(6)
 
 
+class TestResetColumns:
+    """The way back to the shipped layout without a new build.
+
+    Written because there wasn't one: a column switched off is recorded as a
+    choice, the migration only fires when the *defaults* generation changes,
+    and so "I hid Art and now I want it back the way it shipped" had no answer
+    short of bumping a constant and shipping.
+    """
+
+    def test_the_menu_offers_it(self, qtbot, lib):
+        player = make_player(qtbot, lib)
+
+        menu = player._build_column_menu()
+        qtbot.addWidget(menu)
+
+        labels = [a.text() for a in menu.actions() if not a.isCheckable()]
+        assert "Reset Columns" in labels
+
+    def test_it_brings_back_a_hidden_column(self, qtbot, lib):
+        player = make_player(qtbot, lib)
+        player._set_column_visible(player._ARTWORK_COLUMN, False)
+
+        player.reset_columns_to_defaults()
+
+        assert visual_order(player) == EXPECTED_ORDER
+
+    def test_a_column_hidden_at_zero_width_comes_back_visible(self, qtbot, lib):
+        """A hidden section reports a width of 0, and a reset that only flips
+        the flag would bring it back at whatever it last held — which for a
+        column restored from an old state can be 0, i.e. still invisible."""
+        player = make_player(qtbot, lib)
+        player._set_column_visible(player._ARTWORK_COLUMN, False)
+        assert player._table.columnWidth(player._ARTWORK_COLUMN) == 0
+
+        player.reset_columns_to_defaults()
+
+        assert player._table.columnWidth(player._ARTWORK_COLUMN) > 0
+
+    def test_it_undoes_a_reorder(self, qtbot, lib):
+        player = make_player(qtbot, lib)
+        header = player._table.horizontalHeader()
+        header.moveSection(header.visualIndex(1), 0)  # drag Filename to the front
+        assert visual_order(player)[0] == "Filename"
+
+        player.reset_columns_to_defaults()
+
+        assert visual_order(player) == EXPECTED_ORDER
+
+    def test_it_restores_the_default_widths(self, qtbot, lib):
+        player = make_player(qtbot, lib)
+        player._table.setColumnWidth(2, 600)
+
+        player.reset_columns_to_defaults()
+
+        assert player._table.columnWidth(2) == player._default_column_widths[2]
+
+    def test_it_survives_the_next_launch(self, qtbot, lib):
+        """It saves, or the next launch restores the layout being reset away."""
+        first = make_player(qtbot, lib)
+        first._set_column_visible(player_art := first._ARTWORK_COLUMN, False)
+        first._save_column_state()
+        first.reset_columns_to_defaults()
+
+        second = make_player(qtbot, lib)
+
+        assert not second._table.isColumnHidden(player_art)
+        assert visual_order(second) == EXPECTED_ORDER
+
+
 class TestTheOneTimeMigration:
     def _old_layout(self, columns=16, version=0):
         """A config as some earlier build left it: a state that predates the
