@@ -11,11 +11,13 @@ QPixmap: QPixmap may only be touched on the GUI thread, while QImage is a plain
 buffer and can be decoded and scaled here, off it. The panel turns it into a
 pixmap, which is cheap.
 
-What comes back is not the whole cover: the panel asks for it scaled well
-taller than a row and then cropped to a band off the top, which is what a
-playlist row shows (see ``PlayerPanel._ART_STRIP_SCALE``). The crop happens
-here, on this thread, so the scaling and the cutting are one pass and the
-cache holds only the band.
+What comes back is usually not the whole cover: the panel asks for it scaled
+well taller than a row and then cropped to a band, which is what a playlist row
+shows (see ``PlayerPanel._ART_STRIP_SCALE``). Which band — off the top or out
+of the middle — is the user's setting, and asking for no crop at all gives the
+whole square back for the "Full" view. The crop happens here, on this thread,
+so the scaling and the cutting are one pass and the cache holds only the band
+rather than the nine-times-larger square behind it.
 """
 
 from __future__ import annotations
@@ -46,15 +48,20 @@ class ArtworkWorker(QObject):
         paths: Sequence[str],
         size: int,
         strip_height: int | None = None,
+        strip_align: str = "top",
         parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
         self._paths = list(paths)
         self._size = size
-        # None keeps the whole (square) cover; a height crops it to that band
-        # off the top. Cropping here rather than at paint time so the cache
+        # None keeps the whole (square) cover; a height crops it to a band of
+        # that height. Cropping here rather than at paint time so the cache
         # holds the band, not the nine-times-larger square behind it.
         self._strip_height = strip_height
+        # Where that band is cut from: "top" or "middle". Anything else reads
+        # as "top", so an unknown setting degrades to the default rather than
+        # raising on a background thread.
+        self._strip_align = strip_align
         self._cancelled = False
 
     def cancel(self) -> None:
@@ -95,8 +102,13 @@ class ArtworkWorker(QObject):
         )
         if self._strip_height is None or scaled.height() <= self._strip_height:
             return scaled
+        top = 0
+        if self._strip_align == "middle":
+            # Integer division, so an odd remainder leaves the extra pixel at
+            # the bottom rather than putting the band half a pixel off centre.
+            top = (scaled.height() - self._strip_height) // 2
         # copy() returns a detached image, so the square behind it is freed.
-        return scaled.copy(0, 0, scaled.width(), self._strip_height)
+        return scaled.copy(0, top, scaled.width(), self._strip_height)
 
 
 class ArtworkThread(QThread):

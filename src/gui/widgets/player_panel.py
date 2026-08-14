@@ -344,6 +344,14 @@ def _make_scope_all_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon
 TEXT_SIZES = {"small": 12, "medium": 14, "large": 17}
 DEFAULT_TEXT_SIZE = "medium"
 
+# What the Art column shows. "top"/"middle" are a band one row tall cut from a
+# cover scaled to _ART_STRIP_SCALE rows either way — so switching between them
+# changes only which part of the sleeve is on screen, never the layout. "full"
+# keeps that same scaled square whole and lets the row grow to fit it, which is
+# the only one of the three that changes the row height.
+ARTWORK_VIEWS = ("top", "middle", "full")
+DEFAULT_ARTWORK_VIEW = "top"
+
 
 @dataclass
 class PlaylistEntry:
@@ -1166,6 +1174,9 @@ class PlayerPanel(QWidget):
         self._columns_changed_while_searching = False
         # Playlist text size; the table's inline QSS is rebuilt from it.
         self._text_size = DEFAULT_TEXT_SIZE
+        # Which part of the cover the Art column shows. Read before the table
+        # exists, so it is set here rather than in the artwork section below.
+        self._art_view = DEFAULT_ARTWORK_VIEW
         # Artwork thumbnails, for the optional Art column. Keyed (path, mtime)
         # so a file re-tagged elsewhere shows its new cover; _art_missing
         # remembers the files that simply have none, which is most of them in
@@ -1173,7 +1184,11 @@ class PlayerPanel(QWidget):
         # and one per scroll.
         self._art_cache: "OrderedDict[tuple[str, float], QPixmap]" = OrderedDict()
         self._art_missing: set[tuple[str, float]] = set()
-        self._art_size_loaded = 0
+        # (edge, view) of the thumbnails currently cached. The view is in it
+        # because top and middle produce images of identical size: comparing
+        # the edge alone would serve a cached top band under the middle
+        # setting, and the change would appear to do nothing at all.
+        self._art_size_loaded: tuple[int, str] = (0, "")
         self._art_worker: ArtworkWorker | None = None
         self._art_thread: ArtworkThread | None = None
         self._num_col_width = 40
@@ -3131,20 +3146,70 @@ class PlayerPanel(QWidget):
         except OSError:
             return (path, 0.0)
 
-    def _art_strip_height(self) -> int:
-        """Height of the visible band: the row height, less breathing room.
+    def _text_row_height(self) -> int:
+        """The row height the current text size asks for, on its own.
 
-        This is what a row can actually show, and so what the cropped strip is
-        cut to — it follows the row height, and therefore the text size.
+        Deliberately computed from the captured base rather than read back from
+        the vertical header: in the Full artwork view the header holds a height
+        derived from the art, which is in turn derived from *this* — reading it
+        back would feed the art its own output and grow the rows on every pass.
         """
-        return max(
-            8,
-            self._table.verticalHeader().defaultSectionSize() - self._ART_ROW_INSET,
+        return round(
+            self._base_row_height
+            * TEXT_SIZES[self._text_size]
+            / TEXT_SIZES[DEFAULT_TEXT_SIZE]
         )
 
+    def _art_strip_height(self) -> int:
+        """Height of the band cut from the cover: a text row, less breathing room.
+
+        Note this stays the band's height in every view, including Full — it is
+        what the cover is scaled *from* (times _ART_STRIP_SCALE), so keeping it
+        tied to the text row alone is what makes the scaled cover the same size
+        in all three views, and the column the same width.
+        """
+        return max(8, self._text_row_height() - self._ART_ROW_INSET)
+
     def _art_size(self) -> int:
-        """Edge the whole cover is scaled to before the top band is cut out."""
+        """Edge the whole cover is scaled to before a band is cut out of it."""
         return self._art_strip_height() * self._ART_STRIP_SCALE
+
+    def _art_paint_height(self) -> int:
+        """How much of that cover a row actually shows: all of it, or one band."""
+        if self._art_view == "full":
+            return self._art_size()
+        return self._art_strip_height()
+
+    def _art_crop_height(self) -> int | None:
+        """The crop to ask the reader for. None means "keep the whole square"."""
+        return None if self._art_view == "full" else self._art_strip_height()
+
+    def _row_height(self) -> int:
+        """The row height to apply: the text's, unless Full art needs more.
+
+        Only Full changes it, and only while the column is actually showing —
+        a hidden Art column must not leave the playlist wearing three-row rows
+        for artwork nobody can see.
+        """
+        height = self._text_row_height()
+        if self._art_view == "full" and self._artwork_showing():
+            height = max(height, self._art_size() + self._ART_ROW_INSET)
+        return height
+
+    def _apply_row_height(self) -> None:
+        """Push the computed row height onto the table.
+
+        Rows do not follow the font on their own — they sit at the vertical
+        header's default section size and nothing re-measures them. Scaling it
+        explicitly (rather than resizeRowsToContents, which sizes to the
+        delegate hint plus the QSS padding and made every row half again as
+        tall at the *current* size) keeps Medium pixel-identical to today.
+        """
+        self._table.verticalHeader().setDefaultSectionSize(self._row_height())
+        # A table pinned to N rows for the slicer was sized against the old
+        # height, so it now shows the wrong number of them.
+        if self._table.maximumHeight() < 16_777_215:
+            self._apply_table_height(True)
 
     def _artwork_showing(self) -> bool:
         return not self._table.isColumnHidden(self._ARTWORK_COLUMN)
@@ -3153,9 +3218,11 @@ class PlayerPanel(QWidget):
         """Size the view's icons — and the column — to the band.
 
         The view's icon size is what actually bounds a decoration, so a strip
-        scaled to 72×24 still paints at Qt's 16px default without this; and it
-        is deliberately not square, because the band is three rows of cover
-        wide and one row tall.
+        scaled to 72×24 still paints at Qt's 16px default without this; and in
+        the band views it is deliberately not square, because the band is three
+        rows of cover wide and one row tall. In Full it is square, and the
+        column width is unchanged — the cover is scaled the same in all three
+        views, so switching between them never reflows the columns.
 
         The column is only ever widened, never narrowed: a band cut off
         halfway looks like a bug, but a user who has dragged the column wider
@@ -3163,7 +3230,7 @@ class PlayerPanel(QWidget):
         it is set to, so for a column nobody has opened yet the widening is
         really the default width, which _set_column_visible applies on reveal.
         """
-        width, height = self._art_size(), self._art_strip_height()
+        width, height = self._art_size(), self._art_paint_height()
         self._table.setIconSize(QSize(width, height))
         # The band's width, or the header word's if that is wider — "Art" is
         # three letters and its translations are not (ja アートワーク wants 95px
@@ -3203,11 +3270,12 @@ class PlayerPanel(QWidget):
         if not self._artwork_showing() or not self._playlist:
             return
         size = self._art_size()
-        if size != self._art_size_loaded:
-            # A text-size change invalidates every scaled thumbnail, but not
-            # the knowledge of which files have no art at all.
+        if (size, self._art_view) != self._art_size_loaded:
+            # A text-size change invalidates every scaled thumbnail and a view
+            # change every crop, but neither invalidates the knowledge of which
+            # files have no art at all.
             self._art_cache.clear()
-            self._art_size_loaded = size
+            self._art_size_loaded = (size, self._art_view)
         wanted = []
         for row in self._visible_rows():
             if not (0 <= row < len(self._playlist)):
@@ -3229,7 +3297,7 @@ class PlayerPanel(QWidget):
         definition for rows the user has already scrolled past.
         """
         self._cancel_artwork_worker()
-        worker = ArtworkWorker(paths, size, size // self._ART_STRIP_SCALE)
+        worker = ArtworkWorker(paths, size, self._art_crop_height(), self._art_view)
         thread = ArtworkThread(worker)
         self._art_worker = worker
         self._art_thread = thread
@@ -3335,23 +3403,29 @@ class PlayerPanel(QWidget):
             return
         self._text_size = size
         self._table.setStyleSheet(self._table_stylesheet())
-        # Rows do not follow the font on their own — they sit at the vertical
-        # header's default section size and nothing re-measures them. Scaling
-        # that explicitly (rather than resizeRowsToContents, which sizes to the
-        # delegate hint plus the QSS padding and made every row half again as
-        # tall at the *current* size) keeps Medium pixel-identical to today.
-        self._table.verticalHeader().setDefaultSectionSize(
-            round(self._base_row_height * TEXT_SIZES[size] / TEXT_SIZES[DEFAULT_TEXT_SIZE])
-        )
+        self._apply_row_height()
         self._remeasure_word_fit_widths()
-        # The artwork band is cut to the row height, so every cached strip is
+        # The artwork is scaled from the text row, so every cached thumbnail is
         # now the wrong size; _load_visible_artwork notices and re-reads.
         self._apply_art_icon_size()
         self._schedule_artwork_load()
-        # Row heights follow from the padding plus the new font metrics, but a
-        # table pinned to N rows for the slicer was sized against the old ones.
-        if self._table.maximumHeight() < 16_777_215:
-            self._apply_table_height(True)
+
+    def set_artwork_view(self, view: str) -> None:
+        """Set which part of the cover the Art column shows, live.
+
+        Unknown names are ignored, so a config from a future build cannot leave
+        the column showing nothing.
+        """
+        if view not in ARTWORK_VIEWS or view == self._art_view:
+            return
+        self._art_view = view
+        # Full needs taller rows and the band views need them back, so the row
+        # height is re-applied even though the text size has not moved.
+        self._apply_row_height()
+        self._apply_art_icon_size()
+        # Every cached image is a crop that is no longer the one being asked
+        # for; the reload is what actually repaints the column.
+        self._schedule_artwork_load()
 
     def _remeasure_word_fit_widths(self) -> None:
         """Re-measure the columns sized to fit their own header word.
@@ -3486,11 +3560,16 @@ class PlayerPanel(QWidget):
         if shown and self._table.columnWidth(col) <= 0:
             # A section hidden at zero width would come back invisible.
             self._table.setColumnWidth(col, self._default_column_widths.get(col, 100))
-        if col == self._ARTWORK_COLUMN and shown:
-            # Nothing was read while it was hidden — that is the point of it
-            # being optional — so the first reveal starts from nothing.
-            self._apply_art_icon_size()
-            self._schedule_artwork_load()
+        if col == self._ARTWORK_COLUMN:
+            # In the Full view the rows are tall enough to hold a whole cover,
+            # which is only right while there is one on screen — so both
+            # directions of the toggle re-apply the height.
+            self._apply_row_height()
+            if shown:
+                # Nothing was read while it was hidden — that is the point of
+                # it being optional — so the first reveal starts from nothing.
+                self._apply_art_icon_size()
+                self._schedule_artwork_load()
         self._schedule_column_save()
 
     def _schedule_column_save(self, *args) -> None:

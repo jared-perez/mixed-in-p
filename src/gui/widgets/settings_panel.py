@@ -257,6 +257,51 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(text_frame)
 
+        # ── Section: Playlist artwork ──────────────────────────────────────
+        # Its own section rather than another row inside Playlist Text Size:
+        # the two do scale together, but a control placed under a section label
+        # reads as belonging to it (the lesson from the energy-field checkbox),
+        # and widening that label would orphan its translation in 11 languages.
+        outer.addWidget(self._make_section_label(self.tr("Playlist Artwork")))
+
+        art_frame = QFrame()
+        art_frame.setObjectName("settingsSection")
+        art_layout = QVBoxLayout(art_frame)
+        art_layout.setContentsMargins(16, 10, 16, 10)
+        art_layout.setSpacing(10)
+
+        art_hint = QLabel(
+            self.tr(
+                "Part of the cover art shown in the player's Art column. "
+                "Full makes each row tall enough for the whole sleeve."
+            )
+        )
+        art_hint.setObjectName("settingsHint")
+        art_hint.setWordWrap(True)
+        art_layout.addWidget(art_hint)
+
+        self._artwork_view_group = QButtonGroup(self)
+        self._artwork_view_group.setExclusive(True)
+        self._artwork_view_radios: dict[str, QRadioButton] = {}
+        art_row = self._row_layout()
+        for index, (view, label) in enumerate(
+            (
+                ("top", self.tr("Top")),
+                ("middle", self.tr("Middle")),
+                ("full", self.tr("Full")),
+            )
+        ):
+            radio = QRadioButton(label)
+            self._artwork_view_group.addButton(radio, index)
+            self._artwork_view_radios[view] = radio
+            art_row.addWidget(radio)
+        self._artwork_view_radios["top"].setChecked(True)
+        art_row.addStretch(1)
+        art_layout.addLayout(art_row)
+        self._artwork_view_group.buttonClicked.connect(self._emit_changed)
+
+        outer.addWidget(art_frame)
+
         # ── Section: Visualizations ────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Visualizations")))
 
@@ -807,6 +852,13 @@ class SettingsPanel(QWidget):
                 return size
         return "medium"
 
+    def _selected_artwork_view(self) -> str:
+        """The checked playlist artwork view."""
+        for view, radio in self._artwork_view_radios.items():
+            if radio.isChecked():
+                return view
+        return "top"
+
     def _emit_changed(self) -> None:
         self.settings_changed.emit()
 
@@ -932,6 +984,7 @@ class SettingsPanel(QWidget):
             energy_tag_enabled=self._energy_enabled_cb.isChecked(),
             energy_field_enabled=self._energy_field_cb.isChecked(),
             player_text_size=self._selected_text_size(),
+            player_artwork_view=self._selected_artwork_view(),
             energy_tag_format=energy_format,
             energy_tag_mode=energy_mode,
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
@@ -1003,6 +1056,9 @@ class SettingsPanel(QWidget):
         self._energy_enabled_cb.setChecked(cfg.energy_tag_enabled)
         self._energy_field_cb.setChecked(cfg.energy_field_enabled)
         radio = self._text_size_radios.get(cfg.player_text_size)
+        if radio is not None:
+            radio.setChecked(True)
+        radio = self._artwork_view_radios.get(cfg.player_artwork_view)
         if radio is not None:
             radio.setChecked(True)
         self._energy_written_first_cb.setChecked(cfg.energy_written_first)

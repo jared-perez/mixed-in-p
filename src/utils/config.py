@@ -39,6 +39,7 @@ _VALID_KEY_NOTATIONS = {"keycode", "traditional", "open_key"}
 # Playlist text-size presets. The px values live in the Player panel —
 # this is only the set of names a config file may hold.
 _VALID_TEXT_SIZES = {"small", "medium", "large"}
+_VALID_ARTWORK_VIEWS = {"top", "middle", "full"}
 _VALID_VIS_MODES = {
     "off",
     # Behind the playlist rows.
@@ -150,6 +151,11 @@ class AppConfig:
     # Playlist text size: small/medium/large. Applied live, no restart —
     # unlike the theme, nothing caches a font the way widgets cache colours.
     player_text_size: str = "medium"
+    # Which part of the cover the playlist's Art column shows: top/middle/full.
+    # "top" and "middle" are a band one row tall cut from a cover scaled the
+    # same either way; "full" keeps the whole square and lets the row grow to
+    # fit it. Applied live, like the text size it scales with.
+    player_artwork_view: str = "top"
     # Base64-encoded QMainWindow.saveGeometry() (size + position + maximized
     # state). Empty = open at the default size, centered. The Keyboard panel's
     # transient resize is never stored here.
@@ -263,6 +269,9 @@ def load_config() -> AppConfig:
                 player_text_size=data.get(
                     "player_text_size", AppConfig.player_text_size
                 ),
+                player_artwork_view=data.get(
+                    "player_artwork_view", AppConfig.player_artwork_view
+                ),
                 window_geometry=data.get(
                     "window_geometry", AppConfig.window_geometry
                 ),
@@ -279,6 +288,8 @@ def load_config() -> AppConfig:
                 cfg.key_notation = AppConfig.key_notation
             if cfg.player_text_size not in _VALID_TEXT_SIZES:
                 cfg.player_text_size = AppConfig.player_text_size
+            if cfg.player_artwork_view not in _VALID_ARTWORK_VIEWS:
+                cfg.player_artwork_view = AppConfig.player_artwork_view
             if cfg.energy_tag_format not in _VALID_ENERGY_FORMATS:
                 cfg.energy_tag_format = AppConfig.energy_tag_format
             if cfg.energy_tag_mode not in _VALID_ENERGY_MODES:
