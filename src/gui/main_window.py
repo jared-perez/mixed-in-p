@@ -777,6 +777,10 @@ class MainWindow(QMainWindow):
                     track["artist"] = meta.artist
                 if meta.title:
                     track["title"] = meta.title
+                if meta.album:
+                    track["album"] = meta.album
+                if meta.genre:
+                    track["genre"] = meta.genre
                 if meta.bpm:
                     track["bpm"] = f"{meta.bpm:.1f}"
                 if meta.key:
@@ -1667,7 +1671,12 @@ class MainWindow(QMainWindow):
         self._config.convert_sample_rate = disk.convert_sample_rate
         self._config.convert_bit_depth = disk.convert_bit_depth
         self._config.player_edit_locked = disk.player_edit_locked
+        # These two are one value in two fields and must always be copied
+        # together: the count says how many sections the state describes, and
+        # a state carried across with a stale count is read next launch as
+        # covering the wrong columns.
         self._config.player_column_state = disk.player_column_state
+        self._config.player_column_count = disk.player_column_count
         self._config.visualization_mode = disk.visualization_mode
         save_config(self._config)
 

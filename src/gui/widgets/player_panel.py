@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 
 from PySide6.QtCore import (
+    QT_TRANSLATE_NOOP,
     QByteArray,
     QObject,
     QPoint,
@@ -342,6 +343,8 @@ class PlaylistEntry:
     display_name: str
     artist: str = ""
     title: str = ""
+    album: str = ""
+    genre: str = ""
     bpm: str = ""
     key: str = ""
     comment: str = ""
@@ -1050,6 +1053,45 @@ class PlayerPanel(QWidget):
     # Emitted empty whenever there is nothing to light.
     tree_highlight_changed = Signal(object, object)
 
+    # Playlist columns, in logical order. The first nine are the shipped
+    # defaults; everything after them is optional and hidden until the user
+    # asks for it via the header's right-click menu. Only ever APPEND here —
+    # a saved header state addresses sections by number.
+    #
+    # Marked with QT_TRANSLATE_NOOP because the labels are declared here and
+    # displayed in _setup_ui; self.tr() wraps them at the display site.
+    _COLUMN_LABELS = (
+        QT_TRANSLATE_NOOP("PlayerPanel", "#"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Filename"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Artist"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Title"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "BPM"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Key"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Comment"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Duration"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Year"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Album"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Genre"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Track #"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Label"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Bitrate"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Energy"),
+    )
+    # Optional columns: (logical index, PlaylistEntry attribute).
+    _OPTIONAL_COLUMNS = (
+        (9, "album"),
+        (10, "genre"),
+        (11, "track_number"),
+        (12, "label"),
+        (13, "bitrate"),
+        (14, "energy"),
+    )
+    # Never offered in the hide menu. Filename is the row's identity, and '#'
+    # doubles as the membership-count column during an All-playlists search
+    # (_set_count_column) — hiding either would leave a table you cannot read
+    # or a swap fighting a visibility flag.
+    _LOCKED_COLUMNS = frozenset({0, 1})
+
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._playlist: list[PlaylistEntry] = []
@@ -1083,6 +1125,9 @@ class PlayerPanel(QWidget):
         self._search_track_ids: list[int] | None = None
         self._search_capped = False
         self._count_column_active = False
+        # A column show/hide made during a search: the save is suppressed
+        # while '#' wears its temporary search width, so it waits here.
+        self._columns_changed_while_searching = False
         self._num_col_width = 40
         # path -> "the file is gone", for the "!" marker (step 10). Memoised
         # because the table rebuilds on every list edit and a stat per row
@@ -1375,19 +1420,13 @@ class PlayerPanel(QWidget):
         self._table = ReorderableTableWidget()
         # Inset dividers between the column titles as a width-grab hint.
         self._table.setHorizontalHeader(SeparatorHeaderView(self._table))
-        self._table.setColumnCount(9)
+        # The nine default columns keep logical indexes 0-8 and the optional
+        # ones are appended after them, never inserted between: a saved header
+        # state refers to sections by number, so inserting would silently
+        # re-point every existing user's widths and order at the wrong columns.
+        self._table.setColumnCount(len(self._COLUMN_LABELS))
         self._table.setHorizontalHeaderLabels(
-            [
-                self.tr("#"),
-                self.tr("Filename"),
-                self.tr("Artist"),
-                self.tr("Title"),
-                self.tr("BPM"),
-                self.tr("Key"),
-                self.tr("Comment"),
-                self.tr("Duration"),
-                self.tr("Year"),
-            ]
+            [self.tr(label) for label in self._COLUMN_LABELS]
         )
         # Flat playlist surface in the sidebar's grey (no border / row stripes),
         # so the near-black slice tray below reads as the distinct work area.
@@ -1432,13 +1471,25 @@ class PlayerPanel(QWidget):
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
         )
         header.setSectionResizeMode(0, QHeaderView.ResizeMode.Fixed)
-        for col in range(1, 9):
+        for col in range(1, self._table.columnCount()):
             header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
-        self._table.setColumnWidth(0, 40)
-        self._table.setColumnWidth(1, 300)  # Filename
-        self._table.setColumnWidth(2, 180)  # Artist
-        self._table.setColumnWidth(3, 180)  # Title
-        self._table.setColumnWidth(6, 200)  # Comment
+        # Kept so a refused saved state can be replaced by the defaults rather
+        # than by whatever a half-applied restore left behind.
+        self._default_column_widths = {
+            0: 40,
+            1: 300,   # Filename
+            2: 180,   # Artist
+            3: 180,   # Title
+            6: 200,   # Comment
+            9: 180,   # Album
+            10: 120,  # Genre
+            11: 70,   # Track #
+            12: 150,  # Label
+            13: 80,   # Bitrate
+            14: 70,   # Energy
+        }
+        for col, width in self._default_column_widths.items():
+            self._table.setColumnWidth(col, width)
         # BPM, Key, Duration, Year default just wide enough to show the full
         # (bold) header word — measured from the header font so translated
         # labels fit too — rather than a fixed 70-80px that clips them. The
@@ -1456,6 +1507,7 @@ class PlayerPanel(QWidget):
             # touches the right-edge divider.
             width = header_fm.horizontalAdvance(label) + 2 * SeparatorHeaderView._TEXT_PAD + 4
             self._word_fit_widths[col] = width
+            self._default_column_widths[col] = width
             self._table.setColumnWidth(col, width)
         # Width the # column grows to while it shows membership counts under
         # the "Playlists" header (All-playlists search), measured the same way.
@@ -1659,6 +1711,8 @@ class PlayerPanel(QWidget):
         header = self._table.horizontalHeader()
         header.sectionMoved.connect(self._schedule_column_save)
         header.sectionResized.connect(self._schedule_column_save)
+        header.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        header.customContextMenuRequested.connect(self._show_column_menu)
 
         # Playback engine
         self._engine.positionChanged.connect(self._on_position_changed)
@@ -1805,6 +1859,8 @@ class PlayerPanel(QWidget):
         for t in tracks:
             artist = t.get("artist", "")
             title = t.get("title", "")
+            album = t.get("album", "")
+            genre = t.get("genre", "")
             bpm = t.get("bpm", "")
             key = t.get("key", "")
             comment = t.get("comment", "")
@@ -1837,6 +1893,8 @@ class PlayerPanel(QWidget):
                     meta = read_metadata(t["file_path"])
                     artist = artist or (meta.artist or "")
                     title = title or (meta.title or "")
+                    album = album or (meta.album or "")
+                    genre = genre or (meta.genre or "")
                     bpm = bpm or (str(int(round(meta.bpm))) if meta.bpm else "")
                     key = key or (meta.key or "")
                     comment = comment or (meta.comment or "")
@@ -1861,6 +1919,8 @@ class PlayerPanel(QWidget):
                 display_name=t["display_name"],
                 artist=artist,
                 title=title,
+                album=album,
+                genre=genre,
                 bpm=bpm,
                 key=key,
                 comment=comment,
@@ -2018,6 +2078,8 @@ class PlayerPanel(QWidget):
                         "display_name": Path(t.path).name,
                         "artist": t.artist,
                         "title": t.title,
+                        "album": t.album,
+                        "genre": t.genre,
                         "bpm": str(int(round(t.bpm))) if t.bpm else "",
                         "key": t.key,
                         "comment": t.comment,
@@ -2090,6 +2152,8 @@ class PlayerPanel(QWidget):
                 e.file_path,
                 artist=e.artist,
                 title=e.title,
+                album=e.album,
+                genre=e.genre,
                 comment=e.comment,
                 bpm=_parse_bpm(e.bpm),
                 key=e.key,
@@ -2324,6 +2388,11 @@ class PlayerPanel(QWidget):
         else:
             header_item.setText(self.tr("#"))
             self._table.setColumnWidth(0, self._num_col_width)
+            # '#' is back at its own width, so a layout change the search
+            # suppressed is now safe to persist.
+            if self._columns_changed_while_searching:
+                self._columns_changed_while_searching = False
+                self._col_save_timer.start()
 
     def _relink_playing_row(self) -> None:
         """Point _current_index at the engine's track in the visible list
@@ -2353,6 +2422,8 @@ class PlayerPanel(QWidget):
             display_name=track.filename,
             artist=track.artist,
             title=track.title,
+            album=track.album,
+            genre=track.genre,
             bpm=bpm,
             key=track.key,
             comment=track.comment,
@@ -2565,6 +2636,17 @@ class PlayerPanel(QWidget):
                 year_item = QTableWidgetItem(entry.year)
                 year_item.setFlags(editable_flags)
                 self._table.setItem(row, 8, year_item)
+
+                # The optional columns. Built whether or not they are showing:
+                # they cost a QTableWidgetItem each, and populating them here
+                # means unhiding one displays its data immediately rather than
+                # waiting for the next rebuild. Read-only for now — the
+                # editable set above is a deliberate list, and widening it is
+                # its own conversation.
+                for col, attribute in self._OPTIONAL_COLUMNS:
+                    item = QTableWidgetItem(getattr(entry, attribute))
+                    item.setFlags(non_drop_flags)
+                    self._table.setItem(row, col, item)
         finally:
             self._table.blockSignals(False)
 
@@ -2834,6 +2916,8 @@ class PlayerPanel(QWidget):
                 continue
             entry.artist = meta.artist or ""
             entry.title = meta.title or ""
+            entry.album = meta.album or ""
+            entry.genre = meta.genre or ""
             entry.bpm = str(int(round(meta.bpm))) if meta.bpm else ""
             entry.key = meta.key or ""
             entry.comment = meta.comment or ""
@@ -2903,15 +2987,58 @@ class PlayerPanel(QWidget):
     # ── Column layout persistence ───────────────────────────────
 
     def _restore_column_state(self) -> None:
-        """Apply the saved playlist column order/widths, if any."""
-        state = load_config().player_column_state
+        """Apply the saved playlist column order/widths/visibility, if any.
+
+        The awkward part is what a saved state does NOT contain. Qt accepts a
+        nine-column state into this fifteen-column table — it returns True and
+        applies the nine — but what happens to the six sections the state has
+        never heard of is unspecified, and observably inconsistent: a bare
+        QTableWidget has them **un-hidden** by the restore, while this panel's
+        header keeps whatever flag it was given. Either way an upgrading user
+        must not open the app to six columns nobody asked for.
+
+        So neither behaviour is relied on. `player_column_count` records how
+        many sections the saved state has an opinion about, and everything
+        beyond that has its default visibility applied *after* the restore —
+        which is correct whichever way Qt jumps.
+
+        Worse, and the reason for `_normalize_header`: a header that has
+        swallowed a shorter state is left internally inconsistent, and the
+        state it *saves* afterwards cannot be restored at all. An upgrading
+        user would therefore write a poisoned layout on their first run and
+        lose it — along with anything they had done that session — on their
+        second. Re-seating the header fixes it, keeping their widths.
+        """
+        header = self._table.horizontalHeader()
+        # Taken while the header is definitely healthy: fifteen sections, just
+        # built, nothing restored into it yet.
+        pristine = header.saveState()
+        cfg = load_config()
+        state = cfg.player_column_state
+        covered = 0
         if state:
+            restored = False
             try:
-                self._table.horizontalHeader().restoreState(
+                restored = header.restoreState(
                     QByteArray.fromBase64(state.encode("ascii"))
                 )
             except Exception as exc:  # noqa: BLE001
                 logger.warning("Could not restore player column layout: %s", exc)
+            if restored:
+                covered = cfg.player_column_count
+                if covered < self._table.columnCount():
+                    self._normalize_header(pristine)
+            else:
+                # A refused state has told us nothing, and may have been
+                # partly applied on the way to refusing. Put the header back
+                # the way it was rather than leaving it half-restored.
+                logger.warning("Saved player column layout was refused; using defaults")
+                header.restoreState(pristine)
+                for col, width in self._default_column_widths.items():
+                    self._table.setColumnWidth(col, width)
+        for col, _ in self._OPTIONAL_COLUMNS:
+            if col >= covered:
+                self._table.setColumnHidden(col, True)
         # Floor the word-fit columns so a previously-saved (or freshly dragged)
         # narrow width never reopens with the BPM/Key/Year/Duration header word
         # clipped. Wider saved widths are kept; the user can still widen freely.
@@ -2919,11 +3046,77 @@ class PlayerPanel(QWidget):
             if self._table.columnWidth(col) < min_width:
                 self._table.setColumnWidth(col, min_width)
 
+    def _normalize_header(self, pristine: QByteArray) -> None:
+        """Re-seat the header after it restored a state shorter than itself.
+
+        Qt applies such a state — the widths and order really are right
+        afterwards — but leaves the section bookkeeping inconsistent, and the
+        state saved from that header is then refused by `restoreState`. The
+        layout is therefore copied off the header, the header is put back to a
+        known-good shape, and the layout is applied again through the ordinary
+        setters. Same result on screen, and a header that can save itself.
+        """
+        columns = range(self._table.columnCount())
+        header = self._table.horizontalHeader()
+        layout = [
+            (header.visualIndex(col), self._table.columnWidth(col),
+             self._table.isColumnHidden(col))
+            for col in columns
+        ]
+        header.restoreState(pristine)
+        for col, (_, width, hidden) in enumerate(layout):
+            self._table.setColumnWidth(col, width)
+            self._table.setColumnHidden(col, hidden)
+        # Order last, and applied in the order the columns should end up in,
+        # so each move lands against an already-settled prefix.
+        for col, (visual, _, _) in sorted(enumerate(layout), key=lambda kv: kv[1][0]):
+            if header.visualIndex(col) != visual:
+                header.moveSection(header.visualIndex(col), visual)
+
+    def _build_column_menu(self) -> QMenu:
+        """The header's show/hide menu, built but not shown.
+
+        Separate from showing it so it can be inspected without opening a
+        modal — exec() on a menu nothing clicks blocks forever.
+
+        Column labels come from the header itself so they are already
+        translated; '#' and Filename are never offered.
+        """
+        menu = QMenu(self)
+        for col in range(self._table.columnCount()):
+            if col in self._LOCKED_COLUMNS:
+                continue
+            item = self._table.horizontalHeaderItem(col)
+            action = menu.addAction(item.text() if item else str(col))
+            action.setCheckable(True)
+            action.setChecked(not self._table.isColumnHidden(col))
+            action.setData(col)
+            action.toggled.connect(
+                lambda shown, c=col: self._set_column_visible(c, shown)
+            )
+        return menu
+
+    def _show_column_menu(self, pos) -> None:
+        """Right-click the header: which columns to show."""
+        menu = self._build_column_menu()
+        menu.exec(self._table.horizontalHeader().mapToGlobal(pos))
+
+    def _set_column_visible(self, col: int, shown: bool) -> None:
+        """Show or hide one column and remember the choice."""
+        self._table.setColumnHidden(col, not shown)
+        if shown and self._table.columnWidth(col) <= 0:
+            # A section hidden at zero width would come back invisible.
+            self._table.setColumnWidth(col, self._default_column_widths.get(col, 100))
+        self._schedule_column_save()
+
     def _schedule_column_save(self, *args) -> None:
         """Debounce saves so a drag-resize writes the config once, not per pixel."""
         # Not while searching: column 0 is temporarily widened for its
         # "Playlists" header, and saveState would persist that width onto '#'.
+        # A visibility toggle made mid-search would be lost with it, so the
+        # request is remembered and flushed when the search ends.
         if self._search_active:
+            self._columns_changed_while_searching = True
             return
         self._col_save_timer.start()
 
@@ -2931,10 +3124,15 @@ class PlayerPanel(QWidget):
         """Persist the current column order/widths. Re-loads config first so we
         don't clobber settings another panel changed since launch."""
         state = bytes(self._table.horizontalHeader().saveState().toBase64()).decode("ascii")
+        count = self._table.columnCount()
         cfg = load_config()
-        if cfg.player_column_state == state:
+        if cfg.player_column_state == state and cfg.player_column_count == count:
             return
         cfg.player_column_state = state
+        # Saved together, always: the state alone cannot say how many sections
+        # it covers, and that is what tells a later build which columns it is
+        # allowed to have an opinion about (see _restore_column_state).
+        cfg.player_column_count = count
         save_config(cfg)
 
     # ── Transport handlers ──────────────────────────────────────

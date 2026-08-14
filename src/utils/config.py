@@ -138,6 +138,12 @@ class AppConfig:
     # Base64-encoded QHeaderView.saveState() for the Player playlist columns
     # (order + widths). Empty = use the built-in default layout.
     player_column_state: str = ""
+    # How many columns the state above was saved from. Qt happily restores a
+    # 9-column state into a wider table — and in doing so *un-hides* every
+    # section the state never knew about, so a saved layout from before a
+    # column was added would silently show it. This says which sections the
+    # state has an opinion about; the rest take their default visibility.
+    player_column_count: int = 0
     # Base64-encoded QMainWindow.saveGeometry() (size + position + maximized
     # state). Empty = open at the default size, centered. The Keyboard panel's
     # transient resize is never stored here.
@@ -245,6 +251,9 @@ def load_config() -> AppConfig:
                 player_column_state=data.get(
                     "player_column_state", AppConfig.player_column_state
                 ),
+                player_column_count=_optional_int(
+                    data, "player_column_count", AppConfig.player_column_count
+                ) or AppConfig.player_column_count,
                 window_geometry=data.get(
                     "window_geometry", AppConfig.window_geometry
                 ),
