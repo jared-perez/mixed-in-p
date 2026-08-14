@@ -1101,6 +1101,27 @@ class PlayerPanel(QWidget):
         (15, None),
     )
     _ARTWORK_COLUMN = 15
+    # Starting widths for the columns that are not sized from their own header
+    # word. Measured against the English labels, so they are a *base* rather
+    # than the answer: _apply_header_fit_floor raises any that a translation
+    # outgrows. Kept as a constant so that floor can be recomputed from
+    # scratch when the header font changes, instead of ratcheting.
+    _BASE_COLUMN_WIDTHS = {
+        0: 40,
+        1: 300,   # Filename
+        2: 180,   # Artist
+        3: 180,   # Title
+        6: 200,   # Comment
+        # Art: overwritten with the band's real width by _apply_art_icon_size,
+        # which knows the row height.
+        15: 80,
+        9: 180,   # Album
+        10: 120,  # Genre
+        11: 70,   # Track #
+        12: 150,  # Label
+        13: 80,   # Bitrate
+        14: 70,   # Energy
+    }
     # Never offered in the hide menu. Filename is the row's identity, and '#'
     # doubles as the membership-count column during an All-playlists search
     # (_set_count_column) — hiding either would leave a table you cannot read
@@ -1493,24 +1514,7 @@ class PlayerPanel(QWidget):
             header.setSectionResizeMode(col, QHeaderView.ResizeMode.Interactive)
         # Kept so a refused saved state can be replaced by the defaults rather
         # than by whatever a half-applied restore left behind.
-        self._default_column_widths = {
-            0: 40,
-            1: 300,   # Filename
-            2: 180,   # Artist
-            3: 180,   # Title
-            6: 200,   # Comment
-            # Art: overwritten with the band's real width by
-            # _apply_art_icon_size below, which knows the row height.
-            15: 80,
-            9: 180,   # Album
-            10: 120,  # Genre
-            11: 70,   # Track #
-            12: 150,  # Label
-            13: 80,   # Bitrate
-            14: 70,   # Energy
-        }
-        for col, width in self._default_column_widths.items():
-            self._table.setColumnWidth(col, width)
+        self._default_column_widths = dict(self._BASE_COLUMN_WIDTHS)
         # BPM, Key, Duration, Year default just wide enough to show the full
         # (bold) header word — measured from the header font so translated
         # labels fit too — rather than a fixed 70-80px that clips them. The
@@ -1529,6 +1533,10 @@ class PlayerPanel(QWidget):
             width = header_fm.horizontalAdvance(label) + 2 * SeparatorHeaderView._TEXT_PAD + 4
             self._word_fit_widths[col] = width
             self._default_column_widths[col] = width
+        # The rest keep their English-measured base width unless a translation
+        # needs more room than it allows for.
+        self._apply_header_fit_floor(header_fm)
+        for col, width in self._default_column_widths.items():
             self._table.setColumnWidth(col, width)
         # Width the # column grows to while it shows membership counts under
         # the "Playlists" header (All-playlists search), measured the same way.
@@ -3157,11 +3165,15 @@ class PlayerPanel(QWidget):
         """
         width, height = self._art_size(), self._art_strip_height()
         self._table.setIconSize(QSize(width, height))
-        self._default_column_widths[self._ARTWORK_COLUMN] = width + self._ART_COLUMN_PAD
-        if self._table.columnWidth(self._ARTWORK_COLUMN) < width + self._ART_COLUMN_PAD:
-            self._table.setColumnWidth(
-                self._ARTWORK_COLUMN, width + self._ART_COLUMN_PAD
-            )
+        # The band's width, or the header word's if that is wider — "Art" is
+        # three letters and its translations are not (ja アートワーク wants 95px
+        # of the band's 80), and a column sized purely from the art clips them.
+        column = max(
+            width + self._ART_COLUMN_PAD, self._header_fit_width(self._ARTWORK_COLUMN)
+        )
+        self._default_column_widths[self._ARTWORK_COLUMN] = column
+        if self._table.columnWidth(self._ARTWORK_COLUMN) < column:
+            self._table.setColumnWidth(self._ARTWORK_COLUMN, column)
 
     def _schedule_artwork_load(self) -> None:
         """Ask for the visible rows' art, debounced.
@@ -3365,6 +3377,53 @@ class PlayerPanel(QWidget):
             self._default_column_widths[col] = width
             if self._table.columnWidth(col) < width:
                 self._table.setColumnWidth(col, width)
+        self._apply_header_fit_floor(header_fm)
+
+    def _header_fit_width(self, col: int, header_fm: QFontMetrics | None = None) -> int:
+        """Width at which column ``col`` shows its whole header word.
+
+        The same measurement the word-fit columns are built from, so the two
+        cannot drift apart. Measure with the header's own font, not the
+        table's: `_title_font` is what a section is painted with, and QSS
+        sets it on the header rather than on the view.
+        """
+        item = self._table.horizontalHeaderItem(col)
+        if item is None:
+            return 0
+        if header_fm is None:
+            header = self._table.horizontalHeader()
+            header.ensurePolished()
+            header_fm = QFontMetrics(header._title_font())
+        return (
+            header_fm.horizontalAdvance(item.text())
+            + 2 * SeparatorHeaderView._TEXT_PAD
+            + 4
+        )
+
+    def _apply_header_fit_floor(self, header_fm: QFontMetrics | None = None) -> None:
+        """Widen any base default that its own translated header outgrows.
+
+        The base widths were measured against the English labels, so a longer
+        translation opened clipped in every language that has one — ru "Номер
+        трека" wants 97px of Track #'s 70, and Bitrate, Art and Track # clip in
+        six languages between them. Recomputed from `_BASE_COLUMN_WIDTHS` each
+        time rather than raised in place, so a text-size change that makes the
+        header font *smaller* gives the width back.
+
+        Only ever widens, so English is unchanged, and a visible column the
+        user has narrowed below its word is pushed back out — the same
+        guarantee `_word_fit_widths` gives BPM and Key. A hidden section
+        reports a width of 0 whatever it is set to, so it is left to
+        `_set_column_visible`, which applies the default on reveal.
+        """
+        for col, base in self._BASE_COLUMN_WIDTHS.items():
+            fit = self._header_fit_width(col, header_fm)
+            self._default_column_widths[col] = max(base, fit)
+            if (
+                not self._table.isColumnHidden(col)
+                and 0 < self._table.columnWidth(col) < fit
+            ):
+                self._table.setColumnWidth(col, fit)
 
     def _normalize_header(self, pristine: QByteArray) -> None:
         """Re-seat the header after it restored a state shorter than itself.

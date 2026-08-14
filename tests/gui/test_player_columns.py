@@ -435,3 +435,79 @@ class TestTheDataReachesThem:
             flags = player._table.item(0, col).flags()
             assert not (flags & Qt.ItemFlag.ItemIsEditable), col
         assert col not in player._EDITABLE_COLUMNS
+
+
+class TestTranslatedHeadersFit:
+    """A default width measured against an English label is not a width.
+
+    The seven optional columns shipped with fixed defaults — Track # at 70px,
+    Bitrate and Art at 80 — and the translations authored for them do not fit:
+    ru "Номер трека" wants 97px, ja ビットレート 95, ja アートワーク 95. Six of the
+    eleven languages opened one of these clipped, and it is the *default* that
+    is wrong, so it happened on the first reveal rather than after some
+    unusual sequence.
+
+    Asserted against the panel's own measurement rather than a pixel count:
+    the suite runs with no application stylesheet, so a number written here
+    would describe a header the app never paints (see CLAUDE.md). What must
+    hold in any font is that the default is at least the width the header
+    word needs.
+    """
+
+    FIXED_OPTIONAL = (11, 13, 15)  # Track #, Bitrate, Art — the tight ones
+
+    def test_the_floor_never_narrows_a_base_width(self, player):
+        """It may only widen — a column's base is a floor, not a target.
+
+        Deliberately not asserted as *equality* for the English labels, even
+        though that is what the running app does (Track # measures 57px of
+        its 70 under the real stylesheet). The suite has no application
+        stylesheet, so the same label measures 71px in Fusion's default font
+        and the floor engages here for a reason that does not exist in the
+        app. Equality would be a true statement about the wrong header.
+        """
+        for col, base in player._BASE_COLUMN_WIDTHS.items():
+            assert player._default_column_widths[col] >= base
+
+    def test_every_column_defaults_wide_enough_for_its_own_header(self, player):
+        for col in range(player._table.columnCount()):
+            assert player._default_column_widths[col] >= player._header_fit_width(col), (
+                player._table.horizontalHeaderItem(col).text()
+            )
+
+    def test_a_label_longer_than_its_base_widens_the_default(self, player):
+        """What ru does to Track #, done to a column whose base is fixed."""
+        player._table.horizontalHeaderItem(11).setText("Номер трека вообще")
+        player._apply_header_fit_floor()
+
+        assert player._default_column_widths[11] > player._BASE_COLUMN_WIDTHS[11]
+        assert player._default_column_widths[11] >= player._header_fit_width(11)
+
+    def test_the_floor_is_recomputed_and_not_ratcheted(self, player):
+        """Measured from the base each time, so a header that gets *shorter*
+        (a smaller text size, a re-translation) gives the width back rather
+        than keeping the widest it ever was."""
+        player._table.horizontalHeaderItem(13).setText("Eine sehr lange Bezeichnung")
+        player._apply_header_fit_floor()
+        assert player._default_column_widths[13] > player._BASE_COLUMN_WIDTHS[13]
+
+        player._table.horizontalHeaderItem(13).setText("Bitrate")
+        player._apply_header_fit_floor()
+        assert player._default_column_widths[13] == player._BASE_COLUMN_WIDTHS[13]
+
+    def test_the_artwork_column_keeps_room_for_its_own_header(self, player):
+        """Art's width comes from the band, not from a constant — so the band
+        is what would strand a long label (ja アートワーク) if the two did not
+        both get a say."""
+        player._table.horizontalHeaderItem(15).setText("アートワーク")
+        player._apply_art_icon_size()
+
+        assert player._default_column_widths[15] >= player._header_fit_width(15)
+
+    def test_a_visible_column_narrower_than_its_word_is_pushed_back_out(self, player):
+        player._table.setColumnHidden(11, False)
+        player._table.setColumnWidth(11, 20)
+        player._table.horizontalHeaderItem(11).setText("Номер трека")
+        player._apply_header_fit_floor()
+
+        assert player._table.columnWidth(11) >= player._header_fit_width(11)
