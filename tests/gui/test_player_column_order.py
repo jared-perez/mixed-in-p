@@ -109,6 +109,52 @@ class TestTheShippedOrder:
         )
 
 
+class TestAllTenAreOpen:
+    """The order was only half the ask: those ten columns are the default
+    *open* set, and a stale saved layout must not leave any of them off.
+    """
+
+    def test_a_fresh_install_shows_all_ten(self, qtbot, lib):
+        player = make_player(qtbot, lib)
+
+        assert len(visual_order(player)) == len(EXPECTED_ORDER)
+
+    def test_a_stale_layout_with_columns_switched_off_gets_them_back(
+        self, qtbot, lib
+    ):
+        """What this actually repairs: a layout stamped with an older defaults
+        version but with Artist, Title, Comment and Duration hidden — the shape
+        an unreleased build left behind. Hiding is only the user's to keep once
+        their layout is current."""
+        table = QTableWidget(0, 16)
+        for col in (2, 3, 6, 7):
+            table.setColumnHidden(col, True)
+        cfg = AppConfig()
+        cfg.player_column_state = bytes(
+            table.horizontalHeader().saveState().toBase64()
+        ).decode("ascii")
+        cfg.player_column_count = 16
+        cfg.player_column_defaults_version = (
+            PlayerPanel._COLUMN_DEFAULTS_VERSION - 1
+        )
+        save_config(cfg)
+
+        player = make_player(qtbot, lib)
+
+        assert visual_order(player) == EXPECTED_ORDER
+
+    def test_a_current_layout_keeps_what_the_user_switched_off(self, qtbot, lib):
+        """The other side of it: once migrated, a column the user hid stays
+        hidden. A reset that fired on every launch would be a bug, not a fix."""
+        first = make_player(qtbot, lib)
+        first._set_column_visible(6, False)  # Comment
+        first._save_column_state()
+
+        second = make_player(qtbot, lib)
+
+        assert second._table.isColumnHidden(6)
+
+
 class TestTheOneTimeMigration:
     def _old_layout(self, columns=16, version=0):
         """A config as some earlier build left it: a state that predates the

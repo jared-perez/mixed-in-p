@@ -1122,7 +1122,13 @@ class PlayerPanel(QWidget):
     # Bumped whenever the two constants above change. A saved state beats the
     # defaults, so without this a new default layout would only ever be seen by
     # someone who had never opened the app — see _restore_column_state.
-    _COLUMN_DEFAULTS_VERSION = 1
+    #
+    # 2 rather than 1 because version 1 was written by a build that was still
+    # being edited: it stamped the version onto layouts that had not been fully
+    # migrated, which left the shipped order in place but four of the ten
+    # default columns switched off. Version 1 never shipped, so re-running the
+    # migration costs nobody anything and repairs those.
+    _COLUMN_DEFAULTS_VERSION = 2
     # Starting widths for the columns that are not sized from their own header
     # word. Measured against the English labels, so they are a *base* rather
     # than the answer: _apply_header_fit_floor raises any that a translation
