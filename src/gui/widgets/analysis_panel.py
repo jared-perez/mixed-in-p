@@ -309,6 +309,20 @@ class AnalysisPanel(QWidget):
     auto_analyze_toggled = Signal(bool)  # Auto button toggled (syncs with Settings)
     write_freeze_toggled = Signal(bool)  # Freeze button toggled (session-only)
 
+    # Starting widths for the columns the user cannot drag. A floor, not an
+    # answer: they were measured against the English labels, and _fit_header_widths
+    # raises any that its own header word does not fit inside. Alt Keys and
+    # Status are absent because they size to their contents already.
+    _BASE_COLUMN_WIDTHS = {
+        0: 360,  # Name
+        1: 80,   # BPM
+        2: 75,   # BPM Conf
+        3: 80,   # Key
+        4: 75,   # Key Conf
+        5: 80,   # Key Code
+        7: 60,   # Energy
+    }
+
     def __init__(
         self,
         store: TrackStore,
@@ -408,13 +422,9 @@ class AnalysisPanel(QWidget):
         # ("Проанализирован" measures 126px, "In Warteschlange" 115px), which
         # silently clipped the one column whose whole job is to be readable.
         header.setSectionResizeMode(8, QHeaderView.ResizeMode.ResizeToContents)
-        self._table.setColumnWidth(0, 360)  # Name
-        self._table.setColumnWidth(1, 80)   # BPM
-        self._table.setColumnWidth(2, 75)   # BPM Conf
-        self._table.setColumnWidth(3, 80)   # Key
-        self._table.setColumnWidth(4, 75)   # Key Conf
-        self._table.setColumnWidth(5, 80)   # Key Code
-        self._table.setColumnWidth(7, 60)   # Energy
+        for col, width in self._BASE_COLUMN_WIDTHS.items():
+            self._table.setColumnWidth(col, width)
+        self._fit_header_widths()
 
         layout.addWidget(self._table, 1)
 
@@ -448,6 +458,33 @@ class AnalysisPanel(QWidget):
         layout.addLayout(bottom_row)
 
         self._update_stats()
+
+    def _fit_header_widths(self) -> None:
+        """Widen any column too narrow to show its own header word.
+
+        The widths above were measured against the English labels and every
+        one of these columns is Fixed, so a header that does not fit cannot be
+        dragged wider — and this header is centred with ElideNone, so an
+        over-long word is cut at *both* ends with no ellipsis to say so
+        ("Энергия" renders as "нерги", which just looks like a word). Russian,
+        Japanese and French each lose two or three headers that way, and even
+        English clipped the tail off "Energy" and "Key Code".
+
+        Sized from `sectionSizeHint` rather than from our own arithmetic,
+        because the label is drawn by the *style* here (unlike the player's
+        header, which paints its own text) and three separate things it
+        accounts for are invisible to a QFontMetrics call: the stylesheet's
+        `QHeaderView::section` padding, the bold weight the same rule sets,
+        and the room Qt reserves for a sort indicator. Sorting is enabled on
+        every column, so that indicator can land on any of them — a width that
+        ignores it fits the word right up until the user sorts by it.
+        """
+        header = self._table.horizontalHeader()
+        # The QSS font and padding are only resolved onto the header once it
+        # has been polished; before that the hint comes back short.
+        header.ensurePolished()
+        for col, base in self._BASE_COLUMN_WIDTHS.items():
+            self._table.setColumnWidth(col, max(base, header.sectionSizeHint(col)))
 
     def _connect_signals(self) -> None:
         """Connect internal signals."""

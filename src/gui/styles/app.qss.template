@@ -499,7 +499,12 @@ QTableView::item:hover, QTableWidget::item:hover {
 QHeaderView::section {
     background-color: @BG_MEDIUM@;
     color: @CHROME@;
-    padding: 8px;
+    /* Horizontal padding is deliberately tighter than vertical. A header word
+       has to share its section with the sort indicator Qt reserves room for,
+       and 8px each side of a 60px Energy column is a quarter of it spent on
+       margin — which is what pushed even the English label past its own edge.
+       The vertical 8px is what gives the header row its height. */
+    padding: 8px 5px;
     border: none;
     border-bottom: 2px solid @BG_LIGHT@;
     font-weight: bold;
