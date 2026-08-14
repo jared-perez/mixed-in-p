@@ -6,6 +6,10 @@ Everything else here follows from that: a cache so scrolling back is free, a
 record of which files have no art at all (so they are not re-read forever),
 one reader at a time, and a size that follows the row height.
 
+What a row shows is not the whole sleeve. The cover is scaled to three rows
+tall and cropped to the top third, so the column is a wide band off the top of
+the artwork rather than a postage stamp — see `_ART_STRIP_SCALE`.
+
 The painting is checked by sampling a render rather than by asserting on
 DecorationRole. A model-level assertion would pass against a build that draws
 nothing — which is exactly how the row-tint bug in the Analyze panel survived
@@ -26,6 +30,24 @@ from src.metadata.tags import TrackMetadata, write_metadata
 
 ART_COLUMN = 15
 COVER = "#ff00ff"  # magenta: nothing else in the theme is close
+COVER_BOTTOM = "#00ff00"  # the two thirds a row must never show
+
+
+def _cover(tmp_path, top=COVER, bottom=None, size=300):
+    """A cover image, optionally two-tone: top third `top`, rest `bottom`.
+
+    Two-tone is how the crop is checked — a single-colour sleeve paints the
+    same pixels whether the top third or the whole thing is drawn.
+    """
+    image = QImage(size, size, QImage.Format.Format_RGB32)
+    image.fill(QColor(top))
+    if bottom is not None:
+        for y in range(size // 3, size):
+            for x in range(size):
+                image.setPixelColor(x, y, QColor(bottom))
+    path = tmp_path / f"cover-{top}-{bottom}.png"
+    image.save(str(path))
+    return path.read_bytes()
 
 
 @pytest.fixture
@@ -35,11 +57,12 @@ def sf():
 
 @pytest.fixture
 def cover_bytes(tmp_path):
-    image = QImage(200, 200, QImage.Format.Format_RGB32)
-    image.fill(QColor(COVER))
-    path = tmp_path / "cover.png"
-    image.save(str(path))
-    return path.read_bytes()
+    return _cover(tmp_path)
+
+
+@pytest.fixture
+def two_tone_cover(tmp_path):
+    return _cover(tmp_path, bottom=COVER_BOTTOM)
 
 
 def make_track(sf, tmp_path, name, cover=None):
@@ -182,21 +205,44 @@ class TestOnlyTheRowsOnScreen:
         assert player._art_thread is None, "re-read rows it already had"
 
 
+def make_room(player):
+    """Hide the wide text columns so the Art column is on screen at all.
+
+    The band is three rows wide, and a column drawn past the viewport's right
+    edge is simply cut off there — which measures as a narrow band and looks
+    exactly like a bug in the cropping.
+    """
+    for col in (2, 3, 6, 7):
+        player._set_column_visible(col, False)
+
+
 class TestWhatItPaints:
     def _art_pixel(self, player, row):
-        """Sample inside the thumbnail itself.
+        """Sample inside the band itself.
 
-        The icon is drawn at the left of the cell, so the centre of the *cell*
+        The band is drawn at the left of the cell, so the centre of the *cell*
         misses it — which it did, and briefly looked like nothing was painting
         at all.
         """
         table = player._table
         table.scrollToTop()
         shot = table.viewport().grab().toImage()
-        icon = table.iconSize().width()
-        x = table.columnViewportPosition(ART_COLUMN) + icon // 2 + 2
+        x = table.columnViewportPosition(ART_COLUMN) + table.iconSize().width() // 2
         y = table.rowViewportPosition(row) + table.rowHeight(row) // 2
         return shot.pixelColor(x, y)
+
+    def _art_colours(self, player, row):
+        """Every colour painted in the row's Art cell, as a set of names."""
+        table = player._table
+        table.scrollToTop()
+        shot = table.viewport().grab().toImage()
+        x0 = table.columnViewportPosition(ART_COLUMN)
+        y0 = table.rowViewportPosition(row)
+        return {
+            shot.pixelColor(x, y).name()
+            for y in range(y0, y0 + table.rowHeight(row))
+            for x in range(x0, min(x0 + table.columnWidth(ART_COLUMN), shot.width()))
+        }
 
     def test_a_cover_actually_reaches_the_screen(
         self, player, qtbot, sf, tmp_path, cover_bytes
@@ -205,9 +251,7 @@ class TestWhatItPaints:
         and a data-level assertion cannot tell a painted thumbnail from a
         stored one that never gets drawn."""
         add(player, qtbot, make_track(sf, tmp_path, "a.flac", cover_bytes))
-        # Give the column room on screen.
-        for col in (2, 3, 6, 7):
-            player._set_column_visible(col, False)
+        make_room(player)
         show_art(player, qtbot)
 
         assert self._art_pixel(player, 0).name() == COVER
@@ -220,11 +264,71 @@ class TestWhatItPaints:
             make_track(sf, tmp_path, "with.flac", cover_bytes),
             make_track(sf, tmp_path, "without.flac"),
         )
-        for col in (2, 3, 6, 7):
-            player._set_column_visible(col, False)
+        make_room(player)
         show_art(player, qtbot)
 
         assert self._art_pixel(player, 1).name() != COVER
+
+
+class TestOnlyTheTopOfTheSleeve:
+    """The band: the cover is blown up past the row and cut off below.
+
+    Checked on a render for the same reason as the class above — the cropping
+    could equally be done at paint time, and a test that only reads the cached
+    image would not notice if the view then squashed the whole sleeve back
+    into the row.
+    """
+
+    def test_the_bottom_two_thirds_never_appear(
+        self, player, qtbot, sf, tmp_path, two_tone_cover
+    ):
+        add(player, qtbot, make_track(sf, tmp_path, "a.flac", two_tone_cover))
+        make_room(player)
+        show_art(player, qtbot)
+
+        painted = TestWhatItPaints()._art_colours(player, 0)
+
+        assert COVER in painted, "the top of the sleeve is missing"
+        assert COVER_BOTTOM not in painted, "the whole sleeve was squashed in"
+
+    def test_the_band_is_as_wide_as_the_scale(self, player, qtbot, sf, tmp_path, cover_bytes):
+        """Three rows of cover wide, one row tall — the crop, in the cache."""
+        add(player, qtbot, make_track(sf, tmp_path, "a.flac", cover_bytes))
+        show_art(player, qtbot)
+
+        strip = next(iter(player._art_cache.values()))
+
+        assert strip.height() == player._art_strip_height()
+        assert strip.width() == strip.height() * player._ART_STRIP_SCALE
+
+    def test_the_column_opens_wide_enough_for_it(self, player):
+        """A band cut off halfway by its own column reads as a broken image."""
+        player._set_column_visible(ART_COLUMN, True)
+
+        assert player._table.columnWidth(ART_COLUMN) >= player._art_size()
+
+    def test_a_narrow_saved_width_is_widened_at_startup(self, player):
+        """Every previously-saved Art width predates the band, and a column
+        restored *visible* never passes through _set_column_visible.
+
+        Shown first: a hidden section reports a width of 0 whatever it is set
+        to, so the floor has nothing to read until the column is on screen.
+        """
+        player._table.setColumnHidden(ART_COLUMN, False)
+        player._table.setColumnWidth(ART_COLUMN, 60)
+
+        player._apply_art_icon_size()
+
+        assert player._table.columnWidth(ART_COLUMN) >= player._art_size()
+
+    def test_a_wider_one_is_left_alone(self, player):
+        """Only ever a floor: a user who dragged it wider meant it."""
+        player._table.setColumnHidden(ART_COLUMN, False)
+        player._table.setColumnWidth(ART_COLUMN, 400)
+
+        player._apply_art_icon_size()
+
+        assert player._table.columnWidth(ART_COLUMN) == 400
 
 
 class TestTheCache:
@@ -271,18 +375,24 @@ class TestTheCache:
 
 
 class TestItFollowsTheRowHeight:
-    def test_the_thumbnail_is_sized_to_the_row(self, player):
+    def test_the_band_is_cut_to_the_row(self, player):
         row = player._table.verticalHeader().defaultSectionSize()
 
-        assert player._art_size() == row - player._ART_ROW_INSET
+        assert player._art_strip_height() == row - player._ART_ROW_INSET
+
+    def test_the_cover_behind_it_is_scaled_past_the_row(self, player):
+        assert player._art_size() == (
+            player._art_strip_height() * player._ART_STRIP_SCALE
+        )
 
     def test_the_view_icon_size_follows_too(self, player, qtbot, sf, tmp_path, cover_bytes):
-        """A thumbnail scaled to 30px still paints at Qt's 16px default
-        unless the view's icon size says otherwise."""
+        """A band scaled to 72×24 still paints at Qt's 16px default unless the
+        view's icon size says otherwise — and it is not square."""
         add(player, qtbot, make_track(sf, tmp_path, "a.flac", cover_bytes))
         show_art(player, qtbot)
 
         assert player._table.iconSize().width() == player._art_size()
+        assert player._table.iconSize().height() == player._art_strip_height()
 
     def test_changing_the_text_size_rescales_them(
         self, player, qtbot, sf, tmp_path, cover_bytes

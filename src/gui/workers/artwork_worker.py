@@ -10,6 +10,12 @@ re-asks as the view scrolls), and the result comes back as a **QImage**, not a
 QPixmap: QPixmap may only be touched on the GUI thread, while QImage is a plain
 buffer and can be decoded and scaled here, off it. The panel turns it into a
 pixmap, which is cheap.
+
+What comes back is not the whole cover: the panel asks for it scaled well
+taller than a row and then cropped to a band off the top, which is what a
+playlist row shows (see ``PlayerPanel._ART_STRIP_SCALE``). The crop happens
+here, on this thread, so the scaling and the cutting are one pass and the
+cache holds only the band.
 """
 
 from __future__ import annotations
@@ -27,7 +33,7 @@ logger = logging.getLogger(__name__)
 class ArtworkWorker(QObject):
     """Read and scale embedded art for a list of paths, one signal per hit."""
 
-    # path, scaled square thumbnail
+    # path, the band of cover the row will show (see _thumbnail)
     loaded = Signal(str, QImage)
     # path — the file has no art, or none we can read. Emitted so the panel can
     # remember the answer; without it every scroll past a coverless track would
@@ -35,10 +41,20 @@ class ArtworkWorker(QObject):
     empty = Signal(str)
     finished = Signal()
 
-    def __init__(self, paths: Sequence[str], size: int, parent: QObject | None = None) -> None:
+    def __init__(
+        self,
+        paths: Sequence[str],
+        size: int,
+        strip_height: int | None = None,
+        parent: QObject | None = None,
+    ) -> None:
         super().__init__(parent)
         self._paths = list(paths)
         self._size = size
+        # None keeps the whole (square) cover; a height crops it to that band
+        # off the top. Cropping here rather than at paint time so the cache
+        # holds the band, not the nine-times-larger square behind it.
+        self._strip_height = strip_height
         self._cancelled = False
 
     def cancel(self) -> None:
@@ -72,11 +88,15 @@ class ArtworkWorker(QObject):
         image = QImage()
         if not image.loadFromData(data):
             return None
-        return image.scaled(
+        scaled = image.scaled(
             QSize(self._size, self._size),
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         )
+        if self._strip_height is None or scaled.height() <= self._strip_height:
+            return scaled
+        # copy() returns a detached image, so the square behind it is freed.
+        return scaled.copy(0, 0, scaled.width(), self._strip_height)
 
 
 class ArtworkThread(QThread):

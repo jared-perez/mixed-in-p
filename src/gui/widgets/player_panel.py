@@ -1499,7 +1499,9 @@ class PlayerPanel(QWidget):
             2: 180,   # Artist
             3: 180,   # Title
             6: 200,   # Comment
-            15: 60,   # Art
+            # Art: overwritten with the band's real width by
+            # _apply_art_icon_size below, which knows the row height.
+            15: 80,
             9: 180,   # Album
             10: 120,  # Genre
             11: 70,   # Track #
@@ -1546,6 +1548,12 @@ class PlayerPanel(QWidget):
 
         # Restore the user's saved column order/widths over the defaults above.
         self._restore_column_state()
+        # After the restore, so it can also floor a saved Art width that
+        # predates the current band size (the same reasoning as the word-fit
+        # columns above). Needed at all because a column restored *visible*
+        # never passes through _set_column_visible, and so would otherwise
+        # paint its strips at Qt's 16px default icon size.
+        self._apply_art_icon_size()
 
         layout.addWidget(self._table, 1)
 
@@ -3094,10 +3102,18 @@ class PlayerPanel(QWidget):
     # ── Artwork thumbnails ──────────────────────────────────────
 
     # Enough thumbnails for a long scroll without the cache itself becoming a
-    # memory question: a few hundred ~30px images is well under a megabyte.
+    # memory question: a few hundred strips of ~72×24 is a couple of megabytes.
     _ART_CACHE_MAX = 512
-    # Breathing room between the thumbnail and the row's edges.
+    # Breathing room between the visible band and the row's edges.
     _ART_ROW_INSET = 6
+    # The cover is scaled to this many times the row's height and only its top
+    # 1/scale is kept, so a row shows a wide band off the top of the sleeve
+    # rather than a postage stamp of the whole thing. Changing it changes both
+    # ends at once: bigger art, and a proportionally shallower slice of it.
+    _ART_STRIP_SCALE = 3
+    # Gap either side of the band inside its column, so the strip never runs
+    # into the next column's text.
+    _ART_COLUMN_PAD = 8
 
     def _art_key(self, path: str) -> tuple[str, float]:
         """Cache key. The mtime is in it so re-tagging a file in another app
@@ -3107,22 +3123,45 @@ class PlayerPanel(QWidget):
         except OSError:
             return (path, 0.0)
 
-    def _art_size(self) -> int:
-        """Thumbnail edge in px, following the row height (and so the text size)."""
+    def _art_strip_height(self) -> int:
+        """Height of the visible band: the row height, less breathing room.
+
+        This is what a row can actually show, and so what the cropped strip is
+        cut to — it follows the row height, and therefore the text size.
+        """
         return max(
-            16,
+            8,
             self._table.verticalHeader().defaultSectionSize() - self._ART_ROW_INSET,
         )
+
+    def _art_size(self) -> int:
+        """Edge the whole cover is scaled to before the top band is cut out."""
+        return self._art_strip_height() * self._ART_STRIP_SCALE
 
     def _artwork_showing(self) -> bool:
         return not self._table.isColumnHidden(self._ARTWORK_COLUMN)
 
     def _apply_art_icon_size(self) -> None:
-        """The view's icon size is what actually bounds a decoration, so it
-        has to follow the row height too — a thumbnail scaled to 30px still
-        paints at Qt's 16px default without this."""
-        size = self._art_size()
-        self._table.setIconSize(QSize(size, size))
+        """Size the view's icons — and the column — to the band.
+
+        The view's icon size is what actually bounds a decoration, so a strip
+        scaled to 72×24 still paints at Qt's 16px default without this; and it
+        is deliberately not square, because the band is three rows of cover
+        wide and one row tall.
+
+        The column is only ever widened, never narrowed: a band cut off
+        halfway looks like a bug, but a user who has dragged the column wider
+        than the art meant it. A hidden section reports a width of 0 whatever
+        it is set to, so for a column nobody has opened yet the widening is
+        really the default width, which _set_column_visible applies on reveal.
+        """
+        width, height = self._art_size(), self._art_strip_height()
+        self._table.setIconSize(QSize(width, height))
+        self._default_column_widths[self._ARTWORK_COLUMN] = width + self._ART_COLUMN_PAD
+        if self._table.columnWidth(self._ARTWORK_COLUMN) < width + self._ART_COLUMN_PAD:
+            self._table.setColumnWidth(
+                self._ARTWORK_COLUMN, width + self._ART_COLUMN_PAD
+            )
 
     def _schedule_artwork_load(self) -> None:
         """Ask for the visible rows' art, debounced.
@@ -3178,7 +3217,7 @@ class PlayerPanel(QWidget):
         definition for rows the user has already scrolled past.
         """
         self._cancel_artwork_worker()
-        worker = ArtworkWorker(paths, size)
+        worker = ArtworkWorker(paths, size, size // self._ART_STRIP_SCALE)
         thread = ArtworkThread(worker)
         self._art_worker = worker
         self._art_thread = thread
@@ -3293,8 +3332,8 @@ class PlayerPanel(QWidget):
             round(self._base_row_height * TEXT_SIZES[size] / TEXT_SIZES[DEFAULT_TEXT_SIZE])
         )
         self._remeasure_word_fit_widths()
-        # Thumbnails are square to the row height, so every cached one is now
-        # the wrong size; _load_visible_artwork notices and re-reads.
+        # The artwork band is cut to the row height, so every cached strip is
+        # now the wrong size; _load_visible_artwork notices and re-reads.
         self._apply_art_icon_size()
         self._schedule_artwork_load()
         # Row heights follow from the padding plus the new font metrics, but a
