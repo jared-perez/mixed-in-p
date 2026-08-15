@@ -138,8 +138,8 @@
       <tr><td>Playlists</td><td>A tree of folders and saved playlists, opened from the sidebar's
         <b>Playlists</b> button rather than the nav rail.</td></tr>
       <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
-      <tr><td>Keyboard</td><td>3-octave piano + harmonic reference grid.</td></tr>
       <tr><td>Spectrum</td><td>Spek-style frequency view of a track.</td></tr>
+      <tr><td>Keyboard</td><td>3-octave piano + harmonic reference grid.</td></tr>
       <tr><td>History</td><td>Undo past rename batches.</td></tr>
       <tr><td>Settings</td><td>Tempo range, notation, auto-rename, language, theme, and more.</td></tr>
     </table>
@@ -153,10 +153,42 @@
     <ul>
       <li>The <b>Auto</b> toggle controls whether dropped files analyze instantly; with it off, files
         wait as <i>pending</i> until you press <b>Analyze</b>.</li>
+      <li><b>The table shows the whole queue, not just the finished tracks.</b> Every file appears the
+        moment you add it, and its <b>Status</b> updates live — <i>Pending</i>, <i>Analyzing</i>,
+        <i>Analyzed</i>, <i>Error</i> — so a long batch shows you where it has got to.</li>
       <li>Detected BPM and key can be <b>written back to the file's tags</b> (see Settings).</li>
       <li>Right-click a row to <b>Open File Location</b> or <b>Remove</b>; <b>Clear Results</b> empties the table.</li>
       <li>Use <b>Send To</b> to push selected tracks to <b>Convert</b> or the <b>Player</b>.</li>
     </ul>
+
+    <p><b>Cancelling a run.</b> The <b>Cancel</b> button appears beside the progress bar while a run is
+      going and disappears when there is nothing left to stop. Cancelling ends the batch as soon as the
+      current track lets go — a long track can take a few seconds, since key detection is one
+      uninterruptible pass — and the file it was working on is discarded rather than half-recorded.</p>
+    <div class="callout"><b>Cancelling doesn't undo the tracks that already finished.</b> They keep
+      their results, their tags, and their new filenames if auto-rename is on. Cancel stops the
+      <i>remaining</i> work; it is not an undo. To roll back the renames, use
+      <a href="#history">History</a>.</div>
+
+    <p><b>Freeze — analyze without touching your files.</b> The <b>Freeze</b> toggle sits next to
+      <b>Auto</b> in the Analyze header. With it on, analysis still runs and still shows you every
+      result, but it writes <i>nothing</i> to your files: no BPM or key tags, no energy or key comment,
+      no auto-rename. It is the way to survey a folder you don't want modified — a borrowed drive, or
+      files you haven't decided about yet.</p>
+    <ul>
+      <li>It is a <b>session</b> switch: it always starts off, and it never changes your Settings. Turn
+        it off and your normal write settings are exactly as they were, because they were never
+        touched.</li>
+      <li>It only covers the analysis flow. Edits you make yourself in the <b>Metadata</b> panel or the
+        Player, and <b>Apply Rename</b> in the Rename panel, all still work normally.</li>
+    </ul>
+
+    <div class="callout"><b>WAV files can't store BPM or key.</b> The format has no tag for them, so an
+      analyzed WAV is flagged in the table — a tinted row, and a Status of <b>WAV file</b> before it
+      runs or <b>Analyzed, no tags</b> after. The analysis itself is still worth running: the BPM, key
+      and energy are shown on screen, and <b>auto-rename still writes them into the filename</b>, which
+      is the one place a WAV can carry them. Convert it to AIFF or FLAC if you want real tags.</div>
+
     <img class="shot-img" src="../assets/analyze.webp" alt="Analysis panel — BPM, key, and energy results">
 
     <h3>Organize &amp; batch-rename</h3>
@@ -194,6 +226,8 @@
         44.1 kHz/16-bit FLAC for older CDJs and players. Into the format a file already has, only a
         <i>lower</i> setting does anything — matching ones read <b>Same format</b> and are skipped.</li>
       <li><b>Send To</b> moves output to Analyze, Rename, or the Player.</li>
+      <li><b>Cancel</b> appears beside the progress bar while a batch is converting. Files already
+        written are kept; the one in progress is discarded.</li>
     </ul>
     <img class="shot-img" src="../assets/convert.webp" alt="Convert panel">
 
@@ -203,14 +237,19 @@
       Add fields with <b>Add field…</b>, embed a cover image by dropping it or clicking
       <b>Add Artwork…</b>, and unload with <b>Eject</b>. <b>Reload</b> re-reads the file from disk to
       pick up tag changes made elsewhere — for example, edits you made inline in the Player playlist.</p>
+    <p>The panel header names the file you are editing on two lines: the filename, and beneath it the
+      <b>full path</b> it came from, shortened with an ellipsis if it is too long for the panel (hover
+      it to read the whole thing).
+      <b>Open File Location</b> beside it opens that folder in Finder or Explorer with the file
+      selected — useful when two tracks share a name and you need to know which one you have open.</p>
     <img class="shot-img" src="../assets/metadata.webp" alt="Metadata editor with tags and artwork">
 
     <h3>Play, audition &amp; lift samples</h3>
     <ul>
       <li>Player transport: Previous / Play-Pause / Stop / Next, a click-or-drag seek bar, and volume.</li>
-      <li>The playlist shows filename, artist, title, BPM, key, comment, duration, and year.
-        Double-click to play, drag to reorder, and right-click to open the file location, reload a
-        track's tags from disk, or remove tracks; column layout is remembered.</li>
+      <li>The playlist opens on <b>#</b>, cover art, artist, title, BPM, key, comment, duration, year,
+        and filename. Double-click to play, drag to reorder, and right-click to open the file location,
+        reload a track's tags from disk, or remove tracks; your column layout is remembered.</li>
       <li><b>Edit tags inline:</b> slow-double-click a cell — click an already-selected row again, the
         way you rename in Finder/Explorer — to edit <b>Artist, Title, BPM, Key, Comment, or Year</b>
         directly in the playlist; changes save straight to the file. The <b>Edit Lock</b> toggle at the
@@ -226,6 +265,48 @@
     </ul>
     <img class="shot-img" src="../assets/player.webp" alt="Player with playlist and transport">
     <img class="shot-img" src="../assets/slicer.webp" alt="Waveform Loop Slicer — A–B markers and export">
+
+    <h3>Playlist columns, artwork &amp; text size</h3>
+    <p><b>Right-click the playlist's column header</b> for the full list of columns. Tick one to show
+      it, untick it to hide it again — the entries are toggles, so clicking a column that is already
+      showing switches it off. Seven columns are available beyond the ones you start with:</p>
+    <table>
+      <tr><th>Column</th><th>Shows</th></tr>
+      <tr><td>Art</td><td>The track's cover art. <b>On by default</b>, second in the row.</td></tr>
+      <tr><td>Album</td><td>The album tag.</td></tr>
+      <tr><td>Genre</td><td>The genre tag.</td></tr>
+      <tr><td>Track #</td><td>The track number within its album.</td></tr>
+      <tr><td>Label</td><td>The record label (the publisher tag).</td></tr>
+      <tr><td>Bitrate</td><td>kbps. Lossless files are shown at their true rate — a FLAC reads
+        1411, not the compressed figure — so a real lossless file never looks worse than a 320 MP3
+        beside it.</td></tr>
+      <tr><td>Energy</td><td>The 1–10 energy level from analysis.</td></tr>
+    </table>
+    <p>These columns are read-only and drawn from the tags already loaded, so switching one on is
+      instant. <b>#</b> and <b>Filename</b> are always present and aren't in the menu.</p>
+
+    <div class="callout"><b>Lost track of your layout?</b> <b>Reset Columns</b> — at the bottom of that
+      same right-click menu, under a separator — puts the playlist back to the columns, order, and
+      widths it ships with, in one click. It's the way back if you've hidden something and can't
+      remember what.</div>
+
+    <p><b>Cover art in the list.</b> The <b>Art</b> column shows each track's sleeve, and
+      <b>Settings → Playlist Artwork</b> chooses how much of it you see:</p>
+    <ul>
+      <li><b>Top</b> (default) — a wide band cut from the top of the sleeve, sized to sit in a normal
+        row without making the list any taller.</li>
+      <li><b>Middle</b> — the same band taken from the centre of the sleeve instead. Which part
+        identifies a cover differs from record to record, so it's worth trying both against your own
+        artwork.</li>
+      <li><b>Full</b> — the whole square. Rows grow to fit it, turning the playlist into a browsing
+        view rather than a list.</li>
+    </ul>
+    <p>A track with no embedded artwork simply leaves an empty cell. Covers load in the background for
+      the rows on screen, so scrolling a long playlist stays smooth.</p>
+
+    <p><b>Text size.</b> <b>Settings → Playlist Text Size</b> offers <b>Small</b>, <b>Medium</b>
+      (default) and <b>Large</b> for the playlist's rows. It applies straight away — no restart — and
+      the row height, column widths and artwork all scale with it.</p>
 
     <h3>Build &amp; manage playlists</h3>
     <p>Click <b>Playlists</b> at the top of the sidebar. The nav rail is <i>replaced</i> by your
@@ -255,6 +336,13 @@
         any other playlist, but not renamed or deleted.</li>
     </ul>
 
+    <p><b>Find a playlist by name.</b> The magnifier beside <b>+ Playlist</b> at the top of the tree
+      opens a filter box. Type any part of a name and the tree narrows to matching playlists and
+      folders, keeping the folders they live in visible so you can see where they sit. Folders are
+      opened as needed to reveal a match, and closing the box (Escape, or the magnifier again) puts the
+      tree back exactly as you had it. This filters the <i>tree</i> by name — for finding a
+      <i>track</i>, use the Player's search below.</p>
+
     <p><b>Search.</b> The Player's search box has a scope button beside it: search
       <b>this playlist</b> or <b>all playlists</b>. Searching everything highlights the folders and
       playlists containing matches, so you can see the trail through the tree to a track you only
@@ -269,6 +357,9 @@
     <p>BPM is left out deliberately — as free text it is more noise than help, since a search for
       <code>128</code> would also match a comment, a year, or a filename that happens to contain
       those digits.</p>
+    <p>A search across all playlists returns up to <b>2,000</b> tracks; past that the count reads
+      <code>2000+</code> and you should narrow the term. That is a limit on <i>results</i> only —
+      there is no cap on how many tracks a playlist can hold.</p>
 
     <p><b>Export.</b> Right-click a playlist for <b>Export…</b>, a folder for <b>Export Folder…</b>,
       or use <b>Export All Playlists…</b> in Settings to write your whole tree out as a folder of
@@ -406,6 +497,25 @@
         or <code>8A - Original_Name</code>. Affects auto-rename only.</li>
       <li><b>Notation</b> — Key Codes (default), Traditional, or Traktor Open Key. Applied
         live.</li>
+      <li><b>Energy Tag</b> — where the detected energy level is written. The two options are
+        independent, and you can use both:
+        <ul>
+          <li><b>Write energy level to Comment tag</b> — puts it in the comment, with its own format
+            (<code>7</code> or <code>Energy 7</code>), a choice of prepend / append / replace, and an
+            option to put energy before the key when both are written there.</li>
+          <li><b>Write energy level to its own tag field</b> — stores it in a dedicated field instead
+            of prose, where it can be read back exactly. A comment is free text, so a bare
+            <code>4</code> sitting in one can't be told apart from any other number; a real field can.
+            Mixed in P reads it back too, so the Player's <b>Energy</b> column fills in for files
+            tagged this way. WAV files can't store it — the format has no tag for it.</li>
+        </ul>
+      </li>
+      <li><b>Playlist Text Size</b> — <b>Small</b> / <b>Medium</b> (default) / <b>Large</b> for the
+        Player's track rows; applied live. Row height and cover art scale with it.</li>
+      <li><b>Playlist Artwork</b> — how much of each sleeve the Player's <b>Art</b> column shows:
+        <b>Top</b> (default), <b>Middle</b>, or <b>Full</b>. Applied live; <b>Full</b> makes each row
+        tall enough for the whole square. See
+        <a href="#workflows">Playlist columns, artwork &amp; text size</a>.</li>
       <li><b>Waveform color</b> — the color of the full-length waveform in the Player. Pick a preset
         or choose a custom color; applied live. The first option, <b>Default</b>, follows the active
         theme (each theme has its own waveform color).</li>
@@ -532,6 +642,27 @@
       (e.g. 90–180) so detection stays in DJ-typical territory.</p>
     <p><b>The detected key seems off.</b> Key detection reports a <b>confidence</b> score — low
       confidence means it's a harder call. Correct the key in the <b>Metadata</b> panel.</p>
+    <p><b>My WAV file didn't keep its BPM or key.</b> WAV has nowhere to put them — the format has no
+      tag for BPM, key, or energy, so there is nothing to write to. The Analyze panel says so on the
+      row (<b>WAV file</b>, or <b>Analyzed, no tags</b> once it has run). The results are still on
+      screen, and <b>auto-rename still writes the tempo and key into the filename</b>, which is how a
+      WAV can carry them. For real tags, convert the file to AIFF or FLAC first.</p>
+    <p><b>My analysis ran but didn't write anything.</b> Check the <b>Freeze</b> toggle in the Analyze
+      header — while it's on, analysis deliberately writes no tags, no comment, and renames nothing.
+      It always starts off, so it's on because it was switched on this session; click it again and the
+      next run writes normally. If Freeze is off, check the write options under
+      <b>Settings → Key/BPM adding to filename after analysis</b>, and note that <b>WAV files</b> can't
+      store tags at all (above).</p>
+    <p><b>I cancelled an analysis but files had already been renamed.</b> Cancel stops the work that
+      hasn't happened yet; it doesn't reverse what already finished. Tracks completed before you
+      clicked keep their results, tags, and new names. Use <b>History</b> to undo the renames.</p>
+    <p><b>I hid a playlist column and want the original layout back.</b> Right-click the playlist
+      header and choose <b>Reset Columns</b> at the bottom of the menu. That restores the columns,
+      their order, and their widths as shipped.</p>
+    <p><b>My playlist columns rearranged themselves after an update.</b> A newer version ships a
+      different default layout — cover art on by default, filename moved to the end — and it is applied
+      once, which replaces the arrangement you had. Drag the columns back how you like them and it
+      will stick; <b>Reset Columns</b> is always there if you want the shipped layout again.</p>
     <p><b>I renamed files by mistake.</b> Use <b>Undo Last</b> in the Rename panel, or open
       <b>History</b> to undo any recent batch.</p>
     <p><b>My playlist emptied itself.</b> That will have been <b>Scratch</b>, the working list the
