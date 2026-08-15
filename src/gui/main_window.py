@@ -171,6 +171,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
         self._analysis_panel.set_key_notation(self._config.key_notation)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
+        self._player_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)
@@ -359,6 +360,7 @@ class MainWindow(QMainWindow):
         self._player_panel.files_dropped.connect(self._add_files_to_player)
         self._player_panel.open_in_metadata.connect(self._open_in_metadata_panel)
         self._player_panel.slice_expanded.connect(self._sizer.on_slicer_expanded)
+        self._player_panel.compat_panel_toggled.connect(self._sizer.on_compat_panel_toggled)
 
         # Spectrum panel signals
         self._spectrum_panel.files_dropped.connect(self._add_files)
@@ -1315,6 +1317,7 @@ class MainWindow(QMainWindow):
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
         self._analysis_panel.set_key_notation(self._config.key_notation)
         self._keyboard_panel.set_key_notation(self._config.key_notation)
+        self._player_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)

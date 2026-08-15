@@ -122,12 +122,17 @@ class WindowSizer:
         """
         if page_id == "player":
             base = _PANEL_MIN_WIDTH["player"]
+            player = self.window._player_panel
             if self._slice_expanded:
-                row = self.window._player_panel.slice_time_row_min_width()
+                row = player.slice_time_row_min_width()
                 # Actual width, not Theme.SIDEBAR_WIDTH: in playlists mode the
                 # sidebar can be up to 600px wide and the constant would
                 # understate the window minimum by the difference.
                 base = max(base, self.window._sidebar.width() + row + _SLACK)
+            # Compatible Tracks takes its width out of the playlist's, so the
+            # window has to be able to hold both. Measured from the panel's own
+            # columns (translated header words included), never a constant.
+            base += player.compat_panel_min_width()
         elif page_id == "convert":
             # Measured, not assumed: the format selectors are labelled in the
             # user's language, and a constant left the longest of them clipped
@@ -184,6 +189,21 @@ class WindowSizer:
     def on_slicer_expanded(self, expanded: bool) -> None:
         self._slice_expanded = expanded
         # Only matters while the player is the active page.
+        if self.window._current_page == "player":
+            self._apply_page_min("player")
+            self._grow_to_min()
+
+    # ------------------------------------------------- compatible tracks
+
+    def on_compat_panel_toggled(self, _open: bool) -> None:
+        """The Compatible Tracks panel opened or closed.
+
+        No flag of its own: the toggle's checked state is the open state, and
+        `_min_width_for` asks the panel directly — one source, so the window
+        minimum cannot drift from what is actually on screen. (Deliberately
+        not `isVisible()`, which is False for the whole player page whenever
+        another panel is showing.)
+        """
         if self.window._current_page == "player":
             self._apply_page_min("player")
             self._grow_to_min()

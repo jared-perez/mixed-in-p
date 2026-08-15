@@ -63,6 +63,7 @@ from PySide6.QtWidgets import (
     QScrollArea,
     QSizePolicy,
     QSlider,
+    QSplitter,
     QStyle,
     QStyledItemDelegate,
     QStyleOptionHeader,
@@ -110,6 +111,7 @@ from .droppable_table import (
     blank_drag_pixmap,
     start_file_drag,
 )
+from .compatible_panel import CompatibleTracksPanel
 from .player_engine import PlayerEngine
 from .slice_section import SliceSection
 
@@ -128,6 +130,12 @@ _TRANSPORT_GLYPH = "#c8c8c8"
 # Side length of the album-art thumbnail shown in the header (opposite the
 # "Player" title) while a track is loaded. Sized to sit within the title band.
 _HEADER_ART_SIZE = 56
+
+# Opening width of the Compatible Tracks panel, and the share of the playlist
+# area it may never exceed — past about half, the panel has taken over the
+# thing it is meant to sit beside.
+_COMPAT_DEFAULT_WIDTH = 340
+_COMPAT_MAX_SHARE = 0.5
 
 # Span of the playlist backdrop's scrolling zoom window (playhead centered, so
 # half of this is upcoming audio). Wide enough to read musical phrasing, slow
@@ -252,6 +260,32 @@ def _make_stop_icon(color: str = _TRANSPORT_GLYPH, size: int = 14) -> QIcon:
         p.setBrush(QColor(color))
         m = size * 0.2
         p.drawRect(QRectF(m, m, size - 2 * m, size - 2 * m))
+    finally:
+        p.end()
+    return QIcon(pm)
+
+
+def _make_compat_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon:
+    """Two interlocking rings — the harmonic-mixing glyph for the panel toggle.
+
+    Drawn rather than lettered for the same reason as the transport glyphs:
+    it reads identically in every language, and follows the grey glyph colour.
+    """
+    pm = QPixmap(size, size)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        pen = QPen(QColor(color), max(1.0, size * 0.09))
+        p.setPen(pen)
+        p.setBrush(Qt.BrushStyle.NoBrush)
+        r = size * 0.28
+        mid = size / 2.0
+        # Overlapping by a third of a radius: enough to read as linked at
+        # 18px without the two rings merging into one blob.
+        offset = r * 0.62
+        p.drawEllipse(QPointF(mid - offset, mid), r, r)
+        p.drawEllipse(QPointF(mid + offset, mid), r, r)
     finally:
         p.end()
     return QIcon(pm)
@@ -1070,6 +1104,9 @@ class PlayerPanel(QWidget):
     # selection — (set of playlist ids, {folder id: lit playlists beneath}).
     # Emitted empty whenever there is nothing to light.
     tree_highlight_changed = Signal(object, object)
+    # Compatible Tracks opened/closed — the window sizer widens the window's
+    # minimum while it is open, the same way the slicer does.
+    compat_panel_toggled = Signal(bool)
 
     # Playlist columns, in logical order. The first nine are the shipped
     # defaults; everything after them is optional and hidden until the user
@@ -1227,6 +1264,11 @@ class PlayerPanel(QWidget):
         self._missing_cache: dict[str, bool] = {}
         # Rows the last rebuild marked as missing (drives the dimming).
         self._missing_rows: set[int] = set()
+        # Compatible Tracks: the panel that splits the playlist area. Width is
+        # remembered for the session only — the same reasoning as the
+        # playlists sidebar, where a width chosen on one screen is wrong on
+        # the next — and so is the open state, which starts closed.
+        self._compat_width = _COMPAT_DEFAULT_WIDTH
 
         # In-memory PCM playback engine. Decoding the whole track to RAM makes
         # seeking instant (just an integer offset) — QMediaPlayer's setPosition
@@ -1360,7 +1402,18 @@ class PlayerPanel(QWidget):
             # Icon menu buttons (visuals eye, search scope): keep the default
             # (Clear Playlist-style) light fill/border but drop the wide text
             # padding so the icon centres in its compact fixed size.
-            "QPushButton#visMenuButton, QPushButton#scopeMenuButton { padding: 2px; }"
+            "QPushButton#visMenuButton, QPushButton#scopeMenuButton,"
+            " QPushButton#compatMenuButton { padding: 2px; }"
+            # The checked state has to read as "this panel is open" — the same
+            # neon the Edit Lock indicator uses, as a border rather than a fill
+            # so the grey glyph inside stays legible.
+            f"QPushButton#compatMenuButton:checked {{ border: 1px solid {Theme.NEON_YELLOW};"
+            f" background-color: {Theme.BG_LIGHT}; }}"
+            # A QSplitter is a QFrame, so without this it wears the global
+            # BG_MEDIUM fill *and* a 1px border — a box drawn around the
+            # playlist. Same trap as #sidebarModeStack (see CLAUDE.md).
+            "QSplitter#playlistSplitter { background-color: transparent; border: none; }"
+            "QWidget#compatiblePanel { background-color: transparent; }"
         )
         layout = QVBoxLayout(content)
         layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, Theme.PADDING)
@@ -1491,6 +1544,19 @@ class PlayerPanel(QWidget):
         self._vis_button.clicked.connect(self._show_vis_menu)
         self._vis_button.setVisible(self._visualizations_enabled)
         title_row.addWidget(self._vis_button, 0, Qt.AlignmentFlag.AlignVCenter)
+
+        # Compatible Tracks: the same 40×26 icon button, checkable, sitting
+        # beside the visuals eye. No master switch — the feature is offline
+        # and costs nothing when closed (the eye has one because a GPU
+        # visualizer does not).
+        self._compat_button = QPushButton()
+        self._compat_button.setObjectName("compatMenuButton")
+        self._compat_button.setIcon(_make_compat_icon())
+        self._compat_button.setCheckable(True)
+        self._compat_button.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._compat_button.setFixedSize(40, 26)
+        self._compat_button.toggled.connect(self._on_compat_toggled)
+        title_row.addWidget(self._compat_button, 0, Qt.AlignmentFlag.AlignVCenter)
         title_row.addSpacing(16)
 
         # Edit Lock: a text label with a trailing radial indicator ("Edit Lock ◯"),
@@ -1615,7 +1681,24 @@ class PlayerPanel(QWidget):
                 self._default_column_widths[self._ARTWORK_COLUMN],
             )
 
-        layout.addWidget(self._table, 1)
+        # The playlist and the Compatible Tracks panel share the row, split by
+        # a draggable handle. While the panel is hidden the splitter has one
+        # visible child and behaves exactly as the bare table did, handle
+        # included (Qt hides a handle whose neighbour is hidden).
+        self._compat_panel = CompatibleTracksPanel(self)
+        self._compat_panel.hide()
+        self._compat_panel.track_activated.connect(self._on_compat_track_activated)
+        self._playlist_splitter = QSplitter(Qt.Orientation.Horizontal)
+        self._playlist_splitter.setObjectName("playlistSplitter")
+        self._playlist_splitter.setChildrenCollapsible(False)
+        self._playlist_splitter.setHandleWidth(10)
+        self._playlist_splitter.addWidget(self._table)
+        self._playlist_splitter.addWidget(self._compat_panel)
+        self._playlist_splitter.setStretchFactor(0, 1)
+        self._playlist_splitter.setStretchFactor(1, 0)
+        self._playlist_splitter.splitterMoved.connect(self._on_compat_splitter_moved)
+        layout.addWidget(self._playlist_splitter, 1)
+        self._sync_compat_tooltip()
 
         # Seek bar — wrapped in a widget so it can be hidden when the slice
         # section's waveform takes over as the seek control. It sits directly
@@ -2136,6 +2219,7 @@ class PlayerPanel(QWidget):
         self._save_btn.show()
         self._search_field.show()
         self._scope_btn.show()
+        self._compat_panel.set_library(library)
         self._update_context_label()
 
     def set_undo_stack(self, stack: UndoStack) -> None:
@@ -2303,7 +2387,14 @@ class PlayerPanel(QWidget):
         self._undo.push(label, restore)
 
     def _update_now_playing(self) -> None:
-        """Show the loaded track's filename above the slicer, or hide the line."""
+        """Show the loaded track's filename above the slicer, or hide the line.
+
+        Also the single place the Compatible Tracks seed follows from: this
+        runs wherever the loaded track changes — played, removed from under
+        the player, or cleared — and Stop is deliberately not one of those,
+        since the track stays loaded and the matches stay useful.
+        """
+        self._compat_panel.set_seed_path(self._playing_path)
         if self._playing_path:
             self._now_playing_label.setText(
                 self.tr("Playing: {0}").format(Path(self._playing_path).name)
@@ -2849,6 +2940,74 @@ class PlayerPanel(QWidget):
             cfg.visualization_mode = mode
             save_config(cfg)
         self._apply_vis_mode()
+
+    # ── Compatible Tracks ────────────────────────────────────────
+
+    def _on_compat_toggled(self, open_: bool) -> None:
+        """Split the playlist area with the Compatible Tracks panel, or don't."""
+        self._compat_panel.setVisible(open_)
+        if open_:
+            # The seed only matters while the panel is showing, so it is set
+            # here as well as on play: opening mid-track must not wait for the
+            # next one.
+            self._compat_panel.set_seed_path(self._playing_path)
+            self._apply_compat_sizes()
+        self._sync_compat_tooltip()
+        self.compat_panel_toggled.emit(open_)
+
+    def _apply_compat_sizes(self) -> None:
+        """Give the panel its remembered width, clamped to a sane share."""
+        total = sum(self._playlist_splitter.sizes())
+        if total <= 0:
+            return
+        width = max(
+            self._compat_panel.minimum_useful_width(),
+            min(self._compat_width, int(total * _COMPAT_MAX_SHARE)),
+        )
+        self._playlist_splitter.setSizes([max(0, total - width), width])
+
+    def _on_compat_splitter_moved(self, _pos: int, _index: int) -> None:
+        """Remember the width the user dragged to (session only)."""
+        if self.compat_panel_open:
+            self._compat_width = self._playlist_splitter.sizes()[1]
+
+    def _sync_compat_tooltip(self) -> None:
+        """A toggle's tooltip says what the NEXT click does (house rule)."""
+        self._compat_button.setToolTip(
+            self.tr("Hide tracks that mix with the playing track")
+            if self._compat_button.isChecked()
+            else self.tr("Show tracks that mix with the playing track")
+        )
+
+    def _on_compat_track_activated(self, path: str) -> None:
+        """Double-click in the panel: add the track to the visible playlist.
+
+        Only the path is passed on, so the tags are read from the file like
+        any other add — the library row that matched it may be older than the
+        file, and this is the same route a drop from Finder takes.
+        """
+        self.add_tracks([{"file_path": path, "display_name": Path(path).name}])
+
+    def compat_panel_min_width(self) -> int:
+        """Extra width the window needs while the panel is open, else 0.
+
+        Measured from the panel's own columns rather than assumed — the same
+        rule the Convert row's format selectors are sized by.
+        """
+        if not self.compat_panel_open:
+            return 0
+        return (
+            self._compat_panel.minimum_useful_width()
+            + self._playlist_splitter.handleWidth()
+        )
+
+    @property
+    def compat_panel_open(self) -> bool:
+        return self._compat_button.isChecked()
+
+    def set_key_notation(self, notation: str) -> None:
+        """Follow the Settings key-notation choice in the compatible list."""
+        self._compat_panel.set_key_notation(notation)
 
     def set_visualizations_enabled(self, enabled: bool) -> None:
         """Show/hide the visuals selector to match the Settings master switch."""
