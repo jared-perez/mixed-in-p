@@ -4,6 +4,11 @@ User-facing name is "Playlists"; "library" is the internal name for the
 data layer (tracks table + playlist tree + search).
 """
 
+from src.library.compatibility import (
+    DEFAULT_BPM_TOLERANCE,
+    DEFAULT_LIMIT,
+    CompatibleMatch,
+)
 from src.library.library import (
     SCRATCH_NODE_ID,
     Library,
@@ -15,7 +20,10 @@ from src.library.library import (
 )
 
 __all__ = [
+    "DEFAULT_BPM_TOLERANCE",
+    "DEFAULT_LIMIT",
     "SCRATCH_NODE_ID",
+    "CompatibleMatch",
     "Library",
     "Node",
     "Track",

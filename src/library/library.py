@@ -31,6 +31,14 @@ from hashlib import blake2b
 from pathlib import Path
 from typing import Iterable
 
+from src.library.compatibility import (
+    DEFAULT_BPM_TOLERANCE,
+    DEFAULT_LIMIT,
+    CompatibleMatch,
+    bpm_window,
+    rank_matches,
+)
+
 # Reserved node id for the Player's pinned working list ("Scratch").
 SCRATCH_NODE_ID = 1
 
@@ -1222,6 +1230,57 @@ class Library:
             (track_id,),
         ).fetchall()
         return [_node(row) for row in rows]
+
+    def compatible_tracks(
+        self,
+        seed_track_id: int,
+        *,
+        bpm_tolerance: float = DEFAULT_BPM_TOLERANCE,
+        limit: int | None = DEFAULT_LIMIT,
+    ) -> list[CompatibleMatch]:
+        """Library tracks that mix with a seed, best first.
+
+        The four compatible codes and the tempo window narrow the set in SQL;
+        the ordering is Python (`compatibility.rank_matches`) because the
+        result is small and the ranking is three tiers deep. An unknown seed,
+        or one whose key never parsed into a code, returns nothing — the panel
+        distinguishes that case from "no matches" by looking at the seed row
+        itself, so the query doesn't need to.
+
+        The cap is applied *after* ranking, so it takes the best rows rather
+        than whichever ones SQLite reached first.
+        """
+        seed = self.get_track(seed_track_id)
+        if seed is None or not seed.keycode:
+            return []
+        from src.analysis.keycode import get_compatible_keys
+
+        try:
+            codes = get_compatible_keys(seed.keycode)
+        except ValueError:
+            return []
+        marks = ",".join("?" * len(codes))
+        sql = f"SELECT * FROM tracks WHERE keycode IN ({marks}) AND id != ?"
+        params: list[object] = [*codes, seed_track_id]
+        if seed.bpm and seed.bpm > 0:
+            low, high = bpm_window(seed.bpm, bpm_tolerance)
+            # Half- and double-time readings count (decided 2026-08-12), and a
+            # row with no usable tempo is kept and ranked last rather than
+            # dropped — most libraries hold files nobody has analysed yet.
+            sql += (
+                " AND (bpm IS NULL OR bpm <= 0"
+                " OR bpm BETWEEN ? AND ?"
+                " OR bpm * 2 BETWEEN ? AND ?"
+                " OR bpm / 2 BETWEEN ? AND ?)"
+            )
+            params += [low, high, low, high, low, high]
+        rows = self._con.execute(sql, params).fetchall()
+        return rank_matches(
+            seed,
+            [_track(row) for row in rows],
+            bpm_tolerance=bpm_tolerance,
+            limit=limit,
+        )
 
     def membership_counts(self, track_ids: Iterable[int]) -> dict[int, int]:
         """How many saved playlists each track is in — one query per result
