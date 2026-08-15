@@ -19,13 +19,14 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import QCoreApplication, QSize, Qt, Signal
-from PySide6.QtGui import QFontMetrics
+from PySide6.QtCore import QCoreApplication, QPointF, QSize, Qt, Signal
+from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
     QLabel,
     QSizePolicy,
+    QStyledItemDelegate,
     QTableWidget,
     QTableWidgetItem,
     QVBoxLayout,
@@ -38,16 +39,22 @@ from src.library.compatibility import TEMPO_DOUBLE, TEMPO_HALF
 from src.utils.config import load_config
 
 from ..styles.theme import Theme
+from .audition_player import AuditionPlayer
 from .elided_label import ElidedLabel
 
 logger = logging.getLogger(__name__)
 
-# Column layout. The track column takes whatever is left, so only the three
-# narrow ones are measured.
-COL_KEY = 0
-COL_BPM = 1
-COL_ENERGY = 2
-COL_TRACK = 3
+# Column layout. The track column takes whatever is left, so only the audition
+# column and the three narrow ones are measured.
+COL_AUDITION = 0
+COL_KEY = 1
+COL_BPM = 2
+COL_ENERGY = 3
+COL_TRACK = 4
+
+# The audition column: wide enough for the play glyph and a comfortable click
+# target, narrow enough that it reads as a gutter rather than a column.
+_AUDITION_COL_WIDTH = 26
 
 # Breathing room around the widest value each narrow column can hold, on top
 # of whichever is wider — the sample or the (translated) header word. Kept
@@ -67,6 +74,9 @@ class CompatibleTracksPanel(QWidget):
     #: the list it is showing (decided: double-click adds to the loaded
     #: playlist, drag-out covers every other destination).
     track_activated = Signal(str)
+    #: An audition started (path). The Player stops its own engine on this —
+    #: two streams playing at once is the one thing the gesture must not do.
+    audition_started = Signal(str)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -75,7 +85,12 @@ class CompatibleTracksPanel(QWidget):
         self._seed_path: str | None = None
         self._matches: list[CompatibleMatch] = []
         self._key_notation = load_config().key_notation
+        self._audition = AuditionPlayer(self)
         self._setup_ui()
+        self._audition.started.connect(self.audition_started)
+        self._audition.started.connect(self._on_audition_state)
+        self._audition.stopped.connect(self._on_audition_state)
+        self._audition.busy_changed.connect(self._on_audition_busy)
         self.refresh()
 
     # ── Construction ────────────────────────────────────────────
@@ -91,11 +106,11 @@ class CompatibleTracksPanel(QWidget):
         self._seed_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;")
         layout.addWidget(self._seed_label)
 
-        self._table = QTableWidget()
+        self._table = _AuditionTable()
         self._table.setObjectName("compatibleTable")
-        self._table.setColumnCount(4)
+        self._table.setColumnCount(5)
         self._table.setHorizontalHeaderLabels(
-            [self.tr("Key"), self.tr("BPM"), self.tr("Energy"), self.tr("Track")]
+            ["", self.tr("Key"), self.tr("BPM"), self.tr("Energy"), self.tr("Track")]
         )
         self._table.verticalHeader().setVisible(False)
         # The order IS the ranking, so nothing here reorders or edits.
@@ -143,6 +158,18 @@ class CompatibleTracksPanel(QWidget):
             self._narrow_widths[col] = width
             self._table.setColumnWidth(col, self._narrow_widths[col])
             header.setSectionResizeMode(col, QHeaderView.ResizeMode.Fixed)
+
+        # The audition gutter: fixed, unlabelled, and painted by a delegate —
+        # the QSS `QTableView::item` rule means anything drawn from the model
+        # (a DecorationRole icon, a background brush) is overpainted by the
+        # style, so the glyph has to be drawn here to appear at all.
+        self._table.setColumnWidth(COL_AUDITION, _AUDITION_COL_WIDTH)
+        header.setSectionResizeMode(COL_AUDITION, QHeaderView.ResizeMode.Fixed)
+        self._audition_delegate = _AuditionDelegate(self._table)
+        self._table.setItemDelegateForColumn(COL_AUDITION, self._audition_delegate)
+        self._table.icon_clicked.connect(self._on_audition_clicked)
+        self._table.icon_hover_changed.connect(self._on_icon_hover)
+        self._table.row_hover_changed.connect(self._on_row_hover)
         layout.addWidget(self._table, 1)
 
         # Shown instead of the table whenever there is nothing to list — the
@@ -197,7 +224,13 @@ class CompatibleTracksPanel(QWidget):
     # ── Query + render ──────────────────────────────────────────
 
     def refresh(self) -> None:
-        """Re-run the query and repaint. Safe to call at any time."""
+        """Re-run the query and repaint. Safe to call at any time.
+
+        Any audition ends here: the row it belonged to is about to be
+        replaced, and sound outliving the list it came from is exactly the
+        kind of thing that leaves a DJ hunting for a stop button.
+        """
+        self.stop_audition()
         self._matches = []
         seed = None
         if self._library is not None and self._seed_path:
@@ -251,6 +284,7 @@ class CompatibleTracksPanel(QWidget):
         self._table.setRowCount(len(self._matches))
         for row, match in enumerate(self._matches):
             track = match.track
+            self._set_cell(row, COL_AUDITION, "", self._audition_tooltip())
             key = render_key(track.key or "", track.keycode or "", self._key_notation)
             self._set_cell(row, COL_KEY, key)
             self._set_cell(row, COL_BPM, *_bpm_text(match))
@@ -268,9 +302,85 @@ class CompatibleTracksPanel(QWidget):
     # ── Interaction ─────────────────────────────────────────────
 
     def _on_double_clicked(self, index) -> None:
+        # The gutter is the audition control, where a double click is two
+        # clicks of the gesture (start, then skip on) — not a request to add
+        # the track to the playlist.
+        if index.column() == COL_AUDITION:
+            return
         row = index.row()
         if 0 <= row < len(self._matches):
             self.track_activated.emit(self._matches[row].track.path)
+
+    def _audition_tooltip(self) -> str:
+        return self.tr("Click to preview — hold the pointer here to keep playing")
+
+    # ── Audition ────────────────────────────────────────────────
+
+    def _on_audition_clicked(self, row: int) -> None:
+        """Icon click: start this track, or skip 30 s if it is already going."""
+        if 0 <= row < len(self._matches):
+            self._audition.click(self._matches[row].track.path)
+
+    def _on_icon_hover(self, row: int) -> None:
+        """The gesture's sustain: sound lasts only while the icon is held.
+
+        Any move off the icon — onto another cell, another row, or out of the
+        table — stops everything. The main player stays stopped (confirmed
+        2026-08-12); it is not resumed here or anywhere else.
+        """
+        self._audition_delegate.set_hovered_row(row)
+        self._table.viewport().update()
+        if row < 0 or not self._is_audition_row(row):
+            self._audition.stop()
+
+    def _on_row_hover(self, row: int) -> None:
+        """Row hover warms the first window so the click plays from memory."""
+        if 0 <= row < len(self._matches) and not self._audition.is_playing():
+            self._audition.warm(self._matches[row].track.path)
+
+    def _is_audition_row(self, row: int) -> bool:
+        """Is *row* the one currently being auditioned?"""
+        current = self._audition.current_path
+        return (
+            current is not None
+            and 0 <= row < len(self._matches)
+            and self._matches[row].track.path == current
+        )
+
+    def _on_audition_state(self, *_args) -> None:
+        self._audition_delegate.set_playing_row(self._row_for_path(self._audition.current_path))
+        self._table.viewport().update()
+
+    def _on_audition_busy(self, path: str) -> None:
+        self._audition_delegate.set_busy_row(self._row_for_path(path or None))
+        self._table.viewport().update()
+
+    def _row_for_path(self, path: str | None) -> int:
+        if not path:
+            return -1
+        for row, match in enumerate(self._matches):
+            if match.track.path == path:
+                return row
+        return -1
+
+    def stop_audition(self) -> None:
+        """End any audition — the panel closed, the seed changed, the list
+        was rebuilt. Safe when nothing is playing."""
+        self._audition.stop()
+
+    def set_volume(self, volume: float) -> None:
+        """Follow the Player's volume slider, so a preview is not a surprise."""
+        self._audition.set_volume(volume)
+
+    def shutdown_workers(self) -> None:
+        """Join the audition reader — house rule for a panel that starts
+        threads, and the difference between a clean quit and a QThread
+        destroyed while running."""
+        self._audition.shutdown_workers()
+
+    def closeEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        self.shutdown_workers()
+        super().closeEvent(event)
 
     # ── Metrics ─────────────────────────────────────────────────
 
@@ -281,7 +391,7 @@ class CompatibleTracksPanel(QWidget):
         included) rather than assumed — the mistake the Convert row's constant
         made, and the reason the window minimum can grow when this opens.
         """
-        fixed = sum(self._narrow_widths.values())
+        fixed = sum(self._narrow_widths.values()) + _AUDITION_COL_WIDTH
         # Enough of the track column to read an artist and the start of a
         # title. Measured off the average character rather than a string of
         # 'M's, which is the widest glyph in the font and overstated the
@@ -295,6 +405,128 @@ class CompatibleTracksPanel(QWidget):
 
     def sizeHint(self) -> QSize:  # noqa: N802 (Qt override)
         return QSize(self.minimum_useful_width() + 60, super().sizeHint().height())
+
+
+class _AuditionTable(QTableWidget):
+    """The panel's table, with the mouse state the audition gesture needs.
+
+    Three things a plain table does not report: which row the pointer is over
+    (to warm a window), whether it is over the audition gutter specifically
+    (the sustain — sound lasts exactly as long as this is true), and a click
+    in that gutter. Hover needs `setMouseTracking`, and the viewport needs it
+    too: the table's own tracking flag does not reach the widget that actually
+    receives the moves.
+    """
+
+    icon_clicked = Signal(int)
+    #: Row whose audition icon is under the pointer, -1 for none.
+    icon_hover_changed = Signal(int)
+    #: Row under the pointer at all, -1 for none.
+    row_hover_changed = Signal(int)
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.setMouseTracking(True)
+        self.viewport().setMouseTracking(True)
+        self._hover_row = -1
+        self._icon_row = -1
+
+    def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        pos = event.position().toPoint()
+        row = self.rowAt(pos.y())
+        col = self.columnAt(pos.x())
+        self._set_hover(row, row if (row >= 0 and col == COL_AUDITION) else -1)
+        super().mouseMoveEvent(event)
+
+    def leaveEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        self._set_hover(-1, -1)
+        super().leaveEvent(event)
+
+    def mousePressEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        pos = event.position().toPoint()
+        row = self.rowAt(pos.y())
+        if row >= 0 and self.columnAt(pos.x()) == COL_AUDITION:
+            # Make sure the sustain state agrees with the click: a press can
+            # arrive without a preceding move (a click after the list was
+            # rebuilt under a stationary pointer), and a click that the panel
+            # then reads as "not on the icon" would stop itself instantly.
+            self._set_hover(row, row)
+            self.icon_clicked.emit(row)
+            return
+        super().mousePressEvent(event)
+
+    def _set_hover(self, row: int, icon_row: int) -> None:
+        if row != self._hover_row:
+            self._hover_row = row
+            self.row_hover_changed.emit(row)
+        if icon_row != self._icon_row:
+            self._icon_row = icon_row
+            self.icon_hover_changed.emit(icon_row)
+
+
+class _AuditionDelegate(QStyledItemDelegate):
+    """Draws the audition gutter: a play glyph per row, brighter under the
+    pointer, neon while that row is playing, hollow while it waits on a decode.
+
+    Painted here rather than set as a DecorationRole icon because the QSS
+    styles `QTableView::item`, and once a stylesheet styles items Qt draws
+    them itself and ignores what the model returns — the trap that made an
+    Analyze-panel row tint invisible while every data-level test passed. Test
+    this by sampling a render, not by asking the model.
+    """
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._hovered_row = -1
+        self._playing_row = -1
+        self._busy_row = -1
+
+    def set_hovered_row(self, row: int) -> None:
+        self._hovered_row = row
+
+    def set_playing_row(self, row: int) -> None:
+        self._playing_row = row
+
+    def set_busy_row(self, row: int) -> None:
+        self._busy_row = row
+
+    def paint(self, painter, option, index) -> None:
+        super().paint(painter, option, index)
+        row = index.row()
+        if row == self._playing_row:
+            colour = QColor(Theme.NEON_YELLOW)
+        elif row == self._hovered_row:
+            colour = QColor(Theme.TEXT_PRIMARY)
+        else:
+            # Dim, but drawn on every row: an icon that only exists on hover
+            # is an icon nobody finds.
+            colour = QColor(Theme.TEXT_DISABLED)
+        rect = option.rect
+        size = min(rect.height() - 8, 12)
+        if size <= 2:
+            return
+        cx = rect.center().x()
+        cy = rect.center().y()
+        half = size / 2.0
+        triangle = QPolygonF(
+            [
+                QPointF(cx - half * 0.7, cy - half),
+                QPointF(cx - half * 0.7, cy + half),
+                QPointF(cx + half * 0.9, cy),
+            ]
+        )
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        if row == self._busy_row:
+            # Waiting on a window: outline only, so the icon says "asked for,
+            # not yet playing" instead of pretending sound has started.
+            painter.setPen(QPen(colour, 1.2))
+            painter.setBrush(Qt.BrushStyle.NoBrush)
+        else:
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(colour)
+        painter.drawPolygon(triangle)
+        painter.restore()
 
 
 def _display_name(track) -> str:

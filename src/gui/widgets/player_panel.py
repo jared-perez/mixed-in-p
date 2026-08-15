@@ -1688,6 +1688,8 @@ class PlayerPanel(QWidget):
         self._compat_panel = CompatibleTracksPanel(self)
         self._compat_panel.hide()
         self._compat_panel.track_activated.connect(self._on_compat_track_activated)
+        self._compat_panel.audition_started.connect(self._on_audition_started)
+        self._compat_panel.set_volume(self._volume_pct / 100.0)
         self._playlist_splitter = QSplitter(Qt.Orientation.Horizontal)
         self._playlist_splitter.setObjectName("playlistSplitter")
         self._playlist_splitter.setChildrenCollapsible(False)
@@ -2195,6 +2197,7 @@ class PlayerPanel(QWidget):
         otherwise sit through every remaining file in the batch.
         """
         self._cancel_artwork_worker()
+        self._compat_panel.shutdown_workers()
         self.wait_for_readers()
 
     def closeEvent(self, event) -> None:
@@ -2946,6 +2949,9 @@ class PlayerPanel(QWidget):
     def _on_compat_toggled(self, open_: bool) -> None:
         """Split the playlist area with the Compatible Tracks panel, or don't."""
         self._compat_panel.setVisible(open_)
+        if not open_:
+            # A panel the user has just closed must not still be making noise.
+            self._compat_panel.stop_audition()
         if open_:
             # The seed only matters while the panel is showing, so it is set
             # here as well as on play: opening mid-track must not wait for the
@@ -2978,6 +2984,16 @@ class PlayerPanel(QWidget):
             if self._compat_button.isChecked()
             else self.tr("Show tracks that mix with the playing track")
         )
+
+    def _on_audition_started(self, _path: str) -> None:
+        """An audition began — stop the main player and leave it stopped.
+
+        Full stop rather than pause, and deliberately no resume when the
+        audition ends (confirmed 2026-08-12): the DJ asked to hear the other
+        track, and having the previous one come back unbidden mid-set is
+        worse than having to press play.
+        """
+        self._on_stop()
 
     def _on_compat_track_activated(self, path: str) -> None:
         """Double-click in the panel: add the track to the visible playlist.
@@ -4221,6 +4237,9 @@ class PlayerPanel(QWidget):
     def _on_volume_changed(self, value: int) -> None:
         self._volume_pct = value
         self._engine.set_volume(value / 100.0)
+        # The audition shares the slider: a preview at a volume the user did
+        # not set is the kind of surprise that gets a feature turned off.
+        self._compat_panel.set_volume(value / 100.0)
 
     # ── Slice section ───────────────────────────────────────────
 

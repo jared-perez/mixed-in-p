@@ -16,6 +16,13 @@ from __future__ import annotations
 
 import pytest
 
+from src.gui.widgets.compatible_panel import (
+    COL_AUDITION,
+    COL_BPM,
+    COL_ENERGY,
+    COL_KEY,
+    COL_TRACK,
+)
 from src.gui.widgets.player_panel import PlayerPanel
 from src.library import SCRATCH_NODE_ID, Library
 
@@ -149,16 +156,16 @@ class TestTableContents:
         )
         player._play_track(0)
         table = player._compat_panel._table
-        assert table.item(0, 0).text() == "8A"
-        assert table.item(0, 1).text() == "128"
-        assert table.item(0, 2).text() == "7"
-        assert table.item(0, 3).text() == "Aphex – Xtal"
+        assert table.item(0, COL_KEY).text() == "8A"
+        assert table.item(0, COL_BPM).text() == "128"
+        assert table.item(0, COL_ENERGY).text() == "7"
+        assert table.item(0, COL_TRACK).text() == "Aphex – Xtal"
 
     def test_a_half_time_match_is_marked_not_silently_listed(self, player, lib, tmp_path):
         add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
         add_track(player, lib, tmp_path, "halved.wav", key="8A", bpm=64.0)
         player._play_track(0)
-        cell = player._compat_panel._table.item(0, 1)
+        cell = player._compat_panel._table.item(0, COL_BPM)
         assert cell.text() == "64 ×2"
         assert "Half-time" in cell.toolTip()
 
@@ -169,9 +176,9 @@ class TestTableContents:
         add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
         add_track(player, lib, tmp_path, "match.wav", key="Am", bpm=128.0)
         player._play_track(0)
-        assert player._compat_panel._table.item(0, 0).text() == "8A"
+        assert player._compat_panel._table.item(0, COL_KEY).text() == "8A"
         player.set_key_notation("traditional")
-        assert player._compat_panel._table.item(0, 0).text() == "Am"
+        assert player._compat_panel._table.item(0, COL_KEY).text() == "Am"
 
     def test_double_click_adds_the_track_to_the_visible_playlist(
         self, player, lib, tmp_path
@@ -183,7 +190,7 @@ class TestTableContents:
         panel = player._compat_panel
         assert [e.file_path for e in player._playlist] == [panel.seed_path]
 
-        panel._on_double_clicked(panel._table.model().index(0, 0))
+        panel._on_double_clicked(panel._table.model().index(0, COL_TRACK))
         assert match in [e.file_path for e in player._playlist]
         assert match in [t.path for t in lib.get_items(SCRATCH_NODE_ID)]
 
