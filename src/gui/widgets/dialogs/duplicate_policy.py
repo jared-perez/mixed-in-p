@@ -134,12 +134,12 @@ def resolve_additions(
     QTimer.singleShot(0, ask)
 
 
-#: Horizontal room a button needs beyond its text: the stylesheet's
-#: ``padding: 8px 16px`` on QPushButton, its 1px border, and a little slack.
+# Horizontal room a button needs beyond its text: the stylesheet's
+# ``padding: 8px 16px`` on QPushButton, its 1px border, and a little slack.
 _BUTTON_CHROME = 44
 
-#: ``QDialogButtonBox QPushButton`` in the stylesheet, so a short label still
-#: gets a button of the same size as everywhere else in the app.
+# ``QDialogButtonBox QPushButton`` in the stylesheet, so a short label still
+# gets a button of the same size as everywhere else in the app.
 _BUTTON_MIN = 80
 
 

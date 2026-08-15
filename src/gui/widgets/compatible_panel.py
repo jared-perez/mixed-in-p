@@ -19,8 +19,8 @@ from __future__ import annotations
 
 import logging
 
-from PySide6.QtCore import QCoreApplication, QPointF, QSize, Qt, Signal
-from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen, QPolygonF
+from PySide6.QtCore import QCoreApplication, QMimeData, QPointF, QSize, Qt, QUrl, Signal
+from PySide6.QtGui import QColor, QDrag, QFontMetrics, QPainter, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QAbstractItemView,
     QHeaderView,
@@ -35,11 +35,18 @@ from PySide6.QtWidgets import (
 
 from src.analysis.keycode import render_key
 from src.library import CompatibleMatch, Library
-from src.library.compatibility import TEMPO_DOUBLE, TEMPO_HALF
+from src.library.compatibility import (
+    KEY_ADJACENT,
+    KEY_RELATIVE,
+    KEY_SAME,
+    TEMPO_DOUBLE,
+    TEMPO_HALF,
+)
 from src.utils.config import load_config
 
 from ..styles.theme import Theme
 from .audition_player import AuditionPlayer
+from .droppable_table import blank_drag_pixmap
 from .elided_label import ElidedLabel
 
 logger = logging.getLogger(__name__)
@@ -66,16 +73,27 @@ _CELL_PAD = 10
 # are unreadable and the splitter is just eating the playlist.
 _MIN_PANEL_WIDTH = 220
 
+# What the Key column's colour says about the match. The list is already in
+# this order, so the tint is a reminder rather than the only way to tell: the
+# same key is the primary accent, the relative major/minor the secondary, and
+# a ±1 neighbour is left in the ordinary text colour rather than dimmed —
+# adjacent is a good mix, not a poor one.
+_KEY_TIER_COLOURS = {
+    KEY_SAME: Theme.NEON_YELLOW,
+    KEY_RELATIVE: Theme.NEON_GREEN,
+    KEY_ADJACENT: Theme.TEXT_PRIMARY,
+}
+
 
 class CompatibleTracksPanel(QWidget):
     """The right-hand half of the Player's playlist area, when open."""
 
-    #: A row was double-clicked — the file path, for the Player to append to
-    #: the list it is showing (decided: double-click adds to the loaded
-    #: playlist, drag-out covers every other destination).
+    # A row was double-clicked — the file path, for the Player to append to
+    # the list it is showing (decided: double-click adds to the loaded
+    # playlist, drag-out covers every other destination).
     track_activated = Signal(str)
-    #: An audition started (path). The Player stops its own engine on this —
-    #: two streams playing at once is the one thing the gesture must not do.
+    # An audition started (path). The Player stops its own engine on this —
+    # two streams playing at once is the one thing the gesture must not do.
     audition_started = Signal(str)
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -167,6 +185,7 @@ class CompatibleTracksPanel(QWidget):
         header.setSectionResizeMode(COL_AUDITION, QHeaderView.ResizeMode.Fixed)
         self._audition_delegate = _AuditionDelegate(self._table)
         self._table.setItemDelegateForColumn(COL_AUDITION, self._audition_delegate)
+        self._table.drag_paths = self._selected_paths
         self._table.icon_clicked.connect(self._on_audition_clicked)
         self._table.icon_hover_changed.connect(self._on_icon_hover)
         self._table.row_hover_changed.connect(self._on_row_hover)
@@ -286,17 +305,27 @@ class CompatibleTracksPanel(QWidget):
             track = match.track
             self._set_cell(row, COL_AUDITION, "", self._audition_tooltip())
             key = render_key(track.key or "", track.keycode or "", self._key_notation)
-            self._set_cell(row, COL_KEY, key)
+            self._set_cell(
+                row, COL_KEY, key, tooltip=_key_tooltip(match), colour=match.key_relation
+            )
             self._set_cell(row, COL_BPM, *_bpm_text(match))
             energy = "" if track.energy is None else str(track.energy)
             self._set_cell(row, COL_ENERGY, energy)
             self._set_cell(row, COL_TRACK, _display_name(track), track.path)
 
-    def _set_cell(self, row: int, col: int, text: str, tooltip: str = "") -> None:
+    def _set_cell(
+        self, row: int, col: int, text: str, tooltip: str = "", colour: str = ""
+    ) -> None:
         item = QTableWidgetItem(text)
         item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
         if tooltip:
             item.setToolTip(tooltip)
+        if colour in _KEY_TIER_COLOURS:
+            # ForegroundRole, not a background brush: the stylesheet's
+            # `QTableView::item` rule makes Qt paint item *backgrounds* itself
+            # and ignore the model's brush, but the text colour still comes
+            # through — the same way the playlist marks its playing row.
+            item.setForeground(QColor(_KEY_TIER_COLOURS[colour]))
         self._table.setItem(row, col, item)
 
     # ── Interaction ─────────────────────────────────────────────
@@ -310,6 +339,15 @@ class CompatibleTracksPanel(QWidget):
         row = index.row()
         if 0 <= row < len(self._matches):
             self.track_activated.emit(self._matches[row].track.path)
+
+    def _selected_paths(self) -> list[str]:
+        """Paths for the rows a drag is starting from."""
+        rows = sorted({index.row() for index in self._table.selectedIndexes()})
+        return [
+            self._matches[row].track.path
+            for row in rows
+            if 0 <= row < len(self._matches)
+        ]
 
     def _audition_tooltip(self) -> str:
         return self.tr("Click to preview — hold the pointer here to keep playing")
@@ -419,9 +457,9 @@ class _AuditionTable(QTableWidget):
     """
 
     icon_clicked = Signal(int)
-    #: Row whose audition icon is under the pointer, -1 for none.
+    # Row whose audition icon is under the pointer, -1 for none.
     icon_hover_changed = Signal(int)
-    #: Row under the pointer at all, -1 for none.
+    # Row under the pointer at all, -1 for none.
     row_hover_changed = Signal(int)
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -430,6 +468,28 @@ class _AuditionTable(QTableWidget):
         self.viewport().setMouseTracking(True)
         self._hover_row = -1
         self._icon_row = -1
+        # Set by the panel — the paths a drag out of here should carry.
+        self.drag_paths = lambda: []
+        self.setDragEnabled(True)
+        self.setDragDropMode(QAbstractItemView.DragDropMode.DragOnly)
+
+    def startDrag(self, supported_actions) -> None:  # noqa: N802 (Qt override)
+        """Drag matches out to a playlist, the tree, or Finder.
+
+        Deliberately **Copy only, and with no source-panel marker**. This list
+        is a query result: there is nothing here to move out of, and a drop
+        handler that read a Move would try to remove the row it came from. No
+        marker means every handler treats it as it treats a drop from Finder —
+        an add — which is exactly the intent.
+        """
+        paths = self.drag_paths()
+        if not paths:
+            return
+        mime = drag_mime(paths)
+        drag = QDrag(self)
+        drag.setMimeData(mime)
+        drag.setPixmap(blank_drag_pixmap())
+        drag.exec(Qt.DropAction.CopyAction)
 
     def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt override)
         pos = event.position().toPoint()
@@ -527,6 +587,31 @@ class _AuditionDelegate(QStyledItemDelegate):
             painter.setBrush(colour)
         painter.drawPolygon(triangle)
         painter.restore()
+
+
+def drag_mime(paths: list[str]) -> QMimeData:
+    """The payload a drag out of the panel carries: file URLs, nothing else.
+
+    Split out so what leaves the panel can be asserted without running a
+    drag loop — and so the absence of a source-panel marker is visible as a
+    decision rather than as an omission.
+    """
+    mime = QMimeData()
+    mime.setUrls([QUrl.fromLocalFile(p) for p in paths])
+    return mime
+
+
+def _key_tooltip(match: CompatibleMatch) -> str:
+    """What the key colour means, in one line."""
+    return {
+        KEY_SAME: QCoreApplication.translate("CompatibleTracksPanel", "Same key"),
+        KEY_RELATIVE: QCoreApplication.translate(
+            "CompatibleTracksPanel", "Relative major/minor"
+        ),
+        KEY_ADJACENT: QCoreApplication.translate(
+            "CompatibleTracksPanel", "One step around the wheel"
+        ),
+    }.get(match.key_relation, "")
 
 
 def _display_name(track) -> str:

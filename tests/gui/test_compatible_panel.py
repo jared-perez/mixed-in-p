@@ -23,6 +23,7 @@ from src.gui.widgets.compatible_panel import (
     COL_KEY,
     COL_TRACK,
 )
+from src.gui.styles.theme import Theme
 from src.gui.widgets.player_panel import PlayerPanel
 from src.library import SCRATCH_NODE_ID, Library
 
@@ -256,3 +257,59 @@ class TestToggle:
         assert splitter.indexOf(player._table) == 0
         assert splitter.indexOf(player._compat_panel) == 1
         assert splitter.count() == 2
+
+
+class TestPolish:
+    """Key-tier colour and drag-out — the two things phase 4 added."""
+
+    def test_the_key_colour_says_which_kind_of_match_it_is(
+        self, player, lib, tmp_path
+    ):
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        add_track(player, lib, tmp_path, "same.wav", key="8A", bpm=128.0)
+        add_track(player, lib, tmp_path, "relative.wav", key="8B", bpm=128.0)
+        add_track(player, lib, tmp_path, "adjacent.wav", key="9A", bpm=128.0)
+        player._play_track(0)
+        table = player._compat_panel._table
+        colours = [table.item(row, COL_KEY).foreground().color().name() for row in range(3)]
+        assert len(set(colours)) == 3, "the three tiers must be distinguishable"
+        assert colours[0].lower() == Theme.NEON_YELLOW.lower()
+
+    def test_the_key_cell_names_the_relationship_in_words(
+        self, player, lib, tmp_path
+    ):
+        """Colour alone is not an explanation, and not everyone sees it."""
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        add_track(player, lib, tmp_path, "relative.wav", key="8B", bpm=128.0)
+        player._play_track(0)
+        tip = player._compat_panel._table.item(0, COL_KEY).toolTip()
+        assert "elative" in tip
+
+    def test_a_drag_out_carries_the_selected_paths(self, player, lib, tmp_path):
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        match = add_track(player, lib, tmp_path, "match.wav", key="8A", bpm=128.0)
+        player._play_track(0)
+        panel = player._compat_panel
+        panel._table.selectRow(0)
+        assert panel._selected_paths() == [match]
+
+    def test_the_drag_payload_is_indistinguishable_from_a_finder_drop(self):
+        """No source-panel marker, on purpose: with one, every drop target
+        would route the drag by DRAG_ROUTES and an unknown source is refused
+        everywhere. Without one it is an ordinary file add."""
+        from src.gui.widgets.compatible_panel import drag_mime
+        from src.gui.widgets.droppable_table import SOURCE_PAGE_MIME
+
+        mime = drag_mime(["/music/a.wav", "/music/b.wav"])
+        assert [u.toLocalFile() for u in mime.urls()] == ["/music/a.wav", "/music/b.wav"]
+        assert not mime.hasFormat(SOURCE_PAGE_MIME)
+
+    def test_a_drag_out_is_copy_only(self, player):
+        """A Move would ask the source to give the row up, and this list has
+        no rows of its own to give — it is a query result."""
+        from PySide6.QtWidgets import QAbstractItemView
+
+        assert player._compat_panel._table.dragDropMode() == (
+            QAbstractItemView.DragDropMode.DragOnly
+        )
+        assert player._compat_panel._table.dragEnabled()

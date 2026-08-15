@@ -35,10 +35,10 @@ WINDOW_MS = 35_000
 class AuditionWindowWorker(QObject):
     """Decodes one window of one file to float32 PCM, off the UI thread."""
 
-    #: path, offset_ms, pcm, sample_rate — the offset rides along so a
-    #: result that arrives after the user has skipped on can be discarded.
+    # path, offset_ms, pcm, sample_rate — the offset rides along so a
+    # result that arrives after the user has skipped on can be discarded.
     ready = Signal(str, int, object, int)
-    #: path, offset_ms — the window held no audio (past the end of the file).
+    # path, offset_ms — the window held no audio (past the end of the file).
     empty = Signal(str, int)
     error = Signal(str, str)
 

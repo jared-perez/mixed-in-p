@@ -266,6 +266,38 @@
     <img class="shot-img" src="../assets/player.webp" alt="Player with playlist and transport">
     <img class="shot-img" src="../assets/slicer.webp" alt="Waveform Loop Slicer — A–B markers and export">
 
+    <h3>Compatible Tracks</h3>
+    <p>The button beside the visuals eye — two interlocking rings, at the top-right of the Player —
+      splits the playlist area and lists <b>what else in your library mixes with the track loaded in
+      the player</b>. Drag the divider to give it more or less room; it opens closed each session.</p>
+    <p>The list is ranked, best first, and the <b>Key</b> colour says which kind of match each row is:</p>
+    <table>
+      <tr><th>Key colour</th><th>Relationship</th></tr>
+      <tr><td>Yellow</td><td><b>Same key</b> — the same code as the seed.</td></tr>
+      <tr><td>Green</td><td><b>Relative major/minor</b> — same number, other letter (8A ↔ 8B).</td></tr>
+      <tr><td>Plain</td><td><b>One step around the wheel</b> — ±1 on the same letter (8A ↔ 7A, 9A).</td></tr>
+    </table>
+    <p>Within a key tier, tempo decides: tracks nearest the seed's BPM come first, inside a
+      <b>±8%</b> window. <b>Half- and double-time matches count</b> — a 64 BPM track under a 128 BPM
+      seed mixes perfectly well — and are marked in the BPM column (<code>64 ×2</code>,
+      <code>256 ÷2</code>) so you can see what you're getting. After that, <b>energy</b> breaks the
+      tie: the closest energy level to the seed's ranks higher. A track nobody has analysed yet still
+      appears, at the end of its tier, rather than being hidden.</p>
+    <p><b>Preview without stopping to load anything.</b> Click the play icon in the left gutter of a
+      row and it starts; the sound continues <i>only while you keep the pointer on that icon</i>, and
+      moving off stops it. Clicking again while it plays skips <b>30 seconds</b> forward, so a second
+      and third click walk you into the track. Starting a preview stops the main player, and the main
+      player stays stopped when you let go — nothing comes back on by itself.</p>
+    <p><b>Double-click</b> a row to add that track to the playlist you're looking at, or <b>drag</b>
+      rows out to another playlist, to the tree, or to Finder/Explorer. Dragging always <i>copies</i>
+      — the list is a search result, so there is nothing here to move out of.</p>
+    <div class="callout"><b>Nothing listed?</b> The panel says which reason it is. <b>“No key for this
+      track — analyse it first”</b> means the seed has no key the app can read: run it through
+      <a href="#workflows">Analyze</a>. <b>“This track isn't in your library yet”</b> means the seed
+      is playing from outside your playlists — matching works from library rows, so add it to a
+      playlist first. And <b>“Nothing in your library mixes with this track”</b> is the honest
+      answer: nothing you own is in a compatible key at a workable tempo.</div>
+
     <h3>Playlist columns, artwork &amp; text size</h3>
     <p><b>Right-click the playlist's column header</b> for the full list of columns. Tick one to show
       it, untick it to hide it again — the entries are toggles, so clicking a column that is already
@@ -656,6 +688,17 @@
     <p><b>I cancelled an analysis but files had already been renamed.</b> Cancel stops the work that
       hasn't happened yet; it doesn't reverse what already finished. Tracks completed before you
       clicked keep their results, tags, and new names. Use <b>History</b> to undo the renames.</p>
+    <p><b>Compatible Tracks is empty for a track that clearly has matches.</b> Read the line it shows.
+      If it asks you to analyse the track, the seed has no key stored — the panel matches on key, so
+      it has nothing to work from. If it says the track isn't in your library, you're playing a file
+      that was never added to a playlist. If it says nothing mixes with it, the pool really is empty:
+      a compatible key at within ±8% of the tempo (or half/double it) is a narrow ask in a small
+      library, and the fastest fix is to analyse more of your collection.</p>
+    <p><b>A preview stopped as soon as I moved the mouse.</b> That's the design: a click starts it and
+      it plays only while the pointer stays on the row's play icon, so a stray swipe across the panel
+      can never fill the room with the wrong track. To hear more of it, hold still — or click again to
+      jump 30 seconds further in. Your main player does not restart afterwards; press play when you
+      want it back.</p>
     <p><b>I hid a playlist column and want the original layout back.</b> Right-click the playlist
       header and choose <b>Reset Columns</b> at the bottom of the menu. That restores the columns,
       their order, and their widths as shipped.</p>

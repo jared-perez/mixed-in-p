@@ -41,11 +41,11 @@ SKIP_MS = 30_000
 class AuditionPlayer(QObject):
     """Plays 35-second windows of a track while the cursor holds the icon."""
 
-    #: An audition began (path) — the main player stops on this.
+    # An audition began (path) — the main player stops on this.
     started = Signal(str)
-    #: All audition sound has ended, for any reason.
+    # All audition sound has ended, for any reason.
     stopped = Signal()
-    #: A click is waiting on a decode (path or ""), so the icon can say so.
+    # A click is waiting on a decode (path or ""), so the icon can say so.
     busy_changed = Signal(str)
 
     def __init__(self, parent: QObject | None = None) -> None:
