@@ -1,7 +1,9 @@
 """Sidebar playlists-mode mechanics: width pins, mode stack, collapse interplay."""
 
+from PySide6.QtGui import QKeySequence
+
 from src.gui.styles.theme import Theme
-from src.gui.widgets.sidebar import Sidebar
+from src.gui.widgets.sidebar import PLAYLISTS_SHORTCUT, Sidebar
 
 
 def _make_sidebar(qtbot) -> Sidebar:
@@ -100,3 +102,59 @@ def test_playlists_tooltip_describes_the_next_click(qtbot):
 
     sidebar.set_playlists_mode(False)
     assert sidebar._playlists_btn.toolTip() == off
+
+
+def test_the_hotkey_toggles_the_mode_and_reports_it(qtbot):
+    """`toggle_playlists_mode` is the shortcut's door in, and it must be the
+    same door the button uses: the checked state, the tooltip and the signal
+    MainWindow listens to for the tree's lazy load all hang off that one path.
+    """
+    sidebar = _make_sidebar(qtbot)
+    seen = []
+    sidebar.playlists_toggled.connect(seen.append)
+
+    sidebar.toggle_playlists_mode()
+    assert sidebar.playlists_mode
+    assert sidebar._playlists_btn.isChecked()
+    assert sidebar._mode_stack.currentWidget() is sidebar._playlists_page
+
+    sidebar.toggle_playlists_mode()
+    assert not sidebar.playlists_mode
+    assert not sidebar._playlists_btn.isChecked()
+    assert seen == [True, False]
+
+
+def test_the_hotkey_expands_a_collapsed_rail_in_one_press(qtbot):
+    """Collapsed, the Playlists button is hidden and the stack refuses to show
+    the tree at all — so a bare flip would emit its signal and change nothing
+    visible, which reads as a broken key. One press expands and lands on the
+    tree; it never toggles *off* from collapsed, because "show me my playlists"
+    is the only thing pressing it can sensibly mean there.
+    """
+    sidebar = _make_sidebar(qtbot)
+    for mode_underneath in (False, True):
+        sidebar.set_playlists_mode(mode_underneath)
+        sidebar.set_collapsed(True)
+        assert sidebar._mode_stack.currentWidget() is sidebar._nav_page
+
+        sidebar.toggle_playlists_mode()
+
+        assert not sidebar.collapsed
+        assert sidebar.playlists_mode
+        assert sidebar._mode_stack.currentWidget() is sidebar._playlists_page
+
+
+def test_the_tooltip_advertises_the_shortcut(qtbot):
+    """A hotkey nobody can discover is a hotkey nobody uses, and the button is
+    the only place to say so. Appended outside the translated sentence on
+    purpose — editing an existing tr() source orphans it in eleven languages.
+    """
+    sidebar = _make_sidebar(qtbot)
+    key = PLAYLISTS_SHORTCUT.toString(QKeySequence.SequenceFormat.NativeText)
+    assert key
+    for mode in (False, True):
+        sidebar.set_playlists_mode(mode)
+        tip = sidebar._playlists_btn.toolTip()
+        assert tip.endswith(f"({key})")
+        # The sentence itself is still one of the two authored strings.
+        assert ("Show" in tip) is (not mode)

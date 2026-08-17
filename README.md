@@ -10,7 +10,7 @@ The full audio file preparation workflow for DJs.
 - Audio conversion (MP3/WAV/FLAC/AIFF) — quality is only ever kept or lowered, including same-format downgrades (96k/24-bit FLAC → 44.1k/16-bit FLAC)
 - Acoustic spectrum analyzer
 - Audio Player + Slicer for sample lifting
-- Playlist library — folders, saved playlists, a name filter for the tree, search across every playlist at once, and export to `.m3u8`/`.m3u`/tracklist
+- Playlist library — folders, saved playlists, a name filter for the tree, search across every playlist at once, export to `.m3u8`/`.m3u`/tracklist, and Shift+Tab to show or hide the tree from anywhere
 - Playlist view you can shape — cover art in the list (top / middle / full sleeve), optional Album, Genre, Track #, Label, Bitrate and Energy columns, and Small/Medium/Large text
 - Compatible Tracks — what else in your library mixes with the track in the player, ranked by key, tempo (half- and double-time count) and energy, with click-and-hold preview
 - "Open with Mixed in P" from Finder or Explorer, and an option to become your default audio player

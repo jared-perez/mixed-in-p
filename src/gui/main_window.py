@@ -68,7 +68,7 @@ from .widgets.player_panel import PlayerPanel
 from .widgets.playlist_tree import PlaylistTreePanel
 from .widgets.rename_panel import RenamePanel
 from .widgets.settings_panel import SettingsPanel
-from .widgets.sidebar import Sidebar
+from .widgets.sidebar import PLAYLISTS_SHORTCUT, Sidebar
 from .widgets.spectrum_panel import SpectrumPanel
 from .workers import (
     AnalysisProgress,
@@ -320,6 +320,19 @@ class MainWindow(QMainWindow):
         self._sidebar.playlists_toggled.connect(self._on_playlists_toggled)
         self._sidebar.collapsed_changed.connect(lambda _c: self._apply_playlists_splitter())
         self._apply_playlists_splitter()  # start with the handle locked
+        # Shift+Tab shows/hides the playlists tree from anywhere in the window.
+        # See PLAYLISTS_SHORTCUT for what this key costs and why it is still it.
+        #
+        # WindowShortcut is the scope, matching the undo shortcut above — but
+        # note what it is *not* doing, because the obvious assumption is wrong
+        # and was written here before it was checked: it is not what stops the
+        # hotkey firing behind a modal. Qt's modal event blocking does that on
+        # its own, and an ApplicationShortcut is blocked identically (measured
+        # — the dialog test passes under both, so it does not pin this line).
+        # The context is about scope alone: this belongs to the main window.
+        playlists_sc = QShortcut(PLAYLISTS_SHORTCUT, self)
+        playlists_sc.setContext(Qt.ShortcutContext.WindowShortcut)
+        playlists_sc.activated.connect(self._sidebar.toggle_playlists_mode)
         self._playlists_panel.tree.playlist_activated.connect(self._on_playlist_activated)
         self._playlists_panel.tree.tracks_added.connect(self._on_tracks_added)
         self._player_panel.playlist_saved.connect(self._on_playlist_saved)

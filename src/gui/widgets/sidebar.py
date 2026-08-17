@@ -3,7 +3,13 @@
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QSize, Qt, Signal
-from PySide6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDropEvent
+from PySide6.QtGui import (
+    QDragEnterEvent,
+    QDragLeaveEvent,
+    QDragMoveEvent,
+    QDropEvent,
+    QKeySequence,
+)
 from PySide6.QtWidgets import (
     QButtonGroup,
     QFrame,
@@ -23,6 +29,21 @@ from .nav_icons import nav_icon
 
 # Display size for the sidebar nav glyphs.
 _NAV_ICON_SIZE = QSize(30, 30)
+
+# The Playlists toggle's keyboard shortcut, defined here rather than beside the
+# QShortcut in MainWindow because the button's tooltip advertises it — one
+# source, so the key and the label it is announced by cannot drift apart.
+#
+# Shift+Tab is chosen with its cost known and measured. It is Qt's *backward*
+# focus-navigation key, so binding it window-wide means Shift+Tab no longer
+# steps back through a form anywhere in the app (130 tab stops, 49 of them in
+# Settings). Everything else survives: forward Tab still walks the chain,
+# typing in a field is untouched (a QLineEdit claims letter keys through
+# ShortcutOverride but never claims Tab), plain Tab never triggers this, and it
+# collides with none of Ctrl/Cmd+Z, Space, Escape, Z/X or Delete. Plain Tab was
+# the first request and was rejected on the measurement: it takes focus
+# navigation in *both* directions, which is every keyboard path in the app.
+PLAYLISTS_SHORTCUT = QKeySequence("Shift+Tab")
 
 # Which panel-to-panel drags are allowed, and whether the drop removes the rows
 # from the source (True = move; False = copy, leaves them).
@@ -391,15 +412,47 @@ class Sidebar(QFrame):
         panel, which isn't obvious from a checked button — so the tooltip
         names the swap in both directions, the way the collapse chevron does.
         """
-        self._playlists_btn.setToolTip(
+        text = (
             self.tr("Hide your playlists and show the navigation buttons again")
             if self._playlists_mode
             else self.tr("Show your playlists here in place of the navigation buttons")
         )
+        # The shortcut is appended *outside* the translated string rather than
+        # written into it: editing an existing tr() source breaks its key and
+        # drops that line to English in all eleven languages (CLAUDE.md), and
+        # these two were authored long ago. NativeText so macOS reads the
+        # symbols it expects and Windows reads "Shift+Tab".
+        key = PLAYLISTS_SHORTCUT.toString(QKeySequence.SequenceFormat.NativeText)
+        self._playlists_btn.setToolTip(f"{text}  ({key})")
 
     def _on_playlists_clicked(self, checked: bool) -> None:
         self.set_playlists_mode(checked)
         self.playlists_toggled.emit(checked)
+
+    def toggle_playlists_mode(self) -> None:
+        """Flip playlists mode — the keyboard shortcut's entry point.
+
+        Not simply the button's handler inverted, because the button is not
+        always there to invert. While the rail is collapsed the Playlists
+        button is hidden and `_sync_mode_stack` refuses to show the tree at all
+        (a 56px tree is useless), so a bare flip would report success, emit its
+        signal and change nothing the user can see — a key that looks broken.
+        Pressing it means "show me my playlists", so a collapsed rail expands
+        and lands on the tree in **one** press. Expanding first also matters:
+        `set_collapsed` re-syncs the stack, and doing it second would leave the
+        nav page showing under a mode that says tree.
+
+        Goes through `set_playlists_mode` + `playlists_toggled` exactly as the
+        click does, so the button's checked state, its tooltip, the splitter
+        lock and the tree's lazy load all stay on the one path.
+        """
+        if self._collapsed:
+            self.set_collapsed(False)
+            on = True
+        else:
+            on = not self._playlists_mode
+        self.set_playlists_mode(on)
+        self.playlists_toggled.emit(on)
 
     def _sync_mode_stack(self) -> None:
         # Collapsed always shows the icon rail — a 56px tree would be useless.

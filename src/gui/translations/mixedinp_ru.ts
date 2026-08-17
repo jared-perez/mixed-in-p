@@ -385,12 +385,12 @@ or click “Add Artwork…”</source>
 <context>
     <name>CompatibleTracksPanel</name>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="158"/>
+        <location filename="../widgets/compatible_panel.py" line="169"/>
         <source>Key</source>
         <translation>Тональность</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="159"/>
+        <location filename="../widgets/compatible_panel.py" line="170"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
@@ -399,89 +399,89 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Энергия</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="164"/>
+        <location filename="../widgets/compatible_panel.py" line="175"/>
         <source>E</source>
         <comment>Energy column header, abbreviated</comment>
         <translatorcomment>Сокращение от «Энергия» — кириллическая буква, чтобы столбец не выпадал из кириллического интерфейса.</translatorcomment>
         <translation>Э</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="165"/>
+        <location filename="../widgets/compatible_panel.py" line="176"/>
         <source>Track</source>
         <translation>Трек</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="169"/>
+        <location filename="../widgets/compatible_panel.py" line="180"/>
         <source>Energy (1–10)</source>
         <translation>Энергия (1–10)</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="311"/>
+        <location filename="../widgets/compatible_panel.py" line="342"/>
         <source>Nothing in your library mixes with this track.</source>
         <translation>В библиотеке нет треков, которые сводятся с этим.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="319"/>
+        <location filename="../widgets/compatible_panel.py" line="350"/>
         <source>Play a track to see what mixes with it.</source>
         <translation>Включите трек, чтобы увидеть, что с ним сводится.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="321"/>
+        <location filename="../widgets/compatible_panel.py" line="352"/>
         <source>This track isn&apos;t in your library yet.</source>
         <translation>Этого трека ещё нет в вашей библиотеке.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="323"/>
+        <location filename="../widgets/compatible_panel.py" line="354"/>
         <source>No key for this track — analyse it first.</source>
         <translation>У этого трека нет тональности — сначала проанализируйте его.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="337"/>
+        <location filename="../widgets/compatible_panel.py" line="368"/>
         <source>Compatible with {0}</source>
         <translation>Подходит к {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="346"/>
+        <location filename="../widgets/compatible_panel.py" line="377"/>
         <source>{0} track</source>
         <translation>{0} трек</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="346"/>
+        <location filename="../widgets/compatible_panel.py" line="377"/>
         <source>{0} tracks</source>
         <translation>{0} треков</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="349"/>
+        <location filename="../widgets/compatible_panel.py" line="380"/>
         <source>Compatible with {0} · {1}</source>
         <translation>Подходит к {0} · {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="420"/>
+        <location filename="../widgets/compatible_panel.py" line="482"/>
         <source>Click to preview — hold the pointer here to keep playing</source>
         <translation>Нажмите для прослушивания — держите курсор здесь, чтобы играло</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="674"/>
+        <location filename="../widgets/compatible_panel.py" line="746"/>
         <source>Same key</source>
         <translation>Та же тональность</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="675"/>
+        <location filename="../widgets/compatible_panel.py" line="747"/>
         <source>Relative major/minor</source>
         <translation>Параллельная мажор/минор</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="678"/>
+        <location filename="../widgets/compatible_panel.py" line="750"/>
         <source>One step around the wheel</source>
         <translation>На один шаг по кругу</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="707"/>
+        <location filename="../widgets/compatible_panel.py" line="786"/>
         <source>Half-time — mixes at double this tempo</source>
         <translation>Half-time — сводится на удвоенном темпе</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="715"/>
+        <location filename="../widgets/compatible_panel.py" line="794"/>
         <source>Double-time — mixes at half this tempo</source>
         <translation>Double-time — сводится на половинном темпе</translation>
     </message>
@@ -1097,69 +1097,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="456"/>
-        <location filename="../main_window.py" line="485"/>
+        <location filename="../main_window.py" line="469"/>
+        <location filename="../main_window.py" line="498"/>
         <source>Export All Playlists</source>
         <translation>Экспортировать все плейлисты</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="477"/>
+        <location filename="../main_window.py" line="490"/>
         <source>Export failed</source>
         <translation>Не удалось экспортировать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="478"/>
+        <location filename="../main_window.py" line="491"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Не удалось записать файл:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="486"/>
+        <location filename="../main_window.py" line="499"/>
         <source>There are no playlists to export yet.</source>
         <translation>Пока нет плейлистов для экспорта.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="491"/>
+        <location filename="../main_window.py" line="504"/>
         <source>Export complete</source>
         <translation>Экспорт завершён</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="492"/>
+        <location filename="../main_window.py" line="505"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Экспортировано плейлистов: {0} ({1} треков) в:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="583"/>
+        <location filename="../main_window.py" line="596"/>
         <source>Select Audio Files</source>
         <translation>Выберите аудиофайлы</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="594"/>
+        <location filename="../main_window.py" line="607"/>
         <source>Select Folder</source>
         <translation>Выберите папку</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="824"/>
+        <location filename="../main_window.py" line="837"/>
         <source>No Audio Files</source>
         <translation>Нет аудиофайлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="825"/>
+        <location filename="../main_window.py" line="838"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Аудиофайлы не найдены в:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="830"/>
+        <location filename="../main_window.py" line="843"/>
         <source>Invalid Folder</source>
         <translation>Недопустимая папка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="831"/>
+        <location filename="../main_window.py" line="844"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Недопустимый каталог:
@@ -1174,17 +1174,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Анализ уже выполняется. Подождите или сначала отмените его.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="972"/>
+        <location filename="../main_window.py" line="985"/>
         <source>Analyzing...</source>
         <translation>Анализ...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1004"/>
+        <location filename="../main_window.py" line="1017"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Готово: {0} проанализировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1008"/>
+        <location filename="../main_window.py" line="1021"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Готово: {0} файлов проанализировано</translation>
     </message>
@@ -1193,52 +1193,52 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отменено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1183"/>
+        <location filename="../main_window.py" line="1196"/>
         <source>Conversion in Progress</source>
         <translation>Конвертация выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1184"/>
+        <location filename="../main_window.py" line="1197"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Конвертация уже выполняется. Подождите.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1234"/>
+        <location filename="../main_window.py" line="1247"/>
         <source>Converting...</source>
         <translation>Конвертация...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1250"/>
+        <location filename="../main_window.py" line="1263"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Готово: {0} конвертировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1254"/>
+        <location filename="../main_window.py" line="1267"/>
         <source>Complete: {0} files converted</source>
         <translation>Готово: {0} файлов конвертировано</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1475"/>
+        <location filename="../main_window.py" line="1488"/>
         <source>Rename in Progress</source>
         <translation>Переименование выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1476"/>
+        <location filename="../main_window.py" line="1489"/>
         <source>A rename operation is already running.</source>
         <translation>Операция переименования уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1534"/>
+        <location filename="../main_window.py" line="1547"/>
         <source>Rename Failed</source>
         <translation>Не удалось переименовать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1568"/>
+        <location filename="../main_window.py" line="1581"/>
         <source>Undo Rename</source>
         <translation>Отменить переименование</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1599"/>
+        <location filename="../main_window.py" line="1612"/>
         <source>Undo Failed</source>
         <translation>Не удалось отменить</translation>
     </message>
@@ -1251,22 +1251,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Переименовано {0} файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1540"/>
+        <location filename="../main_window.py" line="1553"/>
         <source>No Session</source>
         <translation>Нет сессии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1540"/>
+        <location filename="../main_window.py" line="1553"/>
         <source>No rename session to undo.</source>
         <translation>Нет сессии переименования для отмены.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1549"/>
+        <location filename="../main_window.py" line="1562"/>
         <source>Confirm Undo</source>
         <translation>Подтвердите отмену</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1550"/>
+        <location filename="../main_window.py" line="1563"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Отменить переименование {0} файлов?</translation>
     </message>
@@ -1275,7 +1275,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отмена переименования...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1569"/>
+        <location filename="../main_window.py" line="1582"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Отменено: {0} файлов, {1} ошибок</translation>
     </message>
@@ -2828,82 +2828,82 @@ or click “Add Artwork…”</source>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="188"/>
-        <location filename="../widgets/sidebar.py" line="356"/>
+        <location filename="../widgets/sidebar.py" line="209"/>
+        <location filename="../widgets/sidebar.py" line="377"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Свернуть боковую панель</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="226"/>
+        <location filename="../widgets/sidebar.py" line="247"/>
         <source>Rename</source>
         <translation>Переименование</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="227"/>
+        <location filename="../widgets/sidebar.py" line="248"/>
         <source>Convert</source>
         <translation>Конвертация</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="228"/>
+        <location filename="../widgets/sidebar.py" line="249"/>
         <source>Analyze</source>
         <translation>Анализ</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="225"/>
+        <location filename="../widgets/sidebar.py" line="246"/>
         <source>Player</source>
         <translation>Плеер</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="177"/>
+        <location filename="../widgets/sidebar.py" line="198"/>
         <source>Playlists</source>
         <translation>Плейлисты</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="231"/>
+        <location filename="../widgets/sidebar.py" line="252"/>
         <source>Keyboard</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="229"/>
+        <location filename="../widgets/sidebar.py" line="250"/>
         <source>Metadata</source>
         <translation>Метаданные</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="230"/>
+        <location filename="../widgets/sidebar.py" line="251"/>
         <source>Spectrum</source>
         <translation>Спектр</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="281"/>
-        <location filename="../widgets/sidebar.py" line="289"/>
+        <location filename="../widgets/sidebar.py" line="302"/>
+        <location filename="../widgets/sidebar.py" line="310"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="293"/>
-        <location filename="../widgets/sidebar.py" line="301"/>
+        <location filename="../widgets/sidebar.py" line="314"/>
+        <location filename="../widgets/sidebar.py" line="322"/>
         <source>History</source>
         <translation>История</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="356"/>
+        <location filename="../widgets/sidebar.py" line="377"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Развернуть боковую панель</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="395"/>
+        <location filename="../widgets/sidebar.py" line="416"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>Скрыть плейлисты и снова показать кнопки навигации</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="397"/>
+        <location filename="../widgets/sidebar.py" line="418"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>Показывать здесь плейлисты вместо кнопок навигации</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="450"/>
+        <location filename="../widgets/sidebar.py" line="503"/>
         <source>Auto</source>
         <translation>Авто</translation>
     </message>

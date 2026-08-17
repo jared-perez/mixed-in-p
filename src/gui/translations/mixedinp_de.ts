@@ -390,12 +390,12 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>CompatibleTracksPanel</name>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="158"/>
+        <location filename="../widgets/compatible_panel.py" line="169"/>
         <source>Key</source>
         <translation>Tonart</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="159"/>
+        <location filename="../widgets/compatible_panel.py" line="170"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
@@ -404,89 +404,89 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">Energie</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="164"/>
+        <location filename="../widgets/compatible_panel.py" line="175"/>
         <source>E</source>
         <comment>Energy column header, abbreviated</comment>
         <translatorcomment>Kurzform von „Energie“ — die Spalte ist nur so breit wie der Wert (1–10).</translatorcomment>
         <translation>E</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="165"/>
+        <location filename="../widgets/compatible_panel.py" line="176"/>
         <source>Track</source>
         <translation>Track</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="169"/>
+        <location filename="../widgets/compatible_panel.py" line="180"/>
         <source>Energy (1–10)</source>
         <translation>Energie (1–10)</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="311"/>
+        <location filename="../widgets/compatible_panel.py" line="342"/>
         <source>Nothing in your library mixes with this track.</source>
         <translation>Nichts in deiner Bibliothek passt zu diesem Track.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="319"/>
+        <location filename="../widgets/compatible_panel.py" line="350"/>
         <source>Play a track to see what mixes with it.</source>
         <translation>Spiele einen Track ab, um zu sehen, was dazu passt.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="321"/>
+        <location filename="../widgets/compatible_panel.py" line="352"/>
         <source>This track isn&apos;t in your library yet.</source>
         <translation>Dieser Track ist noch nicht in deiner Bibliothek.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="323"/>
+        <location filename="../widgets/compatible_panel.py" line="354"/>
         <source>No key for this track — analyse it first.</source>
         <translation>Keine Tonart für diesen Track — zuerst analysieren.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="337"/>
+        <location filename="../widgets/compatible_panel.py" line="368"/>
         <source>Compatible with {0}</source>
         <translation>Passend zu {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="346"/>
+        <location filename="../widgets/compatible_panel.py" line="377"/>
         <source>{0} track</source>
         <translation>{0} Track</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="346"/>
+        <location filename="../widgets/compatible_panel.py" line="377"/>
         <source>{0} tracks</source>
         <translation>{0} Tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="349"/>
+        <location filename="../widgets/compatible_panel.py" line="380"/>
         <source>Compatible with {0} · {1}</source>
         <translation>Passend zu {0} · {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="420"/>
+        <location filename="../widgets/compatible_panel.py" line="482"/>
         <source>Click to preview — hold the pointer here to keep playing</source>
         <translation>Klicken zum Vorhören — Zeiger hier halten, damit es weiterspielt</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="674"/>
+        <location filename="../widgets/compatible_panel.py" line="746"/>
         <source>Same key</source>
         <translation>Gleiche Tonart</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="675"/>
+        <location filename="../widgets/compatible_panel.py" line="747"/>
         <source>Relative major/minor</source>
         <translation>Parallele Dur-/Moll-Tonart</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="678"/>
+        <location filename="../widgets/compatible_panel.py" line="750"/>
         <source>One step around the wheel</source>
         <translation>Ein Schritt weiter im Kreis</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="707"/>
+        <location filename="../widgets/compatible_panel.py" line="786"/>
         <source>Half-time — mixes at double this tempo</source>
         <translation>Halftime — mixt mit doppeltem Tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="715"/>
+        <location filename="../widgets/compatible_panel.py" line="794"/>
         <source>Double-time — mixes at half this tempo</source>
         <translation>Doubletime — mixt mit halbem Tempo</translation>
     </message>
@@ -1105,69 +1105,69 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="456"/>
-        <location filename="../main_window.py" line="485"/>
+        <location filename="../main_window.py" line="469"/>
+        <location filename="../main_window.py" line="498"/>
         <source>Export All Playlists</source>
         <translation>Alle Playlists exportieren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="477"/>
+        <location filename="../main_window.py" line="490"/>
         <source>Export failed</source>
         <translation>Export fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="478"/>
+        <location filename="../main_window.py" line="491"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Die Datei konnte nicht geschrieben werden:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="486"/>
+        <location filename="../main_window.py" line="499"/>
         <source>There are no playlists to export yet.</source>
         <translation>Es gibt noch keine Playlists zum Exportieren.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="491"/>
+        <location filename="../main_window.py" line="504"/>
         <source>Export complete</source>
         <translation>Export abgeschlossen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="492"/>
+        <location filename="../main_window.py" line="505"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} Playlists ({1} Tracks) exportiert nach:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="583"/>
+        <location filename="../main_window.py" line="596"/>
         <source>Select Audio Files</source>
         <translation>Audiodateien auswählen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="594"/>
+        <location filename="../main_window.py" line="607"/>
         <source>Select Folder</source>
         <translation>Ordner auswählen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="824"/>
+        <location filename="../main_window.py" line="837"/>
         <source>No Audio Files</source>
         <translation>Keine Audiodateien</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="825"/>
+        <location filename="../main_window.py" line="838"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Keine Audiodateien gefunden in:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="830"/>
+        <location filename="../main_window.py" line="843"/>
         <source>Invalid Folder</source>
         <translation>Ungültiger Ordner</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="831"/>
+        <location filename="../main_window.py" line="844"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Kein gültiges Verzeichnis:
@@ -1182,17 +1182,17 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">Eine Analyse läuft bereits. Bitte warte oder brich sie zuerst ab.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="972"/>
+        <location filename="../main_window.py" line="985"/>
         <source>Analyzing...</source>
         <translation>Analysieren …</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1004"/>
+        <location filename="../main_window.py" line="1017"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Fertig: {0} analysiert, {1} Fehler</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1008"/>
+        <location filename="../main_window.py" line="1021"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Fertig: {0} Dateien analysiert</translation>
     </message>
@@ -1201,52 +1201,52 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">Abgebrochen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1183"/>
+        <location filename="../main_window.py" line="1196"/>
         <source>Conversion in Progress</source>
         <translation>Konvertierung läuft</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1184"/>
+        <location filename="../main_window.py" line="1197"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Eine Konvertierung läuft bereits. Bitte warte.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1234"/>
+        <location filename="../main_window.py" line="1247"/>
         <source>Converting...</source>
         <translation>Konvertieren …</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1250"/>
+        <location filename="../main_window.py" line="1263"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Fertig: {0} konvertiert, {1} Fehler</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1254"/>
+        <location filename="../main_window.py" line="1267"/>
         <source>Complete: {0} files converted</source>
         <translation>Fertig: {0} Dateien konvertiert</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1475"/>
+        <location filename="../main_window.py" line="1488"/>
         <source>Rename in Progress</source>
         <translation>Umbenennung läuft</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1476"/>
+        <location filename="../main_window.py" line="1489"/>
         <source>A rename operation is already running.</source>
         <translation>Ein Umbenennungsvorgang läuft bereits.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1534"/>
+        <location filename="../main_window.py" line="1547"/>
         <source>Rename Failed</source>
         <translation>Umbenennen fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1568"/>
+        <location filename="../main_window.py" line="1581"/>
         <source>Undo Rename</source>
         <translation>Umbenennen rückgängig machen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1599"/>
+        <location filename="../main_window.py" line="1612"/>
         <source>Undo Failed</source>
         <translation>Rückgängig machen fehlgeschlagen</translation>
     </message>
@@ -1259,22 +1259,22 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">{0} Dateien umbenannt</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1540"/>
+        <location filename="../main_window.py" line="1553"/>
         <source>No Session</source>
         <translation>Keine Sitzung</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1540"/>
+        <location filename="../main_window.py" line="1553"/>
         <source>No rename session to undo.</source>
         <translation>Keine Umbenennungssitzung zum Widerrufen.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1549"/>
+        <location filename="../main_window.py" line="1562"/>
         <source>Confirm Undo</source>
         <translation>Widerrufen bestätigen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1550"/>
+        <location filename="../main_window.py" line="1563"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Umbenennung von {0} Dateien widerrufen?</translation>
     </message>
@@ -1283,7 +1283,7 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">Umbenennung wird widerrufen …</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1569"/>
+        <location filename="../main_window.py" line="1582"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Widerrufen: {0} Dateien, {1} Fehler</translation>
     </message>
@@ -2849,85 +2849,85 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="188"/>
-        <location filename="../widgets/sidebar.py" line="356"/>
+        <location filename="../widgets/sidebar.py" line="209"/>
+        <location filename="../widgets/sidebar.py" line="377"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Seitenleiste einklappen</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="226"/>
+        <location filename="../widgets/sidebar.py" line="247"/>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="227"/>
+        <location filename="../widgets/sidebar.py" line="248"/>
         <source>Convert</source>
         <translation>Konvertieren</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="228"/>
+        <location filename="../widgets/sidebar.py" line="249"/>
         <source>Analyze</source>
         <translation>Analysieren</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="225"/>
+        <location filename="../widgets/sidebar.py" line="246"/>
         <source>Player</source>
         <translatorcomment>Kept &apos;Player&apos; — established loanword in German DJ/audio software (Traktor, etc.).</translatorcomment>
         <translation>Player</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="177"/>
+        <location filename="../widgets/sidebar.py" line="198"/>
         <source>Playlists</source>
         <translation>Playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="231"/>
+        <location filename="../widgets/sidebar.py" line="252"/>
         <source>Keyboard</source>
         <translatorcomment>&apos;Klaviatur&apos; (piano keyboard) rather than &apos;Tastatur&apos; (computer keyboard), matching the piano-panel context.</translatorcomment>
         <translation>Klaviatur</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="229"/>
+        <location filename="../widgets/sidebar.py" line="250"/>
         <source>Metadata</source>
         <translation>Metadaten</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="230"/>
+        <location filename="../widgets/sidebar.py" line="251"/>
         <source>Spectrum</source>
         <translatorcomment>&apos;Spektrum&apos; — standard German DSP term.</translatorcomment>
         <translation>Spektrum</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="281"/>
-        <location filename="../widgets/sidebar.py" line="289"/>
+        <location filename="../widgets/sidebar.py" line="302"/>
+        <location filename="../widgets/sidebar.py" line="310"/>
         <source>Settings</source>
         <translation>Einstellungen</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="293"/>
-        <location filename="../widgets/sidebar.py" line="301"/>
+        <location filename="../widgets/sidebar.py" line="314"/>
+        <location filename="../widgets/sidebar.py" line="322"/>
         <source>History</source>
         <translation>Verlauf</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="356"/>
+        <location filename="../widgets/sidebar.py" line="377"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Seitenleiste ausklappen</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="395"/>
+        <location filename="../widgets/sidebar.py" line="416"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>Playlists ausblenden und wieder die Navigationsschaltflächen zeigen</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="397"/>
+        <location filename="../widgets/sidebar.py" line="418"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>Playlists hier anstelle der Navigationsschaltflächen zeigen</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="450"/>
+        <location filename="../widgets/sidebar.py" line="503"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
