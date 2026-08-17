@@ -33,7 +33,12 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from src.analysis.keycode import render_key
+from src.analysis.keycode import (
+    KEY_TO_KEYCODE,
+    KEYCODE_TO_KEY,
+    keycode_to_open_key,
+    render_key,
+)
 from src.library import CompatibleMatch, Library
 from src.library.compatibility import (
     KEY_ADJACENT,
@@ -51,8 +56,9 @@ from .elided_label import ElidedLabel
 
 logger = logging.getLogger(__name__)
 
-# Column layout. The track column takes whatever is left, so only the audition
-# column and the three narrow ones are measured.
+# Column layout. Every column is measured: the three narrow ones from the
+# widest value they can hold, the track column from the longest name actually
+# in the list (see `_fit_track_column`).
 COL_AUDITION = 0
 COL_KEY = 1
 COL_BPM = 2
@@ -63,15 +69,35 @@ COL_TRACK = 4
 # target, narrow enough that it reads as a gutter rather than a column.
 _AUDITION_COL_WIDTH = 26
 
-# Breathing room around the widest value each narrow column can hold, on top
-# of whichever is wider — the sample or the (translated) header word. Kept
-# tight on purpose: every pixel here comes out of the track name, which is the
-# column the user is actually reading.
-_CELL_PAD = 10
-
 # Never narrower than this, whatever the fonts say — below it the track names
 # are unreadable and the splitter is just eating the playlist.
 _MIN_PANEL_WIDTH = 220
+
+# Every value the narrow columns can ever hold. The columns are **fixed**, so
+# the user cannot widen one to see what an ellipsis is hiding and cannot even
+# hover the header to find out — which makes eliding here a dead end rather
+# than a graceful degradation. The rule that follows, and it is the general
+# one for any non-resizable column over a closed set of values: size it for
+# the widest member of the set, and elision never happens at all. (The ellipsis
+# is left enabled anyway, as the visible symptom if that guarantee ever breaks
+# — silently cutting the tail instead would hide it.)
+#
+# Spelled out rather than assumed: `render_key` answers in whichever of the
+# three notations Settings is on, the setting changes without rebuilding the
+# panel, and the widest string is not the longest one — "A#m" beats "12B" in
+# this font. So all three notations go in, and the measurement takes the max.
+_KEY_SAMPLES = tuple(
+    sorted(
+        set(KEYCODE_TO_KEY)
+        | set(KEY_TO_KEYCODE)
+        | {keycode_to_open_key(code) for code in KEYCODE_TO_KEY}
+    )
+)
+# Three digits, guaranteed by `_bpm_cell` rounding the tempo for display the
+# same way every other panel does — not merely expected of the data.
+_BPM_SAMPLE = "174"
+# Energy is 1-10 by definition (`energy_detector`), so "10" is the ceiling.
+_ENERGY_SAMPLE = "10"
 
 # What the Key column's colour says about the match. The list is already in
 # this order, so the tint is a reminder rather than the only way to tell: the
@@ -83,6 +109,15 @@ _KEY_TIER_COLOURS = {
     KEY_RELATIVE: Theme.NEON_GREEN,
     KEY_ADJACENT: Theme.TEXT_PRIMARY,
 }
+
+# A half- or double-time match is real but needs saying so — 64 under a 128
+# seed otherwise looks like a query bug. It is said with a tint and a tooltip
+# rather than a "×2" suffix in the cell: the suffix is 14px wider than the
+# number, which is a third of this column and comes straight out of the track
+# name. Deliberately neither of the Key tier colours (they mean something
+# else in the row beside it) and not a warning colour either — a half-time
+# match is a good mix, just one to know about.
+_TEMPO_MARKED_COLOUR = Theme.INFO
 
 
 class CompatibleTracksPanel(QWidget):
@@ -103,6 +138,7 @@ class CompatibleTracksPanel(QWidget):
         self._seed_path: str | None = None
         self._matches: list[CompatibleMatch] = []
         self._key_notation = load_config().key_notation
+        self._fitting = False
         self._audition = AuditionPlayer(self)
         self._setup_ui()
         self._audition.started.connect(self.audition_started)
@@ -128,7 +164,20 @@ class CompatibleTracksPanel(QWidget):
         self._table.setObjectName("compatibleTable")
         self._table.setColumnCount(5)
         self._table.setHorizontalHeaderLabels(
-            ["", self.tr("Key"), self.tr("BPM"), self.tr("Energy"), self.tr("Track")]
+            [
+                "",
+                self.tr("Key"),
+                self.tr("BPM"),
+                # One letter, because the header word was three times wider
+                # than the one- or two-digit value under it and every pixel
+                # here comes out of the track name. The full word lives in the
+                # header's tooltip, which is the only place it is needed.
+                self.tr("E", "Energy column header, abbreviated"),
+                self.tr("Track"),
+            ]
+        )
+        self._table.horizontalHeaderItem(COL_ENERGY).setToolTip(
+            self.tr("Energy (1–10)")
         )
         self._table.verticalHeader().setVisible(False)
         # The order IS the ranking, so nothing here reorders or edits.
@@ -143,8 +192,17 @@ class CompatibleTracksPanel(QWidget):
         )
         self._table.doubleClicked.connect(self._on_double_clicked)
 
+        # The track name is the column the user is reading, and it is longer
+        # than any width the splitter can reasonably give it — so the table
+        # scrolls sideways rather than eliding, and the last section is sized
+        # to the longest name instead of stretching to the panel edge.
+        self._table.setWordWrap(False)
+        self._table.setHorizontalScrollMode(
+            QAbstractItemView.ScrollMode.ScrollPerPixel
+        )
+
         header = self._table.horizontalHeader()
-        header.setStretchLastSection(True)
+        header.setStretchLastSection(False)
         header.setSectionsMovable(False)
         header.setDefaultAlignment(
             Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
@@ -153,28 +211,9 @@ class CompatibleTracksPanel(QWidget):
         # is measured — without it the widths come out short (the same trap
         # the playlist's word-fit columns hit).
         header.ensurePolished()
-        fm = QFontMetrics(header.font())
-        self._narrow_widths: dict[int, int] = {}
-        # The BPM sample carries the half-time marker, because that is the
-        # widest thing the cell can hold — without it "64 ×2" rendered as
-        # "64…" in a column measured for "174.5".
-        for col, sample in (
-            (COL_KEY, "10A"),
-            (COL_BPM, "174.5 ×2"),
-            (COL_ENERGY, "10"),
-        ):
-            # The header word is measured with sectionSizeHint, NOT with font
-            # metrics: this is a plain QHeaderView, so the *style* draws the
-            # label and adds the stylesheet's section padding and bold weight,
-            # neither of which reaches header.font(). Measuring by hand here
-            # clipped "Energy" to "Energ" under the real stylesheet — the same
-            # trap the Analyze header hit (CLAUDE.md).
-            width = max(
-                header.sectionSizeHint(col),
-                fm.horizontalAdvance(sample) + _CELL_PAD,
-            )
-            self._narrow_widths[col] = width
-            self._table.setColumnWidth(col, self._narrow_widths[col])
+        self._narrow_widths = self._measure_narrow_columns()
+        for col, width in self._narrow_widths.items():
+            self._table.setColumnWidth(col, width)
             header.setSectionResizeMode(col, QHeaderView.ResizeMode.Fixed)
 
         # The audition gutter: fixed, unlabelled, and painted by a delegate —
@@ -186,6 +225,7 @@ class CompatibleTracksPanel(QWidget):
         self._audition_delegate = _AuditionDelegate(self._table)
         self._table.setItemDelegateForColumn(COL_AUDITION, self._audition_delegate)
         self._table.drag_paths = self._selected_paths
+        self._table.viewport_resized.connect(self._fit_track_column)
         self._table.icon_clicked.connect(self._on_audition_clicked)
         self._table.icon_hover_changed.connect(self._on_icon_hover)
         self._table.row_hover_changed.connect(self._on_row_hover)
@@ -205,6 +245,47 @@ class CompatibleTracksPanel(QWidget):
         layout.addWidget(self._message_label, 1)
 
         self.setMinimumWidth(self.minimum_useful_width())
+
+    def _measure_narrow_columns(self) -> dict[int, int]:
+        """Width for each fixed column: its widest value, or its header word.
+
+        Measured by putting every possible value into the table and asking
+        `resizeColumnToContents`, then emptying it again — **not** by adding a
+        padding constant to a `QFontMetrics` advance. The distinction is the
+        whole point of this method:
+
+        `resizeColumnToContents` runs the same `QStyle` code that lays the cell
+        out at paint time (`sizeFromContents(CT_ItemViewItem)`), so whatever
+        that style reserves around the text is included by construction. A
+        hand-written pad cannot be, because the reservation is a **property of
+        the platform style, not of this app**: `PM_FocusFrameHMargin` is 2 on
+        Fusion and 4 on the macOS style, and the GUI suite runs offscreen —
+        which is *Fusion*. So a pad measured green in the tests was ~8px short
+        on the machine the app actually runs on, and every key code rendered
+        as "1…". The same constant would be wrong again on Windows.
+
+        It also folds in the header word for free: `resizeColumnToContents`
+        takes the larger of the contents hint and `sectionSizeHint`, which is
+        the only honest way to measure a *header* here — the style draws that
+        label with the stylesheet's section padding and bold weight, neither of
+        which reaches `header.font()` (CLAUDE.md, the Analyze header).
+        """
+        samples = {
+            COL_KEY: _KEY_SAMPLES,
+            COL_BPM: (_BPM_SAMPLE,),
+            COL_ENERGY: (_ENERGY_SAMPLE,),
+        }
+        rows = max(len(values) for values in samples.values())
+        self._table.setRowCount(rows)
+        for col, values in samples.items():
+            for row in range(rows):
+                self._table.setItem(row, col, QTableWidgetItem(values[row % len(values)]))
+        widths = {}
+        for col in samples:
+            self._table.resizeColumnToContents(col)
+            widths[col] = self._table.columnWidth(col)
+        self._table.setRowCount(0)
+        return widths
 
     # ── Wiring ──────────────────────────────────────────────────
 
@@ -306,12 +387,60 @@ class CompatibleTracksPanel(QWidget):
             self._set_cell(row, COL_AUDITION, "", self._audition_tooltip())
             key = render_key(track.key or "", track.keycode or "", self._key_notation)
             self._set_cell(
-                row, COL_KEY, key, tooltip=_key_tooltip(match), colour=match.key_relation
+                row,
+                COL_KEY,
+                key,
+                tooltip=_key_tooltip(match),
+                colour=_KEY_TIER_COLOURS.get(match.key_relation, ""),
             )
-            self._set_cell(row, COL_BPM, *_bpm_text(match))
+            self._set_cell(row, COL_BPM, *_bpm_cell(match))
             energy = "" if track.energy is None else str(track.energy)
             self._set_cell(row, COL_ENERGY, energy)
             self._set_cell(row, COL_TRACK, _display_name(track), track.path)
+        self._fit_track_column()
+
+    def _fit_track_column(self) -> None:
+        """Size the track column to the longest name, but never leave a gap.
+
+        Two rules, and the *larger* of them wins:
+
+        1. The longest name in the current result. `resizeColumnToContents`
+           rather than font metrics of our own — it takes the larger of the
+           delegate's hint and the header's own section hint, which is what
+           accounts for the stylesheet's item padding (the same reason the
+           narrow columns are measured with `sectionSizeHint`). Re-measured on
+           every fill rather than nudged upwards, so a shorter list gives the
+           width back.
+        2. Whatever is left of the viewport. This is the half that replaces
+           `setStretchLastSection`, and it is not cosmetic: without it a list
+           of short names ends partway across the panel and the rows and the
+           header band simply stop, with bare background to the right of them.
+
+        So a long name overflows and the table scrolls to it, and a short one
+        still reaches the edge.
+
+        Re-entrancy guard because rule 2 reads the viewport and rule 1 can
+        change it: setting a width wide enough to need a horizontal scrollbar
+        is itself a viewport resize, which is what calls this.
+        """
+        if self._fitting:
+            return
+        self._fitting = True
+        try:
+            self._fit_track_column_once()
+        finally:
+            self._fitting = False
+
+    def _fit_track_column_once(self) -> None:
+        """The body of `_fit_track_column`; call that, not this."""
+        self._table.resizeColumnToContents(COL_TRACK)
+        others = sum(
+            self._table.columnWidth(col)
+            for col in (COL_AUDITION, COL_KEY, COL_BPM, COL_ENERGY)
+        )
+        remaining = self._table.viewport().width() - others
+        if remaining > self._table.columnWidth(COL_TRACK):
+            self._table.setColumnWidth(COL_TRACK, remaining)
 
     def _set_cell(
         self, row: int, col: int, text: str, tooltip: str = "", colour: str = ""
@@ -320,12 +449,12 @@ class CompatibleTracksPanel(QWidget):
         item.setFlags(Qt.ItemFlag.ItemIsEnabled | Qt.ItemFlag.ItemIsSelectable)
         if tooltip:
             item.setToolTip(tooltip)
-        if colour in _KEY_TIER_COLOURS:
+        if colour:
             # ForegroundRole, not a background brush: the stylesheet's
             # `QTableView::item` rule makes Qt paint item *backgrounds* itself
             # and ignore the model's brush, but the text colour still comes
             # through — the same way the playlist marks its playing row.
-            item.setForeground(QColor(_KEY_TIER_COLOURS[colour]))
+            item.setForeground(QColor(colour))
         self._table.setItem(row, col, item)
 
     # ── Interaction ─────────────────────────────────────────────
@@ -461,6 +590,12 @@ class _AuditionTable(QTableWidget):
     icon_hover_changed = Signal(int)
     # Row under the pointer at all, -1 for none.
     row_hover_changed = Signal(int)
+    # The viewport changed width, so the track column's fill needs recomputing.
+    # Emitted from here rather than from the panel's own `resizeEvent` because
+    # a parent is resized *before* the layout has resized its children: reading
+    # `table.viewport().width()` there returns the previous width, which left
+    # the track column sized for a panel 300px wider than the one on screen.
+    viewport_resized = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -490,6 +625,10 @@ class _AuditionTable(QTableWidget):
         drag.setMimeData(mime)
         drag.setPixmap(blank_drag_pixmap())
         drag.exec(Qt.DropAction.CopyAction)
+
+    def resizeEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        super().resizeEvent(event)
+        self.viewport_resized.emit()
 
     def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt override)
         pos = event.position().toPoint()
@@ -623,22 +762,38 @@ def _display_name(track) -> str:
     return title or artist or track.filename
 
 
-def _bpm_text(match: CompatibleMatch) -> tuple[str, str]:
-    """(cell text, tooltip) for a match's tempo.
+def _bpm_cell(match: CompatibleMatch) -> tuple[str, str, str]:
+    """(cell text, tooltip, colour) for a match's tempo.
 
-    A half- or double-time match is real but needs saying so: 64 under a 128
-    seed is shown as "64 ×2" rather than looking like a query bug.
+    The text is the track's own tempo and nothing else — the column is sized
+    for three digits. What marks a half- or double-time match is the colour
+    plus the tooltip; see `_TEMPO_MARKED_COLOUR`.
+
+    Rounded to a whole number, which is what makes "three digits" a property
+    of the column rather than a hope about the data: the library stores BPM as
+    a REAL, so a hand-edited or imported "128.5" would otherwise be the one
+    value the column cannot show. It is also what every other panel displays
+    (`int(round(...))` in the Player, the renamer and the tag writer), so this
+    was the odd one out.
     """
     bpm = match.track.bpm
     if not bpm:
-        return "", ""
-    text = f"{bpm:g}"
+        return "", "", ""
+    text = str(int(round(bpm)))
     if match.tempo_relation == TEMPO_HALF:
-        return f"{text} ×2", QCoreApplication.translate(
-            "CompatibleTracksPanel", "Half-time — mixes at double this tempo"
+        return (
+            text,
+            QCoreApplication.translate(
+                "CompatibleTracksPanel", "Half-time — mixes at double this tempo"
+            ),
+            _TEMPO_MARKED_COLOUR,
         )
     if match.tempo_relation == TEMPO_DOUBLE:
-        return f"{text} ÷2", QCoreApplication.translate(
-            "CompatibleTracksPanel", "Double-time — mixes at half this tempo"
+        return (
+            text,
+            QCoreApplication.translate(
+                "CompatibleTracksPanel", "Double-time — mixes at half this tempo"
+            ),
+            _TEMPO_MARKED_COLOUR,
         )
-    return text, ""
+    return text, "", ""

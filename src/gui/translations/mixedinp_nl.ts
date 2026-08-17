@@ -388,92 +388,103 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>CompatibleTracksPanel</name>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="158"/>
         <source>Key</source>
         <translation>Toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="159"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
         <source>Energy</source>
-        <translation>Energie</translation>
+        <translation type="vanished">Energie</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="164"/>
+        <source>E</source>
+        <comment>Energy column header, abbreviated</comment>
+        <translatorcomment>Afkorting van ‘Energie’ — de kolom is net zo breed als de waarde (1–10).</translatorcomment>
+        <translation>E</translation>
+    </message>
+    <message>
+        <location filename="../widgets/compatible_panel.py" line="165"/>
         <source>Track</source>
         <translation>Track</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="261"/>
+        <location filename="../widgets/compatible_panel.py" line="169"/>
+        <source>Energy (1–10)</source>
+        <translation>Energie (1–10)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/compatible_panel.py" line="311"/>
         <source>Nothing in your library mixes with this track.</source>
         <translation>Niets in je bibliotheek past bij deze track.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="269"/>
+        <location filename="../widgets/compatible_panel.py" line="319"/>
         <source>Play a track to see what mixes with it.</source>
         <translation>Speel een track af om te zien wat erbij past.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="271"/>
+        <location filename="../widgets/compatible_panel.py" line="321"/>
         <source>This track isn&apos;t in your library yet.</source>
         <translation>Deze track staat nog niet in je bibliotheek.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="273"/>
+        <location filename="../widgets/compatible_panel.py" line="323"/>
         <source>No key for this track — analyse it first.</source>
         <translation>Geen toonsoort voor deze track — analyseer hem eerst.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="287"/>
+        <location filename="../widgets/compatible_panel.py" line="337"/>
         <source>Compatible with {0}</source>
         <translation>Past bij {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="296"/>
+        <location filename="../widgets/compatible_panel.py" line="346"/>
         <source>{0} track</source>
         <translation>{0} track</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="296"/>
+        <location filename="../widgets/compatible_panel.py" line="346"/>
         <source>{0} tracks</source>
         <translation>{0} tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="299"/>
+        <location filename="../widgets/compatible_panel.py" line="349"/>
         <source>Compatible with {0} · {1}</source>
         <translation>Past bij {0} · {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="353"/>
+        <location filename="../widgets/compatible_panel.py" line="420"/>
         <source>Click to preview — hold the pointer here to keep playing</source>
         <translation>Klik om voor te beluisteren — houd de muis hier om door te spelen</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="607"/>
+        <location filename="../widgets/compatible_panel.py" line="674"/>
         <source>Same key</source>
         <translation>Zelfde toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="608"/>
+        <location filename="../widgets/compatible_panel.py" line="675"/>
         <source>Relative major/minor</source>
         <translation>Parallelle majeur/mineur</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="611"/>
+        <location filename="../widgets/compatible_panel.py" line="678"/>
         <source>One step around the wheel</source>
         <translation>Eén stap op het wiel</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="637"/>
+        <location filename="../widgets/compatible_panel.py" line="707"/>
         <source>Half-time — mixes at double this tempo</source>
         <translation>Half-time — mixt op het dubbele tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="641"/>
+        <location filename="../widgets/compatible_panel.py" line="715"/>
         <source>Double-time — mixes at half this tempo</source>
         <translation>Double-time — mixt op het halve tempo</translation>
     </message>

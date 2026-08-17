@@ -397,92 +397,103 @@ lub kliknij „Dodaj okładkę…”</translation>
 <context>
     <name>CompatibleTracksPanel</name>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="158"/>
         <source>Key</source>
         <translation>Tonacja</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="159"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
         <source>Energy</source>
-        <translation>Energia</translation>
+        <translation type="vanished">Energia</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="164"/>
+        <source>E</source>
+        <comment>Energy column header, abbreviated</comment>
+        <translatorcomment>Skrót od „Energia” — kolumna jest szeroka na tyle, ile wartość (1–10).</translatorcomment>
+        <translation>E</translation>
+    </message>
+    <message>
+        <location filename="../widgets/compatible_panel.py" line="165"/>
         <source>Track</source>
         <translation>Utwór</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="261"/>
+        <location filename="../widgets/compatible_panel.py" line="169"/>
+        <source>Energy (1–10)</source>
+        <translation>Energia (1–10)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/compatible_panel.py" line="311"/>
         <source>Nothing in your library mixes with this track.</source>
         <translation>Nic w bibliotece nie pasuje do tego utworu.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="269"/>
+        <location filename="../widgets/compatible_panel.py" line="319"/>
         <source>Play a track to see what mixes with it.</source>
         <translation>Odtwórz utwór, aby zobaczyć, co do niego pasuje.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="271"/>
+        <location filename="../widgets/compatible_panel.py" line="321"/>
         <source>This track isn&apos;t in your library yet.</source>
         <translation>Tego utworu nie ma jeszcze w bibliotece.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="273"/>
+        <location filename="../widgets/compatible_panel.py" line="323"/>
         <source>No key for this track — analyse it first.</source>
         <translation>Brak tonacji dla tego utworu — najpierw go przeanalizuj.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="287"/>
+        <location filename="../widgets/compatible_panel.py" line="337"/>
         <source>Compatible with {0}</source>
         <translation>Pasuje do {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="296"/>
+        <location filename="../widgets/compatible_panel.py" line="346"/>
         <source>{0} track</source>
         <translation>{0} utwór</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="296"/>
+        <location filename="../widgets/compatible_panel.py" line="346"/>
         <source>{0} tracks</source>
         <translation>{0} utwory</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="299"/>
+        <location filename="../widgets/compatible_panel.py" line="349"/>
         <source>Compatible with {0} · {1}</source>
         <translation>Pasuje do {0} · {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="353"/>
+        <location filename="../widgets/compatible_panel.py" line="420"/>
         <source>Click to preview — hold the pointer here to keep playing</source>
         <translation>Kliknij, aby odsłuchać — trzymaj tu kursor, aby grało dalej</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="607"/>
+        <location filename="../widgets/compatible_panel.py" line="674"/>
         <source>Same key</source>
         <translation>Ta sama tonacja</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="608"/>
+        <location filename="../widgets/compatible_panel.py" line="675"/>
         <source>Relative major/minor</source>
         <translation>Tonacja równoległa (dur/moll)</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="611"/>
+        <location filename="../widgets/compatible_panel.py" line="678"/>
         <source>One step around the wheel</source>
         <translation>Jeden krok po kole</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="637"/>
+        <location filename="../widgets/compatible_panel.py" line="707"/>
         <source>Half-time — mixes at double this tempo</source>
         <translation>Half-time — miksuje się w podwójnym tempie</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="641"/>
+        <location filename="../widgets/compatible_panel.py" line="715"/>
         <source>Double-time — mixes at half this tempo</source>
         <translation>Double-time — miksuje się w połowie tempa</translation>
     </message>

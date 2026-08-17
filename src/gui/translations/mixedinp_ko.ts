@@ -357,92 +357,103 @@ or click “Add Artwork…”</source>
 <context>
     <name>CompatibleTracksPanel</name>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="158"/>
         <source>Key</source>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="159"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
         <source>Energy</source>
-        <translation>에너지</translation>
+        <translation type="vanished">에너지</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="131"/>
+        <location filename="../widgets/compatible_panel.py" line="164"/>
+        <source>E</source>
+        <comment>Energy column header, abbreviated</comment>
+        <translatorcomment>“에너지”의 약어. 한 글자로 줄일 자연스러운 형태가 없어 라틴 문자 E를 사용.</translatorcomment>
+        <translation>E</translation>
+    </message>
+    <message>
+        <location filename="../widgets/compatible_panel.py" line="165"/>
         <source>Track</source>
         <translation>트랙</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="261"/>
+        <location filename="../widgets/compatible_panel.py" line="169"/>
+        <source>Energy (1–10)</source>
+        <translation>에너지 (1–10)</translation>
+    </message>
+    <message>
+        <location filename="../widgets/compatible_panel.py" line="311"/>
         <source>Nothing in your library mixes with this track.</source>
         <translation>라이브러리에 이 트랙과 어울리는 곡이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="269"/>
+        <location filename="../widgets/compatible_panel.py" line="319"/>
         <source>Play a track to see what mixes with it.</source>
         <translation>트랙을 재생하면 어울리는 곡이 표시됩니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="271"/>
+        <location filename="../widgets/compatible_panel.py" line="321"/>
         <source>This track isn&apos;t in your library yet.</source>
         <translation>이 트랙은 아직 라이브러리에 없습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="273"/>
+        <location filename="../widgets/compatible_panel.py" line="323"/>
         <source>No key for this track — analyse it first.</source>
         <translation>이 트랙의 키가 없습니다 — 먼저 분석하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="287"/>
+        <location filename="../widgets/compatible_panel.py" line="337"/>
         <source>Compatible with {0}</source>
         <translation>{0}와 어울리는 트랙</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="296"/>
+        <location filename="../widgets/compatible_panel.py" line="346"/>
         <source>{0} track</source>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="296"/>
+        <location filename="../widgets/compatible_panel.py" line="346"/>
         <source>{0} tracks</source>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="299"/>
+        <location filename="../widgets/compatible_panel.py" line="349"/>
         <source>Compatible with {0} · {1}</source>
         <translation>{0}와 어울리는 트랙 · {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="353"/>
+        <location filename="../widgets/compatible_panel.py" line="420"/>
         <source>Click to preview — hold the pointer here to keep playing</source>
         <translation>클릭하면 미리듣기 — 포인터를 여기에 두면 계속 재생</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="607"/>
+        <location filename="../widgets/compatible_panel.py" line="674"/>
         <source>Same key</source>
         <translation>같은 키</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="608"/>
+        <location filename="../widgets/compatible_panel.py" line="675"/>
         <source>Relative major/minor</source>
         <translation>나란한조(장/단조)</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="611"/>
+        <location filename="../widgets/compatible_panel.py" line="678"/>
         <source>One step around the wheel</source>
         <translation>휠에서 한 칸 옆</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="637"/>
+        <location filename="../widgets/compatible_panel.py" line="707"/>
         <source>Half-time — mixes at double this tempo</source>
         <translation>하프타임 — 이 템포의 두 배로 믹스</translation>
     </message>
     <message>
-        <location filename="../widgets/compatible_panel.py" line="641"/>
+        <location filename="../widgets/compatible_panel.py" line="715"/>
         <source>Double-time — mixes at half this tempo</source>
         <translation>더블타임 — 이 템포의 절반으로 믹스</translation>
     </message>

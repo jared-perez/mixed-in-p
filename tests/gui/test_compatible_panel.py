@@ -15,8 +15,14 @@ asks for *some* room, and the window minimum grows by it only while open.
 from __future__ import annotations
 
 import pytest
+from PySide6.QtGui import QColor
+from PySide6.QtWidgets import QTableWidgetItem
 
+from src.analysis.keycode import KEY_TO_KEYCODE, KEYCODE_TO_KEY, render_key
 from src.gui.widgets.compatible_panel import (
+    _BPM_SAMPLE,
+    _ENERGY_SAMPLE,
+    _KEY_SAMPLES,
     COL_AUDITION,
     COL_BPM,
     COL_ENERGY,
@@ -163,12 +169,165 @@ class TestTableContents:
         assert table.item(0, COL_TRACK).text() == "Aphex – Xtal"
 
     def test_a_half_time_match_is_marked_not_silently_listed(self, player, lib, tmp_path):
+        """64 under a 128 seed must not read as a query bug.
+
+        The mark is a tint and a tooltip rather than a "×2" beside the number:
+        that suffix was a third of the column's width, and the column is sized
+        for three digits so the track name gets the room. What the test can
+        assert here is the foreground the model carries — unlike a *background*
+        brush, which the stylesheet's `::item` rule would silently discard.
+        """
         add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
         add_track(player, lib, tmp_path, "halved.wav", key="8A", bpm=64.0)
         player._play_track(0)
         cell = player._compat_panel._table.item(0, COL_BPM)
-        assert cell.text() == "64 ×2"
+        assert cell.text() == "64"
         assert "Half-time" in cell.toolTip()
+        assert cell.foreground().color() == QColor(Theme.INFO)
+
+    def test_an_ordinary_tempo_is_left_untinted(self, player, lib, tmp_path):
+        """The tint has to mean something, so a 1:1 match must not carry it."""
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        add_track(player, lib, tmp_path, "match.wav", key="8A", bpm=128.0)
+        player._play_track(0)
+        cell = player._compat_panel._table.item(0, COL_BPM)
+        assert cell.toolTip() == ""
+        assert cell.foreground().color() != QColor(Theme.INFO)
+
+    def test_the_track_column_is_sized_to_the_longest_name(
+        self, player, lib, tmp_path
+    ):
+        """The track column ends at the longest name, and the table scrolls.
+
+        Deliberately *not* the last-section stretch every other table here
+        uses: a stretched column ends at the panel edge, so a long name is
+        elided and the only way to read it is to drag the splitter and take
+        the room off the playlist. Ending at the content instead means the
+        panel scrolls sideways to reach it.
+
+        Asserted as a comparison, never as a pixel count — the GUI suite runs
+        with no application stylesheet, so an absolute width measured here is
+        a width the running app never has (see the module docstring).
+        """
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        add_track(
+            player, lib, tmp_path, "short.wav", key="8A", bpm=128.0,
+            artist="A", title="B",
+        )
+        player._play_track(0)
+        panel = player._compat_panel
+        assert panel._table.horizontalHeader().stretchLastSection() is False
+        short = panel._table.columnWidth(COL_TRACK)
+
+        # Emphatically longer than the table's own width, so this asserts the
+        # name rule and not the fill-the-viewport one. Narrowing the table
+        # here instead does not work and looks like it does: `refresh` toggles
+        # the table's visibility, which re-activates the panel's layout and
+        # puts the width straight back.
+        add_track(
+            player, lib, tmp_path, "long.wav", key="8A", bpm=128.0,
+            artist="Jensen Interceptor & Assembler Code",
+            title="Body Music " + "(Extended Club Mix) " * 8,
+        )
+        panel.refresh()
+        grown = panel._table.columnWidth(COL_TRACK)
+        assert grown > short
+
+        # And it gives the width back: re-measured on every fill rather than
+        # nudged upwards, or one long name widens the column for good. Retagged
+        # straight on the library row rather than through the Player, because
+        # this asserts what the *panel* does with a shorter result — and the
+        # panel reads the library, not the playlist.
+        # Retagged to exactly the other row's name, so the expected width is
+        # the earlier measurement itself rather than a tolerance — glyphs are
+        # not the same width, and "A – C" came back 1px off "A – B".
+        lib.add_track(str(tmp_path / "long.wav"), artist="A", title="B")
+        panel.refresh()
+        assert panel._table.columnWidth(COL_TRACK) == short
+
+    def test_a_short_list_still_reaches_the_panel_edge(self, player, lib, tmp_path):
+        """Sizing to the content must not leave a ragged edge.
+
+        The other half of dropping `stretchLastSection`: with only rule 1, a
+        list of short names ends partway across and the rows and the header
+        band simply stop, with bare background beside them. So the column is
+        also never narrower than what is left of the viewport.
+        """
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        add_track(
+            player, lib, tmp_path, "short.wav", key="8A", bpm=128.0,
+            artist="A", title="B",
+        )
+        player._play_track(0)
+        table = player._compat_panel._table
+        table.resize(600, 200)
+        used = sum(table.columnWidth(c) for c in range(table.columnCount()))
+        assert used >= table.viewport().width()
+
+    def test_no_fixed_column_can_elide_any_value_it_can_hold(self, player):
+        """The fixed columns must fit their whole domain, on any platform.
+
+        They cannot be resized, so an ellipsis there hides a value with no way
+        for the user to get it back — the column has to be wide enough for the
+        widest member of a closed set, full stop.
+
+        Asserted against `sizeHintForColumn`, which is the same quantity
+        `resizeColumnToContents` uses and therefore includes whatever the
+        active QStyle reserves around the text. That matters more than it
+        looks: this suite runs offscreen, which is **Fusion**, while the app
+        on this machine runs the **macOS** style, whose `PM_FocusFrameHMargin`
+        is twice Fusion's. A width that was measured against a hand-written
+        padding constant passed here and clipped every key code to "1…" in the
+        running app; the same constant would be wrong again on Windows. This
+        assertion compares two numbers the style supplies, so it travels.
+        """
+        panel = player._compat_panel
+        table = panel._table
+        domain = {
+            COL_KEY: _KEY_SAMPLES,
+            COL_BPM: (_BPM_SAMPLE,),
+            COL_ENERGY: (_ENERGY_SAMPLE,),
+        }
+        for col, values in domain.items():
+            table.setRowCount(len(values))
+            for row, value in enumerate(values):
+                table.setItem(row, col, QTableWidgetItem(value))
+            assert table.sizeHintForColumn(col) <= table.columnWidth(col), (
+                f"column {col} is narrower than its widest value"
+            )
+            table.setRowCount(0)
+
+    def test_the_key_samples_really_are_every_key_the_panel_renders(self):
+        """The domain above is only a guarantee if it is the whole domain.
+
+        `render_key` answers in one of three notations and the setting can
+        change while the panel is alive, so all three have to be in the
+        measurement — a sample list covering only key codes would be provably
+        wide enough for a case the user can switch away from.
+        """
+        rendered = {
+            render_key(key, keycode, notation)
+            for keycode, key in KEYCODE_TO_KEY.items()
+            for notation in ("keycode", "traditional", "open_key")
+        } | {
+            render_key(key, keycode, "traditional")
+            for key, keycode in KEY_TO_KEYCODE.items()
+        }
+        assert rendered <= set(_KEY_SAMPLES)
+
+    def test_a_fractional_tempo_is_rounded_rather_than_clipped(
+        self, player, lib, tmp_path
+    ):
+        """Three digits is a property of the column, not a hope about the data.
+
+        The library stores BPM as a REAL, so a hand-edited or imported "128.4"
+        is reachable — and it is the one value a column sized for three digits
+        could not show. Rounded for display, as every other panel does.
+        """
+        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+        add_track(player, lib, tmp_path, "frac.wav", key="8A", bpm=128.4)
+        player._play_track(0)
+        assert player._compat_panel._table.item(0, COL_BPM).text() == "128"
 
     def test_the_key_column_follows_the_notation_setting(self, player, lib, tmp_path):
         """A track tagged "Am" reads as 8A under the default notation and as
