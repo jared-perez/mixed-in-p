@@ -1,9 +1,17 @@
 """Collapsible slice section for the Player panel.
 
-A lazily-built, collapsed-by-default expander that turns the player's loaded
-track into a slicer: a full-track waveform (which doubles as the seek control
-while open), a zoomed scrubber, draggable start/end markers, length/nudge
-controls, an A-B loop toggle, and slice export.
+Two lazily-built, collapsed-by-default views behind a pair of header toggles:
+
+- **Waveform** — the full-track waveform, which doubles as the seek control
+  while it is shown (click or drag anywhere on it to move playback) and carries
+  the draggable start/end markers.
+- **Loop Slicer** — the zoomed ±0.5 s scrubber and every slice control: typed
+  and nudged marker times, Mark-at-playhead, length, the A-B loop toggle, and
+  slice export.
+
+They are independent: either alone, both together (the full working slicer), or
+neither. Marker *dragging* lives on the full waveform, so the Slicer on its own
+sets markers by Mark/nudge/typing.
 
 It owns no audio device — it drives the player's single :class:`PlayerEngine`
 (loop bounds, seek, mark-from-position). Nothing is decoded or shown until the
@@ -45,8 +53,13 @@ logger = logging.getLogger(__name__)
 class SliceSection(QWidget):
     """Collapsible slicer that operates on the player's currently-loaded track."""
 
-    # Tell the panel to swap the seek control and, on first open, supply a waveform.
+    # Slice tray opened/closed — drives the window sizer's minimum width and the
+    # panel's S/Q/E/L key routing.
     expanded_changed = Signal(bool)
+    # Full-track waveform shown/hidden — the panel hides its own seek slider
+    # while it is up, since the waveform is then the seek control.
+    waveform_shown_changed = Signal(bool)
+    # Either view opened without a waveform in hand — panel supplies one.
     request_waveform = Signal()
     # User moved the playhead on the waveform — panel forwards to engine.seek_ms.
     seek_requested = Signal(int)
@@ -59,6 +72,7 @@ class SliceSection(QWidget):
         self._show_hours: bool = False
         self._custom_save_dir: str | None = None
         self._expanded: bool = False
+        self._waveform_shown: bool = False
         self._waveform_loaded: bool = False
 
         self._setup_ui()
@@ -68,8 +82,10 @@ class SliceSection(QWidget):
         for btn in self.findChildren(QAbstractButton):
             btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
+        self._set_waveform_visible(False)
         self._set_body_visible(False)
-        self._header_btn.setEnabled(False)
+        self._waveform_btn.setEnabled(False)
+        self._slicer_btn.setEnabled(False)
 
     # ------------------------------------------------------------------ UI
 
@@ -89,26 +105,24 @@ class SliceSection(QWidget):
             "#sliceTray QLabel { background-color: transparent; }"
         )
 
-        # Header toggle
-        self._header_btn = QPushButton(self.tr("▸  Waveform Loop Slicer"))
-        self._header_btn.setCheckable(True)
-        self._header_btn.setStyleSheet(
-            f"text-align: left; font-weight: bold; color: {Theme.ACCENT_TEXT};"
-            " padding: 0px; border: none;"
-        )
-        # Shrink the bar to just the text height (+1px) so it stops hogging
-        # vertical space; the default button padding made it far too tall.
-        # Bump the point size a couple steps so the header reads clearly.
-        _header_font = self._header_btn.font()
-        _header_font.setBold(True)
-        _header_font.setPointSize(_header_font.pointSize() + 2)
-        self._header_btn.setFont(_header_font)
-        self._header_btn.setFixedHeight(QFontMetrics(_header_font).height() + 1)
-        self._header_btn.toggled.connect(self._on_toggle)
-        layout.addWidget(self._header_btn)
+        # Header toggles — two independent views, side by side.
+        self._waveform_btn = self._header_button(self.tr("Waveform"))
+        self._waveform_btn.toggled.connect(self._on_waveform_toggle)
+        self._slicer_btn = self._header_button(self.tr("Loop Slicer"))
+        self._slicer_btn.toggled.connect(self._on_toggle)
+
+        header_row = QHBoxLayout()
+        header_row.setContentsMargins(0, 0, 0, 0)
+        # Wider than Theme.SPACING on purpose: two accent-coloured bold words a
+        # normal gap apart read as one phrase rather than as two buttons.
+        header_row.setSpacing(24)
+        header_row.addWidget(self._waveform_btn)
+        header_row.addWidget(self._slicer_btn)
+        header_row.addStretch(1)
+        layout.addLayout(header_row)
 
         # Full-track waveform — on the player grey, above the dark tray. Also the
-        # seek control while expanded.
+        # seek control while shown.
         self._waveform = WaveformCanvas()
         layout.addWidget(self._waveform)
         # Aliases so the ported handlers read naturally.
@@ -315,6 +329,48 @@ class SliceSection(QWidget):
         self._length_dec_btn.clicked.connect(lambda: self._nudge_length(-10))
         self._length_inc_btn.clicked.connect(lambda: self._nudge_length(10))
 
+    # Disclosure arrows. Kept out of the translatable strings — they are
+    # punctuation, not words, and doubling every header string to carry them
+    # doubles the translation work for nothing.
+    _ARROW_CLOSED = "▸"
+    _ARROW_OPEN = "▾"
+
+    def _header_button(self, label: str) -> QPushButton:
+        """A borderless accent-text disclosure toggle sized to its own label."""
+        btn = QPushButton(f"{self._ARROW_CLOSED}  {label}")
+        btn.setCheckable(True)
+        btn.setProperty("headerLabel", label)
+        btn.setStyleSheet(
+            f"text-align: left; font-weight: bold; color: {Theme.ACCENT_TEXT};"
+            " padding: 0px; border: none;"
+        )
+        # Derived from the button's own font, not the section's: a style is free
+        # to give QPushButton a different default from a plain QWidget's, and
+        # the width below is only honest if it measures what actually paints.
+        # Bump the point size a couple steps so the headers read clearly.
+        font = btn.font()
+        font.setBold(True)
+        font.setPointSize(font.pointSize() + 2)
+        btn.setFont(font)
+        fm = QFontMetrics(font)
+        # Size from font metrics, not sizeHint: a QPushButton *centres* rather
+        # than elides, so a width that's short by a few pixels cuts the label at
+        # both ends with nothing to show it happened. Width the wider arrow so
+        # the label neither shifts nor clips when the view is opened.
+        arrow_w = max(
+            fm.horizontalAdvance(self._ARROW_CLOSED),
+            fm.horizontalAdvance(self._ARROW_OPEN),
+        )
+        btn.setFixedWidth(arrow_w + fm.horizontalAdvance(f"  {label}") + 8)
+        # Shrink the bar to just the text height (+1px) so it stops hogging
+        # vertical space; the default button padding made it far too tall.
+        btn.setFixedHeight(fm.height() + 1)
+        return btn
+
+    def _sync_header_arrow(self, btn: QPushButton, open_: bool) -> None:
+        arrow = self._ARROW_OPEN if open_ else self._ARROW_CLOSED
+        btn.setText(f"{arrow}  {btn.property('headerLabel')}")
+
     @staticmethod
     def _nudge_button(style: str, text: str) -> QPushButton:
         btn = QPushButton(text)
@@ -324,18 +380,38 @@ class SliceSection(QWidget):
         btn.setAutoRepeatDelay(400)
         return btn
 
-    def _set_body_visible(self, visible: bool) -> None:
-        # The full waveform now lives outside the tray, so toggle it too.
+    def _set_waveform_visible(self, visible: bool) -> None:
+        """Show/hide the full-track waveform (its own view, not the tray's)."""
         self._waveform.setVisible(visible)
+        self._sync_header_arrow(self._waveform_btn, visible)
+        self._waveform_btn.setToolTip(
+            self.tr("Hide the full-track waveform")
+            if visible
+            else self.tr("Show the full-track waveform — click it to move playback")
+        )
+
+    def _set_body_visible(self, visible: bool) -> None:
         self._body.setVisible(visible)
-        self._header_btn.setText(
-            self.tr("▾  Waveform Loop Slicer") if visible else self.tr("▸  Waveform Loop Slicer")
+        self._sync_header_arrow(self._slicer_btn, visible)
+        self._slicer_btn.setToolTip(
+            self.tr("Hide the zoomed waveform and slice controls")
+            if visible
+            else self.tr("Show the zoomed waveform and slice controls")
         )
 
     # ------------------------------------------------------------ public API
 
     def is_expanded(self) -> bool:
+        """True while the slice tray (zoomed waveform + controls) is open."""
         return self._expanded
+
+    def is_waveform_shown(self) -> bool:
+        """True while the full-track waveform is up — it is then the seek control."""
+        return self._waveform_shown
+
+    def is_open(self) -> bool:
+        """True while either view is up, i.e. while a waveform is worth building."""
+        return self._expanded or self._waveform_shown
 
     def time_row_min_width(self) -> int:
         """Width needed to show the time-info + Mark-buttons row pushed together.
@@ -348,17 +424,21 @@ class SliceSection(QWidget):
     def set_track(self, file_path: str | None, duration_ms: int) -> None:
         """Point the section at the player's current track (or clear it)."""
         if file_path is None:
-            # Track unloaded — collapse, free, disable.
+            # Track unloaded — collapse both views, free, disable.
             if self._expanded:
-                self._header_btn.setChecked(False)  # triggers _on_toggle(False)
+                self._slicer_btn.setChecked(False)  # triggers _on_toggle(False)
+            if self._waveform_shown:
+                self._waveform_btn.setChecked(False)  # -> _on_waveform_toggle(False)
             self._file_path = None
             self._duration_ms = 0
             self._waveform_loaded = False
-            self._header_btn.setEnabled(False)
+            self._waveform_btn.setEnabled(False)
+            self._slicer_btn.setEnabled(False)
             self.free_waveform()
             return
 
-        self._header_btn.setEnabled(True)
+        self._waveform_btn.setEnabled(True)
+        self._slicer_btn.setEnabled(True)
         new_track = file_path != self._file_path
         self._file_path = file_path
         self._duration_ms = max(0, duration_ms)
@@ -392,9 +472,9 @@ class SliceSection(QWidget):
             self._format_combo.setCurrentIndex(idx)
         self._location_label.setText("")
 
-        # If we're open on a new track, build its waveform now; if closed, it
-        # builds on the next expand.
-        if new_track and self._expanded:
+        # If a view is open on a new track, build its waveform now; if both are
+        # closed, it builds on the next expand.
+        if new_track and self.is_open():
             self.request_waveform.emit()
 
     def set_waveform(self, coarse_min, coarse_max, detail_min, detail_max, bins_per_sec) -> None:
@@ -468,15 +548,26 @@ class SliceSection(QWidget):
 
     # ------------------------------------------------------------- toggling
 
+    def _on_waveform_toggle(self, checked: bool) -> None:
+        self._waveform_shown = checked
+        self._set_waveform_visible(checked)
+        self.waveform_shown_changed.emit(checked)
+        if checked:
+            self._request_waveform_if_needed()
+
+    def _request_waveform_if_needed(self) -> None:
+        """Build only if we don't already hold this track's waveform. Kept
+        across collapse/expand so reopening is instant, and shared by both
+        views — one build feeds the full canvas and the zoomed one alike."""
+        if not self._waveform_loaded and self._file_path is not None:
+            self.request_waveform.emit()
+
     def _on_toggle(self, checked: bool) -> None:
         self._expanded = checked
         self._set_body_visible(checked)
         if checked:
             self.expanded_changed.emit(True)
-            # Build only if we don't already hold this track's waveform. Kept
-            # across collapse/expand so reopening is instant.
-            if not self._waveform_loaded and self._file_path is not None:
-                self.request_waveform.emit()
+            self._request_waveform_if_needed()
         else:
             # Stop looping on collapse, but KEEP the waveform — it's dumped only
             # when the track changes (see set_track), not when the user hides it.

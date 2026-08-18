@@ -1234,17 +1234,17 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Ya hay un análisis en ejecución. Espera o cancélalo primero.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="985"/>
+        <location filename="../main_window.py" line="986"/>
         <source>Analyzing...</source>
         <translation>Analizando...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1017"/>
+        <location filename="../main_window.py" line="1018"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Completado: {0} analizados, {1} errores</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1021"/>
+        <location filename="../main_window.py" line="1022"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Completado: {0} archivos analizados</translation>
     </message>
@@ -1253,52 +1253,52 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Cancelado</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1199"/>
+        <location filename="../main_window.py" line="1204"/>
         <source>Conversion in Progress</source>
         <translation>Conversión en curso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1200"/>
+        <location filename="../main_window.py" line="1205"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Ya hay una conversión en ejecución. Espera.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1251"/>
+        <location filename="../main_window.py" line="1258"/>
         <source>Converting...</source>
         <translation>Convirtiendo...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1267"/>
+        <location filename="../main_window.py" line="1274"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Completado: {0} convertidos, {1} errores</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1271"/>
+        <location filename="../main_window.py" line="1278"/>
         <source>Complete: {0} files converted</source>
         <translation>Completado: {0} archivos convertidos</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1492"/>
+        <location filename="../main_window.py" line="1501"/>
         <source>Rename in Progress</source>
         <translation>Renombrado en curso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1493"/>
+        <location filename="../main_window.py" line="1502"/>
         <source>A rename operation is already running.</source>
         <translation>Ya hay una operación de renombrado en ejecución.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1551"/>
+        <location filename="../main_window.py" line="1560"/>
         <source>Rename Failed</source>
         <translation>Error al renombrar</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1585"/>
+        <location filename="../main_window.py" line="1594"/>
         <source>Undo Rename</source>
         <translation>Deshacer el cambio de nombre</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1616"/>
+        <location filename="../main_window.py" line="1625"/>
         <source>Undo Failed</source>
         <translation>Error al deshacer</translation>
     </message>
@@ -1311,22 +1311,22 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">{0} archivos renombrados</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1557"/>
+        <location filename="../main_window.py" line="1566"/>
         <source>No Session</source>
         <translation>Sin sesión</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1557"/>
+        <location filename="../main_window.py" line="1566"/>
         <source>No rename session to undo.</source>
         <translation>No hay ninguna sesión de renombrado que deshacer.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1566"/>
+        <location filename="../main_window.py" line="1575"/>
         <source>Confirm Undo</source>
         <translation>Confirmar deshacer</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1567"/>
+        <location filename="../main_window.py" line="1576"/>
         <source>Undo renaming of {0} files?</source>
         <translation>¿Deshacer el renombrado de {0} archivos?</translation>
     </message>
@@ -1335,7 +1335,7 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Deshaciendo renombrado...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1586"/>
+        <location filename="../main_window.py" line="1595"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Deshecho: {0} archivos, {1} errores</translation>
     </message>
@@ -1468,7 +1468,7 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1470"/>
-        <location filename="../widgets/player_panel.py" line="2474"/>
+        <location filename="../widgets/player_panel.py" line="2476"/>
         <source>Search all playlists…</source>
         <translation>Buscar en todas las listas…</translation>
     </message>
@@ -1549,7 +1549,7 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1119"/>
-        <location filename="../widgets/player_panel.py" line="2587"/>
+        <location filename="../widgets/player_panel.py" line="2589"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -1630,7 +1630,7 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1652"/>
-        <location filename="../widgets/player_panel.py" line="2584"/>
+        <location filename="../widgets/player_panel.py" line="2586"/>
         <source>Playlists</source>
         <translation>Listas</translation>
     </message>
@@ -1656,8 +1656,8 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1802"/>
-        <location filename="../widgets/player_panel.py" line="2431"/>
-        <location filename="../widgets/player_panel.py" line="2436"/>
+        <location filename="../widgets/player_panel.py" line="2433"/>
+        <location filename="../widgets/player_panel.py" line="2438"/>
         <source>Save Playlist</source>
         <translation>Guardar lista</translation>
     </message>
@@ -1681,100 +1681,100 @@ o haz clic en “Añadir carátula…”</translation>
         <translation>Arrastra esto a una lista para añadir la pista en reproducción</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2025"/>
-        <location filename="../widgets/player_panel.py" line="2418"/>
+        <location filename="../widgets/player_panel.py" line="2027"/>
+        <location filename="../widgets/player_panel.py" line="2420"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2403"/>
+        <location filename="../widgets/player_panel.py" line="2405"/>
         <source>Playing: {0}</source>
         <translation>Reproduciendo: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2415"/>
+        <location filename="../widgets/player_panel.py" line="2417"/>
         <source>Search: {0}</source>
         <translation>Búsqueda: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2432"/>
+        <location filename="../widgets/player_panel.py" line="2434"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>La lista está vacía: añade primero algunas pistas.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2436"/>
+        <location filename="../widgets/player_panel.py" line="2438"/>
         <source>Playlist name:</source>
         <translation>Nombre de la lista:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2471"/>
+        <location filename="../widgets/player_panel.py" line="2473"/>
         <source>Search scope: {0}</source>
         <translation>Ámbito de búsqueda: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2476"/>
+        <location filename="../widgets/player_panel.py" line="2478"/>
         <source>Search this playlist…</source>
         <translation>Buscar en esta lista…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2495"/>
+        <location filename="../widgets/player_panel.py" line="2497"/>
         <source>No matching tracks</source>
         <translation>No hay pistas coincidentes</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2808"/>
+        <location filename="../widgets/player_panel.py" line="2810"/>
         <source>File not found:
 {0}</source>
         <translation>Archivo no encontrado:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2983"/>
+        <location filename="../widgets/player_panel.py" line="2985"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Ocultar las pistas que mezclan con la pista en reproducción</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2985"/>
+        <location filename="../widgets/player_panel.py" line="2987"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Mostrar pistas que mezclan con la pista en reproducción</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3260"/>
+        <location filename="../widgets/player_panel.py" line="3262"/>
         <source>{0}+ results</source>
         <translation>{0}+ resultados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3263"/>
+        <location filename="../widgets/player_panel.py" line="3265"/>
         <source>{0} result</source>
         <translation>{0} resultado</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3265"/>
+        <location filename="../widgets/player_panel.py" line="3267"/>
         <source>{0} results</source>
         <translation>{0} resultados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3269"/>
+        <location filename="../widgets/player_panel.py" line="3271"/>
         <source>{0} track</source>
         <translation>{0} pista</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3271"/>
+        <location filename="../widgets/player_panel.py" line="3273"/>
         <source>{0} tracks</source>
         <translation>{0} pistas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3800"/>
+        <location filename="../widgets/player_panel.py" line="3802"/>
         <source>Reset Columns</source>
         <translation>Restablecer columnas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4408"/>
+        <location filename="../widgets/player_panel.py" line="4415"/>
         <source>“{0}” has moved.</source>
         <translation>«{0}» se ha movido.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="4410"/>
+        <location filename="../widgets/player_panel.py" line="4417"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n de los archivos seleccionados se ha movido.</numerusform>
@@ -1782,42 +1782,42 @@ o haz clic en “Añadir carátula…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4413"/>
+        <location filename="../widgets/player_panel.py" line="4420"/>
         <source>File Has Moved</source>
         <translation>El archivo se ha movido</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4417"/>
+        <location filename="../widgets/player_panel.py" line="4424"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Ya no está en su ubicación guardada, así que no se puede añadir a una lista ni arrastrar fuera. Una pista que ya esté sonando sigue sonando: se cargó en memoria antes de que el archivo se moviera.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4422"/>
+        <location filename="../widgets/player_panel.py" line="4429"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Haz clic derecho en la pista y elige Localizar archivo…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4534"/>
+        <location filename="../widgets/player_panel.py" line="4541"/>
         <source>Locate Missing File…</source>
         <translation>Localizar archivo…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4536"/>
+        <location filename="../widgets/player_panel.py" line="4543"/>
         <source>Open File Location</source>
         <translation>Abrir ubicación del archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4537"/>
+        <location filename="../widgets/player_panel.py" line="4544"/>
         <source>Open in Metadata Panel</source>
         <translation>Abrir en el panel de metadatos</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4538"/>
+        <location filename="../widgets/player_panel.py" line="4545"/>
         <source>Reload Metadata from File</source>
         <translation>Recargar metadatos del archivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4540"/>
+        <location filename="../widgets/player_panel.py" line="4547"/>
         <source>Remove from Playlist</source>
         <translation>Quitar de la lista de reproducción</translation>
     </message>
@@ -2889,82 +2889,82 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="209"/>
-        <location filename="../widgets/sidebar.py" line="377"/>
+        <location filename="../widgets/sidebar.py" line="240"/>
+        <location filename="../widgets/sidebar.py" line="408"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Contraer barra lateral</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="247"/>
+        <location filename="../widgets/sidebar.py" line="278"/>
         <source>Rename</source>
         <translation>Renombrar</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="248"/>
+        <location filename="../widgets/sidebar.py" line="279"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="249"/>
+        <location filename="../widgets/sidebar.py" line="280"/>
         <source>Analyze</source>
         <translation>Analizar</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="246"/>
+        <location filename="../widgets/sidebar.py" line="277"/>
         <source>Player</source>
         <translation>Reproductor</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="198"/>
+        <location filename="../widgets/sidebar.py" line="229"/>
         <source>Playlists</source>
         <translation>Listas</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="252"/>
+        <location filename="../widgets/sidebar.py" line="283"/>
         <source>Keyboard</source>
         <translation>Teclado</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="250"/>
+        <location filename="../widgets/sidebar.py" line="281"/>
         <source>Metadata</source>
         <translation>Metadatos</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="251"/>
+        <location filename="../widgets/sidebar.py" line="282"/>
         <source>Spectrum</source>
         <translation>Espectro</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="302"/>
-        <location filename="../widgets/sidebar.py" line="310"/>
+        <location filename="../widgets/sidebar.py" line="333"/>
+        <location filename="../widgets/sidebar.py" line="341"/>
         <source>Settings</source>
         <translation>Ajustes</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="314"/>
-        <location filename="../widgets/sidebar.py" line="322"/>
+        <location filename="../widgets/sidebar.py" line="345"/>
+        <location filename="../widgets/sidebar.py" line="353"/>
         <source>History</source>
         <translation>Historial</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="377"/>
+        <location filename="../widgets/sidebar.py" line="408"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Expandir barra lateral</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="416"/>
+        <location filename="../widgets/sidebar.py" line="447"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>Ocultar tus listas y volver a mostrar los botones de navegación</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="418"/>
+        <location filename="../widgets/sidebar.py" line="449"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>Mostrar aquí tus listas en lugar de los botones de navegación</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="503"/>
+        <location filename="../widgets/sidebar.py" line="591"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
@@ -2972,95 +2972,124 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>SliceSection</name>
     <message>
-        <location filename="../widgets/slice_section.py" line="93"/>
-        <location filename="../widgets/slice_section.py" line="332"/>
         <source>▸  Waveform Loop Slicer</source>
         <translatorcomment>Slicer panel title kept fully in English per glossary (slicer term retained); leading triangle glyph preserved.</translatorcomment>
-        <translation>▸  Waveform Loop Slicer</translation>
+        <translation type="vanished">▸  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="152"/>
+        <location filename="../widgets/slice_section.py" line="114"/>
+        <source>Waveform</source>
+        <translation>Forma de onda</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="116"/>
+        <source>Loop Slicer</source>
+        <translatorcomment>Producer tool name — kept English here, as the old &apos;Waveform Loop Slicer&apos; header was.</translatorcomment>
+        <translation>Loop Slicer</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="171"/>
         <source>Slice start time (m:ss:mmm) — type to set</source>
         <translation>Tiempo de inicio del slice (m:ss:mmm) — escribe para fijarlo</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="161"/>
+        <location filename="../widgets/slice_section.py" line="180"/>
         <source>Slice end time (m:ss:mmm) — type to set</source>
         <translation>Tiempo de final del slice (m:ss:mmm) — escribe para fijarlo</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="163"/>
-        <location filename="../widgets/slice_section.py" line="170"/>
+        <location filename="../widgets/slice_section.py" line="182"/>
+        <location filename="../widgets/slice_section.py" line="189"/>
         <source>Mark</source>
         <translation>Marcar</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="164"/>
+        <location filename="../widgets/slice_section.py" line="183"/>
         <source>Mark start at playhead (Q)</source>
         <translation>Marcar el inicio en la posición de reproducción (Q)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="171"/>
+        <location filename="../widgets/slice_section.py" line="190"/>
         <source>Mark end at playhead (E)</source>
         <translation>Marcar el final en la posición de reproducción (E)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="186"/>
+        <location filename="../widgets/slice_section.py" line="205"/>
         <source>Nudge start marker back 10 ms</source>
         <translation>Mover el marcador de inicio 10 ms hacia atrás</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="188"/>
+        <location filename="../widgets/slice_section.py" line="207"/>
         <source>Nudge start marker forward 10 ms</source>
         <translation>Mover el marcador de inicio 10 ms hacia adelante</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="190"/>
+        <location filename="../widgets/slice_section.py" line="209"/>
         <source>Nudge end marker back 10 ms</source>
         <translation>Mover el marcador de final 10 ms hacia atrás</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="192"/>
+        <location filename="../widgets/slice_section.py" line="211"/>
         <source>Nudge end marker forward 10 ms</source>
         <translation>Mover el marcador de final 10 ms hacia adelante</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="220"/>
+        <location filename="../widgets/slice_section.py" line="239"/>
         <source>Length</source>
         <translatorcomment>Slicer field showing the selected range duration; translated as &apos;Duración&apos; for consistency with the player&apos;s Duration column.</translatorcomment>
         <translation>Duración</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="224"/>
+        <location filename="../widgets/slice_section.py" line="243"/>
         <source>Shorten slice by 10 ms</source>
         <translation>Acortar el slice 10 ms</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="228"/>
+        <location filename="../widgets/slice_section.py" line="247"/>
         <source>Slice length (m:ss:mmm) — type to set; moves the end marker</source>
         <translation>Duración del slice (m:ss:mmm) — escribe para fijarla; mueve el marcador de final</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="230"/>
+        <location filename="../widgets/slice_section.py" line="249"/>
         <source>Lengthen slice by 10 ms</source>
         <translation>Alargar el slice 10 ms</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="245"/>
+        <location filename="../widgets/slice_section.py" line="264"/>
         <source>&lt; Start</source>
         <translation>&lt; Inicio</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="386"/>
+        <source>Hide the full-track waveform</source>
+        <translation>Ocultar la forma de onda completa</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="388"/>
+        <source>Show the full-track waveform — click it to move playback</source>
+        <translation>Mostrar la forma de onda completa — haz clic en ella para mover la reproducción</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="395"/>
+        <source>Hide the zoomed waveform and slice controls</source>
+        <translation>Ocultar la forma de onda ampliada y los controles de slice</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="397"/>
+        <source>Show the zoomed waveform and slice controls</source>
+        <translation>Mostrar la forma de onda ampliada y los controles de slice</translation>
     </message>
     <message>
         <source>Jump playhead to start marker</source>
         <translation type="vanished">Saltar la posición de reproducción al marcador de inicio</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="250"/>
+        <location filename="../widgets/slice_section.py" line="269"/>
         <source>Loop</source>
         <translation>Bucle</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="255"/>
+        <location filename="../widgets/slice_section.py" line="274"/>
         <source>Loop playback between the start and end markers (L)</source>
         <translatorcomment>Added (L) hotkey hint to the existing loop tooltip translation.</translatorcomment>
         <translation>Reproducir en bucle entre los marcadores de inicio y final (L)</translation>
@@ -3070,50 +3099,49 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Reproducir en bucle entre los marcadores de inicio y final</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="248"/>
+        <location filename="../widgets/slice_section.py" line="267"/>
         <source>Jump playhead to start marker (S)</source>
         <translation>Saltar la posición de reproducción al marcador de inicio (S)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="262"/>
+        <location filename="../widgets/slice_section.py" line="281"/>
         <source>Save Slice As:</source>
         <translatorcomment>&apos;Slice&apos; kept in English (producer/slicer term per glossary); rest translated.</translatorcomment>
         <translation>Guardar slice como:</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="267"/>
+        <location filename="../widgets/slice_section.py" line="286"/>
         <source>output filename</source>
         <translation>nombre del archivo de salida</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="276"/>
+        <location filename="../widgets/slice_section.py" line="295"/>
         <source>Choose save folder</source>
         <translation>Elegir carpeta de guardado</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="283"/>
+        <location filename="../widgets/slice_section.py" line="302"/>
         <source>Slice</source>
         <translatorcomment>Action button for the slicer; &apos;slice&apos; kept in English per glossary as the producer term.</translatorcomment>
         <translation>Slice</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="332"/>
         <source>▾  Waveform Loop Slicer</source>
         <translatorcomment>Slicer panel title kept fully in English per glossary; expanded-state triangle glyph preserved.</translatorcomment>
-        <translation>▾  Waveform Loop Slicer</translation>
+        <translation type="vanished">▾  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="560"/>
+        <location filename="../widgets/slice_section.py" line="649"/>
         <source>Choose Save Folder</source>
         <translation>Elegir carpeta de guardado</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="579"/>
+        <location filename="../widgets/slice_section.py" line="668"/>
         <source>Saved: {0}</source>
         <translation>Guardado: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="584"/>
+        <location filename="../widgets/slice_section.py" line="673"/>
         <source>Error: {0}</source>
         <translation>Error: {0}</translation>
     </message>

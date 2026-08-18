@@ -134,7 +134,7 @@
       <tr><td>Analysis</td><td>Detect BPM, key, and energy.</td></tr>
       <tr><td>Convert</td><td>Convert between WAV, FLAC, AIFF, and MP3.</td></tr>
       <tr><td>Rename</td><td>Batch-rename with live preview.</td></tr>
-      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform Loop Slicer).</td></tr>
+      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform + Loop Slicer).</td></tr>
       <tr><td>Playlists</td><td>A tree of folders and saved playlists, opened from the sidebar's
         <b>Playlists</b> button rather than the nav rail.</td></tr>
       <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
@@ -270,12 +270,17 @@
         File</b> in the Player (or <b>Reload</b> in the Metadata panel) re-reads the file from disk —
         handy after editing the same track in the other panel.</li>
       <li>The next track pre-loads in the background, so <b>Next</b> is instant.</li>
-      <li><b>Waveform Loop Slicer:</b> set start/end markers, nudge them, toggle an <b>A–B loop</b>,
-        pick a format, and <b>export</b> the slice — ideal for lifting loops and samples by ear.</li>
+      <li><b>Waveform:</b> the full-track waveform for the loaded track. Click or drag anywhere on it
+        to move playback — it replaces the seek bar while it's open — and drag the green/red markers
+        to set a slice.</li>
+      <li><b>Loop Slicer:</b> the zoomed waveform and the slice controls — set start/end markers,
+        nudge them, toggle an <b>A–B loop</b>, pick a format, and <b>export</b> the slice, ideal for
+        lifting loops and samples by ear. The two buttons are independent: open either on its own, or
+        both together for the full working slicer.</li>
       <li>The waveform's color is configurable in <b>Settings</b>.</li>
     </ul>
     <img class="shot-img" src="../assets/player.webp" alt="Player with playlist and transport">
-    <img class="shot-img" src="../assets/slicer.webp" alt="Waveform Loop Slicer — A–B markers and export">
+    <img class="shot-img" src="../assets/slicer.webp" alt="Waveform and Loop Slicer — A–B markers and export">
 
     <h3>Compatible Tracks</h3>
     <p>The button beside the visuals eye — two interlocking rings, at the top-right of the Player —
@@ -622,7 +627,7 @@
       <tr><td>Z / X</td><td>Shift octave down / up</td><td>Keyboard</td></tr>
       <tr><td>A–L, ;</td><td>Play notes</td><td>Keyboard</td></tr>
       <tr><td>W E T Y U O P</td><td>Play black-key notes</td><td>Keyboard</td></tr>
-      <tr><td>S / Q / E</td><td>Slice section controls</td><td>Player (slicer expanded)</td></tr>
+      <tr><td>S / Q / E</td><td>Slice section controls</td><td>Player (Loop Slicer open)</td></tr>
     </table>
     <p><b>Shift+Tab</b> works from anywhere in the window, including while you're typing in a
       search or tag field, and it expands a collapsed sidebar straight onto the tree in one press.

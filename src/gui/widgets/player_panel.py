@@ -1955,9 +1955,11 @@ class PlayerPanel(QWidget):
             esc.setContext(Qt.ShortcutContext.WidgetShortcut)
             esc.activated.connect(self._exit_search)
 
-        # Slice section: swap the seek control on expand, supply the waveform
-        # lazily, and forward its playhead seeks to the engine.
-        self._slice.expanded_changed.connect(self._on_slice_expanded)
+        # Slice section: swap the seek control when the waveform is up, supply
+        # the waveform lazily, and forward its playhead seeks to the engine.
+        # Both toggles land on one slot, which recomputes from both states.
+        self._slice.expanded_changed.connect(self._on_slice_view_changed)
+        self._slice.waveform_shown_changed.connect(self._on_slice_view_changed)
         self._slice.request_waveform.connect(self._build_waveform_for_current)
         self._slice.seek_requested.connect(self._on_seek)
 
@@ -4255,19 +4257,24 @@ class PlayerPanel(QWidget):
         """Min width the slicer's time-info + Mark-buttons row needs to fit."""
         return self._slice.time_row_min_width()
 
-    def _on_slice_expanded(self, expanded: bool) -> None:
-        """Swap the seek control and reflow for the expanded slicer.
+    def _on_slice_view_changed(self, _checked: bool = False) -> None:
+        """Swap the seek control and reflow for whichever slice views are open.
 
-        Open: the waveform is the seek control (hide the plain slider), the
-        playlist is pinned to a fixed visible height so it can't be squished,
-        and the panel grows past the viewport so the outer scrollbar reveals the
-        slicer below. Closed: restore the stretchy playlist and plain slider.
+        The two toggles are independent, so this recomputes from both rather
+        than from the one that fired. The full waveform *is* the seek control
+        while it's up, so the plain slider hides only then — with the Loop
+        Slicer alone there'd otherwise be nothing left to scrub with. Either
+        view open pins the playlist to a fixed visible height so it can't be
+        squished, and the panel grows past the viewport so the outer scrollbar
+        reveals what's below. Both closed: stretchy playlist, plain slider.
         """
-        self._seek_row_widget.setVisible(not expanded)
-        self._apply_table_height(expanded)
-        if not expanded:
+        expanded = self._slice.is_expanded()
+        self._seek_row_widget.setVisible(not self._slice.is_waveform_shown())
+        self._apply_table_height(self._slice.is_open())
+        if not self._slice.is_open():
             # Return to the top so the user isn't left scrolled past the slicer.
             self._scroll.verticalScrollBar().setValue(0)
+        # Only the tray's time row needs the wider window minimum.
         self.slice_expanded.emit(expanded)
 
     def _apply_table_height(self, fixed: bool) -> None:
@@ -4333,8 +4340,8 @@ class PlayerPanel(QWidget):
 
     @Slot(object, object, int, object, object, float)
     def _on_waveform_fallback_ready(self, cmin, cmax, _dur, dmin, dmax, bps) -> None:
-        # Only render if the section is still open on the same track.
-        if self._wf_path == self._current_path() and self._slice.is_expanded():
+        # Only render if a view is still open on the same track.
+        if self._wf_path == self._current_path() and self._slice.is_open():
             self._slice.set_waveform(cmin, cmax, dmin, dmax, bps)
 
     @Slot()
