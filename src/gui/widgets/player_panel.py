@@ -605,9 +605,9 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         # Build ONE drag the in-list reorder machinery AND the sidebar both
         # understand: the model's internal-move data (so dropping back on this list
         # reorders, and the drop indicator shows) plus file URLs + a source marker
-        # (so an allowed sidebar button can route the files). An internal reorder
-        # drops on self as a CopyAction → no removal; a move drop on a sidebar
-        # button returns MoveAction → remove the dragged rows from the playlist.
+        # (so an allowed sidebar button can route the files). Removal is opt-in
+        # per source: `remove_cb` runs only on a MoveAction drop, and the Player
+        # passes None (see `_drag_data`) so a playlist never loses a row this way.
         data = self._drag_data_fn() if self._drag_data_fn is not None else None
         paths = data[0] if data else None
         remove_cb = data[1] if data else None
@@ -4443,18 +4443,18 @@ class PlayerPanel(QWidget):
     def _drag_data(self):
         """Provide (paths, remove-on-move callback) for an outgoing drag.
 
-        On a move drop, `_on_remove_selected` removes the dragged rows and stops
-        playback if one was the playing track. A copy drop (e.g. onto Metadata)
-        returns CopyAction, so nothing is removed and playback is untouched.
+        The callback is always None: this list is a saved playlist, so dragging
+        a track to another panel (or out to Finder) copies it and the playlist
+        keeps its row — only an explicit Remove/Delete takes a track out. Every
+        Player route in `DRAG_ROUTES` is a Copy for the same reason; returning
+        None as well means a destination that proposes MoveAction anyway (Finder
+        and other apps decide their own action) still cannot empty a playlist.
         """
         rows = sorted({idx.row() for idx in self._table.selectionModel().selectedRows()})
         paths = [self._playlist[r].file_path for r in rows if 0 <= r < len(self._playlist)]
         if not paths:
             return None
-        # Dragging a search result out is always a copy — there's no list to
-        # remove it from, so a move drop must not delete the row.
-        remove_cb = None if self._search_active else self._on_remove_selected
-        return paths, remove_cb
+        return paths, None
 
     # ── Remove / Clear ──────────────────────────────────────────
 

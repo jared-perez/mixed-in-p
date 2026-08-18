@@ -70,6 +70,8 @@ flowchart TD
   Analyze, Rename, or Player; Analysis can send to Convert or Player.
 - **Sidebar drag** — select rows in a panel and drop them on another panel's
   sidebar button to route them (some routes *move* the files, others *copy*).
+  Routes out of the Player always copy: a playlist only loses a track when you
+  remove it.
 
 ---
 

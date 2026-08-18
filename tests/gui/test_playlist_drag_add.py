@@ -15,9 +15,12 @@ from PySide6.QtGui import QDropEvent
 from PySide6.QtWidgets import QMessageBox
 
 from src.gui.main_window import MainWindow
+from src.gui.widgets import player_panel as player_mod
 from src.gui.widgets import playlist_tree as tree_mod
 from src.gui.widgets.dialogs import duplicate_policy as dup_mod
+from src.gui.widgets.droppable_table import SOURCE_PAGE_MIME
 from src.gui.widgets.player_panel import PlayerPanel
+from src.gui.widgets.sidebar import DRAG_ROUTES, _DroppableSidebarButton
 from src.gui.widgets.playlist_tree import NODE_MIME, PlaylistTreePanel
 from src.gui.models.undo_stack import UndoStack
 from src.library import SCRATCH_NODE_ID, Library
@@ -684,3 +687,59 @@ class TestPlayerDragGuard:
 
         paths, _remove = player._drag_data()
         assert paths == [a, b, c]
+
+
+class TestPlayerDragNeverEmptiesThePlaylist:
+    """Sending a track to another panel copies it; the playlist keeps its row.
+
+    The Player once held a throwaway queue, so its routes were Moves and a
+    drop on the Convert/Analyze nav button deleted the rows it had sent. With
+    saved playlists that is data loss — a track leaves a playlist only when
+    the user removes it.
+    """
+
+    def test_every_route_out_of_the_player_is_a_copy(self):
+        # Not a restatement of the table: the sidebar reads it to pick the drop
+        # action, and a single True here is a silent delete.
+        assert set(DRAG_ROUTES["player"].values()) == {False}
+
+    @pytest.mark.parametrize("destination", ["convert", "analysis", "rename"])
+    def test_the_nav_button_proposes_copy(self, destination, tmp_path, qtbot):
+        (a,) = make_files(tmp_path, "a.wav")
+        mime = url_mime([a])
+        mime.setData(SOURCE_PAGE_MIME, b"player")
+        button = _DroppableSidebarButton("Dest", destination)
+        qtbot.addWidget(button)
+
+        accept, action = button._drag_policy(FakeDropEvent(mime))
+        assert (accept, action) == (True, Qt.DropAction.CopyAction)
+
+    def test_a_move_drop_still_removes_nothing(self, player, tmp_path, monkeypatch):
+        """The source end of the same rule.
+
+        Finder and other apps choose their own drop action, so the drag can
+        come back MoveAction whatever our own targets propose — the removal
+        callback has to be absent, not merely unreached.
+        """
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        player.add_tracks(track_dicts([a, b]))
+        player._table.selectRow(0)
+
+        class MovingDrag:
+            def __init__(self, _parent):
+                pass
+
+            def setMimeData(self, _mime):
+                pass
+
+            def setPixmap(self, _pm):
+                pass
+
+            def exec(self, _actions):
+                return Qt.DropAction.MoveAction
+
+        monkeypatch.setattr(player_mod, "QDrag", MovingDrag)
+        player._table.startDrag(Qt.DropAction.MoveAction | Qt.DropAction.CopyAction)
+
+        assert [e.file_path for e in player._playlist] == [a, b]
+        assert player._table.rowCount() == 2

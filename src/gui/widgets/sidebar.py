@@ -47,18 +47,23 @@ PLAYLISTS_SHORTCUT = QKeySequence("Shift+Tab")
 
 # Which panel-to-panel drags are allowed, and whether the drop removes the rows
 # from the source (True = move; False = copy, leaves them).
-# True is used when source and destination hold independent lists (mirrors "Send
-# To"). False is used when removing would be wrong: Metadata (non-destructive,
-# first-file-only), Player -> Metadata (don't stop a playing track), and the
-# Rename<->Analyze pair which share one TrackStore — there a "move" is a track
-# state change done by the destination intake, not an add+remove (removing would
-# delete the only copy).
+# True is used when source and destination hold independent working lists
+# (mirrors "Send To"). False is used when removing would be wrong:
+#   - Metadata (non-destructive, first-file-only) and Spectrum, which only view.
+#   - the Rename<->Analyze pair, which share one TrackStore — there a "move" is a
+#     track state change done by the destination intake, not an add+remove
+#     (removing would delete the only copy).
+#   - EVERY route out of the Player, because its list is a saved playlist, not a
+#     working queue. Sending a track to Convert or Analyze is a copy; a playlist
+#     loses a track only when the user removes it. This was Move back when the
+#     Player held a throwaway queue, and the playlists feature made it wrong.
+#     PlayerPanel._drag_data enforces the same rule from the source end.
 #   source_page: { destination_page: remove_from_source }
 DRAG_ROUTES: dict[str, dict[str, bool]] = {
     "rename":   {"convert": True, "analysis": False, "player": True, "metadata": False, "spectrum": False},
     "convert":  {"analysis": True, "rename": True, "player": True, "metadata": False, "spectrum": False},
     "analysis": {"convert": True, "rename": False, "player": True, "metadata": False, "spectrum": False},
-    "player":   {"rename": True, "convert": True, "analysis": True, "metadata": False, "spectrum": False},
+    "player":   {"rename": False, "convert": False, "analysis": False, "metadata": False, "spectrum": False},
 }
 
 
