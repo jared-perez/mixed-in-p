@@ -924,6 +924,7 @@ class MainWindow(QMainWindow):
         self._analysis_thread.analysis_cancelled.connect(self._on_analysis_cancelled)
         self._analysis_thread.start()
         self._analysis_panel.set_analyzing(True)
+        self._sidebar.set_page_busy("analysis", True)
 
     def _analyze_and_rename_files(
         self, track_ids: list[str], operations: list[RenameOperation]
@@ -1028,8 +1029,11 @@ class MainWindow(QMainWindow):
         self._analyzing_track_ids = []
         self._analysis_thread = None
         # Re-enable the manual Analyze button (re-armed here; if auto-mode
-        # chaining kicks off a new batch below it flips back on).
+        # chaining kicks off a new batch below it flips back on). Same for the
+        # sidebar spinner — _start_pending_analysis restarts it in place, and
+        # the frame counter carries across so the glyph doesn't visibly jump.
         self._analysis_panel.set_analyzing(False)
+        self._sidebar.set_page_busy("analysis", False)
 
         # Auto-rename pipeline: only for tracks just analyzed in this batch
         if (
@@ -1091,6 +1095,7 @@ class MainWindow(QMainWindow):
         self._analyzing_track_ids = []
         self._analysis_thread = None
         self._analysis_panel.set_analyzing(False)
+        self._sidebar.set_page_busy("analysis", False)
         self._analysis_panel.refresh_table()
 
         # Same auto-rename gate as the finished path, over just what completed
@@ -1226,6 +1231,7 @@ class MainWindow(QMainWindow):
         self._conversion_thread.conversion_error.connect(self._on_conversion_error)
         self._conversion_thread.conversion_cancelled.connect(self._on_conversion_cancelled)
         self._conversion_thread.start()
+        self._sidebar.set_page_busy("convert", True)
 
     def _cancel_conversion(self) -> None:
         """Cancel the current conversion.
@@ -1245,6 +1251,7 @@ class MainWindow(QMainWindow):
         # rows still marked Converting revert to Ready.
         self._conversion_panel.mark_converted([])
         self._conversion_thread = None
+        self._sidebar.set_page_busy("convert", False)
 
     def _on_conversion_started(self) -> None:
         """Handle conversion started."""
@@ -1273,11 +1280,13 @@ class MainWindow(QMainWindow):
 
         self._conversion_panel.mark_converted(results)
         self._conversion_thread = None
+        self._sidebar.set_page_busy("convert", False)
 
     def _on_conversion_error(self, error: str) -> None:
         """Handle conversion error."""
         self._conversion_panel.progress_panel.set_error(error)
         self._conversion_thread = None
+        self._sidebar.set_page_busy("convert", False)
 
     def _on_spectrum_sensitivity(self, dr: float) -> None:
         """Persist the spectrum colour sensitivity when the slider is released."""

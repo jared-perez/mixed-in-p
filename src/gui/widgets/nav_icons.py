@@ -218,9 +218,15 @@ _STATES = (
 )
 
 
-def nav_icon(page_id: str) -> QIcon:
+def nav_icon(page_id: str, angle: float = 0.0) -> QIcon:
     """Build a state-aware QIcon for a sidebar nav page, or an empty icon
-    if the page has no glyph defined."""
+    if the page has no glyph defined.
+
+    ``angle`` turns the glyph clockwise about its own centre (degrees) — the
+    sidebar's working spinner steps it. Every glyph here is drawn well inside
+    a circle of radius ``_DRAW / 2`` (the furthest ink, the magnifier's handle
+    tip, sits at ~0.38 of the box), so none of them clip as they turn.
+    """
     paint = _PAINTERS.get(page_id)
     icon = QIcon()
     if paint is None:
@@ -231,6 +237,10 @@ def nav_icon(page_id: str) -> QIcon:
         p = QPainter(pm)
         try:
             p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            if angle:
+                p.translate(_DRAW / 2.0, _DRAW / 2.0)
+                p.rotate(angle)
+                p.translate(-_DRAW / 2.0, -_DRAW / 2.0)
             paint(p, color)
         finally:
             p.end()

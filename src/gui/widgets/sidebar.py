@@ -2,12 +2,13 @@
 
 from pathlib import Path
 
-from PySide6.QtCore import QEvent, QSize, Qt, Signal
+from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
 from PySide6.QtGui import (
     QDragEnterEvent,
     QDragLeaveEvent,
     QDragMoveEvent,
     QDropEvent,
+    QIcon,
     QKeySequence,
 )
 from PySide6.QtWidgets import (
@@ -29,6 +30,24 @@ from .nav_icons import nav_icon
 
 # Display size for the sidebar nav glyphs.
 _NAV_ICON_SIZE = QSize(30, 30)
+
+# A nav glyph spins while its panel is working, so a long analysis or
+# conversion is visible from anywhere in the app — including with the rail
+# collapsed, where the icon is all there is to look at. 24 frames (one every
+# 15 degrees) at 40ms is a revolution a second: smooth at 30px, and slow
+# enough that a near-symmetric glyph still reads as turning rather than
+# strobing. The whole cycle is built and cached within the first revolution.
+_SPIN_FRAMES = 24
+_SPIN_INTERVAL_MS = 40
+
+# The only two pages that spin at all, and which way each turns. Both go
+# clockwise: the spin says "this panel is working" and nothing more, so there
+# is no reason for them to disagree. Direction is only ever visible on Analyze
+# anyway — the Convert glyph is two opposing arrows, a shape with exact
+# 180-degree rotational symmetry, so its clockwise and counter-clockwise frames
+# are identical pixels. What tells the two buttons apart while collapsed is the
+# glyph and its position in the rail, never the spin.
+_SPIN_DIRECTION = {"convert": 1, "analysis": 1}  # +1 = clockwise on screen
 
 # The Playlists toggle's keyboard shortcut, defined here rather than beside the
 # QShortcut in MainWindow because the button's tooltip advertises it — one
@@ -183,6 +202,13 @@ class Sidebar(QFrame):
         self._auto_badge: QLabel | None = None
         self._auto_dot: QLabel | None = None
         self._auto_badge_enabled = False
+        # Working-spinner state. One timer drives every busy glyph off a single
+        # frame counter, so two panels working at once stay in step and the
+        # timer only runs while something is actually running.
+        self._busy_pages: set[str] = set()
+        self._spin_frame = 0
+        self._spin_timer: QTimer | None = None
+        self._spin_cache: dict[tuple[str, int], QIcon] = {}
         self._setup_ui()
 
     def _setup_ui(self) -> None:
@@ -498,6 +524,63 @@ class Sidebar(QFrame):
         """Set the current active page."""
         if page_id in self._buttons:
             self._buttons[page_id].setChecked(True)
+
+    # ------------------------------------------------------------ busy spinner
+
+    def is_page_busy(self, page_id: str) -> bool:
+        """Whether this page's nav glyph is currently spinning."""
+        return page_id in self._busy_pages
+
+    def set_page_busy(self, page_id: str, busy: bool) -> None:
+        """Spin (or stop) a nav glyph to show that its panel is working.
+
+        Idempotent in both directions: the callers are the thread lifecycle
+        handlers in MainWindow, and analysis in particular can finish and
+        immediately chain into the next queued batch.
+        """
+        btn = self._buttons.get(page_id)
+        if btn is None or page_id not in _SPIN_DIRECTION:
+            return
+        if busy:
+            if page_id in self._busy_pages:
+                return
+            self._busy_pages.add(page_id)
+            # Don't reset the frame counter here: a batch that ends and
+            # instantly restarts would otherwise snap the glyph back to
+            # upright, which reads as a stop the user has to second-guess.
+            if self._spin_timer is None:
+                self._spin_timer = QTimer(self)
+                self._spin_timer.setInterval(_SPIN_INTERVAL_MS)
+                self._spin_timer.timeout.connect(self._advance_spin)
+            if not self._spin_timer.isActive():
+                self._spin_timer.start()
+            self._apply_spin_frame(page_id)
+        else:
+            if page_id not in self._busy_pages:
+                return
+            self._busy_pages.discard(page_id)
+            btn.setIcon(nav_icon(page_id))  # back to the upright glyph
+            if not self._busy_pages and self._spin_timer is not None:
+                self._spin_timer.stop()
+
+    def _advance_spin(self) -> None:
+        self._spin_frame = (self._spin_frame + 1) % _SPIN_FRAMES
+        for page_id in self._busy_pages:
+            self._apply_spin_frame(page_id)
+
+    def _apply_spin_frame(self, page_id: str) -> None:
+        """Set one busy button's icon to the current frame, building it once.
+
+        Frames are cached per (page, step) on the widget rather than at module
+        level: they are QPixmaps, and a module-level cache would outlive the
+        QApplication that created them.
+        """
+        step = (self._spin_frame * _SPIN_DIRECTION[page_id]) % _SPIN_FRAMES
+        icon = self._spin_cache.get((page_id, step))
+        if icon is None:
+            icon = nav_icon(page_id, step * 360.0 / _SPIN_FRAMES)
+            self._spin_cache[(page_id, step)] = icon
+        self._buttons[page_id].setIcon(icon)
 
     def set_auto_analyze_badge(self, enabled: bool) -> None:
         """Show/hide a small 'Auto' badge on the Analyze nav button."""

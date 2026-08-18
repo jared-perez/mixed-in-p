@@ -120,6 +120,16 @@ class PanelStub(QObject):
         self.analyzing = running
 
 
+class _SidebarStub:
+    """The end-of-batch handlers stop the Analyze nav glyph spinning."""
+
+    def __init__(self):
+        self.busy: dict[str, bool] = {}
+
+    def set_page_busy(self, page_id, busy):
+        self.busy[page_id] = busy
+
+
 class _ProgressStub:
     def __init__(self):
         self.messages = []
@@ -145,6 +155,7 @@ class WindowStub(QObject):
         self._config = AppConfig()
         self._config.key_in_comment_enabled = True  # exercise the comment write too
         self._analysis_panel = PanelStub()
+        self._sidebar = _SidebarStub()
         self._analysis_writes_frozen = False
         self._analyzing_track_ids = []
         self._analysis_thread = None
