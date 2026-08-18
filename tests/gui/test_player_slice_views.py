@@ -171,13 +171,15 @@ class TestPanelReflow:
         assert player._table.maximumHeight() == stretchy
 
     def test_closing_one_view_leaves_the_playlist_pinned(self, player):
+        # Pinned, not pinned to the same pixel: closing the waveform brings the
+        # seek row back and swaps which canvas is reserved, so the budget — and
+        # with it the height — legitimately moves a little.
         player._slice._waveform_btn.setChecked(True)
         player._slice._slicer_btn.setChecked(True)
-        pinned = player._table.maximumHeight()
 
         player._slice._waveform_btn.setChecked(False)
 
-        assert player._table.maximumHeight() == pinned
+        assert player._is_table_pinned()
 
     def test_only_the_slicer_widens_the_window_minimum(self, player):
         # slice_expanded drives WindowSizer.on_slicer_expanded, and it is the
@@ -197,3 +199,160 @@ class TestPanelReflow:
 
         player._slice._slicer_btn.setChecked(True)
         assert player._slice.is_expanded()
+
+
+class TestTallRowsStayOnScreen:
+    """Opening a view must not push itself below the fold.
+
+    The playlist pin used to be a fixed *row count* (12), tuned when a row was
+    the height of its text. Full artwork makes a row ~2.6x taller, so 12 of
+    them exceeded the whole viewport and the transport, the waveform and the
+    slice controls all opened out of sight — you had to scroll the panel to
+    find the thing you had just opened.
+
+    Asserted as a relation between two things Qt reports (does the canvas end
+    above the fold), never as a pixel count: the suite runs with no stylesheet,
+    so every height here differs from the running app's.
+    """
+
+    @pytest.fixture
+    def player(self, qtbot, tmp_path):
+        from src.gui.widgets.player_panel import PlayerPanel
+        from src.library import Library
+
+        lib = Library(tmp_path / "library.db")
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        panel.set_library(lib)
+        # A real geometry: the pin is a share of the viewport, so a panel that
+        # was never given one has nothing to divide up.
+        panel.resize(1024, 795)
+        panel.show()
+        qtbot.waitExposed(panel)
+
+        entries = []
+        for i in range(40):
+            f = tmp_path / f"t{i:02d}.wav"
+            f.write_bytes(b"not-really-audio")
+            entries.append({"file_path": str(f), "display_name": f"Track {i:02d}"})
+        panel.add_tracks(entries)
+        # Full only changes the row height while the Art column is showing.
+        panel._table.setColumnHidden(panel._ARTWORK_COLUMN, False)
+        qtbot.wait(10)
+        yield panel
+        lib.close()
+
+    @staticmethod
+    def below_fold(player, widget):
+        """Pixels of *widget*'s bottom edge that fall past the viewport.
+
+        Activates the layout first: Qt computes child geometry lazily, so a
+        position read straight after a toggle is the *previous* answer. Forcing
+        it beats waiting a fixed number of milliseconds, which is only ever
+        long enough until the suite is under load.
+        """
+        content = player._scroll.widget()
+        content.layout().activate()
+        bottom = widget.mapTo(content, widget.rect().bottomLeft()).y()
+        return bottom - player._scroll.viewport().height()
+
+    @staticmethod
+    def visible_rows(player):
+        """How many playlist rows the pin leaves room for.
+
+        The header and frame are taken off first: they are a fixed cost that
+        does not scale with the row, so a ratio that leaves them in makes tall
+        rows look like fewer rows even when the count has not moved.
+        """
+        chrome = (
+            player._table.horizontalHeader().height()
+            + 2 * player._table.frameWidth()
+            + 4
+        )
+        return (player._table.maximumHeight() - chrome) / player._row_height()
+
+    @pytest.mark.parametrize("view", ["top", "middle", "full"])
+    def test_the_waveform_opens_on_screen_in_every_artwork_view(
+        self, player, qtbot, view
+    ):
+        player.set_artwork_view(view)
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+
+        assert self.below_fold(player, player._slice._waveform) <= 0
+
+    @pytest.mark.parametrize("view", ["top", "middle", "full"])
+    def test_the_transport_opens_on_screen_in_every_artwork_view(
+        self, player, qtbot, view
+    ):
+        player.set_artwork_view(view)
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+
+        assert self.below_fold(player, player._clear_btn) <= 0
+
+    def test_the_zoomed_canvas_opens_on_screen_with_tall_rows(self, player, qtbot):
+        player.set_artwork_view("full")
+        player._slice._slicer_btn.setChecked(True)
+        qtbot.wait(20)
+
+        assert self.below_fold(player, player._slice._zoom_waveform) <= 0
+
+    def test_tall_rows_cost_rows_not_the_panel(self, player, qtbot):
+        """The playlist gives up rows to make room — it does not overflow."""
+        player.set_artwork_view("top")
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+        text_rows = self.visible_rows(player)
+
+        player.set_artwork_view("full")
+        qtbot.wait(20)
+        art_rows = self.visible_rows(player)
+
+        assert art_rows < text_rows, "tall rows must yield, not push the panel down"
+        assert art_rows >= player._MIN_ROWS_WHEN_SLICING, "the playlist must survive"
+
+    def test_a_text_height_row_still_gets_the_full_row_count(self, player, qtbot):
+        # The budget is a cap, so the shipped behaviour at a normal row height
+        # is unchanged: still the 12 rows the old fixed pin gave.
+        player.set_artwork_view("top")
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+
+        assert round(self.visible_rows(player)) == player._ROWS_VISIBLE_WHEN_SLICING
+
+    def test_shrinking_the_window_re_fits_the_playlist(self, player, qtbot):
+        # The budget is a share of the viewport, so a resize changes the answer
+        # and the pin has to be recomputed — the old fixed row count never was.
+        player.set_artwork_view("full")
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+        tall = player._table.maximumHeight()
+        viewport = player._scroll.viewport().height()
+
+        player.resize(1024, 560)
+        # Wait for the resize to reach the viewport — the pin is recomputed from
+        # it, so asserting before it lands reads the old budget and the test
+        # passes or fails on how busy the machine is.
+        qtbot.waitUntil(
+            lambda: player._scroll.viewport().height() < viewport, timeout=2000
+        )
+
+        assert player._table.maximumHeight() < tall
+
+    def test_the_playlist_never_shrinks_below_the_floor(self, player, qtbot):
+        """A window too short for both keeps a usable playlist and scrolls.
+
+        Deliberately *not* asserting the waveform stays on screen here: past
+        this point there is no height that satisfies both, and the design
+        chooses to keep some playlist and let the panel scroll. Asserting
+        otherwise demands something no implementation can deliver.
+        """
+        player.set_artwork_view("full")
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+
+        player.resize(1024, 320)
+        qtbot.wait(20)
+
+        assert self.visible_rows(player) >= player._MIN_ROWS_WHEN_SLICING

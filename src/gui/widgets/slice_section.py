@@ -413,6 +413,25 @@ class SliceSection(QWidget):
         """True while either view is up, i.e. while a waveform is worth building."""
         return self._expanded or self._waveform_shown
 
+    def first_screen_height(self) -> int:
+        """Height that has to be on screen for an opened view to look opened.
+
+        The header row plus the top of whichever view is showing — the full
+        waveform if it is up, else the tray's zoomed canvas. Everything below
+        that (the marker rows, Save Slice As) is allowed to want scrolling; the
+        canvas is not, because a view you have to go looking for reads as a
+        button that did nothing. The player reserves this out of its viewport
+        before deciding how tall the playlist may be.
+        """
+        h = self._waveform_btn.height()
+        if self._waveform_shown:
+            h += Theme.SPACING + self._waveform.minimumHeight()
+        elif self._expanded:
+            # The zoomed canvas sits inside the tray, below its top margin.
+            h += Theme.SPACING + self._body.layout().contentsMargins().top()
+            h += self._zoom_waveform.minimumHeight()
+        return h
+
     def time_row_min_width(self) -> int:
         """Width needed to show the time-info + Mark-buttons row pushed together.
 

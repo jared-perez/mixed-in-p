@@ -1366,9 +1366,11 @@ class PlayerPanel(QWidget):
         # The whole panel scrolls: when the slice section expands below the
         # playlist the content grows past the viewport and one vertical
         # scrollbar lets the user scroll down to the slicer. The playlist keeps
-        # its own scrollbar and a fixed 12-row visible height while expanded
-        # (see _apply_table_height); collapsed, everything fits and no outer
-        # scrollbar appears. The faint background overlay stays on the panel
+        # its own scrollbar and, while a slice view is open, only the height the
+        # viewport can spare once the transport and that view are reserved (see
+        # _apply_table_height) — so opening one never pushes itself off the
+        # bottom, however tall the rows are. Collapsed, everything fits and no
+        # outer scrollbar appears. The faint background overlay stays on the panel
         # itself, so the transparent scroll area lets it show through.
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
@@ -1418,6 +1420,8 @@ class PlayerPanel(QWidget):
         layout = QVBoxLayout(content)
         layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, Theme.PADDING)
         layout.setSpacing(Theme.SPACING)
+        # Kept so _height_below_playlist can measure the rows under the table.
+        self._content_layout = layout
 
         # Title row: "Player" on the left, the loaded track's album art sitting
         # just after the title text (shown only while a track is loaded). The art
@@ -1808,6 +1812,9 @@ class PlayerPanel(QWidget):
         self._clear_btn.clicked.connect(self._on_clear_playlist)
         controls_row.addWidget(self._clear_btn)
 
+        # Kept (as the layout, not a wrapper widget — wrapping would change its
+        # inherited spacing) so its height can be reserved by the slice pin.
+        self._controls_row = controls_row
         layout.addLayout(controls_row)
 
         # Now-playing line: names the track loaded in the engine. Playback is
@@ -1853,6 +1860,11 @@ class PlayerPanel(QWidget):
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         self._sync_title_row_width()
+        # The slice pin is a share of the viewport, so a resized window changes
+        # the answer. Without this the playlist keeps the height it was given at
+        # the old size and the waveform slides back under the fold.
+        if self._is_table_pinned():
+            self._apply_table_height(True)
 
     def _sync_title_row_width(self) -> None:
         """Cap the header at the visible width so it never rides the scroll.
@@ -3457,9 +3469,9 @@ class PlayerPanel(QWidget):
         tall at the *current* size) keeps Medium pixel-identical to today.
         """
         self._table.verticalHeader().setDefaultSectionSize(self._row_height())
-        # A table pinned to N rows for the slicer was sized against the old
-        # height, so it now shows the wrong number of them.
-        if self._table.maximumHeight() < 16_777_215:
+        # A table pinned for the slicer was sized against the old row height,
+        # so it now shows the wrong number of them.
+        if self._is_table_pinned():
             self._apply_table_height(True)
 
     def _artwork_showing(self) -> bool:
@@ -4250,8 +4262,17 @@ class PlayerPanel(QWidget):
         visible list, which may be a different playlist entirely."""
         return self._playing_path
 
-    # Number of playlist rows kept visible when the slice section is open.
+    # Most playlist rows kept visible when the slice section is open. A *cap*,
+    # not the answer: what actually decides the height is the room left in the
+    # viewport once the transport and the opened canvas are reserved. This was
+    # the whole rule when a row was 30px tall, and it silently stopped working
+    # when Full artwork made a row 78px — 12 of those is 983px against a 793px
+    # viewport, so the playlist alone was taller than the panel and the
+    # transport, the waveform and the slice controls all opened below the fold.
     _ROWS_VISIBLE_WHEN_SLICING = 12
+    # …and the fewest, so a short window shrinks the playlist rather than
+    # deleting it. Past this point scrolling is unavoidable and correct.
+    _MIN_ROWS_WHEN_SLICING = 3
 
     def slice_time_row_min_width(self) -> int:
         """Min width the slicer's time-info + Mark-buttons row needs to fit."""
@@ -4277,8 +4298,51 @@ class PlayerPanel(QWidget):
         # Only the tray's time row needs the wider window minimum.
         self.slice_expanded.emit(expanded)
 
+    # QWIDGETSIZE_MAX — what setMaximumHeight is reset to when the pin comes off.
+    _UNPINNED_HEIGHT = 16_777_215
+
+    def _is_table_pinned(self) -> bool:
+        """True while the playlist is held at the slice section's budget."""
+        return self._table.maximumHeight() < self._UNPINNED_HEIGHT
+
+    def _height_outside_playlist(self) -> int:
+        """Pixels the panel must keep on screen either side of the playlist.
+
+        The title row above it, and below it the transport cluster and the top
+        of whichever slice view is open. Measured from the widgets, never
+        written as a constant, because every term moves: the seek row comes and
+        goes with the waveform, the now-playing line only exists while a track
+        is loaded, and the button row's height follows the text size and the
+        translated labels. Read the *hints*, not the laid-out heights — this is
+        called to decide a height, so the geometry it would read back is the
+        one it is about to replace (and a hidden widget's height is stale
+        anyway: the now-playing label reports 480px while hidden).
+        """
+        rows = [self._title_row_widget.sizeHint().height()]
+        if not self._slice.is_waveform_shown():
+            rows.append(self._seek_row_widget.sizeHint().height())
+        rows.append(self._controls_row.sizeHint().height())
+        if not self._now_playing_label.isHidden():
+            rows.append(self._now_playing_label.sizeHint().height())
+        rows.append(self._slice.first_screen_height())
+        margins = self._content_layout.contentsMargins()
+        # One gap per row: the rows plus the playlist are len(rows) + 1 items.
+        return (
+            sum(rows)
+            + self._content_layout.spacing() * len(rows)
+            + margins.top()
+            + margins.bottom()
+        )
+
     def _apply_table_height(self, fixed: bool) -> None:
-        """Pin the playlist to N visible rows while slicing, else let it stretch."""
+        """Fit the playlist into what the slice section leaves it, else stretch.
+
+        The height is a *budget*, not a row count: whatever the viewport has
+        spare once the transport and the opened canvas are reserved, capped at
+        the rows the old fixed pin gave (so a text-height row is unchanged) and
+        floored at a few (so a short window still shows a playlist). Sizing it
+        by row count alone is what put Full artwork's 78px rows below the fold.
+        """
         if fixed:
             header_h = self._table.horizontalHeader().height()
             row_h = (
@@ -4288,12 +4352,15 @@ class PlayerPanel(QWidget):
             )
             if row_h <= 0:
                 row_h = 28
-            h = header_h + self._ROWS_VISIBLE_WHEN_SLICING * row_h + 2 * self._table.frameWidth() + 4
+            chrome = header_h + 2 * self._table.frameWidth() + 4
+            budget = self._scroll.viewport().height() - self._height_outside_playlist()
+            h = min(chrome + self._ROWS_VISIBLE_WHEN_SLICING * row_h, budget)
+            h = max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, h)
             self._table.setMinimumHeight(h)
             self._table.setMaximumHeight(h)
         else:
             self._table.setMinimumHeight(0)
-            self._table.setMaximumHeight(16_777_215)  # QWIDGETSIZE_MAX — stretch freely
+            self._table.setMaximumHeight(self._UNPINNED_HEIGHT)  # stretch freely
 
     def _build_waveform_for_current(self) -> None:
         """Supply the slice section a waveform for the current track.
