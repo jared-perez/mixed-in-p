@@ -36,6 +36,7 @@ class ConversionWorker(QObject):
         bitrate: int = 320,
         sample_rate: int | None = None,
         bit_depth: int | None = None,
+        output_dir: str | None = None,
         parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
@@ -44,6 +45,8 @@ class ConversionWorker(QObject):
         self._bitrate = bitrate
         self._sample_rate = sample_rate
         self._bit_depth = bit_depth
+        # None (or "") writes each file beside its own source.
+        self._output_dir = output_dir or None
         self._cancelled = False
 
     def cancel(self) -> None:
@@ -73,6 +76,7 @@ class ConversionWorker(QObject):
             result = convert_file(
                 file_path,
                 self._target_format,
+                output_dir=self._output_dir,
                 bitrate=self._bitrate,
                 sample_rate=self._sample_rate,
                 bit_depth=self._bit_depth,
@@ -114,6 +118,7 @@ class ConversionThread(QThread):
         bitrate: int = 320,
         sample_rate: int | None = None,
         bit_depth: int | None = None,
+        output_dir: str | None = None,
         parent: QObject | None = None,
     ) -> None:
         super().__init__(parent)
@@ -122,6 +127,7 @@ class ConversionThread(QThread):
         self._bitrate = bitrate
         self._sample_rate = sample_rate
         self._bit_depth = bit_depth
+        self._output_dir = output_dir
         self._worker: ConversionWorker | None = None
 
     def cancel(self) -> None:
@@ -137,6 +143,7 @@ class ConversionThread(QThread):
             self._bitrate,
             sample_rate=self._sample_rate,
             bit_depth=self._bit_depth,
+            output_dir=self._output_dir,
         )
 
         self._worker.started.connect(self.conversion_started.emit)

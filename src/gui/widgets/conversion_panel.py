@@ -6,12 +6,15 @@ from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QComboBox,
+    QFileDialog,
     QGroupBox,
     QHBoxLayout,
     QHeaderView,
     QLabel,
     QMenu,
+    QMessageBox,
     QPushButton,
+    QStyle,
     QTableWidgetItem,
     QVBoxLayout,
     QWidget,
@@ -28,6 +31,7 @@ from src.conversion.result import (
     read_audio_quality,
 )
 from src.utils.config import load_config, save_config
+from src.utils.paths import normalize_track_path
 
 from ..models import TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
@@ -39,10 +43,12 @@ from .progress_bar import ProgressPanel
 class ConversionPanel(QWidget):
     """Panel for converting audio files between lossless formats."""
 
-    # (file_paths, target_format, bitrate, sample_rate, bit_depth). The last
-    # two are `object`, not `int`: None is the "Keep source" selection and a
-    # Signal(int) would quietly deliver it as 0.
-    start_conversion = Signal(list, str, int, object, object)
+    # (file_paths, target_format, bitrate, sample_rate, bit_depth, output_dir).
+    # sample_rate/bit_depth are `object`, not `int`: None is the "Keep source"
+    # selection and a Signal(int) would quietly deliver it as 0. output_dir is
+    # a plain str because its own "unset" is "" — the empty string reaches the
+    # engine as None, i.e. "write beside the source".
+    start_conversion = Signal(list, str, int, object, object, str)
     cancel_conversion = Signal()
     send_to_analyze = Signal(list)  # list of file path strings
     send_to_rename = Signal(list)  # list of file path strings
@@ -63,6 +69,11 @@ class ConversionPanel(QWidget):
         # sf.info() per file covers both.
         self._quality_cache: dict[str, tuple[int | None, int | None]] = {}
         self._config = load_config()
+        # The folder last picked, remembered even while the Source toggle is on
+        # so switching back to it costs one click. load_config has already
+        # forgotten one that no longer exists, and forced the mode on with it.
+        self._output_dir: str = self._config.convert_output_dir
+        self._use_source_dir: bool = self._config.convert_use_source_dir
         self._loading_settings = True
         self._setup_ui()
         self._loading_settings = False
@@ -82,6 +93,10 @@ class ConversionPanel(QWidget):
         row would shrink the minimum the moment MP3 hid the rate and depth, and
         the window would jump about as the target format changed. The bitrate
         pair is excluded because it is narrower and never shares the row.
+
+        The destination's two buttons are in here because they share that row
+        and cannot shrink — the *path* is the one thing left out, on purpose:
+        that elides, so it is what gives way as the window narrows.
         """
         row = self._format_row_widget.layout()
         widgets = (
@@ -91,10 +106,14 @@ class ConversionPanel(QWidget):
             self._samplerate_combo,
             self._bitdepth_label,
             self._bitdepth_combo,
+            self._dest_choose_btn,
+            self._dest_source_toggle,
         )
         margins = row.contentsMargins()
+        # A size *hint* ignores setFixedWidth — the icon buttons hint at 54 and
+        # are laid out at 34 — so cap each one at the width it is allowed.
         return (
-            sum(w.sizeHint().width() for w in widgets)
+            sum(min(w.sizeHint().width(), w.maximumWidth()) for w in widgets)
             + row.spacing() * (len(widgets) - 1)
             + margins.left()
             + margins.right()
@@ -121,9 +140,16 @@ class ConversionPanel(QWidget):
 
         # Target format selector
         format_row = QHBoxLayout()
+        # Explicit, for two reasons. A layout that is handed to a widget takes
+        # the Qt style default (6px) rather than this panel's 8, and — the one
+        # that bit — an unset spacing reads back as **-1**, so the window
+        # minimum below was computing `-1 * gaps` and understating the row by
+        # 60-odd pixels. It fitted anyway until the row filled up.
+        format_row.setSpacing(Theme.SPACING)
         self._format_label = QLabel(self.tr("Target Format:"))
         format_row.addWidget(self._format_label)
         self._format_combo = QComboBox()
+        self._format_combo.setObjectName("compactCombo")
         self._format_combo.addItems(["AIFF", "WAV", "FLAC", "MP3"])
         self._format_combo.setCurrentText(self._config.convert_target_format)
         format_row.addWidget(self._format_combo)
@@ -131,6 +157,7 @@ class ConversionPanel(QWidget):
         # Sample rate selector (visible for lossless targets)
         self._samplerate_label = QLabel(self.tr("Sample Rate:"))
         self._samplerate_combo = QComboBox()
+        self._samplerate_combo.setObjectName("compactCombo")
         # "Keep source" (None) leaves the axis alone, the way the CLI does with
         # the flag omitted. It is the only setting that suits a mixed batch,
         # and the only one available to a source below the lowest rate here.
@@ -151,6 +178,7 @@ class ConversionPanel(QWidget):
         # Bit depth selector (visible for lossless targets)
         self._bitdepth_label = QLabel(self.tr("Bit Depth:"))
         self._bitdepth_combo = QComboBox()
+        self._bitdepth_combo.setObjectName("compactCombo")
         for label, bits in [
             (self.tr("Keep source"), None),
             (self.tr("32 bit"), 32),
@@ -168,18 +196,64 @@ class ConversionPanel(QWidget):
         # Bitrate selector (visible only for MP3)
         self._bitrate_label = QLabel(self.tr("Bitrate:"))
         self._bitrate_combo = QComboBox()
+        self._bitrate_combo.setObjectName("compactCombo")
         self._bitrate_combo.addItems(["128", "192", "256", "320"])
         self._bitrate_combo.setCurrentText(str(self._config.convert_mp3_bitrate))
         format_row.addWidget(self._bitrate_label)
         format_row.addWidget(self._bitrate_combo)
 
-        format_row.addStretch()
+        # Where the converted files are written — last on the row, after
+        # whichever quality selectors the target format is showing.
+        #
+        # No text label of its own, unlike every other control here: the folder
+        # icon and the destination printed beside it already say what it is,
+        # and the row cannot afford the decoration. Measured, in the languages
+        # that make this row expensive — a "Save To:" ahead of the button costs
+        # 62px in English and ~138 in French, and it was the difference between
+        # the default message fitting at the default window size and being
+        # elided in ten of the twelve languages. The slicer's folder button is
+        # icon-only for the same reason.
+        self._dest_choose_btn = QPushButton()
+        self._dest_choose_btn.setIcon(self.style().standardIcon(QStyle.StandardPixmap.SP_DirIcon))
+        self._dest_choose_btn.setFixedWidth(34)
+        self._dest_choose_btn.setToolTip(self.tr("Choose the folder converted files are saved to"))
+        format_row.addWidget(self._dest_choose_btn)
+        # The mode, as a toggle rather than the clear button this started as: a
+        # ✕ only appears once a folder is already set, so the way back to the
+        # default was invisible exactly when someone wanted to know it existed,
+        # and "clear" is not what it means. Lit is the resting state.
+        #
+        # Text, not an icon — on macOS SP_DirHomeIcon draws the same folder as
+        # the picker beside it, and no standard icon says "beside the source".
+        # One word keeps it affordable in every language. autoToggle is the
+        # app's toggle style (the Analyze panel's Auto), reused the way
+        # history_panel reuses it.
+        self._dest_source_toggle = QPushButton(self.tr("Source"))
+        self._dest_source_toggle.setObjectName("autoToggle")
+        self._dest_source_toggle.setCheckable(True)
+        format_row.addWidget(self._dest_source_toggle)
+        # A path is arbitrarily long and belongs to the user, not to us, so it
+        # elides instead of pushing the window wider — from the *left*, so what
+        # survives is the deepest folder rather than the root. Sharing the row
+        # leaves it around 150px at the default window size, and in that much
+        # room the other modes spend the whole budget on the part every path on
+        # the machine has in common: middle gives "/var/fol… masters", right
+        # gives "/var/folders/nh/m4f…". This gives "…44.1k 16bit masters" and
+        # grows back into the full path as the window widens. ElidedLabel
+        # raises its own tooltip with the full path whenever it is cut.
+        # It takes the row's leftover width, which is why there is no stretch
+        # after it: the stretch *is* this label.
+        self._dest_path_label = ElidedLabel("", mode=Qt.TextElideMode.ElideLeft)
+        self._dest_path_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
+        format_row.addWidget(self._dest_path_label, 1)
+
         # Host the format controls in a widget so the window sizer can read their
         # pushed-together width and keep the Convert window from getting narrower
         # than what fits the Target Format / Sample Rate / Bit Depth selectors.
         self._format_row_widget = QWidget()
         self._format_row_widget.setLayout(format_row)
         layout.addWidget(self._format_row_widget)
+        self._sync_destination()
 
         # Progress panel (initially hidden)
         self._progress_panel = ProgressPanel(show_activity=True)
@@ -278,6 +352,8 @@ class ConversionPanel(QWidget):
         self._samplerate_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitdepth_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitrate_combo.currentTextChanged.connect(self._save_convert_settings)
+        self._dest_choose_btn.clicked.connect(self._on_choose_output_dir)
+        self._dest_source_toggle.toggled.connect(self._on_source_toggled)
         self._file_table.files_dropped.connect(self.add_files)
         self._file_table.itemSelectionChanged.connect(self._on_selection_changed)
         self._send_to_analyze_action.triggered.connect(self._on_send_to_analyze)
@@ -412,8 +488,144 @@ class ConversionPanel(QWidget):
         bd = self._bitdepth_combo.currentData()
         cfg.convert_sample_rate = None if sr is None else int(sr)
         cfg.convert_bit_depth = None if bd is None else int(bd)
+        cfg.convert_output_dir = self._output_dir
+        cfg.convert_use_source_dir = self._use_source_dir
         save_config(cfg)
         self._config = cfg
+
+    # ------------------------------------------------------------ destination
+
+    def output_dir(self) -> str:
+        """The folder a conversion would write to — "" for beside the source.
+
+        The mode decides, not the remembered path: a folder stays in
+        _output_dir while the toggle is on precisely so it can be switched back
+        to, and reading that field directly would send files to a folder the
+        user can see the app is not using.
+        """
+        return "" if self._use_source_dir else self._output_dir
+
+    def _sync_destination(self) -> None:
+        """Reflect the destination in the toggle, the text and both tooltips."""
+        custom = not self._use_source_dir and bool(self._output_dir)
+        # Which end gives way depends on the value, not the widget. A path is
+        # cut from the left so the chosen folder survives; the resting message
+        # is a sentence and reads from the start like any other.
+        self._dest_path_label.set_elide_mode(
+            Qt.TextElideMode.ElideLeft if custom else Qt.TextElideMode.ElideRight
+        )
+        self._dest_path_label.setText(
+            self._output_dir if custom else self.tr("Same folder as source")
+        )
+        # Set here rather than left to the label's own resize handling: picking
+        # a folder changes the text without changing the width, so no resize
+        # need follow, and the label would keep the previous path's tooltip.
+        self._dest_path_label.setToolTip(self.output_dir())
+
+        # Reflecting the state, not acting on it: an unguarded setChecked here
+        # re-enters _on_source_toggled, and the branch that asks for a folder
+        # then raises a *modal file dialog* from inside a state refresh — which
+        # in a test with no one to click it is a hung suite, and in the app is a
+        # dialog nobody asked for.
+        self._dest_source_toggle.blockSignals(True)
+        self._dest_source_toggle.setChecked(self._use_source_dir)
+        self._dest_source_toggle.blockSignals(False)
+        # What the *next* click does, in both directions, the way every other
+        # toggle in the app states it — a lit button alone does not say what
+        # turning it off would mean.
+        self._dest_source_toggle.setToolTip(
+            self.tr("Save converted files to a folder instead")
+            if self._use_source_dir
+            else self.tr("Save converted files next to the originals")
+        )
+
+        # The label is the row's give — squeeze the window far enough and it
+        # elides away to nothing — so the destination is reachable from the
+        # button too, which cannot shrink. Composed, not a second translatable
+        # string.
+        choose_tip = self.tr("Choose the folder converted files are saved to")
+        self._dest_choose_btn.setToolTip(
+            f"{choose_tip}\n{self._output_dir}" if custom else choose_tip
+        )
+
+    def _set_destination(self, path: str, use_source: bool) -> None:
+        self._output_dir = path
+        self._use_source_dir = use_source
+        self._sync_destination()
+        self._save_convert_settings()
+
+    def _on_choose_output_dir(self) -> str:
+        """Pick the folder converted files are written to.
+
+        Choosing one turns the Source toggle off by itself: the user has just
+        named a destination, and leaving the toggle lit would ignore it.
+        Returns the chosen folder, or "" if the dialog was cancelled — the
+        toggle needs to know, because a cancel there must leave it as it was.
+        """
+        folder = QFileDialog.getExistingDirectory(
+            self,
+            self.tr("Choose Output Folder"),
+            self._output_dir,
+        )
+        if not folder:
+            return ""
+        # A dialog result is a path arriving from the OS, and on Windows it
+        # comes back with forward slashes. The converted files' paths are
+        # built from this and can end up in the library via Send To, where
+        # identity is exact-string — so it is spelled the app's one way here,
+        # at the point it arrives, like every other such entry point.
+        folder = normalize_track_path(folder)
+        self._set_destination(folder, use_source=False)
+        return folder
+
+    def _on_source_toggled(self, checked: bool) -> None:
+        """Switch between writing beside each source and writing to a folder.
+
+        Turning it off restores the folder last picked rather than doing
+        nothing, which is the whole reason the path is remembered while the
+        toggle is on. With nothing to restore — or with a folder that has gone
+        away since — it asks for one, and a cancelled dialog leaves the toggle
+        exactly as it was rather than stranding the panel in an "off" state
+        with no destination behind it.
+        """
+        if checked:
+            self._set_destination(self._output_dir, use_source=True)
+            return
+        if self._output_dir and Path(self._output_dir).is_dir():
+            self._set_destination(self._output_dir, use_source=False)
+            return
+        if not self._on_choose_output_dir():
+            # Back to lit, keeping whatever folder was remembered. The toggle
+            # itself is re-checked by _sync_destination, which does not re-enter
+            # this slot.
+            self._set_destination(self._output_dir, use_source=True)
+
+    def _output_dir_is_writable(self) -> bool:
+        """True if the chosen folder exists (or can be made) and takes a file.
+
+        Checked once before a batch rather than per file: a folder deleted or
+        unmounted since it was picked would otherwise fail every row with a
+        libsndfile message that never names the real problem.
+        """
+        destination = self.output_dir()
+        if not destination:
+            return True  # each file's own folder — it's where the source is
+        target = Path(destination)
+        try:
+            target.mkdir(parents=True, exist_ok=True)
+            probe = target / ".mixedinp-write-test"
+            probe.touch()
+            probe.unlink()
+            return True
+        except OSError as exc:
+            QMessageBox.warning(
+                self,
+                self.tr("Output Folder Unavailable"),
+                self.tr("Can't save converted files to {folder}.\n\n{error}").format(
+                    folder=destination, error=exc
+                ),
+            )
+            return False
 
     def _on_selection_changed(self) -> None:
         """Enable/disable Send To based on table selection."""
@@ -599,6 +811,8 @@ class ConversionPanel(QWidget):
         ]
 
         if file_paths:
+            if not self._output_dir_is_writable():
+                return
             bitrate = int(self._bitrate_combo.currentText())
             # Passed through as-is: None means "Keep source" all the way down
             # to the writer, so no `or` default here.
@@ -608,6 +822,7 @@ class ConversionPanel(QWidget):
                 bitrate,
                 self._samplerate_combo.currentData(),
                 self._bitdepth_combo.currentData(),
+                self.output_dir(),
             )
 
     def _on_send_to_analyze(self) -> None:

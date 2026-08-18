@@ -102,6 +102,21 @@ class AppConfig:
     # change this axis", which is what the CLI passes when the flag is omitted.
     convert_sample_rate: int | None = 44100
     convert_bit_depth: int | None = 16
+    # Where converted files are written, as a mode plus a remembered folder.
+    #
+    # The two are deliberately independent: convert_output_dir holds the last
+    # folder the user picked even while the Source toggle is on, so switching
+    # back to it is one click rather than a second trip through the file
+    # dialog. Only convert_use_source_dir decides what a conversion actually
+    # does — on means "beside each source file", which is what the engine does
+    # with output_dir=None, so a batch spanning several folders lands each file
+    # next to its own original.
+    #
+    # A remembered folder that has since been deleted is cleared on load (and
+    # forces the mode back on), rather than failing every conversion later with
+    # a stale path.
+    convert_output_dir: str = ""
+    convert_use_source_dir: bool = True
     spectrum_dynamic_range: float = 110.0
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
@@ -239,6 +254,12 @@ def load_config() -> AppConfig:
                 convert_bit_depth=_optional_int(
                     data, "convert_bit_depth", AppConfig.convert_bit_depth
                 ),
+                convert_output_dir=str(
+                    data.get("convert_output_dir", AppConfig.convert_output_dir)
+                ),
+                convert_use_source_dir=bool(
+                    data.get("convert_use_source_dir", AppConfig.convert_use_source_dir)
+                ),
                 spectrum_dynamic_range=float(
                     data.get("spectrum_dynamic_range", AppConfig.spectrum_dynamic_range)
                 ),
@@ -314,6 +335,17 @@ def load_config() -> AppConfig:
                 cfg.convert_sample_rate = AppConfig.convert_sample_rate
             if cfg.convert_bit_depth not in {None, 8, 16, 24, 32}:
                 cfg.convert_bit_depth = AppConfig.convert_bit_depth
+            # A saved output folder that has been deleted or unmounted since is
+            # forgotten, and the mode goes back on with it — the alternative is
+            # a panel pointing at somewhere that isn't there and a batch that
+            # fails file by file for a reason the row can't explain. Forcing
+            # the mode matters as much as clearing the path: an "off" with no
+            # folder behind it is a state with no destination at all.
+            if cfg.convert_output_dir and not Path(cfg.convert_output_dir).is_dir():
+                cfg.convert_output_dir = AppConfig.convert_output_dir
+                cfg.convert_use_source_dir = True
+            if not cfg.convert_output_dir:
+                cfg.convert_use_source_dir = True
             cfg.spectrum_dynamic_range = max(60.0, min(cfg.spectrum_dynamic_range, 150.0))
             if not _HEX_COLOR_RE.match(cfg.waveform_color):
                 cfg.waveform_color = AppConfig.waveform_color

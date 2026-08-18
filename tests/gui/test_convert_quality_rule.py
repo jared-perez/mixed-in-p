@@ -114,7 +114,7 @@ def test_convert_emits_the_same_files_the_table_promised(panel, flac_96k_24, qtb
     with qtbot.waitSignal(panel.start_conversion, timeout=1000) as sig:
         panel._convert_btn.click()
 
-    file_paths, target_format, _bitrate, sample_rate, bit_depth = sig.args
+    file_paths, target_format, _bitrate, sample_rate, bit_depth, _out_dir = sig.args
     assert file_paths == [flac_96k_24]
     assert (target_format, sample_rate, bit_depth) == ("FLAC", 44100, 16)
 

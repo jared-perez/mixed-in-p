@@ -73,7 +73,6 @@ else:
 
 BUTTON_PADDING = 32      # qss: padding 8px 16px
 CHECK_INDICATOR = 34     # indicator + spacing
-COMBO_ARROW = 48
 
 # How much worse than English before it is worth a human looking. Small enough
 # to catch a genuinely clipped word, large enough to ignore metric jitter.
@@ -129,8 +128,24 @@ def measure(root, page: str, out: dict) -> None:
             continue
 
         if isinstance(w, QComboBox):
-            text, slack = w.currentText(), COMBO_ARROW
-        elif isinstance(w, QPushButton):
+            # Ask the widget, not a constant. This used to be font metrics plus
+            # a 48px COMBO_ARROW modelling the default QSS chrome (8px padding
+            # and a 30px arrow, reserved twice over), so a combo styled any
+            # other way was measured against the wrong allowance — the Convert
+            # selectors carry a tighter rule and were reported clipped in four
+            # languages while rendering in full.
+            # sizeHint() is the style's own answer, computed from the widest
+            # item and whatever padding actually applies, so it travels.
+            out[widget_key(w)] = {
+                "page": page,
+                "type": type(w).__name__,
+                "name": w.objectName() or "-",
+                "text": w.currentText(),
+                "over": w.sizeHint().width() - w.width(),
+                "axis": "width",
+            }
+            continue
+        if isinstance(w, QPushButton):
             text, slack = w.text(), BUTTON_PADDING
         elif isinstance(w, (QCheckBox, QRadioButton)):
             text, slack = w.text(), CHECK_INDICATOR

@@ -1184,11 +1184,14 @@ class MainWindow(QMainWindow):
         bitrate: int = 320,
         sample_rate: int | None = 44100,
         bit_depth: int | None = 16,
+        output_dir: str = "",
     ) -> None:
         """Start the conversion operation.
 
         sample_rate / bit_depth are None for "Keep source", which the engine
         reads as "leave this axis alone" — don't coerce them to a number.
+        output_dir is "" for "beside each source file", which the engine spells
+        None; the panel has already checked the folder is writable.
         """
         if self._conversion_thread is not None and self._conversion_thread.isRunning():
             QMessageBox.warning(
@@ -1214,6 +1217,7 @@ class MainWindow(QMainWindow):
             bitrate,
             sample_rate=sample_rate,
             bit_depth=bit_depth,
+            output_dir=output_dir or None,
             parent=self,
         )
         self._conversion_thread.conversion_started.connect(self._on_conversion_started)
@@ -1690,6 +1694,12 @@ class MainWindow(QMainWindow):
         self._config.convert_mp3_bitrate = disk.convert_mp3_bitrate
         self._config.convert_sample_rate = disk.convert_sample_rate
         self._config.convert_bit_depth = disk.convert_bit_depth
+        # These two are one value in two fields and must always be copied
+        # together: the folder is remembered even while the Source toggle is
+        # on, so carrying one across without the other resurrects a stale
+        # destination — or silently drops the folder the user meant to keep.
+        self._config.convert_output_dir = disk.convert_output_dir
+        self._config.convert_use_source_dir = disk.convert_use_source_dir
         self._config.player_edit_locked = disk.player_edit_locked
         # These three are one value in three fields and must always be copied
         # together: the count says how many sections the state describes (a

@@ -682,6 +682,21 @@ QComboBox::down-arrow {
     height: 0px;
 }
 
+/* Convert's format selectors share one row with the Save To picker, so they
+   carry no more chrome than the arrow actually needs. The default rule
+   reserves that space twice — padding-right AND the ::drop-down width, which
+   Qt adds to the size hint on top of the padding — which is 70px of slack per
+   combo over its widest item. Text metrics still decide the width, so this
+   stays correct in every language. */
+QComboBox#compactCombo {
+    padding: 8px;
+    padding-right: 4px;
+}
+
+QComboBox#compactCombo::drop-down {
+    width: 22px;
+}
+
 QComboBox QAbstractItemView {
     background-color: @BG_MEDIUM@;
     border: 1px solid @BG_LIGHTER@;
