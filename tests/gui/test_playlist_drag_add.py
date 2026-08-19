@@ -71,6 +71,30 @@ def tree(qtbot, lib, stack):
 
 
 @pytest.fixture
+def scrolled_panel(qtbot, lib, stack):
+    """A shown panel with more playlists than fit, for the scroll tests.
+
+    The *panel* is shown, not the bare tree: a tree resized and shown on its
+    own is never really visible (its parent isn't), and in that state a rebuild
+    keeps its scroll position all by itself — so a test written against it
+    passes just as happily with the fix removed. Found by removing it.
+    """
+    panel = PlaylistTreePanel()
+    qtbot.addWidget(panel)
+    panel.set_library(lib)
+    panel.tree.set_undo_stack(stack)
+    panel.resize(240, 300)
+    panel.show()
+    panel.ensure_loaded()
+    for i in range(40):
+        lib.create_playlist(f"Playlist {i:02d}")
+    panel.tree.refresh()
+    qtbot.wait(10)
+    assert panel.tree.verticalScrollBar().maximum() > 0, "must be scrollable"
+    return panel
+
+
+@pytest.fixture
 def player(qtbot, lib):
     panel = PlayerPanel()
     qtbot.addWidget(panel)
@@ -236,6 +260,55 @@ class TestDropTracks:
 
         stack.undo()
         assert [t.path for t in lib.get_items(pl)] == [a]
+
+    def test_the_tree_stays_where_the_user_scrolled_it(
+        self, qtbot, scrolled_panel, lib, tmp_path, monkeypatch
+    ):
+        """A drop rebuilds the whole tree and changes not one row of it, so
+        losing the scroll meant a long tree jumped to the top on every drop —
+        away from the playlist being filled."""
+        (a,) = make_files(tmp_path, "a.wav")
+        tree = scrolled_panel.tree
+        target = lib.create_playlist("Target")
+        tree.refresh()
+
+        bar = tree.verticalScrollBar()
+        assert bar.maximum() > 0, "fixture must actually be scrollable"
+        bar.setValue(bar.maximum())
+        qtbot.wait(10)
+        scrolled = bar.value()
+
+        aim_at(tree, target, monkeypatch)
+        tree._drop_tracks(FakeDropEvent(url_mime([a])))
+        qtbot.wait(10)
+
+        assert [t.path for t in lib.get_items(target)] == [a]  # the drop worked
+        assert bar.value() == scrolled
+
+    def test_a_new_playlist_is_still_scrolled_into_view(
+        self, qtbot, scrolled_panel, lib
+    ):
+        """The restore must not fight a rebuild that means to move.
+
+        A new node lands at the top with a rename editor already open on it,
+        so leaving the tree scrolled down would have the user typing into a row
+        they cannot see. That used to work by accident — the rebuild threw the
+        scroll away — so keeping the scroll is what makes the reveal need
+        saying out loud.
+        """
+        tree = scrolled_panel.tree
+        bar = tree.verticalScrollBar()
+        bar.setValue(bar.maximum())
+        qtbot.wait(10)
+        assert bar.value() > 0
+
+        tree.create_playlist(None)
+        qtbot.wait(10)
+
+        new_id = tree.library.get_children(None)[0].id
+        rect = tree.visualRect(tree._find_item(new_id).index())
+        assert not rect.isEmpty()
+        assert tree.viewport().rect().contains(rect)
 
 
 class TestDuplicatePolicy:

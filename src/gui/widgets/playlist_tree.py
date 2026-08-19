@@ -453,17 +453,23 @@ class PlaylistTree(QTreeView):
         return self._library
 
     def _rebuild(self) -> None:
-        """Repopulate from the database, preserving expansion + selection.
+        """Repopulate from the database, preserving expansion, selection, scroll.
 
         Expansion comes from the database, not from the view we are about to
         clear: every expand/collapse writes through as it happens, so the
         stored set is always current, and reading it here is also what makes
         the tree come back the way it was left in the previous session.
+
+        The scroll matters because most rebuilds change nothing the user can
+        see: dropping tracks onto a playlist rebuilds the whole tree and alters
+        not one row of it, so a tree scrolled down to the playlist being filled
+        jumped back to the top on every drop.
         """
         expanded = (
             self._library.expanded_node_ids() if self._library is not None else set()
         )
         selected = self._current_id()
+        scroll = self.verticalScrollBar().value()
         self._building = True
         try:
             self._model.clear()
@@ -492,6 +498,13 @@ class PlaylistTree(QTreeView):
         if self._name_filter:
             self._apply_name_filter()
         self.resizeColumnToContents(0)
+        # Last, because restoring the selection *scrolls to it*: setCurrentIndex
+        # calls scrollTo, so putting this any earlier would have it overwritten
+        # by the very restore above. Qt has already recomputed the range by
+        # here (measured), so an out-of-date position clamps rather than
+        # silently landing at 0, and a rebuild that really did move things —
+        # _create_node's — scrolls to its new row after this returns.
+        self.verticalScrollBar().setValue(scroll)
         # Every row the button could have been aimed at is gone. Re-aim on the
         # next tick rather than now: a rebuild from _create_node is followed by
         # an edit() in the same call, and the deferred pass sees the editor.
@@ -866,6 +879,11 @@ class PlaylistTree(QTreeView):
                 if parent_item is not None:
                     self.setExpanded(parent_item.index(), True)
             self.setCurrentIndex(item.index())
+            # Reveals the new row on its own — nothing extra needed here even
+            # now that _rebuild keeps the scroll. A scrollTo was written for
+            # this and removed again: with the tree really on screen a
+            # mutation test would not fail against its absence, so it was a
+            # comment asserting a trap that isn't there.
             self.edit(item.index())  # name it right away
 
     def _on_item_changed(self, item: QStandardItem) -> None:
