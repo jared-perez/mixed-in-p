@@ -20,10 +20,21 @@ import logging
 import shutil
 from pathlib import Path
 
-from PySide6.QtCore import QMimeData, QPointF, QRectF, QSize, Qt, QTimer, QUrl, Signal
+from PySide6.QtCore import (
+    QMimeData,
+    QPoint,
+    QPointF,
+    QRectF,
+    QSize,
+    Qt,
+    QTimer,
+    QUrl,
+    Signal,
+)
 from PySide6.QtGui import (
     QBrush,
     QColor,
+    QCursor,
     QDrag,
     QFont,
     QIcon,
@@ -96,6 +107,13 @@ _ICON_DRAW = 40  # painted at 2x, displayed at 20 for HiDPI crispness
 # row is the narrowest in the app and every pixel here is taken from a
 # translated button label that would centre-clip rather than elide.
 _SEARCH_BTN_WIDTH = 22
+
+# The per-row create button, floating at the tree's right edge over whichever
+# row the cursor is on. It is a child of the viewport at an absolute position,
+# never part of the row: the column is ResizeToContents with ElideNone (§4b),
+# so an item rect ends at its own text and cannot reach the right edge.
+_ROW_ADD_SIZE = 18
+_ROW_ADD_MARGIN = 4
 
 
 def _with_playlist_suffix(path: str, chosen_filter: str) -> str:
@@ -189,6 +207,27 @@ def _make_search_icon() -> QIcon:
         p.setBrush(Qt.BrushStyle.NoBrush)
         p.drawEllipse(QRectF(s * 0.16, s * 0.16, s * 0.48, s * 0.48))
         p.drawLine(QPointF(s * 0.62, s * 0.62), QPointF(s * 0.84, s * 0.84))
+    finally:
+        p.end()
+    icon = QIcon()
+    icon.addPixmap(pm)
+    return icon
+
+
+def _make_add_icon() -> QIcon:
+    """A plus for the per-row create button, drawn to match _tree_icon."""
+    pm = QPixmap(_ICON_DRAW, _ICON_DRAW)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        s = _ICON_DRAW
+        pen = QPen(QColor(Theme.TEXT_SECONDARY))
+        pen.setWidthF(s * 0.11)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        p.setPen(pen)
+        p.drawLine(QPointF(s * 0.5, s * 0.2), QPointF(s * 0.5, s * 0.8))
+        p.drawLine(QPointF(s * 0.2, s * 0.5), QPointF(s * 0.8, s * 0.5))
     finally:
         p.end()
     icon = QIcon()
@@ -291,6 +330,10 @@ class PlaylistTree(QTreeView):
         self._name_filter = ""
         self._pre_filter_expanded: set[int] | None = None
         self._filtering = False
+        # Which node the floating create button is currently offering to add
+        # under. Stored as an id, not a QModelIndex: every structural edit
+        # rebuilds the model, and a stale index would still answer isValid().
+        self._row_add_node_id: int | None = None
 
         self.setObjectName("playlistTree")
         self._model = QStandardItemModel(self)
@@ -316,7 +359,8 @@ class PlaylistTree(QTreeView):
         self.viewport().setAcceptDrops(True)
         self.setDropIndicatorShown(True)
 
-        self.setItemDelegate(_TreeItemDelegate(self))
+        delegate = _TreeItemDelegate(self)
+        self.setItemDelegate(delegate)
         self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
         self.customContextMenuRequested.connect(self._on_context_menu)
         self._model.itemChanged.connect(self._on_item_changed)
@@ -325,6 +369,26 @@ class PlaylistTree(QTreeView):
         # the same two signals are where expansion is persisted.
         self.expanded.connect(lambda index: self._on_expansion_changed(index, True))
         self.collapsed.connect(lambda index: self._on_expansion_changed(index, False))
+
+        # Floating per-row create button. A child of the viewport rather than
+        # of the view, so it scrolls out of the way with the rows and never
+        # covers the scrollbars.
+        self.viewport().setMouseTracking(True)
+        self._row_add_btn = QPushButton(self.viewport())
+        self._row_add_btn.setObjectName("treeRowAddButton")
+        self._row_add_btn.setIcon(_make_add_icon())
+        self._row_add_btn.setIconSize(QSize(12, 12))
+        self._row_add_btn.setFixedSize(_ROW_ADD_SIZE, _ROW_ADD_SIZE)
+        self._row_add_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._row_add_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        self._row_add_btn.hide()
+        self._row_add_btn.clicked.connect(self._on_row_add_clicked)
+        # Scrolling moves rows under a stationary cursor, so the button has to
+        # re-aim without a mouse event; closeEditor brings it back after the
+        # inline rename it opened for itself.
+        self.verticalScrollBar().valueChanged.connect(self._refresh_row_add_button)
+        self.horizontalScrollBar().valueChanged.connect(self._refresh_row_add_button)
+        delegate.closeEditor.connect(lambda *_: self._refresh_row_add_button())
 
     # ----------------------------------------------------------------- loading
 
@@ -395,6 +459,11 @@ class PlaylistTree(QTreeView):
         if self._name_filter:
             self._apply_name_filter()
         self.resizeColumnToContents(0)
+        # Every row the button could have been aimed at is gone. Re-aim on the
+        # next tick rather than now: a rebuild from _create_node is followed by
+        # an edit() in the same call, and the deferred pass sees the editor.
+        self._hide_row_add_button()
+        QTimer.singleShot(0, self, self._refresh_row_add_button)
 
     def _append_children(self, parent_item: QStandardItem, parent_id: int | None) -> None:
         for node in self._library.get_children(parent_id):
@@ -602,6 +671,116 @@ class PlaylistTree(QTreeView):
         index = self.currentIndex()
         return index.data(NODE_ID_ROLE) if index.isValid() else None
 
+    # ------------------------------------------------- floating create button
+
+    def _row_index_at(self, pos):
+        """The row at *pos*'s height, whatever its horizontal position.
+
+        ``indexAt`` answers about a **cell**, and the one column is sized to
+        its own content (ResizeToContents, no stretch) — so a point out at the
+        viewport's right edge is past the end of the only column and reads as
+        empty space, even with a row plainly drawn at that height. That is
+        precisely where the button lives, and where the cursor has to travel
+        to click it, so hit-testing with ``indexAt`` alone made the button
+        disappear the moment the user reached for it.
+        """
+        index = self.indexAt(pos)
+        if index.isValid():
+            return index
+        # Retake at the column's own left edge (clamped into view, since a
+        # horizontal scroll puts that edge at a negative x).
+        return self.indexAt(QPoint(max(0, self.columnViewportPosition(0)), pos.y()))
+
+    def _aim_row_add_button(self, pos) -> None:
+        """Park the create button on the row at viewport point *pos*.
+
+        Pinned to the viewport's right edge, not to the row: the column is
+        ResizeToContents with ElideNone, so the item rect stops at the end of
+        the name and a long name scrolls sideways underneath the button.
+        """
+        if self.state() == QAbstractItemView.State.EditingState:
+            self._hide_row_add_button()
+            return
+        index = self._row_index_at(pos)
+        kind = index.data(KIND_ROLE) if index.isValid() else None
+        # Scratch is pinned and owns no siblings the user arranges — offering
+        # to create beside it would be a third route to the "+ Playlist"
+        # button already sitting above the tree.
+        if kind not in ("playlist", "folder"):
+            self._hide_row_add_button()
+            return
+        rect = self.visualRect(index)
+        if rect.isEmpty():
+            self._hide_row_add_button()
+            return
+        btn = self._row_add_btn
+        node_id = index.data(NODE_ID_ROLE)
+        if node_id != self._row_add_node_id:
+            self._row_add_node_id = node_id
+            btn.setToolTip(
+                self.tr("New folder inside this folder")
+                if kind == "folder"
+                else self.tr("New playlist below this one")
+            )
+        btn.move(
+            self.viewport().width() - btn.width() - _ROW_ADD_MARGIN,
+            rect.center().y() - btn.height() // 2,
+        )
+        btn.show()
+        btn.raise_()
+
+    def _refresh_row_add_button(self) -> None:
+        """Re-aim from the real cursor position, for the times there is no
+        mouse event to read one off (a scroll, a rebuild, an editor closing)."""
+        if not self._loaded:
+            self._hide_row_add_button()
+            return
+        pos = self.viewport().mapFromGlobal(QCursor.pos())
+        if not self.viewport().rect().contains(pos):
+            self._hide_row_add_button()
+            return
+        self._aim_row_add_button(pos)
+
+    def _hide_row_add_button(self) -> None:
+        self._row_add_node_id = None
+        self._row_add_btn.hide()
+
+    def _on_row_add_clicked(self) -> None:
+        """Create below a playlist, or inside a folder.
+
+        Read back from the database rather than trusted from the row: the
+        button is aimed by hover and the tree can have been rebuilt (a drop, a
+        delete, an undo) since it last moved.
+        """
+        node_id = self._row_add_node_id
+        if node_id is None or self._library is None:
+            return
+        node = self._library.get_node(node_id)
+        if node is None:
+            return
+        self._hide_row_add_button()
+        if node.kind == "folder":
+            self._create_node("folder", node_id)
+        elif node.kind == "playlist":
+            self._create_node("playlist", node.parent_id, after_id=node_id)
+
+    def mouseMoveEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        super().mouseMoveEvent(event)
+        self._aim_row_add_button(event.position().toPoint())
+
+    def leaveEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        # Not an unconditional hide: entering the button is itself a Leave for
+        # the viewport it is a child of, and hiding there would snatch the
+        # button out from under the click it was reached for. Re-aiming
+        # instead keeps it up (the cursor is still inside the viewport) and
+        # drops it only when the cursor has really gone.
+        self._refresh_row_add_button()
+        super().leaveEvent(event)
+
+    def resizeEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        super().resizeEvent(event)
+        self._refresh_row_add_button()
+
     # -------------------------------------------------------------------- CRUD
 
     def create_playlist(self, parent_id: int | None = None) -> None:
@@ -610,13 +789,33 @@ class PlaylistTree(QTreeView):
     def create_folder(self, parent_id: int | None = None) -> None:
         self._create_node("folder", parent_id)
 
-    def _create_node(self, kind: str, parent_id: int | None) -> None:
+    def _create_node(
+        self, kind: str, parent_id: int | None, *, after_id: int | None = None
+    ) -> None:
+        """Create a folder or playlist, optionally right below a sibling.
+
+        ``after_id`` is what the floating row button uses: "new playlist below
+        this one" has to survive ``Library._create_node`` inserting at the
+        *top* of the parent's children, so the position is taken before the
+        insert and replayed as a move afterwards.
+        """
         self.ensure_loaded()
         name = self.tr("New Playlist") if kind == "playlist" else self.tr("New Folder")
+        anchor_pos: int | None = None
+        if after_id is not None:
+            anchor = self._library.get_node(after_id)
+            if anchor is not None and anchor.parent_id == parent_id:
+                anchor_pos = anchor.position
         if kind == "playlist":
             node_id = self._library.create_playlist(name, parent_id)
         else:
             node_id = self._library.create_folder(name, parent_id)
+        if anchor_pos is not None:
+            # The new node went in at 0, so the anchor sits one lower than the
+            # position read above — but move_node counts siblings with the
+            # moved node removed, which is the pre-insert order, and there the
+            # anchor is still at anchor_pos. Slot after it.
+            self._library.move_node(node_id, parent_id, anchor_pos + 1)
         self._rebuild()
         item = self._find_item(node_id)
         if item is not None:
@@ -1014,6 +1213,8 @@ class PlaylistTree(QTreeView):
         return index.data(NODE_ID_ROLE)
 
     def dragEnterEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        # Nothing floating over the rows while a drag is picking one out.
+        self._hide_row_add_button()
         if event.mimeData().hasFormat(NODE_MIME):
             event.acceptProposedAction()
         elif self._is_track_drag(event.mimeData()):

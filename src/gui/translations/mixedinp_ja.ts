@@ -1471,94 +1471,94 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1440"/>
+        <location filename="../widgets/player_panel.py" line="1444"/>
         <source>Player</source>
         <translation>プレイヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1470"/>
-        <location filename="../widgets/player_panel.py" line="2476"/>
+        <location filename="../widgets/player_panel.py" line="1474"/>
+        <location filename="../widgets/player_panel.py" line="2488"/>
         <source>Search all playlists…</source>
         <translation>すべてのプレイリストを検索…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1489"/>
+        <location filename="../widgets/player_panel.py" line="1493"/>
         <source>This playlist</source>
         <translation>このプレイリスト</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1490"/>
+        <location filename="../widgets/player_panel.py" line="1494"/>
         <source>All playlists</source>
         <translation>すべてのプレイリスト</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1515"/>
+        <location filename="../widgets/player_panel.py" line="1519"/>
         <source>Choose a visualization</source>
         <translation>ビジュアライゼーションを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1523"/>
+        <location filename="../widgets/player_panel.py" line="1527"/>
         <source>Visuals off</source>
         <translation>ビジュアルオフ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1524"/>
+        <location filename="../widgets/player_panel.py" line="1528"/>
         <source>Backdrop waveform</source>
         <translation>背景：波形</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1525"/>
+        <location filename="../widgets/player_panel.py" line="1529"/>
         <source>Backdrop oscilloscope</source>
         <translation>背景：オシロスコープ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1526"/>
+        <location filename="../widgets/player_panel.py" line="1530"/>
         <source>Backdrop spectrum</source>
         <translation>背景：スペクトラム</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1527"/>
+        <location filename="../widgets/player_panel.py" line="1531"/>
         <source>Backdrop fire</source>
         <translation>背景：ファイア</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1528"/>
+        <location filename="../widgets/player_panel.py" line="1532"/>
         <source>Backdrop fractal</source>
         <translation>背景：フラクタル</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1529"/>
+        <location filename="../widgets/player_panel.py" line="1533"/>
         <source>Popout oscilloscope</source>
         <translation>別ウインドウ：オシロスコープ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1530"/>
+        <location filename="../widgets/player_panel.py" line="1534"/>
         <source>Popout spectrum bars</source>
         <translation>別ウインドウ：スペクトラムバー</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1531"/>
+        <location filename="../widgets/player_panel.py" line="1535"/>
         <source>Popout fire</source>
         <translation>別ウインドウ：ファイア</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1532"/>
+        <location filename="../widgets/player_panel.py" line="1536"/>
         <source>Popout fractal</source>
         <translation>別ウインドウ：フラクタル</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1565"/>
+        <location filename="../widgets/player_panel.py" line="1569"/>
         <source>Edit Lock</source>
         <translation>編集ロック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1569"/>
+        <location filename="../widgets/player_panel.py" line="1573"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>プレイリストのメタデータ編集をロック</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1119"/>
-        <location filename="../widgets/player_panel.py" line="2589"/>
+        <location filename="../widgets/player_panel.py" line="2601"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -1639,40 +1639,40 @@ or click “Add Artwork…”</source>
         <translation>アートワーク</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1652"/>
-        <location filename="../widgets/player_panel.py" line="2586"/>
+        <location filename="../widgets/player_panel.py" line="1656"/>
+        <location filename="../widgets/player_panel.py" line="2598"/>
         <source>Playlists</source>
         <translation>プレイリスト</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1759"/>
+        <location filename="../widgets/player_panel.py" line="1763"/>
         <source>Previous</source>
         <translation>前へ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1770"/>
+        <location filename="../widgets/player_panel.py" line="1774"/>
         <source>Play / Pause  (Space)</source>
         <translation>再生 / 一時停止  （Space）</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1777"/>
+        <location filename="../widgets/player_panel.py" line="1781"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1784"/>
+        <location filename="../widgets/player_panel.py" line="1788"/>
         <source>Next</source>
         <translation>次へ</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1802"/>
-        <location filename="../widgets/player_panel.py" line="2433"/>
-        <location filename="../widgets/player_panel.py" line="2438"/>
+        <location filename="../widgets/player_panel.py" line="1806"/>
+        <location filename="../widgets/player_panel.py" line="2445"/>
+        <location filename="../widgets/player_panel.py" line="2450"/>
         <source>Save Playlist</source>
         <translation>プレイリストを保存</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1740"/>
+        <location filename="../widgets/player_panel.py" line="1744"/>
         <source>Vol</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>音量</translation>
@@ -1682,154 +1682,154 @@ or click “Add Artwork…”</source>
         <translation type="vanished">選択項目を削除</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1807"/>
+        <location filename="../widgets/player_panel.py" line="1811"/>
         <source>Clear Playlist</source>
         <translation>プレイリストをクリア</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1825"/>
+        <location filename="../widgets/player_panel.py" line="1832"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>これをプレイリストにドラッグすると再生中のトラックを追加できます</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2027"/>
-        <location filename="../widgets/player_panel.py" line="2420"/>
+        <location filename="../widgets/player_panel.py" line="2039"/>
+        <location filename="../widgets/player_panel.py" line="2432"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2405"/>
+        <location filename="../widgets/player_panel.py" line="2417"/>
         <source>Playing: {0}</source>
         <translation>再生中: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2417"/>
+        <location filename="../widgets/player_panel.py" line="2429"/>
         <source>Search: {0}</source>
         <translation>検索: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2434"/>
+        <location filename="../widgets/player_panel.py" line="2446"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>プレイリストが空です。まずトラックを追加してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2438"/>
+        <location filename="../widgets/player_panel.py" line="2450"/>
         <source>Playlist name:</source>
         <translation>プレイリスト名:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2473"/>
+        <location filename="../widgets/player_panel.py" line="2485"/>
         <source>Search scope: {0}</source>
         <translation>検索範囲: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2478"/>
+        <location filename="../widgets/player_panel.py" line="2490"/>
         <source>Search this playlist…</source>
         <translation>このプレイリストを検索…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2497"/>
+        <location filename="../widgets/player_panel.py" line="2509"/>
         <source>No matching tracks</source>
         <translation>一致するトラックがありません</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2810"/>
+        <location filename="../widgets/player_panel.py" line="2822"/>
         <source>File not found:
 {0}</source>
         <translation>ファイルが見つかりません:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2985"/>
+        <location filename="../widgets/player_panel.py" line="2997"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>再生中のトラックと相性のよい曲を隠す</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2987"/>
+        <location filename="../widgets/player_panel.py" line="2999"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>再生中のトラックと相性のよい曲を表示</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3262"/>
+        <location filename="../widgets/player_panel.py" line="3274"/>
         <source>{0}+ results</source>
         <translation>{0}+件の結果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3265"/>
+        <location filename="../widgets/player_panel.py" line="3277"/>
         <source>{0} result</source>
         <translation>{0}件の結果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3267"/>
+        <location filename="../widgets/player_panel.py" line="3279"/>
         <source>{0} results</source>
         <translation>{0}件の結果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3271"/>
+        <location filename="../widgets/player_panel.py" line="3283"/>
         <source>{0} track</source>
         <translatorcomment>No plural in Japanese; both singular/plural render identically as {0}トラック with counter omitted. Both &apos;{0} track&apos; and &apos;{0} tracks&apos; map to same form intentionally.</translatorcomment>
         <translation>{0}トラック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3273"/>
+        <location filename="../widgets/player_panel.py" line="3285"/>
         <source>{0} tracks</source>
         <translatorcomment>Identical to &apos;{0} track&apos; — Japanese has no plural distinction. Used トラック as counter-noun directly.</translatorcomment>
         <translation>{0}トラック</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3802"/>
+        <location filename="../widgets/player_panel.py" line="3814"/>
         <source>Reset Columns</source>
         <translation>列をリセット</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4415"/>
+        <location filename="../widgets/player_panel.py" line="4482"/>
         <source>“{0}” has moved.</source>
         <translation>「{0}」は移動されました。</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="4417"/>
+        <location filename="../widgets/player_panel.py" line="4484"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>選択したファイルのうち%n件が移動されました。</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4420"/>
+        <location filename="../widgets/player_panel.py" line="4487"/>
         <source>File Has Moved</source>
         <translation>ファイルが移動されました</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4424"/>
+        <location filename="../widgets/player_panel.py" line="4491"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>保存された場所にもうないため、プレイリストに追加したり外へドラッグしたりできません。すでに再生中のトラックはそのまま再生を続けます。ファイルが移動する前にメモリへ読み込まれているためです。</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4429"/>
+        <location filename="../widgets/player_panel.py" line="4496"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>トラックを右クリックして「見つからないファイルを探す…」を選んでください</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4541"/>
+        <location filename="../widgets/player_panel.py" line="4608"/>
         <source>Locate Missing File…</source>
         <translation>見つからないファイルを探す…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4543"/>
+        <location filename="../widgets/player_panel.py" line="4610"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4544"/>
+        <location filename="../widgets/player_panel.py" line="4611"/>
         <source>Open in Metadata Panel</source>
         <translation>メタデータパネルで開く</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4545"/>
+        <location filename="../widgets/player_panel.py" line="4612"/>
         <source>Reload Metadata from File</source>
         <translation>ファイルからメタデータを再読み込み</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4547"/>
+        <location filename="../widgets/player_panel.py" line="4614"/>
         <source>Remove from Playlist</source>
         <translation>プレイリストから削除</translation>
     </message>
@@ -1837,177 +1837,187 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlaylistTree</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="374"/>
+        <location filename="../widgets/playlist_tree.py" line="438"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="615"/>
-        <location filename="../widgets/playlist_tree.py" line="692"/>
-        <location filename="../widgets/playlist_tree.py" line="712"/>
+        <location filename="../widgets/playlist_tree.py" line="721"/>
+        <source>New folder inside this folder</source>
+        <translation>このフォルダ内に新規フォルダ</translation>
+    </message>
+    <message>
+        <location filename="../widgets/playlist_tree.py" line="723"/>
+        <source>New playlist below this one</source>
+        <translation>このすぐ下に新規プレイリスト</translation>
+    </message>
+    <message>
+        <location filename="../widgets/playlist_tree.py" line="803"/>
+        <location filename="../widgets/playlist_tree.py" line="891"/>
+        <location filename="../widgets/playlist_tree.py" line="911"/>
         <source>New Playlist</source>
         <translation>新規プレイリスト</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="615"/>
-        <location filename="../widgets/playlist_tree.py" line="693"/>
-        <location filename="../widgets/playlist_tree.py" line="713"/>
+        <location filename="../widgets/playlist_tree.py" line="803"/>
+        <location filename="../widgets/playlist_tree.py" line="892"/>
+        <location filename="../widgets/playlist_tree.py" line="912"/>
         <source>New Folder</source>
         <translation>新規フォルダ</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="657"/>
+        <location filename="../widgets/playlist_tree.py" line="856"/>
         <source>Delete folder &quot;{0}&quot; and everything inside it?</source>
         <translation>フォルダ「{0}」とその中身すべてを削除しますか？</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="659"/>
+        <location filename="../widgets/playlist_tree.py" line="858"/>
         <source>Delete playlist &quot;{0}&quot;?</source>
         <translation>プレイリスト「{0}」を削除しますか？</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="662"/>
+        <location filename="../widgets/playlist_tree.py" line="861"/>
         <source>Delete</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="695"/>
-        <location filename="../widgets/playlist_tree.py" line="701"/>
+        <location filename="../widgets/playlist_tree.py" line="894"/>
+        <location filename="../widgets/playlist_tree.py" line="900"/>
         <source>Rename</source>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="696"/>
-        <location filename="../widgets/playlist_tree.py" line="702"/>
+        <location filename="../widgets/playlist_tree.py" line="895"/>
+        <location filename="../widgets/playlist_tree.py" line="901"/>
         <source>Delete…</source>
         <translation>削除…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="698"/>
+        <location filename="../widgets/playlist_tree.py" line="897"/>
         <source>Export Folder…</source>
         <translation>フォルダを書き出す…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="706"/>
+        <location filename="../widgets/playlist_tree.py" line="905"/>
         <source>Export…</source>
         <translation>書き出す…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="708"/>
+        <location filename="../widgets/playlist_tree.py" line="907"/>
         <source>Export and Copy Tracks…</source>
         <translation>書き出してトラックをコピー…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="727"/>
-        <location filename="../widgets/playlist_tree.py" line="734"/>
+        <location filename="../widgets/playlist_tree.py" line="926"/>
+        <location filename="../widgets/playlist_tree.py" line="933"/>
         <source>Export Playlist</source>
         <translation>プレイリストの書き出し</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="728"/>
-        <location filename="../widgets/playlist_tree.py" line="797"/>
+        <location filename="../widgets/playlist_tree.py" line="927"/>
+        <location filename="../widgets/playlist_tree.py" line="996"/>
         <source>This playlist is empty — there is nothing to export.</source>
         <translation>このプレイリストは空です。書き出すものがありません。</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="749"/>
-        <location filename="../widgets/playlist_tree.py" line="857"/>
+        <location filename="../widgets/playlist_tree.py" line="948"/>
+        <location filename="../widgets/playlist_tree.py" line="1056"/>
         <source>Exported {0} tracks to:
 {1}</source>
         <translation>{0}件のトラックを次の場所に書き出しました:
 {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="759"/>
+        <location filename="../widgets/playlist_tree.py" line="958"/>
         <source>Export Folder</source>
         <translation>フォルダの書き出し</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="777"/>
+        <location filename="../widgets/playlist_tree.py" line="976"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0}件のプレイリスト（{1}トラック）を次の場所に書き出しました:
 {2}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="796"/>
-        <location filename="../widgets/playlist_tree.py" line="823"/>
+        <location filename="../widgets/playlist_tree.py" line="995"/>
+        <location filename="../widgets/playlist_tree.py" line="1022"/>
         <source>Export and Copy Tracks</source>
         <translation>書き出しとトラックのコピー</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="803"/>
+        <location filename="../widgets/playlist_tree.py" line="1002"/>
         <source>Export in Progress</source>
         <translation>書き出し中</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="804"/>
+        <location filename="../widgets/playlist_tree.py" line="1003"/>
         <source>An export is already running. Please wait.</source>
         <translation>すでに書き出しを実行中です。お待ちください。</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="808"/>
+        <location filename="../widgets/playlist_tree.py" line="1007"/>
         <source>Choose Where to Create the Folder</source>
         <translation>フォルダを作成する場所を選択</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="821"/>
+        <location filename="../widgets/playlist_tree.py" line="1020"/>
         <source>Copying tracks…</source>
         <translation>トラックをコピー中…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="821"/>
+        <location filename="../widgets/playlist_tree.py" line="1020"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="848"/>
+        <location filename="../widgets/playlist_tree.py" line="1047"/>
         <source>Copying {0}</source>
         <translation>{0}をコピー中</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/playlist_tree.py" line="864"/>
+        <location filename="../widgets/playlist_tree.py" line="1063"/>
         <source>%n track(s) could not be found and were skipped.</source>
         <translation>
             <numerusform>%n件のトラックが見つからず、スキップされました。</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="872"/>
-        <location filename="../widgets/playlist_tree.py" line="930"/>
+        <location filename="../widgets/playlist_tree.py" line="1071"/>
+        <location filename="../widgets/playlist_tree.py" line="1129"/>
         <source>Export failed</source>
         <translation>書き出しに失敗しました</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="873"/>
-        <location filename="../widgets/playlist_tree.py" line="931"/>
+        <location filename="../widgets/playlist_tree.py" line="1072"/>
+        <location filename="../widgets/playlist_tree.py" line="1130"/>
         <source>Could not write the file:
 {0}</source>
         <translation>ファイルを書き込めませんでした:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="904"/>
+        <location filename="../widgets/playlist_tree.py" line="1103"/>
         <source>Serato — drag the file onto the crate panel</source>
         <translation>Serato — ファイルを crate パネルにドラッグ</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="905"/>
+        <location filename="../widgets/playlist_tree.py" line="1104"/>
         <source>Rekordbox — File → Import Playlist</source>
         <translation>Rekordbox — File → Import Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="906"/>
+        <location filename="../widgets/playlist_tree.py" line="1105"/>
         <source>Traktor — File → Import</source>
         <translation>Traktor — File → Import</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="919"/>
+        <location filename="../widgets/playlist_tree.py" line="1118"/>
         <source>Export complete</source>
         <translation>書き出しが完了しました</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="922"/>
+        <location filename="../widgets/playlist_tree.py" line="1121"/>
         <source>To import it:</source>
         <translation>読み込む方法:</translation>
     </message>
@@ -2015,27 +2025,27 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlaylistTreePanel</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1291"/>
+        <location filename="../widgets/playlist_tree.py" line="1492"/>
         <source>+ Playlist</source>
         <translation>+ プレイリスト</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1292"/>
+        <location filename="../widgets/playlist_tree.py" line="1493"/>
         <source>+ Folder</source>
         <translation>+ フォルダ</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1315"/>
+        <location filename="../widgets/playlist_tree.py" line="1516"/>
         <source>Playlist name…</source>
         <translation>プレイリスト名…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1362"/>
+        <location filename="../widgets/playlist_tree.py" line="1563"/>
         <source>Close the playlist filter</source>
         <translation>プレイリストの絞り込みを閉じる</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1364"/>
+        <location filename="../widgets/playlist_tree.py" line="1565"/>
         <source>Filter playlists by name</source>
         <translation>プレイリストを名前で絞り込む</translation>
     </message>
@@ -2999,104 +3009,104 @@ or click “Add Artwork…”</source>
         <translation type="vanished">▸  波形ループスライサー</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="114"/>
+        <location filename="../widgets/slice_section.py" line="109"/>
         <source>Waveform</source>
         <translation>波形</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="116"/>
+        <location filename="../widgets/slice_section.py" line="111"/>
         <source>Loop Slicer</source>
         <translation>ループスライサー</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="171"/>
+        <location filename="../widgets/slice_section.py" line="166"/>
         <source>Slice start time (m:ss:mmm) — type to set</source>
         <translation>スライスの開始時間 (m:ss:mmm) — 入力して設定</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="180"/>
+        <location filename="../widgets/slice_section.py" line="175"/>
         <source>Slice end time (m:ss:mmm) — type to set</source>
         <translation>スライスの終了時間 (m:ss:mmm) — 入力して設定</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="182"/>
-        <location filename="../widgets/slice_section.py" line="189"/>
+        <location filename="../widgets/slice_section.py" line="177"/>
+        <location filename="../widgets/slice_section.py" line="184"/>
         <source>Mark</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>マーク</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="183"/>
+        <location filename="../widgets/slice_section.py" line="178"/>
         <source>Mark start at playhead (Q)</source>
         <translation>再生位置に開始をマーク（Q）</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="190"/>
+        <location filename="../widgets/slice_section.py" line="185"/>
         <source>Mark end at playhead (E)</source>
         <translation>再生位置に終了をマーク（E）</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="205"/>
+        <location filename="../widgets/slice_section.py" line="200"/>
         <source>Nudge start marker back 10 ms</source>
         <translation>開始マーカーを 10 ms 戻す</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="207"/>
+        <location filename="../widgets/slice_section.py" line="202"/>
         <source>Nudge start marker forward 10 ms</source>
         <translation>開始マーカーを 10 ms 進める</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="209"/>
+        <location filename="../widgets/slice_section.py" line="204"/>
         <source>Nudge end marker back 10 ms</source>
         <translation>終了マーカーを 10 ms 戻す</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="211"/>
+        <location filename="../widgets/slice_section.py" line="206"/>
         <source>Nudge end marker forward 10 ms</source>
         <translation>終了マーカーを 10 ms 進める</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="239"/>
+        <location filename="../widgets/slice_section.py" line="234"/>
         <source>Length</source>
         <translation>長さ</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="243"/>
+        <location filename="../widgets/slice_section.py" line="238"/>
         <source>Shorten slice by 10 ms</source>
         <translation>スライスを 10 ms 短くする</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="247"/>
+        <location filename="../widgets/slice_section.py" line="242"/>
         <source>Slice length (m:ss:mmm) — type to set; moves the end marker</source>
         <translation>スライスの長さ (m:ss:mmm) — 入力して設定。終了マーカーを移動します</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="249"/>
+        <location filename="../widgets/slice_section.py" line="244"/>
         <source>Lengthen slice by 10 ms</source>
         <translation>スライスを 10 ms 長くする</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="264"/>
+        <location filename="../widgets/slice_section.py" line="259"/>
         <source>&lt; Start</source>
         <translation>&lt; 開始</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="386"/>
+        <location filename="../widgets/slice_section.py" line="388"/>
         <source>Hide the full-track waveform</source>
         <translation>トラック全体の波形を非表示</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="388"/>
+        <location filename="../widgets/slice_section.py" line="390"/>
         <source>Show the full-track waveform — click it to move playback</source>
         <translation>トラック全体の波形を表示 — クリックで再生位置を移動</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="395"/>
+        <location filename="../widgets/slice_section.py" line="397"/>
         <source>Hide the zoomed waveform and slice controls</source>
         <translation>拡大波形とスライスコントロールを非表示</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="397"/>
+        <location filename="../widgets/slice_section.py" line="399"/>
         <source>Show the zoomed waveform and slice controls</source>
         <translation>拡大波形とスライスコントロールを表示</translation>
     </message>
@@ -3105,12 +3115,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">再生位置を開始マーカーへ移動</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="269"/>
+        <location filename="../widgets/slice_section.py" line="264"/>
         <source>Loop</source>
         <translation>ループ</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="274"/>
+        <location filename="../widgets/slice_section.py" line="269"/>
         <source>Loop playback between the start and end markers (L)</source>
         <translatorcomment>Added (L) hotkey hint to the existing loop tooltip translation.</translatorcomment>
         <translation>開始マーカーと終了マーカーの間をループ再生 (L)</translation>
@@ -3120,28 +3130,28 @@ or click “Add Artwork…”</source>
         <translation type="vanished">開始マーカーと終了マーカーの間をループ再生</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="267"/>
+        <location filename="../widgets/slice_section.py" line="262"/>
         <source>Jump playhead to start marker (S)</source>
         <translation>再生位置を開始マーカーへ移動 (S)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="281"/>
+        <location filename="../widgets/slice_section.py" line="276"/>
         <source>Save Slice As:</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>スライスの保存名:</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="286"/>
+        <location filename="../widgets/slice_section.py" line="281"/>
         <source>output filename</source>
         <translation>出力ファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="295"/>
+        <location filename="../widgets/slice_section.py" line="290"/>
         <source>Choose save folder</source>
         <translation>保存先フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="302"/>
+        <location filename="../widgets/slice_section.py" line="297"/>
         <source>Slice</source>
         <translation>スライス</translation>
     </message>
@@ -3150,17 +3160,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">▾  波形ループスライサー</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="649"/>
+        <location filename="../widgets/slice_section.py" line="670"/>
         <source>Choose Save Folder</source>
         <translation>保存先フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="668"/>
+        <location filename="../widgets/slice_section.py" line="689"/>
         <source>Saved: {0}</source>
         <translation>保存しました: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="673"/>
+        <location filename="../widgets/slice_section.py" line="694"/>
         <source>Error: {0}</source>
         <translation>エラー: {0}</translation>
     </message>

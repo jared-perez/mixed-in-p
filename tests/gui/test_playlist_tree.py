@@ -6,6 +6,7 @@ from PySide6.QtWidgets import QMessageBox
 from src.gui.widgets.playlist_tree import (
     KIND_ROLE,
     NODE_ID_ROLE,
+    _ROW_ADD_MARGIN,
     PlaylistTreePanel,
 )
 from src.gui.widgets.droppable_table import SOURCE_PAGE_MIME
@@ -169,6 +170,115 @@ class TestCrud:
         assert lib.get_node(folder) is None
         assert lib.get_node(inner) is None
         assert tree._find_item(folder) is None
+
+
+class TestRowAddButton:
+    """The floating create button at the tree's right edge."""
+
+    @staticmethod
+    def _shown(panel, qtbot):
+        panel.resize(240, 320)
+        panel.show()
+        qtbot.wait(10)
+
+    def test_playlist_button_creates_a_sibling_directly_below(self, tree):
+        lib = tree.library
+        folder = lib.create_folder("Crates")
+        third = lib.create_playlist("Third", parent_id=folder)
+        anchor = lib.create_playlist("Anchor", parent_id=folder)
+        first = lib.create_playlist("First", parent_id=folder)  # newest on top
+        tree._rebuild()
+        assert [n.id for n in lib.get_children(folder)] == [first, anchor, third]
+
+        tree._row_add_node_id = anchor
+        tree._on_row_add_clicked()
+
+        ids = [n.id for n in lib.get_children(folder)]
+        assert ids[0] == first and ids[1] == anchor and ids[3] == third
+        new = lib.get_node(ids[2])
+        assert new.kind == "playlist"
+        assert new.parent_id == folder  # same folder, not the root
+
+    def test_playlist_button_at_the_root_stays_at_the_root(self, tree):
+        lib = tree.library
+        anchor = lib.create_playlist("Anchor")
+        tree._rebuild()
+        tree._row_add_node_id = anchor
+        tree._on_row_add_clicked()
+        ids = [n.id for n in lib.get_children(None)]
+        assert ids[0] == anchor
+        assert lib.get_node(ids[1]).parent_id is None
+
+    def test_folder_button_creates_a_folder_inside(self, tree):
+        lib = tree.library
+        folder = lib.create_folder("Crates")
+        tree._rebuild()
+        tree._row_add_node_id = folder
+        tree._on_row_add_clicked()
+        # Inside the folder, not beside it.
+        assert [n.id for n in lib.get_children(None)] == [folder]
+        children = lib.get_children(folder)
+        assert len(children) == 1 and children[0].kind == "folder"
+
+    def test_stale_aim_after_a_delete_creates_nothing(self, tree):
+        lib = tree.library
+        node_id = lib.create_playlist("Gone")
+        tree._rebuild()
+        lib.delete_node(node_id)
+        tree._row_add_node_id = node_id  # the hover the button was left with
+        tree._on_row_add_clicked()
+        assert lib.get_children(None) == []
+
+    def test_button_rides_the_viewport_edge_not_the_item_rect(self, panel, tree, qtbot):
+        lib = tree.library
+        # Long enough that the item rect runs well past the viewport: the
+        # column is ResizeToContents with ElideNone, so a row's own right edge
+        # is nowhere near the tree's.
+        node_id = lib.create_playlist("A very long playlist name indeed, honestly")
+        tree._rebuild()
+        self._shown(panel, qtbot)
+
+        rect = tree.visualRect(tree._find_item(node_id).index())
+        tree._aim_row_add_button(rect.center())
+
+        btn = tree._row_add_btn
+        assert not btn.isHidden()
+        assert tree._row_add_node_id == node_id
+        assert btn.geometry().right() == tree.viewport().width() - _ROW_ADD_MARGIN - 1
+        assert rect.top() <= btn.geometry().center().y() <= rect.bottom()
+
+    def test_button_survives_the_cursor_travelling_to_it(self, panel, tree, qtbot):
+        # The button sits well past the end of a short name, and the single
+        # column is only as wide as its content — so the cursor crosses "empty
+        # space" on its way there. A cell-wise hit test hides the button
+        # mid-reach and it can never be clicked.
+        lib = tree.library
+        node_id = lib.create_playlist("Hi")
+        tree._rebuild()
+        self._shown(panel, qtbot)
+
+        rect = tree.visualRect(tree._find_item(node_id).index())
+        tree._aim_row_add_button(rect.center())
+        btn_centre = tree._row_add_btn.geometry().center()
+        assert btn_centre.x() > rect.right()  # genuinely outside the item rect
+
+        tree._aim_row_add_button(btn_centre)
+        assert not tree._row_add_btn.isHidden()
+        assert tree._row_add_node_id == node_id
+
+    def test_no_button_on_the_scratch_row(self, panel, tree, qtbot):
+        lib = tree.library
+        node_id = lib.create_playlist("Real")
+        tree._rebuild()
+        self._shown(panel, qtbot)
+
+        tree._aim_row_add_button(tree.visualRect(tree._find_item(node_id).index()).center())
+        assert not tree._row_add_btn.isHidden()  # it was showing…
+
+        scratch = tree.visualRect(tree._find_item(SCRATCH_NODE_ID).index())
+        tree._aim_row_add_button(scratch.center())
+        assert tree._row_add_btn.isHidden()  # …and Scratch takes it away
+        assert tree._row_add_node_id is None
 
 
 class TestMoves:

@@ -427,6 +427,27 @@ QPushButton#treeCreateButton:hover {
     background-color: @BG_LIGHT@;
 }
 
+/* Per-row create button, floating at the tree's right edge over the hovered
+   row. It carries its own dark chip rather than going transparent: it sits ON
+   a row whose hover fill is already BG_LIGHT, and a long name scrolls
+   underneath it (the column is ElideNone), so it needs to be opaque to stay
+   legible against whatever it lands on. */
+QPushButton#treeRowAddButton {
+    background-color: @BG_DARK@;
+    border: 1px solid @BG_LIGHTER@;
+    border-radius: 4px;
+    padding: 0px;
+    /* The global QPushButton rule's min-height beats setFixedSize (a QSS
+       minimum wins over a widget maximum), which stretched an 18px square
+       chip to 22px tall. Released here so the size stays the code's to set. */
+    min-height: 0px;
+}
+
+QPushButton#treeRowAddButton:hover {
+    background-color: @BG_LIGHT@;
+    border-color: @NEON_YELLOW@;
+}
+
 /* Name-filter toggle, in the same row. Borderless and unpadded because this
    row is the narrowest in the app: any width it takes comes out of the two
    translated button labels beside it, which centre-clip rather than elide. */
