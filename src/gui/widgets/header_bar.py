@@ -16,6 +16,13 @@ from PySide6.QtWidgets import (
 )
 
 from ..styles.theme import Theme
+from .elided_label import LinkLabel
+
+# The header's now-playing line elides rather than pushing the Add button off
+# the bar, and floors out at roughly "Playing: <a few characters>…" — below
+# that it says nothing the user couldn't get from the tab strip.
+_NOW_PLAYING_MIN_WIDTH = 90
+_NOW_PLAYING_GAP = 16
 
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
     _ASSETS = Path(sys._MEIPASS) / "src" / "gui" / "assets"
@@ -29,6 +36,8 @@ class HeaderBar(QFrame):
     add_files_clicked = Signal()
     add_folder_clicked = Signal()
     about_clicked = Signal()
+    # The now-playing line was clicked: take the user to what's playing.
+    now_playing_clicked = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -59,6 +68,30 @@ class HeaderBar(QFrame):
         self._subtitle = QLabel(self.tr("DJ Audio Analysis Toolkit"))
         self._subtitle.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 12px; margin-bottom: 8px;")
         layout.addWidget(self._subtitle, alignment=Qt.AlignmentFlag.AlignBottom)
+
+        # What's playing, for every panel that isn't the Player. Playback
+        # outlives the Player being on screen, so from anywhere else in the app
+        # there was no way to tell what was running short of switching back —
+        # and switching back is exactly what this saves. Hidden on the Player
+        # itself, which says it better one line above the slicer.
+        #
+        # Same bottom alignment and margin as the subtitle so the two sit on one
+        # baseline rather than reading as two rows that failed to line up.
+        # A wider gap than the layout's 4px: this is a separate fact from the
+        # tagline, not more of it, and at 4px the two read as one sentence.
+        layout.addSpacing(_NOW_PLAYING_GAP)
+
+        self._now_playing = LinkLabel(min_width=_NOW_PLAYING_MIN_WIDTH)
+        self._now_playing.setObjectName("headerNowPlaying")
+        self._now_playing.setStyleSheet(
+            f"color: {Theme.ACCENT_TEXT}; font-size: 12px; margin-bottom: 8px;"
+        )
+        self._now_playing.setToolTip(
+            self.tr("Go to the playlist the current track is playing from")
+        )
+        self._now_playing.clicked.connect(self.now_playing_clicked.emit)
+        self._now_playing.hide()
+        layout.addWidget(self._now_playing, alignment=Qt.AlignmentFlag.AlignBottom)
 
         # Spacer
         layout.addStretch()
@@ -95,6 +128,23 @@ class HeaderBar(QFrame):
         """Show or hide the 'DJ Audio Analysis Toolkit' subtitle."""
         self._subtitle.setVisible(visible)
 
+    def set_now_playing(self, track_name: str) -> None:
+        """Name the playing track in the header, or hide the line when empty.
+
+        Takes the bare filename and words it here rather than being handed a
+        finished sentence: the copy belongs with the widget that shows it, and
+        this keeps the phrasing one string instead of the same English written
+        out in two contexts for translators to keep in step.
+        """
+        if track_name:
+            self._now_playing.setText(self.tr("Playing: {0}").format(track_name))
+            self._now_playing.show()
+        else:
+            self._now_playing.hide()
+        # It joins the row the subtitle is competing for, so the threshold
+        # below has just moved.
+        self._apply_subtitle_rule()
+
     def _subtitle_fits(self) -> int:
         """Width the header needs for the logo, subtitle, and buttons to coexist.
 
@@ -110,18 +160,31 @@ class HeaderBar(QFrame):
             self._add_btn,
             self._about_btn,
         ]
-        total = margins.left() + margins.right() + spacing * (len(widgets) - 1)
+        total = margins.left() + margins.right()
         total += sum(w.sizeHint().width() for w in widgets)
-        return total
+        gaps = len(widgets) - 1
+        # The now-playing spacer is a QSpacerItem, so it holds its width whether
+        # or not the label beside it is showing.
+        total += _NOW_PLAYING_GAP
+        gaps += 1
+        if not self._now_playing.isHidden():
+            # Its *floor*, not its hint: it elides, so a long filename must not
+            # be what takes the subtitle away — only a header with no room for
+            # even a stub of it should.
+            total += self._now_playing.minimumSizeHint().width()
+            gaps += 1
+        return total + spacing * gaps
 
-    def resizeEvent(self, event) -> None:
-        """Drop the subtitle before 'Add Files' would overlap it; restore it
-        once there's room again (with a small dead-band to avoid jitter)."""
-        super().resizeEvent(event)
+    def _apply_subtitle_rule(self) -> None:
+        """Drop the subtitle before 'Add' would overlap it; restore it once
+        there's room again (with a small dead-band to avoid jitter)."""
         needed = self._subtitle_fits()
         if self._subtitle.isVisible():
             if self.width() < needed:
                 self.set_subtitle_visible(False)
-        else:
-            if self.width() >= needed + 8:
-                self.set_subtitle_visible(True)
+        elif self.width() >= needed + 8:
+            self.set_subtitle_visible(True)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._apply_subtitle_rule()

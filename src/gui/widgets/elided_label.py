@@ -19,8 +19,8 @@ retranslation, tests and anything reading the label back are unaffected.
 
 from __future__ import annotations
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPainter
+from PySide6.QtCore import QSize, Qt, Signal
+from PySide6.QtGui import QMouseEvent, QPainter
 from PySide6.QtWidgets import QLabel, QSizePolicy, QStyleOption, QWidget
 
 
@@ -100,3 +100,105 @@ class ElidedLabel(QLabel):
         # ConversionPanel._sync_destination both do). Doing it here instead
         # would mean overwriting a tooltip a caller deliberately set.
         self.setToolTip("" if self._fits() else self.text())
+
+
+class HuggingElidedLabel(ElidedLabel):
+    """An ElidedLabel that is no wider than its text, and keeps its tooltip.
+
+    ElidedLabel above is built for *filling* whatever a layout gives it, which
+    is wrong for a label the mouse can act on: its dead space to the right of
+    the text is dead space that responds to a click or wears a grab cursor.
+    Measured on the Player's now-playing line, a stretchy one was 684px wide
+    around 157px of text. A Maximum policy hugs the text instead — and on its
+    own would make the label **unshrinkable**, because QLabel answers its full
+    text width as the minimum too, so ``min_width`` is what keeps the eliding
+    working.
+
+    The tooltip rule is inverted for the same reason. ElidedLabel *replaces*
+    the tooltip on every resize, which deletes anything the caller set to say
+    what the widget does ("Drag this onto a playlist…") the first time the
+    window moves. Here the caller's tooltip is remembered and the cut-off text
+    appended to it. That means overriding ``setText`` — safe only because this
+    class owns both ends of the rule, where for a bare ElidedLabel it would
+    silently overwrite tooltips its callers deliberately set.
+    """
+
+    def __init__(
+        self,
+        parent: QWidget | None = None,
+        *,
+        min_width: int = 80,
+        mode: Qt.TextElideMode = Qt.TextElideMode.ElideRight,
+    ) -> None:
+        super().__init__("", parent, mode)
+        self._min_width = min_width
+        self._base_tooltip = ""
+        self.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+
+    def minimumSizeHint(self) -> QSize:  # noqa: N802 - Qt override
+        return QSize(self._min_width, super().minimumSizeHint().height())
+
+    def setToolTip(self, text: str) -> None:  # noqa: N802 - Qt override
+        self._base_tooltip = text
+        super().setToolTip(text)
+
+    def _apply_tooltip(self) -> None:
+        full = self._base_tooltip
+        if not self._fits():
+            full = f"{full}\n{self.text()}" if full else self.text()
+        # Not self.setToolTip: that would take the composed string for the base
+        # and staple the text on again on the next resize.
+        ElidedLabel.setToolTip(self, full)
+
+    def setText(self, text: str) -> None:  # noqa: N802 - Qt override
+        # New text at an unchanged width can start overflowing with no resize
+        # to follow, which is the gap ElidedLabel leaves to its callers.
+        super().setText(text)
+        self._apply_tooltip()
+
+    def resizeEvent(self, event) -> None:  # noqa: N802 - Qt override
+        # QLabel's, not ElidedLabel's — see the class docstring.
+        QLabel.resizeEvent(self, event)
+        self._apply_tooltip()
+
+
+class LinkLabel(HuggingElidedLabel):
+    """Text that acts like a link: underlined on hover, and emitting ``clicked``.
+
+    For where a control would be too heavy for what is really a sentence with
+    one live word in it — the Player's "In Playlist: …" and the header's
+    now-playing line. The colour is the caller's job (it differs by surface);
+    everything that makes it *read* as clickable is here.
+    """
+
+    clicked = Signal()
+
+    def __init__(self, parent: QWidget | None = None, **kwargs) -> None:
+        super().__init__(parent, **kwargs)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def _set_underline(self, on: bool) -> None:
+        # A font attribute rather than QSS: this class paints its own text with
+        # drawText, which honours the font and never sees `text-decoration`.
+        font = self.font()
+        if font.underline() != on:
+            font.setUnderline(on)
+            self.setFont(font)
+
+    def enterEvent(self, event) -> None:  # noqa: N802 - Qt override
+        self._set_underline(True)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event) -> None:  # noqa: N802 - Qt override
+        self._set_underline(False)
+        super().leaveEvent(event)
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # noqa: N802
+        # Containment, not just the button: Qt delivers the release to whoever
+        # took the press, so a press here dragged off and let go elsewhere would
+        # otherwise count as a click.
+        if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(
+            event.position().toPoint()
+        ):
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)

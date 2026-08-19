@@ -313,6 +313,7 @@ class MainWindow(QMainWindow):
         self._header.add_files_clicked.connect(self._on_add_files)
         self._header.add_folder_clicked.connect(self._on_add_folder)
         self._header.about_clicked.connect(self._on_about)
+        self._header.now_playing_clicked.connect(self._on_header_now_playing_clicked)
 
         # Sidebar signals
         self._sidebar.page_changed.connect(self._on_page_changed)
@@ -343,6 +344,7 @@ class MainWindow(QMainWindow):
         self._player_panel.playing_playlist_clicked.connect(
             self._on_playing_playlist_clicked
         )
+        self._player_panel.now_playing_changed.connect(self._sync_header_now_playing)
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -432,6 +434,10 @@ class MainWindow(QMainWindow):
         elif page_id == "history":
             self._history_panel.refresh()
 
+        # The header's now-playing line is for the panels that aren't the
+        # Player, so which page is showing is half of what decides it.
+        self._sync_header_now_playing()
+
         # Apply the panel's window minimum (and keyboard resize-to-fit). Done
         # after the page is current so size hints reflect the new panel.
         if self._geometry_restored:
@@ -445,6 +451,34 @@ class MainWindow(QMainWindow):
     def _on_playlist_activated(self, node_id: int) -> None:
         """A playlist (or Scratch) clicked in the tree loads into the Player."""
         self._player_panel.load_node(node_id)
+        self._sidebar.set_current_page("player")
+        self._on_page_changed("player")
+
+    def _sync_header_now_playing(self) -> None:
+        """Put what's playing in the header — unless the Player is showing it.
+
+        Two inputs, so this is called from both: which page is current, and
+        what the Player has loaded.
+        """
+        if self._current_page == "player":
+            self._header.set_now_playing("")
+            return
+        self._header.set_now_playing(self._player_panel.playing_track_name())
+
+    def _on_header_now_playing_clicked(self) -> None:
+        """The header's now-playing line: take the user to what's playing.
+
+        To the playlist it came from where there is one — the same destination
+        as the Player's own "In Playlist" link, reached from a panel that
+        isn't the Player. A track played out of a search result set has no
+        playlist to go to, so that falls back to just opening the Player,
+        which is still the thing the user was asking for.
+        """
+        node_id = self._player_panel.playing_node_id
+        if node_id is not None and not self._player_panel.is_showing_node(node_id):
+            self._player_panel.load_node(node_id)
+        if node_id is not None:
+            self._playlists_panel.tree.select_node(node_id)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
 
