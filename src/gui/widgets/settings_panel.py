@@ -2,8 +2,8 @@
 
 import logging
 
-from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QColor
+from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import (
     QButtonGroup,
     QCheckBox,
@@ -12,6 +12,7 @@ from PySide6.QtWidgets import (
     QFrame,
     QHBoxLayout,
     QLabel,
+    QLineEdit,
     QMessageBox,
     QPushButton,
     QRadioButton,
@@ -24,6 +25,7 @@ from PySide6.QtWidgets import (
 import sys
 from dataclasses import replace
 
+from ...online import discogs
 from ...utils import default_app
 from ...utils.config import AppConfig
 from ...utils.i18n import LANGUAGES
@@ -662,6 +664,74 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(playlist_frame)
 
+        # ── Section: Online Metadata ────────────────────────────────────────
+        outer.addWidget(self._make_section_label(self.tr("Online Metadata")))
+
+        online_frame = QFrame()
+        online_frame.setObjectName("settingsSection")
+        online_layout = QVBoxLayout(online_frame)
+        online_layout.setContentsMargins(16, 10, 16, 10)
+        online_layout.setSpacing(8)
+
+        self._online_lookup_cb = QCheckBox(
+            self.tr("Look up track details online (Discogs)")
+        )
+        self._online_lookup_cb.setObjectName("circleCheckLg")
+        self._online_lookup_cb.setChecked(False)
+        online_layout.addWidget(self._online_lookup_cb)
+
+        online_hint = QLabel(
+            self.tr(
+                "Off by default, and the app makes no network requests until you "
+                "turn it on. A lookup sends the artist and title of the track you "
+                "chose — never your audio, and never your library. BPM, key and "
+                "energy always come from this app's own analysis."
+            )
+        )
+        online_hint.setObjectName("settingsHint")
+        online_hint.setWordWrap(True)
+        online_layout.addWidget(online_hint)
+
+        token_row = self._row_layout()
+        token_row.addWidget(QLabel(self.tr("Discogs token:")))
+        self._discogs_token_edit = QLineEdit()
+        self._discogs_token_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._discogs_token_edit.setPlaceholderText(self.tr("Paste your token"))
+        self._discogs_token_edit.setMinimumWidth(260)
+        token_row.addWidget(self._discogs_token_edit, 1)
+        self._token_help_btn = QPushButton(self.tr("Get a Token…"))
+        self._token_help_btn.clicked.connect(self._on_token_help_clicked)
+        token_row.addWidget(self._token_help_btn)
+        online_layout.addLayout(token_row)
+
+        token_hint = QLabel(
+            self.tr(
+                "Discogs needs a free personal token to answer with cover images "
+                "and at full speed. It is read-only, and you can revoke it on "
+                "your Discogs account page at any time."
+            )
+        )
+        token_hint.setObjectName("settingsHint")
+        token_hint.setWordWrap(True)
+        online_layout.addWidget(token_hint)
+
+        self._fetch_artwork_cb = QCheckBox(self.tr("Fetch cover art with lookups"))
+        self._fetch_artwork_cb.setObjectName("circleCheckLg")
+        self._fetch_artwork_cb.setChecked(True)
+        online_layout.addWidget(self._fetch_artwork_cb)
+
+        artwork_hint = QLabel(
+            self.tr(
+                "Shows the release's cover next to your file's, so you can "
+                "compare them. Nothing is written until you approve it."
+            )
+        )
+        artwork_hint.setObjectName("settingsHint")
+        artwork_hint.setWordWrap(True)
+        online_layout.addWidget(artwork_hint)
+
+        outer.addWidget(online_frame)
+
         outer.addStretch()
 
         scroll.setWidget(container)
@@ -677,6 +747,11 @@ class SettingsPanel(QWidget):
         self._visualizations_cb.stateChanged.connect(self._emit_changed)
         self._export_absolute_cb.stateChanged.connect(self._emit_changed)
         self._persist_scratch_cb.stateChanged.connect(self._emit_changed)
+        self._online_lookup_cb.stateChanged.connect(self._emit_changed)
+        self._fetch_artwork_cb.stateChanged.connect(self._emit_changed)
+        # editingFinished, not textChanged: a token is pasted in one go, and
+        # persisting per keystroke would write a dozen half-tokens to disk.
+        self._discogs_token_edit.editingFinished.connect(self._emit_changed)
         self._duplicate_policy_combo.currentIndexChanged.connect(self._emit_changed)
         self._format_group.buttonClicked.connect(self._emit_changed)
         self._language_combo.currentIndexChanged.connect(self._on_language_changed)
@@ -686,6 +761,10 @@ class SettingsPanel(QWidget):
         self.setStyleSheet(self._build_stylesheet())
 
     # ── Helpers ────────────────────────────────────────────────────────────
+
+    def _on_token_help_clicked(self) -> None:
+        """Open the Discogs page where a personal token is generated."""
+        QDesktopServices.openUrl(QUrl(discogs.TOKEN_PAGE_URL))
 
     def _on_make_default_clicked(self) -> None:
         """Ask the OS, then say only what actually happened.
@@ -994,6 +1073,9 @@ class SettingsPanel(QWidget):
             export_absolute_paths=self._export_absolute_cb.isChecked(),
             persist_scratch=self._persist_scratch_cb.isChecked(),
             duplicate_policy=self._duplicate_policy_combo.currentData(),
+            online_lookup_enabled=self._online_lookup_cb.isChecked(),
+            discogs_token=self._discogs_token_edit.text().strip(),
+            online_fetch_artwork=self._fetch_artwork_cb.isChecked(),
         )
 
     def load_config(self, cfg: AppConfig) -> None:
@@ -1041,6 +1123,16 @@ class SettingsPanel(QWidget):
         self._persist_scratch_cb.blockSignals(True)
         self._persist_scratch_cb.setChecked(cfg.persist_scratch)
         self._persist_scratch_cb.blockSignals(False)
+
+        self._online_lookup_cb.blockSignals(True)
+        self._online_lookup_cb.setChecked(cfg.online_lookup_enabled)
+        self._online_lookup_cb.blockSignals(False)
+        self._fetch_artwork_cb.blockSignals(True)
+        self._fetch_artwork_cb.setChecked(cfg.online_fetch_artwork)
+        self._fetch_artwork_cb.blockSignals(False)
+        self._discogs_token_edit.blockSignals(True)
+        self._discogs_token_edit.setText(cfg.discogs_token)
+        self._discogs_token_edit.blockSignals(False)
 
         self._duplicate_policy_combo.blockSignals(True)
         dup_index = self._duplicate_policy_combo.findData(cfg.duplicate_policy)

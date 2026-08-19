@@ -188,7 +188,9 @@ class DiscogsProvider:
         self.token = (token or "").strip()
         self._opener = opener or urllib.request.urlopen
         self._sleep = sleeper or time.sleep
-        self._on_wait = on_wait
+        # Public: the worker thread re-points this at a Qt signal so the panel
+        # can say *why* it paused. A private name would make that reach in.
+        self.on_wait = on_wait
         self.prefer_master_year = prefer_master_year
         # Live counters from the last response's headers; None until the first
         # one lands. Never hardcoded — Discogs is free to change the numbers.
@@ -233,8 +235,8 @@ class DiscogsProvider:
         self._wait(PACE_WAIT_S)
 
     def _wait(self, seconds: float) -> None:
-        if self._on_wait:
-            self._on_wait(seconds)
+        if self.on_wait:
+            self.on_wait(seconds)
         self._sleep(seconds)
 
     def _get(self, path: str, params: dict[str, Any] | None = None) -> dict[str, Any]:

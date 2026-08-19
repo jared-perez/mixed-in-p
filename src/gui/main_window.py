@@ -176,6 +176,7 @@ class MainWindow(QMainWindow):
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)
         self._apply_visualization_settings()
+        self._apply_online_lookup_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
         self._spectrum_panel.set_dynamic_range(self._config.spectrum_dynamic_range)
         # Playlist library: one shared main-thread connection. Opened at
@@ -1400,7 +1401,21 @@ class MainWindow(QMainWindow):
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)
         self._apply_visualization_settings()
+        self._apply_online_lookup_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
+
+    def _apply_online_lookup_settings(self) -> None:
+        """Push the online-metadata switch and token down to the Metadata panel.
+
+        The panel *hides* its lookup button while the switch is off rather than
+        greying it: until the user opts in, the app should look as offline as
+        it is.
+        """
+        self._metadata_panel.set_online_lookup(
+            self._config.online_lookup_enabled,
+            self._config.discogs_token,
+            self._config.online_fetch_artwork,
+        )
 
     def _apply_visualization_settings(self) -> None:
         """Push the visualizations switch (and waveform color) to every consumer.
@@ -1791,6 +1806,7 @@ class MainWindow(QMainWindow):
         # file the user may be about to rename).
         self._player_panel.shutdown_workers()
         self._spectrum_panel.shutdown_workers()
+        self._metadata_panel.shutdown_workers()
 
         # Cancel any running analysis — including runs the user already
         # cancelled, which are detached from the UI but may still be inside the

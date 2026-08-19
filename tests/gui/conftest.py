@@ -44,6 +44,35 @@ def warm_lazy_audio_imports():
 
 
 @pytest.fixture(autouse=True)
+def lookup_review_guard(monkeypatch):
+    """Make a stray online-lookup review dialog fail rather than hang.
+
+    Same hazard as the duplicate prompt below: ``exec()`` on a modal blocks
+    forever in a headless run, and the failure lands on whichever test was
+    unlucky. Replaced with a recorder that answers Cancel and then fails the
+    test by name.
+
+    A test that *means* to open it patches ``exec`` itself — that overrides
+    this stub, so the guard stays quiet.
+    """
+    from src.gui.widgets.dialogs.lookup_review import LookupReviewDialog
+
+    seen = []
+
+    def trap(self):
+        seen.append(self._file_path)
+        return 0  # QDialog.Rejected — apply nothing
+
+    monkeypatch.setattr(LookupReviewDialog, "exec", trap)
+    yield
+    assert not seen, (
+        "The lookup review dialog opened unexpectedly for: "
+        + "; ".join(seen)
+        + ". Patch LookupReviewDialog.exec in a test that means to reach it."
+    )
+
+
+@pytest.fixture(autouse=True)
 def duplicate_prompt_guard(monkeypatch):
     """Pin the duplicate policy, and make a stray prompt fail rather than hang.
 

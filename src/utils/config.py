@@ -145,6 +145,21 @@ class AppConfig:
     # cleared (at startup, so a crash can't strand a half-written list) — the
     # node itself is reserved and always exists.
     persist_scratch: bool = False
+    # Online metadata lookup (Discogs). Off by default and, while off, the
+    # lookup affordances are *hidden* rather than greyed — the app should look
+    # fully offline, because it is. What ever leaves the machine is the artist
+    # and title of the tracks the user chose to look up. Never the audio.
+    online_lookup_enabled: bool = False
+    # A Discogs personal access token, stored in plain text here alongside the
+    # other preferences. It is read-scope and revocable in one click on the
+    # user's Discogs account page, which is why this is the ecosystem norm
+    # (beets, Picard) rather than per-platform keychain surface.
+    discogs_token: str = ""
+    # Whether a lookup also fetches the release's cover. Separate from the
+    # master switch because art is the one proposal that costs a second
+    # request and rewrites a large binary field; the write still happens only
+    # after the user approves it, like every other field.
+    online_fetch_artwork: bool = True
     language: str = DEFAULT_LANGUAGE
     # Colour scheme id (see THEMES in src/gui/styles/theme.py). Applied at
     # startup; changing it requires a restart (like ``language``).
@@ -281,6 +296,15 @@ def load_config() -> AppConfig:
                 ),
                 persist_scratch=bool(
                     data.get("persist_scratch", AppConfig.persist_scratch)
+                ),
+                online_lookup_enabled=bool(
+                    data.get("online_lookup_enabled", AppConfig.online_lookup_enabled)
+                ),
+                discogs_token=str(
+                    data.get("discogs_token", AppConfig.discogs_token) or ""
+                ).strip(),
+                online_fetch_artwork=bool(
+                    data.get("online_fetch_artwork", AppConfig.online_fetch_artwork)
                 ),
                 language=data.get("language", AppConfig.language),
                 theme=data.get("theme", AppConfig.theme),

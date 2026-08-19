@@ -31,8 +31,21 @@ from src.metadata.tags import (
     write_comment,
     delete_metadata_fields,
 )
+from src.online import matching
+from src.online.discogs import DiscogsProvider
+from src.online.result import (
+    ERROR_AUTH,
+    ERROR_NETWORK,
+    ERROR_NOT_FOUND,
+    ERROR_NO_TOKEN,
+    ERROR_RATE_LIMIT,
+    ERROR_SERVER,
+)
 from src.utils.reveal import reveal_in_file_manager
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
+from ..workers import thread_keeper
+from ..workers.lookup_worker import LookupJob, LookupThread
+from .dialogs.lookup_review import ARTWORK_FIELD, LookupReviewDialog
 from .elided_label import ElidedLabel
 from .artwork_widget import ArtworkWidget, mime_for_path
 from .drop_zone import AUDIO_EXTENSIONS
@@ -69,6 +82,18 @@ FIELD_LABELS = dict(FIELD_ORDER)
 _FORM_LEFT_MARGIN = 8
 
 
+def _sniff_mime(data: bytes) -> str:
+    """The MIME type of downloaded cover bytes, read from the bytes themselves.
+
+    There is no filename to go on — the URL is a signed, time-limited address —
+    and writing "image/jpeg" over a PNG produces a file whose art some players
+    refuse to draw.
+    """
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return "image/png"
+    return "image/jpeg"
+
+
 def _format_audio_props(path: str) -> str:
     """Return a short 'Sample Rate: 44.1 kHz   Bit Depth: 16-bit' summary."""
     try:
@@ -99,6 +124,15 @@ class MetadataPanel(QWidget):
         self._file_path: str | None = None
         self._field_edits: dict[str, QLineEdit] = {}
         self._saving = False  # guard against re-entrant saves
+        # Online lookup state. Off until MainWindow pushes the setting down —
+        # while off the button is hidden, not greyed, so the app looks as
+        # offline as it is.
+        self._online_enabled = False
+        self._discogs_token = ""
+        self._fetch_artwork = True
+        self._lookup_thread: LookupThread | None = None
+        self._review_dialog: LookupReviewDialog | None = None
+        self._threads: list = []
         self.setAcceptDrops(True)
         self._setup_ui()
         self._bg_overlay = BackgroundOverlay("bg_metadata.png", self)
@@ -254,6 +288,28 @@ class MetadataPanel(QWidget):
         # Eject button row (full-width)
         btn_row = QHBoxLayout()
         btn_row.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
+
+        # Online lookup. Hidden entirely until the setting is on — see
+        # _sync_lookup_button.
+        self._lookup_btn = QPushButton(self.tr("Look Up Online…"))
+        self._lookup_btn.setToolTip(
+            self.tr("Search Discogs for this track's details, and review them.")
+        )
+        self._lookup_btn.setMinimumWidth(
+            self._lookup_btn.fontMetrics().horizontalAdvance(self._lookup_btn.text())
+            + _BUTTON_CHROME
+        )
+        self._lookup_btn.clicked.connect(self._on_lookup_clicked)
+        self._lookup_btn.setVisible(False)
+        btn_row.addWidget(self._lookup_btn)
+
+        # Says what the lookup is doing, including *why* it paused — a rate
+        # limit that reads as a stuck spinner is the thing to avoid.
+        self._lookup_status = ElidedLabel("")
+        self._lookup_status.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
+        self._lookup_status.setVisible(False)
+        btn_row.addWidget(self._lookup_status, 1)
+
         btn_row.addStretch()
         # Reload re-reads the file's tags from disk and rebuilds the form —
         # used to pick up changes written elsewhere (e.g. the Player playlist).
@@ -374,6 +430,7 @@ class MetadataPanel(QWidget):
         self._artwork.setVisible(True)
         self._add_artwork_btn.setVisible(True)
         self._remove_artwork_btn.setVisible(True)
+        self._sync_lookup_button()
         self._bottom_spacer.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
     def _add_field_row(self, field_key: str, label: str, value: str = "") -> None:
@@ -546,9 +603,238 @@ class MetadataPanel(QWidget):
         self._add_artwork_btn.setVisible(False)
         self._remove_artwork_btn.setVisible(False)
         self._remove_artwork_btn.setEnabled(False)
+        self._sync_lookup_button()
         # Restore the bottom spacer so empty state stays pinned to top
         self._bottom_spacer.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         self.layout().invalidate()
+
+    # ------------------------------------------------------- online lookup
+
+    def set_online_lookup(
+        self, enabled: bool, token: str = "", fetch_artwork: bool = True
+    ) -> None:
+        """Push the Settings state down. Called by MainWindow, not by the user."""
+        self._online_enabled = bool(enabled)
+        self._discogs_token = (token or "").strip()
+        self._fetch_artwork = bool(fetch_artwork)
+        self._sync_lookup_button()
+
+    def _sync_lookup_button(self) -> None:
+        """The button exists only when the feature is on and a file is loaded."""
+        visible = self._online_enabled and self._file_path is not None
+        self._lookup_btn.setVisible(visible)
+        if not visible:
+            self._lookup_status.setVisible(False)
+            self._lookup_status.setText("")
+
+    def _current_query(self):
+        """What we know about the loaded file, filename fallback included."""
+        values = {key: edit.text().strip() for key, edit in self._field_edits.items()}
+        duration = None
+        try:
+            duration = read_metadata(self._file_path).duration
+        except Exception:
+            pass
+        return matching.build_query(
+            artist=values.get("artist"),
+            title=values.get("title"),
+            album=values.get("album"),
+            duration=duration,
+            filename_stem=Path(self._file_path).stem,
+        )
+
+    def _on_lookup_clicked(self) -> None:
+        if self._file_path is None or self._lookup_thread is not None:
+            return
+        query = self._current_query()
+        if not query.is_usable():
+            QMessageBox.information(
+                self,
+                self.tr("Look Up Online"),
+                self.tr(
+                    "This file has no artist or title to search with, and its "
+                    "name doesn't give one either. Fill in the Title field and "
+                    "try again."
+                ),
+            )
+            return
+        self._start_lookup(
+            LookupJob(
+                path=self._file_path,
+                query=query,
+                want_artwork=self._fetch_artwork,
+            )
+        )
+
+    def _start_lookup(self, job: LookupJob) -> None:
+        provider = DiscogsProvider(token=self._discogs_token)
+        thread = LookupThread(provider, [job], self)
+        thread.result_ready.connect(self._on_lookup_result)
+        thread.waiting.connect(self._on_lookup_waiting)
+        thread.finished.connect(self._on_lookup_finished)
+        # Hold the wrapper until its C++ object is actually gone; reassigning
+        # the attribute alone can drop the last reference mid-teardown.
+        thread_keeper.keep_alive(self._threads, thread)
+        self._lookup_thread = thread
+        self._lookup_btn.setEnabled(False)
+        self._set_lookup_status(self.tr("Looking up…"))
+        thread.start()
+
+    def _set_lookup_status(self, text: str) -> None:
+        self._lookup_status.setText(text)
+        self._lookup_status.setToolTip(text)
+        self._lookup_status.setVisible(bool(text))
+
+    def _on_lookup_waiting(self, seconds: float) -> None:
+        self._set_lookup_status(self.tr("Waiting for the Discogs rate limit…"))
+
+    def _on_lookup_finished(self) -> None:
+        # Clear the slot only if a newer lookup has not already taken it —
+        # a superseded thread finishing is the normal case, and an unguarded
+        # clear would wipe the live one's reference.
+        thread = self.sender()
+        if thread is self._lookup_thread:
+            self._lookup_thread = None
+        self._lookup_btn.setEnabled(True)
+
+    def _on_lookup_result(self, result) -> None:
+        if self._file_path is None or result.path != self._file_path:
+            # The user ejected or dropped another file while it ran.
+            self._set_lookup_status("")
+            return
+        if not result.ok:
+            self._set_lookup_status("")
+            QMessageBox.information(
+                self, self.tr("Look Up Online"), self._lookup_error_text(result.error)
+            )
+            return
+        self._set_lookup_status("")
+        if self._review_dialog is not None:
+            # A candidate switch: the dialog is open and waiting for this.
+            self._review_dialog.set_result(result)
+            return
+        self._show_review_dialog(result)
+
+    def _lookup_error_text(self, kind: str) -> str:
+        """One sentence per failure kind — no stack traces, no error codes."""
+        if kind == ERROR_NO_TOKEN:
+            return self.tr(
+                "Add your Discogs token in Settings to look up track details."
+            )
+        if kind == ERROR_AUTH:
+            return self.tr(
+                "Discogs rejected that token. Check it in Settings, or generate "
+                "a new one."
+            )
+        if kind == ERROR_RATE_LIMIT:
+            return self.tr(
+                "Discogs is rate limiting this connection. Wait a minute and "
+                "try again."
+            )
+        if kind == ERROR_NOT_FOUND:
+            return self.tr(
+                "Nothing on Discogs matched this track. Editing the Artist and "
+                "Title fields and trying again usually helps."
+            )
+        if kind == ERROR_SERVER:
+            return self.tr("Discogs is having trouble right now. Try again later.")
+        if kind == ERROR_NETWORK:
+            return self.tr("Couldn't reach Discogs. Check your internet connection.")
+        return self.tr("Couldn't read Discogs' answer. Try again later.")
+
+    def _show_review_dialog(self, result) -> None:
+        try:
+            current = read_metadata(self._file_path)
+        except Exception as exc:
+            logger.error("Could not re-read tags before review: %s", exc)
+            return
+        values = dict(current.to_dict())
+        values[ARTWORK_FIELD] = current.artwork
+        dialog = LookupReviewDialog(
+            file_path=self._file_path,
+            current=values,
+            result=result,
+            allow_artwork=self._fetch_artwork,
+            parent=self,
+        )
+        dialog.candidate_requested.connect(self._on_candidate_requested)
+        self._review_dialog = dialog
+        try:
+            accepted = dialog.exec()
+        finally:
+            self._review_dialog = None
+        if accepted:
+            self._apply_lookup_values(dialog.selected_values())
+
+    def _on_candidate_requested(self, candidate) -> None:
+        """The user picked a different release; read that one instead."""
+        if self._file_path is None or self._lookup_thread is not None:
+            return
+        self._start_lookup(
+            LookupJob(
+                path=self._file_path,
+                query=self._current_query(),
+                candidate=candidate,
+                want_artwork=self._fetch_artwork,
+            )
+        )
+
+    def _apply_lookup_values(self, values: dict) -> None:
+        """Write the approved fields through the ordinary tag-writing path.
+
+        Deliberately the same ``tags.py`` calls a manual edit makes, so the
+        Windows file-lock rules and the WAV guard apply here for free — and the
+        form is rebuilt from disk afterwards rather than from what we believe
+        we wrote.
+        """
+        if not values or self._file_path is None:
+            return
+        artwork = values.pop(ARTWORK_FIELD, None)
+        meta = TrackMetadata()
+        fields: list[str] = []
+        for key, value in values.items():
+            setattr(meta, key, value)
+            fields.append(key)
+        try:
+            if fields:
+                write_metadata(self._file_path, meta, fields)
+            if artwork:
+                write_metadata(
+                    self._file_path,
+                    TrackMetadata(
+                        artwork=bytes(artwork), artwork_mime=_sniff_mime(artwork)
+                    ),
+                    fields=[ARTWORK_FIELD],
+                )
+            logger.info(
+                "Applied %d online field(s) to %s",
+                len(fields) + (1 if artwork else 0),
+                Path(self._file_path).name,
+            )
+        except Exception as exc:
+            logger.error("Failed to apply looked-up metadata: %s", exc)
+            QMessageBox.warning(
+                self,
+                self.tr("Look Up Online"),
+                self.tr("Couldn't write these tags: {0}").format(exc),
+            )
+            return
+        self._load_file(self._file_path)
+
+    def shutdown_workers(self) -> None:
+        """Wait for a lookup in flight before the window goes away.
+
+        A urllib request is one long blocking call, so there is nothing to
+        interrupt — but a QThread destroyed while running is undefined
+        behaviour, and a worker emitting into a deleted panel is worse.
+        """
+        if self._lookup_thread is not None:
+            self._lookup_thread.cancel()
+        thread_keeper.wait_for_threads(self._threads)
+
+    def closeEvent(self, event) -> None:
+        self.shutdown_workers()
+        super().closeEvent(event)
 
     # ----------------------------------------------------------- artwork actions
 
