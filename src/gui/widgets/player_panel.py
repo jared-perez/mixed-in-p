@@ -59,6 +59,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QMenu,
     QMessageBox,
+    QProgressDialog,
     QPushButton,
     QScrollArea,
     QSizePolicy,
@@ -83,12 +84,15 @@ from src.metadata.tags import (
     write_comment,
     write_metadata,
 )
+from src.online.discogs import DiscogsProvider
 from src.utils.config import load_config, save_config
 
+from .. import lookup_flow
 from ..models.undo_stack import UndoStack
 from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
+from ..workers.lookup_worker import LookupJob, LookupThread
 from ..workers.thread_keeper import keep_alive, wait_for_threads
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
 from .elided_label import HuggingElidedLabel, LinkLabel
@@ -104,6 +108,7 @@ _BACKDROP_VIS_MAP = {
 from .dialogs.duplicate_policy import ADD as DUPLICATES_ADD
 from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
 from .dialogs.duplicate_policy import resolve_additions
+from .dialogs.lookup_review import STOP_RESULT, LookupReviewDialog
 from .dialogs.relocate_dialog import RelocateDialog
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import (
@@ -1372,6 +1377,16 @@ class PlayerPanel(QWidget):
         self._wf_loading: bool = False
         self._wf_path: str | None = None
 
+        # Online lookup, pushed down from Settings by MainWindow. Off until
+        # then, and while off the context-menu entry does not exist at all.
+        self._online_enabled = False
+        self._discogs_token = ""
+        self._fetch_artwork = True
+        self._lookup_thread: LookupThread | None = None
+        self._lookup_progress: QProgressDialog | None = None
+        self._lookup_results: list = []
+        self._lookup_paths: list[str] = []
+
         self._setup_ui()
         self._connect_signals()
         self._update_transport_state()
@@ -2303,6 +2318,8 @@ class PlayerPanel(QWidget):
         otherwise sit through every remaining file in the batch.
         """
         self._cancel_artwork_worker()
+        if self._lookup_thread is not None:
+            self._lookup_thread.cancel()
         self._compat_panel.shutdown_workers()
         self.wait_for_readers()
 
@@ -3375,29 +3392,37 @@ class PlayerPanel(QWidget):
         for row in sorted(selected):
             if not (0 <= row < len(self._playlist)):
                 continue
-            entry = self._playlist[row]
-            try:
-                meta = read_metadata(entry.file_path)
-            except Exception as exc:  # noqa: BLE001
-                logger.warning("Could not reload metadata for %s: %s", entry.file_path, exc)
-                continue
-            entry.artist = meta.artist or ""
-            entry.title = meta.title or ""
-            entry.album = meta.album or ""
-            entry.genre = meta.genre or ""
-            entry.bpm = str(int(round(meta.bpm))) if meta.bpm else ""
-            entry.key = meta.key or ""
-            entry.comment = meta.comment or ""
-            entry.year = str(meta.year) if meta.year else ""
-            entry.track_number = str(meta.track_number) if meta.track_number else ""
-            entry.label = meta.label or ""
-            entry.bitrate = str(meta.bitrate) if meta.bitrate else ""
-            entry.energy = str(meta.energy) if meta.energy else ""
-            if meta.duration:
-                entry.duration = self._format_time(int(meta.duration * 1000))
-            changed = True
+            changed |= self._refresh_entry_from_disk(self._playlist[row])
         if changed:
             self._rebuild_table()  # sets _rebuilding, so itemChanged stays quiet
+
+    def _refresh_entry_from_disk(self, entry) -> bool:
+        """Copy one file's tags back onto its playlist entry. True if it read.
+
+        Split out of the selection-wide reload above so a single row can be
+        refreshed after a write without disturbing what the user has selected —
+        which matters during a batch lookup, where the selection *is* the queue.
+        """
+        try:
+            meta = read_metadata(entry.file_path)
+        except Exception as exc:  # noqa: BLE001
+            logger.warning("Could not reload metadata for %s: %s", entry.file_path, exc)
+            return False
+        entry.artist = meta.artist or ""
+        entry.title = meta.title or ""
+        entry.album = meta.album or ""
+        entry.genre = meta.genre or ""
+        entry.bpm = str(int(round(meta.bpm))) if meta.bpm else ""
+        entry.key = meta.key or ""
+        entry.comment = meta.comment or ""
+        entry.year = str(meta.year) if meta.year else ""
+        entry.track_number = str(meta.track_number) if meta.track_number else ""
+        entry.label = meta.label or ""
+        entry.bitrate = str(meta.bitrate) if meta.bitrate else ""
+        entry.energy = str(meta.energy) if meta.energy else ""
+        if meta.duration:
+            entry.duration = self._format_time(int(meta.duration * 1000))
+        return True
 
     def _sync_playlist_from_table(self) -> None:
         """Rebuild the internal playlist list from table row order after drag-drop."""
@@ -4769,35 +4794,264 @@ class PlayerPanel(QWidget):
             return
         entry = self._playlist[row]
 
-        menu = QMenu(self._table)
-        # Only when the file is actually gone: an always-present "Locate…"
-        # would read as an invitation to repoint tracks that are fine.
-        locate_action = None
-        if self._library is not None and self._is_missing(entry.file_path):
-            locate_action = menu.addAction(self.tr("Locate Missing File…"))
-            menu.addSeparator()
-        open_folder_action = menu.addAction(self.tr("Open File Location"))
-        open_metadata_action = menu.addAction(self.tr("Open in Metadata Panel"))
-        reload_action = menu.addAction(self.tr("Reload Metadata from File"))
-        menu.addSeparator()
-        remove_action = menu.addAction(self.tr("Remove from Playlist"))
-
+        menu, actions = self._build_row_menu(entry)
         chosen = menu.exec(self._table.viewport().mapToGlobal(pos))
-        if locate_action is not None and chosen is locate_action:
+        if chosen is None:
+            return
+        name = next((key for key, action in actions.items() if action is chosen), "")
+        if name == "locate":
             self._locate_missing(row)
-        elif chosen is open_folder_action:
+        elif name == "open_folder":
             self._reveal_in_explorer(entry.file_path)
-        elif chosen is open_metadata_action:
+        elif name == "open_metadata":
             self.open_in_metadata.emit(entry.file_path)
-        elif chosen is reload_action:
+        elif name == "reload":
             self._reload_selected_metadata(row)
-        elif chosen is remove_action:
+        elif name == "lookup":
+            self._lookup_selected_online(row)
+        elif name == "remove":
             # Remove the current selection; if the right-clicked row isn't part
             # of it, act on just that row instead.
             selected = {idx.row() for idx in self._table.selectionModel().selectedRows()}
             if row not in selected:
                 self._table.selectRow(row)
             self._on_remove_selected()
+
+    def _build_row_menu(self, entry) -> tuple[QMenu, dict[str, object]]:
+        """The row menu and its actions by name, built but not shown.
+
+        Split from the handler so a test can ask what a row offers: ``exec``
+        on a QMenu resolves through Qt's C++ side and cannot be patched out, so
+        a test that drove the handler would open a real modal menu and hang.
+        """
+        menu = QMenu(self._table)
+        actions: dict[str, object] = {}
+        # Only when the file is actually gone: an always-present "Locate…"
+        # would read as an invitation to repoint tracks that are fine.
+        if self._library is not None and self._is_missing(entry.file_path):
+            actions["locate"] = menu.addAction(self.tr("Locate Missing File…"))
+            menu.addSeparator()
+        actions["open_folder"] = menu.addAction(self.tr("Open File Location"))
+        actions["open_metadata"] = menu.addAction(self.tr("Open in Metadata Panel"))
+        actions["reload"] = menu.addAction(self.tr("Reload Metadata from File"))
+        # Only when the feature is switched on — while it is off the app makes
+        # no network requests at all, and an entry here would suggest otherwise.
+        if self._online_enabled:
+            actions["lookup"] = menu.addAction(self.tr("Look Up Online…"))
+        menu.addSeparator()
+        actions["remove"] = menu.addAction(self.tr("Remove from Playlist"))
+        return menu, actions
+
+    # ── Online lookup (batch) ───────────────────────────────────
+
+    def set_online_lookup(
+        self, enabled: bool, token: str = "", fetch_artwork: bool = True
+    ) -> None:
+        """Push the Settings state down. Called by MainWindow, not by the user."""
+        self._online_enabled = bool(enabled)
+        self._discogs_token = (token or "").strip()
+        self._fetch_artwork = bool(fetch_artwork)
+
+    def _lookup_selected_online(self, fallback_row: int) -> None:
+        """Look up every selected row, then review the results one at a time.
+
+        The whole queue runs *before* any review dialog opens, rather than
+        interleaving them. Two reasons: a modal opened while the queue is still
+        running would have the user reviewing file 1 with no way to see what
+        the rest are doing, and cancelling half-way through a run whose results
+        are already on screen has no honest meaning. The cost is the wait,
+        which is what the progress dialog is for.
+        """
+        if self._lookup_thread is not None:
+            return
+        selected = {idx.row() for idx in self._table.selectionModel().selectedRows()}
+        if fallback_row not in selected:
+            selected = {fallback_row}
+        jobs: list[LookupJob] = []
+        skipped = 0
+        for row in sorted(selected):
+            if not (0 <= row < len(self._playlist)):
+                continue
+            entry = self._playlist[row]
+            query = lookup_flow.query_for(
+                entry.file_path,
+                artist=entry.artist,
+                title=entry.title,
+                album=entry.album,
+            )
+            if not query.is_usable():
+                # No tags and a filename that parses to nothing. Counted rather
+                # than queued — searching for a filename finds nonsense.
+                skipped += 1
+                continue
+            jobs.append(
+                LookupJob(
+                    path=entry.file_path,
+                    query=query,
+                    want_artwork=self._fetch_artwork,
+                )
+            )
+        if not jobs:
+            QMessageBox.information(
+                self,
+                self.tr("Look Up Online"),
+                self.tr(
+                    "None of the selected tracks have an artist or title to "
+                    "search with, and their filenames don't give one either."
+                ),
+            )
+            return
+        self._lookup_results = []
+        self._lookup_paths = [job.path for job in jobs]
+        self._start_lookup_queue(jobs, skipped)
+
+    def _start_lookup_queue(self, jobs: list[LookupJob], skipped: int) -> None:
+        provider = DiscogsProvider(token=self._discogs_token)
+        thread = LookupThread(provider, jobs, self)
+        thread.result_ready.connect(self._lookup_results.append)
+        thread.progress.connect(self._on_lookup_progress)
+        thread.waiting.connect(self._on_lookup_waiting)
+        thread.finished.connect(lambda: self._on_lookup_queue_done(skipped))
+        keep_alive(self._thread_keep, thread)
+        self._lookup_thread = thread
+
+        progress = QProgressDialog(
+            self.tr("Looking up track details…"),
+            self.tr("Cancel"),
+            0,
+            len(jobs),
+            self,
+        )
+        progress.setWindowTitle(self.tr("Look Up Online"))
+        progress.setWindowModality(Qt.WindowModality.WindowModal)
+        # Shown at once rather than after Qt's default delay: a lookup is
+        # always slow enough to need it, and a window that appears late reads
+        # as the app having hung first.
+        progress.setMinimumDuration(0)
+        progress.setValue(0)
+        progress.canceled.connect(thread.cancel)
+        self._lookup_progress = progress
+
+        thread.start()
+
+    def _on_lookup_progress(self, done: int, total: int) -> None:
+        """Advance the progress dialog.
+
+        The label is set *before* the value, and nothing follows the value, on
+        purpose: ``QProgressDialog.setValue`` pumps the event loop, so the
+        thread's own ``finished`` can be delivered from inside this call — and
+        anything written after it would be running against a dialog that has
+        already been closed and cleared.
+        """
+        progress = self._lookup_progress
+        if progress is None:
+            return
+        progress.setLabelText(
+            self.tr("Looking up {0} of {1}…").format(min(done + 1, total), total)
+        )
+        progress.setValue(done)
+
+    def _on_lookup_waiting(self, seconds: float) -> None:
+        """Say *why* the queue paused. A silent wait reads as a hang."""
+        if self._lookup_progress is not None:
+            self._lookup_progress.setLabelText(
+                self.tr("Waiting for the Discogs rate limit…")
+            )
+
+    def _on_lookup_queue_done(self, skipped: int) -> None:
+        """Close the progress dialog, then review — on a fresh trip round the loop.
+
+        The review opens modals, and this runs from a thread signal that may
+        itself have been delivered from inside ``QProgressDialog.setValue``'s
+        event pump. Firing a modal from there fights Qt for the mouse grab, so
+        it goes through a zero-delay timer like every other deferred dialog in
+        this app.
+        """
+        self._lookup_thread = None
+        if self._lookup_progress is not None:
+            self._lookup_progress.close()
+            self._lookup_progress = None
+        results, self._lookup_results = self._lookup_results, []
+        QTimer.singleShot(0, lambda: self._review_lookup_results(results, skipped))
+
+    def _review_lookup_results(self, results: list, skipped: int) -> None:
+        """Page through the results, writing what the user approves."""
+        usable = [r for r in results if r.ok]
+        failures = [r for r in results if not r.ok]
+        applied = 0
+        for index, result in enumerate(usable, start=1):
+            row = self._row_for_path(result.path)
+            if row is None:
+                continue  # removed from the playlist while the queue ran
+            entry = self._playlist[row]
+            try:
+                current = read_metadata(entry.file_path)
+            except Exception as exc:  # noqa: BLE001
+                logger.warning("Could not read %s before review: %s", entry.file_path, exc)
+                continue
+            values = dict(current.to_dict())
+            values[lookup_flow.ARTWORK_FIELD] = current.artwork
+            dialog = LookupReviewDialog(
+                file_path=entry.file_path,
+                current=values,
+                result=result,
+                allow_artwork=self._fetch_artwork,
+                parent=self,
+                position=(index, len(usable)),
+            )
+            outcome = dialog.exec()
+            if outcome == STOP_RESULT:
+                break
+            if not outcome:
+                continue  # Skip: this file only
+            error = lookup_flow.apply_values(entry.file_path, dialog.selected_values())
+            if error:
+                QMessageBox.warning(self, self.tr("Look Up Online"), error)
+                continue
+            applied += 1
+            self._reload_row_metadata(row)
+        self._report_lookup_outcome(applied, failures, skipped)
+
+    def _report_lookup_outcome(self, applied: int, failures: list, skipped: int) -> None:
+        """Say what did not work, and stay quiet about what did.
+
+        A summary after every run would be a dialog to dismiss after a batch
+        the user watched succeed. What they cannot see is which files came back
+        with nothing, so that is what this reports.
+        """
+        unmatched = len(failures) + skipped
+        if not unmatched:
+            return
+        names = [Path(r.path).name for r in failures[:5]]
+        detail = "\n".join(names)
+        message = self.tr("%n track(s) had no match.", "", unmatched)
+        if applied:
+            message = self.tr(
+                "Updated %n track(s).", "", applied
+            ) + " " + message
+        if detail:
+            message = f"{message}\n\n{detail}"
+        QMessageBox.information(self, self.tr("Look Up Online"), message)
+
+    def _row_for_path(self, file_path: str) -> int | None:
+        """Where a path sits in the visible list now, or None if it has gone."""
+        for row, entry in enumerate(self._playlist):
+            if entry.file_path == file_path:
+                return row
+        return None
+
+    def _reload_row_metadata(self, row: int) -> None:
+        """Re-read one row's tags from disk (the write went through tags.py).
+
+        Deliberately not ``_reload_selected_metadata``: that acts on the whole
+        selection, which during a batch is every file in the queue — so each
+        applied file would re-read all of them, and the row count would square
+        the work.
+        """
+        if not (0 <= row < len(self._playlist)):
+            return
+        if self._refresh_entry_from_disk(self._playlist[row]):
+            self._rebuild_table()
 
     @staticmethod
     def _reveal_in_explorer(file_path: str) -> None:

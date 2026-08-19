@@ -1405,17 +1405,18 @@ class MainWindow(QMainWindow):
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
 
     def _apply_online_lookup_settings(self) -> None:
-        """Push the online-metadata switch and token down to the Metadata panel.
+        """Push the online-metadata switch and token to the two panels that use it.
 
-        The panel *hides* its lookup button while the switch is off rather than
-        greying it: until the user opts in, the app should look as offline as
-        it is.
+        Both hide their affordance while the switch is off rather than greying
+        it — the Metadata panel's button, the playlist's context-menu entry.
+        Until the user opts in, the app should look as offline as it is.
         """
-        self._metadata_panel.set_online_lookup(
-            self._config.online_lookup_enabled,
-            self._config.discogs_token,
-            self._config.online_fetch_artwork,
-        )
+        for panel in (self._metadata_panel, self._player_panel):
+            panel.set_online_lookup(
+                self._config.online_lookup_enabled,
+                self._config.discogs_token,
+                self._config.online_fetch_artwork,
+            )
 
     def _apply_visualization_settings(self) -> None:
         """Push the visualizations switch (and waveform color) to every consumer.

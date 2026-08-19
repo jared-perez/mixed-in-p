@@ -40,6 +40,7 @@ from src.metadata.tags import stores_tags
 from src.online import discogs, matching
 from src.online.result import Candidate
 
+from ...lookup_flow import ARTWORK_FIELD
 from ...styles.theme import Theme
 from ..elided_label import ElidedLabel
 
@@ -72,8 +73,10 @@ _FIELD_ORDER = [
 # small enough that two of them plus the fields fit without scrolling.
 _ART_EDGE = 96
 
-#: Key used for the artwork row in the returned selection.
-ARTWORK_FIELD = "artwork"
+# Result code for "stop reviewing the rest", offered only in a batch run.
+# QDialog's own Accepted (1) and Rejected (0) mean apply-this-one and skip-it,
+# so a third verb needs a third code rather than an overloaded Cancel.
+STOP_RESULT = 2
 
 
 class LookupReviewDialog(QDialog):
@@ -98,11 +101,16 @@ class LookupReviewDialog(QDialog):
         result,
         allow_artwork: bool = True,
         parent: QWidget | None = None,
+        position: tuple[int, int] | None = None,
     ) -> None:
         super().__init__(parent)
         self._file_path = file_path
         self._current = dict(current)
         self._allow_artwork = allow_artwork
+        # (n, total) while reviewing a batch; None for a single file. Batch
+        # mode is what turns Cancel into Skip and adds Stop — with several
+        # files queued, "cancel" is ambiguous between this one and the rest.
+        self._position = position
         self._result = result
         self._checks: dict[str, QCheckBox] = {}
         self._proposed_labels: dict[str, QLabel] = {}
@@ -125,6 +133,12 @@ class LookupReviewDialog(QDialog):
         heading = QLabel(self.tr("Tick the values you want to write to this file."))
         heading.setWordWrap(True)
         layout.addWidget(heading)
+
+        if self._position is not None:
+            index, total = self._position
+            counter = QLabel(self.tr("File {0} of {1}").format(index, total))
+            counter.setStyleSheet(f"color: {Theme.NEON_YELLOW};")
+            layout.addWidget(counter)
 
         self._file_label = ElidedLabel(self._file_path, mode=Qt.TextElideMode.ElideLeft)
         self._file_label.setToolTip(self._file_path)
@@ -209,14 +223,26 @@ class LookupReviewDialog(QDialog):
 
         self._all_btn = self._make_button(self.tr("Select All"), self._select_all)
         self._none_btn = self._make_button(self.tr("Select None"), self._select_none)
-        self._cancel_btn = self._make_button(self.tr("Cancel"), self.reject)
+        self._stop_btn = None
+        if self._position is None:
+            self._cancel_btn = self._make_button(self.tr("Cancel"), self.reject)
+        else:
+            # Skip leaves this file alone and moves on; Stop abandons the rest
+            # of the queue. Two escape hatches because a batch really does have
+            # two things to escape.
+            self._cancel_btn = self._make_button(self.tr("Skip"), self.reject)
+            self._stop_btn = self._make_button(
+                self.tr("Stop"), lambda: self.done(STOP_RESULT)
+            )
         self._apply_btn = self._make_button(self.tr("Apply"), self.accept)
         self._apply_btn.setStyleSheet(
             f"background-color: {Theme.NEON_YELLOW}; color: #000000; font-weight: bold;"
         )
         self._apply_btn.setDefault(True)
-        for btn in (self._all_btn, self._none_btn, self._cancel_btn, self._apply_btn):
-            buttons.addWidget(btn)
+        for btn in (self._all_btn, self._none_btn, self._stop_btn,
+                    self._cancel_btn, self._apply_btn):
+            if btn is not None:
+                buttons.addWidget(btn)
         layout.addLayout(buttons)
 
     def _make_button(self, text: str, slot) -> QPushButton:

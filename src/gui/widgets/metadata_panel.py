@@ -31,21 +31,14 @@ from src.metadata.tags import (
     write_comment,
     delete_metadata_fields,
 )
-from src.online import matching
 from src.online.discogs import DiscogsProvider
-from src.online.result import (
-    ERROR_AUTH,
-    ERROR_NETWORK,
-    ERROR_NOT_FOUND,
-    ERROR_NO_TOKEN,
-    ERROR_RATE_LIMIT,
-    ERROR_SERVER,
-)
 from src.utils.reveal import reveal_in_file_manager
+from .. import lookup_flow
+from ..lookup_flow import ARTWORK_FIELD
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from ..workers import thread_keeper
 from ..workers.lookup_worker import LookupJob, LookupThread
-from .dialogs.lookup_review import ARTWORK_FIELD, LookupReviewDialog
+from .dialogs.lookup_review import LookupReviewDialog
 from .elided_label import ElidedLabel
 from .artwork_widget import ArtworkWidget, mime_for_path
 from .drop_zone import AUDIO_EXTENSIONS
@@ -80,18 +73,6 @@ FIELD_LABELS = dict(FIELD_ORDER)
 # Left margin applied to the form rows. A small indent keeps labels visually
 # tucked in slightly while still extending the field column nearly to the artwork.
 _FORM_LEFT_MARGIN = 8
-
-
-def _sniff_mime(data: bytes) -> str:
-    """The MIME type of downloaded cover bytes, read from the bytes themselves.
-
-    There is no filename to go on — the URL is a signed, time-limited address —
-    and writing "image/jpeg" over a PNG produces a file whose art some players
-    refuse to draw.
-    """
-    if data[:8] == b"\x89PNG\r\n\x1a\n":
-        return "image/png"
-    return "image/jpeg"
 
 
 def _format_audio_props(path: str) -> str:
@@ -629,18 +610,20 @@ class MetadataPanel(QWidget):
 
     def _current_query(self):
         """What we know about the loaded file, filename fallback included."""
+        # The form, not the file: an edit the user has just made is the better
+        # description of the track, and it is already saved to disk anyway.
         values = {key: edit.text().strip() for key, edit in self._field_edits.items()}
         duration = None
         try:
             duration = read_metadata(self._file_path).duration
-        except Exception:
+        except Exception:  # noqa: BLE001 — a duration is a nicety, not a need
             pass
-        return matching.build_query(
+        return lookup_flow.query_for(
+            self._file_path,
             artist=values.get("artist"),
             title=values.get("title"),
             album=values.get("album"),
             duration=duration,
-            filename_stem=Path(self._file_path).stem,
         )
 
     def _on_lookup_clicked(self) -> None:
@@ -716,31 +699,8 @@ class MetadataPanel(QWidget):
         self._show_review_dialog(result)
 
     def _lookup_error_text(self, kind: str) -> str:
-        """One sentence per failure kind — no stack traces, no error codes."""
-        if kind == ERROR_NO_TOKEN:
-            return self.tr(
-                "Add your Discogs token in Settings to look up track details."
-            )
-        if kind == ERROR_AUTH:
-            return self.tr(
-                "Discogs rejected that token. Check it in Settings, or generate "
-                "a new one."
-            )
-        if kind == ERROR_RATE_LIMIT:
-            return self.tr(
-                "Discogs is rate limiting this connection. Wait a minute and "
-                "try again."
-            )
-        if kind == ERROR_NOT_FOUND:
-            return self.tr(
-                "Nothing on Discogs matched this track. Editing the Artist and "
-                "Title fields and trying again usually helps."
-            )
-        if kind == ERROR_SERVER:
-            return self.tr("Discogs is having trouble right now. Try again later.")
-        if kind == ERROR_NETWORK:
-            return self.tr("Couldn't reach Discogs. Check your internet connection.")
-        return self.tr("Couldn't read Discogs' answer. Try again later.")
+        """One sentence per failure kind (shared with the Player's batch run)."""
+        return lookup_flow.error_text(kind)
 
     def _show_review_dialog(self, result) -> None:
         try:
@@ -780,45 +740,14 @@ class MetadataPanel(QWidget):
         )
 
     def _apply_lookup_values(self, values: dict) -> None:
-        """Write the approved fields through the ordinary tag-writing path.
-
-        Deliberately the same ``tags.py`` calls a manual edit makes, so the
-        Windows file-lock rules and the WAV guard apply here for free — and the
-        form is rebuilt from disk afterwards rather than from what we believe
-        we wrote.
-        """
+        """Write the approved fields, then rebuild the form from disk."""
         if not values or self._file_path is None:
             return
-        artwork = values.pop(ARTWORK_FIELD, None)
-        meta = TrackMetadata()
-        fields: list[str] = []
-        for key, value in values.items():
-            setattr(meta, key, value)
-            fields.append(key)
-        try:
-            if fields:
-                write_metadata(self._file_path, meta, fields)
-            if artwork:
-                write_metadata(
-                    self._file_path,
-                    TrackMetadata(
-                        artwork=bytes(artwork), artwork_mime=_sniff_mime(artwork)
-                    ),
-                    fields=[ARTWORK_FIELD],
-                )
-            logger.info(
-                "Applied %d online field(s) to %s",
-                len(fields) + (1 if artwork else 0),
-                Path(self._file_path).name,
-            )
-        except Exception as exc:
-            logger.error("Failed to apply looked-up metadata: %s", exc)
-            QMessageBox.warning(
-                self,
-                self.tr("Look Up Online"),
-                self.tr("Couldn't write these tags: {0}").format(exc),
-            )
+        error = lookup_flow.apply_values(self._file_path, values)
+        if error:
+            QMessageBox.warning(self, self.tr("Look Up Online"), error)
             return
+        # Reload rather than trusting what we believe we wrote.
         self._load_file(self._file_path)
 
     def shutdown_workers(self) -> None:
