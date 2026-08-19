@@ -236,3 +236,27 @@ def test_a_single_file_review_has_no_skip_or_stop(qtbot):
 
 def _batch_candidate() -> Candidate:
     return Candidate(release_id=1, artist="Underworld", album="Born Slippy", score=0.9)
+
+
+def test_both_surfaces_credit_discogs_with_the_same_words(qtbot):
+    """The attribution is one constant, shown in the review dialog and About.
+
+    Not translated, and not spelled out twice: the API terms ask for the credit
+    wherever the data appears, and two copies of a required string are two
+    strings that can drift.
+    """
+    from src.gui.widgets.dialogs.about_dialog import AboutDialog
+    from src.online import discogs
+
+    dialog = _dialog(qtbot, current={})
+    assert any(
+        w.text() == discogs.ATTRIBUTION
+        for w in dialog.findChildren(type(dialog._warning))
+    )
+
+    about = AboutDialog()
+    qtbot.addWidget(about)
+    assert any(
+        w.text() == discogs.ATTRIBUTION
+        for w in about.findChildren(type(dialog._warning))
+    )

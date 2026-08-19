@@ -13,6 +13,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from src.online import discogs
+
 from ...styles.theme import Theme
 from ...workers.update_worker import (
     RELEASES_PAGE_URL,
@@ -39,9 +41,36 @@ class AboutDialog(QDialog):
             Qt.WindowType.FramelessWindowHint | Qt.WindowType.Dialog
         )
         self.setAttribute(Qt.WidgetAttribute.WA_DeleteOnClose)
-        self.setFixedSize(440, 560)
         self._update_thread: UpdateCheckThread | None = None
         self._setup_ui()
+        self._fit_height()
+
+    # Width is fixed by design (the icon slide is square-ish and the prose is
+    # centred to it); height is not ours to guess.
+    _WIDTH = 440
+    _MIN_HEIGHT = 560
+
+    def _fit_height(self) -> None:
+        """Fix the size, but take the height from what the pages actually need.
+
+        It was a flat 440x560, which is an *English* height with today's text:
+        adding one credit line pushed the feature list under the top edge and
+        cut "Spectrum analyzer" off the bottom, silently — the dialog has no
+        scroll area to reveal it and a fixed size cannot grow. Since the page
+        is a fixed-width column of wrapped prose, ask it how tall it wants to
+        be at that width and take the larger of that and the old height, so
+        English is unchanged and a longer translation gets the room instead of
+        being clipped.
+        """
+        for index in range(self._stack.count()):
+            page = self._stack.widget(index)
+            page.setFixedWidth(self._WIDTH)
+        needed = max(
+            self._stack.widget(i).heightForWidth(self._WIDTH)
+            or self._stack.widget(i).sizeHint().height()
+            for i in range(self._stack.count())
+        )
+        self.setFixedSize(self._WIDTH, max(self._MIN_HEIGHT, needed))
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -130,6 +159,11 @@ class AboutDialog(QDialog):
 
         subtitle = QLabel(self.tr("DJ Audio Analysis Toolkit"))
         subtitle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Wraps rather than running off both edges: the Russian subtitle is
+        # 48 characters against this dialog's fixed 440px width, and a centred
+        # QLabel that overflows is cut at *both* ends with no ellipsis to admit
+        # it. Safe to wrap now that the height is measured rather than fixed.
+        subtitle.setWordWrap(True)
 
         subtitle.setStyleSheet(f"font-size: 16px; color: {Theme.TEXT_SECONDARY};")
         info_layout.addWidget(subtitle)
@@ -211,6 +245,17 @@ class AboutDialog(QDialog):
 
         formats.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;")
         info_layout.addWidget(formats)
+
+        # Credit for the online-lookup data, which the Discogs API terms ask to
+        # be shown wherever it appears. Deliberately NOT translated and read
+        # from one constant, so this line and the one in the review dialog can
+        # never drift apart or be localised into something the terms don't
+        # recognise. Always shown, whether or not the feature is switched on:
+        # a file tagged from Discogs keeps that data after the switch goes off.
+        credit = QLabel(discogs.ATTRIBUTION)
+        credit.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        credit.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 12px;")
+        info_layout.addWidget(credit)
 
         info_layout.addStretch()
         self._stack.addWidget(info_page)
@@ -344,7 +389,7 @@ class AboutDialog(QDialog):
             f"color: {Theme.CHROME_DARK}; font-size: 10px; background: transparent;"
         )
         self._hint.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        self._hint.setGeometry(0, self.height() - 20, self.width(), 14)
+        self._pin_hint()
         self._hint.raise_()
 
         # Start on info page
@@ -406,6 +451,20 @@ class AboutDialog(QDialog):
                 f'<a href="{RELEASES_PAGE_URL}"'
                 f' style="color: {Theme.CHROME};">{releases}</a>'
             )
+
+    def _pin_hint(self) -> None:
+        """Pin the hint just above the bottom edge, at whatever the size is now.
+
+        Pinned from ``self.height()`` inside _setup_ui once, which was correct
+        only while the height was a constant known before the layout ran. Now
+        that the dialog measures itself, that reading is the *pre-fit* height
+        and the hint lands in the middle of the feature list.
+        """
+        self._hint.setGeometry(0, self.height() - 20, self.width(), 14)
+
+    def resizeEvent(self, event) -> None:
+        super().resizeEvent(event)
+        self._pin_hint()
 
     def _update_hint_visibility(self) -> None:
         """Show the hint on the info / how-to slides, not the icon slide."""
