@@ -209,16 +209,20 @@ class TestRowAddButton:
         assert ids[0] == anchor
         assert lib.get_node(ids[1]).parent_id is None
 
-    def test_folder_button_creates_a_folder_inside(self, tree):
+    def test_folder_button_creates_a_playlist_at_the_top_inside(self, tree):
         lib = tree.library
         folder = lib.create_folder("Crates")
+        existing = lib.create_playlist("Already here", parent_id=folder)
         tree._rebuild()
         tree._row_add_node_id = folder
         tree._on_row_add_clicked()
         # Inside the folder, not beside it.
         assert [n.id for n in lib.get_children(None)] == [folder]
         children = lib.get_children(folder)
-        assert len(children) == 1 and children[0].kind == "folder"
+        assert len(children) == 2
+        # A playlist (folders are the right-click menu's job), at the top.
+        assert children[0].kind == "playlist"
+        assert children[1].id == existing
 
     def test_stale_aim_after_a_delete_creates_nothing(self, tree):
         lib = tree.library

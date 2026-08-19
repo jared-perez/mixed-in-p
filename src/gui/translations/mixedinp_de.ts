@@ -1841,9 +1841,13 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="721"/>
         <source>New folder inside this folder</source>
-        <translation>Neuer Ordner in diesem Ordner</translation>
+        <translation type="vanished">Neuer Ordner in diesem Ordner</translation>
+    </message>
+    <message>
+        <location filename="../widgets/playlist_tree.py" line="721"/>
+        <source>New playlist inside this folder</source>
+        <translation>Neue Playlist in diesem Ordner</translation>
     </message>
     <message>
         <location filename="../widgets/playlist_tree.py" line="723"/>
@@ -1851,131 +1855,131 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Neue Playlist unterhalb dieser</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="803"/>
-        <location filename="../widgets/playlist_tree.py" line="891"/>
-        <location filename="../widgets/playlist_tree.py" line="911"/>
+        <location filename="../widgets/playlist_tree.py" line="809"/>
+        <location filename="../widgets/playlist_tree.py" line="897"/>
+        <location filename="../widgets/playlist_tree.py" line="917"/>
         <source>New Playlist</source>
         <translation>Neue Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="803"/>
-        <location filename="../widgets/playlist_tree.py" line="892"/>
-        <location filename="../widgets/playlist_tree.py" line="912"/>
+        <location filename="../widgets/playlist_tree.py" line="809"/>
+        <location filename="../widgets/playlist_tree.py" line="898"/>
+        <location filename="../widgets/playlist_tree.py" line="918"/>
         <source>New Folder</source>
         <translation>Neuer Ordner</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="856"/>
+        <location filename="../widgets/playlist_tree.py" line="862"/>
         <source>Delete folder &quot;{0}&quot; and everything inside it?</source>
         <translation>Ordner „{0}“ und seinen gesamten Inhalt löschen?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="858"/>
+        <location filename="../widgets/playlist_tree.py" line="864"/>
         <source>Delete playlist &quot;{0}&quot;?</source>
         <translation>Playlist „{0}“ löschen?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="861"/>
+        <location filename="../widgets/playlist_tree.py" line="867"/>
         <source>Delete</source>
         <translation>Löschen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="894"/>
         <location filename="../widgets/playlist_tree.py" line="900"/>
+        <location filename="../widgets/playlist_tree.py" line="906"/>
         <source>Rename</source>
         <translation>Umbenennen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="895"/>
         <location filename="../widgets/playlist_tree.py" line="901"/>
+        <location filename="../widgets/playlist_tree.py" line="907"/>
         <source>Delete…</source>
         <translation>Löschen…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="897"/>
+        <location filename="../widgets/playlist_tree.py" line="903"/>
         <source>Export Folder…</source>
         <translation>Ordner exportieren…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="905"/>
+        <location filename="../widgets/playlist_tree.py" line="911"/>
         <source>Export…</source>
         <translation>Exportieren…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="907"/>
+        <location filename="../widgets/playlist_tree.py" line="913"/>
         <source>Export and Copy Tracks…</source>
         <translation>Exportieren und Tracks kopieren…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="926"/>
-        <location filename="../widgets/playlist_tree.py" line="933"/>
+        <location filename="../widgets/playlist_tree.py" line="932"/>
+        <location filename="../widgets/playlist_tree.py" line="939"/>
         <source>Export Playlist</source>
         <translation>Playlist exportieren</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="927"/>
-        <location filename="../widgets/playlist_tree.py" line="996"/>
+        <location filename="../widgets/playlist_tree.py" line="933"/>
+        <location filename="../widgets/playlist_tree.py" line="1002"/>
         <source>This playlist is empty — there is nothing to export.</source>
         <translation>Diese Playlist ist leer – es gibt nichts zu exportieren.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="948"/>
-        <location filename="../widgets/playlist_tree.py" line="1056"/>
+        <location filename="../widgets/playlist_tree.py" line="954"/>
+        <location filename="../widgets/playlist_tree.py" line="1062"/>
         <source>Exported {0} tracks to:
 {1}</source>
         <translation>{0} Tracks exportiert nach:
 {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="958"/>
+        <location filename="../widgets/playlist_tree.py" line="964"/>
         <source>Export Folder</source>
         <translation>Ordner exportieren</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="976"/>
+        <location filename="../widgets/playlist_tree.py" line="982"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} Playlists ({1} Tracks) exportiert nach:
 {2}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="995"/>
-        <location filename="../widgets/playlist_tree.py" line="1022"/>
+        <location filename="../widgets/playlist_tree.py" line="1001"/>
+        <location filename="../widgets/playlist_tree.py" line="1028"/>
         <source>Export and Copy Tracks</source>
         <translation>Exportieren und Tracks kopieren</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1002"/>
+        <location filename="../widgets/playlist_tree.py" line="1008"/>
         <source>Export in Progress</source>
         <translation>Export läuft</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1003"/>
+        <location filename="../widgets/playlist_tree.py" line="1009"/>
         <source>An export is already running. Please wait.</source>
         <translation>Es läuft bereits ein Export. Bitte warten.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1007"/>
+        <location filename="../widgets/playlist_tree.py" line="1013"/>
         <source>Choose Where to Create the Folder</source>
         <translation>Wähle, wo der Ordner erstellt werden soll</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1020"/>
+        <location filename="../widgets/playlist_tree.py" line="1026"/>
         <source>Copying tracks…</source>
         <translation>Tracks werden kopiert…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1020"/>
+        <location filename="../widgets/playlist_tree.py" line="1026"/>
         <source>Cancel</source>
         <translation>Abbrechen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1047"/>
+        <location filename="../widgets/playlist_tree.py" line="1053"/>
         <source>Copying {0}</source>
         <translation>Kopiere {0}</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/playlist_tree.py" line="1063"/>
+        <location filename="../widgets/playlist_tree.py" line="1069"/>
         <source>%n track(s) could not be found and were skipped.</source>
         <translation>
             <numerusform>%n Track wurde nicht gefunden und übersprungen.</numerusform>
@@ -1983,41 +1987,41 @@ oder „Cover hinzufügen …“ klicken</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1071"/>
-        <location filename="../widgets/playlist_tree.py" line="1129"/>
+        <location filename="../widgets/playlist_tree.py" line="1077"/>
+        <location filename="../widgets/playlist_tree.py" line="1135"/>
         <source>Export failed</source>
         <translation>Export fehlgeschlagen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1072"/>
-        <location filename="../widgets/playlist_tree.py" line="1130"/>
+        <location filename="../widgets/playlist_tree.py" line="1078"/>
+        <location filename="../widgets/playlist_tree.py" line="1136"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Die Datei konnte nicht geschrieben werden:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1103"/>
+        <location filename="../widgets/playlist_tree.py" line="1109"/>
         <source>Serato — drag the file onto the crate panel</source>
         <translation>Serato – die Datei auf das Crate-Panel ziehen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1104"/>
+        <location filename="../widgets/playlist_tree.py" line="1110"/>
         <source>Rekordbox — File → Import Playlist</source>
         <translation>Rekordbox – File → Import Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1105"/>
+        <location filename="../widgets/playlist_tree.py" line="1111"/>
         <source>Traktor — File → Import</source>
         <translation>Traktor – File → Import</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1118"/>
+        <location filename="../widgets/playlist_tree.py" line="1124"/>
         <source>Export complete</source>
         <translation>Export abgeschlossen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1121"/>
+        <location filename="../widgets/playlist_tree.py" line="1127"/>
         <source>To import it:</source>
         <translation>So importierst du sie:</translation>
     </message>
@@ -2025,27 +2029,27 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>PlaylistTreePanel</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1492"/>
+        <location filename="../widgets/playlist_tree.py" line="1498"/>
         <source>+ Playlist</source>
         <translation>+ Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1493"/>
+        <location filename="../widgets/playlist_tree.py" line="1499"/>
         <source>+ Folder</source>
         <translation>+ Ordner</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1516"/>
+        <location filename="../widgets/playlist_tree.py" line="1522"/>
         <source>Playlist name…</source>
         <translation>Playlist-Name…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1563"/>
+        <location filename="../widgets/playlist_tree.py" line="1569"/>
         <source>Close the playlist filter</source>
         <translation>Playlist-Filter schließen</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1565"/>
+        <location filename="../widgets/playlist_tree.py" line="1571"/>
         <source>Filter playlists by name</source>
         <translation>Playlists nach Namen filtern</translation>
     </message>

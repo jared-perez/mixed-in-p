@@ -718,7 +718,7 @@ class PlaylistTree(QTreeView):
         if node_id != self._row_add_node_id:
             self._row_add_node_id = node_id
             btn.setToolTip(
-                self.tr("New folder inside this folder")
+                self.tr("New playlist inside this folder")
                 if kind == "folder"
                 else self.tr("New playlist below this one")
             )
@@ -746,7 +746,13 @@ class PlaylistTree(QTreeView):
         self._row_add_btn.hide()
 
     def _on_row_add_clicked(self) -> None:
-        """Create below a playlist, or inside a folder.
+        """Create a playlist: below a playlist row, or at the top inside a folder.
+
+        Always a playlist, never a folder — a folder inside a folder is what
+        the row's own right-click menu is for, and a button that made one was
+        a second route to the same thing on the row least in need of it.
+        ``create_playlist`` inserts at position 0, which is the top of the
+        folder's children with no move to replay.
 
         Read back from the database rather than trusted from the row: the
         button is aimed by hover and the tree can have been rebuilt (a drop, a
@@ -760,7 +766,7 @@ class PlaylistTree(QTreeView):
             return
         self._hide_row_add_button()
         if node.kind == "folder":
-            self._create_node("folder", node_id)
+            self._create_node("playlist", node_id)
         elif node.kind == "playlist":
             self._create_node("playlist", node.parent_id, after_id=node_id)
 
