@@ -255,6 +255,38 @@
       selected — useful when two tracks share a name and you need to know which one you have open.</p>
     <img class="shot-img" src="../assets/metadata.webp" alt="Metadata editor with tags and artwork">
 
+    <h3>Fill in tags from Discogs</h3>
+    <p>Tracks arrive with half their tags missing, and the things this app cannot work out from the
+      audio — the label, the year, the album a track came from — are exactly the ones a discography
+      knows. <b>Online lookup is off by default</b>, and while it is off the app makes no network
+      requests at all and the buttons below do not appear. Turn it on in
+      <b>Settings → Online Metadata</b> and paste a free Discogs token.</p>
+    <ul>
+      <li><b>One file</b> — load it in the <b>Metadata</b> panel and click <b>Look Up Online…</b>.</li>
+      <li><b>A whole selection</b> — select the rows in the <b>Player</b> playlist, right-click, and
+        choose <b>Look Up Online…</b>. The queue runs behind a progress bar you can cancel, then the
+        results are reviewed one file at a time.</li>
+    </ul>
+    <p>Either way you get a review window listing <b>your current value beside the proposed one</b>,
+      with a tick box per field. Nothing is ever written without a tick. A field you have already
+      filled in <b>starts unticked</b> — the lookup will not overwrite your own work unless you say
+      so — and an empty field starts ticked; <b>Select All</b> is one click when you are deliberately
+      re-tagging. Fields that already match are not listed at all. If the best match is a weak one,
+      the window says so instead of pre-filling confidently, and the <b>Release</b> dropdown at the
+      top switches to any of the other pressings the search found.</p>
+    <p>What can be filled in: <b>Title, Artist, Album, Label, Genre, Year, Track #</b> and
+      <b>cover art</b>. Genre comes from Discogs <i>styles</i> ("Techno", "Deep House"), not its
+      coarse genre field. The year prefers the original release over the repress you happened to
+      match. Cover art is previewed next to your file's own so you can compare them, and is written
+      only if you tick it — turn the fetch off entirely in Settings if you would rather not.</p>
+    <p><b>BPM, key and energy are never fetched.</b> Discogs does not hold them, and they stay the
+      product of this app's own analysis of your actual file. A <b>WAV</b> can be looked up — reading
+      the values is still useful — but the window will remind you that WAV files hold no tags, so
+      nothing will stick.</p>
+    <p>Lookups are paced to Discogs' rate limit (about 20 tracks a minute), and a batch that has to
+      wait says so rather than sitting there. Nothing about your library is uploaded: a lookup sends
+      the artist and title of the track you chose, and nothing else — never the audio.</p>
+
     <h3>Play, audition &amp; lift samples</h3>
     <ul>
       <li>Player transport: Previous / Play-Pause / Stop / Next, a click-or-drag seek bar, and volume.</li>
@@ -609,6 +641,21 @@
       <li><b>Export All Playlists…</b> — writes one folder of playlist files mirroring your whole
         tree; a backup any other app can read.</li>
     </ul>
+    <p><b>Online Metadata</b> controls the Discogs lookup described in
+      <a href="#workflows">Fill in tags from Discogs</a>. It is the only part of the app that uses
+      the internet, and it is off until you turn it on:</p>
+    <ul>
+      <li><b>Look up track details online (Discogs)</b> — off by default. While it is off the app
+        makes no network requests and the lookup buttons are not shown anywhere. A lookup sends the
+        artist and title of the track you chose — never your audio, and never your library.</li>
+      <li><b>Discogs token</b> — a free personal token from your Discogs account, pasted here.
+        <b>Get a Token…</b> opens the page that issues one. Without a token Discogs answers more
+        slowly and without cover images, so the feature needs one to work properly. The token is
+        read-only and you can revoke it on Discogs at any time.</li>
+      <li><b>Fetch cover art with lookups</b> — on by default. Shows the release's cover next to your
+        file's in the review window so you can compare them. As with every other field, the art is
+        written only if you tick it.</li>
+    </ul>
     <p>All settings save instantly — there's no Save button.</p>
 
     <h2 id="history"><span class="num">07</span>History</h2><hr>
@@ -705,6 +752,23 @@
       source (or below) and it converts. In a mixed batch this can hit some files and not others,
       since the settings apply to the whole list — pick <b>Keep source</b> on the axis you don't
       need to change and every file converts at its own quality.</p>
+    <p><b>I can't find the Look Up Online button.</b> Online lookup is off until you turn it on, and
+      while it is off its buttons are hidden rather than greyed out — the app really does make no
+      network requests. Switch it on in <b>Settings → Online Metadata</b> and paste a Discogs token;
+      the button then appears at the bottom of the <b>Metadata</b> panel (with a file loaded) and in
+      the <b>Player</b> playlist's right-click menu.</p>
+    <p><b>Will a lookup overwrite the tags I've already fixed?</b> Not unless you tick them. Any field
+      that already has a value arrives <b>unticked</b> in the review window; only empty fields are
+      ticked for you. If you <i>are</i> deliberately re-tagging a file, <b>Select All</b> ticks
+      everything at once.</p>
+    <p><b>Why won't it fetch BPM or key from Discogs?</b> Discogs doesn't hold them — and they are
+      properties of your particular file, not of the record. They stay the product of this app's own
+      analysis, which is measuring the audio you actually have.</p>
+    <p><b>A lookup says there was no match.</b> The search runs on the artist and title, falling back
+      to the filename when the tags are empty. If those are wrong or nearly empty, so is the search:
+      correct <b>Artist</b> and <b>Title</b> in the Metadata panel and run it again. Bootleg and
+      unofficial pressings are deliberately filtered out, so a white-label rip may genuinely have
+      nothing to match.</p>
     <p><b>The BPM looks half or double what I expect.</b> Set a tighter <b>tempo range</b> in Settings
       (e.g. 90–180) so detection stays in DJ-typical territory.</p>
     <p><b>The detected key seems off.</b> Key detection reports a <b>confidence</b> score — low

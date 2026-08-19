@@ -21,6 +21,7 @@ The full audio file preparation workflow for DJs.
 - Live analysis queue with per-track status, and a Cancel that keeps the results already in
 - Freeze toggle — analyze and read the results without writing anything to your files
 - Auto-write metadata to file tags & Manual metadata editing, with the full path of the file you're editing and a jump to it in Finder/Explorer
+- Online lookup (opt-in) — fill in title, artist, album, label, genre, year, track number and cover art from Discogs, one file or a whole selection, with every value reviewed before anything is written. Off by default; BPM, key and energy always come from your own analysis
 - Dark/Light modes and waveform color customization
 
 ## Install
