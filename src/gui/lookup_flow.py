@@ -32,9 +32,14 @@ from src.online.result import (
 
 logger = logging.getLogger(__name__)
 
-_CTX = "LookupFlow"
+# NB: every translate() call below spells this context out as a literal.
+# lupdate parses the source text — it cannot resolve a variable — so passing a
+# module constant here extracts nothing at all, and the sentences would fall
+# back to English in every language with no warning that they had.
 
-#: Key the review dialog uses for approved cover bytes.
+# Key the review dialog uses for approved cover bytes. Plain '#', not
+# '#:' — lupdate harvests the latter as a note to translators and staples it
+# onto the next translatable string, which here is an error sentence.
 ARTWORK_FIELD = "artwork"
 
 
@@ -47,34 +52,34 @@ def error_text(kind: str) -> str:
     """
     if kind == ERROR_NO_TOKEN:
         return QCoreApplication.translate(
-            _CTX, "Add your Discogs token in Settings to look up track details."
+            "LookupFlow", "Add your Discogs token in Settings to look up track details."
         )
     if kind == ERROR_AUTH:
         return QCoreApplication.translate(
-            _CTX,
+            "LookupFlow",
             "Discogs rejected that token. Check it in Settings, or generate a new one.",
         )
     if kind == ERROR_RATE_LIMIT:
         return QCoreApplication.translate(
-            _CTX,
+            "LookupFlow",
             "Discogs is rate limiting this connection. Wait a minute and try again.",
         )
     if kind == ERROR_NOT_FOUND:
         return QCoreApplication.translate(
-            _CTX,
+            "LookupFlow",
             "Nothing on Discogs matched this track. Editing the Artist and Title "
             "fields and trying again usually helps.",
         )
     if kind == ERROR_SERVER:
         return QCoreApplication.translate(
-            _CTX, "Discogs is having trouble right now. Try again later."
+            "LookupFlow", "Discogs is having trouble right now. Try again later."
         )
     if kind == ERROR_NETWORK:
         return QCoreApplication.translate(
-            _CTX, "Couldn't reach Discogs. Check your internet connection."
+            "LookupFlow", "Couldn't reach Discogs. Check your internet connection."
         )
     return QCoreApplication.translate(
-        _CTX, "Couldn't read Discogs' answer. Try again later."
+        "LookupFlow", "Couldn't read Discogs' answer. Try again later."
     )
 
 
@@ -152,7 +157,7 @@ def apply_values(file_path: str, values: dict) -> str:
     except Exception as exc:  # noqa: BLE001
         logger.error("Failed to apply looked-up metadata to %s: %s", file_path, exc)
         return QCoreApplication.translate(
-            _CTX, "Couldn't write these tags: {0}"
+            "LookupFlow", "Couldn't write these tags: {0}"
         ).format(exc)
     logger.info(
         "Applied %d online field(s) to %s",

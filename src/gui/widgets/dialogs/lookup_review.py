@@ -212,13 +212,16 @@ class LookupReviewDialog(QDialog):
         self._tagless_label.setVisible(not stores_tags(self._file_path))
         layout.addWidget(self._tagless_label)
 
-        # Footer: attribution (required by the ToS for the data we display),
-        # then the actions.
-        buttons = QHBoxLayout()
-        buttons.setSpacing(Theme.SPACING)
+        # Attribution for the data we display, on its own line. It shared the
+        # button row until Russian, where five buttons and a credit together
+        # are wider than the dialog — and a QPushButton neither shrinks below
+        # its text nor elides, so the row simply overlapped itself.
         credit = QLabel(discogs.ATTRIBUTION)
         credit.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
-        buttons.addWidget(credit)
+        layout.addWidget(credit)
+
+        buttons = QHBoxLayout()
+        buttons.setSpacing(Theme.SPACING)
         buttons.addStretch()
 
         self._all_btn = self._make_button(self.tr("Select All"), self._select_all)
@@ -239,11 +242,31 @@ class LookupReviewDialog(QDialog):
             f"background-color: {Theme.NEON_YELLOW}; color: #000000; font-weight: bold;"
         )
         self._apply_btn.setDefault(True)
-        for btn in (self._all_btn, self._none_btn, self._stop_btn,
-                    self._cancel_btn, self._apply_btn):
-            if btn is not None:
-                buttons.addWidget(btn)
+        row = [b for b in (self._all_btn, self._none_btn, self._stop_btn,
+                           self._cancel_btn, self._apply_btn) if b is not None]
+        for btn in row:
+            buttons.addWidget(btn)
         layout.addLayout(buttons)
+        self._fit_to_buttons(row, layout)
+
+    def _fit_to_buttons(self, row: list[QPushButton], layout) -> None:
+        """Widen the dialog if its own buttons need more room than the default.
+
+        A width written as a constant is an English width: "Select None" is
+        11 characters and "Снять выделение" is 15, and the row grows again in
+        batch mode where there are five buttons rather than four. So the
+        minimum is measured from the buttons actually present — each already
+        sized from *its* font metrics plus the stylesheet padding the native
+        size hint cannot see.
+        """
+        margins = layout.contentsMargins()
+        needed = (
+            sum(b.minimumWidth() for b in row)
+            + Theme.SPACING * max(0, len(row) - 1)
+            + margins.left()
+            + margins.right()
+        )
+        self.setMinimumWidth(max(self.minimumWidth(), needed))
 
     def _make_button(self, text: str, slot) -> QPushButton:
         button = QPushButton(text)

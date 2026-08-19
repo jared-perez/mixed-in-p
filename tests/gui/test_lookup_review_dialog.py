@@ -202,3 +202,37 @@ def _png_bytes() -> bytes:
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM"
         "IQAAAABJRU5ErkJggg=="
     )
+
+
+def test_the_dialog_is_wide_enough_for_its_own_buttons(qtbot):
+    """A width written as a constant is an English width.
+
+    "Select None" is eleven characters; "Снять выделение" is fifteen, and batch
+    mode adds a fifth button — which is where this first bit, with the row
+    overlapping the attribution. Asserted against the buttons' own minimums
+    rather than a pixel count, because the suite runs with no stylesheet and so
+    measures a different app than the one that ships.
+    """
+    dialog = _dialog(
+        qtbot, current={}, result=_result(chosen=_batch_candidate()), position=(3, 12)
+    )
+    row = [
+        dialog._all_btn,
+        dialog._none_btn,
+        dialog._stop_btn,
+        dialog._cancel_btn,
+        dialog._apply_btn,
+    ]
+    assert all(b is not None for b in row)  # batch mode has all five
+    needed = sum(b.minimumWidth() for b in row)
+    assert dialog.minimumWidth() >= needed
+
+
+def test_a_single_file_review_has_no_skip_or_stop(qtbot):
+    dialog = _dialog(qtbot, current={})
+    assert dialog._stop_btn is None
+    assert "Cancel" in dialog._cancel_btn.text()
+
+
+def _batch_candidate() -> Candidate:
+    return Candidate(release_id=1, artist="Underworld", album="Born Slippy", score=0.9)
