@@ -335,8 +335,14 @@ class MainWindow(QMainWindow):
         playlists_sc.activated.connect(self._sidebar.toggle_playlists_mode)
         self._playlists_panel.tree.playlist_activated.connect(self._on_playlist_activated)
         self._playlists_panel.tree.tracks_added.connect(self._on_tracks_added)
+        self._playlists_panel.tree.nodes_changed.connect(
+            self._player_panel.refresh_playing_playlist
+        )
         self._player_panel.playlist_saved.connect(self._on_playlist_saved)
         self._player_panel.tree_highlight_changed.connect(self._on_tree_highlight)
+        self._player_panel.playing_playlist_clicked.connect(
+            self._on_playing_playlist_clicked
+        )
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -441,6 +447,18 @@ class MainWindow(QMainWindow):
         self._player_panel.load_node(node_id)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
+
+    def _on_playing_playlist_clicked(self, node_id: int) -> None:
+        """The Player's "In Playlist" link: go to the list the track plays from.
+
+        Routed here rather than handled in the panel so the tree's selection
+        follows too — the same end state as clicking that playlist in the tree,
+        reached from the other direction. Already on the Player page by
+        construction (the link lives there), so no page switch.
+        """
+        if not self._player_panel.is_showing_node(node_id):
+            self._player_panel.load_node(node_id)
+        self._playlists_panel.tree.select_node(node_id)
 
     def _on_tracks_added(self, node_id: int) -> None:
         """Tracks were dropped into a playlist in the tree.

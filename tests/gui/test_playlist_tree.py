@@ -128,6 +128,45 @@ class TestExpansionPersistence:
         second.tree.library.close()
 
 
+class TestSelectNode:
+    """Programmatic reveal, for a selection the Player made on the user's
+    behalf (the "In Playlist" link)."""
+
+    def test_it_opens_the_folders_enclosing_the_node(self, tree):
+        lib = tree.library
+        outer = lib.create_folder("Outer")
+        inner = lib.create_folder("Inner", parent_id=outer)
+        buried = lib.create_playlist("Buried", parent_id=inner)
+        tree._rebuild()
+        assert not tree.isExpanded(tree._find_item(outer).index())
+
+        tree.select_node(buried)
+
+        assert tree.isExpanded(tree._find_item(outer).index())
+        assert tree.isExpanded(tree._find_item(inner).index())
+        assert tree.currentIndex().data(NODE_ID_ROLE) == buried
+        # Deliberately persisted: the user asked to be taken here, so the
+        # folders being open is the shape they should come back to.
+        assert lib.expanded_node_ids() == {outer, inner}
+
+    def test_it_is_a_no_op_before_first_load(self, qtbot, tmp_path):
+        """Building the tree here would undo the laziness that keeps it off
+        the startup path."""
+        p = PlaylistTreePanel(db_path=tmp_path / "library.db")
+        qtbot.addWidget(p)
+        p.tree.select_node(SCRATCH_NODE_ID)  # never ensure_loaded()
+        assert not p.tree._loaded
+        assert p.tree._model.invisibleRootItem().rowCount() == 0
+
+    def test_an_unknown_node_selects_nothing(self, tree):
+        lib = tree.library
+        keep = lib.create_playlist("Keep")
+        tree._rebuild()
+        tree.select_node(keep)
+        tree.select_node(9999)
+        assert tree.currentIndex().data(NODE_ID_ROLE) == keep
+
+
 class TestCrud:
     def test_create_buttons_write_to_db(self, panel, tree):
         panel._new_playlist_btn.click()

@@ -290,6 +290,13 @@ class PlaylistTree(QTreeView):
     # Emitted when the user clicks a playlist (or Scratch); the Player
     # integration step loads the clicked list.
     playlist_activated = Signal(int)
+    # Something about the nodes themselves changed — created, renamed, deleted,
+    # moved. For anything holding a node's *name* outside this tree (the
+    # Player's "In Playlist" link), which would otherwise go on showing a name
+    # the database no longer has. Carries no payload on purpose: every listener
+    # so far re-reads what it needs, and a per-node signal would have to fire
+    # once per row for a folder delete's cascade.
+    nodes_changed = Signal()
     # Tracks were dropped into a node. The window reloads the Player when
     # this is the list it is showing — otherwise the Player's next
     # auto-save would write its stale visible list back over the drop.
@@ -415,6 +422,32 @@ class PlaylistTree(QTreeView):
         if self._loaded:
             self._rebuild()
 
+    def select_node(self, node_id: int) -> None:
+        """Reveal and select a node, opening whatever folders enclose it.
+
+        For selections the Player makes on the user's behalf (the "In Playlist"
+        link), so the tree agrees with what the Player is showing. A no-op
+        before first load: building the tree here would undo the laziness that
+        keeps it off the startup path, and a tree nobody has opened has no
+        selection to be wrong about.
+
+        The expanding is deliberately *not* suppressed the way `_rebuild`'s and
+        the filter's are — the user asked to be taken to this playlist, so its
+        folders being open afterwards is the state they should come back to.
+        """
+        if not self._loaded:
+            return
+        item = self._find_item(node_id)
+        if item is None:
+            return
+        index = item.index()
+        parent = index.parent()
+        while parent.isValid():
+            self.setExpanded(parent, True)
+            parent = parent.parent()
+        self.setCurrentIndex(index)
+        self.scrollTo(index)
+
     @property
     def library(self) -> Library | None:
         return self._library
@@ -464,6 +497,9 @@ class PlaylistTree(QTreeView):
         # an edit() in the same call, and the deferred pass sees the editor.
         self._hide_row_add_button()
         QTimer.singleShot(0, self, self._refresh_row_add_button)
+        # Every create, delete and move funnels through here. A rename does
+        # not — it edits the item in place — so _on_item_changed emits too.
+        self.nodes_changed.emit()
 
     def _append_children(self, parent_item: QStandardItem, parent_id: int | None) -> None:
         for node in self._library.get_children(parent_id):
@@ -852,6 +888,7 @@ class PlaylistTree(QTreeView):
                 self._building = True
                 item.setText(name)  # normalize stripped whitespace
                 self._building = False
+            self.nodes_changed.emit()
         self.resizeColumnToContents(0)
 
     def _delete_node(self, node_id: int) -> None:

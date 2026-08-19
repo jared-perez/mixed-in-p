@@ -91,6 +91,7 @@ from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
 from ..workers.thread_keeper import keep_alive, wait_for_threads
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
+from .elided_label import ElidedLabel
 from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, VisualizerWindow
 
 # Backdrop visualizer modes → the VisRenderer mode that draws them.
@@ -1041,7 +1042,63 @@ class NoElideDelegate(QStyledItemDelegate):
         painter.restore()
 
 
-class NowPlayingLabel(QLabel):
+# The now-playing line's two halves. The filename hugs its own text while it
+# fits and is capped at a share of the row once it doesn't, so the "In Playlist"
+# link beside it always has somewhere to be; both floor out rather than
+# vanishing entirely on a narrow window.
+_NOW_PLAYING_MIN_WIDTH = 80
+_NOW_PLAYING_MAX_SHARE = 0.55
+
+
+class HuggingElidedLabel(ElidedLabel):
+    """An ElidedLabel that is no wider than its text, and keeps its tooltip.
+
+    ElidedLabel is built for filling whatever a layout gives it, which on this
+    line is wrong twice over: both halves carry a cursor and a mouse handler,
+    so dead space to the right of the text is dead space that responds. A
+    Maximum policy hugs the text — and on its own would make the label
+    *unshrinkable*, because QLabel answers its full text width as the minimum
+    too, so the floor below is what lets the eliding still happen.
+
+    Both halves also have something to say that the text does not (drag me;
+    click me), and ElidedLabel's tooltip rule *replaces* the tooltip on every
+    resize — so that one is inverted here: remember what the caller set and
+    append the cut-off text to it instead of overwriting.
+    """
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__("", parent)
+        self._base_tooltip = ""
+        self.setSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed)
+
+    def minimumSizeHint(self) -> QSize:  # noqa: N802 (Qt override)
+        return QSize(_NOW_PLAYING_MIN_WIDTH, super().minimumSizeHint().height())
+
+    def setToolTip(self, text: str) -> None:  # noqa: N802 (Qt override)
+        self._base_tooltip = text
+        super().setToolTip(text)
+
+    def _apply_tooltip(self) -> None:
+        full = self._base_tooltip
+        if not self._fits():
+            full = f"{full}\n{self.text()}" if full else self.text()
+        # Not setToolTip: that would take the composed string for the base and
+        # staple the text on again on the next resize.
+        ElidedLabel.setToolTip(self, full)
+
+    def setText(self, text: str) -> None:  # noqa: N802 (Qt override)
+        # New text at an unchanged width can start overflowing with no resize
+        # to follow, which is the gap ElidedLabel leaves to its callers.
+        super().setText(text)
+        self._apply_tooltip()
+
+    def resizeEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        # QLabel's, not ElidedLabel's — see the class docstring.
+        QLabel.resizeEvent(self, event)
+        self._apply_tooltip()
+
+
+class NowPlayingLabel(HuggingElidedLabel):
     """The "Playing: …" line, draggable as the file it names.
 
     The list below can be showing something else entirely — a search result
@@ -1053,6 +1110,10 @@ class NowPlayingLabel(QLabel):
     Always a copy — the label isn't a list position, so a move drop has
     nothing to remove. ``set_drag_source`` supplies the path and gets the
     veto (a file that has moved off disk), mirroring the table's guard.
+
+    Elides, because a filename is the definition of text whose length we do
+    not control — and it now shares its line with the "In Playlist" link,
+    which a plain QLabel would simply have pushed off the panel.
     """
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -1090,6 +1151,53 @@ class NowPlayingLabel(QLabel):
         super().mouseReleaseEvent(event)
 
 
+class PlayingPlaylistLink(HuggingElidedLabel):
+    """The "In Playlist: …" link that follows the now-playing line.
+
+    Playback outlives the visible list, so a track can be playing from a
+    playlist the user has since navigated away from — and until now nothing
+    said which one. This names it and, clicked, opens it in the Player.
+
+    Elides rather than wraps or overflows: the name is the user's own and can
+    be any length, and this line sits beside a filename that is already
+    competing for the same width. Hugs that text, so the empty right end of
+    the line is not a several-hundred-pixel target that opens a playlist.
+    """
+
+    clicked = Signal()
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def _set_underline(self, on: bool) -> None:
+        # The affordance is a font attribute rather than QSS: ElidedLabel paints
+        # its own text with drawText, which honours the font and never sees a
+        # `text-decoration` rule.
+        font = self.font()
+        if font.underline() != on:
+            font.setUnderline(on)
+            self.setFont(font)
+
+    def enterEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        self._set_underline(True)
+        super().enterEvent(event)
+
+    def leaveEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        self._set_underline(False)
+        super().leaveEvent(event)
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:  # noqa: N802
+        # Containment, not just the button: Qt delivers the release to whoever
+        # took the press, so a press here dragged off and let go elsewhere would
+        # otherwise count as a click.
+        if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(
+            event.position().toPoint()
+        ):
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)
+
+
 class PlayerPanel(QWidget):
     """Panel with playlist table, transport controls, seek bar, and volume slider."""
 
@@ -1100,6 +1208,11 @@ class PlayerPanel(QWidget):
     slice_expanded = Signal(bool)
     # A new saved playlist was created via Save Playlist (payload: node id).
     playlist_saved = Signal(int)
+    # The "In Playlist" link beside the now-playing line was clicked (payload:
+    # the node the playing track was started from). Routed through MainWindow
+    # rather than loaded here, so the tree's selection follows the same way it
+    # does when the playlist is clicked in the tree itself.
+    playing_playlist_clicked = Signal(int)
     # §10 highlight trail: which tree nodes to light for the current search
     # selection — (set of playlist ids, {folder id: lit playlists beneath}).
     # Emitted empty whenever there is nothing to light.
@@ -1209,6 +1322,11 @@ class PlayerPanel(QWidget):
         # the music. _current_index is just this track's row in the visible
         # list (-1 when it isn't there).
         self._playing_path: str | None = None
+        # Which node the playing track was started from — the "In Playlist"
+        # link. Captured at play time and never re-derived, because the visible
+        # list is exactly what moves on underneath it. None when the track was
+        # started from a search result set, which is no playlist to go back to.
+        self._playing_node_id: int | None = None
         # Playlist library binding (set_library): the visible list persists
         # into the loaded node — Scratch by default, or a saved playlist the
         # user clicked in the tree (auto-save: every edit writes through).
@@ -1822,6 +1940,25 @@ class PlayerPanel(QWidget):
         # it), so while browsing other lists this is the one place that says
         # what's actually playing.
         # It's also the drag handle for the playing track — see NowPlayingLabel.
+        #
+        # A container widget rather than a bare sub-layout so the whole line can
+        # be hidden as one: a QVBoxLayout skips a hidden *widget* and the gap
+        # that would sit above it, where an empty nested layout still takes its
+        # spacing and would leave a stray gap under the transport with nothing
+        # playing. It needs no transparency rule the way the sidebar's
+        # containers do (the global QWidget BG_DARK it inherits is what this
+        # panel sits on — no background overlay), same as #seekRow above it.
+        self._now_playing_row = QWidget()
+        self._now_playing_row.setObjectName("nowPlayingRow")
+        now_playing_row = QHBoxLayout(self._now_playing_row)
+        now_playing_row.setContentsMargins(0, 0, 0, 0)
+        # Explicit: a widget's own layout falls back to the Qt style default
+        # (6px), not the Theme.SPACING a nested layout would have inherited.
+        # Wider than Theme.SPACING because these are two separate facts sharing
+        # a line, not two parts of one control — at 8px the playlist name reads
+        # as a continuation of the filename.
+        now_playing_row.setSpacing(Theme.SPACING * 2)
+
         self._now_playing_label = NowPlayingLabel()
         self._now_playing_label.setObjectName("nowPlayingLabel")
         self._now_playing_label.setStyleSheet(
@@ -1832,13 +1969,31 @@ class PlayerPanel(QWidget):
             self.tr("Drag this onto a playlist to add the playing track")
         )
         self._now_playing_label.set_drag_source(self._now_playing_drag_path)
-        # Only as wide as the text, so the grab cursor doesn't claim the whole
-        # row's dead space to the right.
-        self._now_playing_label.setSizePolicy(
-            QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Fixed
-        )
+        # Only as wide as its text (HuggingElidedLabel), so the grab cursor
+        # doesn't claim the row's dead space to the right.
         self._now_playing_label.hide()
-        layout.addWidget(self._now_playing_label)
+        now_playing_row.addWidget(self._now_playing_label)
+
+        # …and which list it is playing from. Accent-coloured and underlined on
+        # hover: it is the only clickable text on the panel, so it has to say so
+        # without a border that would make the line look like a control.
+        self._playing_playlist_link = PlayingPlaylistLink()
+        self._playing_playlist_link.setObjectName("playingPlaylistLink")
+        self._playing_playlist_link.setStyleSheet(
+            f"color: {Theme.ACCENT_TEXT}; font-size: 13px;"
+        )
+        self._playing_playlist_link.setToolTip(
+            self.tr("Open the playlist the current track is playing from")
+        )
+        self._playing_playlist_link.clicked.connect(self._on_playing_playlist_clicked)
+        self._playing_playlist_link.hide()
+        now_playing_row.addWidget(self._playing_playlist_link)
+        # The slack goes here, not into the link: a stretchy label would put
+        # several hundred pixels of clickable nothing at the end of the line.
+        now_playing_row.addStretch(1)
+
+        self._now_playing_row.hide()
+        layout.addWidget(self._now_playing_row)
 
         # Collapsible slice section — shares the engine; builds its waveform
         # lazily on expand. Lets the user trim a slice from the loaded track.
@@ -1881,6 +2036,32 @@ class PlayerPanel(QWidget):
         # clipping. Past this point the header overflows like any other row.
         floor = self._title_row_widget.minimumSizeHint().width()
         self._title_row_widget.setMaximumWidth(max(visible, floor))
+        self._sync_now_playing_widths(visible)
+
+    def _sync_now_playing_widths(self, visible: int) -> None:
+        """Share the now-playing line between the filename and the link.
+
+        Both halves hug their own text and would otherwise take every pixel it
+        asks for — and neither is text we control. The filename is the greedier
+        of the two (a DJ's are long), so it is capped at a share of the row and
+        the link gets what is left; each elides once past its cap.
+
+        The caps are what keep the pair inside the viewport at all. Nothing
+        else does: this panel's rows may be wider than the viewport and scroll
+        horizontally, so uncapped these two would answer a long playlist name
+        with a horizontal scrollbar under the whole Player.
+
+        Every term is a *hint* or the viewport, never a laid-out width: this
+        runs to decide a geometry, so what it would read back is the one it is
+        about to replace — and on the first pass there is none to read.
+        """
+        label_cap = max(_NOW_PLAYING_MIN_WIDTH, int(visible * _NOW_PLAYING_MAX_SHARE))
+        self._now_playing_label.setMaximumWidth(label_cap)
+        taken = min(self._now_playing_label.sizeHint().width(), label_cap)
+        gap = self._now_playing_row.layout().spacing()
+        self._playing_playlist_link.setMaximumWidth(
+            max(_NOW_PLAYING_MIN_WIDTH, visible - taken - gap)
+        )
 
     # ── Signal wiring ───────────────────────────────────────────
 
@@ -2417,8 +2598,63 @@ class PlayerPanel(QWidget):
                 self.tr("Playing: {0}").format(Path(self._playing_path).name)
             )
             self._now_playing_label.show()
+            self._update_playing_playlist_link()
+            self._now_playing_row.show()
+            # The link's share is whatever the filename leaves, so a new
+            # filename re-decides it — and no resize follows a track change.
+            self._sync_title_row_width()
         else:
+            self._playing_node_id = None
             self._now_playing_label.hide()
+            self._playing_playlist_link.hide()
+            self._now_playing_row.hide()
+
+    def refresh_playing_playlist(self) -> None:
+        """Re-read the "In Playlist" name after the tree changed the nodes.
+
+        Cheap enough to hang off a blunt tree-wide signal: one row lookup, and
+        only while something is playing.
+        """
+        if self._playing_path:
+            self._update_playing_playlist_link()
+
+    def _update_playing_playlist_link(self) -> None:
+        """Name the playlist the loaded track came from, or hide the link.
+
+        The name is read back from the database on every refresh rather than
+        remembered from play time: the playlist can be renamed, or deleted
+        outright, while the track it started plays on.
+        """
+        node_id = self._playing_node_id
+        if self._library is None or node_id is None:
+            self._playing_playlist_link.hide()
+            return
+        if node_id == SCRATCH_NODE_ID:
+            name = self.tr("Scratch")
+        else:
+            node = self._library.get_node(node_id)
+            if node is None:  # deleted from under the playing track
+                self._playing_node_id = None
+                self._playing_playlist_link.hide()
+                return
+            name = node.name
+        # HuggingElidedLabel keeps the constructor's tooltip and appends the
+        # full name to it whenever the name is too long to read off the line.
+        self._playing_playlist_link.setText(self.tr("In Playlist: {0}").format(name))
+        self._playing_playlist_link.show()
+
+    def _on_playing_playlist_clicked(self) -> None:
+        node_id = self._playing_node_id
+        if node_id is not None:
+            self.playing_playlist_clicked.emit(node_id)
+
+    def is_showing_node(self, node_id: int) -> bool:
+        """True when *node_id*'s own contents are what the table is showing.
+
+        False during a search even for the loaded node, because the rows on
+        screen are then the results and not the playlist.
+        """
+        return not self._search_active and self._loaded_node_id == node_id
 
     def _update_context_label(self) -> None:
         if self._library is None:
@@ -3958,6 +4194,10 @@ class PlayerPanel(QWidget):
         self._current_index = index
         entry = self._playlist[index]
         self._playing_path = entry.file_path
+        # A search result set is not a playlist — there is nothing to go back
+        # to, so the link stays off rather than naming whichever node happened
+        # to be loaded when the search started.
+        self._playing_node_id = None if self._search_active else self._loaded_node_id
         self._update_now_playing()
         logger.info(f"Playing: {entry.display_name}")
         self._engine.stop()
@@ -4322,8 +4562,8 @@ class PlayerPanel(QWidget):
         if not self._slice.is_waveform_shown():
             rows.append(self._seek_row_widget.sizeHint().height())
         rows.append(self._controls_row.sizeHint().height())
-        if not self._now_playing_label.isHidden():
-            rows.append(self._now_playing_label.sizeHint().height())
+        if not self._now_playing_row.isHidden():
+            rows.append(self._now_playing_row.sizeHint().height())
         rows.append(self._slice.first_screen_height())
         margins = self._content_layout.contentsMargins()
         # One gap per row: the rows plus the playlist are len(rows) + 1 items.
