@@ -1286,92 +1286,92 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation>Wybierz wydanie</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="189"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="190"/>
         <source>Wrong track from this release? Pick the right row of the tracklist.</source>
         <translation>Nie ten utwór z tego wydania? Wybierz właściwy wiersz listy utworów.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="191"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="192"/>
         <source>Select track</source>
         <translation>Wybierz utwór</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="234"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="247"/>
         <source>Album Art</source>
         <translation>Okładka albumu</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="263"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>Pliki WAV nie przechowują tagów — te wartości nie zostaną zapisane.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="269"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
         <source>Select All</source>
         <translation>Zaznacz wszystko</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="270"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="283"/>
         <source>Select None</source>
         <translation>Odznacz wszystko</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="273"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="286"/>
         <source>Cancel</source>
         <translation>Anuluj</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="278"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="291"/>
         <source>Skip</source>
         <translation>Pomiń</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="280"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="293"/>
         <source>Stop</source>
         <translation>Zatrzymaj</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="295"/>
         <source>Apply</source>
         <translation>Zastosuj</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="346"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="359"/>
         <source>Unknown release</source>
         <translation>Nieznane wydanie</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="372"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="385"/>
         <source>Unknown track</source>
         <translation>Nieznany utwór</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="411"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="424"/>
         <source>Current</source>
         <translation>Obecnie</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="412"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="425"/>
         <source>From Discogs</source>
         <translation>Z Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="432"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="445"/>
         <source>(empty)</source>
         <translation>(puste)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="446"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="459"/>
         <source>Every field already matches this release.</source>
         <translation>Wszystkie pola już pasują do tego wydania.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="467"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
         <source>(none)</source>
         <translation>(brak)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="493"/>
         <source>No confident match — check the release before applying.</source>
         <translation>Brak pewnego dopasowania — sprawdź wydanie przed zastosowaniem.</translation>
     </message>
@@ -1637,7 +1637,7 @@ lub kliknij „Dodaj okładkę…”</translation>
     </message>
     <message>
         <location filename="../widgets/metadata_panel.py" line="196"/>
-        <location filename="../widgets/metadata_panel.py" line="596"/>
+        <location filename="../widgets/metadata_panel.py" line="611"/>
         <source>Open File Location</source>
         <translation>Otwórz lokalizację pliku</translation>
     </message>
@@ -1648,7 +1648,7 @@ lub kliknij „Dodaj okładkę…”</translation>
     </message>
     <message>
         <location filename="../widgets/metadata_panel.py" line="258"/>
-        <location filename="../widgets/metadata_panel.py" line="432"/>
+        <location filename="../widgets/metadata_panel.py" line="443"/>
         <source>Add field...</source>
         <translation>Dodaj pole...</translation>
     </message>
@@ -1663,75 +1663,80 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation>Usuń</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="287"/>
+        <location filename="../widgets/metadata_panel.py" line="298"/>
         <source>Look Up Online…</source>
         <translation>Szukaj online…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="289"/>
+        <location filename="../widgets/metadata_panel.py" line="300"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>Wyszukaj dane tego utworu w Discogs i sprawdź je.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="318"/>
+        <location filename="../widgets/metadata_panel.py" line="329"/>
         <source>View release</source>
         <translation>Zobacz wydanie</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="321"/>
+        <location filename="../widgets/metadata_panel.py" line="332"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>Otwiera stronę tego wydania w serwisie Discogs w przeglądarce.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="332"/>
+        <location filename="../widgets/metadata_panel.py" line="343"/>
         <source>Reload</source>
         <translation>Wczytaj ponownie</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="337"/>
+        <location filename="../widgets/metadata_panel.py" line="348"/>
         <source>Eject</source>
         <translatorcomment>Reviewed (pl pass): confirmed.</translatorcomment>
         <translation>Wysuń</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="400"/>
+        <location filename="../widgets/metadata_panel.py" line="411"/>
         <source>Error: {0}</source>
         <translation>Błąd: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="598"/>
+        <location filename="../widgets/metadata_panel.py" line="613"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Nie można znaleźć tego pliku — mógł zostać przeniesiony, zmieniony lub usunięty.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="680"/>
-        <location filename="../widgets/metadata_panel.py" line="735"/>
-        <location filename="../widgets/metadata_panel.py" line="796"/>
+        <location filename="../widgets/metadata_panel.py" line="685"/>
+        <source>No tags on this file — look it up on Discogs?</source>
+        <translation>Ten plik nie ma tagów — poszukać go w serwisie Discogs?</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="715"/>
+        <location filename="../widgets/metadata_panel.py" line="770"/>
+        <location filename="../widgets/metadata_panel.py" line="831"/>
         <source>Look Up Online</source>
         <translation>Szukaj online</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="682"/>
+        <location filename="../widgets/metadata_panel.py" line="717"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>Ten plik nie ma wykonawcy ani tytułu do wyszukania, a nazwa pliku też ich nie podaje. Uzupełnij pole Tytuł i spróbuj ponownie.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="707"/>
+        <location filename="../widgets/metadata_panel.py" line="742"/>
         <source>Looking up…</source>
         <translation>Wyszukiwanie…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="716"/>
+        <location filename="../widgets/metadata_panel.py" line="751"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Czekanie na limit zapytań Discogs…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="825"/>
+        <location filename="../widgets/metadata_panel.py" line="860"/>
         <source>Applied from Discogs</source>
         <translation>Zastosowano z Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="863"/>
+        <location filename="../widgets/metadata_panel.py" line="898"/>
         <source>Select cover art</source>
         <translation>Wybierz okładkę</translation>
     </message>

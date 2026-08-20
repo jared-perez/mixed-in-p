@@ -1275,92 +1275,92 @@ or click “Add Artwork…”</source>
         <translation>リリースを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="189"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="190"/>
         <source>Wrong track from this release? Pick the right row of the tracklist.</source>
         <translation>このリリースの別のトラックですか？トラックリストの正しい行を選べます。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="191"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="192"/>
         <source>Select track</source>
         <translation>トラックを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="234"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="247"/>
         <source>Album Art</source>
         <translation>アルバムアート</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="263"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>WAV ファイルはタグを保存できないため、これらの値は保存されません。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="269"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
         <source>Select All</source>
         <translation>すべて選択</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="270"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="283"/>
         <source>Select None</source>
         <translation>選択を解除</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="273"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="286"/>
         <source>Cancel</source>
         <translation>キャンセル</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="278"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="291"/>
         <source>Skip</source>
         <translation>スキップ</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="280"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="293"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="295"/>
         <source>Apply</source>
         <translation>適用</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="346"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="359"/>
         <source>Unknown release</source>
         <translation>不明なリリース</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="372"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="385"/>
         <source>Unknown track</source>
         <translation>不明なトラック</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="411"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="424"/>
         <source>Current</source>
         <translation>現在</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="412"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="425"/>
         <source>From Discogs</source>
         <translation>Discogs から</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="432"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="445"/>
         <source>(empty)</source>
         <translation>（空）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="446"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="459"/>
         <source>Every field already matches this release.</source>
         <translation>すべての項目がこのリリースと一致しています。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="467"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
         <source>(none)</source>
         <translation>（なし）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="493"/>
         <source>No confident match — check the release before applying.</source>
         <translation>確実な一致ではありません。適用する前にリリースを確認してください。</translation>
     </message>
@@ -1626,7 +1626,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/metadata_panel.py" line="196"/>
-        <location filename="../widgets/metadata_panel.py" line="596"/>
+        <location filename="../widgets/metadata_panel.py" line="611"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
@@ -1637,7 +1637,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/metadata_panel.py" line="258"/>
-        <location filename="../widgets/metadata_panel.py" line="432"/>
+        <location filename="../widgets/metadata_panel.py" line="443"/>
         <source>Add field...</source>
         <translation>フィールドを追加...</translation>
     </message>
@@ -1652,75 +1652,80 @@ or click “Add Artwork…”</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="287"/>
+        <location filename="../widgets/metadata_panel.py" line="298"/>
         <source>Look Up Online…</source>
         <translation>オンラインで検索…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="289"/>
+        <location filename="../widgets/metadata_panel.py" line="300"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>このトラックの情報を Discogs で検索して確認します。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="318"/>
+        <location filename="../widgets/metadata_panel.py" line="329"/>
         <source>View release</source>
         <translation>リリースを表示</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="321"/>
+        <location filename="../widgets/metadata_panel.py" line="332"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>このリリースの Discogs ページをブラウザーで開きます。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="332"/>
+        <location filename="../widgets/metadata_panel.py" line="343"/>
         <source>Reload</source>
         <translation>再読み込み</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="337"/>
+        <location filename="../widgets/metadata_panel.py" line="348"/>
         <source>Eject</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>取り出す</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="400"/>
+        <location filename="../widgets/metadata_panel.py" line="411"/>
         <source>Error: {0}</source>
         <translation>エラー: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="598"/>
+        <location filename="../widgets/metadata_panel.py" line="613"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>ファイルが見つかりません。移動、名前変更、または削除された可能性があります。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="680"/>
-        <location filename="../widgets/metadata_panel.py" line="735"/>
-        <location filename="../widgets/metadata_panel.py" line="796"/>
+        <location filename="../widgets/metadata_panel.py" line="685"/>
+        <source>No tags on this file — look it up on Discogs?</source>
+        <translation>このファイルにはタグがありません — Discogs で検索しますか？</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="715"/>
+        <location filename="../widgets/metadata_panel.py" line="770"/>
+        <location filename="../widgets/metadata_panel.py" line="831"/>
         <source>Look Up Online</source>
         <translation>オンラインで検索</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="682"/>
+        <location filename="../widgets/metadata_panel.py" line="717"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>このファイルには検索に使えるアーティストもタイトルもなく、ファイル名からも読み取れません。「タイトル」を入力してからもう一度お試しください。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="707"/>
+        <location filename="../widgets/metadata_panel.py" line="742"/>
         <source>Looking up…</source>
         <translation>検索中…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="716"/>
+        <location filename="../widgets/metadata_panel.py" line="751"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Discogs のリクエスト制限の解除を待っています…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="825"/>
+        <location filename="../widgets/metadata_panel.py" line="860"/>
         <source>Applied from Discogs</source>
         <translation>Discogs から適用しました</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="863"/>
+        <location filename="../widgets/metadata_panel.py" line="898"/>
         <source>Select cover art</source>
         <translation>カバーアートを選択</translation>
     </message>
