@@ -237,6 +237,67 @@ def test_button_to_written_tag_with_a_stub_provider(qtbot, panel, flac, monkeypa
     assert meta.label == "Junior Boy's Own"
 
 
+# --- the empty state --------------------------------------------------------
+
+
+@pytest.fixture
+def untagged(tmp_path):
+    sf = pytest.importorskip("soundfile")
+    path = tmp_path / "Underworld - Born Slippy.flac"
+    sf.write(str(path), np.zeros(4410, dtype=np.float32), 44100, format="FLAC")
+    return str(path)
+
+
+def test_a_file_with_no_tags_is_offered_the_lookup(qtbot, untagged):
+    # query_for's filename fallback was written for exactly this file, and the
+    # empty form never mentioned it.
+    panel = MetadataPanel()
+    qtbot.addWidget(panel)
+    panel.set_online_lookup(True, token="tok")
+    panel._load_file(untagged)
+    assert not panel._empty_hint.isHidden()
+    assert "Discogs" in panel._empty_hint.text()
+
+
+def test_the_offer_is_not_made_when_the_feature_is_off(qtbot, untagged):
+    # A sentence naming Discogs on a panel with no Discogs on it advertises
+    # something the user cannot reach.
+    panel = MetadataPanel()
+    qtbot.addWidget(panel)
+    panel._load_file(untagged)
+    assert panel._empty_hint.isHidden()
+
+
+def test_a_tagged_file_is_not_offered_the_lookup(qtbot, flac):
+    write_metadata(flac, TrackMetadata(title="Born Slippy (Nuxx)"), ["title"])
+    panel = MetadataPanel()
+    qtbot.addWidget(panel)
+    panel.set_online_lookup(True, token="tok")
+    panel._load_file(flac)
+    assert panel._empty_hint.isHidden()
+
+
+def test_typing_a_title_takes_the_offer_away(qtbot, untagged):
+    panel = MetadataPanel()
+    qtbot.addWidget(panel)
+    panel.set_online_lookup(True, token="tok")
+    panel._load_file(untagged)
+    # "Add field" is how a blank file gets a Title row at all.
+    panel._add_field_row("title", "Title")
+    panel._field_edits["title"].setText("Born Slippy (Nuxx)")
+    panel._on_editing_finished()
+    assert panel._empty_hint.isHidden()
+
+
+def test_the_offer_goes_away_with_the_file(qtbot, untagged):
+    panel = MetadataPanel()
+    qtbot.addWidget(panel)
+    panel.set_online_lookup(True, token="tok")
+    panel._load_file(untagged)
+    panel._clear()
+    assert panel._empty_hint.isHidden()
+
+
 # --- provenance -------------------------------------------------------------
 #
 # Never open a browser: the click handler is driven directly and the URL is

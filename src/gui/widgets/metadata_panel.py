@@ -278,6 +278,17 @@ class MetadataPanel(QWidget):
         # Backwards-compat alias used by existing show/hide code paths
         self._add_field_widget = self._controls_row_widget
 
+        # A file with no artist and no title gets an empty form and, until now,
+        # no hint that the one feature built for exactly that case exists.
+        # `query_for`'s filename fallback was written for this file. An offer
+        # and not an action: looking it up on drop would spend the user's rate
+        # limit without being asked.
+        self._empty_hint = ElidedLabel("")
+        self._empty_hint.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
+        self._empty_hint.setVisible(False)
+        self._empty_hint.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
+        layout.addWidget(self._empty_hint)
+
         # Eject button row (full-width)
         btn_row = QHBoxLayout()
         btn_row.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
@@ -491,6 +502,10 @@ class MetadataPanel(QWidget):
     def _on_editing_finished(self) -> None:
         """Auto-save when a field loses focus."""
         self._save_metadata()
+        # Typing a title is the other way out of the empty state, and the offer
+        # has to notice: a hint saying the file has no tags, beside a Title the
+        # user has just filled in, is the panel arguing with itself.
+        self._sync_lookup_button()
 
     # --------------------------------------------------------------- save
 
@@ -644,6 +659,7 @@ class MetadataPanel(QWidget):
         """The button exists only when the feature is on and a file is loaded."""
         visible = self._online_enabled and self._file_path is not None
         self._lookup_btn.setVisible(visible)
+        self._sync_empty_hint(visible)
         if not visible:
             self._lookup_status.setVisible(False)
             self._lookup_status.setText("")
@@ -651,6 +667,25 @@ class MetadataPanel(QWidget):
             # line surviving the feature being switched off would credit
             # Discogs on a panel with no Discogs on it.
             self._release_link.setVisible(False)
+
+    def _sync_empty_hint(self, lookup_offered: bool) -> None:
+        """Offer the lookup on a file that has nothing to show.
+
+        Tied to the button's own visibility, not just to the file's tags: a
+        sentence naming Discogs on a panel with the feature switched off
+        advertises something the user cannot reach, the same rule the
+        provenance link follows.
+        """
+        blank = lookup_offered and not any(
+            self._field_edits[key].text().strip()
+            for key in ("artist", "title")
+            if key in self._field_edits
+        )
+        if blank:
+            text = self.tr("No tags on this file — look it up on Discogs?")
+            self._empty_hint.setText(text)
+            self._empty_hint.setToolTip(text)
+        self._empty_hint.setVisible(blank)
 
     def _current_query(self):
         """What we know about the loaded file, filename fallback included."""
