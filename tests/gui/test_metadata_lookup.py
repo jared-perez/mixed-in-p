@@ -11,6 +11,7 @@ import numpy as np
 import pytest
 from PySide6.QtWidgets import QMessageBox
 
+import src.gui.widgets.metadata_panel as panel_module
 from src.gui.widgets.dialogs.lookup_review import ARTWORK_FIELD
 from src.gui.widgets.metadata_panel import MetadataPanel
 from src.gui.workers.lookup_worker import LookupResult
@@ -234,6 +235,96 @@ def test_button_to_written_tag_with_a_stub_provider(qtbot, panel, flac, monkeypa
     assert meta.title == "Born Slippy (Nuxx)"
     assert meta.artist == "Underworld"
     assert meta.label == "Junior Boy's Own"
+
+
+# --- provenance -------------------------------------------------------------
+#
+# Never open a browser: the click handler is driven directly and the URL is
+# asserted on the widget, which is the only part of it that is ours.
+
+
+class _StubDialog:
+    """Stands in for an open review dialog, so no modal is ever shown.
+
+    It also puts the result through the branch the ordering trap is about: a
+    candidate switch comes back to _on_lookup_result with the dialog already
+    open, and returns before the code that shows one.
+    """
+
+    def __init__(self) -> None:
+        self.results: list = []
+
+    def set_result(self, result) -> None:
+        self.results.append(result)
+
+
+def _applied(panel, path, url="https://www.discogs.com/release/1002", **values):
+    """Hand the panel a result, then apply values as the dialog would."""
+    panel._review_dialog = _StubDialog()
+    try:
+        panel._on_lookup_result(
+            _result(path, proposed=ProposedTags(provider="discogs", source_url=url))
+        )
+    finally:
+        panel._review_dialog = None
+    panel._apply_lookup_values(values or {"artist": "Underworld"})
+
+
+def test_an_apply_says_where_the_values_came_from(panel, flac):
+    _applied(panel, flac, artist="Underworld", title="Born Slippy (Nuxx)")
+    assert "Discogs" in panel._lookup_status.text()
+    assert not panel._release_link.isHidden()
+    assert panel._release_url == "https://www.discogs.com/release/1002"
+
+
+def test_the_link_follows_the_release_the_user_ended_up_on(panel, flac):
+    # A candidate switch comes back through _on_lookup_result while the dialog
+    # is open. Crediting the release the user rejected is the failure here.
+    _applied(panel, flac, url="https://www.discogs.com/release/1")
+    _applied(panel, flac, url="https://www.discogs.com/release/999")
+    assert panel._release_url == "https://www.discogs.com/release/999"
+
+
+def test_the_provenance_goes_away_when_the_file_does(panel, flac):
+    _applied(panel, flac)
+    panel._clear()
+    assert panel._lookup_status.isHidden()
+    assert panel._release_link.isHidden()
+    assert panel._release_url == ""
+
+
+def test_a_second_file_does_not_wear_the_first_one_s_provenance(panel, flac, tmp_path):
+    sf = pytest.importorskip("soundfile")
+    other = tmp_path / "another.flac"
+    sf.write(str(other), np.zeros(4410, dtype=np.float32), 44100, format="FLAC")
+    _applied(panel, flac)
+    panel._load_file(str(other))
+    assert panel._lookup_status.isHidden()
+    assert panel._release_link.isHidden()
+    assert panel._release_url == ""
+
+
+def test_switching_the_feature_off_takes_the_link_with_it(panel, flac):
+    panel.set_online_lookup(True, token="tok")
+    _applied(panel, flac)
+    panel.set_online_lookup(False)
+    assert panel._release_link.isHidden()
+
+
+def test_a_result_with_no_release_page_offers_no_link(panel, flac):
+    _applied(panel, flac, url="")
+    assert "Discogs" in panel._lookup_status.text()
+    assert panel._release_link.isHidden()
+
+
+def test_the_link_opens_the_release_page(panel, flac, monkeypatch):
+    opened: list[str] = []
+    monkeypatch.setattr(
+        panel_module.QDesktopServices, "openUrl", lambda url: opened.append(url.toString())
+    )
+    _applied(panel, flac)
+    panel._on_release_link_clicked()
+    assert opened == ["https://www.discogs.com/release/1002"]
 
 
 def _png_bytes() -> bytes:

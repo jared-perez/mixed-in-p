@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from PySide6.QtCore import QT_TRANSLATE_NOOP, Qt, Signal
+from PySide6.QtCore import QT_TRANSLATE_NOOP, Qt, QUrl, Signal
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -22,7 +22,13 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from PySide6.QtGui import QDragEnterEvent, QDragLeaveEvent, QDragMoveEvent, QDropEvent
+from PySide6.QtGui import (
+    QDesktopServices,
+    QDragEnterEvent,
+    QDragLeaveEvent,
+    QDragMoveEvent,
+    QDropEvent,
+)
 
 from src.metadata.tags import (
     TrackMetadata,
@@ -39,7 +45,7 @@ from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from ..workers import thread_keeper
 from ..workers.lookup_worker import LookupJob, LookupThread
 from .dialogs.lookup_review import LookupReviewDialog
-from .elided_label import ElidedLabel
+from .elided_label import ElidedLabel, HuggingElidedLabel, LinkLabel
 from .artwork_widget import ArtworkWidget, mime_for_path
 from .drop_zone import AUDIO_EXTENSIONS
 
@@ -113,6 +119,12 @@ class MetadataPanel(QWidget):
         self._fetch_artwork = True
         self._lookup_thread: LookupThread | None = None
         self._review_dialog: LookupReviewDialog | None = None
+        # The result the review dialog is showing, kept so an apply can say
+        # which release it wrote from. Set on every result — including the one
+        # a candidate switch brings back, or the link would point at the
+        # release the user rejected.
+        self._last_result = None
+        self._release_url = ""
         self._threads: list = []
         self.setAcceptDrops(True)
         self._setup_ui()
@@ -284,12 +296,35 @@ class MetadataPanel(QWidget):
         self._lookup_btn.setVisible(False)
         btn_row.addWidget(self._lookup_btn)
 
-        # Says what the lookup is doing, including *why* it paused — a rate
-        # limit that reads as a stuck spinner is the thing to avoid.
-        self._lookup_status = ElidedLabel("")
+        # The lookup's own line: what it is doing — including *why* it paused,
+        # since a rate limit that reads as a stuck spinner is the thing to
+        # avoid — and, after an apply, where the values came from.
+        #
+        # Both hug their text and share one trailing stretch inside their own
+        # row. A stretchy label would take half the row's slack and leave the
+        # link floating a couple of hundred pixels from the sentence it
+        # belongs to; the same hugging the Player's now-playing line needs.
+        status_row = QHBoxLayout()
+        status_row.setSpacing(Theme.SPACING)
+        self._lookup_status = HuggingElidedLabel()
         self._lookup_status.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         self._lookup_status.setVisible(False)
-        btn_row.addWidget(self._lookup_status, 1)
+        status_row.addWidget(self._lookup_status)
+
+        # Where the tags came from. ACCENT_TEXT rather than the raw accent:
+        # it is the palette-aware "accent as readable text" token, and it is
+        # the one that stays legible when a light palette inverts the role.
+        self._release_link = LinkLabel()
+        self._release_link.setText(self.tr("View release"))
+        self._release_link.setStyleSheet(f"color: {Theme.ACCENT_TEXT};")
+        self._release_link.setToolTip(
+            self.tr("Open this release's page on Discogs in your browser.")
+        )
+        self._release_link.setVisible(False)
+        self._release_link.clicked.connect(self._on_release_link_clicked)
+        status_row.addWidget(self._release_link)
+        status_row.addStretch()
+        btn_row.addLayout(status_row, 1)
 
         btn_row.addStretch()
         # Reload re-reads the file's tags from disk and rebuilds the form —
@@ -344,6 +379,10 @@ class MetadataPanel(QWidget):
 
     def _load_file(self, path: str) -> None:
         """Load metadata from *path* and populate the form."""
+        # Before anything else: a file that has just arrived has no
+        # provenance, and inheriting the previous file's would read as having
+        # been looked up. _apply_lookup_values re-states it after this returns.
+        self._clear_provenance()
         self._file_path = path
         self._file_label.setText(Path(path).name)
         self._path_label.setText(path)
@@ -565,6 +604,7 @@ class MetadataPanel(QWidget):
 
     def _clear(self) -> None:
         """Reset panel to drop state."""
+        self._clear_provenance()
         self._file_path = None
         self._disconnect_fields()
         self._field_edits.clear()
@@ -607,6 +647,10 @@ class MetadataPanel(QWidget):
         if not visible:
             self._lookup_status.setVisible(False)
             self._lookup_status.setText("")
+            # The link has to follow the sentence it belongs to: a provenance
+            # line surviving the feature being switched off would credit
+            # Discogs on a panel with no Discogs on it.
+            self._release_link.setVisible(False)
 
     def _current_query(self):
         """What we know about the loaded file, filename fallback included."""
@@ -692,6 +736,10 @@ class MetadataPanel(QWidget):
             )
             return
         self._set_lookup_status("")
+        # Before the branch below, not after it: a candidate switch arrives
+        # through that return, and the release the apply credits has to be the
+        # one the user ended up looking at.
+        self._last_result = result
         if self._review_dialog is not None:
             # A candidate switch: the dialog is open and waiting for this.
             self._review_dialog.set_result(result)
@@ -747,8 +795,48 @@ class MetadataPanel(QWidget):
         if error:
             QMessageBox.warning(self, self.tr("Look Up Online"), error)
             return
+        # Read the release *before* the reload: _load_file clears the
+        # provenance, which is what stops a newly dropped file wearing the
+        # previous one's.
+        proposed = getattr(self._last_result, "proposed", None)
+        url = getattr(proposed, "source_url", "") or ""
         # Reload rather than trusting what we believe we wrote.
         self._load_file(self._file_path)
+        self._show_provenance(url)
+
+    def _show_provenance(self, url: str) -> None:
+        """Say the values came from Discogs, and offer the release page.
+
+        Survives until the file is ejected or another is loaded — a tag editor
+        with no history of its own is otherwise silent about where a value it
+        is now showing came from.
+
+        **No field count**, deliberately. "Applied %n field(s)" is what a Qt
+        plural ships as its own source text, and an untranslated language falls
+        back to that source — so English, the default, would read "Applied 5
+        field(s)", which is not English. Spelling the two forms out instead
+        (the branch `compatible_panel._sync_seed_label` takes) fixes English
+        and breaks Russian and Polish, which need a third form for 2–4 and
+        would get the plural one. The count is the least load-bearing part of
+        the sentence — the form beside it has just been rebuilt from disk and
+        shows every value that changed — so dropping it is what makes the line
+        correct in all twelve languages at once.
+        """
+        sentence = self.tr("Applied from Discogs")
+        self._release_url = url
+        self._set_lookup_status(f"{sentence} ·" if url else sentence)
+        self._release_link.setVisible(bool(url))
+
+    def _clear_provenance(self) -> None:
+        """Forget the last lookup: a new file has nothing to do with it."""
+        self._last_result = None
+        self._release_url = ""
+        self._release_link.setVisible(False)
+        self._set_lookup_status("")
+
+    def _on_release_link_clicked(self) -> None:
+        if self._release_url:
+            QDesktopServices.openUrl(QUrl(self._release_url))
 
     def shutdown_workers(self) -> None:
         """Wait for a lookup in flight before the window goes away.
