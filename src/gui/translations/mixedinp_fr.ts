@@ -4,24 +4,24 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="111"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="150"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="91"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="120"/>
         <source>docs</source>
         <translatorcomment>Kept in English: ubiquitous software borrowing in a Latin-script UI (cf. sample/slicer rule).</translatorcomment>
         <translation>docs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="116"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="145"/>
         <source>Jared P presents</source>
         <translation>Jared P présente</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="131"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="160"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translation>Boîte à outils d&apos;analyse audio pour DJ</translation>
     </message>
@@ -57,17 +57,17 @@ Fonctionnalités :
         <translation type="vanished">Version 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="139"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="173"/>
         <source>Version {0}</source>
         <translation>Version {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="182"/>
         <source>Check for updates</source>
         <translation>Rechercher les mises à jour</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="187"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -93,62 +93,62 @@ Fonctionnalités :
   - Analyseur de spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="208"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="242"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Formats pris en charge : MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="227"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="272"/>
         <source>Find Your Way Around</source>
         <translation>Trouvez vos repères</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="240"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="285"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Déposez vos fichiers sur n&apos;importe quel panneau pour commencer.&lt;br&gt;La barre latérale ne sert pas qu&apos;à la navigation — vous pouvez&lt;br&gt;glisser des fichiers directement sur les boutons pour les router.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMMER&lt;/span&gt; — Nettoyez d&apos;abord les noms de fichiers&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;rognez, préfixez, prévisualisez avant de valider&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSER&lt;/span&gt; — Détecte le BPM, la tonalité &amp;amp; l&apos;énergie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;écrit les tags + renomme en une seule fois&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTIR&lt;/span&gt; — Changez de format&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Utilisez &lt;span style=&quot;color: {y};&quot;&gt;Envoyer vers&lt;/span&gt; pour déplacer les fichiers entre les panneaux.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
         <source>click for more</source>
         <translation>cliquez pour en savoir plus</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="362"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="407"/>
         <source>Checking…</source>
         <translation>Vérification…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="431"/>
         <source>You&apos;re on the latest version</source>
         <translation>Vous avez la dernière version</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="390"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="435"/>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="391"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
         <source>Update available: {0}</source>
         <translation>Mise à jour disponible : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="399"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="444"/>
         <source>see all releases</source>
         <translation>voir toutes les versions</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="400"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>Impossible de vérifier les mises à jour</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="286"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="331"/>
         <source>The Rest of the Kit</source>
         <translation>Le reste de la boîte à outils</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="296"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DÉCOUPER&lt;/span&gt; — Prélevez une section de n&apos;importe quel morceau.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;S&apos;ouvre depuis la fenêtre Lecteur.&lt;br&gt;Définissez le début/la fin avec le curseur de plage ou marquez&lt;br&gt;les limites pendant la lecture. Ajustez de ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;MÉTADONNÉES&lt;/span&gt; — Déposez un fichier, modifiez ses tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Sauvegarde automatique quand vous passez à autre chose.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CLAVIER&lt;/span&gt; — Jouez des notes dans n&apos;importe quelle tonalité.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;La bande de tonalités harmoniques juste là pour référence.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRE&lt;/span&gt; — Analyseur de spectre acoustique.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Représentation visuelle de la qualité audio.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RÉGLAGES&lt;/span&gt; — Plage de BPM, format de tonalité,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;règles de renommage automatique.&lt;/span&gt;&lt;/div&gt;</translation>
@@ -1245,82 +1245,91 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation>Fichier {0} sur {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="152"/>
         <source>Release:</source>
-        <translation>Édition :</translation>
+        <translation type="vanished">Édition :</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="192"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="160"/>
+        <source>Not the right pressing? Pick another release the search found.</source>
+        <translation>Ce n&apos;est pas le bon pressage ? Choisissez une autre édition trouvée par la recherche.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="162"/>
+        <source>Select release</source>
+        <translation>Sélectionner l&apos;édition</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="204"/>
         <source>Album Art</source>
         <translation>Pochette</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="208"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="220"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>Les fichiers WAV ne peuvent pas stocker de tags — ces valeurs ne seront pas enregistrées.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="224"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="239"/>
         <source>Select All</source>
         <translation>Tout sélectionner</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="225"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="240"/>
         <source>Select None</source>
         <translation>Tout désélectionner</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="228"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="243"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="233"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="248"/>
         <source>Skip</source>
         <translation>Ignorer</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="235"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="237"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="252"/>
         <source>Apply</source>
         <translation>Appliquer</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="279"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="314"/>
         <source>Unknown release</source>
         <translation>Édition inconnue</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="299"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
         <source>Current</source>
         <translation>Actuel</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="300"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="335"/>
         <source>From Discogs</source>
         <translation>Depuis Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="320"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="355"/>
         <source>(empty)</source>
         <translation>(vide)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="369"/>
         <source>Every field already matches this release.</source>
         <translation>Tous les champs correspondent déjà à cette édition.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="355"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="390"/>
         <source>(none)</source>
         <translation>(aucune)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="368"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="403"/>
         <source>No confident match — check the release before applying.</source>
         <translation>Aucune correspondance sûre — vérifiez l’édition avant d’appliquer.</translation>
     </message>
@@ -1523,146 +1532,161 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="59"/>
+        <location filename="../widgets/metadata_panel.py" line="65"/>
         <source>Title</source>
         <translation>Titre</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="60"/>
+        <location filename="../widgets/metadata_panel.py" line="66"/>
         <source>Artist</source>
         <translation>Artiste</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="61"/>
+        <location filename="../widgets/metadata_panel.py" line="67"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="62"/>
+        <location filename="../widgets/metadata_panel.py" line="68"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="63"/>
+        <location filename="../widgets/metadata_panel.py" line="69"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="64"/>
+        <location filename="../widgets/metadata_panel.py" line="70"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="65"/>
+        <location filename="../widgets/metadata_panel.py" line="71"/>
         <source>Key</source>
         <translation>Tonalité</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="66"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
         <source>Year</source>
         <translation>Année</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="67"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Track #</source>
         <translation>N° de piste</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="68"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>Comment</source>
         <translation>Commentaire</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="136"/>
+        <location filename="../widgets/metadata_panel.py" line="148"/>
         <source>Metadata Editor</source>
         <translation>Éditeur de métadonnées</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="139"/>
+        <location filename="../widgets/metadata_panel.py" line="151"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>Déposez un seul fichier audio pour afficher et modifier ses tags de métadonnées.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="184"/>
-        <location filename="../widgets/metadata_panel.py" line="557"/>
+        <location filename="../widgets/metadata_panel.py" line="196"/>
+        <location filename="../widgets/metadata_panel.py" line="596"/>
         <source>Open File Location</source>
         <translation>Ouvrir l’emplacement du fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="187"/>
+        <location filename="../widgets/metadata_panel.py" line="199"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>Afficher ce fichier dans le Finder / l’Explorateur de fichiers.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="246"/>
-        <location filename="../widgets/metadata_panel.py" line="393"/>
+        <location filename="../widgets/metadata_panel.py" line="258"/>
+        <location filename="../widgets/metadata_panel.py" line="432"/>
         <source>Add field...</source>
         <translation>Ajouter un champ...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="251"/>
+        <location filename="../widgets/metadata_panel.py" line="263"/>
         <source>Add Artwork…</source>
         <translation>Ajouter une pochette…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="256"/>
+        <location filename="../widgets/metadata_panel.py" line="268"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="275"/>
+        <location filename="../widgets/metadata_panel.py" line="287"/>
         <source>Look Up Online…</source>
         <translation>Rechercher en ligne…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="277"/>
+        <location filename="../widgets/metadata_panel.py" line="289"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>Rechercher les informations de ce morceau sur Discogs et les vérifier.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="297"/>
+        <location filename="../widgets/metadata_panel.py" line="318"/>
+        <source>View release</source>
+        <translation>Voir l&apos;édition</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="321"/>
+        <source>Open this release&apos;s page on Discogs in your browser.</source>
+        <translation>Ouvre la page de cette édition sur Discogs dans votre navigateur.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="332"/>
         <source>Reload</source>
         <translation>Recharger</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="302"/>
+        <location filename="../widgets/metadata_panel.py" line="337"/>
         <source>Eject</source>
         <translation>Éjecter</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="361"/>
+        <location filename="../widgets/metadata_panel.py" line="400"/>
         <source>Error: {0}</source>
         <translation>Erreur : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="559"/>
+        <location filename="../widgets/metadata_panel.py" line="598"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Ce fichier est introuvable — il a peut-être été déplacé, renommé ou supprimé.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="636"/>
-        <location filename="../widgets/metadata_panel.py" line="691"/>
-        <location filename="../widgets/metadata_panel.py" line="748"/>
+        <location filename="../widgets/metadata_panel.py" line="680"/>
+        <location filename="../widgets/metadata_panel.py" line="735"/>
+        <location filename="../widgets/metadata_panel.py" line="796"/>
         <source>Look Up Online</source>
         <translation>Rechercher en ligne</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="638"/>
+        <location filename="../widgets/metadata_panel.py" line="682"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>Ce fichier n’a ni artiste ni titre pour effectuer la recherche, et son nom n’en donne pas non plus. Renseignez le champ Titre, puis réessayez.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="663"/>
+        <location filename="../widgets/metadata_panel.py" line="707"/>
         <source>Looking up…</source>
         <translation>Recherche…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="672"/>
+        <location filename="../widgets/metadata_panel.py" line="716"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Attente de la limite de requêtes Discogs…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="775"/>
+        <location filename="../widgets/metadata_panel.py" line="825"/>
+        <source>Applied from Discogs</source>
+        <translation>Appliqué depuis Discogs</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="863"/>
         <source>Select cover art</source>
         <translation>Sélectionner une pochette</translation>
     </message>

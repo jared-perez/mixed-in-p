@@ -4,25 +4,25 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="82"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="111"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="150"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="91"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="120"/>
         <source>docs</source>
         <translatorcomment>Native script for a non-Latin UI (cf. sample/slicer rule).</translatorcomment>
         <translation>文档</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="116"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="145"/>
         <source>Jared P presents</source>
         <translatorcomment>&apos;presents&apos; rendered as 出品 (Apple-style &apos;presented by&apos;); flag tone—could also be 呈现.</translatorcomment>
         <translation>Jared P 出品</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="131"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="160"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>DJ kept Latin (universal term); &apos;Toolkit&apos; → 工具包.</translatorcomment>
         <translation>DJ 音频分析工具包</translation>
@@ -58,17 +58,17 @@ Features:
         <translation type="vanished">版本 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="139"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="173"/>
         <source>Version {0}</source>
         <translation>版本 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="182"/>
         <source>Check for updates</source>
         <translation>检查更新</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="187"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -94,62 +94,62 @@ Features:
   - 频谱分析器</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="208"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="242"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>支持的格式：MP3、WAV、FLAC、AIFF、M4A、OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="227"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="272"/>
         <source>Find Your Way Around</source>
         <translation>快速上手</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="240"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="285"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;将文件拖到任意面板即可开始。&lt;br&gt;侧边栏不仅用于导航——你还可以&lt;br&gt;把文件直接拖到按钮上来进行路由。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;重命名&lt;/span&gt; — 先整理文件名&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;修剪、添加前缀，提交前预览&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;分析&lt;/span&gt; — 检测 BPM、调性和能量&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;一步自动写入标签并重命名&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;转换&lt;/span&gt; — 切换格式&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;使用&lt;span style=&quot;color: {y};&quot;&gt;发送到&lt;/span&gt;在各面板间移动文件。&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
         <source>click for more</source>
         <translation>点击查看更多</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="362"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="407"/>
         <source>Checking…</source>
         <translation>正在检查…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="431"/>
         <source>You&apos;re on the latest version</source>
         <translation>你使用的是最新版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="390"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="435"/>
         <source>Download</source>
         <translation>下载</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="391"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
         <source>Update available: {0}</source>
         <translation>有可用更新：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="399"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="444"/>
         <source>see all releases</source>
         <translation>查看所有版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="400"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>无法检查更新</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="286"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="331"/>
         <source>The Rest of the Kit</source>
         <translation>其余工具</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="296"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;切片&lt;/span&gt; — 从任意曲目中截取片段。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;从播放器窗口内打开。&lt;br&gt;用范围滑块设置起点/终点，或从播放中&lt;br&gt;标记边界。微调 ±10ms。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;元数据&lt;/span&gt; — 拖入文件，编辑其标签。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;切换时自动保存。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;键盘&lt;/span&gt; — 在任意调上弹奏音符。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;和声键条就在旁边供参考。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;频谱&lt;/span&gt; — 声学频谱分析器。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;音质的可视化呈现。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;设置&lt;/span&gt; — BPM 范围、调性格式、&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;自动重命名规则。&lt;/span&gt;&lt;/div&gt;</translation>
@@ -1262,82 +1262,91 @@ or click “Add Artwork…”</source>
         <translation>第 {0} 个文件，共 {1} 个</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="152"/>
         <source>Release:</source>
-        <translation>版本：</translation>
+        <translation type="vanished">版本：</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="192"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="160"/>
+        <source>Not the right pressing? Pick another release the search found.</source>
+        <translation>不是想要的版本？可以选择搜索找到的其他版本。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="162"/>
+        <source>Select release</source>
+        <translation>选择版本</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="204"/>
         <source>Album Art</source>
         <translation>专辑封面</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="208"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="220"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>WAV 文件无法存储标签，这些值不会被保存。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="224"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="239"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="225"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="240"/>
         <source>Select None</source>
         <translation>全不选</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="228"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="243"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="233"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="248"/>
         <source>Skip</source>
         <translation>跳过</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="235"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="237"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="252"/>
         <source>Apply</source>
         <translation>应用</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="279"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="314"/>
         <source>Unknown release</source>
         <translation>未知版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="299"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
         <source>Current</source>
         <translation>当前</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="300"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="335"/>
         <source>From Discogs</source>
         <translation>来自 Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="320"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="355"/>
         <source>(empty)</source>
         <translation>（空）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="369"/>
         <source>Every field already matches this release.</source>
         <translation>所有字段都已与此版本一致。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="355"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="390"/>
         <source>(none)</source>
         <translation>（无）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="368"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="403"/>
         <source>No confident match — check the release before applying.</source>
         <translation>匹配不确定，请先核对版本再应用。</translation>
     </message>
@@ -1540,149 +1549,164 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="59"/>
+        <location filename="../widgets/metadata_panel.py" line="65"/>
         <source>Title</source>
         <translation>标题</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="60"/>
+        <location filename="../widgets/metadata_panel.py" line="66"/>
         <source>Artist</source>
         <translation>艺术家</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="61"/>
+        <location filename="../widgets/metadata_panel.py" line="67"/>
         <source>Album</source>
         <translation>专辑</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="62"/>
+        <location filename="../widgets/metadata_panel.py" line="68"/>
         <source>Label</source>
         <translation>厂牌</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="63"/>
+        <location filename="../widgets/metadata_panel.py" line="69"/>
         <source>Genre</source>
         <translation>流派</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="64"/>
+        <location filename="../widgets/metadata_panel.py" line="70"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="65"/>
+        <location filename="../widgets/metadata_panel.py" line="71"/>
         <source>Key</source>
         <translatorcomment>Reviewed (zh pass): 调 for compact key labels per glossary (调性 used in full sentences).</translatorcomment>
         <translation>调</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="66"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
         <source>Year</source>
         <translation>年份</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="67"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Track #</source>
         <translatorcomment>Metadata track number → 音轨号 (track index in album), distinct from playlist 曲目. Flag 音轨 vs 曲目: here it is a track-number tag.</translatorcomment>
         <translation>音轨号</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="68"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>Comment</source>
         <translation>注释</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="136"/>
+        <location filename="../widgets/metadata_panel.py" line="148"/>
         <source>Metadata Editor</source>
         <translation>元数据编辑器</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="139"/>
+        <location filename="../widgets/metadata_panel.py" line="151"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>拖入单个音频文件以查看和编辑其元数据标签。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="184"/>
-        <location filename="../widgets/metadata_panel.py" line="557"/>
+        <location filename="../widgets/metadata_panel.py" line="196"/>
+        <location filename="../widgets/metadata_panel.py" line="596"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="187"/>
+        <location filename="../widgets/metadata_panel.py" line="199"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>在访达 / 文件资源管理器中显示此文件。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="246"/>
-        <location filename="../widgets/metadata_panel.py" line="393"/>
+        <location filename="../widgets/metadata_panel.py" line="258"/>
+        <location filename="../widgets/metadata_panel.py" line="432"/>
         <source>Add field...</source>
         <translation>添加字段……</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="251"/>
+        <location filename="../widgets/metadata_panel.py" line="263"/>
         <source>Add Artwork…</source>
         <translation>添加封面……</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="256"/>
+        <location filename="../widgets/metadata_panel.py" line="268"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="275"/>
+        <location filename="../widgets/metadata_panel.py" line="287"/>
         <source>Look Up Online…</source>
         <translation>在线查找…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="277"/>
+        <location filename="../widgets/metadata_panel.py" line="289"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>在 Discogs 上查找此曲目的信息并核对。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="297"/>
+        <location filename="../widgets/metadata_panel.py" line="318"/>
+        <source>View release</source>
+        <translation>查看版本</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="321"/>
+        <source>Open this release&apos;s page on Discogs in your browser.</source>
+        <translation>在浏览器中打开该版本的 Discogs 页面。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="332"/>
         <source>Reload</source>
         <translation>重新加载</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="302"/>
+        <location filename="../widgets/metadata_panel.py" line="337"/>
         <source>Eject</source>
         <translatorcomment>弹出 (eject loaded file from metadata/player). Verify vs 移除/退出.</translatorcomment>
         <translation>弹出</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="361"/>
+        <location filename="../widgets/metadata_panel.py" line="400"/>
         <source>Error: {0}</source>
         <translation>错误：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="559"/>
+        <location filename="../widgets/metadata_panel.py" line="598"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>找不到此文件——可能已被移动、重命名或删除。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="636"/>
-        <location filename="../widgets/metadata_panel.py" line="691"/>
-        <location filename="../widgets/metadata_panel.py" line="748"/>
+        <location filename="../widgets/metadata_panel.py" line="680"/>
+        <location filename="../widgets/metadata_panel.py" line="735"/>
+        <location filename="../widgets/metadata_panel.py" line="796"/>
         <source>Look Up Online</source>
         <translation>在线查找</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="638"/>
+        <location filename="../widgets/metadata_panel.py" line="682"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>此文件没有可用于搜索的艺人或标题，文件名中也没有。请填写“标题”后重试。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="663"/>
+        <location filename="../widgets/metadata_panel.py" line="707"/>
         <source>Looking up…</source>
         <translation>正在查找…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="672"/>
+        <location filename="../widgets/metadata_panel.py" line="716"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>正在等待 Discogs 的请求限制…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="775"/>
+        <location filename="../widgets/metadata_panel.py" line="825"/>
+        <source>Applied from Discogs</source>
+        <translation>已从 Discogs 应用</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="863"/>
         <source>Select cover art</source>
         <translation>选择封面</translation>
     </message>
