@@ -227,3 +227,78 @@ def test_a_lookup_asks_for_the_remembered_release(panel, flac, monkeypatch):
     panel._release_id = 249504
     panel._on_lookup_clicked()
     assert jobs and jobs[0].prefer_release_id == 249504
+
+
+# --- the already-tagged file ------------------------------------------------
+#
+# Reported from the running app: a file tagged from Discogs in an earlier
+# session opened the review dialog on the right release, and the tab still
+# said "No release known for this file yet". Two separate faults, both of
+# which this file's shape makes unavoidable — every field matches, so the
+# diff has nothing to offer and there is nothing to tick.
+
+
+def test_the_tab_fills_in_as_soon_as_a_result_arrives(panel, flac, monkeypatch):
+    # Not only when a value is written: the tab reports what Discogs knows,
+    # and a review the user then cancels has still answered that.
+    monkeypatch.setattr(MetadataPanel, "_show_review_dialog", lambda self, r: None)
+    panel._on_lookup_result(_result(flac))
+    assert panel._discogs_summary.text() == "Born Slippy"
+    assert panel._discogs_page_url().endswith("/249504")
+
+
+def test_approving_nothing_still_remembers_the_release(panel, flac, library):
+    # The reported case exactly: nothing left to tick, Apply pressed anyway.
+    library.add_track(flac)
+    panel.set_library(library)
+    panel._last_result = _result(flac)
+    panel._apply_lookup_values({})
+    assert library.get_track_by_path(flac).discogs_release_id == 249504
+    assert panel._release_id == 249504
+
+
+def test_approving_nothing_claims_no_write(panel, flac):
+    # ...but it must not say "Applied from Discogs" over an unchanged file.
+    panel._last_result = _result(flac)
+    panel._apply_lookup_values({})
+    assert panel._release_link.isHidden()
+    assert not panel._lookup_status.text()
+
+
+def test_a_cancelled_review_records_nothing(panel, flac, library, monkeypatch):
+    # A review is cancelled when the match was *wrong*; remembering it would
+    # seed the next lookup with the release the user just rejected. Driven
+    # through the real _show_review_dialog, with only exec() replaced — a
+    # test that just asserts the column is still NULL passes without a fix.
+    from src.gui.widgets.dialogs.lookup_review import LookupReviewDialog
+
+    library.add_track(flac)
+    panel.set_library(library)
+    monkeypatch.setattr(LookupReviewDialog, "exec", lambda self: 0)  # rejected
+    panel._on_lookup_result(_result(flac))
+    assert library.get_track_by_path(flac).discogs_release_id is None
+    # The tab still shows what the search found — session state, not stored.
+    assert panel._discogs_summary.text() == "Born Slippy"
+
+
+def test_an_accepted_review_records_it_even_with_nothing_ticked(
+    panel, flac, library, monkeypatch
+):
+    """The reported case, end to end through the real dialog.
+
+    The file's tags already match the release, so the diff offers nothing and
+    _select_none is what the user effectively pressed. Accepting still means
+    "this is the right release".
+    """
+    from src.gui.widgets.dialogs.lookup_review import LookupReviewDialog
+
+    library.add_track(flac)
+    panel.set_library(library)
+
+    def accept_with_nothing(self):
+        self._select_none()
+        return 1  # QDialog.Accepted
+
+    monkeypatch.setattr(LookupReviewDialog, "exec", accept_with_nothing)
+    panel._on_lookup_result(_result(flac))
+    assert library.get_track_by_path(flac).discogs_release_id == 249504

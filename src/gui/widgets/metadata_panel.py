@@ -1024,10 +1024,15 @@ class MetadataPanel(QWidget):
         # through that return, and the release the apply credits has to be the
         # one the user ended up looking at.
         self._last_result = result
+        # The tab follows *every* result, not only an applied one. It reports
+        # what Discogs knows about this file, and a review the user cancels —
+        # or one where every field already matched, so there was nothing left
+        # to tick — has still answered the question the tab asks. Before the
+        # dialog, because exec() blocks until it closes.
+        self._refresh_discogs_tab()
         if self._tab_refresh:
             # A Refresh, not a re-tag: fill the tab and open nothing.
             self._tab_refresh = False
-            self._refresh_discogs_tab()
             return
         if self._review_dialog is not None:
             # A candidate switch: the dialog is open and waiting for this.
@@ -1077,14 +1082,21 @@ class MetadataPanel(QWidget):
         )
 
     def _apply_lookup_values(self, values: dict) -> None:
-        """Write the approved fields, then rebuild the form from disk."""
-        if not values or self._file_path is None:
+        """Write the approved fields, and remember the release either way.
+
+        **Approving zero fields is not approving nothing.** On a file that was
+        tagged from Discogs in an earlier session every field already matches,
+        so the diff offers nothing to tick — and that is precisely the file
+        whose release identity is most clearly known and, before this, the one
+        case where it was never recorded. Pressing Apply is the user saying
+        this is the right release; whether it also changed a tag is a separate
+        question. Cancel still records nothing, because a review is cancelled
+        when the match was *wrong*, and remembering it would seed the next
+        lookup with it.
+        """
+        if self._file_path is None:
             return
-        error = lookup_flow.apply_values(self._file_path, values)
-        if error:
-            QMessageBox.warning(self, self.tr("Look Up Online"), error)
-            return
-        # Read the release *before* the reload: _load_file clears the
+        # Read the release *before* any reload: _load_file clears the
         # provenance, which is what stops a newly dropped file wearing the
         # previous one's.
         proposed = getattr(self._last_result, "proposed", None)
@@ -1092,20 +1104,25 @@ class MetadataPanel(QWidget):
         chosen = getattr(self._last_result, "chosen", None)
         release_id = getattr(chosen, "release_id", 0) or None
         result = self._last_result
-        # Reload rather than trusting what we believe we wrote. It clears the
-        # provenance and re-reads the release memory, so both are restated
-        # afterwards — and the memory is written first, so the re-read finds it.
         self._remember_release(release_id)
-        self._load_file(self._file_path)
-        # Both restored by hand, because _load_file legitimately clears them
-        # for a *new* file and this is the one reload of the same one. The
-        # release id especially: _sync_release_memory answers from the library,
-        # and a file dropped straight onto this panel has no row there — so
-        # what the user just approved would be forgotten the instant it was
-        # applied.
-        self._last_result = result
-        self._release_id = release_id
-        self._show_provenance(url)
+        if values:
+            error = lookup_flow.apply_values(self._file_path, values)
+            if error:
+                QMessageBox.warning(self, self.tr("Look Up Online"), error)
+                return
+            # Reload rather than trusting what we believe we wrote.
+            self._load_file(self._file_path)
+            # Both restored by hand, because _load_file legitimately clears
+            # them for a *new* file and this is the one reload of the same
+            # one. The release id especially: _sync_release_memory answers
+            # from the library, and a file dropped straight onto this panel
+            # has no row there — so what the user just approved would be
+            # forgotten the instant it was applied.
+            self._last_result = result
+            self._release_id = release_id
+            # Only when something really was written: a provenance line over
+            # an unchanged file would be claiming a write that never happened.
+            self._show_provenance(url)
         self._refresh_discogs_tab()
 
     def _show_provenance(self, url: str) -> None:
