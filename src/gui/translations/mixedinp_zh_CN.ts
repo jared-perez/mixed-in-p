@@ -1247,17 +1247,17 @@ or click “Add Artwork…”</source>
         <translation>音轨号</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="119"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="125"/>
         <source>Review Metadata</source>
         <translation>检查元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="133"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="139"/>
         <source>Tick the values you want to write to this file.</source>
         <translation>勾选要写入此文件的值。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="139"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="145"/>
         <source>File {0} of {1}</source>
         <translation>第 {0} 个文件，共 {1} 个</translation>
     </message>
@@ -1266,87 +1266,102 @@ or click “Add Artwork…”</source>
         <translation type="vanished">版本：</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="160"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="166"/>
         <source>Not the right pressing? Pick another release the search found.</source>
         <translation>不是想要的版本？可以选择搜索找到的其他版本。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="162"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="168"/>
         <source>Select release</source>
         <translation>选择版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="204"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="189"/>
+        <source>Wrong track from this release? Pick the right row of the tracklist.</source>
+        <translation>不是该版本中的这首曲目？请选择曲目表中正确的一行。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="191"/>
+        <source>Select track</source>
+        <translation>选择曲目</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="234"/>
         <source>Album Art</source>
         <translation>专辑封面</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="220"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>WAV 文件无法存储标签，这些值不会被保存。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="239"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="269"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="240"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="270"/>
         <source>Select None</source>
         <translation>全不选</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="243"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="273"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="248"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="278"/>
         <source>Skip</source>
         <translation>跳过</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="280"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="252"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
         <source>Apply</source>
         <translation>应用</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="314"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="346"/>
         <source>Unknown release</source>
         <translation>未知版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="372"/>
+        <source>Unknown track</source>
+        <translation>未知曲目</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="411"/>
         <source>Current</source>
         <translation>当前</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="335"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="412"/>
         <source>From Discogs</source>
         <translation>来自 Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="355"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="432"/>
         <source>(empty)</source>
         <translation>（空）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="369"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="446"/>
         <source>Every field already matches this release.</source>
         <translation>所有字段都已与此版本一致。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="390"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="467"/>
         <source>(none)</source>
         <translation>（无）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="403"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
         <source>No confident match — check the release before applying.</source>
         <translation>匹配不确定，请先核对版本再应用。</translation>
     </message>

@@ -1240,17 +1240,17 @@ o haz clic en “Añadir carátula…”</translation>
         <translation>N.º de pista</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="119"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="125"/>
         <source>Review Metadata</source>
         <translation>Revisar metadatos</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="133"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="139"/>
         <source>Tick the values you want to write to this file.</source>
         <translation>Marca los valores que quieres escribir en este archivo.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="139"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="145"/>
         <source>File {0} of {1}</source>
         <translation>Archivo {0} de {1}</translation>
     </message>
@@ -1259,87 +1259,102 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Edición:</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="160"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="166"/>
         <source>Not the right pressing? Pick another release the search found.</source>
         <translation>¿No es el prensaje correcto? Elige otra edición encontrada por la búsqueda.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="162"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="168"/>
         <source>Select release</source>
         <translation>Seleccionar edición</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="204"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="189"/>
+        <source>Wrong track from this release? Pick the right row of the tracklist.</source>
+        <translation>¿Es la pista equivocada de esta edición? Elige la fila correcta de la lista.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="191"/>
+        <source>Select track</source>
+        <translation>Seleccionar pista</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="234"/>
         <source>Album Art</source>
         <translation>Portada</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="220"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>Los archivos WAV no pueden guardar etiquetas: estos valores no se guardarán.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="239"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="269"/>
         <source>Select All</source>
         <translation>Seleccionar todo</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="240"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="270"/>
         <source>Select None</source>
         <translation>No seleccionar nada</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="243"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="273"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="248"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="278"/>
         <source>Skip</source>
         <translation>Omitir</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="250"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="280"/>
         <source>Stop</source>
         <translation>Detener</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="252"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
         <source>Apply</source>
         <translation>Aplicar</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="314"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="346"/>
         <source>Unknown release</source>
         <translation>Edición desconocida</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="372"/>
+        <source>Unknown track</source>
+        <translation>Pista desconocida</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="411"/>
         <source>Current</source>
         <translation>Actual</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="335"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="412"/>
         <source>From Discogs</source>
         <translation>De Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="355"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="432"/>
         <source>(empty)</source>
         <translation>(vacío)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="369"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="446"/>
         <source>Every field already matches this release.</source>
         <translation>Todos los campos ya coinciden con esta edición.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="390"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="467"/>
         <source>(none)</source>
         <translation>(ninguna)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="403"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
         <source>No confident match — check the release before applying.</source>
         <translation>Sin coincidencia fiable: comprueba la edición antes de aplicar.</translation>
     </message>
