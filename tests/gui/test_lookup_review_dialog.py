@@ -13,7 +13,7 @@ from PySide6.QtWidgets import QDialog
 from src.gui.widgets.dialogs.lookup_review import ARTWORK_FIELD, LookupReviewDialog
 from src.gui.workers.lookup_worker import LookupResult
 from src.online import matching
-from src.online.result import Candidate, ProposedTags, TrackQuery
+from src.online.result import Candidate, ProposedTags, TrackEntry, TrackQuery
 
 PROPOSED = ProposedTags(
     title="Born Slippy (Nuxx)",
@@ -146,6 +146,114 @@ def test_the_switcher_says_what_it_is_for(qtbot):
     # is the Convert format row's compaction, and shrinks this combo's arrow
     # to buy width a dialog row does not need.
     assert dialog._candidate_combo.objectName() != "compactCombo"
+
+
+# --- the track picker (Q2) --------------------------------------------------
+#
+# The release switcher answers "which record is this"; this answers "which
+# row of it". Nothing offered that until now: pick_track chose among twenty
+# rows of a compilation with no way to say it chose wrong.
+
+
+def _tracks() -> list[TrackEntry]:
+    return [
+        TrackEntry(position="A", title="Born Slippy", ordinal=1, number=1,
+                   duration=245.0),
+        TrackEntry(position="B1", title="Born Slippy (Nuxx)", ordinal=2, number=2,
+                   duration=584.0),
+        TrackEntry(position="B2", title="Born Slippy (Cake Mix)", ordinal=3,
+                   number=3, duration=402.0),
+    ]
+
+
+def _with_tracks(picked: int = 1, **kwargs):
+    entries = _tracks()
+    chosen = Candidate(
+        release_id=1,
+        artist="Underworld",
+        album="Born Slippy",
+        score=0.9,
+        track=entries[picked],
+        tracklist=tuple(entries),
+        **kwargs,
+    )
+    return _result(chosen=chosen, candidates=[chosen])
+
+
+def test_a_release_with_several_rows_offers_the_one_the_matcher_picked(qtbot):
+    dialog = _dialog(qtbot, current={}, result=_with_tracks(picked=1))
+    assert not dialog._track_row.isHidden()
+    assert dialog._track_combo.count() == 3
+    # Pre-selected on pick_track's answer: this is an override, not a
+    # replacement for the automatic choice.
+    assert dialog._track_combo.currentIndex() == 1
+    assert "Born Slippy (Nuxx)" in dialog._track_combo.currentText()
+
+
+def test_a_single_row_release_does_not_grow_a_pointless_dropdown(qtbot):
+    only = TrackEntry(position="A", title="Acid Tracks", ordinal=1, number=1)
+    chosen = Candidate(release_id=1, track=only, tracklist=(only,), score=0.9)
+    dialog = _dialog(qtbot, current={}, result=_result(chosen=chosen,
+                                                       candidates=[chosen]))
+    assert dialog._track_row.isHidden()
+
+
+def test_choosing_another_row_re_derives_the_track_fields(qtbot):
+    dialog = _dialog(qtbot, current={}, result=_with_tracks(picked=1))
+    dialog._track_combo.setCurrentIndex(2)
+    # The diff moved, not just the label: every tick is per-field and three of
+    # those rows have new values on both sides.
+    assert dialog._proposed_labels["title"].text() == "Born Slippy (Cake Mix)"
+    assert dialog.selected_values()["title"] == "Born Slippy (Cake Mix)"
+    assert dialog.selected_values()["track_number"] == 3
+
+
+def test_the_release_fields_do_not_move_with_the_track(qtbot):
+    dialog = _dialog(qtbot, current={}, result=_with_tracks(picked=1))
+    dialog._track_combo.setCurrentIndex(2)
+    values = dialog.selected_values()
+    # Album, label, genre and year belong to the release, whichever row the
+    # file turns out to be.
+    assert values["album"] == "Born Slippy"
+    assert values["label"] == "Junior Boy's Own"
+    assert values["year"] == 1995
+
+
+def test_choosing_another_row_asks_for_nothing_over_the_network(qtbot):
+    # The tracklist is already downloaded; a track override is not a candidate
+    # switch and must not be mistaken for one.
+    dialog = _dialog(qtbot, current={}, result=_with_tracks(picked=1))
+    asked: list[Candidate] = []
+    dialog.candidate_requested.connect(asked.append)
+    dialog._track_combo.setCurrentIndex(0)
+    assert asked == []
+
+
+def test_a_compilation_row_credits_the_track_artist(qtbot):
+    entries = [
+        TrackEntry(position="1-1", title="Sunrise", artist="M People", ordinal=1,
+                   number=1),
+        TrackEntry(position="1-2", title="Papua New Guinea",
+                   artist="The Future Sound Of London", ordinal=2, number=2),
+    ]
+    chosen = Candidate(release_id=1, artist="Various", album="Renaissance",
+                       score=0.9, track=entries[0], tracklist=tuple(entries))
+    dialog = _dialog(qtbot, current={}, result=_result(chosen=chosen,
+                                                       candidates=[chosen]))
+    dialog._track_combo.setCurrentIndex(1)
+    # Never "Various": the row's own credit is the artist on a compilation.
+    assert dialog.selected_values()["artist"] == "The Future Sound Of London"
+
+
+def test_showing_a_new_result_repopulates_the_rows(qtbot):
+    # A candidate switch brings a different release, so its tracklist replaces
+    # this one's rather than being appended to it.
+    dialog = _dialog(qtbot, current={}, result=_with_tracks(picked=1))
+    only = TrackEntry(position="A", title="Acid Tracks", ordinal=1, number=1)
+    other = Candidate(release_id=2, track=only, tracklist=(only,), score=0.8)
+    dialog.set_result(_result(chosen=other, candidates=[other]))
+    assert dialog._track_combo.count() == 1
+    assert dialog._track_row.isHidden()
 
 
 def test_a_wav_says_its_tags_will_not_stick(qtbot):

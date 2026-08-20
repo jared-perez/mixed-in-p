@@ -10,7 +10,7 @@ hand.
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 
 # Failure kinds. These are logic values, not UI prose — the human-readable
 # (and translated) strings are built in the dialog, the same split
@@ -94,6 +94,36 @@ class TrackEntry:
     artist: str = ""            # per-track artist; set on compilations
     duration: float | None = None  # seconds; often absent on vinyl-era entries
     ordinal: int = 0            # 1-based index within the release
+    # The track number to write, already read out of `position` by whichever
+    # provider built this row. Derived here rather than at the point of use so
+    # that re-deriving tags for a *different* row costs no provider knowledge
+    # and no second request — reading "A1" or "1-3" is the provider's job, and
+    # it has already done it.
+    number: int = 0
+
+    def label_line(self) -> str:
+        """One-line description for the track picker.
+
+        Untranslated for the same reason :meth:`Candidate.label_line` is:
+        every part is data, and the only prose is punctuation. The duration
+        earns its place — a remix 12" puts five rows of one title in this
+        list, and the running time is often the only thing between them that
+        a sleeve actually prints.
+        """
+        head = self.position.strip() or (str(self.ordinal) if self.ordinal else "")
+        parts = [p for p in (head, self.title) if p]
+        length = _as_clock(self.duration)
+        if length:
+            parts.append(length)
+        return " — ".join(parts)
+
+
+def _as_clock(seconds: float | None) -> str:
+    """Seconds as "M:SS", or "" for the blanks vinyl-era entries are full of."""
+    if not seconds or seconds < 0:
+        return ""
+    total = int(round(seconds))
+    return f"{total // 60}:{total % 60:02d}"
 
 
 @dataclass
@@ -121,6 +151,11 @@ class Candidate:
     page_url: str = ""          # human-facing release page, for the dialog
     score: float = 0.0
     track: TrackEntry | None = None  # the matched row, after fetch()
+    # Every playable row of the release, in the order and with the filtering
+    # `pick_track` ran against — so the dialog's track picker offers exactly
+    # the list the automatic choice was made from, and an override needs no
+    # second request. Empty until fetch() reads the release.
+    tracklist: tuple[TrackEntry, ...] = ()
 
     def format_line(self) -> str:
         """The pressing in at most two words: what it is, and what kind.
@@ -182,6 +217,25 @@ class ProposedTags:
     artwork_url: str = ""
     source_url: str = ""        # the release page, for attribution
     provider: str = ""
+
+    def with_track(self, entry: TrackEntry, release_artist: str = ""):
+        """A copy of this proposal, read off a different row of the release.
+
+        Only the three fields that belong to a *track* move; album, label,
+        genre, year and the URLs belong to the release and are the same
+        whichever row the file turns out to be. Nothing here fetches: the row
+        already carries its own number, so an override costs no request.
+
+        The artist rule is `fetch`'s, deliberately duplicated rather than
+        shared: a compilation credits the track, not "Various", and a release
+        with one artist leaves every row's artist blank.
+        """
+        return replace(
+            self,
+            title=entry.title or None,
+            artist=(entry.artist or release_artist) or None,
+            track_number=entry.number or None,
+        )
 
     def as_fields(self) -> dict[str, object]:
         """The proposed values by tag-field name, dropping the empty ones."""

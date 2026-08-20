@@ -347,6 +347,11 @@ class DiscogsProvider:
 
         candidate.track = entry
         candidate.score = score
+        # Keep the whole filtered list, not just the winner: the dialog's
+        # track picker offers an override, and re-reading the release to
+        # populate a dropdown we have already downloaded would be a request
+        # spent on nothing.
+        candidate.tracklist = tuple(tracklist)
         if release_artist:
             candidate.artist = release_artist
         album = str(payload.get("title") or candidate.album)
@@ -374,9 +379,7 @@ class DiscogsProvider:
             album=album or None,
             genre=_genre_from(styles, genres) or None,
             year=year,
-            track_number=(
-                _track_number(entry.position, entry.ordinal) if entry else None
-            ),
+            track_number=(entry.number or None) if entry else None,
             label=label or None,
             artwork_url=_primary_image(payload) or candidate.cover_url,
             source_url=str(payload.get("uri") or candidate.page_url),
@@ -398,13 +401,15 @@ class DiscogsProvider:
             if str(row.get("type_") or "track").strip().casefold() != "track":
                 continue
             ordinal += 1
+            position = str(row.get("position") or "")
             entries.append(
                 TrackEntry(
-                    position=str(row.get("position") or ""),
+                    position=position,
                     title=str(row.get("title") or ""),
                     artist=_join_artists(row.get("artists") or []),
                     duration=_duration_seconds(str(row.get("duration") or "")),
                     ordinal=ordinal,
+                    number=_track_number(position, ordinal),
                 )
             )
         return entries

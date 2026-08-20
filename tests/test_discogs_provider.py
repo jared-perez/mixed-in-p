@@ -346,3 +346,30 @@ def test_fetch_artwork_with_no_url_asks_for_nothing():
     provider, opener, _, _ = _provider({})
     assert provider.fetch_artwork("") == b""
     assert opener.requests == []
+
+
+# --- the tracklist the picker offers ----------------------------------------
+
+
+def test_fetch_keeps_the_whole_filtered_tracklist():
+    # The dialog's track picker offers an override, and re-reading a release
+    # we have already downloaded to populate a dropdown would be a request
+    # spent on nothing.
+    provider, _, _, _ = _provider({"/releases/2001": VA_RELEASE_RESPONSE})
+    candidate = Candidate(release_id=2001)
+    provider.fetch(candidate, TrackQuery(artist="M People", title="Sunrise"))
+    assert [e.title for e in candidate.tracklist] == [
+        e["title"] for e in VA_RELEASE_RESPONSE["tracklist"] if e["type_"] == "track"
+    ]
+    # The matched row is one *of* that list, not a copy beside it — the dialog
+    # pre-selects by identity.
+    assert candidate.track in candidate.tracklist
+
+
+def test_every_row_carries_the_number_it_would_write():
+    provider, _, _, _ = _provider({"/releases/2001": VA_RELEASE_RESPONSE})
+    candidate = Candidate(release_id=2001)
+    provider.fetch(candidate, TrackQuery(artist="M People", title="Sunrise"))
+    # "1-1" is disc 1 track 1; the position is read once, here, so an override
+    # in the dialog needs no knowledge of how Discogs spells a position.
+    assert [e.number for e in candidate.tracklist] == [1, 2]

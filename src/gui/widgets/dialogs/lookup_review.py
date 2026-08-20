@@ -112,6 +112,12 @@ class LookupReviewDialog(QDialog):
         # files queued, "cancel" is ambiguous between this one and the rest.
         self._position = position
         self._result = result
+        # The proposal actually on screen. Not `result.proposed`: the track
+        # picker re-derives it for a different row of the release, and the
+        # result belongs to the caller — mutating theirs to show ours would
+        # make the override invisible from the outside and permanent from the
+        # inside.
+        self._proposed = getattr(result, "proposed", None)
         self._checks: dict[str, QCheckBox] = {}
         self._proposed_labels: dict[str, QLabel] = {}
         self._loading = False
@@ -159,7 +165,8 @@ class LookupReviewDialog(QDialog):
         release_hint = self.tr(
             "Not the right pressing? Pick another release the search found."
         )
-        release_label = QLabel(self.tr("Select release"))
+        self._release_label = QLabel(self.tr("Select release"))
+        release_label = self._release_label
         release_label.setToolTip(release_hint)
         release_row.addWidget(release_label)
         self._candidate_combo = QComboBox()
@@ -167,6 +174,42 @@ class LookupReviewDialog(QDialog):
         self._candidate_combo.currentIndexChanged.connect(self._on_candidate_changed)
         release_row.addWidget(self._candidate_combo, 1)
         layout.addLayout(release_row)
+
+        # Which row of that release the file is. The release switcher answers
+        # "which record is this"; this answers "which track on it", and until
+        # now nothing did — `pick_track` chose among twenty rows of a
+        # compilation, or five mixes of one title on a 12", with no way to say
+        # it chose wrong. Hidden for a release with nothing to choose between.
+        self._track_row = QWidget()
+        self._track_row.setObjectName("lookupTrackRow")
+        self._track_row.setStyleSheet("#lookupTrackRow { background: transparent; }")
+        track_layout = QHBoxLayout(self._track_row)
+        track_layout.setContentsMargins(0, 0, 0, 0)
+        track_layout.setSpacing(Theme.SPACING)
+        track_hint = self.tr(
+            "Wrong track from this release? Pick the right row of the tracklist."
+        )
+        track_label = QLabel(self.tr("Select track"))
+        track_label.setToolTip(track_hint)
+        track_layout.addWidget(track_label)
+        self._track_combo = QComboBox()
+        self._track_combo.setToolTip(track_hint)
+        self._track_combo.currentIndexChanged.connect(self._on_track_changed)
+        track_layout.addWidget(self._track_combo, 1)
+        self._track_row.setVisible(False)
+        layout.addWidget(self._track_row)
+
+        # Line the two combos up. Release sits above Track and their labels are
+        # different lengths in every language, so without this the second
+        # dropdown starts a few dozen pixels left of the first and the pair
+        # reads as unfinished. Measured from the labels' own size hints, never
+        # a constant: "Veröffentlichung wählen" is twice the width of "Titel
+        # wählen", and both are twice "Select release".
+        label_column = max(
+            release_label.sizeHint().width(), track_label.sizeHint().width()
+        )
+        release_label.setMinimumWidth(label_column)
+        track_label.setMinimumWidth(label_column)
 
         self._warning = QLabel("")
         self._warning.setWordWrap(True)
@@ -294,12 +337,14 @@ class LookupReviewDialog(QDialog):
     def set_result(self, result) -> None:
         """Show a new result — used when the user switched candidate."""
         self._result = result
+        self._proposed = getattr(result, "proposed", None)
         self._apply_result()
 
     def _apply_result(self) -> None:
         self._loading = True
         try:
             self._fill_candidates()
+            self._fill_tracks()
             self._fill_rows()
             self._fill_artwork()
             self._fill_warning()
@@ -322,6 +367,51 @@ class LookupReviewDialog(QDialog):
         combo.setEnabled(combo.count() > 1)
         combo.blockSignals(False)
 
+    def _fill_tracks(self) -> None:
+        """Offer the release's rows, with the automatic choice pre-selected.
+
+        The list is the candidate's own ``tracklist``, which is exactly what
+        ``pick_track`` ran against — headings and index tracks already
+        dropped. Offering an unfiltered list instead would put the ordinals
+        out of step with the numbers the rows carry, so a heading two lines up
+        would silently shift every track number written after it.
+        """
+        combo = self._track_combo
+        chosen = self._result.chosen
+        entries = list(getattr(chosen, "tracklist", ()) or ())
+        combo.blockSignals(True)
+        combo.clear()
+        for entry in entries:
+            combo.addItem(entry.label_line() or self.tr("Unknown track"), entry)
+        picked = getattr(chosen, "track", None)
+        if picked is not None:
+            for index in range(combo.count()):
+                if combo.itemData(index) is picked:
+                    combo.setCurrentIndex(index)
+                    break
+        combo.blockSignals(False)
+        # One row is not a choice, and a dropdown that cannot be changed reads
+        # as a control that is broken.
+        self._track_row.setVisible(len(entries) > 1)
+
+    def _on_track_changed(self, index: int) -> None:
+        """Re-read the proposal off another row. No request, no re-rank.
+
+        Only the diff is rebuilt, not the whole result: the release is still
+        the release, so its artwork, its candidates and the weak-match warning
+        that `pick_track`'s score drove all stand. What must be redone is the
+        diff itself — every tick is per-field, and the values on both sides of
+        three of those rows have just moved.
+        """
+        if self._loading or index < 0 or self._proposed is None:
+            return
+        entry = self._track_combo.itemData(index)
+        if entry is None:
+            return
+        release_artist = getattr(self._result.chosen, "artist", "")
+        self._proposed = self._proposed.with_track(entry, release_artist)
+        self._fill_rows()
+
     def _fill_rows(self) -> None:
         while self._grid.count():
             item = self._grid.takeAt(0)
@@ -338,7 +428,7 @@ class LookupReviewDialog(QDialog):
         self._grid.addWidget(header_current, 0, 1)
         self._grid.addWidget(header_proposed, 0, 3)
 
-        proposed = self._result.proposed.as_fields() if self._result.proposed else {}
+        proposed = self._proposed.as_fields() if self._proposed else {}
         row = 1
         for key, label in _FIELD_ORDER:
             if key not in proposed:
@@ -445,7 +535,7 @@ class LookupReviewDialog(QDialog):
         dict means the user approved nothing, which the caller treats as a
         cancel — there is no such thing as writing zero fields.
         """
-        proposed = self._result.proposed.as_fields() if self._result.proposed else {}
+        proposed = self._proposed.as_fields() if self._proposed else {}
         values: dict[str, object] = {
             key: proposed[key]
             for key, check in self._checks.items()
