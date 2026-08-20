@@ -1347,69 +1347,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="522"/>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="525"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Export All Playlists</source>
         <translation>모든 재생목록 내보내기</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="546"/>
         <source>Export failed</source>
         <translation>내보내기 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="544"/>
+        <location filename="../main_window.py" line="547"/>
         <source>Could not write the file:
 {0}</source>
         <translation>파일을 쓸 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="552"/>
+        <location filename="../main_window.py" line="555"/>
         <source>There are no playlists to export yet.</source>
         <translation>아직 내보낼 재생목록이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="557"/>
+        <location filename="../main_window.py" line="560"/>
         <source>Export complete</source>
         <translation>내보내기 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="558"/>
+        <location filename="../main_window.py" line="561"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>재생목록 {0}개({1}곡)를 다음 위치로 내보냈습니다:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="649"/>
+        <location filename="../main_window.py" line="652"/>
         <source>Select Audio Files</source>
         <translation>오디오 파일 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="660"/>
+        <location filename="../main_window.py" line="663"/>
         <source>Select Folder</source>
         <translation>폴더 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="890"/>
+        <location filename="../main_window.py" line="893"/>
         <source>No Audio Files</source>
         <translation>오디오 파일 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="891"/>
+        <location filename="../main_window.py" line="894"/>
         <source>No audio files found in:
 {0}</source>
         <translation>다음 위치에서 오디오 파일을 찾을 수 없어요:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="896"/>
+        <location filename="../main_window.py" line="899"/>
         <source>Invalid Folder</source>
         <translation>잘못된 폴더</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="897"/>
+        <location filename="../main_window.py" line="900"/>
         <source>Not a valid directory:
 {0}</source>
         <translatorcomment>directory → 디렉터리 (Apple Korean spelling). Flag for native review.</translatorcomment>
@@ -1425,17 +1425,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이미 분석이 실행 중이에요. 잠시 기다리거나 먼저 취소하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1039"/>
+        <location filename="../main_window.py" line="1042"/>
         <source>Analyzing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1071"/>
+        <location filename="../main_window.py" line="1074"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>완료: {0}개 분석, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1075"/>
+        <location filename="../main_window.py" line="1078"/>
         <source>Complete: {0} files analyzed</source>
         <translation>완료: 파일 {0}개 분석</translation>
     </message>
@@ -1444,52 +1444,52 @@ or click “Add Artwork…”</source>
         <translation type="vanished">취소됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1257"/>
+        <location filename="../main_window.py" line="1260"/>
         <source>Conversion in Progress</source>
         <translation>변환 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1258"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>이미 변환이 실행 중이에요. 잠시 기다리세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1311"/>
+        <location filename="../main_window.py" line="1314"/>
         <source>Converting...</source>
         <translation>변환 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1327"/>
+        <location filename="../main_window.py" line="1330"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>완료: {0}개 변환, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1331"/>
+        <location filename="../main_window.py" line="1334"/>
         <source>Complete: {0} files converted</source>
         <translation>완료: 파일 {0}개 변환</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1569"/>
+        <location filename="../main_window.py" line="1572"/>
         <source>Rename in Progress</source>
         <translation>이름 변경 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1570"/>
+        <location filename="../main_window.py" line="1573"/>
         <source>A rename operation is already running.</source>
         <translation>이미 이름 변경 작업이 실행 중이에요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1628"/>
+        <location filename="../main_window.py" line="1631"/>
         <source>Rename Failed</source>
         <translation>이름 변경 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1662"/>
+        <location filename="../main_window.py" line="1665"/>
         <source>Undo Rename</source>
         <translation>이름 변경 취소</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1693"/>
+        <location filename="../main_window.py" line="1696"/>
         <source>Undo Failed</source>
         <translation>실행 취소 실패</translation>
     </message>
@@ -1502,22 +1502,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No Session</source>
         <translation>세션 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No rename session to undo.</source>
         <translation>실행 취소할 이름 변경 세션이 없어요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1643"/>
+        <location filename="../main_window.py" line="1646"/>
         <source>Confirm Undo</source>
         <translation>실행 취소 확인</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1644"/>
+        <location filename="../main_window.py" line="1647"/>
         <source>Undo renaming of {0} files?</source>
         <translatorcomment>Object particle avoided via 의 + 을 on 이름 변경. Counter 개. Flag for native review.</translatorcomment>
         <translation>파일 {0}개의 이름 변경을 실행 취소할까요?</translation>
@@ -1527,7 +1527,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이름 변경 실행 취소 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1663"/>
+        <location filename="../main_window.py" line="1666"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>실행 취소: 파일 {0}개, 오류 {1}개</translation>
     </message>
@@ -1539,170 +1539,230 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="65"/>
+        <location filename="../widgets/metadata_panel.py" line="69"/>
         <source>Title</source>
         <translation>제목</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="66"/>
+        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="497"/>
         <source>Artist</source>
         <translation>아티스트</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="67"/>
+        <location filename="../widgets/metadata_panel.py" line="71"/>
         <source>Album</source>
         <translation>앨범</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="68"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="498"/>
         <source>Label</source>
         <translation>레이블</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="69"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Genre</source>
         <translation>장르</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="71"/>
+        <location filename="../widgets/metadata_panel.py" line="75"/>
         <source>Key</source>
         <translatorcomment>Metadata tag for the musical key → 조성. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="76"/>
+        <location filename="../widgets/metadata_panel.py" line="501"/>
         <source>Year</source>
         <translation>연도</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="73"/>
+        <location filename="../widgets/metadata_panel.py" line="77"/>
         <source>Track #</source>
         <translatorcomment>Track → 트랙 (music-production context). &quot;Track #&quot; → 트랙 번호.</translatorcomment>
         <translation>트랙 번호</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="74"/>
+        <location filename="../widgets/metadata_panel.py" line="78"/>
         <source>Comment</source>
         <translatorcomment>ID3 comment tag → 코멘트 (loanword DJs recognize); used consistently with the Settings &quot;Comment tag&quot; strings. Flag for native review (vs 설명).</translatorcomment>
         <translation>코멘트</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="148"/>
+        <location filename="../widgets/metadata_panel.py" line="160"/>
         <source>Metadata Editor</source>
         <translation>메타데이터 편집기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="151"/>
+        <location filename="../widgets/metadata_panel.py" line="163"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>오디오 파일 하나를 끌어다 놓으면 메타데이터 태그를 보고 편집할 수 있어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="196"/>
-        <location filename="../widgets/metadata_panel.py" line="611"/>
+        <location filename="../widgets/metadata_panel.py" line="208"/>
+        <location filename="../widgets/metadata_panel.py" line="797"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="199"/>
+        <location filename="../widgets/metadata_panel.py" line="211"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>Finder / 파일 탐색기에서 이 파일을 표시합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="258"/>
-        <location filename="../widgets/metadata_panel.py" line="443"/>
+        <location filename="../widgets/metadata_panel.py" line="277"/>
+        <source>Tags</source>
+        <translation>태그</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="629"/>
         <source>Add field...</source>
         <translation>필드 추가...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="263"/>
+        <location filename="../widgets/metadata_panel.py" line="303"/>
         <source>Add Artwork…</source>
         <translation>아트워크 추가…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="268"/>
+        <location filename="../widgets/metadata_panel.py" line="308"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="338"/>
         <source>Look Up Online…</source>
         <translation>온라인에서 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="300"/>
+        <location filename="../widgets/metadata_panel.py" line="340"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>이 트랙의 정보를 Discogs에서 찾아 확인해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="329"/>
+        <location filename="../widgets/metadata_panel.py" line="369"/>
+        <location filename="../widgets/metadata_panel.py" line="448"/>
         <source>View release</source>
         <translation>릴리스 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="332"/>
+        <location filename="../widgets/metadata_panel.py" line="372"/>
+        <location filename="../widgets/metadata_panel.py" line="451"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>이 릴리스의 Discogs 페이지를 브라우저에서 엽니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="343"/>
+        <location filename="../widgets/metadata_panel.py" line="383"/>
         <source>Reload</source>
         <translation>다시 불러오기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="348"/>
+        <location filename="../widgets/metadata_panel.py" line="388"/>
         <source>Eject</source>
         <translatorcomment>Eject → 꺼내기 (Apple Korean). Flag for native review.</translatorcomment>
         <translation>꺼내기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="411"/>
+        <location filename="../widgets/metadata_panel.py" line="435"/>
+        <source>Refresh from Discogs</source>
+        <translation>Discogs에서 새로 고침</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="437"/>
+        <source>Read this release again and show what Discogs has on it.</source>
+        <translation>이 릴리스를 다시 읽어 Discogs의 정보를 보여줍니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="471"/>
+        <source>Unknown release</source>
+        <translation>알 수 없는 릴리스</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="474"/>
+        <source>Tagged from Discogs release {0}.</source>
+        <translation>Discogs 릴리스 {0}에서 태그를 가져왔습니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="478"/>
+        <source>No release known for this file yet. Look it up online.</source>
+        <translation>이 파일의 릴리스를 아직 모릅니다. 온라인에서 찾아보세요.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="482"/>
+        <source>Online lookup is switched off in Settings.</source>
+        <translation>온라인 조회가 설정에서 꺼져 있습니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="496"/>
+        <source>Release</source>
+        <translation>릴리스</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="499"/>
+        <source>Format</source>
+        <translation>포맷</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="500"/>
+        <source>Country</source>
+        <translation>국가</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="504"/>
+        <source>Styles</source>
+        <translation>스타일</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="595"/>
         <source>Error: {0}</source>
         <translation>오류: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="613"/>
+        <location filename="../widgets/metadata_panel.py" line="799"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>파일을 찾을 수 없습니다. 이동, 이름 변경 또는 삭제되었을 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="685"/>
+        <location filename="../widgets/metadata_panel.py" line="909"/>
         <source>No tags on this file — look it up on Discogs?</source>
         <translation>이 파일에는 태그가 없습니다 — Discogs에서 찾아볼까요?</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="715"/>
-        <location filename="../widgets/metadata_panel.py" line="770"/>
-        <location filename="../widgets/metadata_panel.py" line="831"/>
+        <location filename="../widgets/metadata_panel.py" line="939"/>
+        <location filename="../widgets/metadata_panel.py" line="997"/>
+        <location filename="../widgets/metadata_panel.py" line="1063"/>
         <source>Look Up Online</source>
         <translation>온라인에서 찾기</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="717"/>
+        <location filename="../widgets/metadata_panel.py" line="941"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>이 파일에는 검색에 쓸 아티스트나 제목이 없고, 파일 이름에서도 알 수 없어요. 제목을 입력한 뒤 다시 시도하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="742"/>
+        <location filename="../widgets/metadata_panel.py" line="967"/>
         <source>Looking up…</source>
         <translation>찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="751"/>
+        <location filename="../widgets/metadata_panel.py" line="976"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Discogs 요청 제한이 풀리기를 기다리는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="860"/>
+        <location filename="../widgets/metadata_panel.py" line="1107"/>
         <source>Applied from Discogs</source>
         <translation>Discogs에서 적용함</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="898"/>
+        <location filename="../widgets/metadata_panel.py" line="1148"/>
         <source>Select cover art</source>
         <translation>커버 아트 선택</translation>
     </message>

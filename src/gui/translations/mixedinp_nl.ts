@@ -1364,69 +1364,69 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="522"/>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="525"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Export All Playlists</source>
         <translation>Alle playlists exporteren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="546"/>
         <source>Export failed</source>
         <translation>Exporteren mislukt</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="544"/>
+        <location filename="../main_window.py" line="547"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Kan het bestand niet schrijven:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="552"/>
+        <location filename="../main_window.py" line="555"/>
         <source>There are no playlists to export yet.</source>
         <translation>Er zijn nog geen playlists om te exporteren.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="557"/>
+        <location filename="../main_window.py" line="560"/>
         <source>Export complete</source>
         <translation>Exporteren voltooid</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="558"/>
+        <location filename="../main_window.py" line="561"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} playlists ({1} tracks) geëxporteerd naar:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="649"/>
+        <location filename="../main_window.py" line="652"/>
         <source>Select Audio Files</source>
         <translation>Audiobestanden selecteren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="660"/>
+        <location filename="../main_window.py" line="663"/>
         <source>Select Folder</source>
         <translation>Map selecteren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="890"/>
+        <location filename="../main_window.py" line="893"/>
         <source>No Audio Files</source>
         <translation>Geen audiobestanden</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="891"/>
+        <location filename="../main_window.py" line="894"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Geen audiobestanden gevonden in:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="896"/>
+        <location filename="../main_window.py" line="899"/>
         <source>Invalid Folder</source>
         <translation>Ongeldige map</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="897"/>
+        <location filename="../main_window.py" line="900"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Geen geldige map:
@@ -1441,17 +1441,17 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Er loopt al een analyse. Wacht even of annuleer deze eerst.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1039"/>
+        <location filename="../main_window.py" line="1042"/>
         <source>Analyzing...</source>
         <translation>Analyseren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1071"/>
+        <location filename="../main_window.py" line="1074"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Voltooid: {0} geanalyseerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1075"/>
+        <location filename="../main_window.py" line="1078"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Voltooid: {0} bestanden geanalyseerd</translation>
     </message>
@@ -1460,52 +1460,52 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Geannuleerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1257"/>
+        <location filename="../main_window.py" line="1260"/>
         <source>Conversion in Progress</source>
         <translation>Conversie bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1258"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Er loopt al een conversie. Wacht even.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1311"/>
+        <location filename="../main_window.py" line="1314"/>
         <source>Converting...</source>
         <translation>Converteren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1327"/>
+        <location filename="../main_window.py" line="1330"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Voltooid: {0} geconverteerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1331"/>
+        <location filename="../main_window.py" line="1334"/>
         <source>Complete: {0} files converted</source>
         <translation>Voltooid: {0} bestanden geconverteerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1569"/>
+        <location filename="../main_window.py" line="1572"/>
         <source>Rename in Progress</source>
         <translation>Hernoemen bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1570"/>
+        <location filename="../main_window.py" line="1573"/>
         <source>A rename operation is already running.</source>
         <translation>Er loopt al een hernoembewerking.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1628"/>
+        <location filename="../main_window.py" line="1631"/>
         <source>Rename Failed</source>
         <translation>Hernoemen mislukt</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1662"/>
+        <location filename="../main_window.py" line="1665"/>
         <source>Undo Rename</source>
         <translation>Hernoemen ongedaan maken</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1693"/>
+        <location filename="../main_window.py" line="1696"/>
         <source>Undo Failed</source>
         <translation>Ongedaan maken mislukt</translation>
     </message>
@@ -1518,22 +1518,22 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">{0} bestanden hernoemd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No Session</source>
         <translation>Geen sessie</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No rename session to undo.</source>
         <translation>Geen hernoemsessie om te herstellen.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1643"/>
+        <location filename="../main_window.py" line="1646"/>
         <source>Confirm Undo</source>
         <translation>Herstel bevestigen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1644"/>
+        <location filename="../main_window.py" line="1647"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Hernoemen van {0} bestanden herstellen?</translation>
     </message>
@@ -1542,7 +1542,7 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Hernoemen herstellen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1663"/>
+        <location filename="../main_window.py" line="1666"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Hersteld: {0} bestanden, {1} fouten</translation>
     </message>
@@ -1554,168 +1554,228 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="65"/>
+        <location filename="../widgets/metadata_panel.py" line="69"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="66"/>
+        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="497"/>
         <source>Artist</source>
         <translation>Artiest</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="67"/>
+        <location filename="../widgets/metadata_panel.py" line="71"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="68"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="498"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="69"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="71"/>
+        <location filename="../widgets/metadata_panel.py" line="75"/>
         <source>Key</source>
         <translatorcomment>Translated as &apos;Toonsoort&apos; (musical key), per glossary — not &apos;sleutel&apos;/&apos;toets&apos;.</translatorcomment>
         <translation>Toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="76"/>
+        <location filename="../widgets/metadata_panel.py" line="501"/>
         <source>Year</source>
         <translation>Jaar</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="73"/>
+        <location filename="../widgets/metadata_panel.py" line="77"/>
         <source>Track #</source>
         <translation>Track #</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="74"/>
+        <location filename="../widgets/metadata_panel.py" line="78"/>
         <source>Comment</source>
         <translation>Opmerking</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="148"/>
+        <location filename="../widgets/metadata_panel.py" line="160"/>
         <source>Metadata Editor</source>
         <translatorcomment>&apos;Editor&apos;-&gt;&apos;editor&apos; kept English in compound &apos;Metadata-editor&apos;; standard NL software usage.</translatorcomment>
         <translation>Metadata-editor</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="151"/>
+        <location filename="../widgets/metadata_panel.py" line="163"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>Sleep één audiobestand om de metadatatags te bekijken en te bewerken.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="196"/>
-        <location filename="../widgets/metadata_panel.py" line="611"/>
+        <location filename="../widgets/metadata_panel.py" line="208"/>
+        <location filename="../widgets/metadata_panel.py" line="797"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="199"/>
+        <location filename="../widgets/metadata_panel.py" line="211"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>Dit bestand tonen in Finder / Verkenner.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="258"/>
-        <location filename="../widgets/metadata_panel.py" line="443"/>
+        <location filename="../widgets/metadata_panel.py" line="277"/>
+        <source>Tags</source>
+        <translation>Tags</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="629"/>
         <source>Add field...</source>
         <translation>Veld toevoegen...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="263"/>
+        <location filename="../widgets/metadata_panel.py" line="303"/>
         <source>Add Artwork…</source>
         <translation>Artwork toevoegen…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="268"/>
+        <location filename="../widgets/metadata_panel.py" line="308"/>
         <source>Remove</source>
         <translation>Verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="338"/>
         <source>Look Up Online…</source>
         <translation>Online opzoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="300"/>
+        <location filename="../widgets/metadata_panel.py" line="340"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>Zoek de gegevens van dit nummer op Discogs en controleer ze.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="329"/>
+        <location filename="../widgets/metadata_panel.py" line="369"/>
+        <location filename="../widgets/metadata_panel.py" line="448"/>
         <source>View release</source>
         <translation>Uitgave bekijken</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="332"/>
+        <location filename="../widgets/metadata_panel.py" line="372"/>
+        <location filename="../widgets/metadata_panel.py" line="451"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>Opent de pagina van deze uitgave op Discogs in je browser.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="343"/>
+        <location filename="../widgets/metadata_panel.py" line="383"/>
         <source>Reload</source>
         <translation>Herladen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="348"/>
+        <location filename="../widgets/metadata_panel.py" line="388"/>
         <source>Eject</source>
         <translation>Uitwerpen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="411"/>
+        <location filename="../widgets/metadata_panel.py" line="435"/>
+        <source>Refresh from Discogs</source>
+        <translation>Vernieuwen via Discogs</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="437"/>
+        <source>Read this release again and show what Discogs has on it.</source>
+        <translation>Leest deze uitgave opnieuw en toont wat Discogs erover heeft.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="471"/>
+        <source>Unknown release</source>
+        <translation>Onbekende uitgave</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="474"/>
+        <source>Tagged from Discogs release {0}.</source>
+        <translation>Getagd vanaf Discogs-uitgave {0}.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="478"/>
+        <source>No release known for this file yet. Look it up online.</source>
+        <translation>Nog geen uitgave bekend voor dit bestand. Zoek het online op.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="482"/>
+        <source>Online lookup is switched off in Settings.</source>
+        <translation>Online opzoeken staat uit in Instellingen.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="496"/>
+        <source>Release</source>
+        <translation>Uitgave</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="499"/>
+        <source>Format</source>
+        <translation>Formaat</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="500"/>
+        <source>Country</source>
+        <translation>Land</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="504"/>
+        <source>Styles</source>
+        <translation>Stijlen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="595"/>
         <source>Error: {0}</source>
         <translation>Fout: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="613"/>
+        <location filename="../widgets/metadata_panel.py" line="799"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Dit bestand kan niet worden gevonden — het is mogelijk verplaatst, hernoemd of verwijderd.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="685"/>
+        <location filename="../widgets/metadata_panel.py" line="909"/>
         <source>No tags on this file — look it up on Discogs?</source>
         <translation>Geen tags in dit bestand — opzoeken op Discogs?</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="715"/>
-        <location filename="../widgets/metadata_panel.py" line="770"/>
-        <location filename="../widgets/metadata_panel.py" line="831"/>
+        <location filename="../widgets/metadata_panel.py" line="939"/>
+        <location filename="../widgets/metadata_panel.py" line="997"/>
+        <location filename="../widgets/metadata_panel.py" line="1063"/>
         <source>Look Up Online</source>
         <translation>Online opzoeken</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="717"/>
+        <location filename="../widgets/metadata_panel.py" line="941"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>Dit bestand heeft geen artiest of titel om mee te zoeken, en de bestandsnaam geeft er ook geen. Vul het veld Titel in en probeer het opnieuw.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="742"/>
+        <location filename="../widgets/metadata_panel.py" line="967"/>
         <source>Looking up…</source>
         <translation>Bezig met opzoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="751"/>
+        <location filename="../widgets/metadata_panel.py" line="976"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Wachten op de aanvraaglimiet van Discogs…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="860"/>
+        <location filename="../widgets/metadata_panel.py" line="1107"/>
         <source>Applied from Discogs</source>
         <translation>Toegepast uit Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="898"/>
+        <location filename="../widgets/metadata_panel.py" line="1148"/>
         <source>Select cover art</source>
         <translation>Hoesafbeelding selecteren</translation>
     </message>

@@ -1360,69 +1360,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="522"/>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="525"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Export All Playlists</source>
         <translation>Экспортировать все плейлисты</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="546"/>
         <source>Export failed</source>
         <translation>Не удалось экспортировать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="544"/>
+        <location filename="../main_window.py" line="547"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Не удалось записать файл:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="552"/>
+        <location filename="../main_window.py" line="555"/>
         <source>There are no playlists to export yet.</source>
         <translation>Пока нет плейлистов для экспорта.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="557"/>
+        <location filename="../main_window.py" line="560"/>
         <source>Export complete</source>
         <translation>Экспорт завершён</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="558"/>
+        <location filename="../main_window.py" line="561"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Экспортировано плейлистов: {0} ({1} треков) в:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="649"/>
+        <location filename="../main_window.py" line="652"/>
         <source>Select Audio Files</source>
         <translation>Выберите аудиофайлы</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="660"/>
+        <location filename="../main_window.py" line="663"/>
         <source>Select Folder</source>
         <translation>Выберите папку</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="890"/>
+        <location filename="../main_window.py" line="893"/>
         <source>No Audio Files</source>
         <translation>Нет аудиофайлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="891"/>
+        <location filename="../main_window.py" line="894"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Аудиофайлы не найдены в:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="896"/>
+        <location filename="../main_window.py" line="899"/>
         <source>Invalid Folder</source>
         <translation>Недопустимая папка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="897"/>
+        <location filename="../main_window.py" line="900"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Недопустимый каталог:
@@ -1437,17 +1437,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Анализ уже выполняется. Подождите или сначала отмените его.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1039"/>
+        <location filename="../main_window.py" line="1042"/>
         <source>Analyzing...</source>
         <translation>Анализ...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1071"/>
+        <location filename="../main_window.py" line="1074"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Готово: {0} проанализировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1075"/>
+        <location filename="../main_window.py" line="1078"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Готово: {0} файлов проанализировано</translation>
     </message>
@@ -1456,52 +1456,52 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отменено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1257"/>
+        <location filename="../main_window.py" line="1260"/>
         <source>Conversion in Progress</source>
         <translation>Конвертация выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1258"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Конвертация уже выполняется. Подождите.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1311"/>
+        <location filename="../main_window.py" line="1314"/>
         <source>Converting...</source>
         <translation>Конвертация...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1327"/>
+        <location filename="../main_window.py" line="1330"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Готово: {0} конвертировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1331"/>
+        <location filename="../main_window.py" line="1334"/>
         <source>Complete: {0} files converted</source>
         <translation>Готово: {0} файлов конвертировано</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1569"/>
+        <location filename="../main_window.py" line="1572"/>
         <source>Rename in Progress</source>
         <translation>Переименование выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1570"/>
+        <location filename="../main_window.py" line="1573"/>
         <source>A rename operation is already running.</source>
         <translation>Операция переименования уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1628"/>
+        <location filename="../main_window.py" line="1631"/>
         <source>Rename Failed</source>
         <translation>Не удалось переименовать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1662"/>
+        <location filename="../main_window.py" line="1665"/>
         <source>Undo Rename</source>
         <translation>Отменить переименование</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1693"/>
+        <location filename="../main_window.py" line="1696"/>
         <source>Undo Failed</source>
         <translation>Не удалось отменить</translation>
     </message>
@@ -1514,22 +1514,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Переименовано {0} файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No Session</source>
         <translation>Нет сессии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No rename session to undo.</source>
         <translation>Нет сессии переименования для отмены.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1643"/>
+        <location filename="../main_window.py" line="1646"/>
         <source>Confirm Undo</source>
         <translation>Подтвердите отмену</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1644"/>
+        <location filename="../main_window.py" line="1647"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Отменить переименование {0} файлов?</translation>
     </message>
@@ -1538,7 +1538,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отмена переименования...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1663"/>
+        <location filename="../main_window.py" line="1666"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Отменено: {0} файлов, {1} ошибок</translation>
     </message>
@@ -1550,166 +1550,226 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="65"/>
+        <location filename="../widgets/metadata_panel.py" line="69"/>
         <source>Title</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="66"/>
+        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="497"/>
         <source>Artist</source>
         <translation>Исполнитель</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="67"/>
+        <location filename="../widgets/metadata_panel.py" line="71"/>
         <source>Album</source>
         <translation>Альбом</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="68"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="498"/>
         <source>Label</source>
         <translation>Лейбл</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="69"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Genre</source>
         <translation>Жанр</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="71"/>
+        <location filename="../widgets/metadata_panel.py" line="75"/>
         <source>Key</source>
         <translation>Тональность</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="76"/>
+        <location filename="../widgets/metadata_panel.py" line="501"/>
         <source>Year</source>
         <translation>Год</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="73"/>
+        <location filename="../widgets/metadata_panel.py" line="77"/>
         <source>Track #</source>
         <translation>Номер трека</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="74"/>
+        <location filename="../widgets/metadata_panel.py" line="78"/>
         <source>Comment</source>
         <translation>Комментарий</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="148"/>
+        <location filename="../widgets/metadata_panel.py" line="160"/>
         <source>Metadata Editor</source>
         <translation>Редактор метаданных</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="151"/>
+        <location filename="../widgets/metadata_panel.py" line="163"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>Перетащите один аудиофайл для просмотра и редактирования его тегов метаданных.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="196"/>
-        <location filename="../widgets/metadata_panel.py" line="611"/>
+        <location filename="../widgets/metadata_panel.py" line="208"/>
+        <location filename="../widgets/metadata_panel.py" line="797"/>
         <source>Open File Location</source>
         <translation>Открыть расположение файла</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="199"/>
+        <location filename="../widgets/metadata_panel.py" line="211"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>Показать этот файл в Finder / Проводнике.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="258"/>
-        <location filename="../widgets/metadata_panel.py" line="443"/>
+        <location filename="../widgets/metadata_panel.py" line="277"/>
+        <source>Tags</source>
+        <translation>Теги</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="629"/>
         <source>Add field...</source>
         <translation>Добавить поле...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="263"/>
+        <location filename="../widgets/metadata_panel.py" line="303"/>
         <source>Add Artwork…</source>
         <translation>Добавить обложку…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="268"/>
+        <location filename="../widgets/metadata_panel.py" line="308"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="338"/>
         <source>Look Up Online…</source>
         <translation>Найти в интернете…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="300"/>
+        <location filename="../widgets/metadata_panel.py" line="340"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>Найти сведения об этом треке на Discogs и проверить их.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="329"/>
+        <location filename="../widgets/metadata_panel.py" line="369"/>
+        <location filename="../widgets/metadata_panel.py" line="448"/>
         <source>View release</source>
         <translation>Открыть издание</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="332"/>
+        <location filename="../widgets/metadata_panel.py" line="372"/>
+        <location filename="../widgets/metadata_panel.py" line="451"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>Открыть страницу этого издания на Discogs в браузере.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="343"/>
+        <location filename="../widgets/metadata_panel.py" line="383"/>
         <source>Reload</source>
         <translation>Обновить</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="348"/>
+        <location filename="../widgets/metadata_panel.py" line="388"/>
         <source>Eject</source>
         <translation>Извлечь</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="411"/>
+        <location filename="../widgets/metadata_panel.py" line="435"/>
+        <source>Refresh from Discogs</source>
+        <translation>Обновить с Discogs</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="437"/>
+        <source>Read this release again and show what Discogs has on it.</source>
+        <translation>Перечитать это издание и показать, что о нём знает Discogs.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="471"/>
+        <source>Unknown release</source>
+        <translation>Неизвестное издание</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="474"/>
+        <source>Tagged from Discogs release {0}.</source>
+        <translation>Теги взяты из издания Discogs {0}.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="478"/>
+        <source>No release known for this file yet. Look it up online.</source>
+        <translation>Для этого файла издание пока неизвестно. Найдите его онлайн.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="482"/>
+        <source>Online lookup is switched off in Settings.</source>
+        <translation>Поиск в интернете отключён в настройках.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="496"/>
+        <source>Release</source>
+        <translation>Издание</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="499"/>
+        <source>Format</source>
+        <translation>Формат</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="500"/>
+        <source>Country</source>
+        <translation>Страна</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="504"/>
+        <source>Styles</source>
+        <translation>Стили</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="595"/>
         <source>Error: {0}</source>
         <translation>Ошибка: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="613"/>
+        <location filename="../widgets/metadata_panel.py" line="799"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Не удалось найти файл — возможно, он был перемещён, переименован или удалён.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="685"/>
+        <location filename="../widgets/metadata_panel.py" line="909"/>
         <source>No tags on this file — look it up on Discogs?</source>
         <translation>В этом файле нет тегов — найти его на Discogs?</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="715"/>
-        <location filename="../widgets/metadata_panel.py" line="770"/>
-        <location filename="../widgets/metadata_panel.py" line="831"/>
+        <location filename="../widgets/metadata_panel.py" line="939"/>
+        <location filename="../widgets/metadata_panel.py" line="997"/>
+        <location filename="../widgets/metadata_panel.py" line="1063"/>
         <source>Look Up Online</source>
         <translation>Найти в интернете</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="717"/>
+        <location filename="../widgets/metadata_panel.py" line="941"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>В этом файле нет ни исполнителя, ни названия для поиска, и имя файла их не даёт. Заполните поле «Название» и повторите попытку.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="742"/>
+        <location filename="../widgets/metadata_panel.py" line="967"/>
         <source>Looking up…</source>
         <translation>Поиск…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="751"/>
+        <location filename="../widgets/metadata_panel.py" line="976"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Ожидание лимита запросов Discogs…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="860"/>
+        <location filename="../widgets/metadata_panel.py" line="1107"/>
         <source>Applied from Discogs</source>
         <translation>Применено из Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="898"/>
+        <location filename="../widgets/metadata_panel.py" line="1148"/>
         <source>Select cover art</source>
         <translation>Выберите обложку</translation>
     </message>

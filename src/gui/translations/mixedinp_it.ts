@@ -1372,69 +1372,69 @@ o tocca “Aggiungi copertina…”</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="522"/>
-        <location filename="../main_window.py" line="551"/>
+        <location filename="../main_window.py" line="525"/>
+        <location filename="../main_window.py" line="554"/>
         <source>Export All Playlists</source>
         <translation>Esporta tutte le playlist</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
+        <location filename="../main_window.py" line="546"/>
         <source>Export failed</source>
         <translation>Esportazione non riuscita</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="544"/>
+        <location filename="../main_window.py" line="547"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Impossibile scrivere il file:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="552"/>
+        <location filename="../main_window.py" line="555"/>
         <source>There are no playlists to export yet.</source>
         <translation>Non c’è ancora nessuna playlist da esportare.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="557"/>
+        <location filename="../main_window.py" line="560"/>
         <source>Export complete</source>
         <translation>Esportazione completata</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="558"/>
+        <location filename="../main_window.py" line="561"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Esportate {0} playlist ({1} tracce) in:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="649"/>
+        <location filename="../main_window.py" line="652"/>
         <source>Select Audio Files</source>
         <translation>Seleziona file audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="660"/>
+        <location filename="../main_window.py" line="663"/>
         <source>Select Folder</source>
         <translation>Seleziona cartella</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="890"/>
+        <location filename="../main_window.py" line="893"/>
         <source>No Audio Files</source>
         <translation>Nessun file audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="891"/>
+        <location filename="../main_window.py" line="894"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Nessun file audio trovato in:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="896"/>
+        <location filename="../main_window.py" line="899"/>
         <source>Invalid Folder</source>
         <translation>Cartella non valida</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="897"/>
+        <location filename="../main_window.py" line="900"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Directory non valida:
@@ -1450,17 +1450,17 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Un&apos;analisi è già in corso. Attendi o annullala prima.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1039"/>
+        <location filename="../main_window.py" line="1042"/>
         <source>Analyzing...</source>
         <translation>Analisi in corso...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1071"/>
+        <location filename="../main_window.py" line="1074"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Completato: {0} analizzati, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1075"/>
+        <location filename="../main_window.py" line="1078"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Completato: {0} file analizzati</translation>
     </message>
@@ -1469,53 +1469,53 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Annullato</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1257"/>
+        <location filename="../main_window.py" line="1260"/>
         <source>Conversion in Progress</source>
         <translation>Conversione in corso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1258"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Una conversione è già in corso. Attendi.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1311"/>
+        <location filename="../main_window.py" line="1314"/>
         <source>Converting...</source>
         <translation>Conversione in corso...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1327"/>
+        <location filename="../main_window.py" line="1330"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Completato: {0} convertiti, {1} errori</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1331"/>
+        <location filename="../main_window.py" line="1334"/>
         <source>Complete: {0} files converted</source>
         <translation>Completato: {0} file convertiti</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1569"/>
+        <location filename="../main_window.py" line="1572"/>
         <source>Rename in Progress</source>
         <translation>Rinomina in corso</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1570"/>
+        <location filename="../main_window.py" line="1573"/>
         <source>A rename operation is already running.</source>
         <translatorcomment>Elision applied: &apos;Un&apos;operazione&apos;.</translatorcomment>
         <translation>Un&apos;operazione di rinomina è già in corso.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1628"/>
+        <location filename="../main_window.py" line="1631"/>
         <source>Rename Failed</source>
         <translation>Rinomina non riuscita</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1662"/>
+        <location filename="../main_window.py" line="1665"/>
         <source>Undo Rename</source>
         <translation>Annulla rinomina</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1693"/>
+        <location filename="../main_window.py" line="1696"/>
         <source>Undo Failed</source>
         <translation>Annullamento non riuscito</translation>
     </message>
@@ -1529,22 +1529,22 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Rinominati {0} file</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No Session</source>
         <translation>Nessuna sessione</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No rename session to undo.</source>
         <translation>Nessuna sessione di rinomina da annullare.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1643"/>
+        <location filename="../main_window.py" line="1646"/>
         <source>Confirm Undo</source>
         <translation>Conferma annullamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1644"/>
+        <location filename="../main_window.py" line="1647"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Annullare la rinomina di {0} file?</translation>
     </message>
@@ -1553,7 +1553,7 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Annullamento della rinomina...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1663"/>
+        <location filename="../main_window.py" line="1666"/>
         <source>Undone: {0} files, {1} errors</source>
         <translatorcomment>Reviewed (it pass): &apos;Annullati&apos; agrees with &apos;file&apos; (m.pl) - confirmed.</translatorcomment>
         <translation>Annullati: {0} file, {1} errori</translation>
@@ -1567,170 +1567,230 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="65"/>
+        <location filename="../widgets/metadata_panel.py" line="69"/>
         <source>Title</source>
         <translation>Titolo</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="66"/>
+        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="497"/>
         <source>Artist</source>
         <translation>Artista</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="67"/>
+        <location filename="../widgets/metadata_panel.py" line="71"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="68"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="498"/>
         <source>Label</source>
         <translation>Etichetta</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="69"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Genre</source>
         <translation>Genere</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="70"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="71"/>
+        <location filename="../widgets/metadata_panel.py" line="75"/>
         <source>Key</source>
         <translatorcomment>Translated as &apos;Tonalità&apos; (musical key), never &apos;chiave&apos;.</translatorcomment>
         <translation>Tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="72"/>
+        <location filename="../widgets/metadata_panel.py" line="76"/>
+        <location filename="../widgets/metadata_panel.py" line="501"/>
         <source>Year</source>
         <translation>Anno</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="73"/>
+        <location filename="../widgets/metadata_panel.py" line="77"/>
         <source>Track #</source>
         <translatorcomment>Abbreviated as &apos;Traccia n.&apos; (Apple uses &apos;n.&apos; for number).</translatorcomment>
         <translation>Traccia n.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="74"/>
+        <location filename="../widgets/metadata_panel.py" line="78"/>
         <source>Comment</source>
         <translation>Commento</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="148"/>
+        <location filename="../widgets/metadata_panel.py" line="160"/>
         <source>Metadata Editor</source>
         <translation>Editor metadati</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="151"/>
+        <location filename="../widgets/metadata_panel.py" line="163"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>Trascina un singolo file audio per visualizzare e modificare i suoi tag.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="196"/>
-        <location filename="../widgets/metadata_panel.py" line="611"/>
+        <location filename="../widgets/metadata_panel.py" line="208"/>
+        <location filename="../widgets/metadata_panel.py" line="797"/>
         <source>Open File Location</source>
         <translation>Apri posizione del file</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="199"/>
+        <location filename="../widgets/metadata_panel.py" line="211"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>Mostra questo file nel Finder / Esplora file.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="258"/>
-        <location filename="../widgets/metadata_panel.py" line="443"/>
+        <location filename="../widgets/metadata_panel.py" line="277"/>
+        <source>Tags</source>
+        <translation>Tag</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="629"/>
         <source>Add field...</source>
         <translatorcomment>Field of metadata -&gt; &apos;campo&apos; (masculine).</translatorcomment>
         <translation>Aggiungi campo...</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="263"/>
+        <location filename="../widgets/metadata_panel.py" line="303"/>
         <source>Add Artwork…</source>
         <translation>Aggiungi copertina…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="268"/>
+        <location filename="../widgets/metadata_panel.py" line="308"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="298"/>
+        <location filename="../widgets/metadata_panel.py" line="338"/>
         <source>Look Up Online…</source>
         <translation>Cerca online…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="300"/>
+        <location filename="../widgets/metadata_panel.py" line="340"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>Cerca su Discogs i dati di questa traccia e rivedili.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="329"/>
+        <location filename="../widgets/metadata_panel.py" line="369"/>
+        <location filename="../widgets/metadata_panel.py" line="448"/>
         <source>View release</source>
         <translation>Vedi pubblicazione</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="332"/>
+        <location filename="../widgets/metadata_panel.py" line="372"/>
+        <location filename="../widgets/metadata_panel.py" line="451"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>Apre la pagina di questa pubblicazione su Discogs nel browser.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="343"/>
+        <location filename="../widgets/metadata_panel.py" line="383"/>
         <source>Reload</source>
         <translation>Ricarica</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="348"/>
+        <location filename="../widgets/metadata_panel.py" line="388"/>
         <source>Eject</source>
         <translatorcomment>Player eject control -&gt; &apos;Espelli&apos; (Apple imperative).</translatorcomment>
         <translation>Espelli</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="411"/>
+        <location filename="../widgets/metadata_panel.py" line="435"/>
+        <source>Refresh from Discogs</source>
+        <translation>Aggiorna da Discogs</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="437"/>
+        <source>Read this release again and show what Discogs has on it.</source>
+        <translation>Rilegge questa pubblicazione e mostra cosa ne sa Discogs.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="471"/>
+        <source>Unknown release</source>
+        <translation>Pubblicazione sconosciuta</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="474"/>
+        <source>Tagged from Discogs release {0}.</source>
+        <translation>Taggato dalla pubblicazione Discogs {0}.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="478"/>
+        <source>No release known for this file yet. Look it up online.</source>
+        <translation>Nessuna pubblicazione nota per questo file. Cercalo online.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="482"/>
+        <source>Online lookup is switched off in Settings.</source>
+        <translation>La ricerca online è disattivata nelle Impostazioni.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="496"/>
+        <source>Release</source>
+        <translation>Pubblicazione</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="499"/>
+        <source>Format</source>
+        <translation>Formato</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="500"/>
+        <source>Country</source>
+        <translation>Paese</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="504"/>
+        <source>Styles</source>
+        <translation>Stili</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="595"/>
         <source>Error: {0}</source>
         <translation>Errore: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="613"/>
+        <location filename="../widgets/metadata_panel.py" line="799"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Impossibile trovare questo file: potrebbe essere stato spostato, rinominato o eliminato.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="685"/>
+        <location filename="../widgets/metadata_panel.py" line="909"/>
         <source>No tags on this file — look it up on Discogs?</source>
         <translation>Nessun tag in questo file: lo cerchiamo su Discogs?</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="715"/>
-        <location filename="../widgets/metadata_panel.py" line="770"/>
-        <location filename="../widgets/metadata_panel.py" line="831"/>
+        <location filename="../widgets/metadata_panel.py" line="939"/>
+        <location filename="../widgets/metadata_panel.py" line="997"/>
+        <location filename="../widgets/metadata_panel.py" line="1063"/>
         <source>Look Up Online</source>
         <translation>Cerca online</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="717"/>
+        <location filename="../widgets/metadata_panel.py" line="941"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>Questo file non ha artista né titolo con cui cercare, e nemmeno il nome del file li fornisce. Compila il campo Titolo e riprova.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="742"/>
+        <location filename="../widgets/metadata_panel.py" line="967"/>
         <source>Looking up…</source>
         <translation>Ricerca…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="751"/>
+        <location filename="../widgets/metadata_panel.py" line="976"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>In attesa del limite di richieste di Discogs…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="860"/>
+        <location filename="../widgets/metadata_panel.py" line="1107"/>
         <source>Applied from Discogs</source>
         <translation>Applicato da Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="898"/>
+        <location filename="../widgets/metadata_panel.py" line="1148"/>
         <source>Select cover art</source>
         <translation>Seleziona copertina</translation>
     </message>
