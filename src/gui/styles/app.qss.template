@@ -736,10 +736,19 @@ QMenu::separator {
 }
 
 /* ===== Tab Widget ===== */
+/* Transparent and borderless, so the pane does not paint a card over the
+   panel's own background the way a bare QWidget container would — the same
+   rule the sidebar's stack and the playlist tree panel follow.
+
+   It has to be said HERE rather than on the widget: a `#objectName::pane`
+   rule in a widget's own stylesheet does NOT beat this one despite being the
+   more specific selector, measured by sampling the rendered pixel (it stayed
+   BG_MEDIUM under every spelling tried). What made it look fixed in a quick
+   test was the tab *page* painting BG_DARK over the pane — so with the page
+   correctly transparent, the pane shows through again. */
 QTabWidget::pane {
-    border: 1px solid @BG_LIGHT@;
-    border-radius: 4px;
-    background-color: @BG_MEDIUM@;
+    border: none;
+    background-color: transparent;
 }
 
 QTabBar::tab {

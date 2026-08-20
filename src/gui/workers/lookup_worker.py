@@ -46,6 +46,12 @@ class LookupJob:
     query: TrackQuery
     candidate: Candidate | None = None
     want_artwork: bool = False
+    # A release this file was tagged from before. The search still runs and
+    # the switcher still offers everything it found — this only decides which
+    # row starts selected, so a second lookup of a file the user has already
+    # judged opens on their answer instead of re-arguing the ranking. Ignored
+    # when the search does not return it.
+    prefer_release_id: int | None = None
 
 
 @dataclass
@@ -129,7 +135,7 @@ class LookupThread(QThread):
             if not candidates:
                 result.error = ERROR_NOT_FOUND
                 return result
-            chosen = candidates[0]
+            chosen = _preferred(candidates, job.prefer_release_id)
             result.chosen = chosen
             result.proposed = self._provider.fetch(chosen, job.query)
             if job.want_artwork and result.proposed.artwork_url:
@@ -156,3 +162,17 @@ class LookupThread(QThread):
         except Exception:
             logger.debug("Artwork unavailable: %s", url)
             return b""
+
+
+def _preferred(candidates: list[Candidate], release_id: int | None) -> Candidate:
+    """The remembered release if the search found it, else the best-ranked one.
+
+    Deliberately a *preference* and not a shortcut: skipping the search would
+    leave the candidate switcher with one row and take away the escape hatch
+    that made a wrong match recoverable in the first place.
+    """
+    if release_id:
+        for candidate in candidates:
+            if candidate.release_id == release_id:
+                return candidate
+    return candidates[0]

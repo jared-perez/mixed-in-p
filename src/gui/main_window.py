@@ -185,6 +185,9 @@ class MainWindow(QMainWindow):
         self._library = library.Library()
         self._playlists_panel.set_library(self._library)
         self._player_panel.set_library(self._library)
+        # Read/update only — the Metadata panel never adds a row. It uses the
+        # library to remember which Discogs release a file was tagged from.
+        self._metadata_panel.set_library(self._library)
         # Playlist edits auto-save, so Cmd/Ctrl+Z is the only way back (§11).
         # One stack for both views: a delete in the tree and a Clear in the
         # Player are the same kind of mistake and undo in the same order.

@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QScrollArea,
     QSizePolicy,
+    QTabWidget,
     QSpacerItem,
     QVBoxLayout,
     QWidget,
@@ -37,12 +38,15 @@ from src.metadata.tags import (
     write_comment,
     delete_metadata_fields,
 )
-from src.online.discogs import DiscogsProvider
+from src.online import discogs
+from src.online.discogs import RELEASE_PAGE, DiscogsProvider
+from src.utils.paths import normalize_track_path
 from src.utils.reveal import reveal_in_file_manager
 from .. import lookup_flow
 from ..lookup_flow import ARTWORK_FIELD
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from ..workers import thread_keeper
+from src.online.result import Candidate
 from ..workers.lookup_worker import LookupJob, LookupThread
 from .dialogs.lookup_review import LookupReviewDialog
 from .elided_label import ElidedLabel, HuggingElidedLabel, LinkLabel
@@ -125,6 +129,14 @@ class MetadataPanel(QWidget):
         # release the user rejected.
         self._last_result = None
         self._release_url = ""
+        # Set by MainWindow, like the Player's and the playlist tree's. The
+        # panel works without one — every use is guarded — because a file
+        # dropped here need not be in the library at all.
+        self._library = None
+        self._release_id: int | None = None
+        # Set for the length of one Refresh: the same thread path serves the
+        # tab and the review dialog, and this is which of them asked.
+        self._tab_refresh = False
         self._threads: list = []
         self.setAcceptDrops(True)
         self._setup_ui()
@@ -239,8 +251,52 @@ class MetadataPanel(QWidget):
         self._form_layout.setContentsMargins(_FORM_LEFT_MARGIN, 10, 0, 0)
         scroll.setWidget(self._form_container)
         self._scroll_area = scroll
-        self._scroll_area.setVisible(False)
-        body.addWidget(self._scroll_area, 3)
+
+        # Two jobs, two pages. Editing this file's tags is one thing; reading
+        # what Discogs knows about the release is another, and bolting ten
+        # read-only rows onto a form whose every row is an editable field
+        # would destroy the distinction. The artwork column stays OUTSIDE the
+        # tabs — the cover belongs to both jobs.
+        self._tabs = QTabWidget()
+        self._tabs.setObjectName("metadataTabs")
+        # A QTabWidget's pane is a QFrame and its pages are bare QWidgets, so
+        # both hit the global rules: the QWidget background paints BG_DARK
+        # over the panel, and the QFrame border draws a box nobody asked for.
+        # The pane's own background and border are handled in app.qss.template,
+        # NOT here: a `#objectName::pane` rule set on the widget does not beat
+        # the global `QTabWidget::pane` one, measured by sampling the rendered
+        # pixel. Only the pages and the tab bar are the widget's business —
+        # and the bar is left-aligned because the macOS style centres it,
+        # which puts two tabs in the middle of a panel whose every other row
+        # starts at the left margin.
+        # qt_tabwidget_stackedwidget is the container QTabWidget builds for
+        # itself, and it is the documented bare-QWidget trap wearing a name Qt
+        # assigned: it takes BG_MEDIUM and paints it over the panel, which
+        # neither the ::pane rule nor a rule on the pages can reach. Found by
+        # sampling the rendered pixel and walking the children, because the
+        # Tags page happened to cover it and only the Discogs page showed it.
+        self._tabs.setStyleSheet(
+            "#metadataTabs::tab-bar { alignment: left; }"
+            " #metadataTabs > QWidget#qt_tabwidget_stackedwidget"
+            " { background-color: transparent; }"
+            " #metadataTagsPage, #metadataDiscogsPage"
+            " { background-color: transparent; }"
+        )
+        tags_page = QWidget()
+        tags_page.setObjectName("metadataTagsPage")
+        tags_layout = QVBoxLayout(tags_page)
+        tags_layout.setContentsMargins(0, 0, 0, 0)
+        # A layout handed to a widget takes the Qt style default (6px), not
+        # Theme.SPACING — the form's rows shift by 2px each without this.
+        tags_layout.setSpacing(Theme.SPACING)
+        tags_layout.addWidget(scroll)
+        self._tabs.addTab(tags_page, self.tr("Tags"))
+        # Not translated: a provider name, like the format codes and the
+        # product name. DISPLAY_NAME rather than a literal so the tab and
+        # the About credit cannot drift apart.
+        self._tabs.addTab(self._build_discogs_page(), discogs.DISPLAY_NAME)
+        self._tabs.setVisible(False)
+        body.addWidget(self._tabs, 3)
 
         self._artwork = ArtworkWidget()
         self._artwork.artwork_changed.connect(self._on_artwork_changed)
@@ -362,6 +418,156 @@ class MetadataPanel(QWidget):
         )
         layout.addSpacerItem(self._bottom_spacer)
 
+    def _build_discogs_page(self) -> QWidget:
+        """The read-only half: what we know about the release, and how to get more.
+
+        Deliberately thin on load. The lookup is manual-trigger-only by
+        contract, and what is *stored* is an identity, not content — so on
+        opening a file this can honestly say which release was approved and
+        offer to go and read it, and nothing more. Filling it at startup would
+        mean either a background request or a cached payload, and the feature
+        refuses both.
+        """
+        page = QWidget()
+        page.setObjectName("metadataDiscogsPage")
+        layout = QVBoxLayout(page)
+        layout.setContentsMargins(_FORM_LEFT_MARGIN, 10, 0, 0)
+        layout.setSpacing(Theme.SPACING)
+
+        self._discogs_summary = QLabel("")
+        self._discogs_summary.setWordWrap(True)
+        layout.addWidget(self._discogs_summary)
+
+        self._discogs_details = QFormLayout()
+        self._discogs_details.setLabelAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
+        )
+        self._discogs_details.setSpacing(10)
+        self._discogs_details.setContentsMargins(0, 0, 0, 0)
+        # The macOS style's default form alignment is centred, which pushed
+        # every row into the middle of the tab. The tag form above escapes it
+        # only because its fields grow to fill the width; these are labels.
+        self._discogs_details.setFormAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        )
+        layout.addLayout(self._discogs_details)
+
+        row = QHBoxLayout()
+        row.setSpacing(Theme.SPACING)
+        self._discogs_refresh_btn = QPushButton(self.tr("Refresh from Discogs"))
+        self._discogs_refresh_btn.setToolTip(
+            self.tr("Read this release again and show what Discogs has on it.")
+        )
+        self._discogs_refresh_btn.setMinimumWidth(
+            self._discogs_refresh_btn.fontMetrics().horizontalAdvance(
+                self._discogs_refresh_btn.text()
+            )
+            + _BUTTON_CHROME
+        )
+        self._discogs_refresh_btn.clicked.connect(self._on_discogs_refresh)
+        row.addWidget(self._discogs_refresh_btn)
+        self._discogs_link = LinkLabel()
+        self._discogs_link.setText(self.tr("View release"))
+        self._discogs_link.setStyleSheet(f"color: {Theme.ACCENT_TEXT};")
+        self._discogs_link.setToolTip(
+            self.tr("Open this release's page on Discogs in your browser.")
+        )
+        self._discogs_link.clicked.connect(self._on_discogs_link_clicked)
+        row.addWidget(self._discogs_link)
+        row.addStretch()
+        layout.addLayout(row)
+        layout.addStretch()
+        return page
+
+    def _refresh_discogs_tab(self) -> None:
+        """Redraw the tab from whatever we currently know about the release."""
+        while self._discogs_details.rowCount():
+            self._discogs_details.removeRow(0)
+
+        candidate = getattr(self._last_result, "chosen", None)
+        # A lookup this session is the rich case; a stored id on its own is the
+        # honest one. Both beat a blank tab, which reads as broken.
+        if candidate is not None:
+            for label, value in self._release_rows(candidate):
+                self._discogs_details.addRow(QLabel(label), QLabel(value))
+            self._discogs_summary.setText(candidate.album or self.tr("Unknown release"))
+        elif self._release_id:
+            self._discogs_summary.setText(
+                self.tr("Tagged from Discogs release {0}.").format(self._release_id)
+            )
+        elif self._online_enabled:
+            self._discogs_summary.setText(
+                self.tr("No release known for this file yet. Look it up online.")
+            )
+        else:
+            self._discogs_summary.setText(
+                self.tr("Online lookup is switched off in Settings.")
+            )
+        known = bool(self._release_id or candidate is not None)
+        self._discogs_refresh_btn.setVisible(self._online_enabled and known)
+        self._discogs_link.setVisible(bool(self._discogs_page_url()))
+
+    def _release_rows(self, candidate) -> list[tuple[str, str]]:
+        """The release facts worth showing, skipping the ones we have not got.
+
+        Same data D1 crams onto one line in the switcher; the difference is
+        that the line there helps you *decide*, and this is reference after
+        you already have. They share the formatting, not the layout.
+        """
+        rows = [
+            (self.tr("Release"), candidate.album),
+            (self.tr("Artist"), candidate.artist),
+            (self.tr("Label"), candidate.label),
+            (self.tr("Format"), candidate.format_line()),
+            (self.tr("Country"), candidate.country),
+            (self.tr("Year"), str(candidate.year) if candidate.year else ""),
+            # Not translated: styles are Discogs' own taxonomy, the same
+            # reason the genre tag is written from them verbatim.
+            (self.tr("Styles"), "; ".join(candidate.styles)),
+        ]
+        return [(label, value) for label, value in rows if value]
+
+    def _discogs_page_url(self) -> str:
+        """The release page, from this session's result or the stored id."""
+        candidate = getattr(self._last_result, "chosen", None)
+        if candidate is not None and candidate.page_url:
+            return candidate.page_url
+        if self._release_id:
+            return RELEASE_PAGE.format(id=self._release_id)
+        return ""
+
+    def _on_discogs_link_clicked(self) -> None:
+        url = self._discogs_page_url()
+        if url:
+            QDesktopServices.openUrl(QUrl(url))
+
+    def _on_discogs_refresh(self) -> None:
+        """Read the known release again, into the tab rather than the dialog.
+
+        One thread path, not two: the same `_start_lookup` the button uses,
+        with a flag saying where the answer goes. A second async path would
+        need its own cancel, its own thread_keeper handling and its own
+        shutdown, all to do what this one already does.
+        """
+        if self._file_path is None or self._lookup_thread is not None:
+            return
+        candidate = getattr(self._last_result, "chosen", None)
+        if candidate is None and self._release_id:
+            candidate = Candidate(
+                provider=discogs.PROVIDER_NAME, release_id=self._release_id
+            )
+        if candidate is None:
+            return
+        self._tab_refresh = True
+        self._start_lookup(
+            LookupJob(
+                path=self._file_path,
+                query=self._current_query(),
+                candidate=candidate,
+                want_artwork=False,
+            )
+        )
+
     # ---------------------------------------------------------- drop handling
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
@@ -385,7 +591,7 @@ class MetadataPanel(QWidget):
             path = Path(url.toLocalFile())
             if path.is_file() and path.suffix.lower() in AUDIO_EXTENSIONS:
                 event.acceptProposedAction()
-                self._load_file(str(path.resolve()))
+                self._load_file(normalize_track_path(path))
                 return
 
     def _load_file(self, path: str) -> None:
@@ -413,6 +619,8 @@ class MetadataPanel(QWidget):
             return
 
         self._populate_form(meta)
+        # After the form, so _refresh_discogs_tab sees the finished state.
+        self._sync_release_memory()
         # Programmatic load — don't fire artwork_changed (would re-save the same bytes).
         self._artwork.set_artwork(meta.artwork, meta.artwork_mime, emit=False)
         self._remove_artwork_btn.setEnabled(meta.artwork is not None)
@@ -454,7 +662,7 @@ class MetadataPanel(QWidget):
         self._add_combo.currentIndexChanged.connect(self._on_add_field_selected)
 
         # Show editor widgets and collapse the bottom spacer
-        self._scroll_area.setVisible(True)
+        self._tabs.setVisible(True)
         self._add_field_widget.setVisible(True)
         self._reload_btn.setVisible(True)
         self._eject_btn.setVisible(True)
@@ -631,7 +839,7 @@ class MetadataPanel(QWidget):
         self._info_label.setText("")
         self._path_label.setText("")
         self._path_label.setToolTip("")
-        self._scroll_area.setVisible(False)
+        self._tabs.setVisible(False)
         self._add_field_widget.setVisible(False)
         self._reload_btn.setVisible(False)
         self._eject_btn.setVisible(False)
@@ -646,6 +854,43 @@ class MetadataPanel(QWidget):
 
     # ------------------------------------------------------- online lookup
 
+    def set_library(self, library) -> None:
+        """Hand the panel the library, so a lookup can be remembered.
+
+        Only ever *read and updated* through here — never added to. A file
+        dropped on this panel is not a library import, and calling `add_track`
+        from here would quietly turn the tag editor into one.
+        """
+        self._library = library
+        self._sync_release_memory()
+
+    def _sync_release_memory(self) -> None:
+        """Read back the release this file was tagged from, if we know it."""
+        self._release_id = None
+        if self._library is not None and self._file_path is not None:
+            try:
+                track = self._library.get_track_by_path(self._file_path)
+            except Exception as exc:  # noqa: BLE001 — no memory is not an error
+                logger.debug("Could not read the release memory: %s", exc)
+                track = None
+            # None means the file is simply not in the library, which is the
+            # ordinary case for one dragged straight onto this panel.
+            if track is not None:
+                self._release_id = track.discogs_release_id
+        self._refresh_discogs_tab()
+
+    def _remember_release(self, release_id: int | None) -> None:
+        """Store the approved release against the library row, if there is one."""
+        self._release_id = release_id
+        if self._library is None or self._file_path is None or not release_id:
+            return
+        try:
+            track = self._library.get_track_by_path(self._file_path)
+            if track is not None:
+                self._library.set_release_id(track.id, release_id)
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Could not remember the release: %s", exc)
+
     def set_online_lookup(
         self, enabled: bool, token: str = "", fetch_artwork: bool = True
     ) -> None:
@@ -654,6 +899,7 @@ class MetadataPanel(QWidget):
         self._discogs_token = (token or "").strip()
         self._fetch_artwork = bool(fetch_artwork)
         self._sync_lookup_button()
+        self._refresh_discogs_tab()
 
     def _sync_lookup_button(self) -> None:
         """The button exists only when the feature is on and a file is loaded."""
@@ -725,6 +971,7 @@ class MetadataPanel(QWidget):
                 path=self._file_path,
                 query=query,
                 want_artwork=self._fetch_artwork,
+                prefer_release_id=self._release_id,
             )
         )
 
@@ -763,9 +1010,11 @@ class MetadataPanel(QWidget):
         if self._file_path is None or result.path != self._file_path:
             # The user ejected or dropped another file while it ran.
             self._set_lookup_status("")
+            self._tab_refresh = False
             return
         if not result.ok:
             self._set_lookup_status("")
+            self._tab_refresh = False
             QMessageBox.information(
                 self, self.tr("Look Up Online"), self._lookup_error_text(result.error)
             )
@@ -775,6 +1024,11 @@ class MetadataPanel(QWidget):
         # through that return, and the release the apply credits has to be the
         # one the user ended up looking at.
         self._last_result = result
+        if self._tab_refresh:
+            # A Refresh, not a re-tag: fill the tab and open nothing.
+            self._tab_refresh = False
+            self._refresh_discogs_tab()
+            return
         if self._review_dialog is not None:
             # A candidate switch: the dialog is open and waiting for this.
             self._review_dialog.set_result(result)
@@ -835,9 +1089,24 @@ class MetadataPanel(QWidget):
         # previous one's.
         proposed = getattr(self._last_result, "proposed", None)
         url = getattr(proposed, "source_url", "") or ""
-        # Reload rather than trusting what we believe we wrote.
+        chosen = getattr(self._last_result, "chosen", None)
+        release_id = getattr(chosen, "release_id", 0) or None
+        result = self._last_result
+        # Reload rather than trusting what we believe we wrote. It clears the
+        # provenance and re-reads the release memory, so both are restated
+        # afterwards — and the memory is written first, so the re-read finds it.
+        self._remember_release(release_id)
         self._load_file(self._file_path)
+        # Both restored by hand, because _load_file legitimately clears them
+        # for a *new* file and this is the one reload of the same one. The
+        # release id especially: _sync_release_memory answers from the library,
+        # and a file dropped straight onto this panel has no row there — so
+        # what the user just approved would be forgotten the instant it was
+        # applied.
+        self._last_result = result
+        self._release_id = release_id
         self._show_provenance(url)
+        self._refresh_discogs_tab()
 
     def _show_provenance(self, url: str) -> None:
         """Say the values came from Discogs, and offer the release page.
@@ -868,6 +1137,9 @@ class MetadataPanel(QWidget):
         self._release_url = ""
         self._release_link.setVisible(False)
         self._set_lookup_status("")
+        # The tab reads `_last_result` first, so it has to be redrawn here or
+        # a newly dropped file shows the previous one's release.
+        self._refresh_discogs_tab()
 
     def _on_release_link_clicked(self) -> None:
         if self._release_url:
