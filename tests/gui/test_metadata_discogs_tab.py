@@ -302,3 +302,22 @@ def test_an_accepted_review_records_it_even_with_nothing_ticked(
     monkeypatch.setattr(LookupReviewDialog, "exec", accept_with_nothing)
     panel._on_lookup_result(_result(flac))
     assert library.get_track_by_path(flac).discogs_release_id == 249504
+
+
+def test_a_refresh_from_a_stored_id_alone_describes_the_release(panel, flac):
+    """The reported case: stored id → Refresh → "Unknown release".
+
+    Refresh builds a candidate from the release id and nothing else, so the
+    tab is only as good as what `fetch` writes back onto it. Driven here with
+    the provider stubbed the way the real one now behaves.
+    """
+    panel._release_id = 249504
+    described = _candidate()          # what fetch fills a bare candidate with
+    panel._tab_refresh = True
+    panel._on_lookup_result(_result(flac, described))
+    assert panel._discogs_summary.text() == "Born Slippy"
+    labels = [
+        panel._discogs_details.itemAt(i).widget().text()
+        for i in range(panel._discogs_details.count())
+    ]
+    assert "Junior Boy's Own" in labels and "UK" in labels

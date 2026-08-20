@@ -373,3 +373,50 @@ def test_every_row_carries_the_number_it_would_write():
     # "1-1" is disc 1 track 1; the position is read once, here, so an override
     # in the dialog needs no knowledge of how Discogs spells a position.
     assert [e.number for e in candidate.tracklist] == [1, 2]
+
+
+# --- the candidate as an out-parameter --------------------------------------
+#
+# Reported from the running app: the Metadata panel's Refresh builds a
+# candidate from a stored release id and nothing else, and the Discogs tab
+# then showed "Unknown release" with a lone Artist row over a release it had
+# just successfully read. fetch() filled the *proposal* and left the candidate
+# — which is what any "which record is this" UI reads — almost empty.
+
+
+def test_fetch_describes_the_release_on_a_bare_candidate():
+    provider, _, _, _ = _release_provider()
+    bare = Candidate(release_id=1001)  # all a stored release id gives us
+    provider.fetch(bare, QUERY)
+    assert bare.album == "Born Slippy"
+    assert bare.label == "Junior Boy's Own"
+    assert bare.year == 1995  # the master's, the same one the tags get
+    # All of them, not the two _genre_from writes into the genre tag: the
+    # tab is reference, the tag is a value.
+    assert bare.styles == ("Techno", "Progressive House", "Breaks")
+    assert bare.page_url.endswith("/1001")
+    assert bare.format_line()  # something to say about the pressing
+    # And the line the switcher shows is no longer a bare dash-joined blank.
+    assert "Born Slippy" in bare.label_line()
+
+
+def test_fetch_does_not_blank_what_the_search_already_knew():
+    # The release payload is the better source where it has a value; where it
+    # has none, the search summary must survive rather than be overwritten.
+    provider, _, _, _ = _provider(
+        {"/releases/9001": {"id": 9001, "tracklist": []}, "/masters/77": MASTER_RESPONSE}
+    )
+    from_search = Candidate(
+        release_id=9001,
+        album="Born Slippy",
+        label="Junior Boy's Own",
+        country="Europe",
+        year=1996,
+        formats=("Vinyl", '12"'),
+    )
+    provider.fetch(from_search, QUERY)
+    assert from_search.album == "Born Slippy"
+    assert from_search.label == "Junior Boy's Own"
+    assert from_search.country == "Europe"
+    assert from_search.year == 1996
+    assert from_search.formats == ("Vinyl", '12"')

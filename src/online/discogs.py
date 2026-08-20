@@ -373,6 +373,32 @@ class DiscogsProvider:
         elif release_artist:
             artist = release_artist
 
+        # Write the release's own description back onto the candidate, not
+        # just into the proposal. The candidate is what any UI showing "which
+        # record is this" reads, and until now only `artist` came back — which
+        # is invisible while the candidate came from a *search*, because the
+        # search summary had already filled the rest in, and total the moment
+        # one does not: a candidate built from a bare release id (the Metadata
+        # panel's Refresh) came back with an artist and nothing else, and the
+        # tab reported "Unknown release" over a release it had just read.
+        #
+        # `or` in every case, never a bare assignment: the release payload is
+        # the better source where it has a value, and must not blank a field
+        # the search knew and it does not.
+        candidate.album = album or candidate.album
+        candidate.label = label or candidate.label
+        candidate.styles = styles
+        candidate.genres = genres
+        candidate.year = year or candidate.year
+        candidate.country = str(payload.get("country") or "") or candidate.country
+        candidate.formats = _flatten_formats(payload) or candidate.formats
+        candidate.master_id = master_id or candidate.master_id
+        candidate.page_url = (
+            str(payload.get("uri") or "")
+            or candidate.page_url
+            or RELEASE_PAGE.format(id=candidate.release_id)
+        )
+
         return ProposedTags(
             title=entry.title if entry else None,
             artist=artist or None,
