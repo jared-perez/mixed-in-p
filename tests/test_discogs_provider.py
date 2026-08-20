@@ -120,6 +120,31 @@ def test_search_reads_the_fields_the_dialog_shows():
     assert candidate.cover_url.endswith("cover-1002.jpg")
     assert candidate.page_url == "https://www.discogs.com/release/1002"
     assert "Born Slippy" in candidate.label_line()
+    # The pressing is on the line too, or the single, the EP and the
+    # compilation read as three near-identical rows in the switcher.
+    assert "CD, Single" in candidate.label_line()
+
+
+# --- the switcher's line ----------------------------------------------------
+
+
+def test_a_record_size_beats_the_medium_name_on_the_line():
+    # "Vinyl" says less than '12"', and Discogs gives both.
+    candidate = Candidate(formats=("Vinyl", '12"', "45 RPM", "Single", "Stereo"))
+    assert candidate.format_line() == '12", Single'
+
+
+def test_the_line_keeps_the_medium_when_there_is_no_size():
+    assert Candidate(formats=("CD", "Compilation", "Mixed")).format_line() == (
+        "CD, Compilation"
+    )
+
+
+def test_a_format_with_nothing_to_say_adds_nothing():
+    assert Candidate(formats=()).format_line() == ""
+    assert Candidate(
+        album="Born Slippy", label="Junior Boy's Own", year=1995
+    ).label_line() == "Born Slippy — Junior Boy's Own — 1995"
 
 
 def test_a_search_response_without_results_is_a_bad_response():

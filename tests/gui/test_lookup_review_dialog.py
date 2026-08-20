@@ -137,6 +137,17 @@ def test_a_single_candidate_leaves_nothing_to_switch_to(qtbot):
     assert not dialog._candidate_combo.isEnabled()
 
 
+def test_the_switcher_says_what_it_is_for(qtbot):
+    # It is the escape hatch for every wrong match in the feature, and it read
+    # as a readout: no tooltip anywhere on the row, and a noun for a label.
+    dialog = _dialog(qtbot, current={})
+    assert dialog._candidate_combo.toolTip()
+    # Structure, not pixels — the suite runs with no stylesheet. compactCombo
+    # is the Convert format row's compaction, and shrinks this combo's arrow
+    # to buy width a dialog row does not need.
+    assert dialog._candidate_combo.objectName() != "compactCombo"
+
+
 def test_a_wav_says_its_tags_will_not_stick(qtbot):
     # Lookup is still allowed — reading the values is useful — the same posture
     # the Analyze panel takes.

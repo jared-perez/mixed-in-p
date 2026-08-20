@@ -146,12 +146,24 @@ class LookupReviewDialog(QDialog):
         layout.addWidget(self._file_label)
 
         # Candidate switcher — the alternatives the search found, so a wrong
-        # top match is one dropdown away from the right one.
+        # top match is one dropdown away from the right one. It reads as a
+        # verb, not as a field name: this is the escape hatch for every wrong
+        # match in the feature, and "Release:" made it look like a readout.
+        # No compactCombo here — that object name is the Convert format row's
+        # answer to a row genuinely short of width, and this row (one label
+        # plus one stretching combo) has none of that pressure. All it would
+        # buy is a smaller arrow, i.e. less of the only affordance the control
+        # has.
         release_row = QHBoxLayout()
         release_row.setSpacing(Theme.SPACING)
-        release_row.addWidget(QLabel(self.tr("Release:")))
+        release_hint = self.tr(
+            "Not the right pressing? Pick another release the search found."
+        )
+        release_label = QLabel(self.tr("Select release"))
+        release_label.setToolTip(release_hint)
+        release_row.addWidget(release_label)
         self._candidate_combo = QComboBox()
-        self._candidate_combo.setObjectName("compactCombo")
+        self._candidate_combo.setToolTip(release_hint)
         self._candidate_combo.currentIndexChanged.connect(self._on_candidate_changed)
         release_row.addWidget(self._candidate_combo, 1)
         layout.addLayout(release_row)

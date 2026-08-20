@@ -9,6 +9,7 @@ hand.
 
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass
 
 # Failure kinds. These are logic values, not UI prose — the human-readable
@@ -21,6 +22,29 @@ ERROR_NETWORK = "network"            # offline, DNS, timeout, TLS
 ERROR_SERVER = "server"              # 5xx
 ERROR_NOT_FOUND = "not_found"        # 404 on a release we were just given
 ERROR_BAD_RESPONSE = "bad_response"  # 200 with JSON we can't read
+
+
+# A record size, as Discogs writes it: 7", 10", 12", and the occasional 5¼".
+# Preferred over the medium name on the switcher's line, because `12"` says
+# everything `Vinyl` says and one thing more.
+_SIZE_RE = re.compile(r'^\d+(?:[.,]\d+)?\s*["”″]$')
+
+# Format words naming what *kind* of release this is rather than what it is
+# made of. Two pressings of one title are told apart by those two things
+# together, and by nothing else Discogs flattens in (45 RPM, Stereo, Reissue).
+_RELEASE_KINDS = frozenset(
+    {
+        "album",
+        "single",
+        "ep",
+        "lp",
+        "mini-album",
+        "maxi-single",
+        "compilation",
+        "mixtape",
+        "sampler",
+    }
+)
 
 
 class LookupFailed(Exception):
@@ -98,6 +122,29 @@ class Candidate:
     score: float = 0.0
     track: TrackEntry | None = None  # the matched row, after fetch()
 
+    def format_line(self) -> str:
+        """The pressing in at most two words: what it is, and what kind.
+
+        ``formats`` is ``_flatten_formats``' output — the format name *and*
+        every description Discogs hangs off it (``Vinyl, 12", 45 RPM, Single,
+        Stereo``). The whole tuple on a one-line label is as unreadable as
+        leaving it off, so this takes only the two words that tell two
+        pressings of one title apart: the medium (a record size where there is
+        one) and the release kind.
+        """
+        size = medium = kind = ""
+        for word in self.formats:
+            text = word.strip()
+            if not text:
+                continue
+            if not medium:
+                medium = text
+            if not size and _SIZE_RE.match(text):
+                size = text
+            if not kind and text.casefold() in _RELEASE_KINDS:
+                kind = text
+        return ", ".join(p for p in (size or medium, kind) if p)
+
     def label_line(self) -> str:
         """One-line description for the candidate switcher.
 
@@ -105,7 +152,7 @@ class Candidate:
         year, a country, a format code), and the only prose — the separators —
         is punctuation.
         """
-        parts = [p for p in (self.album, self.label) if p]
+        parts = [p for p in (self.album, self.label, self.format_line()) if p]
         tail = [str(p) for p in (self.year, self.country) if p]
         if tail:
             parts.append(" ".join(tail))
