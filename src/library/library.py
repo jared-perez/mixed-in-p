@@ -43,7 +43,7 @@ from src.library.compatibility import (
 SCRATCH_NODE_ID = 1
 
 _CONTENT_ID_BYTES = 64 * 1024
-_SCHEMA_VERSION = 5
+_SCHEMA_VERSION = 6
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -70,6 +70,13 @@ CREATE TABLE IF NOT EXISTS tracks (
     size INTEGER,
     mtime REAL,
     content_id TEXT,
+    -- The Discogs release the user approved for this file, so a later lookup
+    -- can offer it again instead of re-ranking from scratch, and the Metadata
+    -- panel's Discogs tab has something to show on load. An identity, not
+    -- fetched content: nothing about the release itself is stored, which is
+    -- what keeps the provider's freshness rule intact. Never a tag, so it is
+    -- absent from _TAG_COLUMNS and _FTS_COLUMNS both.
+    discogs_release_id INTEGER,
     search_blob TEXT NOT NULL DEFAULT '',
     added_at TEXT NOT NULL
 );
@@ -149,6 +156,9 @@ class Track:
     mtime: float | None
     content_id: str | None
     added_at: str
+    # The release the user approved in the review dialog, or None. Last so an
+    # older caller building a Track positionally is unaffected.
+    discogs_release_id: int | None = None
 
 
 @dataclass(frozen=True)
@@ -395,6 +405,13 @@ class Library:
         ):
             if column not in tracks:
                 self._con.execute(f"ALTER TABLE tracks ADD COLUMN {column} {decl}")
+        # v6 — the approved Discogs release. Keyed on the column being absent,
+        # like every other column above, not on user_version. Not searchable,
+        # so _FTS_COLUMNS and the search blobs are again untouched.
+        if "discogs_release_id" not in tracks:
+            self._con.execute(
+                "ALTER TABLE tracks ADD COLUMN discogs_release_id INTEGER"
+            )
 
         (version,) = self._con.execute("PRAGMA user_version").fetchone()
         if version and version < 4:  # v4 — the key became a searchable field
@@ -653,6 +670,20 @@ class Library:
             "SELECT * FROM tracks ORDER BY artist, title, id"
         ).fetchall()
         return [_track(row) for row in rows]
+
+    def set_release_id(self, track_id: int, release_id: int | None) -> None:
+        """Remember which Discogs release a track was tagged from.
+
+        Its own method rather than a tag column: `update_track_tags` validates
+        against `_TAG_COLUMNS` and would reject it, and more to the point this
+        is not a tag — it goes nowhere near the merge, the search blob or the
+        FTS index that every real tag has to travel through.
+        """
+        with self._con:
+            self._con.execute(
+                "UPDATE tracks SET discogs_release_id=? WHERE id=?",
+                (int(release_id) if release_id else None, track_id),
+            )
 
     def update_track_tags(self, track_id: int, **fields: object) -> None:
         """Update tag columns (see `_TAG_COLUMNS`)."""
@@ -1334,6 +1365,7 @@ def _track(row: sqlite3.Row) -> Track:
         mtime=row["mtime"],
         content_id=row["content_id"],
         added_at=row["added_at"],
+        discogs_release_id=row["discogs_release_id"],
     )
 
 

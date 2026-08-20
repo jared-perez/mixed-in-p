@@ -20,6 +20,7 @@ import sqlite3
 import pytest
 
 from src.library import Library
+from src.library.library import _SCHEMA_VERSION
 
 V5_COLUMNS = ("keycode", "year", "track_number", "label", "bitrate")
 
@@ -94,11 +95,14 @@ class TestTheUpgrade:
             with Library(v4_db) as lib:
                 assert lib.get_track(track_id).keycode == "8A"
 
-    def test_a_fresh_database_is_stamped_v5(self, tmp_path):
+    def test_a_fresh_database_is_stamped_with_the_current_version(self, tmp_path):
+        # Against the constant, not a literal: what this guards is that a new
+        # database is stamped at all rather than left at 0, and a literal here
+        # turns every future schema bump into a failing test about nothing.
         db = tmp_path / "library.db"
         with Library(db) as lib:
             (version,) = lib._con.execute("PRAGMA user_version").fetchone()
-        assert version == 5
+        assert version == _SCHEMA_VERSION
 
 
 class TestKeycodeBackfill:
