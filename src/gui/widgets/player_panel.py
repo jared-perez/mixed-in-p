@@ -2285,6 +2285,22 @@ class PlayerPanel(QWidget):
             or self._pending_play_path is not None
         ):
             return False
+        return self.play_path(path)
+
+    def play_path(self, path: str) -> bool:
+        """Play *path* now, whatever is under way. True if the row was found.
+
+        The unconditional twin of :meth:`play_path_if_idle`, for a caller that
+        is relaying an explicit request — the Metadata panel's "Play in Player"
+        — rather than reacting to a file the OS handed us. There the idle test
+        would be wrong in both directions: the user asked for this track, and
+        silently refusing because another is playing is indistinguishable from
+        the menu entry being broken.
+
+        The search runs from the end of the list because additions force
+        duplicates: if the file was already here, the copy that just landed is
+        the last one, and that is the one the user asked for.
+        """
         for index in range(len(self._playlist) - 1, -1, -1):
             if self._playlist[index].file_path == path:
                 self._play_track(index)

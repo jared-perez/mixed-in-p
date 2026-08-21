@@ -383,6 +383,7 @@ class MainWindow(QMainWindow):
 
         # Player panel signals
         self._player_panel.files_dropped.connect(self._add_files_to_player)
+        self._metadata_panel.play_requested.connect(self._play_from_metadata)
         self._player_panel.open_in_metadata.connect(self._open_in_metadata_panel)
         self._player_panel.slice_expanded.connect(self._sizer.on_slicer_expanded)
         self._player_panel.compat_panel_toggled.connect(self._sizer.on_compat_panel_toggled)
@@ -1734,6 +1735,24 @@ class MainWindow(QMainWindow):
         self._player_panel.add_tracks(tracks)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
+
+    def _play_from_metadata(self, file_path: str) -> None:
+        """Play the file the tag editor has open (its path menu's "Play in Player").
+
+        The mirror of ``_open_in_metadata_panel``, which is the same trip in
+        the other direction. Added to the playlist first because the player
+        plays *rows*, not paths, and this file need never have been there.
+
+        ``play_path`` and not ``play_path_if_idle``: the user asked for this
+        track by name, and a request that silently does nothing because
+        something else is playing is indistinguishable from a broken menu.
+        Playback survives the page change — only closing the window stops it —
+        so switching to the Player and switching back to keep editing works.
+        """
+        self._add_files_to_player([file_path])
+        self._sidebar.set_current_page("player")
+        self._on_page_changed("player")
+        self._player_panel.play_path(normalize_track_path(file_path))
 
     def _open_in_metadata_panel(self, file_path: str) -> None:
         """Load a file into the metadata panel and switch to it (from Player right-click)."""

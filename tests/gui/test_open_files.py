@@ -526,3 +526,41 @@ class TestFileOpenRelay:
         rly.eventFilter(host, QFileOpenEvent(QUrl("https://example.com/a.mp3")))
 
         assert got == []
+
+
+class TestPlayPath:
+    """The unconditional twin, for a request the user made by name."""
+
+    def test_it_plays_even_while_something_else_is_playing(
+        self, player, played, monkeypatch, tmp_path
+    ):
+        """The Metadata panel's "Play in Player" is an explicit request. Refusing
+        it silently because another track is playing is indistinguishable, from
+        the user's side, from the menu entry being broken."""
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        add(player, [a, b])
+        set_engine(player, monkeypatch, playing=True)
+
+        assert player.play_path(b) is True
+        assert played == [1]
+
+    def test_a_path_that_is_not_in_the_list_plays_nothing(
+        self, player, played, monkeypatch, tmp_path
+    ):
+        (a,) = make_files(tmp_path, "a.mp3")
+        add(player, [a])
+        set_engine(player, monkeypatch)
+
+        assert player.play_path(str(tmp_path / "never-added.mp3")) is False
+        assert played == []
+
+    def test_the_last_copy_wins(self, player, played, monkeypatch, tmp_path):
+        """Additions force duplicates, so the copy that just landed is the one
+        the user asked for."""
+        (a,) = make_files(tmp_path, "a.mp3")
+        add(player, [a])
+        add(player, [a])
+        set_engine(player, monkeypatch)
+
+        assert player.play_path(a) is True
+        assert played == [1]

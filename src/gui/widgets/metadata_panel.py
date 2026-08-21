@@ -13,6 +13,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QLineEdit,
+    QMenu,
     QMessageBox,
     QPushButton,
     QScrollArea,
@@ -25,6 +26,7 @@ from PySide6.QtWidgets import (
 
 from PySide6.QtGui import (
     QDesktopServices,
+    QGuiApplication,
     QDragEnterEvent,
     QDragLeaveEvent,
     QDragMoveEvent,
@@ -115,6 +117,10 @@ class MetadataPanel(QWidget):
     """Panel for viewing and editing audio file metadata tags."""
 
     files_dropped = Signal(list)
+    # "Play in Player" from the path's context menu. A signal rather than a
+    # reach into the player: this panel owns a file, not the transport, and
+    # MainWindow is where every other cross-panel route is already wired.
+    play_requested = Signal(str)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -215,6 +221,15 @@ class MetadataPanel(QWidget):
         self._path_label.setStyleSheet(
             f"color: {Theme.TEXT_SECONDARY}; font-size: 13px; background: transparent;"
         )
+        # The path is the one place in the panel that identifies the file
+        # rather than describing it, so it is where "do something with this
+        # file" belongs. Split from execution for the same reason the cover's
+        # menu is: QMenu.exec cannot be patched out, so a test that drove a
+        # combined handler would open a real modal menu and hang the suite.
+        self._path_label.setContextMenuPolicy(
+            Qt.ContextMenuPolicy.CustomContextMenu
+        )
+        self._path_label.customContextMenuRequested.connect(self._on_path_menu)
         path_row.addWidget(self._path_label, 1)
 
         self._reveal_btn = QPushButton(self.tr("Open File Location"))
@@ -854,6 +869,53 @@ class MetadataPanel(QWidget):
                     "renamed, or deleted."
                 ),
             )
+
+    # ----------------------------------------------------------- path menu
+
+    def build_path_menu(self) -> tuple[QMenu, dict]:
+        """What can be done with the file this panel is editing.
+
+        Open File Location repeats the button beside it on purpose: the button
+        is discoverable and the menu entry is where a user who right-clicked a
+        path expects to find it, and the alternative — a menu that pointedly
+        omits the obvious entry — reads as an oversight.
+        """
+        menu = QMenu(self)
+        actions = {
+            "reveal": menu.addAction(self.tr("Open File Location")),
+            "play": menu.addAction(self.tr("Play in Player")),
+            "copy": menu.addAction(self.tr("Copy File Path")),
+        }
+        for action in actions.values():
+            action.setEnabled(bool(self._file_path))
+        return menu, actions
+
+    def _on_path_menu(self, pos) -> None:
+        if not self._file_path:
+            return
+        menu, actions = self.build_path_menu()
+        chosen = menu.exec(self._path_label.mapToGlobal(pos))
+        if chosen is None:
+            return
+        if chosen is actions["reveal"]:
+            self._on_reveal_clicked()
+        elif chosen is actions["play"]:
+            self.play_requested.emit(self._file_path)
+        elif chosen is actions["copy"]:
+            self.copy_path_to_clipboard()
+
+    def copy_path_to_clipboard(self) -> None:
+        """Put the full path on the clipboard.
+
+        The whole path, not the elided text on screen: what the label shows is
+        a rendering decision, and pasting `/Users/…/a track.flac` into a
+        terminal would be worse than pasting nothing.
+        """
+        if not self._file_path:
+            return
+        clipboard = QGuiApplication.clipboard()
+        if clipboard is not None:
+            clipboard.setText(self._file_path)
 
     # --------------------------------------------------------------- clear
 
