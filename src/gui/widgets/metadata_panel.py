@@ -26,6 +26,7 @@ from PySide6.QtWidgets import (
 
 from PySide6.QtGui import (
     QDesktopServices,
+    QFontMetrics,
     QGuiApplication,
     QDragEnterEvent,
     QDragLeaveEvent,
@@ -92,6 +93,21 @@ _FORM_LEFT_MARGIN = 8
 # ArtworkWidget). Sized for the cover itself plus a 4px margin.
 _ART_COLUMN_WIDTH = 150
 
+# Discogs tab spacing. Bigger than the tag form's on purpose: that is a column
+# of edit boxes whose borders already separate the rows, and this is plain text
+# where the only thing telling one fact from the next is the gap.
+_SECTION_GAP = 14        # between one headed block and the next
+_ROW_GAP = 7             # between rows inside a block
+_SECTION_LABEL_GAP = 14  # between a row's label and its value
+# Room for the vertical scrollbar, so the longest value is not drawn under it.
+_DISCOGS_SCROLL_GUTTER = 12
+
+
+def _format_duration(seconds: float) -> str:
+    """Seconds as m:ss, the way a sleeve prints a running time."""
+    total = int(round(seconds))
+    return f"{total // 60}:{total % 60:02d}"
+
 
 def _format_audio_props(path: str) -> str:
     """Return a short 'Sample Rate: 44.1 kHz   Bit Depth: 16-bit' summary."""
@@ -146,6 +162,8 @@ class MetadataPanel(QWidget):
         # dropped here need not be in the library at all.
         self._library = None
         self._release_id: int | None = None
+        # Section label widgets, so they can be given one shared column width.
+        self._discogs_keys: list[tuple[QLabel, str]] = []
         # Set for the length of one Refresh: the same thread path serves the
         # tab and the review dialog, and this is which of them asked.
         self._tab_refresh = False
@@ -460,14 +478,13 @@ class MetadataPanel(QWidget):
         layout.addSpacerItem(self._bottom_spacer)
 
     def _build_discogs_page(self) -> QWidget:
-        """The read-only half: what we know about the release, and how to get more.
+        """The read-only half: everything Discogs told us about the release.
 
-        Deliberately thin on load. The lookup is manual-trigger-only by
-        contract, and what is *stored* is an identity, not content — so on
-        opening a file this can honestly say which release was approved and
-        offer to go and read it, and nothing more. Filling it at startup would
-        mean either a background request or a cached payload, and the feature
-        refuses both.
+        Scrolls, because it is now long enough to. It shows what is *stored*
+        for this release — one request's worth of answer, kept so that opening
+        a file costs nothing — and every value is selectable, because the
+        reason to look at a catalogue number or a runout is usually to paste
+        it somewhere.
         """
         page = QWidget()
         page.setObjectName("metadataDiscogsPage")
@@ -475,23 +492,37 @@ class MetadataPanel(QWidget):
         layout.setContentsMargins(_FORM_LEFT_MARGIN, 10, 0, 0)
         layout.setSpacing(Theme.SPACING)
 
-        self._discogs_summary = QLabel("")
-        self._discogs_summary.setWordWrap(True)
+        # The release's own name, above the scroll rather than in it: it is
+        # what the tab is *about*, and it used to be printed twice — once here
+        # and once as the first row of the table underneath.
+        self._discogs_summary = ElidedLabel("")
+        self._discogs_summary.setStyleSheet(
+            f"color: {Theme.NEON_YELLOW}; font-size: 15px; background: transparent;"
+        )
         layout.addWidget(self._discogs_summary)
+        self._discogs_subtitle = ElidedLabel("")
+        self._discogs_subtitle.setStyleSheet(
+            f"color: {Theme.TEXT_SECONDARY}; background: transparent;"
+        )
+        self._discogs_subtitle.setVisible(False)
+        layout.addWidget(self._discogs_subtitle)
 
-        self._discogs_details = QFormLayout()
-        self._discogs_details.setLabelAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter
-        )
-        self._discogs_details.setSpacing(10)
-        self._discogs_details.setContentsMargins(0, 0, 0, 0)
-        # The macOS style's default form alignment is centred, which pushed
-        # every row into the middle of the tab. The tag form above escapes it
-        # only because its fields grow to fill the width; these are labels.
-        self._discogs_details.setFormAlignment(
-            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
-        )
-        layout.addLayout(self._discogs_details)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QScrollArea.Shape.NoFrame)
+        # Never sideways: a long note or a runout etching must wrap into the
+        # column, not push a scrollbar under the whole panel.
+        scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        body = QWidget()
+        # The documented bare-QWidget trap: the global QWidget rule paints
+        # BG_DARK over the panel unless the container says otherwise.
+        body.setObjectName("metadataDiscogsBody")
+        body.setStyleSheet("#metadataDiscogsBody { background-color: transparent; }")
+        self._discogs_body = QVBoxLayout(body)
+        self._discogs_body.setContentsMargins(0, 0, _DISCOGS_SCROLL_GUTTER, 0)
+        self._discogs_body.setSpacing(_SECTION_GAP)
+        scroll.setWidget(body)
+        layout.addWidget(scroll, 1)
 
         row = QHBoxLayout()
         row.setSpacing(Theme.SPACING)
@@ -524,36 +555,247 @@ class MetadataPanel(QWidget):
         self._discogs_credit.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
         row.addWidget(self._discogs_credit)
         layout.addLayout(row)
-        layout.addStretch()
         return page
+
+    # ---------------------------------------------------------- tab drawing
+
+    def _clear_discogs_body(self) -> None:
+        """Empty the scrolling area, widgets and nested layouts alike.
+
+        `removeRow` is not available here — this is a QVBoxLayout of sections,
+        not a form — and dropping the layout items alone would leave every
+        widget parented to the body and still painted. Recursed, because a
+        section is a layout containing labels.
+        """
+        def drain(layout) -> None:
+            while layout.count():
+                item = layout.takeAt(0)
+                widget = item.widget()
+                if widget is not None:
+                    widget.setParent(None)
+                    widget.deleteLater()
+                elif item.layout() is not None:
+                    drain(item.layout())
+                    item.layout().deleteLater()
+
+        drain(self._discogs_body)
+
+    def _value_label(self, text: str) -> QLabel:
+        """A value the user can select and copy.
+
+        Selectable is the point of the whole tab: the reason to look at a
+        catalogue number, a runout etching or a barcode is almost always to
+        paste it into something else, and a label you cannot select makes a
+        reader retype what is on screen in front of them.
+        """
+        label = QLabel(text)
+        label.setWordWrap(True)
+        label.setTextInteractionFlags(
+            Qt.TextInteractionFlag.TextSelectableByMouse
+            | Qt.TextInteractionFlag.TextSelectableByKeyboard
+        )
+        label.setStyleSheet("background: transparent;")
+        return label
+
+    def _add_section(
+        self, title: str, rows: list[tuple[str, str]], *, align: bool = True
+    ) -> None:
+        """A headed block of label/value pairs, or nothing if it has no rows.
+
+        An empty section is worse than a missing one: it says Discogs holds a
+        kind of information about this record and then shows none of it.
+
+        ``align=False`` keeps a section out of the shared label column. The
+        distinction is whether the left-hand text is a *field name* or a
+        *value*: "Catalogue Number" and "Barcode" line up with each other and
+        should, but a tracklist position is data — stretching "A1" to the width
+        of "Catalogue Number" puts 150px of nothing between a track and its
+        own number.
+        """
+        rows = [(label, value) for label, value in rows if value]
+        if not rows:
+            return
+        heading = QLabel(title)
+        heading.setStyleSheet(
+            f"color: {Theme.NEON_YELLOW}; font-weight: bold; background: transparent;"
+        )
+        self._discogs_body.addWidget(heading)
+
+        form = QFormLayout()
+        form.setLabelAlignment(
+            Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
+        )
+        # The macOS style's default form alignment is centred, which pushes
+        # every row into the middle of the tab. The tag form above escapes it
+        # only because its fields grow to fill the width; these are labels.
+        form.setFormAlignment(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop)
+        form.setFieldGrowthPolicy(
+            QFormLayout.FieldGrowthPolicy.AllNonFixedFieldsGrow
+        )
+        form.setHorizontalSpacing(_SECTION_LABEL_GAP)
+        form.setVerticalSpacing(_ROW_GAP)
+        form.setContentsMargins(0, 0, 0, 0)
+        for label, value in rows:
+            key = QLabel(label)
+            key.setStyleSheet(
+                f"color: {Theme.TEXT_SECONDARY}; background: transparent;"
+            )
+            # Collected so every section can be given one label column below.
+            # Each QFormLayout sizes its own otherwise, and the values then
+            # start at a different x in each block — which reads as three
+            # tables that failed to line up rather than as one panel.
+            if align:
+                self._discogs_keys.append((key, label))
+            form.addRow(key, self._value_label(value))
+        self._discogs_body.addLayout(form)
+
+    def _add_text_section(self, title: str, text: str) -> None:
+        """A headed block of prose, full width.
+
+        Not a one-row form with a blank label: that indents the text to the
+        label column and leaves a rectangle of nothing beside it. Release notes
+        are a paragraph, not a field.
+        """
+        heading = QLabel(title)
+        heading.setStyleSheet(
+            f"color: {Theme.NEON_YELLOW}; font-weight: bold; background: transparent;"
+        )
+        self._discogs_body.addWidget(heading)
+        self._discogs_body.addWidget(self._value_label(text))
+
+    def _align_section_labels(self) -> None:
+        """Give every section the same label column, measured not guessed.
+
+        The widest label wins, and it is measured from the font rather than
+        set as a constant, because these strings are translated — a number
+        that fits "Catalogue Number" says nothing about "Katalognummer" or
+        «Каталожный номер».
+        """
+        if not self._discogs_keys:
+            return
+        widest = max(
+            QFontMetrics(key.font()).horizontalAdvance(text)
+            for key, text in self._discogs_keys
+        )
+        for key, _text in self._discogs_keys:
+            key.setMinimumWidth(widest)
 
     def _refresh_discogs_tab(self) -> None:
         """Redraw the tab from whatever we currently know about the release."""
-        while self._discogs_details.rowCount():
-            self._discogs_details.removeRow(0)
+        self._clear_discogs_body()
+        self._discogs_keys: list[tuple[QLabel, str]] = []
 
         candidate = self._tab_candidate()
-        # A lookup this session is the rich case; a stored id on its own is the
-        # honest one. Both beat a blank tab, which reads as broken.
+        # A lookup this session or a stored description is the rich case; a
+        # stored id on its own is the honest one. Both beat a blank tab, which
+        # reads as broken.
         if candidate is not None:
-            for label, value in self._release_rows(candidate):
-                self._discogs_details.addRow(QLabel(label), QLabel(value))
             self._discogs_summary.setText(candidate.album or self.tr("Unknown release"))
+            self._discogs_summary.setToolTip(candidate.album)
+            self._discogs_subtitle.setText(candidate.artist)
+            self._discogs_subtitle.setVisible(bool(candidate.artist))
+            self._fill_release_sections(candidate)
+            self._align_section_labels()
         elif self._release_id:
             self._discogs_summary.setText(
                 self.tr("Tagged from Discogs release {0}.").format(self._release_id)
             )
+            self._discogs_subtitle.setVisible(False)
         elif self._online_enabled:
             self._discogs_summary.setText(
                 self.tr("No release known for this file yet. Look it up online.")
             )
+            self._discogs_subtitle.setVisible(False)
         else:
             self._discogs_summary.setText(
                 self.tr("Online lookup is switched off in Settings.")
             )
+            self._discogs_subtitle.setVisible(False)
+        self._discogs_body.addStretch()
         known = bool(self._release_id or candidate is not None)
         self._discogs_refresh_btn.setVisible(self._online_enabled and known)
         self._discogs_link.setVisible(bool(self._discogs_page_url()))
+
+    def _fill_release_sections(self, candidate) -> None:
+        """Everything the provider gave us, grouped by what kind of fact it is.
+
+        The grouping is what makes two of these readable at all. ``Year`` and
+        ``Released`` are different facts that can legitimately disagree — the
+        year prefers the *master*'s, so a DJ gets the year the record came out
+        rather than the year this repress did, while the date is this
+        pressing's own — and side by side under one heading they read as the
+        panel contradicting itself. Under **Release** and **Pressing** they
+        read as what they are.
+
+        The title and artist are the heading above, not rows here: they were
+        the tab's one visible duplication.
+        """
+        self._add_section(
+            self.tr("Release"),
+            [
+                (self.tr("Label"), candidate.label),
+                (self.tr("Catalogue Number"), candidate.catalogue_number),
+                (self.tr("Year"), str(candidate.year) if candidate.year else ""),
+                # Not translated: styles and genres are Discogs' own taxonomy,
+                # the same reason the genre tag is written from them verbatim.
+                (self.tr("Styles"), "; ".join(candidate.styles)),
+                (self.tr("Genres"), "; ".join(candidate.genres)),
+            ],
+        )
+        self._add_section(
+            self.tr("Pressing"),
+            [
+                (self.tr("Format"), candidate.format_line()),
+                (self.tr("Country"), candidate.country),
+                (self.tr("Released"), candidate.released),
+            ],
+        )
+        self._add_section(
+            self.tr("Tracklist"), self._tracklist_rows(candidate), align=False
+        )
+        self._add_section(self.tr("Credits"), self._credit_rows(candidate.credits))
+        self._add_section(self.tr("Identifiers"), list(candidate.identifiers))
+        self._add_section(self.tr("Community"), self._community_rows(candidate))
+        if candidate.notes:
+            self._add_text_section(self.tr("Notes"), candidate.notes)
+
+    def _tracklist_rows(self, candidate) -> list[tuple[str, str]]:
+        """Each playable row: where it sits, what it is, how long, who remixed it.
+
+        The position is the label because that is how a record is read — "B1"
+        is where you put the needle. It falls back to the ordinal for a CD,
+        where there is no side to name.
+        """
+        rows: list[tuple[str, str]] = []
+        for entry in candidate.tracklist:
+            head = entry.position.strip() or (str(entry.ordinal) if entry.ordinal else "")
+            parts = [entry.title]
+            if entry.artist:
+                parts.insert(0, f"{entry.artist} —")
+            if entry.duration:
+                parts.append(f"({_format_duration(entry.duration)})")
+            for name, role in self._grouped_credits(entry.credits):
+                parts.append(f"· {role}: {name}")
+            rows.append((head, " ".join(p for p in parts if p)))
+        return rows
+
+    def _credit_rows(self, credits) -> list[tuple[str, str]]:
+        """Credits as role → the people who did it."""
+        return [(role, name) for name, role in self._grouped_credits(credits)]
+
+    @staticmethod
+    def _grouped_credits(credits) -> list[tuple[str, str]]:
+        """(names, role) pairs, one per role, in the order Discogs gave them.
+
+        Grouped because a release routinely credits three people as Written-By
+        and one row each turns the section into a list of repetitions of the
+        word. Roles are never translated — they are values out of Discogs'
+        taxonomy, like the styles.
+        """
+        by_role: dict[str, list[str]] = {}
+        for credit in credits or ():
+            by_role.setdefault(credit.role, []).append(credit.name)
+        return [(", ".join(names), role) for role, names in by_role.items()]
 
     def _tab_candidate(self):
         """The best description of this file's release that we have.
@@ -561,34 +803,31 @@ class MetadataPanel(QWidget):
         This session's lookup first, because it is the freshest and because a
         candidate switch has to be reflected before the user presses anything.
         Otherwise the stored description, which is the whole reason the tab can
-        say something about a file the moment it is loaded — before this, a
-        file whose release was perfectly well known still got a release
-        *number* and an invitation to look it up.
+        say something about a file the moment it is loaded — before v7, a file
+        whose release was perfectly well known still got a release *number*
+        and an invitation to look it up.
         """
         candidate = getattr(self._last_result, "chosen", None)
         if candidate is not None:
             return candidate
         return lookup_flow.cached_candidate(self._library, self._release_id)
 
-    def _release_rows(self, candidate) -> list[tuple[str, str]]:
-        """The release facts worth showing, skipping the ones we have not got.
+    def _community_rows(self, candidate) -> list[tuple[str, str]]:
+        """Have / want / rating — not tags, and not a match signal either.
 
-        Same data D1 crams onto one line in the switcher; the difference is
-        that the line there helps you *decide*, and this is reference after
-        you already have. They share the formatting, not the layout.
+        They are how two pressings of one title are told apart when everything
+        printed on them reads the same.
         """
-        rows = [
-            (self.tr("Release"), candidate.album),
-            (self.tr("Artist"), candidate.artist),
-            (self.tr("Label"), candidate.label),
-            (self.tr("Format"), candidate.format_line()),
-            (self.tr("Country"), candidate.country),
-            (self.tr("Year"), str(candidate.year) if candidate.year else ""),
-            # Not translated: styles are Discogs' own taxonomy, the same
-            # reason the genre tag is written from them verbatim.
-            (self.tr("Styles"), "; ".join(candidate.styles)),
+        rating = ""
+        if candidate.rating:
+            rating = f"{candidate.rating:.2f}"
+            if candidate.rating_count:
+                rating = f"{rating} ({candidate.rating_count})"
+        return [
+            (self.tr("Have"), str(candidate.have) if candidate.have else ""),
+            (self.tr("Want"), str(candidate.want) if candidate.want else ""),
+            (self.tr("Rating"), rating),
         ]
-        return [(label, value) for label, value in rows if value]
 
     def _discogs_page_url(self) -> str:
         """The release page, from the best description we have or the stored id."""

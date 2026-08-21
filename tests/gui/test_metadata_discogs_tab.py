@@ -91,6 +91,39 @@ def _apply(panel, path, candidate=None):
     panel._apply_lookup_values({"title": "Born Slippy (Nuxx)"})
 
 
+def _sections(panel) -> dict[str, dict[str, str]]:
+    """The tab's headed blocks, as {heading: {label: value}}.
+
+    Walks the scrolling body rather than one form, because the tab is a column
+    of sections now — a heading label followed by the QFormLayout it heads.
+    """
+    from PySide6.QtWidgets import QFormLayout, QLabel
+
+    body = panel._discogs_body
+    out: dict[str, dict[str, str]] = {}
+    heading = ""
+    for i in range(body.count()):
+        item = body.itemAt(i)
+        widget = item.widget()
+        if isinstance(widget, QLabel):
+            heading = widget.text()
+            out.setdefault(heading, {})
+            continue
+        form = item.layout()
+        if isinstance(form, QFormLayout):
+            rows = out.setdefault(heading, {})
+            for row in range(form.rowCount()):
+                key = form.itemAt(row, QFormLayout.ItemRole.LabelRole)
+                value = form.itemAt(row, QFormLayout.ItemRole.FieldRole)
+                if key is not None and value is not None:
+                    rows[key.widget().text()] = value.widget().text()
+    return out
+
+
+def _all_values(panel) -> list[str]:
+    return [v for rows in _sections(panel).values() for v in rows.values()]
+
+
 # --- the memory -------------------------------------------------------------
 
 
@@ -149,13 +182,64 @@ def test_another_file_does_not_inherit_the_memory(qtbot, flac, tmp_path, library
 
 def test_the_tab_shows_the_release_after_a_lookup(panel, flac):
     _apply(panel, flac)
-    labels = [
-        panel._discogs_details.itemAt(i).widget().text()
-        for i in range(panel._discogs_details.count())
-    ]
-    assert "Junior Boy's Own" in labels
-    assert '12", Single' in labels
-    assert "Techno; Progressive House" in labels
+    sections = _sections(panel)
+
+    assert sections["Release"]["Label"] == "Junior Boy's Own"
+    assert sections["Pressing"]["Format"] == '12", Single'
+    assert sections["Release"]["Styles"] == "Techno; Progressive House"
+
+
+def test_the_title_and_artist_are_the_heading_not_a_row(panel, flac):
+    """They were the tab's one visible duplication: printed once above the
+    table and again as its first row."""
+    _apply(panel, flac)
+
+    assert panel._discogs_summary.text() == "Born Slippy"
+    assert panel._discogs_subtitle.text() == "Underworld"
+    assert "Born Slippy" not in _all_values(panel)
+
+
+def test_year_and_released_are_kept_apart(panel, flac):
+    """They are different facts that can legitimately disagree — the year
+    prefers the master's — so under one heading they read as a contradiction."""
+    described = _candidate()
+    described.released = "1996-05-13"
+    _apply(panel, flac, described)
+    sections = _sections(panel)
+
+    assert "Year" in sections["Release"]
+    assert sections["Pressing"]["Released"] == "1996-05-13"
+
+
+def test_an_empty_section_is_left_out_entirely(panel, flac):
+    """Worse than a missing one: it says Discogs holds this kind of
+    information about the record and then shows none of it."""
+    _apply(panel, flac)  # the plain fixture has no notes and no identifiers
+
+    assert "Notes" not in _sections(panel)
+    assert "Identifiers" not in _sections(panel)
+
+
+def test_every_value_can_be_selected_and_copied(panel, flac):
+    """The reason to look at a catalogue number or a runout is to paste it."""
+    from PySide6.QtCore import Qt
+    from PySide6.QtWidgets import QFormLayout
+
+    _apply(panel, flac)
+    body = panel._discogs_body
+    checked = 0
+    for i in range(body.count()):
+        form = body.itemAt(i).layout()
+        if not isinstance(form, QFormLayout):
+            continue
+        for row in range(form.rowCount()):
+            value = form.itemAt(row, QFormLayout.ItemRole.FieldRole).widget()
+            assert (
+                value.textInteractionFlags()
+                & Qt.TextInteractionFlag.TextSelectableByMouse
+            )
+            checked += 1
+    assert checked
 
 
 def test_a_remembered_release_gives_the_tab_something_to_say_on_load(
@@ -318,11 +402,8 @@ def test_a_refresh_from_a_stored_id_alone_describes_the_release(panel, flac):
     panel._tab_refresh = True
     panel._on_lookup_result(_result(flac, described))
     assert panel._discogs_summary.text() == "Born Slippy"
-    labels = [
-        panel._discogs_details.itemAt(i).widget().text()
-        for i in range(panel._discogs_details.count())
-    ]
-    assert "Junior Boy's Own" in labels and "UK" in labels
+    values = _all_values(panel)
+    assert "Junior Boy's Own" in values and "UK" in values
 
 
 # --- v7: the description, not just the identity -----------------------------
@@ -352,13 +433,10 @@ def test_the_tab_describes_the_release_on_load_with_no_lookup(
     second._load_file(flac)
 
     assert second._discogs_summary.text() == "Born Slippy"
-    labels = {
-        second._discogs_details.itemAt(row, second._discogs_details.ItemRole.LabelRole)
-        .widget()
-        .text()
-        for row in range(second._discogs_details.rowCount())
-    }
-    assert {"Label", "Country", "Year"} <= labels
+    sections = _sections(second)
+    assert "Label" in sections["Release"]
+    assert "Year" in sections["Release"]
+    assert "Country" in sections["Pressing"]
 
 
 def test_a_dropped_file_remembers_its_release_without_joining_the_library(
@@ -380,7 +458,7 @@ def test_a_release_known_but_never_described_still_says_so(panel, flac, library)
     panel._load_file(flac)
 
     assert "999" in panel._discogs_summary.text()
-    assert panel._discogs_details.rowCount() == 0
+    assert _sections(panel) == {}
 
 
 def test_ejecting_and_reloading_keeps_the_description(panel, flac, library):
@@ -407,3 +485,71 @@ def test_ejecting_takes_the_release_with_the_file(panel, flac, library):
 
     assert panel._release_id is None
     assert "Born Slippy" not in panel._discogs_summary.text()
+
+
+def test_notes_are_a_paragraph_not_a_field(panel, flac):
+    """A one-row form with a blank label indents the text to the label column
+    and leaves a rectangle of nothing beside it."""
+    from PySide6.QtWidgets import QFormLayout, QLabel
+
+    described = _candidate()
+    described.notes = "Comes in a printed inner sleeve."
+    _apply(panel, flac, described)
+
+    body = panel._discogs_body
+    texts = [
+        body.itemAt(i).widget().text()
+        for i in range(body.count())
+        if isinstance(body.itemAt(i).widget(), QLabel)
+    ]
+    # Straight onto the column, as its own widget — not inside any form.
+    assert "Comes in a printed inner sleeve." in texts
+    in_forms = [
+        body.itemAt(i).layout()
+        for i in range(body.count())
+        if isinstance(body.itemAt(i).layout(), QFormLayout)
+    ]
+    assert all(
+        form.itemAt(r, QFormLayout.ItemRole.FieldRole).widget().text()
+        != "Comes in a printed inner sleeve."
+        for form in in_forms
+        for r in range(form.rowCount())
+    )
+
+
+def test_credits_are_grouped_by_role(panel, flac):
+    """Three people credited Written-By is one row, not the word three times."""
+    from src.online.result import Credit
+
+    described = _candidate()
+    described.credits = (
+        Credit("Karl Hyde", "Written-By"),
+        Credit("Rick Smith", "Written-By"),
+        Credit("Rick Smith", "Producer"),
+    )
+    _apply(panel, flac, described)
+
+    assert _sections(panel)["Credits"]["Written-By"] == "Karl Hyde, Rick Smith"
+
+
+def test_the_label_column_is_measured_not_a_constant(panel, flac):
+    """These strings are translated: a number that fits "Catalogue Number"
+    says nothing about "Katalognummer"."""
+    from PySide6.QtGui import QFontMetrics
+
+    _apply(panel, flac)
+    widths = {key.minimumWidth() for key, _ in panel._discogs_keys}
+    assert len(widths) == 1  # one shared column across every aligned section
+
+    widest = max(
+        QFontMetrics(key.font()).horizontalAdvance(text)
+        for key, text in panel._discogs_keys
+    )
+    assert widths == {widest}
+
+
+def test_the_tracklist_keeps_out_of_that_column(panel, flac):
+    """A position is data, not a field name — stretching "A1" to the width of
+    "Catalogue Number" puts 150px of nothing between a track and its number."""
+    _apply(panel, flac)
+    assert "A1" not in [text for _key, text in panel._discogs_keys]
