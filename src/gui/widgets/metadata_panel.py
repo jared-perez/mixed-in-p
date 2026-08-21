@@ -290,6 +290,21 @@ class MetadataPanel(QWidget):
         # Theme.SPACING — the form's rows shift by 2px each without this.
         tags_layout.setSpacing(Theme.SPACING)
         tags_layout.addWidget(scroll)
+        # Add field belongs to the *form*, not to the panel: it puts a new row
+        # in the file's tags, which is the one job the Tags page does. Sitting
+        # in the shared row under the tabs it stayed on screen over the Discogs
+        # page, where there is no form to add anything to — and it read as an
+        # offer to add a field to the release. Inside the page it comes and
+        # goes with the page, for no visibility handling of its own.
+        add_field_row = QHBoxLayout()
+        add_field_row.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
+        add_field_row.setSpacing(Theme.SPACING)
+        self._add_combo = QComboBox()
+        self._add_combo.addItem(self.tr("Add field..."))
+        self._add_combo.setMinimumWidth(160)
+        add_field_row.addWidget(self._add_combo)
+        add_field_row.addStretch()
+        tags_layout.addLayout(add_field_row)
         self._tabs.addTab(tags_page, self.tr("Tags"))
         # Not translated: a provider name, like the format codes and the
         # product name. DISPLAY_NAME rather than a literal so the tab and
@@ -305,15 +320,12 @@ class MetadataPanel(QWidget):
 
         layout.addLayout(body, 1)
 
-        # Single row for Add field combo (under form) + Add Artwork / Remove (under artwork)
+        # Add Artwork / Remove, under the artwork column. The cover belongs to
+        # both jobs, so these stay outside the tabs — unlike Add field, which
+        # is part of the Tags page above.
         controls_row = QHBoxLayout()
         controls_row.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
         controls_row.setSpacing(Theme.SPACING)
-
-        self._add_combo = QComboBox()
-        self._add_combo.addItem(self.tr("Add field..."))
-        self._add_combo.setMinimumWidth(160)
-        controls_row.addWidget(self._add_combo)
         controls_row.addStretch()
 
         self._add_artwork_btn = QPushButton(self.tr("Add Artwork…"))
@@ -331,8 +343,6 @@ class MetadataPanel(QWidget):
         self._controls_row_widget.setLayout(controls_row)
         self._controls_row_widget.setVisible(False)
         layout.addWidget(self._controls_row_widget)
-        # Backwards-compat alias used by existing show/hide code paths
-        self._add_field_widget = self._controls_row_widget
 
         # A file with no artist and no title gets an empty form and, until now,
         # no hint that the one feature built for exactly that case exists.
@@ -475,6 +485,13 @@ class MetadataPanel(QWidget):
         self._discogs_link.clicked.connect(self._on_discogs_link_clicked)
         row.addWidget(self._discogs_link)
         row.addStretch()
+        # The same credit the review dialog and the About box carry, on the
+        # third surface that displays this data. Not translated: it is a
+        # provider credit, like DISPLAY_NAME, and ATTRIBUTION is one constant
+        # so the three cannot drift apart.
+        self._discogs_credit = QLabel(discogs.ATTRIBUTION)
+        self._discogs_credit.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
+        row.addWidget(self._discogs_credit)
         layout.addLayout(row)
         layout.addStretch()
         return page
@@ -663,7 +680,7 @@ class MetadataPanel(QWidget):
 
         # Show editor widgets and collapse the bottom spacer
         self._tabs.setVisible(True)
-        self._add_field_widget.setVisible(True)
+        self._controls_row_widget.setVisible(True)
         self._reload_btn.setVisible(True)
         self._eject_btn.setVisible(True)
         self._artwork.setVisible(True)
@@ -840,7 +857,7 @@ class MetadataPanel(QWidget):
         self._path_label.setText("")
         self._path_label.setToolTip("")
         self._tabs.setVisible(False)
-        self._add_field_widget.setVisible(False)
+        self._controls_row_widget.setVisible(False)
         self._reload_btn.setVisible(False)
         self._eject_btn.setVisible(False)
         self._artwork.setVisible(False)
