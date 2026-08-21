@@ -23,6 +23,8 @@ Design rules (settled in the playlist feature research, 2026-07-26):
 
 from __future__ import annotations
 
+import json
+import logging
 import re
 import sqlite3
 from dataclasses import dataclass
@@ -42,8 +44,10 @@ from src.library.compatibility import (
 # Reserved node id for the Player's pinned working list ("Scratch").
 SCRATCH_NODE_ID = 1
 
+logger = logging.getLogger(__name__)
+
 _CONTENT_ID_BYTES = 64 * 1024
-_SCHEMA_VERSION = 6
+_SCHEMA_VERSION = 7
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -93,6 +97,39 @@ CREATE TABLE IF NOT EXISTS nodes (
     expanded INTEGER NOT NULL DEFAULT 0
 );
 CREATE INDEX IF NOT EXISTS idx_nodes_parent ON nodes(parent_id);
+
+-- v7. What Discogs said about a release, so the Metadata panel's Discogs tab
+-- can describe it the moment a file is loaded rather than only after a lookup.
+-- Before this the app stored an identity and nothing else, so a file it knew
+-- the release of could still only be shown a release *number*.
+--
+-- `facts` is JSON, not columns, and that is the point: this is a cache of an
+-- external description whose field set is Discogs' to change, nothing queries
+-- it, and a schema migration per displayed field would be a bad trade. Readers
+-- tolerate absent and unknown keys (Candidate.from_release_facts), so the set
+-- can widen without touching this table.
+--
+-- `fetched_at` is what makes the copy answerable for its own age: the provider
+-- keeps no results cache by design, and this is the one place fetched content
+-- outlives the request, so it says when it arrived and Refresh replaces it.
+CREATE TABLE IF NOT EXISTS discogs_releases (
+    release_id INTEGER PRIMARY KEY,
+    fetched_at TEXT NOT NULL,
+    facts TEXT NOT NULL
+);
+
+-- v7. Which release a *file* was tagged from, for a file with no `tracks` row.
+-- The Metadata panel takes a file dropped straight onto it without importing
+-- it — deliberately; a tag editor is not a library importer — and until now
+-- that meant looking one up, applying it, and forgetting it in the same
+-- gesture. `tracks.discogs_release_id` stays the answer wherever there IS a
+-- row, because it survives a rename and this does not; see release_for_path
+-- for the one precedence rule that keeps the two from drifting.
+CREATE TABLE IF NOT EXISTS discogs_path_releases (
+    path TEXT PRIMARY KEY,
+    release_id INTEGER NOT NULL,
+    tagged_at TEXT NOT NULL
+);
 
 CREATE TABLE IF NOT EXISTS playlist_items (
     node_id INTEGER NOT NULL REFERENCES nodes(id) ON DELETE CASCADE,
@@ -413,6 +450,13 @@ class Library:
                 "ALTER TABLE tracks ADD COLUMN discogs_release_id INTEGER"
             )
 
+        # v7 — the Discogs release cache and the path-keyed release memory.
+        # Nothing to do here on purpose: both are whole *tables*, and
+        # `_init_schema` runs `executescript(_SCHEMA)` on every open, so
+        # `CREATE TABLE IF NOT EXISTS` reaches an existing database exactly as
+        # it reaches a fresh one. Only a new *column* on an existing table
+        # needs an ALTER, which is what every branch above is.
+
         (version,) = self._con.execute("PRAGMA user_version").fetchone()
         if version and version < 4:  # v4 — the key became a searchable field
             # Here a rebuild IS required: existing rows have a stored key that
@@ -684,6 +728,127 @@ class Library:
                 "UPDATE tracks SET discogs_release_id=? WHERE id=?",
                 (int(release_id) if release_id else None, track_id),
             )
+
+    # ------------------------------------------------- Discogs release memory
+
+    def release_for_path(self, path: str) -> int | None:
+        """Which Discogs release this file was tagged from, or None.
+
+        **One read path, with one precedence rule.** A `tracks` row wins when
+        it has an answer, because that memory survives a rename and a
+        path-keyed one cannot. The path table answers only for a file the
+        library has never heard of — or for one that has since joined it
+        without bringing its release along, which is the case the promotion
+        below exists for.
+
+        The promotion is what stops the two drifting: without it, a file whose
+        release was remembered before it was ever imported would be answered
+        forever by the weaker of the two records, and adding it to a playlist
+        would silently lose the release the user had approved.
+        """
+        row = self._con.execute(
+            "SELECT id, discogs_release_id FROM tracks WHERE path=?", (str(path),)
+        ).fetchone()
+        if row is not None and row["discogs_release_id"]:
+            return int(row["discogs_release_id"])
+        stored = self._con.execute(
+            "SELECT release_id FROM discogs_path_releases WHERE path=?", (str(path),)
+        ).fetchone()
+        if stored is None:
+            return None
+        release_id = int(stored["release_id"])
+        if row is not None:
+            with self._con:
+                self._con.execute(
+                    "UPDATE tracks SET discogs_release_id=? WHERE id=?",
+                    (release_id, row["id"]),
+                )
+                self._con.execute(
+                    "DELETE FROM discogs_path_releases WHERE path=?", (str(path),)
+                )
+        return release_id
+
+    def remember_release_for_path(self, path: str, release_id: int | None) -> None:
+        """Store the approved release against a file, row or no row.
+
+        The write mirrors :meth:`release_for_path`: the `tracks` row if there
+        is one, the path table otherwise — never both, so there is nothing to
+        keep in step. A falsy release_id forgets whichever record exists,
+        because "no release" is an answer and leaving a stale one would make
+        the next lookup argue from a release the user has just rejected.
+        """
+        path = str(path)
+        row = self._con.execute(
+            "SELECT id FROM tracks WHERE path=?", (path,)
+        ).fetchone()
+        with self._con:
+            if row is not None:
+                self._con.execute(
+                    "UPDATE tracks SET discogs_release_id=? WHERE id=?",
+                    (int(release_id) if release_id else None, row["id"]),
+                )
+                self._con.execute(
+                    "DELETE FROM discogs_path_releases WHERE path=?", (path,)
+                )
+                return
+            if not release_id:
+                self._con.execute(
+                    "DELETE FROM discogs_path_releases WHERE path=?", (path,)
+                )
+                return
+            self._con.execute(
+                """
+                INSERT INTO discogs_path_releases (path, release_id, tagged_at)
+                VALUES (?, ?, ?)
+                ON CONFLICT(path) DO UPDATE SET
+                    release_id=excluded.release_id, tagged_at=excluded.tagged_at
+                """,
+                (path, int(release_id), _now()),
+            )
+
+    def cache_release(self, release_id: int, facts: dict) -> None:
+        """Keep what a provider said about a release, so a panel can show it.
+
+        Replaces rather than merges: a Refresh exists to say "read it again",
+        and a merge would let a field the release no longer carries outlive
+        the reading that dropped it.
+        """
+        if not release_id:
+            return
+        with self._con:
+            self._con.execute(
+                """
+                INSERT INTO discogs_releases (release_id, fetched_at, facts)
+                VALUES (?, ?, ?)
+                ON CONFLICT(release_id) DO UPDATE SET
+                    fetched_at=excluded.fetched_at, facts=excluded.facts
+                """,
+                (int(release_id), _now(), json.dumps(facts, ensure_ascii=False)),
+            )
+
+    def cached_release(self, release_id: int) -> tuple[dict, str] | None:
+        """The stored facts and when they were read, or None if never.
+
+        Bad JSON reads as *absent*, not as an error: this is a cache, the
+        recovery is to fetch again, and a panel that raised on load because a
+        row was truncated would be a worse failure than the one it reports.
+        """
+        if not release_id:
+            return None
+        row = self._con.execute(
+            "SELECT facts, fetched_at FROM discogs_releases WHERE release_id=?",
+            (int(release_id),),
+        ).fetchone()
+        if row is None:
+            return None
+        try:
+            facts = json.loads(row["facts"])
+        except (TypeError, ValueError) as exc:
+            logger.debug("Unreadable cached release %s: %s", release_id, exc)
+            return None
+        if not isinstance(facts, dict):
+            return None
+        return facts, str(row["fetched_at"])
 
     def update_track_tags(self, track_id: int, **fields: object) -> None:
         """Update tag columns (see `_TAG_COLUMNS`)."""

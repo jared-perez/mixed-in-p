@@ -5055,7 +5055,7 @@ class PlayerPanel(QWidget):
             # only writer of the release memory — so every track tagged from
             # the playlist came back to the Discogs tab as "No release known
             # for this file yet", over tags it had just taken from a release.
-            self._remember_release(entry.file_path, dialog.chosen_release_id())
+            self._remember_release(entry.file_path, dialog.chosen_candidate())
         self._report_lookup_outcome(applied, failures, skipped)
 
     # ------------------------------------------------- release memory (v6)
@@ -5065,22 +5065,19 @@ class PlayerPanel(QWidget):
         if self._library is None:
             return None
         try:
-            track = self._library.get_track_by_path(file_path)
+            return self._library.release_for_path(file_path)
         except Exception as exc:  # noqa: BLE001 — no memory is not an error
             logger.debug("Could not read the release memory: %s", exc)
             return None
-        return getattr(track, "discogs_release_id", None) if track else None
 
-    def _remember_release(self, file_path: str, release_id: int | None) -> None:
-        """Store the approved release against the library row, if there is one."""
-        if self._library is None or not release_id:
-            return
-        try:
-            track = self._library.get_track_by_path(file_path)
-            if track is not None:
-                self._library.set_release_id(track.id, release_id)
-        except Exception as exc:  # noqa: BLE001
-            logger.debug("Could not remember the release: %s", exc)
+    def _remember_release(self, file_path: str, candidate) -> None:
+        """Store the approved release, and what Discogs said about it.
+
+        The same helper the Metadata panel calls. Two surfaces writing this by
+        hand is exactly how it came to be written by one of them and read by
+        neither.
+        """
+        lookup_flow.remember_lookup(self._library, file_path, candidate)
 
     def _on_review_candidate_requested(self, dialog, result, candidate) -> None:
         """Read another pressing into the review dialog that asked for it.

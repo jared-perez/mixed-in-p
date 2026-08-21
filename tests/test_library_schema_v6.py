@@ -8,7 +8,9 @@ One column, and the three rules it has to follow:
 * it is **not a tag**, so it is absent from `_TAG_COLUMNS` (which would reject
   it anyway) and from `_FTS_COLUMNS`, and never travels the merge/blob path;
 * it stores an **identity, not content**. Nothing about the release itself is
-  kept, which is what leaves the provider's freshness rule intact.
+  kept in this column — the description lives in `discogs_releases`, added in
+  v7 and tested next door, and the split is deliberate: the identity is per
+  file and permanent, the description is per release and replaceable.
 """
 
 from __future__ import annotations

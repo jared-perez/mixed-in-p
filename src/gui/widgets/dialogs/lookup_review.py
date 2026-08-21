@@ -350,6 +350,15 @@ class LookupReviewDialog(QDialog):
         """
         self._fill_candidates()
 
+    def chosen_candidate(self):
+        """The release the user was looking at, as the provider described it.
+
+        The caller wants both halves — the identity to remember and the
+        description to cache — and reading them off one object is what stops a
+        panel storing a description of a release it did not credit.
+        """
+        return getattr(self._result, "chosen", None)
+
     def chosen_release_id(self) -> int | None:
         """The release the user was looking at, for the caller to remember.
 

@@ -5,9 +5,11 @@ Two rules carry this feature, and both are easy to break silently:
 * **A file dropped here need not be in the library, and the panel must not
   put it there.** Calling `add_track` from a tag editor would quietly turn it
   into a library importer.
-* **What is stored is an identity, not content.** The release id, and nothing
-  the provider fetched — which is what leaves the freshness rule intact and
-  is why the tab has a Refresh button rather than a cache.
+* **The identity and the description are stored separately.** `tracks`
+  (or `discogs_path_releases`) holds which release the file was tagged from;
+  `discogs_releases` holds what the provider said about it, stamped with when
+  it was read, which is the one place fetched content outlives its request.
+  Refresh replaces that row wholesale.
 """
 
 from __future__ import annotations
@@ -321,3 +323,87 @@ def test_a_refresh_from_a_stored_id_alone_describes_the_release(panel, flac):
         for i in range(panel._discogs_details.count())
     ]
     assert "Junior Boy's Own" in labels and "UK" in labels
+
+
+# --- v7: the description, not just the identity -----------------------------
+#
+# The complaint this answers: a file that had been looked up came back to a tab
+# saying "No release known for this file yet. Look it up online." The identity
+# was stored and the description was not, so the most the tab could ever offer
+# a known release was its number.
+
+
+def test_the_tab_describes_the_release_on_load_with_no_lookup(
+    qtbot, flac, library
+):
+    """The headline: open a file, see the release, spend no request."""
+    first = MetadataPanel()
+    qtbot.addWidget(first)
+    first.set_online_lookup(True, token="tok")
+    first.set_library(library)
+    first._load_file(flac)
+    _apply(first, flac)
+
+    # A different panel, a fresh session: nothing in memory, only the database.
+    second = MetadataPanel()
+    qtbot.addWidget(second)
+    second.set_online_lookup(True, token="tok")
+    second.set_library(library)
+    second._load_file(flac)
+
+    assert second._discogs_summary.text() == "Born Slippy"
+    labels = {
+        second._discogs_details.itemAt(row, second._discogs_details.ItemRole.LabelRole)
+        .widget()
+        .text()
+        for row in range(second._discogs_details.rowCount())
+    }
+    assert {"Label", "Country", "Year"} <= labels
+
+
+def test_a_dropped_file_remembers_its_release_without_joining_the_library(
+    panel, flac, library
+):
+    """Bug 2. The panel must still not import it — both halves matter."""
+    panel.set_library(library)
+    _apply(panel, flac)
+
+    assert library.track_count() == 0
+    assert library.release_for_path(flac) == 249504
+
+
+def test_a_release_known_but_never_described_still_says_so(panel, flac, library):
+    """A release remembered by a build older than the cache. Not an error —
+    show the identity, which is all there is."""
+    library.remember_release_for_path(flac, 999)
+    panel.set_library(library)
+    panel._load_file(flac)
+
+    assert "999" in panel._discogs_summary.text()
+    assert panel._discogs_details.rowCount() == 0
+
+
+def test_ejecting_and_reloading_keeps_the_description(panel, flac, library):
+    """`_clear` drops the session result on purpose — a new file must not wear
+    the last one's release. Reloading the *same* file has to get it back from
+    the database, not from what the panel happened to still be holding."""
+    panel.set_library(library)
+    _apply(panel, flac)
+    panel._clear()
+    assert panel._discogs_summary.text() != "Born Slippy"  # genuinely dropped
+
+    panel._load_file(flac)
+
+    assert panel._discogs_summary.text() == "Born Slippy"
+    assert panel._discogs_page_url() == "https://www.discogs.com/release/249504"
+
+
+def test_ejecting_takes_the_release_with_the_file(panel, flac, library):
+    """`_clear` never reset the release id, so an empty panel went on
+    reporting the ejected file's release."""
+    panel.set_library(library)
+    _apply(panel, flac)
+    panel._clear()
+
+    assert panel._release_id is None
+    assert "Born Slippy" not in panel._discogs_summary.text()

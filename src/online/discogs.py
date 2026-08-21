@@ -14,9 +14,15 @@ Three things about the API that shape this file:
   live counters, so the pacer reads those rather than hardcoding 60 — if
   Discogs changes the number, this follows it.
 * **Freshness rule: fetched content must not be cached longer than needed.**
-  So there is no results cache here. Fetch, show, the user applies, the values
-  become their own tags (the core data is CC0, which makes that clean), and
-  the payload is discarded. The only memo is per-lookup and dies with it.
+  So there is no results cache *here*: this module fetches, hands the result
+  over and keeps nothing but a per-lookup memo that dies with it. What the
+  user applies becomes their own tags (the core data is CC0, which makes that
+  clean). Since v7 the library does keep one copy of a release's description
+  — `discogs_releases` — so the Metadata panel can say what a file's release
+  *is* without spending a request to re-read what it already read. That copy
+  is stamped with when it arrived, is replaced wholesale by Refresh, and
+  covers only the fields shown; it is not a mirror of the API. Attribution
+  travels with it (`ATTRIBUTION`, on all three surfaces that display it).
 """
 
 from __future__ import annotations

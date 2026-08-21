@@ -193,6 +193,88 @@ class Candidate:
             parts.append(" ".join(tail))
         return " — ".join(parts)
 
+    # ------------------------------------------------- the release, storable
+
+    def release_facts(self) -> dict:
+        """Everything here that belongs to the *release* rather than to a file.
+
+        What ``score`` and ``track`` say is "how well this release matched
+        *that* file", which is a per-file answer and must not be stored against
+        a release that another file will read back. ``tracklist`` is the
+        release's own and stays.
+
+        A plain dict rather than columns on purpose: this is a cache of an
+        external description whose field set is Discogs' to change, and a
+        schema migration per field is a bad trade for data nothing queries. A
+        reader tolerates keys it does not know and keys that are not there, so
+        widening it later costs nothing.
+        """
+        return {
+            "provider": self.provider,
+            "release_id": self.release_id,
+            "master_id": self.master_id,
+            "artist": self.artist,
+            "album": self.album,
+            "year": self.year,
+            "label": self.label,
+            "styles": list(self.styles),
+            "genres": list(self.genres),
+            "formats": list(self.formats),
+            "country": self.country,
+            "thumb_url": self.thumb_url,
+            "cover_url": self.cover_url,
+            "page_url": self.page_url,
+            "tracklist": [
+                {
+                    "position": e.position,
+                    "title": e.title,
+                    "artist": e.artist,
+                    "duration": e.duration,
+                    "ordinal": e.ordinal,
+                    "number": e.number,
+                }
+                for e in self.tracklist
+            ],
+        }
+
+    @classmethod
+    def from_release_facts(cls, facts: dict) -> "Candidate":
+        """Rebuild a candidate from :meth:`release_facts`.
+
+        Every field is read with a default, so a blob written by an older build
+        — or a newer one, whose extra keys are simply ignored — still produces
+        a usable candidate rather than raising in the middle of a panel load.
+        """
+        entries = tuple(
+            TrackEntry(
+                position=str(row.get("position") or ""),
+                title=str(row.get("title") or ""),
+                artist=str(row.get("artist") or ""),
+                duration=row.get("duration"),
+                ordinal=int(row.get("ordinal") or 0),
+                number=int(row.get("number") or 0),
+            )
+            for row in facts.get("tracklist") or []
+            if isinstance(row, dict)
+        )
+        return cls(
+            provider=str(facts.get("provider") or ""),
+            release_id=int(facts.get("release_id") or 0),
+            master_id=facts.get("master_id"),
+            artist=str(facts.get("artist") or ""),
+            album=str(facts.get("album") or ""),
+            year=facts.get("year"),
+            label=str(facts.get("label") or ""),
+            styles=tuple(str(v) for v in facts.get("styles") or ()),
+            genres=tuple(str(v) for v in facts.get("genres") or ()),
+            formats=tuple(str(v) for v in facts.get("formats") or ()),
+            country=str(facts.get("country") or ""),
+            thumb_url=str(facts.get("thumb_url") or ""),
+            cover_url=str(facts.get("cover_url") or ""),
+            page_url=str(facts.get("page_url") or ""),
+            tracklist=entries,
+        )
+
 
 @dataclass
 class ProposedTags:

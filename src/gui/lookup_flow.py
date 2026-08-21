@@ -165,3 +165,59 @@ def apply_values(file_path: str, values: dict) -> str:
         Path(file_path).name,
     )
     return ""
+
+
+def remember_lookup(library, file_path: str, candidate) -> None:
+    """Record what a lookup found: which release, and what it said.
+
+    Both panels call this and neither does either half by hand. That is the
+    whole point — the release memory shipped written by one of the two lookup
+    paths and read by neither, and the class of bug it belongs to is "one path
+    fills something in, another reuses the result and inherits only what the
+    first happened to store".
+
+    Two separate records, deliberately:
+
+    * the **identity** — this file was tagged from that release — which is
+      answered per file and survives whether or not we can still describe it;
+    * the **description**, cached per release, which is what lets the Discogs
+      tab say something on load instead of showing a release *number*.
+
+    Storing the description is the one place fetched content outlives its
+    request, so the row carries when it arrived and Refresh replaces it
+    wholesale. Nothing here raises: a lookup the user has already approved must
+    not be undone by a database that would not write.
+    """
+    release_id = getattr(candidate, "release_id", 0)
+    if library is None or not file_path or not release_id:
+        return
+    try:
+        library.remember_release_for_path(file_path, release_id)
+    except Exception as exc:  # noqa: BLE001 — no memory is not a failed lookup
+        logger.debug("Could not remember the release: %s", exc)
+    try:
+        library.cache_release(release_id, candidate.release_facts())
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Could not cache the release description: %s", exc)
+
+
+def cached_candidate(library, release_id: int):
+    """Rebuild the last-known description of a release, or None.
+
+    None means "we know the identity and not the description" — a release
+    remembered by a build before the cache existed, or one whose row has gone.
+    Callers show what they can rather than treating it as an error.
+    """
+    if library is None or not release_id:
+        return None
+    try:
+        stored = library.cached_release(release_id)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Could not read the cached release: %s", exc)
+        return None
+    if stored is None:
+        return None
+    facts, _fetched_at = stored
+    from src.online.result import Candidate
+
+    return Candidate.from_release_facts(facts)

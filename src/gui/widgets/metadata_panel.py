@@ -532,7 +532,7 @@ class MetadataPanel(QWidget):
         while self._discogs_details.rowCount():
             self._discogs_details.removeRow(0)
 
-        candidate = getattr(self._last_result, "chosen", None)
+        candidate = self._tab_candidate()
         # A lookup this session is the rich case; a stored id on its own is the
         # honest one. Both beat a blank tab, which reads as broken.
         if candidate is not None:
@@ -555,6 +555,21 @@ class MetadataPanel(QWidget):
         self._discogs_refresh_btn.setVisible(self._online_enabled and known)
         self._discogs_link.setVisible(bool(self._discogs_page_url()))
 
+    def _tab_candidate(self):
+        """The best description of this file's release that we have.
+
+        This session's lookup first, because it is the freshest and because a
+        candidate switch has to be reflected before the user presses anything.
+        Otherwise the stored description, which is the whole reason the tab can
+        say something about a file the moment it is loaded — before this, a
+        file whose release was perfectly well known still got a release
+        *number* and an invitation to look it up.
+        """
+        candidate = getattr(self._last_result, "chosen", None)
+        if candidate is not None:
+            return candidate
+        return lookup_flow.cached_candidate(self._library, self._release_id)
+
     def _release_rows(self, candidate) -> list[tuple[str, str]]:
         """The release facts worth showing, skipping the ones we have not got.
 
@@ -576,8 +591,8 @@ class MetadataPanel(QWidget):
         return [(label, value) for label, value in rows if value]
 
     def _discogs_page_url(self) -> str:
-        """The release page, from this session's result or the stored id."""
-        candidate = getattr(self._last_result, "chosen", None)
+        """The release page, from the best description we have or the stored id."""
+        candidate = self._tab_candidate()
         if candidate is not None and candidate.page_url:
             return candidate.page_url
         if self._release_id:
@@ -599,7 +614,7 @@ class MetadataPanel(QWidget):
         """
         if self._file_path is None or self._lookup_thread is not None:
             return
-        candidate = getattr(self._last_result, "chosen", None)
+        candidate = self._tab_candidate()
         if candidate is None and self._release_id:
             candidate = Candidate(
                 provider=discogs.PROVIDER_NAME, release_id=self._release_id
@@ -979,27 +994,39 @@ class MetadataPanel(QWidget):
         self._release_id = None
         if self._library is not None and self._file_path is not None:
             try:
-                track = self._library.get_track_by_path(self._file_path)
+                # `release_for_path`, not the track row: a file dragged
+                # straight onto this panel has no row — the ordinary case
+                # here, and the one whose lookups were forgotten the instant
+                # they were applied.
+                self._release_id = self._library.release_for_path(self._file_path)
             except Exception as exc:  # noqa: BLE001 — no memory is not an error
                 logger.debug("Could not read the release memory: %s", exc)
-                track = None
-            # None means the file is simply not in the library, which is the
-            # ordinary case for one dragged straight onto this panel.
-            if track is not None:
-                self._release_id = track.discogs_release_id
         self._refresh_discogs_tab()
 
     def _remember_release(self, release_id: int | None) -> None:
-        """Store the approved release against the library row, if there is one."""
+        """Store the approved release, and what Discogs said about it.
+
+        Through `lookup_flow.remember_lookup`, which the Player's batch review
+        also calls: the release memory shipped written by one of the two
+        lookup paths and read by neither, and one helper is what stops that
+        happening a third time.
+        """
         self._release_id = release_id
-        if self._library is None or self._file_path is None or not release_id:
+        if self._file_path is None or not release_id:
             return
-        try:
-            track = self._library.get_track_by_path(self._file_path)
-            if track is not None:
-                self._library.set_release_id(track.id, release_id)
-        except Exception as exc:  # noqa: BLE001
-            logger.debug("Could not remember the release: %s", exc)
+        candidate = getattr(self._last_result, "chosen", None)
+        if candidate is None or candidate.release_id != release_id:
+            # Nothing to describe — record the identity alone rather than
+            # cache a description of a different release.
+            if self._library is not None:
+                try:
+                    self._library.remember_release_for_path(
+                        self._file_path, release_id
+                    )
+                except Exception as exc:  # noqa: BLE001
+                    logger.debug("Could not remember the release: %s", exc)
+            return
+        lookup_flow.remember_lookup(self._library, self._file_path, candidate)
 
     def set_online_lookup(
         self, enabled: bool, token: str = "", fetch_artwork: bool = True
@@ -1265,8 +1292,17 @@ class MetadataPanel(QWidget):
         self._release_link.setVisible(bool(url))
 
     def _clear_provenance(self) -> None:
-        """Forget the last lookup: a new file has nothing to do with it."""
+        """Forget the last lookup: a new file has nothing to do with it.
+
+        The release *id* goes too, and always did need to: `_clear` never
+        reset it, so an ejected file left its release behind and the empty
+        panel went on reporting one. That was survivable while the tab could
+        only print a number and is not now that it can describe the record.
+        `_load_file` re-reads it from the library immediately afterwards, so
+        the only state this can lose is state that belonged to another file.
+        """
         self._last_result = None
+        self._release_id = None
         self._release_url = ""
         self._release_link.setVisible(False)
         self._set_lookup_status("")
