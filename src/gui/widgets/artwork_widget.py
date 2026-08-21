@@ -12,9 +12,17 @@ from PySide6.QtGui import (
     QDropEvent,
     QPixmap,
 )
-from PySide6.QtWidgets import QFrame, QLabel, QSizePolicy, QVBoxLayout, QWidget
+from PySide6.QtWidgets import (
+    QFrame,
+    QLabel,
+    QMenu,
+    QSizePolicy,
+    QVBoxLayout,
+    QWidget,
+)
 
 from ..styles.theme import Theme
+from .artwork_lightbox import ArtworkLightbox
 
 # The gap between the cover and the edge of its column. Deliberately small:
 # this column *is* the cover, and every pixel of margin here is a pixel the
@@ -50,9 +58,20 @@ class ArtworkWidget(QFrame):
         # The width the panel gave us, kept rather than read back off the
         # laid-out widget. See set_column_width.
         self._column_width = 0
+        # At most one enlargement at a time. Cleared from the box's own
+        # `destroyed`, never by comparing against it: WA_DeleteOnClose means
+        # the Python wrapper outlives the C++ object, and asking a dead one
+        # whether it is the current one is the `already deleted` crash.
+        self._lightbox: ArtworkLightbox | None = None
 
         self._apply_style(active=False)
         self._setup_ui()
+        # Split from execution so a test can ask what the cover offers without
+        # showing a menu: QMenu.exec cannot be monkeypatched out (PySide6
+        # resolves it through C++), so a handler that builds and runs in one
+        # call hangs the whole suite with no output.
+        self.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
+        self.customContextMenuRequested.connect(self._on_context_menu)
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -132,6 +151,59 @@ class ArtworkWidget(QFrame):
     def clear_artwork(self, *, emit: bool = True) -> None:
         self.set_artwork(None, None, emit=emit)
 
+    # ------------------------------------------------------- looking at it
+
+    def build_context_menu(self) -> tuple[QMenu, dict]:
+        """The cover's own menu, and its actions by name.
+
+        Remove used to be a button in the row under the panel. It is a rare,
+        destructive action on one thing, which is what a context menu is for —
+        and giving it back its slot in the row is what leaves Add Artwork room
+        to be a full label in every language.
+        """
+        menu = QMenu(self)
+        actions = {"remove": menu.addAction(self.tr("Remove Artwork"))}
+        actions["remove"].setEnabled(self.has_artwork())
+        return menu, actions
+
+    def _on_context_menu(self, pos) -> None:
+        menu, actions = self.build_context_menu()
+        chosen = menu.exec(self.mapToGlobal(pos))
+        if chosen is not None and chosen is actions["remove"]:
+            self.clear_artwork(emit=True)
+
+    def open_lightbox(self) -> ArtworkLightbox | None:
+        """Show the cover at size over the window, if there is one.
+
+        Parented to the *window*, not to this widget, which is what makes
+        "click anywhere to close" true: an overlay the size of a 150px column
+        could only be dismissed by clicking the very thing it covers.
+        """
+        if self._source_pixmap is None or self._source_pixmap.isNull():
+            return None
+        window = self.window()
+        if window is None:
+            return None
+        if self._lightbox is not None:
+            return self._lightbox
+        box = ArtworkLightbox(self._source_pixmap, window)
+        box.destroyed.connect(self._forget_lightbox)
+        self._lightbox = box
+        box.show_over_parent()
+        return box
+
+    def _forget_lightbox(self) -> None:
+        self._lightbox = None
+
+    def mouseReleaseEvent(self, event) -> None:
+        # On release, not press: a press that leaves the widget is a drag or a
+        # miss, and neither is a request to look at the cover.
+        if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(
+            event.position().toPoint()
+        ):
+            self.open_lightbox()
+        super().mouseReleaseEvent(event)
+
     def current(self) -> tuple[bytes | None, str | None]:
         return self._data, self._mime
 
@@ -143,6 +215,10 @@ class ArtworkWidget(QFrame):
     def _show_placeholder(self) -> None:
         self._image_label.setPixmap(QPixmap())
         self._image_label.setText(self._placeholder)
+        # Nothing to enlarge and nothing to remove: an affordance over an
+        # empty box is an offer the widget cannot honour.
+        self.setToolTip("")
+        self.unsetCursor()
 
     def _inner_side(self) -> int:
         """The square the cover is drawn into, in the column's own terms."""
@@ -174,6 +250,8 @@ class ArtworkWidget(QFrame):
         )
         self._image_label.setText("")
         self._image_label.setPixmap(scaled)
+        self.setToolTip(self.tr("Click to enlarge. Right-click for more."))
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
 
     def set_column_width(self, width: int) -> None:
         """Fix this column's size, squared off at the width the panel chose.

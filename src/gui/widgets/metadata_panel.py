@@ -338,9 +338,13 @@ class MetadataPanel(QWidget):
 
         layout.addLayout(body, 1)
 
-        # Add Artwork / Remove, under the artwork column. The cover belongs to
-        # both jobs, so these stay outside the tabs — unlike Add field, which
-        # is part of the Tags page above.
+        # Add Artwork, under the artwork column. Outside the tabs because the
+        # cover belongs to both jobs, unlike Add field, which is part of the
+        # Tags page above. Remove used to sit beside it and now lives on the
+        # cover's own context menu: a rare destructive action on one thing,
+        # which is what a context menu is for, and it was the row's whole
+        # width pressure — Add Artwork is a full label in every language with
+        # it gone.
         controls_row = QHBoxLayout()
         controls_row.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
         controls_row.setSpacing(Theme.SPACING)
@@ -350,12 +354,6 @@ class MetadataPanel(QWidget):
         self._add_artwork_btn.clicked.connect(self._on_add_artwork_clicked)
         self._add_artwork_btn.setVisible(False)
         controls_row.addWidget(self._add_artwork_btn)
-
-        self._remove_artwork_btn = QPushButton(self.tr("Remove"))
-        self._remove_artwork_btn.clicked.connect(self._on_remove_artwork_clicked)
-        self._remove_artwork_btn.setVisible(False)
-        self._remove_artwork_btn.setEnabled(False)
-        controls_row.addWidget(self._remove_artwork_btn)
 
         self._controls_row_widget = QWidget()
         self._controls_row_widget.setLayout(controls_row)
@@ -658,7 +656,6 @@ class MetadataPanel(QWidget):
         self._sync_release_memory()
         # Programmatic load — don't fire artwork_changed (would re-save the same bytes).
         self._artwork.set_artwork(meta.artwork, meta.artwork_mime, emit=False)
-        self._remove_artwork_btn.setEnabled(meta.artwork is not None)
 
     # ------------------------------------------------------------- form build
 
@@ -704,7 +701,6 @@ class MetadataPanel(QWidget):
         self._eject_btn.setVisible(True)
         self._artwork.setVisible(True)
         self._add_artwork_btn.setVisible(True)
-        self._remove_artwork_btn.setVisible(True)
         self._sync_lookup_button()
         self._bottom_spacer.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
@@ -899,8 +895,6 @@ class MetadataPanel(QWidget):
         self._eject_btn.setVisible(False)
         self._artwork.setVisible(False)
         self._add_artwork_btn.setVisible(False)
-        self._remove_artwork_btn.setVisible(False)
-        self._remove_artwork_btn.setEnabled(False)
         self._sync_lookup_button()
         # Restore the bottom spacer so empty state stays pinned to top
         self._bottom_spacer.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
@@ -1258,13 +1252,8 @@ class MetadataPanel(QWidget):
         mime = mime_for_path(path)
         self._artwork.set_artwork(data, mime, emit=True)
 
-    def _on_remove_artwork_clicked(self) -> None:
-        if self._file_path is None:
-            return
-        self._artwork.clear_artwork(emit=True)
-
     def _on_artwork_changed(self, data, mime) -> None:
-        """Persist artwork changes triggered by drop, Add Artwork, or Remove."""
+        """Persist artwork changes from a drop, Add Artwork, or the cover menu."""
         if self._file_path is None or self._saving:
             return
         self._saving = True
@@ -1273,11 +1262,9 @@ class MetadataPanel(QWidget):
                 meta = TrackMetadata(artwork=bytes(data), artwork_mime=str(mime) if mime else None)
                 write_metadata(self._file_path, meta, fields=["artwork"])
                 logger.info("Wrote artwork (%d bytes) to %s", len(data), Path(self._file_path).name)
-                self._remove_artwork_btn.setEnabled(True)
             else:
                 delete_metadata_fields(self._file_path, ["artwork"])
                 logger.info("Removed artwork from %s", Path(self._file_path).name)
-                self._remove_artwork_btn.setEnabled(False)
         except Exception as e:
             logger.error("Failed to save artwork: %s", e)
         finally:
