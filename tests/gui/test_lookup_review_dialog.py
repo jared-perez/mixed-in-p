@@ -132,6 +132,50 @@ def test_showing_a_new_result_does_not_read_as_the_user_switching(qtbot):
     assert dialog._candidate_combo.currentIndex() == 1
 
 
+def test_the_switcher_survives_being_used(qtbot):
+    """A switch is answered with a fetch of *one* release, not a new search.
+
+    So the result that comes back carries a single-entry ``candidates`` — what
+    ``LookupThread._run_job`` really returns for a job with a candidate on it —
+    and rebuilding the combo from it left one row, disabled: the escape hatch
+    for a wrong match worked exactly once, on both panels. The fixture above
+    hands ``set_result`` the full list, which is the well-populated shape no
+    caller actually produces.
+    """
+    first = Candidate(release_id=1, album="First", score=0.9)
+    second = Candidate(release_id=2, album="Second", score=0.8)
+    third = Candidate(release_id=3, album="Third", score=0.7)
+    dialog = _dialog(
+        qtbot, current={},
+        result=_result(chosen=first, candidates=[first, second, third]),
+    )
+    dialog.set_result(_result(chosen=second, candidates=[second]))
+    assert dialog._candidate_combo.count() == 3
+    assert dialog._candidate_combo.isEnabled()
+    assert dialog._candidate_combo.currentIndex() == 1
+    # And it is still a way back to the first, and on to the third.
+    asked: list[Candidate] = []
+    dialog.candidate_requested.connect(asked.append)
+    dialog._candidate_combo.setCurrentIndex(2)
+    assert asked == [third]
+
+
+def test_a_switch_that_failed_puts_the_combo_back_without_losing_the_others(qtbot):
+    # A guard rather than a regression — this one passes against the old
+    # build too, because restore_candidate() reads the *previous* result.
+    # It is here so a narrower fix cannot re-collapse the combo on the way
+    # back from a failed switch.
+    first = Candidate(release_id=1, album="First", score=0.9)
+    second = Candidate(release_id=2, album="Second", score=0.8)
+    dialog = _dialog(
+        qtbot, current={}, result=_result(chosen=first, candidates=[first, second])
+    )
+    dialog._candidate_combo.setCurrentIndex(1)
+    dialog.restore_candidate()
+    assert dialog._candidate_combo.count() == 2
+    assert dialog._candidate_combo.currentIndex() == 0
+
+
 def test_a_single_candidate_leaves_nothing_to_switch_to(qtbot):
     dialog = _dialog(qtbot, current={})
     assert not dialog._candidate_combo.isEnabled()

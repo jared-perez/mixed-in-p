@@ -112,6 +112,14 @@ class LookupReviewDialog(QDialog):
         # files queued, "cancel" is ambiguous between this one and the rest.
         self._position = position
         self._result = result
+        # The ranked list the *search* found, held by the dialog rather than
+        # read off the result each time. A candidate switch is answered with a
+        # *fetch of one release*, whose result therefore carries a
+        # single-entry ``candidates`` — so rebuilding the combo from it
+        # collapsed the switcher to the release just picked and disabled it.
+        # The escape hatch for a wrong match worked exactly once, on both
+        # panels. The list belongs to the search, and the search is not re-run.
+        self._candidates = list(getattr(result, "candidates", ()) or ())
         # The proposal actually on screen. Not `result.proposed`: the track
         # picker re-derives it for a different row of the release, and the
         # result belongs to the caller — mutating theirs to show ours would
@@ -335,7 +343,12 @@ class LookupReviewDialog(QDialog):
     # -------------------------------------------------------------- results
 
     def set_result(self, result) -> None:
-        """Show a new result — used when the user switched candidate."""
+        """Show a new result — used when the user switched candidate.
+
+        Deliberately does **not** adopt ``result.candidates``: this is always
+        a fetch of the one release the user picked, and the alternatives it
+        was picked from live on the dialog. See ``__init__``.
+        """
         self._result = result
         self._proposed = getattr(result, "proposed", None)
         self._apply_result()
@@ -385,17 +398,36 @@ class LookupReviewDialog(QDialog):
         combo = self._candidate_combo
         combo.blockSignals(True)
         combo.clear()
-        for candidate in self._result.candidates:
+        for candidate in self._candidates:
             combo.addItem(candidate.label_line() or self.tr("Unknown release"),
                           candidate)
         chosen = self._result.chosen
         if chosen is not None:
-            for index in range(combo.count()):
-                if combo.itemData(index) is chosen:
-                    combo.setCurrentIndex(index)
-                    break
+            index = self._index_of(chosen)
+            if index >= 0:
+                combo.setCurrentIndex(index)
         combo.setEnabled(combo.count() > 1)
         combo.blockSignals(False)
+
+    def _index_of(self, chosen) -> int:
+        """Where the release on screen sits in the switcher, or -1.
+
+        Identity first, because the fetch is handed the very object the combo
+        held; release id as the fallback, so a caller that rebuilds a
+        candidate rather than passing ours through still lands on the right
+        row instead of silently leaving the combo naming release one while
+        release two is on show.
+        """
+        combo = self._candidate_combo
+        for index in range(combo.count()):
+            if combo.itemData(index) is chosen:
+                return index
+        release_id = getattr(chosen, "release_id", 0)
+        if release_id:
+            for index in range(combo.count()):
+                if getattr(combo.itemData(index), "release_id", 0) == release_id:
+                    return index
+        return -1
 
     def _fill_tracks(self) -> None:
         """Offer the release's rows, with the automatic choice pre-selected.
