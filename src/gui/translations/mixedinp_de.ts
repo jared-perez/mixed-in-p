@@ -1338,42 +1338,42 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Übernehmen</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="380"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="389"/>
         <source>Unknown release</source>
         <translation>Unbekannte Veröffentlichung</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="406"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="415"/>
         <source>Unknown track</source>
         <translation>Unbekannter Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="445"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="454"/>
         <source>Current</source>
         <translation>Aktuell</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="446"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="455"/>
         <source>From Discogs</source>
         <translation>Von Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="466"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="475"/>
         <source>(empty)</source>
         <translation>(leer)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="480"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="489"/>
         <source>Every field already matches this release.</source>
         <translation>Alle Felder stimmen bereits mit dieser Veröffentlichung überein.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="501"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="510"/>
         <source>(none)</source>
         <translation>(keins)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="514"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="523"/>
         <source>No confident match — check the release before applying.</source>
         <translation>Keine sichere Übereinstimmung — prüfe die Veröffentlichung vor dem Übernehmen.</translation>
     </message>
@@ -1576,96 +1576,95 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>MetadataPanel</name>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="71"/>
+        <location filename="../widgets/metadata_panel.py" line="72"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="72"/>
-        <location filename="../widgets/metadata_panel.py" line="567"/>
+        <location filename="../widgets/metadata_panel.py" line="73"/>
         <source>Artist</source>
         <translatorcomment>&apos;Interpret&apos; is the standard German tag/metadata term for the performing artist.</translatorcomment>
         <translation>Interpret</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="73"/>
+        <location filename="../widgets/metadata_panel.py" line="74"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="74"/>
-        <location filename="../widgets/metadata_panel.py" line="568"/>
+        <location filename="../widgets/metadata_panel.py" line="75"/>
+        <location filename="../widgets/metadata_panel.py" line="736"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="75"/>
+        <location filename="../widgets/metadata_panel.py" line="76"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="76"/>
+        <location filename="../widgets/metadata_panel.py" line="77"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="77"/>
+        <location filename="../widgets/metadata_panel.py" line="78"/>
         <source>Key</source>
         <translatorcomment>Musical context -&gt; &apos;Tonart&apos; per glossary, never &apos;Schlüssel&apos;/&apos;Taste&apos;.</translatorcomment>
         <translation>Tonart</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="78"/>
-        <location filename="../widgets/metadata_panel.py" line="571"/>
+        <location filename="../widgets/metadata_panel.py" line="79"/>
+        <location filename="../widgets/metadata_panel.py" line="738"/>
         <source>Year</source>
         <translation>Jahr</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="79"/>
+        <location filename="../widgets/metadata_panel.py" line="80"/>
         <source>Track #</source>
         <translatorcomment>&apos;Track-Nr.&apos; — &apos;Track&apos; kept (common in German audio metadata), &apos;#&apos; -&gt; &apos;Nr.&apos;.</translatorcomment>
         <translation>Track-Nr.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="80"/>
+        <location filename="../widgets/metadata_panel.py" line="81"/>
         <source>Comment</source>
         <translation>Kommentar</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="172"/>
+        <location filename="../widgets/metadata_panel.py" line="190"/>
         <source>Metadata Editor</source>
         <translation>Metadaten-Editor</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="180"/>
+        <location filename="../widgets/metadata_panel.py" line="198"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>Eine einzelne Audiodatei ablegen, um ihre Metadaten-Tags anzuzeigen und zu bearbeiten.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="235"/>
-        <location filename="../widgets/metadata_panel.py" line="866"/>
-        <location filename="../widgets/metadata_panel.py" line="885"/>
+        <location filename="../widgets/metadata_panel.py" line="253"/>
+        <location filename="../widgets/metadata_panel.py" line="1120"/>
+        <location filename="../widgets/metadata_panel.py" line="1139"/>
         <source>Open File Location</source>
         <translation>Dateipfad öffnen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="238"/>
+        <location filename="../widgets/metadata_panel.py" line="256"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>Diese Datei im Finder / Explorer anzeigen.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="335"/>
+        <location filename="../widgets/metadata_panel.py" line="353"/>
         <source>Tags</source>
         <translation>Tags</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="330"/>
-        <location filename="../widgets/metadata_panel.py" line="698"/>
+        <location filename="../widgets/metadata_panel.py" line="348"/>
+        <location filename="../widgets/metadata_panel.py" line="952"/>
         <source>Add field...</source>
         <translation>Feld hinzufügen …</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="368"/>
+        <location filename="../widgets/metadata_panel.py" line="386"/>
         <source>Add Artwork…</source>
         <translation>Cover hinzufügen …</translation>
     </message>
@@ -1674,143 +1673,212 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation type="vanished">Entfernen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="395"/>
+        <location filename="../widgets/metadata_panel.py" line="413"/>
         <source>Look Up Online…</source>
         <translation>Online suchen…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="397"/>
+        <location filename="../widgets/metadata_panel.py" line="415"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>Auf Discogs nach den Angaben zu diesem Track suchen und sie prüfen.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="426"/>
-        <location filename="../widgets/metadata_panel.py" line="511"/>
+        <location filename="../widgets/metadata_panel.py" line="444"/>
+        <location filename="../widgets/metadata_panel.py" line="542"/>
         <source>View release</source>
         <translation>Veröffentlichung ansehen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="429"/>
-        <location filename="../widgets/metadata_panel.py" line="514"/>
+        <location filename="../widgets/metadata_panel.py" line="447"/>
+        <location filename="../widgets/metadata_panel.py" line="545"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>Die Seite dieser Veröffentlichung auf Discogs im Browser öffnen.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="440"/>
+        <location filename="../widgets/metadata_panel.py" line="458"/>
         <source>Reload</source>
         <translation>Neu laden</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="445"/>
+        <location filename="../widgets/metadata_panel.py" line="463"/>
         <source>Eject</source>
         <translatorcomment>&apos;Auswerfen&apos; matches Apple macOS media terminology.</translatorcomment>
         <translation>Auswerfen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="498"/>
+        <location filename="../widgets/metadata_panel.py" line="529"/>
         <source>Refresh from Discogs</source>
         <translation>Von Discogs aktualisieren</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="500"/>
+        <location filename="../widgets/metadata_panel.py" line="531"/>
         <source>Read this release again and show what Discogs has on it.</source>
         <translation>Diese Veröffentlichung erneut lesen und zeigen, was Discogs dazu hat.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="541"/>
+        <location filename="../widgets/metadata_panel.py" line="693"/>
         <source>Unknown release</source>
         <translation>Unbekannte Veröffentlichung</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="544"/>
+        <location filename="../widgets/metadata_panel.py" line="701"/>
         <source>Tagged from Discogs release {0}.</source>
         <translation>Getaggt aus Discogs-Veröffentlichung {0}.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="548"/>
+        <location filename="../widgets/metadata_panel.py" line="706"/>
         <source>No release known for this file yet. Look it up online.</source>
         <translation>Für diese Datei ist noch keine Veröffentlichung bekannt. Online nachschlagen.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="552"/>
+        <location filename="../widgets/metadata_panel.py" line="711"/>
         <source>Online lookup is switched off in Settings.</source>
         <translation>Die Online-Suche ist in den Einstellungen ausgeschaltet.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="566"/>
+        <location filename="../widgets/metadata_panel.py" line="734"/>
         <source>Release</source>
         <translation>Veröffentlichung</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="569"/>
+        <location filename="../widgets/metadata_panel.py" line="737"/>
+        <source>Catalogue Number</source>
+        <translation>Katalognummer</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="742"/>
+        <source>Genres</source>
+        <translatorcomment>Plural of the existing translation of &apos;Genre&apos;; kept distinct from &apos;Styles&apos;.</translatorcomment>
+        <translation>Genres</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="746"/>
+        <source>Pressing</source>
+        <translatorcomment>Section heading: this physical pressing, as against the release itself.</translatorcomment>
+        <translation>Pressung</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="748"/>
         <source>Format</source>
         <translation>Format</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="570"/>
+        <location filename="../widgets/metadata_panel.py" line="749"/>
         <source>Country</source>
         <translation>Land</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="574"/>
+        <location filename="../widgets/metadata_panel.py" line="741"/>
         <source>Styles</source>
         <translation>Stile</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="665"/>
+        <location filename="../widgets/metadata_panel.py" line="750"/>
+        <source>Released</source>
+        <translatorcomment>This pressing&apos;s own date. Distinct from Year, which is the original release year.</translatorcomment>
+        <translation>Veröffentlicht</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="754"/>
+        <source>Tracklist</source>
+        <translatorcomment>Built on this language&apos;s established word for a track (see the glossary).</translatorcomment>
+        <translation>Trackliste</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="756"/>
+        <source>Credits</source>
+        <translatorcomment>Who worked on the record. The role names themselves stay in Discogs&apos; English.</translatorcomment>
+        <translation>Mitwirkende</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="757"/>
+        <source>Identifiers</source>
+        <translatorcomment>Barcode, label code, matrix/runout — what identifies a pressing in the hand.</translatorcomment>
+        <translation>Kennungen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="758"/>
+        <source>Community</source>
+        <translation>Community</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="760"/>
+        <source>Notes</source>
+        <translatorcomment>The label&apos;s own sleeve notes, free text.</translatorcomment>
+        <translation>Anmerkungen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="827"/>
+        <source>Have</source>
+        <translatorcomment>Discogs&apos; counter. Rendered as &apos;in N collections&apos; rather than the bare verb, which does not survive translation as a field label.</translatorcomment>
+        <translation>Sammlungen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="828"/>
+        <source>Want</source>
+        <translatorcomment>Paired with &apos;Have&apos; — the wantlist counter, phrased as a place rather than a verb.</translatorcomment>
+        <translation>Wunschlisten</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="829"/>
+        <source>Rating</source>
+        <translation>Bewertung</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="919"/>
         <source>Error: {0}</source>
         <translation>Fehler: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="868"/>
+        <location filename="../widgets/metadata_panel.py" line="1122"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Diese Datei wurde nicht gefunden — sie wurde möglicherweise verschoben, umbenannt oder gelöscht.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="886"/>
+        <location filename="../widgets/metadata_panel.py" line="1140"/>
         <source>Play in Player</source>
         <translatorcomment>„Player“ bleibt englisch — etablierter Begriff, wie in der Seitenleiste.</translatorcomment>
         <translation>Im Player abspielen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="887"/>
+        <location filename="../widgets/metadata_panel.py" line="1141"/>
         <source>Copy File Path</source>
         <translation>Dateipfad kopieren</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1041"/>
+        <location filename="../widgets/metadata_panel.py" line="1307"/>
         <source>No tags on this file — look it up on Discogs?</source>
         <translation>Keine Tags in dieser Datei — auf Discogs nachschlagen?</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1071"/>
-        <location filename="../widgets/metadata_panel.py" line="1135"/>
-        <location filename="../widgets/metadata_panel.py" line="1227"/>
+        <location filename="../widgets/metadata_panel.py" line="1337"/>
+        <location filename="../widgets/metadata_panel.py" line="1401"/>
+        <location filename="../widgets/metadata_panel.py" line="1493"/>
         <source>Look Up Online</source>
         <translation>Online suchen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1073"/>
+        <location filename="../widgets/metadata_panel.py" line="1339"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>Diese Datei hat weder Interpret noch Titel zum Suchen, und der Dateiname gibt auch nichts her. Fülle das Feld „Titel“ aus und versuche es erneut.</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1099"/>
+        <location filename="../widgets/metadata_panel.py" line="1365"/>
         <source>Looking up…</source>
         <translation>Suche läuft…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1108"/>
+        <location filename="../widgets/metadata_panel.py" line="1374"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Warten auf das Anfragelimit von Discogs…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1262"/>
+        <location filename="../widgets/metadata_panel.py" line="1528"/>
         <source>Applied from Discogs</source>
         <translation>Aus Discogs übernommen</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1303"/>
+        <location filename="../widgets/metadata_panel.py" line="1578"/>
         <source>Select cover art</source>
         <translation>Cover auswählen</translation>
     </message>
@@ -2203,8 +2271,8 @@ oder „Cover hinzufügen …“ klicken</translation>
         <location filename="../widgets/player_panel.py" line="4917"/>
         <location filename="../widgets/player_panel.py" line="4945"/>
         <location filename="../widgets/player_panel.py" line="5045"/>
-        <location filename="../widgets/player_panel.py" line="5121"/>
-        <location filename="../widgets/player_panel.py" line="5151"/>
+        <location filename="../widgets/player_panel.py" line="5118"/>
+        <location filename="../widgets/player_panel.py" line="5148"/>
         <source>Look Up Online</source>
         <translation>Online suchen</translation>
     </message>
@@ -2234,7 +2302,7 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Warten auf das Anfragelimit von Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5144"/>
+        <location filename="../widgets/player_panel.py" line="5141"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n Track ohne Treffer.</numerusform>
@@ -2242,7 +2310,7 @@ oder „Cover hinzufügen …“ klicken</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5147"/>
+        <location filename="../widgets/player_panel.py" line="5144"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n Track aktualisiert.</numerusform>
