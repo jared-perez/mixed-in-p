@@ -122,6 +122,24 @@ QPushButton:disabled {
     border-color: @BG_LIGHT@;
 }
 
+/* The Discogs tab's per-row "write this into the tags" arrow. A square 24px
+   button cannot wear the 8px/16px padding above: a QPushButton centres its
+   label rather than eliding it, so 32px of horizontal padding inside a 24px
+   button leaves no contents rect at all and the arrow is simply not drawn —
+   which reads as an empty box rather than as damage. Stated here rather than
+   inline so the palette tokens stay in one file. */
+QPushButton#discogsApplyButton {
+    padding: 0;
+    min-height: 0;
+    min-width: 0;
+    font-weight: bold;
+    color: @ACCENT_TEXT@;
+}
+
+QPushButton#discogsApplyButton:disabled {
+    color: @TEXT_DISABLED@;
+}
+
 /* Header "Add" menu button (QToolButton). Styled here (not via an inline
    setStyleSheet) so the larger font doesn't leak into the button's tooltip/menu,
    which would otherwise render at 16px instead of the default size. QToolButton

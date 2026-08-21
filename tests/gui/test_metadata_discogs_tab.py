@@ -116,7 +116,38 @@ def _sections(panel) -> dict[str, dict[str, str]]:
                 key = form.itemAt(row, QFormLayout.ItemRole.LabelRole)
                 value = form.itemAt(row, QFormLayout.ItemRole.FieldRole)
                 if key is not None and value is not None:
-                    rows[key.widget().text()] = value.widget().text()
+                    rows[key.widget().text()] = _value_text(value.widget())
+    return out
+
+
+def _value_text(holder) -> str:
+    """The text out of a value cell, which wraps its label with an arrow button."""
+    from PySide6.QtWidgets import QLabel
+
+    if isinstance(holder, QLabel):
+        return holder.text()
+    label = holder.findChild(QLabel)
+    return label.text() if label is not None else ""
+
+
+def _apply_buttons(panel) -> dict[str, object]:
+    """Every row's arrow button, keyed by the row label that carries it."""
+    from PySide6.QtWidgets import QFormLayout, QPushButton
+
+    body = panel._discogs_body
+    out: dict[str, object] = {}
+    for i in range(body.count()):
+        form = body.itemAt(i).layout()
+        if not isinstance(form, QFormLayout):
+            continue
+        for row in range(form.rowCount()):
+            key = form.itemAt(row, QFormLayout.ItemRole.LabelRole)
+            value = form.itemAt(row, QFormLayout.ItemRole.FieldRole)
+            if key is None or value is None:
+                continue
+            button = value.widget().findChild(QPushButton)
+            if button is not None:
+                out[key.widget().text()] = button
     return out
 
 
@@ -225,6 +256,8 @@ def test_every_value_can_be_selected_and_copied(panel, flac):
     from PySide6.QtCore import Qt
     from PySide6.QtWidgets import QFormLayout
 
+    from PySide6.QtWidgets import QLabel
+
     _apply(panel, flac)
     body = panel._discogs_body
     checked = 0
@@ -233,7 +266,8 @@ def test_every_value_can_be_selected_and_copied(panel, flac):
         if not isinstance(form, QFormLayout):
             continue
         for row in range(form.rowCount()):
-            value = form.itemAt(row, QFormLayout.ItemRole.FieldRole).widget()
+            holder = form.itemAt(row, QFormLayout.ItemRole.FieldRole).widget()
+            value = holder if isinstance(holder, QLabel) else holder.findChild(QLabel)
             assert (
                 value.textInteractionFlags()
                 & Qt.TextInteractionFlag.TextSelectableByMouse
@@ -510,7 +544,7 @@ def test_notes_are_a_paragraph_not_a_field(panel, flac):
         if isinstance(body.itemAt(i).layout(), QFormLayout)
     ]
     assert all(
-        form.itemAt(r, QFormLayout.ItemRole.FieldRole).widget().text()
+        _value_text(form.itemAt(r, QFormLayout.ItemRole.FieldRole).widget())
         != "Comes in a printed inner sleeve."
         for form in in_forms
         for r in range(form.rowCount())
@@ -553,3 +587,148 @@ def test_the_tracklist_keeps_out_of_that_column(panel, flac):
     "Catalogue Number" puts 150px of nothing between a track and its number."""
     _apply(panel, flac)
     assert "A1" not in [text for _key, text in panel._discogs_keys]
+
+
+# --- putting what it shows into the file ------------------------------------
+
+
+def test_the_arrow_writes_the_value_to_its_tag(panel, flac):
+    from src.metadata.tags import read_metadata
+
+    _apply(panel, flac)
+    _apply_buttons(panel)["Label"].click()
+
+    assert read_metadata(flac).label == "Junior Boy's Own"
+
+
+def test_the_form_shows_it_without_a_reload(panel, flac):
+    """The panel reloads from disk rather than trusting what it wrote."""
+    _apply(panel, flac)
+    _apply_buttons(panel)["Label"].click()
+
+    assert panel._field_edits["label"].text() == "Junior Boy's Own"
+
+
+def test_a_value_the_file_already_has_offers_a_disabled_button(panel, flac):
+    """Which rows are *available* to apply is worth seeing at a glance, and a
+    button that comes and goes as tags change is harder to read than one that
+    greys out."""
+    _apply(panel, flac)
+    assert _apply_buttons(panel)["Label"].isEnabled()
+
+    _apply_buttons(panel)["Label"].click()
+
+    button = _apply_buttons(panel)["Label"]
+    assert not button.isEnabled()
+    assert "Already" in button.toolTip()
+
+
+def test_the_genre_arrow_writes_styles_not_the_coarse_genre(panel, flac):
+    """"Electronic" is not a genre a DJ sorts by; "Techno" is. The arrow sits
+    on Styles for that reason, and writes what the lookup would."""
+    from src.metadata.tags import read_metadata
+
+    _apply(panel, flac)
+    _apply_buttons(panel)["Styles"].click()
+
+    assert read_metadata(flac).genre == "Techno; Progressive House"
+
+
+def test_genres_is_reference_only(panel, flac):
+    assert "Genres" not in _apply_buttons(_applied(panel, flac))
+
+
+def _applied(panel, flac):
+    _apply(panel, flac)
+    return panel
+
+
+def test_a_row_with_no_tag_of_its_own_has_no_arrow(panel, flac):
+    """Country and Catalogue Number have nowhere to go in an ID3 frame."""
+    _apply(panel, flac)
+    buttons = _apply_buttons(panel)
+
+    assert "Country" not in buttons
+    assert "Catalogue Number" not in buttons
+
+
+def test_a_tracklist_row_writes_the_title_and_the_number_together(panel, flac):
+    """A title written without its number leaves the file claiming to be track
+    1 of a twelve-track compilation."""
+    from src.metadata.tags import read_metadata
+    from src.online.result import TrackEntry
+
+    described = _candidate()
+    described.tracklist = (
+        TrackEntry(position="A1", title="Born Slippy (Nuxx) (Extended Mix)",
+                   ordinal=1, number=1),
+        TrackEntry(position="B1", title="Born Slippy (Nuxx) (Radio Edit)",
+                   ordinal=2, number=2),
+    )
+    _apply(panel, flac, described)
+    _apply_buttons(panel)["B1"].click()
+
+    meta = read_metadata(flac)
+    assert meta.title == "Born Slippy (Nuxx) (Radio Edit)"
+    assert meta.track_number == 2
+
+
+def test_the_heading_keeps_its_buttons(panel, flac):
+    """Moving the album and artist out of the table to stop the duplication
+    must not cost them the two arrows most worth having."""
+    from src.metadata.tags import read_metadata
+
+    _apply(panel, flac)
+    assert panel._album_apply_btn.isVisible() or not panel.isVisible()
+
+    panel._album_apply_btn.click()
+    panel._artist_apply_btn.click()
+
+    meta = read_metadata(flac)
+    assert meta.album == "Born Slippy"
+    assert meta.artist == "Underworld"
+
+
+def test_the_heading_button_is_rewired_not_re_connected(
+    panel, flac, tmp_path, monkeypatch
+):
+    """It is built once and survives every redraw, so an accumulated
+    connection fires once per past redraw.
+
+    Counted, not asserted on the result: with the leak the last connection
+    still wins, so the file ends up correct and only the *extra* write —
+    of the release we were looking at two files ago — gives it away.
+    """
+    import numpy as np
+
+    from src.gui import lookup_flow
+
+    sf = pytest.importorskip("soundfile")
+    other = tmp_path / "Another - Track.flac"
+    sf.write(str(other), np.zeros(4410, dtype=np.float32), 44100, format="FLAC")
+
+    _apply(panel, flac)
+    second = _candidate(release_id=888)
+    second.album = "A Different Record"
+    panel._load_file(str(other))
+    _apply(panel, str(other), second)
+
+    calls: list[dict] = []
+    real = lookup_flow.apply_values
+    monkeypatch.setattr(
+        lookup_flow,
+        "apply_values",
+        lambda path, values: calls.append(dict(values)) or real(path, values),
+    )
+    panel._album_apply_btn.click()
+
+    assert calls == [{"album": "A Different Record"}]
+
+
+def test_nothing_is_offered_on_a_release_we_only_know_the_id_of(panel, flac, library):
+    library.remember_release_for_path(flac, 999)
+    panel.set_library(library)
+    panel._load_file(flac)
+
+    assert _apply_buttons(panel) == {}
+    assert panel._album_apply_btn.isHidden()

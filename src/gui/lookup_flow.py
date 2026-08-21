@@ -195,6 +195,28 @@ def remember_lookup(library, file_path: str, candidate) -> None:
         library.remember_release_for_path(file_path, release_id)
     except Exception as exc:  # noqa: BLE001 — no memory is not a failed lookup
         logger.debug("Could not remember the release: %s", exc)
+    cache_description(library, candidate)
+
+
+def cache_description(library, candidate) -> None:
+    """Store what a provider just said about a release.
+
+    Separate from :func:`remember_lookup` because the two answer different
+    questions and happen at different moments. The *identity* is a per-file
+    decision and is recorded when the user approves it; the description is
+    public information about a release, keyed by release id, and is worth
+    keeping the moment it arrives — whichever file the lookup was for, and
+    whether or not anything is applied.
+
+    That distinction is what makes Refresh honest. "Read this release again"
+    has to replace the stored copy, or the tab shows fresh values this session
+    and the old ones on the next load, with nothing to tell them apart. It
+    also pre-warms a candidate the user switched to and then cancelled out of,
+    which costs nothing and saves the next request.
+    """
+    release_id = getattr(candidate, "release_id", 0)
+    if library is None or not release_id:
+        return
     try:
         library.cache_release(release_id, candidate.release_facts())
     except Exception as exc:  # noqa: BLE001

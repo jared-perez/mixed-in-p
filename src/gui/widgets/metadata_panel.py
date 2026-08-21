@@ -101,6 +101,10 @@ _ROW_GAP = 7             # between rows inside a block
 _SECTION_LABEL_GAP = 14  # between a row's label and its value
 # Room for the vertical scrollbar, so the longest value is not drawn under it.
 _DISCOGS_SCROLL_GUTTER = 12
+# The per-row "write this into the tags" button. Square and icon-only: a
+# QPushButton centres rather than elides, so a translated word here would be
+# cut at both ends before it ever clipped.
+_APPLY_BUTTON_SIDE = 24
 
 
 def _format_duration(seconds: float) -> str:
@@ -495,18 +499,6 @@ class MetadataPanel(QWidget):
         # The release's own name, above the scroll rather than in it: it is
         # what the tab is *about*, and it used to be printed twice — once here
         # and once as the first row of the table underneath.
-        self._discogs_summary = ElidedLabel("")
-        self._discogs_summary.setStyleSheet(
-            f"color: {Theme.NEON_YELLOW}; font-size: 15px; background: transparent;"
-        )
-        layout.addWidget(self._discogs_summary)
-        self._discogs_subtitle = ElidedLabel("")
-        self._discogs_subtitle.setStyleSheet(
-            f"color: {Theme.TEXT_SECONDARY}; background: transparent;"
-        )
-        self._discogs_subtitle.setVisible(False)
-        layout.addWidget(self._discogs_subtitle)
-
         scroll = QScrollArea()
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QScrollArea.Shape.NoFrame)
@@ -522,6 +514,43 @@ class MetadataPanel(QWidget):
         self._discogs_body.setContentsMargins(0, 0, _DISCOGS_SCROLL_GUTTER, 0)
         self._discogs_body.setSpacing(_SECTION_GAP)
         scroll.setWidget(body)
+
+        # The heading sits *outside* the scroll so the release stays named
+        # while its details scroll — but its two buttons then live in a
+        # different coordinate space from the ones inside, and landed hard
+        # against the pane edge with the section arrows 30px to their left.
+        # Reserving the scrollbar's own width plus the body's gutter is what
+        # puts all of them in one column; asked of the style rather than
+        # guessed, because a scrollbar is not the same width on every platform.
+        heading_gutter = (
+            scroll.verticalScrollBar().sizeHint().width() + _DISCOGS_SCROLL_GUTTER
+        )
+
+        self._discogs_summary = ElidedLabel("")
+        self._discogs_summary.setStyleSheet(
+            f"color: {Theme.NEON_YELLOW}; font-size: 15px; background: transparent;"
+        )
+        self._album_apply_btn = self._heading_button()
+        title_row = QHBoxLayout()
+        title_row.setSpacing(Theme.SPACING)
+        title_row.setContentsMargins(0, 0, heading_gutter, 0)
+        title_row.addWidget(self._discogs_summary, 1)
+        title_row.addWidget(self._album_apply_btn, 0)
+        layout.addLayout(title_row)
+
+        self._discogs_subtitle = ElidedLabel("")
+        self._discogs_subtitle.setStyleSheet(
+            f"color: {Theme.TEXT_SECONDARY}; background: transparent;"
+        )
+        self._discogs_subtitle.setVisible(False)
+        self._artist_apply_btn = self._heading_button()
+        artist_row = QHBoxLayout()
+        artist_row.setSpacing(Theme.SPACING)
+        artist_row.setContentsMargins(0, 0, heading_gutter, 0)
+        artist_row.addWidget(self._discogs_subtitle, 1)
+        artist_row.addWidget(self._artist_apply_btn, 0)
+        layout.addLayout(artist_row)
+
         layout.addWidget(scroll, 1)
 
         row = QHBoxLayout()
@@ -558,6 +587,44 @@ class MetadataPanel(QWidget):
         return page
 
     # ---------------------------------------------------------- tab drawing
+
+    def _heading_button(self) -> QPushButton:
+        """An empty arrow button for the heading, rewired on every redraw.
+
+        Built once and kept, unlike the ones in the sections: the heading is
+        not torn down and rebuilt, so a button created here would otherwise be
+        connected again on every refresh and fire once per past redraw.
+        """
+        button = QPushButton("→")
+        button.setObjectName("discogsApplyButton")
+        button.setFixedSize(_APPLY_BUTTON_SIDE, _APPLY_BUTTON_SIDE)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        button.setVisible(False)
+        return button
+
+    def _sync_heading_button(self, button: QPushButton, writes: dict) -> None:
+        """Point a heading's button at the value beside it, now."""
+        writes = {field: value for field, value in writes.items() if value}
+        button.setVisible(bool(writes))
+        if not writes:
+            return
+        field = next(iter(writes))
+        current = self._writes_are_current(writes)
+        button.setEnabled(not current)
+        button.setToolTip(
+            self.tr("Already in this file's tags.")
+            if current
+            else self.tr("Write this to the {0} tag.").format(
+                self.tr(FIELD_LABELS.get(field, field))
+            )
+        )
+        # Disconnected first: this runs on every redraw, and an accumulated
+        # connection would write the release we were looking at three files ago.
+        try:
+            button.clicked.disconnect()
+        except RuntimeError:
+            pass
+        button.clicked.connect(lambda _=False, w=dict(writes): self._apply_from_tab(w))
 
     def _clear_discogs_body(self) -> None:
         """Empty the scrolling area, widgets and nested layouts alike.
@@ -612,7 +679,15 @@ class MetadataPanel(QWidget):
         of "Catalogue Number" puts 150px of nothing between a track and its
         own number.
         """
-        rows = [(label, value) for label, value in rows if value]
+        # Rows are (label, value) or (label, value, {tag: value}). The third
+        # element is what the arrow button writes — a dict rather than one
+        # field, because a tracklist row is a title *and* a number and
+        # applying half of it is not a thing anyone wants.
+        rows = [
+            (row[0], row[1], row[2] if len(row) > 2 else {})
+            for row in rows
+            if row[1]
+        ]
         if not rows:
             return
         heading = QLabel(title)
@@ -635,7 +710,7 @@ class MetadataPanel(QWidget):
         form.setHorizontalSpacing(_SECTION_LABEL_GAP)
         form.setVerticalSpacing(_ROW_GAP)
         form.setContentsMargins(0, 0, 0, 0)
-        for label, value in rows:
+        for label, value, writes in rows:
             key = QLabel(label)
             key.setStyleSheet(
                 f"color: {Theme.TEXT_SECONDARY}; background: transparent;"
@@ -646,8 +721,91 @@ class MetadataPanel(QWidget):
             # tables that failed to line up rather than as one panel.
             if align:
                 self._discogs_keys.append((key, label))
-            form.addRow(key, self._value_label(value))
+            form.addRow(key, self._value_row(value, writes))
         self._discogs_body.addLayout(form)
+
+    def _value_row(self, value: str, writes: dict) -> QWidget:
+        """A value, plus the button that writes it into this file's tags.
+
+        Wrapped in a widget rather than added as a third form column: the
+        button belongs to its value, and a column of its own would leave a
+        gutter of empty space down every row that has nothing to write.
+        """
+        holder = QWidget()
+        holder.setObjectName("discogsValueRow")
+        holder.setStyleSheet("#discogsValueRow { background: transparent; }")
+        row = QHBoxLayout(holder)
+        row.setContentsMargins(0, 0, 0, 0)
+        row.setSpacing(Theme.SPACING)
+        row.addWidget(self._value_label(value), 1)
+        if writes:
+            row.addWidget(self._apply_button(writes), 0, Qt.AlignmentFlag.AlignTop)
+        return holder
+
+    def _apply_button(self, writes: dict) -> QPushButton:
+        """One click to put this value in the tag it belongs to.
+
+        Disabled rather than hidden when the file already has the value: which
+        rows are *available* to apply is worth seeing at a glance, and a button
+        that comes and goes as the tags change is harder to read than one that
+        greys out. Icon-only because a QPushButton centres rather than elides,
+        so a translated word here would be cut at both ends before it clipped.
+        """
+        button = QPushButton("→")
+        button.setObjectName("discogsApplyButton")
+        button.setFixedSize(_APPLY_BUTTON_SIDE, _APPLY_BUTTON_SIDE)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        if self._writes_are_current(writes):
+            button.setEnabled(False)
+            button.setToolTip(self.tr("Already in this file's tags."))
+        elif len(writes) > 1:
+            button.setToolTip(
+                self.tr("Write this row's title and track number to the tags.")
+            )
+        else:
+            field = next(iter(writes))
+            button.setToolTip(
+                self.tr("Write this to the {0} tag.").format(
+                    self.tr(FIELD_LABELS.get(field, field))
+                )
+            )
+        button.clicked.connect(lambda _=False, w=dict(writes): self._apply_from_tab(w))
+        return button
+
+    def _writes_are_current(self, writes: dict) -> bool:
+        """Whether the file already holds exactly what this button would write.
+
+        Compared against the *form*, not against a re-read of the file: the
+        form is what the user is looking at, it is authoritative for unsaved
+        edits, and re-reading a file per row on every redraw would put a dozen
+        disk reads behind a tab switch.
+        """
+        for field, value in writes.items():
+            edit = self._field_edits.get(field)
+            if edit is None or edit.text().strip() != str(value).strip():
+                return False
+        return True
+
+    def _apply_from_tab(self, writes: dict) -> None:
+        """Write one row's worth of Discogs values into the file.
+
+        Through `lookup_flow.apply_values`, the same path the review dialog
+        takes, so the WAV guard and the Windows file-lock retries apply here
+        for free rather than being reimplemented for a second entry point.
+        """
+        if self._file_path is None or not writes:
+            return
+        error = lookup_flow.apply_values(self._file_path, writes)
+        if error:
+            QMessageBox.warning(self, self.tr("Look Up Online"), error)
+            return
+        # Reload rather than trusting what we believe we wrote — and hold the
+        # session result across it, because `_load_file` clears the provenance
+        # for a *new* file and this is a reload of the same one.
+        result = self._last_result
+        self._load_file(self._file_path)
+        self._last_result = result
+        self._refresh_discogs_tab()
 
     def _add_text_section(self, title: str, text: str) -> None:
         """A headed block of prose, full width.
@@ -694,6 +852,16 @@ class MetadataPanel(QWidget):
             self._discogs_summary.setToolTip(candidate.album)
             self._discogs_subtitle.setText(candidate.artist)
             self._discogs_subtitle.setVisible(bool(candidate.artist))
+            # The heading is where the album and the artist live now, so it is
+            # where their buttons have to live too — they are the two most
+            # worth applying, and moving them out of the table to stop the
+            # duplication must not cost them their arrow.
+            self._sync_heading_button(
+                self._album_apply_btn, {"album": candidate.album}
+            )
+            self._sync_heading_button(
+                self._artist_apply_btn, {"artist": candidate.artist}
+            )
             self._fill_release_sections(candidate)
             self._align_section_labels()
         elif self._release_id:
@@ -701,16 +869,22 @@ class MetadataPanel(QWidget):
                 self.tr("Tagged from Discogs release {0}.").format(self._release_id)
             )
             self._discogs_subtitle.setVisible(False)
+            self._album_apply_btn.setVisible(False)
+            self._artist_apply_btn.setVisible(False)
         elif self._online_enabled:
             self._discogs_summary.setText(
                 self.tr("No release known for this file yet. Look it up online.")
             )
             self._discogs_subtitle.setVisible(False)
+            self._album_apply_btn.setVisible(False)
+            self._artist_apply_btn.setVisible(False)
         else:
             self._discogs_summary.setText(
                 self.tr("Online lookup is switched off in Settings.")
             )
             self._discogs_subtitle.setVisible(False)
+            self._album_apply_btn.setVisible(False)
+            self._artist_apply_btn.setVisible(False)
         self._discogs_body.addStretch()
         known = bool(self._release_id or candidate is not None)
         self._discogs_refresh_btn.setVisible(self._online_enabled and known)
@@ -730,15 +904,21 @@ class MetadataPanel(QWidget):
         The title and artist are the heading above, not rows here: they were
         the tab's one visible duplication.
         """
+        year = str(candidate.year) if candidate.year else ""
+        # The genre tag is written from *styles* — "Electronic" is not a genre
+        # a DJ sorts by and "Techno" is — so the arrow is on that row and not
+        # on Genres, which is shown for reference. `_genre_from` is the same
+        # function the lookup writes through, so the two cannot disagree.
+        genre = discogs._genre_from(candidate.styles, candidate.genres)
         self._add_section(
             self.tr("Release"),
             [
-                (self.tr("Label"), candidate.label),
+                (self.tr("Label"), candidate.label, {"label": candidate.label}),
                 (self.tr("Catalogue Number"), candidate.catalogue_number),
-                (self.tr("Year"), str(candidate.year) if candidate.year else ""),
+                (self.tr("Year"), year, {"year": year}),
                 # Not translated: styles and genres are Discogs' own taxonomy,
                 # the same reason the genre tag is written from them verbatim.
-                (self.tr("Styles"), "; ".join(candidate.styles)),
+                (self.tr("Styles"), "; ".join(candidate.styles), {"genre": genre}),
                 (self.tr("Genres"), "; ".join(candidate.genres)),
             ],
         )
@@ -776,7 +956,13 @@ class MetadataPanel(QWidget):
                 parts.append(f"({_format_duration(entry.duration)})")
             for name, role in self._grouped_credits(entry.credits):
                 parts.append(f"· {role}: {name}")
-            rows.append((head, " ".join(p for p in parts if p)))
+            # Title and number together: which row of a release a file is, is
+            # one fact, and a title written without its number leaves the file
+            # claiming to be track 1 of a twelve-track compilation.
+            writes = {"title": entry.title}
+            if entry.number:
+                writes["track_number"] = str(entry.number)
+            rows.append((head, " ".join(p for p in parts if p), writes))
         return rows
 
     def _credit_rows(self, credits) -> list[tuple[str, str]]:
@@ -1406,6 +1592,11 @@ class MetadataPanel(QWidget):
         # through that return, and the release the apply credits has to be the
         # one the user ended up looking at.
         self._last_result = result
+        # Every reading of a release is worth keeping, whether or not anything
+        # is applied: without this, Refresh showed fresh values this session
+        # and the stored ones on the next load, with nothing to tell them
+        # apart. The *identity* is still only recorded on approval.
+        lookup_flow.cache_description(self._library, result.chosen)
         # The tab follows *every* result, not only an applied one. It reports
         # what Discogs knows about this file, and a review the user cancels —
         # or one where every field already matched, so there was nothing left
