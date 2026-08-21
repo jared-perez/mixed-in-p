@@ -84,6 +84,12 @@ FIELD_LABELS = dict(FIELD_ORDER)
 # tucked in slightly while still extending the field column nearly to the artwork.
 _FORM_LEFT_MARGIN = 8
 
+# How wide the cover column is. A constant is safe here where it would not be
+# for a text column: nothing in it is translated prose — the one string that
+# lives there, the empty-state hint, wraps rather than clips (see
+# ArtworkWidget). Sized for the cover itself plus a 4px margin.
+_ART_COLUMN_WIDTH = 150
+
 
 def _format_audio_props(path: str) -> str:
     """Return a short 'Sample Rate: 44.1 kHz   Bit Depth: 16-bit' summary."""
@@ -160,9 +166,15 @@ class MetadataPanel(QWidget):
         title = QLabel(self.tr("Metadata Editor"))
         title.setObjectName("sectionTitle")
         title.setStyleSheet(f"font-size: 24px; color: {Theme.NEON_YELLOW};")
-        desc = ElidedLabel(self.tr("Drop a single audio file to view and edit its metadata tags."))
-        desc.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
-        layout.addLayout(panel_header_row(title, desc))
+        # Kept on the panel so it can be taken down once its instruction has
+        # been followed: "Drop a single audio file" is an empty-state prompt,
+        # and leaving it over a loaded file spends the widest row in the panel
+        # telling the user to do the thing they have just done.
+        self._desc_label = ElidedLabel(
+            self.tr("Drop a single audio file to view and edit its metadata tags.")
+        )
+        self._desc_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
+        layout.addLayout(panel_header_row(title, self._desc_label))
 
         # File header row: filename (yellow) | Sample Rate / Bit Depth (secondary)
         file_row = QHBoxLayout()
@@ -316,7 +328,13 @@ class MetadataPanel(QWidget):
         self._artwork = ArtworkWidget()
         self._artwork.artwork_changed.connect(self._on_artwork_changed)
         self._artwork.setVisible(False)
-        body.addWidget(self._artwork, 1)
+        # A fixed column, not a quarter of the panel. At 1:3 the cover column
+        # was 225px wide for a cover that never rendered above 132 — and the
+        # width it was taking is exactly what the Discogs tab beside it has
+        # too little of. Top-aligned so the cover sits level with the top of
+        # the tabs instead of floating in the middle of a 550px column.
+        self._artwork.set_column_width(_ART_COLUMN_WIDTH)
+        body.addWidget(self._artwork, 0, Qt.AlignmentFlag.AlignTop)
 
         layout.addLayout(body, 1)
 
@@ -679,6 +697,7 @@ class MetadataPanel(QWidget):
         self._add_combo.currentIndexChanged.connect(self._on_add_field_selected)
 
         # Show editor widgets and collapse the bottom spacer
+        self._set_empty_state(False)
         self._tabs.setVisible(True)
         self._controls_row_widget.setVisible(True)
         self._reload_btn.setVisible(True)
@@ -842,6 +861,23 @@ class MetadataPanel(QWidget):
 
     # --------------------------------------------------------------- clear
 
+    def _set_empty_state(self, empty: bool) -> None:
+        """Show or hide the two things that only belong to the drop state.
+
+        Both say the same thing in different registers — "there is no file
+        here yet" — and both keep saying it over a file that is plainly
+        loaded. The description is a prompt to do what the user has already
+        done; the watermark is a panel-sized icon behind a form. Hidden
+        together so the loaded panel is the tags and nothing else.
+
+        The overlay is shared by every panel (``BackgroundOverlay``), and this
+        makes Metadata the only one that takes it down. That is deliberate and
+        limited to here: it is also the only panel whose content routinely
+        fills the space the watermark occupies.
+        """
+        self._desc_label.setVisible(empty)
+        self._bg_overlay.setVisible(empty)
+
     def _clear(self) -> None:
         """Reset panel to drop state."""
         self._clear_provenance()
@@ -852,6 +888,7 @@ class MetadataPanel(QWidget):
             self._form_layout.removeRow(0)
 
         self._artwork.clear_artwork(emit=False)
+        self._set_empty_state(True)
         self._file_header_widget.setVisible(False)
         self._info_label.setText("")
         self._path_label.setText("")

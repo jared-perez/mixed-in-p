@@ -4,16 +4,25 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt, Signal
+from PySide6.QtCore import QRect, Qt, Signal
 from PySide6.QtGui import (
+    QFontMetrics,
     QDragEnterEvent,
     QDragLeaveEvent,
     QDropEvent,
     QPixmap,
 )
-from PySide6.QtWidgets import QFrame, QLabel, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QFrame, QLabel, QSizePolicy, QVBoxLayout, QWidget
 
 from ..styles.theme import Theme
+
+# The gap between the cover and the edge of its column. Deliberately small:
+# this column *is* the cover, and every pixel of margin here is a pixel the
+# tabs beside it do not get.
+_ART_MARGIN = 4
+
+# Tall enough that a wrapped hint never runs out of room to be measured in.
+_UNBOUNDED = 10_000
 
 IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png"}
 
@@ -38,21 +47,46 @@ class ArtworkWidget(QFrame):
         self._data: bytes | None = None
         self._mime: str | None = None
         self._source_pixmap: QPixmap | None = None
+        # The width the panel gave us, kept rather than read back off the
+        # laid-out widget. See set_column_width.
+        self._column_width = 0
 
         self._apply_style(active=False)
         self._setup_ui()
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, Theme.PADDING)
-        layout.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # A hair of breathing room, not a frame. The cover sits in a column
+        # whose whole width is the cover — Theme.PADDING on each side spent
+        # ~30px of the panel on nothing, in the one place the Discogs tab
+        # next door most wants the room.
+        layout.setContentsMargins(_ART_MARGIN, _ART_MARGIN, _ART_MARGIN, _ART_MARGIN)
 
+        # Held rather than re-tr()'d at each use: this column's height is
+        # measured from it, and a string that differed between the measurement
+        # and the label would size the box for text nobody sees.
+        self._placeholder = self.tr(
+            "No artwork\n\nDrop an image here\nor click “Add Artwork…”"
+        )
         self._image_label = QLabel()
         self._image_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._image_label.setMinimumSize(120, 120)
-        self._image_label.setText(
-            self.tr("No artwork\n\nDrop an image here\nor click “Add Artwork…”")
+        # The placeholder is four translated lines in a column narrower than
+        # three of them: fr wants 220px and ja 240px against ~140 available,
+        # and a QLabel does not elide — it draws past its own edge and the
+        # sentence is simply cut. Wrapping is what lets the column be sized
+        # for the cover rather than for the longest translation of a hint.
+        self._image_label.setWordWrap(True)
+        # Ignored, so the *pixmap* cannot dictate the column width. A QLabel
+        # holding a pixmap reports that pixmap as its size hint, and the
+        # pixmap is scaled from the label's own width — a size derived from a
+        # width that is then read back off it. It settled at 132px inside a
+        # 225px column and never grew, which is where the margin everyone
+        # could see came from.
+        self._image_label.setSizePolicy(
+            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
         )
+        self._image_label.setText(self._placeholder)
         self._image_label.setStyleSheet(
             f"color: {Theme.TEXT_DISABLED}; font-size: 12px;"
         )
@@ -108,24 +142,68 @@ class ArtworkWidget(QFrame):
 
     def _show_placeholder(self) -> None:
         self._image_label.setPixmap(QPixmap())
-        self._image_label.setText(
-            self.tr("No artwork\n\nDrop an image here\nor click “Add Artwork…”")
-        )
+        self._image_label.setText(self._placeholder)
+
+    def _inner_side(self) -> int:
+        """The square the cover is drawn into, in the column's own terms."""
+        margins = self.layout().contentsMargins()
+        side = self._column_width or self.width()
+        return side - margins.left() - margins.right()
 
     def _render_pixmap(self) -> None:
+        """Scale the cover to the width the panel *gave* this column.
+
+        Never to the laid-out size. A QLabel holding a pixmap reports that
+        pixmap as its size hint, so scaling to the label — or to this widget,
+        whose height the label's hint decides — feeds the calculation its own
+        output: it settled at 120px inside a 150px column and could not grow,
+        the same shape as the playlist's artwork-row bug. ``_column_width`` is
+        an input, so there is no loop to converge.
+        """
         if self._source_pixmap is None or self._source_pixmap.isNull():
             self._show_placeholder()
             return
-        target = self._image_label.size()
-        if target.width() < 1 or target.height() < 1:
+        target_w = target_h = self._inner_side()
+        if target_w < 1 or target_h < 1:
             return
         scaled = self._source_pixmap.scaled(
-            target,
+            target_w,
+            target_h,
             Qt.AspectRatioMode.KeepAspectRatio,
             Qt.TransformationMode.SmoothTransformation,
         )
         self._image_label.setText("")
         self._image_label.setPixmap(scaled)
+
+    def set_column_width(self, width: int) -> None:
+        """Fix this column's size, squared off at the width the panel chose.
+
+        Both dimensions are *given*, never read back. A size hint would not
+        survive the trip: word wrap on the empty-state label makes this widget
+        report ``hasHeightForWidth``, and a parent layout then asks
+        ``heightForWidth`` and ignores ``sizeHint().height()`` entirely —
+        which is why the box sat at the label's 120px minimum with a 142px
+        cover drawn into it while every hint in the chain said 150.
+
+        The height is that square, floored by what the empty-state hint needs
+        once wrapped: it is four translated lines, and fr and ja each take two
+        lines for the last one. Measured with the font rather than asked of
+        the label, because the label holds a *cover* whenever there is one and
+        would answer for the picture instead of the sentence.
+        """
+        self._column_width = int(width)
+        margins = self.layout().contentsMargins()
+        inner = max(1, self._inner_side())
+        wrapped = QFontMetrics(self._image_label.font()).boundingRect(
+            QRect(0, 0, inner, _UNBOUNDED),
+            int(Qt.TextFlag.TextWordWrap) | int(Qt.AlignmentFlag.AlignCenter),
+            self._placeholder,
+        )
+        self.setFixedSize(
+            self._column_width,
+            max(inner, wrapped.height()) + margins.top() + margins.bottom(),
+        )
+        self._render_pixmap()
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
