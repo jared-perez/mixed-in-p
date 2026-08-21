@@ -1386,6 +1386,9 @@ class PlayerPanel(QWidget):
         self._lookup_progress: QProgressDialog | None = None
         self._lookup_results: list = []
         self._lookup_paths: list[str] = []
+        # The review dialog currently on screen, so a candidate switch it asks
+        # for can be delivered back into it. None whenever nothing is open.
+        self._review_dialog: LookupReviewDialog | None = None
 
         self._setup_ui()
         self._connect_signals()
@@ -4889,6 +4892,7 @@ class PlayerPanel(QWidget):
                     path=entry.file_path,
                     query=query,
                     want_artwork=self._fetch_artwork,
+                    prefer_release_id=self._remembered_release_id(entry.file_path),
                 )
             )
         if not jobs:
@@ -4999,7 +5003,23 @@ class PlayerPanel(QWidget):
                 parent=self,
                 position=(index, len(usable)),
             )
-            outcome = dialog.exec()
+            # The switcher has always been drawn here and never wired: nothing
+            # answered `candidate_requested`, so picking a different pressing
+            # moved the combo, left every field describing the release the
+            # automatic match had picked, and Apply then wrote *that* one. A
+            # control that reports a choice it did not make is worse than no
+            # control, and the fix is the Metadata panel's handler, not a
+            # second one.
+            dialog.candidate_requested.connect(
+                lambda candidate, d=dialog, r=result: self._on_review_candidate_requested(
+                    d, r, candidate
+                )
+            )
+            self._review_dialog = dialog
+            try:
+                outcome = dialog.exec()
+            finally:
+                self._review_dialog = None
             if outcome == STOP_RESULT:
                 break
             if not outcome:
@@ -5009,8 +5029,89 @@ class PlayerPanel(QWidget):
                 QMessageBox.warning(self, self.tr("Look Up Online"), error)
                 continue
             applied += 1
+            # Before the release memory, not after: `_reload_row_metadata`
+            # writes the list through to the library, so it is what guarantees
+            # there is a row to hang the release id on for a file that reached
+            # the playlist without one.
             self._reload_row_metadata(row)
+            # Apply is the user saying this is the right release. Until now
+            # this path recorded nothing at all — the Metadata panel was the
+            # only writer of the release memory — so every track tagged from
+            # the playlist came back to the Discogs tab as "No release known
+            # for this file yet", over tags it had just taken from a release.
+            self._remember_release(entry.file_path, dialog.chosen_release_id())
         self._report_lookup_outcome(applied, failures, skipped)
+
+    # ------------------------------------------------- release memory (v6)
+
+    def _remembered_release_id(self, file_path: str) -> int | None:
+        """Which Discogs release this file was tagged from, if we know."""
+        if self._library is None:
+            return None
+        try:
+            track = self._library.get_track_by_path(file_path)
+        except Exception as exc:  # noqa: BLE001 — no memory is not an error
+            logger.debug("Could not read the release memory: %s", exc)
+            return None
+        return getattr(track, "discogs_release_id", None) if track else None
+
+    def _remember_release(self, file_path: str, release_id: int | None) -> None:
+        """Store the approved release against the library row, if there is one."""
+        if self._library is None or not release_id:
+            return
+        try:
+            track = self._library.get_track_by_path(file_path)
+            if track is not None:
+                self._library.set_release_id(track.id, release_id)
+        except Exception as exc:  # noqa: BLE001
+            logger.debug("Could not remember the release: %s", exc)
+
+    def _on_review_candidate_requested(self, dialog, result, candidate) -> None:
+        """Read another pressing into the review dialog that asked for it.
+
+        Deliberately the same `LookupThread` the queue uses, with one job —
+        the rule the Metadata panel follows too. A second async path would
+        need its own cancel, its own keeper and its own shutdown to do what
+        this one already does. The dialog is modal, so its own `exec()` is
+        what pumps the loop the result arrives on.
+        """
+        if self._lookup_thread is not None or self._review_dialog is not dialog:
+            return
+        provider = DiscogsProvider(token=self._discogs_token)
+        job = LookupJob(
+            path=result.path,
+            query=result.query,
+            candidate=candidate,
+            want_artwork=self._fetch_artwork,
+        )
+        thread = LookupThread(provider, [job], self)
+        thread.result_ready.connect(
+            lambda new_result, d=dialog: self._on_review_candidate_ready(d, new_result)
+        )
+        thread.finished.connect(self._on_review_candidate_finished)
+        keep_alive(self._thread_keep, thread)
+        self._lookup_thread = thread
+        thread.start()
+
+    def _on_review_candidate_ready(self, dialog, result) -> None:
+        """Hand the re-read release to the dialog, or put the switcher back."""
+        if self._review_dialog is not dialog:
+            return  # Skipped or stopped while the request ran.
+        if not result.ok:
+            # Leaving the combo on a release we could not read would restore
+            # the very mismatch this whole handler exists to end.
+            dialog.restore_candidate()
+            QMessageBox.warning(
+                self, self.tr("Look Up Online"), lookup_flow.error_text(result.error)
+            )
+            return
+        dialog.set_result(result)
+
+    def _on_review_candidate_finished(self) -> None:
+        # Clear the slot only if a newer lookup has not already taken it — a
+        # superseded thread finishing is the normal case.
+        if self.sender() is self._lookup_thread:
+            self._lookup_thread = None
 
     def _report_lookup_outcome(self, applied: int, failures: list, skipped: int) -> None:
         """Say what did not work, and stay quiet about what did.

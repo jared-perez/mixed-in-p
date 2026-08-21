@@ -1015,6 +1015,12 @@ class MetadataPanel(QWidget):
         if not result.ok:
             self._set_lookup_status("")
             self._tab_refresh = False
+            if self._review_dialog is not None:
+                # A candidate switch that failed. Leaving the combo on a
+                # release we could not read would have it naming one pressing
+                # over fields describing another — the mismatch the switcher
+                # exists to escape.
+                self._review_dialog.restore_candidate()
             QMessageBox.information(
                 self, self.tr("Look Up Online"), self._lookup_error_text(result.error)
             )

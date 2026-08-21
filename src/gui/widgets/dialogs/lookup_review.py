@@ -340,6 +340,27 @@ class LookupReviewDialog(QDialog):
         self._proposed = getattr(result, "proposed", None)
         self._apply_result()
 
+    def restore_candidate(self) -> None:
+        """Put the switcher back on the release actually on screen.
+
+        A candidate the caller could not read leaves the combo naming one
+        release and every field under it describing another — which is the
+        exact state the switcher exists to escape. Called by whoever answers
+        :attr:`candidate_requested` when the request fails.
+        """
+        self._fill_candidates()
+
+    def chosen_release_id(self) -> int | None:
+        """The release the user was looking at, for the caller to remember.
+
+        Reads ``_result``, not the result the caller passed in: a candidate
+        switch replaces it through :meth:`set_result`, and the release an
+        apply is credited to has to be the one on screen when Apply was
+        pressed, not the one the automatic match opened with.
+        """
+        release_id = getattr(getattr(self._result, "chosen", None), "release_id", 0)
+        return int(release_id) or None
+
     def _apply_result(self) -> None:
         self._loading = True
         try:
