@@ -47,6 +47,7 @@ from .result import (
     ERROR_RATE_LIMIT,
     ERROR_SERVER,
     Candidate,
+    Credit,
     LookupFailed,
     ProposedTags,
     TrackEntry,
@@ -136,6 +137,57 @@ def _flatten_formats(payload: dict[str, Any]) -> tuple[str, ...]:
             if isinstance(desc, str):
                 words.append(desc)
     return tuple(words)
+
+
+# Which identifiers are worth a row. Discogs accepts free-form types and a
+# busy release carries a dozen — every runout etching on every side, plus
+# rights-society codes and distribution numbers. These four are the ones that
+# identify a pressing to a person holding it, or feed a tag.
+_IDENTIFIER_TYPES = {
+    "barcode": "Barcode",
+    "matrix / runout": "Matrix / Runout",
+    "label code": "Label Code",
+    "isrc": "ISRC",
+}
+
+
+def _credits_from(entries: list[Any]) -> tuple[Credit, ...]:
+    """Discogs ``extraartists`` as (name, role) pairs.
+
+    Names get the same disambiguation-suffix strip artists get — "Photek (2)"
+    is a Discogs bookkeeping detail, not part of anyone's name. A row with no
+    role is dropped: "someone was involved" is not a credit.
+    """
+    credits: list[Credit] = []
+    for entry in entries or []:
+        if not isinstance(entry, dict):
+            continue
+        name = matching.strip_artist_suffix(str(entry.get("name") or "").strip())
+        role = str(entry.get("role") or "").strip()
+        if name and role:
+            credits.append(Credit(name=name, role=role))
+    return tuple(credits)
+
+
+def _identifiers_from(payload: dict[str, Any]) -> tuple[tuple[str, str], ...]:
+    """The identifiers worth showing, as (label, value) pairs.
+
+    A description is folded into the label rather than dropped, because on a
+    record with two sides it is the whole point: "Matrix / Runout (Side A)"
+    and "Matrix / Runout (Side B)" are different etchings and identical rows
+    without it.
+    """
+    rows: list[tuple[str, str]] = []
+    for entry in payload.get("identifiers") or []:
+        if not isinstance(entry, dict):
+            continue
+        kind = _IDENTIFIER_TYPES.get(str(entry.get("type") or "").strip().casefold())
+        value = str(entry.get("value") or "").strip()
+        if not kind or not value:
+            continue
+        description = str(entry.get("description") or "").strip()
+        rows.append((f"{kind} ({description})" if description else kind, value))
+    return tuple(rows)
 
 
 def _split_search_title(text: str) -> tuple[str, str]:
@@ -365,8 +417,14 @@ class DiscogsProvider:
         genres = tuple(str(g) for g in payload.get("genres") or []) or candidate.genres
         labels = payload.get("labels") or []
         label = ""
+        catalogue_number = ""
         if labels and isinstance(labels[0], dict):
             label = matching.strip_artist_suffix(str(labels[0].get("name") or ""))
+            # In the very dict we were already opening for the name. Discogs
+            # writes "none" for a release that has no catalogue number, which
+            # is a word rather than a number and must not be shown as one.
+            catno = str(labels[0].get("catno") or "").strip()
+            catalogue_number = "" if catno.casefold() == "none" else catno
 
         year = _as_int(payload.get("year")) or candidate.year
         master_id = _as_int(payload.get("master_id")) or candidate.master_id
@@ -399,6 +457,22 @@ class DiscogsProvider:
         candidate.country = str(payload.get("country") or "") or candidate.country
         candidate.formats = _flatten_formats(payload) or candidate.formats
         candidate.master_id = master_id or candidate.master_id
+        # Same `or` rule as the fields above: the release payload is the better
+        # source where it has a value and must not blank what the search knew.
+        candidate.catalogue_number = catalogue_number or candidate.catalogue_number
+        candidate.released = str(payload.get("released") or "") or candidate.released
+        candidate.notes = str(payload.get("notes") or "") or candidate.notes
+        candidate.credits = _credits_from(payload.get("extraartists")) or candidate.credits
+        candidate.identifiers = _identifiers_from(payload) or candidate.identifiers
+        community = payload.get("community")
+        if isinstance(community, dict):
+            candidate.have = _as_int(community.get("have"))
+            candidate.want = _as_int(community.get("want"))
+            score_block = community.get("rating")
+            if isinstance(score_block, dict):
+                average = score_block.get("average")
+                candidate.rating = float(average) if average else None
+                candidate.rating_count = _as_int(score_block.get("count"))
         candidate.page_url = (
             str(payload.get("uri") or "")
             or candidate.page_url
@@ -442,6 +516,7 @@ class DiscogsProvider:
                     duration=_duration_seconds(str(row.get("duration") or "")),
                     ordinal=ordinal,
                     number=_track_number(position, ordinal),
+                    credits=_credits_from(row.get("extraartists")),
                 )
             )
         return entries

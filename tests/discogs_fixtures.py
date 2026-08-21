@@ -121,6 +121,24 @@ RELEASE_RESPONSE: dict[str, Any] = {
             "resource_url": "https://img.discogs.com/front-1001.jpg",
         },
     ],
+    "released": "1996-05-13",
+    "notes": "Comes in a printed inner sleeve.",
+    "extraartists": [
+        {"name": "Rick Smith (2)", "role": "Producer"},
+        {"name": "Underworld", "role": "Written-By"},
+        # No role: "somebody was involved" is not a credit, and this row is
+        # here to be dropped.
+        {"name": "Nobody In Particular", "role": ""},
+    ],
+    "identifiers": [
+        {"type": "Barcode", "value": "5 016553 004417"},
+        {"type": "Matrix / Runout", "value": "JBO 44 A1", "description": "Side A"},
+        {"type": "Matrix / Runout", "value": "JBO 44 B1", "description": "Side B"},
+        # Free-form types are allowed and a busy release carries a dozen; this
+        # one is here to prove the filter is a filter.
+        {"type": "Rights Society", "value": "MCPS"},
+    ],
+    "community": {"have": 4100, "want": 584, "rating": {"count": 240, "average": 3.86}},
     "tracklist": [
         {"type_": "heading", "position": "", "title": "Side A", "duration": ""},
         {
@@ -134,6 +152,9 @@ RELEASE_RESPONSE: dict[str, Any] = {
             "position": "B1",
             "title": "Born Slippy (Nuxx) (Radio Edit)",
             "duration": "4:02",
+            # Per-track credits are the DJ-relevant ones: a remix 12" credits
+            # a different person on every side.
+            "extraartists": [{"name": "Darren Price", "role": "Remix"}],
         },
     ],
 }

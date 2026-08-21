@@ -86,6 +86,20 @@ class TrackQuery:
 
 
 @dataclass(frozen=True)
+class Credit:
+    """Somebody who worked on a release or a track, and what they did.
+
+    Discogs calls these ``extraartists`` and hangs them off both the release
+    and each row. The role is theirs verbatim and is never translated — it is
+    a value out of their own taxonomy, the same reason ``styles`` is written
+    through to the genre tag as it stands.
+    """
+
+    name: str = ""
+    role: str = ""
+
+
+@dataclass(frozen=True)
 class TrackEntry:
     """One row of a release's tracklist."""
 
@@ -100,6 +114,11 @@ class TrackEntry:
     # and no second request — reading "A1" or "1-3" is the provider's job, and
     # it has already done it.
     number: int = 0
+    # Who did what on *this row*. The DJ-relevant role is Remixer, and it is
+    # per-track far more often than per-release: a remix 12" credits a
+    # different person on every side, and the release-level list says nothing
+    # about which of them made the mix in this file.
+    credits: tuple[Credit, ...] = ()
 
     def label_line(self) -> str:
         """One-line description for the track picker.
@@ -156,6 +175,27 @@ class Candidate:
     # the list the automatic choice was made from, and an override needs no
     # second request. Empty until fetch() reads the release.
     tracklist: tuple[TrackEntry, ...] = ()
+
+    # --- the rest of what the release response already carries -------------
+    #
+    # Every field below arrives in the request `fetch` already makes, and was
+    # being parsed past and dropped. The release payload has 36 top-level
+    # keys; this takes it from 9 read to 16, for no extra request.
+    catalogue_number: str = ""  # labels[].catno — Traktor and Rekordbox both have a field for it
+    released: str = ""          # the full date; `year` keeps only the first four digits
+    notes: str = ""
+    credits: tuple[Credit, ...] = ()
+    # (label, value) pairs, already filtered to the ones worth showing: barcode,
+    # matrix/runout, label code, ISRC. Text, because that is what they are — a
+    # runout etching is not a number.
+    identifiers: tuple[tuple[str, str], ...] = ()
+    # Discogs' community counters. Not tags, and not a match signal either:
+    # they are how two pressings of one title are told apart when everything
+    # else printed on them reads the same.
+    have: int | None = None
+    want: int | None = None
+    rating: float | None = None
+    rating_count: int | None = None
 
     def format_line(self) -> str:
         """The pressing in at most two words: what it is, and what kind.
@@ -224,6 +264,15 @@ class Candidate:
             "thumb_url": self.thumb_url,
             "cover_url": self.cover_url,
             "page_url": self.page_url,
+            "catalogue_number": self.catalogue_number,
+            "released": self.released,
+            "notes": self.notes,
+            "credits": [{"name": c.name, "role": c.role} for c in self.credits],
+            "identifiers": [list(pair) for pair in self.identifiers],
+            "have": self.have,
+            "want": self.want,
+            "rating": self.rating,
+            "rating_count": self.rating_count,
             "tracklist": [
                 {
                     "position": e.position,
@@ -232,6 +281,7 @@ class Candidate:
                     "duration": e.duration,
                     "ordinal": e.ordinal,
                     "number": e.number,
+                    "credits": [{"name": c.name, "role": c.role} for c in e.credits],
                 }
                 for e in self.tracklist
             ],
@@ -253,6 +303,7 @@ class Candidate:
                 duration=row.get("duration"),
                 ordinal=int(row.get("ordinal") or 0),
                 number=int(row.get("number") or 0),
+                credits=_credits_from(row.get("credits")),
             )
             for row in facts.get("tracklist") or []
             if isinstance(row, dict)
@@ -272,8 +323,30 @@ class Candidate:
             thumb_url=str(facts.get("thumb_url") or ""),
             cover_url=str(facts.get("cover_url") or ""),
             page_url=str(facts.get("page_url") or ""),
+            catalogue_number=str(facts.get("catalogue_number") or ""),
+            released=str(facts.get("released") or ""),
+            notes=str(facts.get("notes") or ""),
+            credits=_credits_from(facts.get("credits")),
+            identifiers=tuple(
+                (str(pair[0]), str(pair[1]))
+                for pair in facts.get("identifiers") or ()
+                if isinstance(pair, (list, tuple)) and len(pair) == 2
+            ),
+            have=facts.get("have"),
+            want=facts.get("want"),
+            rating=facts.get("rating"),
+            rating_count=facts.get("rating_count"),
             tracklist=entries,
         )
+
+
+def _credits_from(rows) -> tuple[Credit, ...]:
+    """Rebuild a credit list from cached JSON, skipping anything malformed."""
+    return tuple(
+        Credit(name=str(row.get("name") or ""), role=str(row.get("role") or ""))
+        for row in rows or ()
+        if isinstance(row, dict) and (row.get("name") or row.get("role"))
+    )
 
 
 @dataclass

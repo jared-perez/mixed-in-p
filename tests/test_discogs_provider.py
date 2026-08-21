@@ -420,3 +420,104 @@ def test_fetch_does_not_blank_what_the_search_already_knew():
     assert from_search.country == "Europe"
     assert from_search.year == 1996
     assert from_search.formats == ("Vinyl", '12"')
+
+
+# --- what the release response was already carrying and we were dropping ----
+#
+# Every field below arrives in the request `fetch` already makes. The payload
+# has 36 top-level keys; before this batch the provider read 9.
+
+
+class TestTheRestOfTheRelease:
+    def _fetched(self, release=None):
+        routes = {
+            "/releases/1001": release or RELEASE_RESPONSE,
+            "/masters/77": MASTER_RESPONSE,
+        }
+        provider, _, _, _ = _provider(routes)
+        candidate = Candidate(provider="discogs", release_id=1001)
+        provider.fetch(candidate, QUERY)
+        return candidate
+
+    def test_the_catalogue_number_comes_from_the_dict_we_already_opened(self):
+        """`labels[0]` was already being read for the name; catno sat beside it."""
+        assert self._fetched().catalogue_number == "JBO 44"
+
+    def test_none_is_a_word_not_a_catalogue_number(self):
+        """Discogs writes the string "none" for a release that has none."""
+        payload = dict(RELEASE_RESPONSE)
+        payload["labels"] = [{"name": "White Label", "catno": "none"}]
+
+        assert self._fetched(payload).catalogue_number == ""
+
+    def test_the_full_date_is_the_pressing_s_and_the_year_may_not_be(self):
+        """These two are not the same fact and can legitimately disagree.
+
+        `year` prefers the *master*'s — a DJ wants the year the record came
+        out, not the year this repress did — while `released` is this
+        pressing's own date. Here the master says 1995 and the pressing says
+        1996-05-13, and both are correct. Anything displaying them has to
+        label them apart, or the tab reads as contradicting itself.
+        """
+        candidate = self._fetched()
+        assert candidate.released == "1996-05-13"
+        assert candidate.year == 1995
+
+    def test_release_credits_are_named_and_roled(self):
+        credits = self._fetched().credits
+        assert ("Rick Smith", "Producer") in [(c.name, c.role) for c in credits]
+
+    def test_a_credit_with_no_role_is_dropped(self):
+        assert all(c.role for c in self._fetched().credits)
+
+    def test_the_disambiguation_suffix_goes_the_way_it_does_for_artists(self):
+        """"Rick Smith (2)" is Discogs bookkeeping, not part of a name."""
+        assert "Rick Smith" in [c.name for c in self._fetched().credits]
+
+    def test_track_credits_land_on_the_row_they_belong_to(self):
+        entries = {e.position: e for e in self._fetched().tracklist}
+        assert [(c.name, c.role) for c in entries["B1"].credits] == [
+            ("Darren Price", "Remix")
+        ]
+        assert entries["A1"].credits == ()
+
+    def test_only_the_identifiers_worth_a_row_are_kept(self):
+        kinds = [label for label, _ in self._fetched().identifiers]
+        assert any(k.startswith("Barcode") for k in kinds)
+        assert not any("Rights Society" in k for k in kinds)
+
+    def test_two_sides_of_one_runout_are_told_apart_by_the_description(self):
+        """Without it they are different etchings on identical rows."""
+        rows = dict(self._fetched().identifiers)
+        assert rows["Matrix / Runout (Side A)"] == "JBO 44 A1"
+        assert rows["Matrix / Runout (Side B)"] == "JBO 44 B1"
+
+    def test_the_community_counters_come_through(self):
+        candidate = self._fetched()
+        assert (candidate.have, candidate.want) == (4100, 584)
+        assert candidate.rating == pytest.approx(3.86)
+        assert candidate.rating_count == 240
+
+    def test_the_notes_come_through(self):
+        assert "printed inner sleeve" in self._fetched().notes
+
+    def test_all_of_it_survives_the_cache_round_trip(self):
+        """The tab reads this back out of the database, not off the wire."""
+        original = self._fetched()
+        restored = Candidate.from_release_facts(original.release_facts())
+
+        assert restored.catalogue_number == original.catalogue_number
+        assert restored.released == original.released
+        assert restored.notes == original.notes
+        assert [(c.name, c.role) for c in restored.credits] == [
+            (c.name, c.role) for c in original.credits
+        ]
+        assert restored.identifiers == original.identifiers
+        assert (restored.have, restored.want, restored.rating_count) == (
+            original.have,
+            original.want,
+            original.rating_count,
+        )
+        assert [
+            [(c.name, c.role) for c in e.credits] for e in restored.tracklist
+        ] == [[(c.name, c.role) for c in e.credits] for e in original.tracklist]
