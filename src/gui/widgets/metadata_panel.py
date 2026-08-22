@@ -171,6 +171,12 @@ class MetadataPanel(QWidget):
         # Set for the length of one Refresh: the same thread path serves the
         # tab and the review dialog, and this is which of them asked.
         self._tab_refresh = False
+        # Its sibling for "Find Cover Online": the answer goes to a review
+        # dialog like an ordinary lookup's, but one showing the sleeve alone.
+        # Same reason there is one flag and not a second thread path — a
+        # second one would need its own cancel, keeper and shutdown to do what
+        # this one already does.
+        self._artwork_lookup = False
         self._threads: list = []
         self.setAcceptDrops(True)
         self._setup_ui()
@@ -553,6 +559,14 @@ class MetadataPanel(QWidget):
 
         layout.addWidget(scroll, 1)
 
+        # Two rows, not one. Four controls and a credit do not fit the tab's
+        # 500px at the window's minimum width in any language — German was
+        # already 32px over with three of them, and French wants 727px. A
+        # QPushButton centres rather than elides, so the overflow is not an
+        # ellipsis but two labels cut at both ends and drawn over each other.
+        # The review dialog learned the same thing from its own button row:
+        # the credit is the part that shares badly, and the buttons are the
+        # part that must stay legible.
         row = QHBoxLayout()
         row.setSpacing(Theme.SPACING)
         self._discogs_refresh_btn = QPushButton(self.tr("Refresh from Discogs"))
@@ -567,6 +581,27 @@ class MetadataPanel(QWidget):
         )
         self._discogs_refresh_btn.clicked.connect(self._on_discogs_refresh)
         row.addWidget(self._discogs_refresh_btn)
+        # Homed here rather than beside Add Artwork…: that row is already
+        # [Add field ▾] [stretch] [Add Artwork…] [Remove], and a fourth
+        # translated label on it is the width problem this tab exists to give
+        # the feature a way out of.
+        self._find_cover_btn = QPushButton(self.tr("Find Cover Online…"))
+        self._find_cover_btn.setToolTip(
+            self.tr("Search Discogs and pick which release's cover to use.")
+        )
+        self._find_cover_btn.setMinimumWidth(
+            self._find_cover_btn.fontMetrics().horizontalAdvance(
+                self._find_cover_btn.text()
+            )
+            + _BUTTON_CHROME
+        )
+        self._find_cover_btn.clicked.connect(self._on_find_cover_clicked)
+        row.addWidget(self._find_cover_btn)
+        row.addStretch()
+        layout.addLayout(row)
+
+        credit_row = QHBoxLayout()
+        credit_row.setSpacing(Theme.SPACING)
         self._discogs_link = LinkLabel()
         self._discogs_link.setText(self.tr("View release"))
         self._discogs_link.setStyleSheet(f"color: {Theme.ACCENT_TEXT};")
@@ -574,16 +609,16 @@ class MetadataPanel(QWidget):
             self.tr("Open this release's page on Discogs in your browser.")
         )
         self._discogs_link.clicked.connect(self._on_discogs_link_clicked)
-        row.addWidget(self._discogs_link)
-        row.addStretch()
+        credit_row.addWidget(self._discogs_link)
+        credit_row.addStretch()
         # The same credit the review dialog and the About box carry, on the
         # third surface that displays this data. Not translated: it is a
         # provider credit, like DISPLAY_NAME, and ATTRIBUTION is one constant
         # so the three cannot drift apart.
         self._discogs_credit = QLabel(discogs.ATTRIBUTION)
         self._discogs_credit.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
-        row.addWidget(self._discogs_credit)
-        layout.addLayout(row)
+        credit_row.addWidget(self._discogs_credit)
+        layout.addLayout(credit_row)
         return page
 
     # ---------------------------------------------------------- tab drawing
@@ -1467,6 +1502,12 @@ class MetadataPanel(QWidget):
         """The button exists only when the feature is on and a file is loaded."""
         visible = self._online_enabled and self._file_path is not None
         self._lookup_btn.setVisible(visible)
+        # Same rule, so the same call: the cover search is not gated on a
+        # known release the way Refresh is — a file with no release at all is
+        # the one most likely to be missing its sleeve. Set here rather than
+        # in `_refresh_discogs_tab` because `_clear` redraws the tab *before*
+        # it drops the file path, so a button synced there survived the eject.
+        self._find_cover_btn.setVisible(visible)
         self._sync_empty_hint(visible)
         if not visible:
             self._lookup_status.setVisible(False)
@@ -1513,26 +1554,69 @@ class MetadataPanel(QWidget):
             duration=duration,
         )
 
+    def _usable_query(self, title: str):
+        """The search query, or None having said why there isn't one.
+
+        Shared by both buttons that search: the reason a file cannot be looked
+        up does not change with what the user meant to get out of it, and the
+        sentence is the same one either way — only the title over it differs,
+        so it names the button that was pressed.
+        """
+        query = self._current_query()
+        if query.is_usable():
+            return query
+        QMessageBox.information(
+            self,
+            title,
+            self.tr(
+                "This file has no artist or title to search with, and its "
+                "name doesn't give one either. Fill in the Title field and "
+                "try again."
+            ),
+        )
+        return None
+
     def _on_lookup_clicked(self) -> None:
         if self._file_path is None or self._lookup_thread is not None:
             return
-        query = self._current_query()
-        if not query.is_usable():
-            QMessageBox.information(
-                self,
-                self.tr("Look Up Online"),
-                self.tr(
-                    "This file has no artist or title to search with, and its "
-                    "name doesn't give one either. Fill in the Title field and "
-                    "try again."
-                ),
-            )
+        query = self._usable_query(self.tr("Look Up Online"))
+        if query is None:
             return
         self._start_lookup(
             LookupJob(
                 path=self._file_path,
                 query=query,
                 want_artwork=self._fetch_artwork,
+                prefer_release_id=self._release_id,
+            )
+        )
+
+    def _on_find_cover_clicked(self) -> None:
+        """Search for this track and review the sleeve alone.
+
+        ``want_artwork=True`` whatever Settings says. That checkbox reads
+        "Fetch cover art with lookups" and governs the cover that rides along
+        with a *metadata* lookup; this is the cover, asked for by name, and a
+        button that answered "no covers, you turned them off" would be
+        refusing to do the only thing it offers.
+
+        The search runs even when the release is already known, because the
+        point is usually that *this* pressing has no scan. ``prefer_release_id``
+        opens the dialog on the known one when the search returns it, so the
+        default answer stays the release the file was tagged from and the
+        switcher is what moves off it.
+        """
+        if self._file_path is None or self._lookup_thread is not None:
+            return
+        query = self._usable_query(self.tr("Find Cover Online"))
+        if query is None:
+            return
+        self._artwork_lookup = True
+        self._start_lookup(
+            LookupJob(
+                path=self._file_path,
+                query=query,
+                want_artwork=True,
                 prefer_release_id=self._release_id,
             )
         )
@@ -1547,9 +1631,21 @@ class MetadataPanel(QWidget):
         # the attribute alone can drop the last reference mid-teardown.
         thread_keeper.keep_alive(self._threads, thread)
         self._lookup_thread = thread
-        self._lookup_btn.setEnabled(False)
+        # All three, not just the one on the Tags page: the status line lives
+        # there too, so a lookup started from the Discogs tab has nothing else
+        # to show for itself, and a button that swallows clicks in silence
+        # reads as broken rather than as busy.
+        self._set_lookup_controls_enabled(False)
         self._set_lookup_status(self.tr("Looking up…"))
         thread.start()
+
+    def _set_lookup_controls_enabled(self, enabled: bool) -> None:
+        for button in (
+            self._lookup_btn,
+            self._discogs_refresh_btn,
+            self._find_cover_btn,
+        ):
+            button.setEnabled(enabled)
 
     def _set_lookup_status(self, text: str) -> None:
         self._lookup_status.setText(text)
@@ -1566,17 +1662,21 @@ class MetadataPanel(QWidget):
         thread = self.sender()
         if thread is self._lookup_thread:
             self._lookup_thread = None
-        self._lookup_btn.setEnabled(True)
+        self._set_lookup_controls_enabled(True)
 
     def _on_lookup_result(self, result) -> None:
         if self._file_path is None or result.path != self._file_path:
             # The user ejected or dropped another file while it ran.
             self._set_lookup_status("")
             self._tab_refresh = False
+            self._artwork_lookup = False
             return
         if not result.ok:
             self._set_lookup_status("")
             self._tab_refresh = False
+            # Safe unconditionally: a failed *candidate switch* arrives with a
+            # dialog already open, and opening it is what consumed the flag.
+            self._artwork_lookup = False
             if self._review_dialog is not None:
                 # A candidate switch that failed. Leaving the combo on a
                 # release we could not read would have it naming one pressing
@@ -1611,13 +1711,19 @@ class MetadataPanel(QWidget):
             # A candidate switch: the dialog is open and waiting for this.
             self._review_dialog.set_result(result)
             return
-        self._show_review_dialog(result)
+        # Spent here, at the one point it turns into a dialog: the two returns
+        # above are a Refresh and a candidate switch, neither of which can be
+        # holding it — a switch arrives with the dialog that consumed it
+        # already open.
+        artwork_only = self._artwork_lookup
+        self._artwork_lookup = False
+        self._show_review_dialog(result, artwork_only=artwork_only)
 
     def _lookup_error_text(self, kind: str) -> str:
         """One sentence per failure kind (shared with the Player's batch run)."""
         return lookup_flow.error_text(kind)
 
-    def _show_review_dialog(self, result) -> None:
+    def _show_review_dialog(self, result, artwork_only: bool = False) -> None:
         try:
             current = read_metadata(self._file_path)
         except Exception as exc:
@@ -1631,6 +1737,7 @@ class MetadataPanel(QWidget):
             result=result,
             allow_artwork=self._fetch_artwork,
             parent=self,
+            artwork_only=artwork_only,
         )
         dialog.candidate_requested.connect(self._on_candidate_requested)
         self._review_dialog = dialog
@@ -1645,12 +1752,21 @@ class MetadataPanel(QWidget):
         """The user picked a different release; read that one instead."""
         if self._file_path is None or self._lookup_thread is not None:
             return
+        # A cover review switching pressing has to pull *that* release's
+        # sleeve down, whatever the Settings checkbox says: without this the
+        # preview keeps showing the previous release's cover under the new
+        # release's name, which is the same mismatch the switcher exists to
+        # escape, moved from the fields onto the picture.
+        review = self._review_dialog
+        want_artwork = self._fetch_artwork or bool(
+            getattr(review, "artwork_only", False)
+        )
         self._start_lookup(
             LookupJob(
                 path=self._file_path,
                 query=self._current_query(),
                 candidate=candidate,
-                want_artwork=self._fetch_artwork,
+                want_artwork=want_artwork,
             )
         )
 

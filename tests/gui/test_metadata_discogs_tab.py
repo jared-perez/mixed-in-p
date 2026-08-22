@@ -307,7 +307,7 @@ def test_the_tab_says_when_the_feature_is_off(qtbot, flac):
 def test_a_refresh_fills_the_tab_and_opens_no_dialog(panel, flac, monkeypatch):
     opened: list = []
     monkeypatch.setattr(
-        MetadataPanel, "_show_review_dialog", lambda self, r: opened.append(r)
+        MetadataPanel, "_show_review_dialog", lambda self, r, **kw: opened.append(r)
     )
     panel._release_id = 249504
     panel._tab_refresh = True
@@ -361,7 +361,7 @@ def test_a_lookup_asks_for_the_remembered_release(panel, flac, monkeypatch):
 def test_the_tab_fills_in_as_soon_as_a_result_arrives(panel, flac, monkeypatch):
     # Not only when a value is written: the tab reports what Discogs knows,
     # and a review the user then cancels has still answered that.
-    monkeypatch.setattr(MetadataPanel, "_show_review_dialog", lambda self, r: None)
+    monkeypatch.setattr(MetadataPanel, "_show_review_dialog", lambda self, r, **kw: None)
     panel._on_lookup_result(_result(flac))
     assert panel._discogs_summary.text() == "Born Slippy"
     assert panel._discogs_page_url().endswith("/249504")

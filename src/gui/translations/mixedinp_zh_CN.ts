@@ -1265,17 +1265,27 @@ or click “Add Artwork…”</source>
         <translation>音轨号</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="125"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="141"/>
+        <source>Find Cover Online</source>
+        <translation>在线查找封面</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="143"/>
         <source>Review Metadata</source>
         <translation>检查元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="139"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="159"/>
+        <source>Pick the release with the cover you want.</source>
+        <translation>选择你想要封面的版本。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="161"/>
         <source>Tick the values you want to write to this file.</source>
         <translation>勾选要写入此文件的值。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="145"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="168"/>
         <source>File {0} of {1}</source>
         <translation>第 {0} 个文件，共 {1} 个</translation>
     </message>
@@ -1284,102 +1294,107 @@ or click “Add Artwork…”</source>
         <translation type="vanished">版本：</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="166"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="189"/>
         <source>Not the right pressing? Pick another release the search found.</source>
         <translation>不是想要的版本？可以选择搜索找到的其他版本。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="168"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="191"/>
         <source>Select release</source>
         <translation>选择版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="190"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="213"/>
         <source>Wrong track from this release? Pick the right row of the tracklist.</source>
         <translation>不是该版本中的这首曲目？请选择曲目表中正确的一行。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="192"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="215"/>
         <source>Select track</source>
         <translation>选择曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="247"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="275"/>
         <source>Album Art</source>
         <translation>专辑封面</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="263"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="291"/>
         <source>WAV files can&apos;t store tags — these values won&apos;t be saved.</source>
         <translation>WAV 文件无法存储标签，这些值不会被保存。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="282"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="316"/>
         <source>Select All</source>
         <translation>全选</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="283"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="321"/>
         <source>Select None</source>
         <translation>全不选</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="286"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="325"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="291"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="330"/>
         <source>Skip</source>
         <translation>跳过</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="293"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="332"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="295"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="334"/>
         <source>Apply</source>
         <translation>应用</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="389"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="443"/>
         <source>Unknown release</source>
         <translation>未知版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="415"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="488"/>
         <source>Unknown track</source>
         <translation>未知曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="454"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="535"/>
         <source>Current</source>
         <translation>当前</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="455"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="536"/>
         <source>From Discogs</source>
         <translation>来自 Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="475"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="556"/>
         <source>(empty)</source>
         <translation>（空）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="489"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="570"/>
         <source>Every field already matches this release.</source>
         <translation>所有字段都已与此版本一致。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="510"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="604"/>
         <source>(none)</source>
         <translation>（无）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="523"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="626"/>
+        <source>No cover on Discogs for this release — try another one.</source>
+        <translation>Discogs 上没有该版本的封面，请试试其他版本。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/lookup_review.py" line="633"/>
         <source>No confident match — check the release before applying.</source>
         <translation>匹配不确定，请先核对版本再应用。</translation>
     </message>
@@ -1598,7 +1613,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/metadata_panel.py" line="75"/>
-        <location filename="../widgets/metadata_panel.py" line="916"/>
+        <location filename="../widgets/metadata_panel.py" line="951"/>
         <source>Label</source>
         <translation>厂牌</translation>
     </message>
@@ -1620,7 +1635,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/metadata_panel.py" line="79"/>
-        <location filename="../widgets/metadata_panel.py" line="918"/>
+        <location filename="../widgets/metadata_panel.py" line="953"/>
         <source>Year</source>
         <translation>年份</translation>
     </message>
@@ -1636,40 +1651,40 @@ or click “Add Artwork…”</source>
         <translation>注释</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="194"/>
+        <location filename="../widgets/metadata_panel.py" line="200"/>
         <source>Metadata Editor</source>
         <translation>元数据编辑器</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="202"/>
+        <location filename="../widgets/metadata_panel.py" line="208"/>
         <source>Drop a single audio file to view and edit its metadata tags.</source>
         <translation>拖入单个音频文件以查看和编辑其元数据标签。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="257"/>
-        <location filename="../widgets/metadata_panel.py" line="1306"/>
-        <location filename="../widgets/metadata_panel.py" line="1325"/>
+        <location filename="../widgets/metadata_panel.py" line="263"/>
+        <location filename="../widgets/metadata_panel.py" line="1341"/>
+        <location filename="../widgets/metadata_panel.py" line="1360"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="260"/>
+        <location filename="../widgets/metadata_panel.py" line="266"/>
         <source>Show this file in Finder / File Explorer.</source>
         <translation>在访达 / 文件资源管理器中显示此文件。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="357"/>
+        <location filename="../widgets/metadata_panel.py" line="363"/>
         <source>Tags</source>
         <translation>标签</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="352"/>
-        <location filename="../widgets/metadata_panel.py" line="1138"/>
+        <location filename="../widgets/metadata_panel.py" line="358"/>
+        <location filename="../widgets/metadata_panel.py" line="1173"/>
         <source>Add field...</source>
         <translation>添加字段……</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="390"/>
+        <location filename="../widgets/metadata_panel.py" line="396"/>
         <source>Add Artwork…</source>
         <translation>添加封面……</translation>
     </message>
@@ -1678,232 +1693,247 @@ or click “Add Artwork…”</source>
         <translation type="vanished">移除</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="417"/>
+        <location filename="../widgets/metadata_panel.py" line="423"/>
         <source>Look Up Online…</source>
         <translation>在线查找…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="419"/>
+        <location filename="../widgets/metadata_panel.py" line="425"/>
         <source>Search Discogs for this track&apos;s details, and review them.</source>
         <translation>在 Discogs 上查找此曲目的信息并核对。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="448"/>
-        <location filename="../widgets/metadata_panel.py" line="571"/>
+        <location filename="../widgets/metadata_panel.py" line="454"/>
+        <location filename="../widgets/metadata_panel.py" line="606"/>
         <source>View release</source>
         <translation>查看版本</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="451"/>
-        <location filename="../widgets/metadata_panel.py" line="574"/>
+        <location filename="../widgets/metadata_panel.py" line="457"/>
+        <location filename="../widgets/metadata_panel.py" line="609"/>
         <source>Open this release&apos;s page on Discogs in your browser.</source>
         <translation>在浏览器中打开该版本的 Discogs 页面。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="462"/>
+        <location filename="../widgets/metadata_panel.py" line="468"/>
         <source>Reload</source>
         <translation>重新加载</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="467"/>
+        <location filename="../widgets/metadata_panel.py" line="473"/>
         <source>Eject</source>
         <translatorcomment>弹出 (eject loaded file from metadata/player). Verify vs 移除/退出.</translatorcomment>
         <translation>弹出</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="558"/>
+        <location filename="../widgets/metadata_panel.py" line="572"/>
         <source>Refresh from Discogs</source>
         <translation>从 Discogs 刷新</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="560"/>
+        <location filename="../widgets/metadata_panel.py" line="574"/>
         <source>Read this release again and show what Discogs has on it.</source>
         <translation>重新读取该版本，并显示 Discogs 上的信息。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="615"/>
-        <location filename="../widgets/metadata_panel.py" line="760"/>
+        <location filename="../widgets/metadata_panel.py" line="588"/>
+        <source>Find Cover Online…</source>
+        <translation>在线查找封面…</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="590"/>
+        <source>Search Discogs and pick which release&apos;s cover to use.</source>
+        <translation>搜索 Discogs，并选择使用哪个版本的封面。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="650"/>
+        <location filename="../widgets/metadata_panel.py" line="795"/>
         <source>Already in this file&apos;s tags.</source>
         <translatorcomment>Shown on a disabled button — the value is there already, so there is nothing to write.</translatorcomment>
         <translation>已存在于此文件的标签中。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="617"/>
-        <location filename="../widgets/metadata_panel.py" line="768"/>
+        <location filename="../widgets/metadata_panel.py" line="652"/>
+        <location filename="../widgets/metadata_panel.py" line="803"/>
         <source>Write this to the {0} tag.</source>
         <translatorcomment>{0} is a tag field name (Album, Artist, Label, Year, Genre), already translated elsewhere.</translatorcomment>
         <translation>将此值写入“{0}”标签。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="763"/>
+        <location filename="../widgets/metadata_panel.py" line="798"/>
         <source>Write this row&apos;s title and track number to the tags.</source>
         <translatorcomment>Both together: a title written without its number leaves the file claiming to be track 1.</translatorcomment>
         <translation>将此行的标题和曲目编号写入标签。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="851"/>
+        <location filename="../widgets/metadata_panel.py" line="886"/>
         <source>Unknown release</source>
         <translation>未知版本</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="869"/>
+        <location filename="../widgets/metadata_panel.py" line="904"/>
         <source>Tagged from Discogs release {0}.</source>
         <translation>标签来自 Discogs 版本 {0}。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="876"/>
+        <location filename="../widgets/metadata_panel.py" line="911"/>
         <source>No release known for this file yet. Look it up online.</source>
         <translation>尚不知道此文件的版本。请在线查找。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="883"/>
+        <location filename="../widgets/metadata_panel.py" line="918"/>
         <source>Online lookup is switched off in Settings.</source>
         <translation>在线查找已在“设置”中关闭。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="914"/>
+        <location filename="../widgets/metadata_panel.py" line="949"/>
         <source>Release</source>
         <translation>版本</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="917"/>
+        <location filename="../widgets/metadata_panel.py" line="952"/>
         <source>Catalogue Number</source>
         <translation>目录编号</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="922"/>
+        <location filename="../widgets/metadata_panel.py" line="957"/>
         <source>Genres</source>
         <translatorcomment>Plural of the existing translation of &apos;Genre&apos;; kept distinct from &apos;Styles&apos;.</translatorcomment>
         <translation>流派</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="926"/>
+        <location filename="../widgets/metadata_panel.py" line="961"/>
         <source>Pressing</source>
         <translatorcomment>Section heading: this physical pressing, as against the release itself.</translatorcomment>
         <translation>版本</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="928"/>
+        <location filename="../widgets/metadata_panel.py" line="963"/>
         <source>Format</source>
         <translation>格式</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="929"/>
+        <location filename="../widgets/metadata_panel.py" line="964"/>
         <source>Country</source>
         <translation>国家/地区</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="921"/>
+        <location filename="../widgets/metadata_panel.py" line="956"/>
         <source>Styles</source>
         <translation>风格</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="930"/>
+        <location filename="../widgets/metadata_panel.py" line="965"/>
         <source>Released</source>
         <translatorcomment>This pressing&apos;s own date. Distinct from Year, which is the original release year.</translatorcomment>
         <translation>发行日期</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="934"/>
+        <location filename="../widgets/metadata_panel.py" line="969"/>
         <source>Tracklist</source>
         <translatorcomment>Built on this language&apos;s established word for a track (see the glossary).</translatorcomment>
         <translation>曲目列表</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="936"/>
+        <location filename="../widgets/metadata_panel.py" line="971"/>
         <source>Credits</source>
         <translatorcomment>Who worked on the record. The role names themselves stay in Discogs&apos; English.</translatorcomment>
         <translation>参与者</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="937"/>
+        <location filename="../widgets/metadata_panel.py" line="972"/>
         <source>Identifiers</source>
         <translatorcomment>Barcode, label code, matrix/runout — what identifies a pressing in the hand.</translatorcomment>
         <translation>识别码</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="938"/>
+        <location filename="../widgets/metadata_panel.py" line="973"/>
         <source>Community</source>
         <translation>社区</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="940"/>
+        <location filename="../widgets/metadata_panel.py" line="975"/>
         <source>Notes</source>
         <translatorcomment>The label&apos;s own sleeve notes, free text.</translatorcomment>
         <translation>备注</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1013"/>
+        <location filename="../widgets/metadata_panel.py" line="1048"/>
         <source>Have</source>
         <translatorcomment>Discogs&apos; counter. Rendered as &apos;in N collections&apos; rather than the bare verb, which does not survive translation as a field label.</translatorcomment>
         <translation>拥有</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1014"/>
+        <location filename="../widgets/metadata_panel.py" line="1049"/>
         <source>Want</source>
         <translatorcomment>Paired with &apos;Have&apos; — the wantlist counter, phrased as a place rather than a verb.</translatorcomment>
         <translation>想要</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1015"/>
+        <location filename="../widgets/metadata_panel.py" line="1050"/>
         <source>Rating</source>
         <translation>评分</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1105"/>
+        <location filename="../widgets/metadata_panel.py" line="1140"/>
         <source>Error: {0}</source>
         <translation>错误：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1308"/>
+        <location filename="../widgets/metadata_panel.py" line="1343"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>找不到此文件——可能已被移动、重命名或删除。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1326"/>
+        <location filename="../widgets/metadata_panel.py" line="1361"/>
         <source>Play in Player</source>
         <translation>在播放器中播放</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1327"/>
+        <location filename="../widgets/metadata_panel.py" line="1362"/>
         <source>Copy File Path</source>
         <translation>复制文件路径</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1493"/>
+        <location filename="../widgets/metadata_panel.py" line="1534"/>
         <source>No tags on this file — look it up on Discogs?</source>
         <translation>此文件没有标签 — 要在 Discogs 上查找吗？</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="800"/>
-        <location filename="../widgets/metadata_panel.py" line="1523"/>
-        <location filename="../widgets/metadata_panel.py" line="1587"/>
-        <location filename="../widgets/metadata_panel.py" line="1684"/>
+        <location filename="../widgets/metadata_panel.py" line="835"/>
+        <location filename="../widgets/metadata_panel.py" line="1582"/>
+        <location filename="../widgets/metadata_panel.py" line="1687"/>
+        <location filename="../widgets/metadata_panel.py" line="1800"/>
         <source>Look Up Online</source>
         <translation>在线查找</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1525"/>
+        <location filename="../widgets/metadata_panel.py" line="1572"/>
         <source>This file has no artist or title to search with, and its name doesn&apos;t give one either. Fill in the Title field and try again.</source>
         <translation>此文件没有可用于搜索的艺人或标题，文件名中也没有。请填写“标题”后重试。</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1551"/>
+        <location filename="../widgets/metadata_panel.py" line="1611"/>
+        <source>Find Cover Online</source>
+        <translation>在线查找封面</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metadata_panel.py" line="1639"/>
         <source>Looking up…</source>
         <translation>正在查找…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1560"/>
+        <location filename="../widgets/metadata_panel.py" line="1656"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>正在等待 Discogs 的请求限制…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1719"/>
+        <location filename="../widgets/metadata_panel.py" line="1835"/>
         <source>Applied from Discogs</source>
         <translation>已从 Discogs 应用</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="1769"/>
+        <location filename="../widgets/metadata_panel.py" line="1885"/>
         <source>Select cover art</source>
         <translation>选择封面</translation>
     </message>

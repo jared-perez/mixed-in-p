@@ -423,3 +423,138 @@ def test_both_surfaces_credit_discogs_with_the_same_words(qtbot):
         w.text() == discogs.ATTRIBUTION
         for w in about.findChildren(type(dialog._warning))
     )
+
+
+# --- artwork-only mode (D5, "Find Cover Online") -----------------------------
+#
+# The same dialog with the field rows suppressed. A mode rather than a default
+# check-state, because the ticks default to *empty* fields: "art only" is
+# genuinely unreachable by ticking, so a default would leave the user one
+# stray tick away from a retag they never asked for.
+
+
+def _art_bytes() -> bytes:
+    from PySide6.QtCore import QBuffer
+    from PySide6.QtGui import QColor, QPixmap
+
+    pixmap = QPixmap(8, 8)
+    pixmap.fill(QColor("red"))
+    buffer = QBuffer()
+    buffer.open(QBuffer.OpenModeFlag.WriteOnly)
+    pixmap.save(buffer, "PNG")
+    return bytes(buffer.data())
+
+
+def test_artwork_only_offers_the_cover_and_no_fields(qtbot):
+    dialog = _dialog(
+        qtbot, current={}, result=_result(artwork=_art_bytes()), artwork_only=True
+    )
+    # Not one tickable field, on a file with nothing filled in — which in the
+    # ordinary mode would tick every one of them.
+    assert dialog._checks == {}
+    assert dialog._diff_scroll.isHidden()
+    assert not dialog._art_row.isHidden()
+    assert set(dialog.selected_values()) == {ARTWORK_FIELD}
+
+
+def test_artwork_only_replaces_a_cover_the_file_already_has(qtbot):
+    # The standing rule is "never replace art silently". Pressing a button
+    # named Find Cover Online over a file that has one is a request to change
+    # it, and both covers are on screen side by side — so the tick starts on,
+    # or Apply would answer by doing nothing at all.
+    dialog = _dialog(
+        qtbot,
+        current={ARTWORK_FIELD: _art_bytes()},
+        result=_result(artwork=_art_bytes()),
+        artwork_only=True,
+    )
+    assert dialog._art_check.isChecked()
+    assert dialog._apply_btn.isEnabled()
+
+
+def test_the_ordinary_mode_still_never_replaces_a_cover_silently(qtbot):
+    dialog = _dialog(
+        qtbot, current={ARTWORK_FIELD: _art_bytes()}, result=_result(artwork=_art_bytes())
+    )
+    assert not dialog._art_check.isChecked()
+
+
+def test_a_release_with_no_cover_says_so_and_offers_nothing_to_apply(qtbot):
+    # The ordinary way this search comes back empty. Without the sentence the
+    # dialog is a blank frame over a dead Apply, which reads as broken rather
+    # than as an answer — and the answer has a next step: another pressing.
+    dialog = _dialog(qtbot, current={}, result=_result(), artwork_only=True)
+    assert dialog._art_row.isHidden()
+    assert not dialog._warning.isHidden()
+    assert "cover" in dialog._warning.text().lower()
+    assert not dialog._apply_btn.isEnabled()
+
+
+def test_artwork_only_keeps_the_release_switcher(qtbot):
+    # It is the whole interaction: a cover is per release, so picking another
+    # pressing is the only way to get a different one.
+    first = Candidate(release_id=1, album="First", score=0.9)
+    second = Candidate(release_id=2, album="Second", score=0.8)
+    dialog = _dialog(
+        qtbot,
+        current={},
+        result=_result(chosen=first, candidates=[first, second],
+                       artwork=_art_bytes()),
+        artwork_only=True,
+    )
+    assert dialog._candidate_combo.isEnabled()
+    asked: list[Candidate] = []
+    dialog.candidate_requested.connect(asked.append)
+    dialog._candidate_combo.setCurrentIndex(1)
+    assert asked == [second]
+
+
+def test_artwork_only_drops_the_track_picker(qtbot):
+    # Artwork belongs to the release, so choosing a row would move nothing on
+    # screen — a control that cannot change the answer it is asked about.
+    result = _with_tracks(picked=1)
+    result.artwork = _art_bytes()
+    dialog = _dialog(qtbot, current={}, result=result, artwork_only=True)
+    assert dialog._track_row.isHidden()
+
+
+def test_artwork_only_drops_select_all_and_select_none(qtbot):
+    dialog = _dialog(
+        qtbot, current={}, result=_result(artwork=_art_bytes()), artwork_only=True
+    )
+    assert dialog._all_btn is None and dialog._none_btn is None
+    # And the ordinary mode still has them.
+    other = _dialog(qtbot, current={}, result=_result())
+    assert other._all_btn is not None
+
+
+def test_artwork_only_says_what_it_is_for_in_its_own_words(qtbot):
+    dialog = _dialog(
+        qtbot, current={}, result=_result(artwork=_art_bytes()), artwork_only=True
+    )
+    assert dialog.artwork_only
+    assert "cover" in dialog.windowTitle().lower()
+
+
+def test_a_cover_with_no_field_changes_can_still_be_applied(qtbot):
+    """Not artwork-only — the shipped ordinary mode had this wrong.
+
+    ``_fill_rows`` syncs Apply *before* ``_fill_artwork`` has drawn the cover
+    row, so on the first pass it read the hidden row ``_setup_ui`` built. A
+    result offering a sleeve and no field changes — every tag already matching
+    the release, i.e. any file tagged from Discogs in an earlier session —
+    left Apply disabled over a cover the user could plainly see.
+    """
+    matching_tags = {
+        "title": PROPOSED.title,
+        "artist": PROPOSED.artist,
+        "album": PROPOSED.album,
+        "label": PROPOSED.label,
+        "genre": PROPOSED.genre,
+        "year": PROPOSED.year,
+        "track_number": PROPOSED.track_number,
+    }
+    dialog = _dialog(qtbot, current=matching_tags, result=_result(artwork=_art_bytes()))
+    assert dialog._checks == {}
+    assert not dialog._art_row.isHidden()
+    assert dialog._apply_btn.isEnabled()

@@ -128,7 +128,7 @@ def test_a_result_for_a_file_that_has_since_been_ejected_is_dropped(panel, monke
     # file while it does.
     opened: list[str] = []
     monkeypatch.setattr(
-        MetadataPanel, "_show_review_dialog", lambda self, r: opened.append(r.path)
+        MetadataPanel, "_show_review_dialog", lambda self, r, **kw: opened.append(r.path)
     )
     result = _result("/some/other/file.flac")
     panel._on_lookup_result(result)
@@ -395,3 +395,107 @@ def _png_bytes() -> bytes:
         "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmM"
         "IQAAAABJRU5ErkJggg=="
     )
+
+
+# --- Find Cover Online (D5) --------------------------------------------------
+
+
+def test_the_cover_button_follows_the_setting_and_the_file(panel):
+    assert panel._find_cover_btn.isHidden()
+    panel.set_online_lookup(True, token="tok")
+    assert not panel._find_cover_btn.isHidden()
+    panel._clear()
+    assert panel._find_cover_btn.isHidden()
+
+
+def test_the_cover_button_is_offered_with_no_release_known(panel):
+    # Deliberately not gated on a known release, unlike Refresh: a file with
+    # no release at all is the one most likely to be missing its sleeve, and
+    # the search is what finds one.
+    panel.set_online_lookup(True, token="tok")
+    assert panel._release_id is None
+    assert panel._discogs_refresh_btn.isHidden()
+    assert not panel._find_cover_btn.isHidden()
+
+
+def test_finding_a_cover_asks_for_artwork_even_with_the_setting_off(panel, monkeypatch):
+    # "Fetch cover art with lookups" governs the cover that rides along with a
+    # metadata lookup. This is the cover, asked for by name.
+    panel.set_online_lookup(True, token="tok", fetch_artwork=False)
+    jobs: list = []
+    monkeypatch.setattr(MetadataPanel, "_start_lookup", lambda self, job: jobs.append(job))
+    panel._on_find_cover_clicked()
+    assert len(jobs) == 1
+    assert jobs[0].want_artwork is True
+    assert jobs[0].candidate is None  # a search, so the switcher has alternatives
+    assert panel._artwork_lookup is True
+
+
+def test_a_cover_lookup_opens_the_review_in_artwork_only_mode(panel, monkeypatch):
+    panel.set_online_lookup(True, token="tok")
+    monkeypatch.setattr(MetadataPanel, "_start_lookup", lambda self, job: None)
+    panel._on_find_cover_clicked()
+    seen: list[bool] = []
+    monkeypatch.setattr(
+        MetadataPanel,
+        "_show_review_dialog",
+        lambda self, r, artwork_only=False: seen.append(artwork_only),
+    )
+    panel._on_lookup_result(_result(panel._file_path))
+    assert seen == [True]
+    # And the flag is spent, so the next ordinary lookup is an ordinary review.
+    assert panel._artwork_lookup is False
+
+
+def test_an_ordinary_lookup_is_not_artwork_only(panel, monkeypatch):
+    panel.set_online_lookup(True, token="tok")
+    seen: list[bool] = []
+    monkeypatch.setattr(
+        MetadataPanel,
+        "_show_review_dialog",
+        lambda self, r, artwork_only=False: seen.append(artwork_only),
+    )
+    panel._on_lookup_result(_result(panel._file_path))
+    assert seen == [False]
+
+
+def test_a_failed_cover_lookup_does_not_leave_the_mode_armed(panel, monkeypatch):
+    # Otherwise the *next* ordinary lookup opens reviewing the sleeve alone.
+    panel.set_online_lookup(True, token="tok")
+    monkeypatch.setattr(MetadataPanel, "_start_lookup", lambda self, job: None)
+    monkeypatch.setattr(QMessageBox, "information", lambda *a, **kw: None)
+    panel._on_find_cover_clicked()
+    panel._on_lookup_result(
+        _result(panel._file_path, proposed=None, error=ERROR_NETWORK)
+    )
+    assert panel._artwork_lookup is False
+
+
+def test_switching_release_in_a_cover_review_fetches_that_cover(panel, monkeypatch):
+    """Or the preview keeps the old sleeve under the new release's name."""
+    panel.set_online_lookup(True, token="tok", fetch_artwork=False)
+    jobs: list = []
+    monkeypatch.setattr(MetadataPanel, "_start_lookup", lambda self, job: jobs.append(job))
+
+    class _Review:
+        artwork_only = True
+
+    panel._review_dialog = _Review()
+    panel._on_candidate_requested(Candidate(release_id=7, score=0.5))
+    assert jobs[-1].want_artwork is True
+    # An ordinary review with the setting off still asks for none.
+    panel._review_dialog = None
+    panel._on_candidate_requested(Candidate(release_id=7, score=0.5))
+    assert jobs[-1].want_artwork is False
+
+
+def test_every_control_that_starts_a_lookup_is_disabled_while_one_runs(panel):
+    # The status line lives on the Tags page, so a lookup started from the
+    # Discogs tab has nothing else to show for itself.
+    panel.set_online_lookup(True, token="tok")
+    buttons = (panel._lookup_btn, panel._discogs_refresh_btn, panel._find_cover_btn)
+    assert all(b.isEnabled() for b in buttons)
+    panel._set_lookup_controls_enabled(False)
+    assert not any(b.isEnabled() for b in buttons)
+    panel._on_lookup_finished()
+    assert all(b.isEnabled() for b in buttons)

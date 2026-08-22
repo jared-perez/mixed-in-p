@@ -102,11 +102,18 @@ class LookupReviewDialog(QDialog):
         allow_artwork: bool = True,
         parent: QWidget | None = None,
         position: tuple[int, int] | None = None,
+        artwork_only: bool = False,
     ) -> None:
         super().__init__(parent)
         self._file_path = file_path
         self._current = dict(current)
         self._allow_artwork = allow_artwork
+        # "Find Cover Online" — the same lookup, reviewing only the sleeve.
+        # A mode rather than a default, because the ticks default to *empty*
+        # fields: art-only is genuinely unreachable by ticking, so pretending
+        # it is a check-state would leave the user one stray tick away from a
+        # retag they did not ask for.
+        self._artwork_only = bool(artwork_only)
         # (n, total) while reviewing a batch; None for a single file. Batch
         # mode is what turns Cancel into Skip and adds Stop — with several
         # files queued, "cancel" is ambiguous between this one and the rest.
@@ -130,7 +137,11 @@ class LookupReviewDialog(QDialog):
         self._proposed_labels: dict[str, QLabel] = {}
         self._loading = False
 
-        self.setWindowTitle(self.tr("Review Metadata"))
+        self.setWindowTitle(
+            self.tr("Find Cover Online")
+            if self._artwork_only
+            else self.tr("Review Metadata")
+        )
         self.setMinimumWidth(640)
         self._setup_ui()
         self._apply_result()
@@ -144,7 +155,11 @@ class LookupReviewDialog(QDialog):
         )
         layout.setSpacing(Theme.SPACING)
 
-        heading = QLabel(self.tr("Tick the values you want to write to this file."))
+        heading = QLabel(
+            self.tr("Pick the release with the cover you want.")
+            if self._artwork_only
+            else self.tr("Tick the values you want to write to this file.")
+        )
         heading.setWordWrap(True)
         layout.addWidget(heading)
 
@@ -243,7 +258,12 @@ class LookupReviewDialog(QDialog):
         scroll.setWidgetResizable(True)
         scroll.setFrameShape(QFrame.Shape.NoFrame)
         scroll.setWidget(self._grid_host)
-        layout.addWidget(scroll, 1)
+        # Hidden whole in artwork-only mode, not merely emptied: an empty
+        # scroll area still takes the stretch, so the cover would sit at the
+        # bottom of a dialog that is mostly blank.
+        scroll.setVisible(not self._artwork_only)
+        layout.addWidget(scroll, 1 if not self._artwork_only else 0)
+        self._diff_scroll = scroll
 
         # Artwork: current beside proposed, with its own tick.
         self._art_row = QWidget()
@@ -263,7 +283,7 @@ class LookupReviewDialog(QDialog):
         art_layout.addWidget(self._art_proposed)
         art_layout.addStretch()
         self._art_row.setVisible(False)
-        layout.addWidget(self._art_row)
+        layout.addWidget(self._art_row, 1 if self._artwork_only else 0)
 
         # WAV holds no tags at all. The lookup is still worth running (reading
         # the values is useful), so this says so rather than blocking.
@@ -287,8 +307,19 @@ class LookupReviewDialog(QDialog):
         buttons.setSpacing(Theme.SPACING)
         buttons.addStretch()
 
-        self._all_btn = self._make_button(self.tr("Select All"), self._select_all)
-        self._none_btn = self._make_button(self.tr("Select None"), self._select_none)
+        # Nothing to select all *of* when the cover is the only row, and two
+        # dead buttons are also two more translated labels on the row this
+        # dialog already has to fit in Russian.
+        self._all_btn = (
+            None
+            if self._artwork_only
+            else self._make_button(self.tr("Select All"), self._select_all)
+        )
+        self._none_btn = (
+            None
+            if self._artwork_only
+            else self._make_button(self.tr("Select None"), self._select_none)
+        )
         self._stop_btn = None
         if self._position is None:
             self._cancel_btn = self._make_button(self.tr("Cancel"), self.reject)
@@ -301,9 +332,14 @@ class LookupReviewDialog(QDialog):
                 self.tr("Stop"), lambda: self.done(STOP_RESULT)
             )
         self._apply_btn = self._make_button(self.tr("Apply"), self.accept)
-        self._apply_btn.setStyleSheet(
-            f"background-color: {Theme.NEON_YELLOW}; color: #000000; font-weight: bold;"
-        )
+        # The shared rule, not an inline copy of half of it. Inline it was
+        # NEON_YELLOW over a hardcoded #000000 with no :disabled state — so a
+        # disabled Apply stayed as bright and bold as a live one, which is the
+        # ordinary state of the cover search when the release has no scan, and
+        # it read as a button that does nothing when pressed. #primaryButton
+        # also carries hover and pressed, and takes its text colour from the
+        # palette rather than assuming the background is dark.
+        self._apply_btn.setObjectName("primaryButton")
         self._apply_btn.setDefault(True)
         row = [b for b in (self._all_btn, self._none_btn, self._stop_btn,
                            self._cancel_btn, self._apply_btn) if b is not None]
@@ -362,6 +398,16 @@ class LookupReviewDialog(QDialog):
         :attr:`candidate_requested` when the request fails.
         """
         self._fill_candidates()
+
+    @property
+    def artwork_only(self) -> bool:
+        """Whether this dialog is reviewing the cover and nothing else.
+
+        Read by the panel that owns the lookup: a candidate switch from here
+        must pull the new release's cover down too, or the preview would keep
+        showing the previous release's sleeve under the new release's name.
+        """
+        return self._artwork_only
 
     def chosen_candidate(self):
         """The release the user was looking at, as the provider described it.
@@ -453,8 +499,10 @@ class LookupReviewDialog(QDialog):
                     break
         combo.blockSignals(False)
         # One row is not a choice, and a dropdown that cannot be changed reads
-        # as a control that is broken.
-        self._track_row.setVisible(len(entries) > 1)
+        # as a control that is broken. Neither is *any* row a choice when the
+        # cover is what is under review: artwork belongs to the release, so
+        # the track picker would move nothing on screen.
+        self._track_row.setVisible(len(entries) > 1 and not self._artwork_only)
 
     def _on_track_changed(self, index: int) -> None:
         """Re-read the proposal off another row. No request, no re-rank.
@@ -482,6 +530,12 @@ class LookupReviewDialog(QDialog):
                 widget.deleteLater()
         self._checks.clear()
         self._proposed_labels.clear()
+        if self._artwork_only:
+            # No field is offered, so none can be ticked, and `_checks` stays
+            # empty — which is what makes `selected_values` return the cover
+            # and nothing else without a second code path.
+            self._sync_apply_enabled()
+            return
 
         header_current = QLabel(self.tr("Current"))
         header_proposed = QLabel(self.tr("From Discogs"))
@@ -525,8 +579,21 @@ class LookupReviewDialog(QDialog):
         self._sync_apply_enabled()
 
     def _fill_artwork(self) -> None:
+        """Draw the cover row, then re-decide whether Apply has anything to do.
+
+        The re-decide matters because ``_fill_rows`` runs *first* and syncs
+        Apply against an art row that has not been filled in yet: on the first
+        pass that row is still the hidden one ``_setup_ui`` built, so a result
+        offering a cover and no field changes — every tag already matching the
+        release, which is the commonest state of a file tagged last week —
+        left Apply disabled over a sleeve the user could plainly see.
+        """
+        self._fill_artwork_row()
+        self._sync_apply_enabled()
+
+    def _fill_artwork_row(self) -> None:
         art = getattr(self._result, "artwork", b"")
-        if not self._allow_artwork or not art:
+        if (not self._allow_artwork and not self._artwork_only) or not art:
             self._art_row.setVisible(False)
             return
         proposed = QPixmap()
@@ -543,12 +610,28 @@ class LookupReviewDialog(QDialog):
             self._art_check.setChecked(True)
         else:
             self._art_current.setPixmap(_scaled(current_pixmap))
-            self._art_check.setChecked(False)  # never replace art silently
+            # Never replace art silently — except where replacing it is the
+            # whole errand. "Find Cover Online" over a file that already has a
+            # sleeve is a request to change that sleeve, and an unticked box
+            # would answer Apply by doing nothing at all. Both covers are on
+            # screen side by side, so the swap is anything but silent.
+            self._art_check.setChecked(self._artwork_only)
         self._art_row.setVisible(True)
 
     def _fill_warning(self) -> None:
         chosen = self._result.chosen
         weak = chosen is not None and chosen.score < matching.MATCH_FLOOR
+        # A release with no scan on Discogs is the ordinary way for the cover
+        # search to come back empty, and it has a next step the user can take:
+        # another pressing usually has one. Without this the dialog offered a
+        # blank frame and a dead Apply, which reads as a broken feature rather
+        # than an answer.
+        if self._artwork_only and self._art_row.isHidden():
+            self._warning.setText(
+                self.tr("No cover on Discogs for this release — try another one.")
+            )
+            self._warning.setVisible(True)
+            return
         if weak:
             self._warning.setText(
                 self.tr(
@@ -588,6 +671,11 @@ class LookupReviewDialog(QDialog):
         self._art_check.setChecked(False)
 
     def _sync_apply_enabled(self) -> None:
+        if self._artwork_only:
+            # The cover is the only thing on offer; with none found there is
+            # nothing to apply, and the warning above says why.
+            self._apply_btn.setEnabled(self._art_offered())
+            return
         self._apply_btn.setEnabled(bool(self._checks) or self._art_offered())
 
     def selected_values(self) -> dict[str, object]:
