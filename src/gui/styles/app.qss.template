@@ -692,7 +692,16 @@ QComboBox:focus {
    padding, which is where most of its saving came from: the native
    sub-control is roughly half the 30px the old rule reserved, so the "space
    reserved twice" problem it was written for is largely gone with the rule
-   that caused it. */
+   that caused it.
+
+   Before trimming this padding any further, note what it is also paying for.
+   A combo's POPUP is sized from the combo's frame and comes out narrower than
+   it, and each popup row then spends part of what is left on the check column
+   beside the current item. So the padding here is the slack the popup borrows,
+   and cutting it to 4px is what made all three Convert selectors open onto
+   their own labels cut off ("Keep sourc", "24 bit (DVD") in every language.
+   That is fixed in the widget, not here — FittedComboBox floors the popup at
+   the combo's own width — and it is why every combo in the app is one. */
 QComboBox#compactCombo {
     padding: 8px;
     padding-right: 4px;

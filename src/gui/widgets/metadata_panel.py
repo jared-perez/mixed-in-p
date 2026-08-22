@@ -24,6 +24,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .fitted_combo import FittedComboBox
+
 from PySide6.QtGui import (
     QDesktopServices,
     QFontMetrics,
@@ -354,7 +356,7 @@ class MetadataPanel(QWidget):
         add_field_row = QHBoxLayout()
         add_field_row.setContentsMargins(_FORM_LEFT_MARGIN, 0, 0, 0)
         add_field_row.setSpacing(Theme.SPACING)
-        self._add_combo = QComboBox()
+        self._add_combo = FittedComboBox()
         self._add_combo.addItem(self.tr("Add field..."))
         self._add_combo.setMinimumWidth(160)
         add_field_row.addWidget(self._add_combo)

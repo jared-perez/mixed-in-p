@@ -20,6 +20,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .fitted_combo import FittedComboBox
+
 from src.conversion.result import (
     FORMAT_EXTENSION,
     LOSSLESS_EXTENSIONS,
@@ -148,7 +150,7 @@ class ConversionPanel(QWidget):
         format_row.setSpacing(Theme.SPACING)
         self._format_label = QLabel(self.tr("Target Format:"))
         format_row.addWidget(self._format_label)
-        self._format_combo = QComboBox()
+        self._format_combo = FittedComboBox()
         self._format_combo.setObjectName("compactCombo")
         self._format_combo.addItems(["AIFF", "WAV", "FLAC", "MP3"])
         self._format_combo.setCurrentText(self._config.convert_target_format)
@@ -156,7 +158,7 @@ class ConversionPanel(QWidget):
 
         # Sample rate selector (visible for lossless targets)
         self._samplerate_label = QLabel(self.tr("Sample Rate:"))
-        self._samplerate_combo = QComboBox()
+        self._samplerate_combo = FittedComboBox()
         self._samplerate_combo.setObjectName("compactCombo")
         # "Keep source" (None) leaves the axis alone, the way the CLI does with
         # the flag omitted. It is the only setting that suits a mixed batch,
@@ -177,7 +179,7 @@ class ConversionPanel(QWidget):
 
         # Bit depth selector (visible for lossless targets)
         self._bitdepth_label = QLabel(self.tr("Bit Depth:"))
-        self._bitdepth_combo = QComboBox()
+        self._bitdepth_combo = FittedComboBox()
         self._bitdepth_combo.setObjectName("compactCombo")
         for label, bits in [
             (self.tr("Keep source"), None),
@@ -195,7 +197,7 @@ class ConversionPanel(QWidget):
 
         # Bitrate selector (visible only for MP3)
         self._bitrate_label = QLabel(self.tr("Bitrate:"))
-        self._bitrate_combo = QComboBox()
+        self._bitrate_combo = FittedComboBox()
         self._bitrate_combo.setObjectName("compactCombo")
         self._bitrate_combo.addItems(["128", "192", "256", "320"])
         self._bitrate_combo.setCurrentText(str(self._config.convert_mp3_bitrate))

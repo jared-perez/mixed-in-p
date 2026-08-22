@@ -21,6 +21,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .fitted_combo import FittedComboBox
+
 from src.analysis.keycode import KEYCODE_TO_KEY, render_key
 
 from ..styles.theme import Theme, panel_header_row
@@ -678,7 +680,7 @@ class KeyboardPanel(QWidget):
         view_label = QLabel(self.tr("View"))
         view_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;")
         view_row.addWidget(view_label)
-        self._view_combo = QComboBox()
+        self._view_combo = FittedComboBox()
         self._view_combo.addItem(self.tr("Hex Grid"))
         self._view_combo.addItem(self.tr("Circle of Fifths"))
         self._view_combo.setCursor(Qt.CursorShape.PointingHandCursor)

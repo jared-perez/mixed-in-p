@@ -22,6 +22,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .fitted_combo import FittedComboBox
+
 import sys
 from dataclasses import replace
 
@@ -78,7 +80,7 @@ class SettingsPanel(QWidget):
         language_layout.setContentsMargins(16, 10, 16, 10)
         language_layout.setSpacing(8)
 
-        self._language_combo = QComboBox()
+        self._language_combo = FittedComboBox()
         for code, native in LANGUAGES:
             self._language_combo.addItem(native, code)
         # Pin to a compact fixed width sized to the longest language name (plus
@@ -157,7 +159,7 @@ class SettingsPanel(QWidget):
             "nuevo_leon": "Nuevo Leon",
             "daylight": self.tr("Daylight"),
         }
-        self._theme_combo = QComboBox()
+        self._theme_combo = FittedComboBox()
         for code, palette in THEMES.items():
             self._theme_combo.addItem(theme_labels.get(code, palette.label), code)
         # Size to the widest item (incl. the dropdown arrow + frame) at layout
@@ -584,7 +586,7 @@ class SettingsPanel(QWidget):
 
         dup_row = self._row_layout()
         dup_row.addWidget(QLabel(self.tr("Duplicate tracks:")))
-        self._duplicate_policy_combo = QComboBox()
+        self._duplicate_policy_combo = FittedComboBox()
         for label, code in (
             (self.tr("Ask each time"), "ask"),
             (self.tr("Always add duplicates"), "add"),

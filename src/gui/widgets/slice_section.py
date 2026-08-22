@@ -40,6 +40,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from .fitted_combo import FittedComboBox
+
 from src.conversion.result import FORMAT_EXTENSION
 from ..styles.theme import Theme
 from .player_engine import PlayerEngine
@@ -280,7 +282,7 @@ class SliceSection(QWidget):
         self._filename_edit.setMinimumWidth(200)
         self._filename_edit.setPlaceholderText(self.tr("output filename"))
         save_row.addWidget(self._filename_edit)
-        self._format_combo = QComboBox()
+        self._format_combo = FittedComboBox()
         self._format_combo.addItems(["AIFF", "WAV", "FLAC", "MP3"])
         self._format_combo.setMinimumWidth(100)
         save_row.addWidget(self._format_combo)

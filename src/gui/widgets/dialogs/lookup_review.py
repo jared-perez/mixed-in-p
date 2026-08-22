@@ -36,6 +36,8 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from ..fitted_combo import FittedComboBox
+
 from src.metadata.tags import stores_tags
 from src.online import discogs, matching
 from src.online.result import Candidate
@@ -192,7 +194,7 @@ class LookupReviewDialog(QDialog):
         release_label = self._release_label
         release_label.setToolTip(release_hint)
         release_row.addWidget(release_label)
-        self._candidate_combo = QComboBox()
+        self._candidate_combo = FittedComboBox()
         self._candidate_combo.setToolTip(release_hint)
         self._candidate_combo.currentIndexChanged.connect(self._on_candidate_changed)
         release_row.addWidget(self._candidate_combo, 1)
@@ -215,7 +217,7 @@ class LookupReviewDialog(QDialog):
         track_label = QLabel(self.tr("Select track"))
         track_label.setToolTip(track_hint)
         track_layout.addWidget(track_label)
-        self._track_combo = QComboBox()
+        self._track_combo = FittedComboBox()
         self._track_combo.setToolTip(track_hint)
         self._track_combo.currentIndexChanged.connect(self._on_track_changed)
         track_layout.addWidget(self._track_combo, 1)
