@@ -1327,47 +1327,47 @@ or click “Add Artwork…”</source>
         <translation>적용</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="443"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="448"/>
         <source>Unknown release</source>
         <translation>알 수 없는 릴리스</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="488"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="493"/>
         <source>Unknown track</source>
         <translation>알 수 없는 트랙</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="535"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="540"/>
         <source>Current</source>
         <translation>현재</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="536"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="541"/>
         <source>From Discogs</source>
         <translation>Discogs 정보</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="556"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="561"/>
         <source>(empty)</source>
         <translation>(비어 있음)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="570"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="575"/>
         <source>Every field already matches this release.</source>
         <translation>모든 항목이 이미 이 릴리스와 일치해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="604"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="609"/>
         <source>(none)</source>
         <translation>(없음)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="626"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="631"/>
         <source>No cover on Discogs for this release — try another one.</source>
         <translation>Discogs에 이 릴리스의 커버가 없어요. 다른 릴리스를 시도해 보세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="633"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="638"/>
         <source>No confident match — check the release before applying.</source>
         <translation>확실한 일치가 아니에요. 적용하기 전에 릴리스를 확인하세요.</translation>
     </message>
@@ -2975,7 +2975,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="105"/>
-        <location filename="../widgets/settings_panel.py" line="780"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Default Audio Player</source>
         <translation>기본 오디오 플레이어</translation>
     </message>
@@ -3410,69 +3410,69 @@ or click “Add Artwork…”</source>
         <translation>Discogs 토큰:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="699"/>
+        <location filename="../widgets/settings_panel.py" line="702"/>
         <source>Paste your token</source>
         <translation>토큰을 붙여넣으세요</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="702"/>
+        <location filename="../widgets/settings_panel.py" line="705"/>
         <source>Get a Token…</source>
         <translation>토큰 받기…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="709"/>
+        <location filename="../widgets/settings_panel.py" line="712"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>커버 이미지를 받고 최대 속도로 응답을 받으려면 Discogs의 무료 개인 토큰이 필요해요. 읽기 전용이며 Discogs 계정 페이지에서 언제든지 해지할 수 있어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="718"/>
+        <location filename="../widgets/settings_panel.py" line="721"/>
         <source>Fetch cover art with lookups</source>
         <translation>찾을 때 커버 이미지도 가져오기</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="725"/>
+        <location filename="../widgets/settings_panel.py" line="728"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>릴리스의 커버를 파일의 커버와 나란히 보여 줘서 비교할 수 있어요. 승인하기 전에는 아무것도 기록되지 않아요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="785"/>
+        <location filename="../widgets/settings_panel.py" line="818"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>이제 오디오 파일이 Mixed in P에서 열립니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="796"/>
+        <location filename="../widgets/settings_panel.py" line="829"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P가 Windows에 등록되어 있지 않습니다. 다시 설치하면 등록됩니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="801"/>
+        <location filename="../widgets/settings_panel.py" line="834"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>Windows 설정을 열지 못했습니다. ‘앱 → 기본 앱’에서 직접 설정할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="807"/>
+        <location filename="../widgets/settings_panel.py" line="840"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Finder에서 오디오 파일을 선택하고 Command-I를 누른 다음, ‘다음으로 열기’에서 Mixed in P를 선택하고 ‘모두 변경’을 클릭하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="955"/>
+        <location filename="../widgets/settings_panel.py" line="988"/>
         <source>Waveform color</source>
         <translation>파형 색상</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="987"/>
-        <location filename="../widgets/settings_panel.py" line="1000"/>
+        <location filename="../widgets/settings_panel.py" line="1020"/>
+        <location filename="../widgets/settings_panel.py" line="1033"/>
         <source>Restart required</source>
         <translation>재시작 필요</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="989"/>
+        <location filename="../widgets/settings_panel.py" line="1022"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translatorcomment>Product name &quot;Mixed in P&quot; kept Latin; object particle 를 after the vowel-final &quot;P&quot; (피). Flag for native review.</translatorcomment>
         <translation>언어 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1002"/>
+        <location filename="../widgets/settings_panel.py" line="1035"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>테마 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>

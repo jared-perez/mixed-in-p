@@ -1354,47 +1354,47 @@ or click “Add Artwork…”</source>
         <translation>应用</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="443"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="448"/>
         <source>Unknown release</source>
         <translation>未知版本</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="488"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="493"/>
         <source>Unknown track</source>
         <translation>未知曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="535"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="540"/>
         <source>Current</source>
         <translation>当前</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="536"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="541"/>
         <source>From Discogs</source>
         <translation>来自 Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="556"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="561"/>
         <source>(empty)</source>
         <translation>（空）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="570"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="575"/>
         <source>Every field already matches this release.</source>
         <translation>所有字段都已与此版本一致。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="604"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="609"/>
         <source>(none)</source>
         <translation>（无）</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="626"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="631"/>
         <source>No cover on Discogs for this release — try another one.</source>
         <translation>Discogs 上没有该版本的封面，请试试其他版本。</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="633"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="638"/>
         <source>No confident match — check the release before applying.</source>
         <translation>匹配不确定，请先核对版本再应用。</translation>
     </message>
@@ -2999,7 +2999,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="105"/>
-        <location filename="../widgets/settings_panel.py" line="780"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Default Audio Player</source>
         <translation>默认音频播放器</translation>
     </message>
@@ -3432,68 +3432,68 @@ or click “Add Artwork…”</source>
         <translation>Discogs 令牌：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="699"/>
+        <location filename="../widgets/settings_panel.py" line="702"/>
         <source>Paste your token</source>
         <translation>粘贴你的令牌</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="702"/>
+        <location filename="../widgets/settings_panel.py" line="705"/>
         <source>Get a Token…</source>
         <translation>获取令牌…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="709"/>
+        <location filename="../widgets/settings_panel.py" line="712"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs 需要一个免费的个人令牌，才能返回封面图片并以完整速度响应。它是只读的，你可以随时在 Discogs 账户页面撤销。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="718"/>
+        <location filename="../widgets/settings_panel.py" line="721"/>
         <source>Fetch cover art with lookups</source>
         <translation>查找时一并获取封面</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="725"/>
+        <location filename="../widgets/settings_panel.py" line="728"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>将该版本的封面与你文件的封面并排显示，便于比较。在你确认之前不会写入任何内容。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="785"/>
+        <location filename="../widgets/settings_panel.py" line="818"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>音频文件现在会用 Mixed in P 打开。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="796"/>
+        <location filename="../widgets/settings_panel.py" line="829"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P 未在 Windows 中注册。重新安装即可注册。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="801"/>
+        <location filename="../widgets/settings_panel.py" line="834"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>无法打开 Windows 设置。你可以在「应用 → 默认应用」中自行设置。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="807"/>
+        <location filename="../widgets/settings_panel.py" line="840"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>在访达中选择一个音频文件，按 Command-I，在「打开方式」中选择 Mixed in P，然后点按「全部更改」。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="955"/>
+        <location filename="../widgets/settings_panel.py" line="988"/>
         <source>Waveform color</source>
         <translation>波形颜色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="987"/>
-        <location filename="../widgets/settings_panel.py" line="1000"/>
+        <location filename="../widgets/settings_panel.py" line="1020"/>
+        <location filename="../widgets/settings_panel.py" line="1033"/>
         <source>Restart required</source>
         <translation>需要重启</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="989"/>
+        <location filename="../widgets/settings_panel.py" line="1022"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>语言更改将在下次重启 Mixed in P 时生效。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1002"/>
+        <location filename="../widgets/settings_panel.py" line="1035"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>主题更改将在下次重启 Mixed in P 时生效。</translation>
     </message>

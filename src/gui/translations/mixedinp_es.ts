@@ -1348,47 +1348,47 @@ o haz clic en “Añadir carátula…”</translation>
         <translation>Aplicar</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="443"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="448"/>
         <source>Unknown release</source>
         <translation>Edición desconocida</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="488"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="493"/>
         <source>Unknown track</source>
         <translation>Pista desconocida</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="535"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="540"/>
         <source>Current</source>
         <translation>Actual</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="536"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="541"/>
         <source>From Discogs</source>
         <translation>De Discogs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="556"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="561"/>
         <source>(empty)</source>
         <translation>(vacío)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="570"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="575"/>
         <source>Every field already matches this release.</source>
         <translation>Todos los campos ya coinciden con esta edición.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="604"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="609"/>
         <source>(none)</source>
         <translation>(ninguna)</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="626"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="631"/>
         <source>No cover on Discogs for this release — try another one.</source>
         <translation>Discogs no tiene carátula para esta edición: prueba con otra.</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/lookup_review.py" line="633"/>
+        <location filename="../widgets/dialogs/lookup_review.py" line="638"/>
         <source>No confident match — check the release before applying.</source>
         <translation>Sin coincidencia fiable: comprueba la edición antes de aplicar.</translation>
     </message>
@@ -2992,7 +2992,7 @@ o haz clic en “Añadir carátula…”</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="105"/>
-        <location filename="../widgets/settings_panel.py" line="780"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Default Audio Player</source>
         <translation>Reproductor de audio predeterminado</translation>
     </message>
@@ -3415,68 +3415,68 @@ o haz clic en “Añadir carátula…”</translation>
         <translation>Token de Discogs:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="699"/>
+        <location filename="../widgets/settings_panel.py" line="702"/>
         <source>Paste your token</source>
         <translation>Pega tu token</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="702"/>
+        <location filename="../widgets/settings_panel.py" line="705"/>
         <source>Get a Token…</source>
         <translation>Obtener un token…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="709"/>
+        <location filename="../widgets/settings_panel.py" line="712"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs necesita un token personal gratuito para responder con las portadas y a plena velocidad. Es de solo lectura y puedes revocarlo cuando quieras en tu cuenta de Discogs.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="718"/>
+        <location filename="../widgets/settings_panel.py" line="721"/>
         <source>Fetch cover art with lookups</source>
         <translation>Descargar la portada al buscar</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="725"/>
+        <location filename="../widgets/settings_panel.py" line="728"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>Muestra la portada de la edición junto a la de tu archivo para que puedas compararlas. No se escribe nada hasta que lo apruebes.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="785"/>
+        <location filename="../widgets/settings_panel.py" line="818"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>Tus archivos de audio ahora se abren con Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="796"/>
+        <location filename="../widgets/settings_panel.py" line="829"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P no está registrado en Windows. Volver a instalarlo lo registrará.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="801"/>
+        <location filename="../widgets/settings_panel.py" line="834"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>No se pudo abrir la Configuración de Windows. Puedes hacerlo tú mismo allí, en «Aplicaciones → Aplicaciones predeterminadas».</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="807"/>
+        <location filename="../widgets/settings_panel.py" line="840"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Selecciona un archivo de audio en el Finder, pulsa Comando-I, elige Mixed in P en «Abrir con» y haz clic en «Cambiar todo».</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="955"/>
+        <location filename="../widgets/settings_panel.py" line="988"/>
         <source>Waveform color</source>
         <translation>Color de la forma de onda</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="987"/>
-        <location filename="../widgets/settings_panel.py" line="1000"/>
+        <location filename="../widgets/settings_panel.py" line="1020"/>
+        <location filename="../widgets/settings_panel.py" line="1033"/>
         <source>Restart required</source>
         <translation>Reinicio necesario</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="989"/>
+        <location filename="../widgets/settings_panel.py" line="1022"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>El cambio de idioma se aplicará la próxima vez que reinicies Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1002"/>
+        <location filename="../widgets/settings_panel.py" line="1035"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>El cambio de tema se aplicará la próxima vez que reinicies Mixed in P.</translation>
     </message>

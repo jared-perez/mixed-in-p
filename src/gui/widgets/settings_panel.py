@@ -694,6 +694,9 @@ class SettingsPanel(QWidget):
 
         token_row = self._row_layout()
         token_row.addWidget(QLabel(self.tr("Discogs token:")))
+        # Whether the token box held anything before the keystroke being
+        # handled. See _on_token_text_changed.
+        self._had_token = False
         self._discogs_token_edit = QLineEdit()
         self._discogs_token_edit.setEchoMode(QLineEdit.EchoMode.Password)
         self._discogs_token_edit.setPlaceholderText(self.tr("Paste your token"))
@@ -752,6 +755,8 @@ class SettingsPanel(QWidget):
         # editingFinished, not textChanged: a token is pasted in one go, and
         # persisting per keystroke would write a dozen half-tokens to disk.
         self._discogs_token_edit.editingFinished.connect(self._emit_changed)
+        # ...and textChanged only to *reflect* the tick, never to save it.
+        self._discogs_token_edit.textChanged.connect(self._on_token_text_changed)
         self._duplicate_policy_combo.currentIndexChanged.connect(self._emit_changed)
         self._format_group.buttonClicked.connect(self._emit_changed)
         self._language_combo.currentIndexChanged.connect(self._on_language_changed)
@@ -761,6 +766,34 @@ class SettingsPanel(QWidget):
         self.setStyleSheet(self._build_stylesheet())
 
     # ── Helpers ────────────────────────────────────────────────────────────
+
+    def _on_token_text_changed(self, text: str) -> None:
+        """Filling the token box switches the lookup on — that is what it is for.
+
+        Nobody pastes a Discogs token in order to leave Discogs switched off,
+        and the two controls sat one above the other with the feature silently
+        still off, which reads as a token that did not take.
+
+        Two limits on it. It fires on the **empty → filled** transition only,
+        so it cannot re-tick a box someone deliberately cleared while editing
+        an existing token. And it only ever switches the feature *on*: a lookup
+        works without a token (slower, and with no cover art), so clearing the
+        field is not a request to turn the feature off, and an auto-off would
+        overrule anyone running it untokened on purpose.
+
+        The tick is reflected with the checkbox's signal blocked and left for
+        the field's own ``editingFinished`` to persist, alongside the token it
+        belongs with. Ticking it for real here would emit on every keystroke
+        and write those half-tokens to disk — the very thing the line above
+        exists to avoid.
+        """
+        had_token = self._had_token
+        self._had_token = bool(text.strip())
+        if had_token or not self._had_token or self._online_lookup_cb.isChecked():
+            return
+        self._online_lookup_cb.blockSignals(True)
+        self._online_lookup_cb.setChecked(True)
+        self._online_lookup_cb.blockSignals(False)
 
     def _on_token_help_clicked(self) -> None:
         """Open the Discogs page where a personal token is generated."""
@@ -1133,6 +1166,11 @@ class SettingsPanel(QWidget):
         self._discogs_token_edit.blockSignals(True)
         self._discogs_token_edit.setText(cfg.discogs_token)
         self._discogs_token_edit.blockSignals(False)
+        # Kept beside the field rather than read back off it: the handler runs
+        # *after* the text has already changed, so the widget can no longer say
+        # what it held a moment ago. Set here too, and with signals blocked, so
+        # loading a saved token is not mistaken for the user typing one.
+        self._had_token = bool(cfg.discogs_token.strip())
 
         self._duplicate_policy_combo.blockSignals(True)
         dup_index = self._duplicate_policy_combo.findData(cfg.duplicate_policy)
