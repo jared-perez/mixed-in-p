@@ -85,8 +85,8 @@ def duplicate_prompt_guard(monkeypatch):
       ``QMessageBox.exec()`` blocks forever — and because the prompt is fired
       from a zero-delay timer, it goes off during pytest-qt's teardown event
       processing, hanging a test that had already passed. Instead of a hang,
-      the box is replaced by a recorder that answers Cancel and fails the test
-      afterwards, naming the collision it was asked about.
+      the box is replaced by a recorder that abandons the add and fails the
+      test afterwards, naming the collision it was asked about.
 
     A test that *wants* the prompt patches ``_prompt`` itself; that overrides
     this stub, so the guard stays quiet.

@@ -7,9 +7,14 @@ was purely a width-vs-text arithmetic error.
 """
 
 import pytest
+from PySide6.QtGui import QCloseEvent
 from PySide6.QtWidgets import QMessageBox
 
-from src.gui.widgets.dialogs.duplicate_policy import DuplicatePrompt
+from src.gui.widgets.dialogs.duplicate_policy import (
+    _BUTTON_MIN,
+    DuplicatePrompt,
+    _fit_buttons,
+)
 
 
 @pytest.fixture
@@ -39,10 +44,11 @@ class TestButtonsFitTheirLabels:
             text_width = button.fontMetrics().horizontalAdvance(label)
             assert button.minimumWidth() - text_width >= 32, label
 
-    def test_a_short_label_keeps_the_standard_button_width(self, box):
-        """Cancel must not shrink below what every other dialog uses."""
-        cancel = box.button(QMessageBox.StandardButton.Cancel)
-        assert cancel.minimumWidth() >= 80
+    def test_no_button_shrinks_below_the_standard_width(self, box):
+        """However short a label gets translated, a button here is still the
+        size every other dialog in the app uses."""
+        for button in box.buttons():
+            assert button.minimumWidth() >= _BUTTON_MIN, button.text()
 
     def test_sizing_is_measured_not_hardcoded(self, qtbot):
         """A translated label is longer or shorter than the English one, so a
@@ -52,12 +58,28 @@ class TestButtonsFitTheirLabels:
         wide = short.addButton(
             "A Very Much Longer Button Label Indeed", QMessageBox.ButtonRole.ActionRole
         )
-        from src.gui.widgets.dialogs.duplicate_policy import _fit_buttons
-
         _fit_buttons(short)
-        assert wide.minimumWidth() > short.button(
-            QMessageBox.StandardButton.Cancel
-        ).minimumWidth()
+        assert wide.minimumWidth() > _BUTTON_MIN
+        assert wide.minimumWidth() > short._skip_btn.minimumWidth()
+
+
+class TestTheBoxIsNarrow:
+    """The Cancel button was 90px of width buying an outcome the window's own
+    close box already gives, so it went. Measured offscreen/Fusion, the hint
+    went 474x116 -> 384x116."""
+
+    def test_there_are_only_two_buttons(self, box):
+        assert len(box.buttons()) == 2
+        assert box.button(QMessageBox.StandardButton.Cancel) is None
+
+    def test_it_is_narrower_than_it_was_with_cancel(self, box, qtbot):
+        """Not a pixel count — a comparison against the same box wearing the
+        button that used to be there, so it survives a restyle."""
+        wide = DuplicatePrompt(None, 1, 1, "New Playlist")
+        qtbot.addWidget(wide)
+        wide.addButton(QMessageBox.StandardButton.Cancel)
+        _fit_buttons(wide)
+        assert box.sizeHint().width() < wide.sizeHint().width()
 
 
 class TestVerdict:
@@ -71,16 +93,46 @@ class TestVerdict:
         monkeypatch.setattr(box, "clickedButton", lambda: box._skip_btn)
         assert box.ask() is False
 
-    def test_anything_else_is_a_cancel(self, box, monkeypatch):
-        """Esc is wired to Cancel, and a closed box reports no button at all —
-        both must read as "do nothing", never as a silent Add."""
+    def test_no_button_at_all_abandons_the_add(self, box, monkeypatch):
+        """A box that reports no clicked button was closed, not answered, and
+        must read as "do nothing" — never as a silent Add."""
         monkeypatch.setattr(box, "exec", lambda: None)
         monkeypatch.setattr(box, "clickedButton", lambda: None)
         assert box.ask() is None
 
-    def test_skip_is_the_default_and_cancel_takes_escape(self, box):
+    def test_skip_is_the_default(self, box):
         assert box.defaultButton() is box._skip_btn
-        assert box.escapeButton() is box.button(QMessageBox.StandardButton.Cancel)
+
+
+class TestLeavingWithoutAnswering:
+    """The two ways out that are not a button, which now differ on purpose."""
+
+    def test_escape_skips(self, box):
+        """Qt detects the lone RejectRole button as the escape button once
+        Cancel is gone, so Esc lands on Skip — the conservative answer, and
+        already the default.
+
+        Read through the *base class's* close path, which answers with that
+        same detected button: Qt exposes it nowhere public (``escapeButton()``
+        returns only an explicitly set one, and here that is None), the
+        detection runs on show, and driving the real key needs an ``exec()``
+        whose nested event loop pumps every other test's pending events —
+        which measurably destabilised the suite.
+        """
+        box.show()
+        QMessageBox.closeEvent(box, QCloseEvent())
+        assert box.clickedButton() is box._skip_btn
+
+    def test_closing_the_window_abandons_everything(self, box, qtbot):
+        """The close box is not a choice. Qt would have answered it with the
+        detected escape button (Skip); ``DuplicatePrompt.closeEvent`` goes
+        straight to QDialog so no button is recorded and ``ask()`` says None.
+
+        Run it with the override removed and this returns Skip instead."""
+        box.show()
+        box.close()
+        assert box.clickedButton() is None
+        assert box.isHidden()
 
 
 class TestMessage:

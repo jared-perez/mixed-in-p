@@ -27,7 +27,7 @@ import logging
 from collections.abc import Callable, Iterable
 
 from PySide6.QtCore import QCoreApplication, QTimer
-from PySide6.QtWidgets import QMessageBox, QWidget
+from PySide6.QtWidgets import QDialog, QMessageBox, QWidget
 
 logger = logging.getLogger(__name__)
 
@@ -86,8 +86,8 @@ def resolve_additions(
     ``existing_provider`` is a callable rather than a list so the final diff
     reads the playlist as it is when the user answers — see the module note.
     ``on_resolved`` receives the paths to add, which may be empty (everything
-    skipped, or the user cancelled); it is not called at all only if the widget
-    dies before the prompt is answered.
+    skipped). It is *not* called at all when the user abandons the prompt by
+    closing its window, or if the widget dies before the prompt is answered.
 
     ``policy`` overrides the setting for callers that must not ask (loading a
     saved playlist). Left ``None`` it is read here rather than by the caller,
@@ -123,7 +123,7 @@ def resolve_additions(
     def ask() -> None:
         choice = _prompt(parent, collisions, len(incoming), playlist_name)
         if choice is None:
-            return  # Cancel: nothing added, and no undo entry pushed
+            return  # Closed: nothing added, and no undo entry pushed
         if choice:
             on_resolved(list(incoming))
         else:
@@ -166,7 +166,7 @@ def _fit_buttons(box: QMessageBox) -> None:
 
 
 class DuplicatePrompt(QMessageBox):
-    """The Add / Skip / Cancel box.
+    """The Add / Skip box.
 
     A class rather than a plain function purely so its strings can go through
     ``self.tr()``: pyside6-lupdate marks ``%n`` as a plural form (``numerus``)
@@ -203,16 +203,34 @@ class DuplicatePrompt(QMessageBox):
         self._skip_btn = self.addButton(
             self.tr("Skip Duplicates"), QMessageBox.ButtonRole.RejectRole
         )
-        cancel_btn = self.addButton(QMessageBox.StandardButton.Cancel)
         # Skip is the default: it is the conservative answer and matches what
-        # the app did before the prompt existed. Cancel takes Esc so the key
-        # has somewhere safe to land rather than aliasing a real choice.
+        # the app did before the prompt existed. It is also the lone
+        # RejectRole button, so QMessageBox routes Esc to it with no
+        # setEscapeButton call — which is why there is no Cancel here. Cancel
+        # cost ~90px of width for an outcome the window's close box still
+        # gives: that abandons the add entirely (``ask()`` returns None).
         self.setDefaultButton(self._skip_btn)
-        self.setEscapeButton(cancel_btn)
         _fit_buttons(self)
 
+    def closeEvent(self, event) -> None:  # type: ignore[override]
+        """Closing the window abandons the add — it does not answer Skip.
+
+        Measured: with no Cancel button QMessageBox detects the lone
+        RejectRole button as its escape button, and its own ``closeEvent``
+        then reports that button as clicked. That is right for Esc (a key
+        wants a safe landing) and wrong for the close box, which means "I did
+        not want this at all". Going straight to ``QDialog`` leaves
+        ``clickedButton()`` null, so ``ask()`` returns None and nothing is
+        added.
+        """
+        QDialog.closeEvent(self, event)
+
     def ask(self) -> bool | None:
-        """True = add duplicates, False = skip them, None = cancel."""
+        """True = add duplicates, False = skip them, None = abandoned.
+
+        None is the close-box route: no button was clicked, so the caller adds
+        nothing at all. Esc lands on Skip, not here.
+        """
         self.exec()
         clicked = self.clickedButton()
         if clicked is self._add_btn:
