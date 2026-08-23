@@ -55,6 +55,38 @@ def visual_order(player, visible_only=True):
     return labels
 
 
+def why(player):
+    """Everything that decided the layout, for an assertion message.
+
+    This test has failed intermittently three times (2026-08-13, -22, -23),
+    never reproducibly, and each sighting produced nothing usable because
+    pytest truncates the repr of two ten-item lists and prints
+    ``['#', 'Art', ...', 'Filename'] == ['#', 'Art', ...`` — from which the
+    only inference available is that the difference is somewhere in the
+    middle. A comparison whose failure cannot be read is not much of a test,
+    so it now shows its working: the full order, what is hidden, and the three
+    config fields ``_restore_column_state`` branches on.
+    """
+    header = player._table.horizontalHeader()
+    hidden = [
+        player._table.horizontalHeaderItem(c).text()
+        for c in range(player._table.columnCount())
+        if player._table.isColumnHidden(c)
+    ]
+    cfg = load_config()
+    return (
+        f"\n  visual order: {visual_order(player)}"
+        f"\n  hidden:       {hidden}"
+        f"\n  logical→visual: "
+        f"{[header.visualIndex(c) for c in range(player._table.columnCount())]}"
+        f"\n  config: state={len(cfg.player_column_state)}ch"
+        f" count={cfg.player_column_count}"
+        f" defaults_version={cfg.player_column_defaults_version}"
+        f"\n  panel is wearing the shipped defaults:"
+        f" {player._default_columns_applied}"
+    )
+
+
 def saved_state_from(player):
     """What this panel would persist, as a config the next one will read."""
     player._save_column_state()
@@ -65,7 +97,7 @@ class TestTheShippedOrder:
     def test_it_is_what_was_asked_for(self, qtbot, lib):
         player = make_player(qtbot, lib)
 
-        assert visual_order(player) == EXPECTED_ORDER
+        assert visual_order(player) == EXPECTED_ORDER, why(player)
 
     def test_the_hidden_ones_follow_behind(self, qtbot, lib):
         """Order still matters for a column that is off: turning one on should

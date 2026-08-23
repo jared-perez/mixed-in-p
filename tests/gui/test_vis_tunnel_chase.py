@@ -131,13 +131,16 @@ def test_a_straightaway_is_a_long_lazy_curve(long_path):
     tunnel never settled. It sits around 10% now, and both neighbours are
     regressions from a judgement someone made by watching it.
 
-    The bound is wide because the figure is hypersensitive at this amplitude
-    (1/50 R is roughly the amplitude itself), so it is pinned loosely enough
-    not to flake on a compiler's idea of sin() and tightly enough to fail if
-    the drift is removed (27.9%) or doubled (4.1%).
+    The band is half-to-double around the tuned figure, which is about as
+    tight as this measure deserves: it is hypersensitive at this amplitude
+    (1/50 R is roughly the amplitude itself) and it moves with how much path
+    is sampled (the same setting reads 8.9% over these 40 bars and 10.1% over
+    60). It still fails at both settings that were tried and rejected — no
+    drift at all reads 27.8%, and the first attempt's 0.05 reads 3.3% — though
+    note the lower bound clears that second one by only 0.3 of a point.
     """
     kappa = np.array(long_path.kappa[1:])
-    assert 0.05 < float((kappa < 0.02).mean()) < 0.18
+    assert 0.036 < float((kappa < 0.02).mean()) < 0.14
     # ...and the wander is gentle enough never to read as a turn of its own.
     assert np.median(kappa) < 1.0 / (5.0 * TUNNEL_R)
 

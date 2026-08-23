@@ -114,16 +114,23 @@ _COMPASS = 8  # directions a turn can take in the normal/binormal plane
 # path can then be re-derived from any *s* without knowing how the camera got
 # there, which is the same property the wormhole's frozen waypoints have.
 #
-# 0.023 is tuned by eye to leave about **10%** of the flight straighter than
-# 1/50 R, down from 53% before any of this and back up from the 3.3% that the
-# first pass at it (0.05) produced, which was too much. Beware measuring the
-# knob by that percentage alone: 1/50 R *is* roughly this amplitude, so the
-# figure is hypersensitive right here (0.021 → 13%, 0.026 → 8%) while the
-# wander's own median radius barely moves across the whole range (17.7 to
-# 17.9). What the number really counts is how often the two sinusoids cross
-# zero together. Judge it by rendering; the percentage is a way to hold a
-# judgement still, not a way to make one.
-_DRIFT_K = 0.023  # curvature amplitude, both axes
+# 0.026 is tuned by eye, converging from both sides: 53% of the flight was
+# straighter than 1/50 R before any of this, 0.05 took it to 3.3% (too much
+# wander, it never settled), 0.023 to 8.9% (too straight), and this leaves
+# **6.8%**. Two warnings about that percentage, because it is the number this
+# knob gets discussed in and it is a slippery one.
+#
+# It is hypersensitive right here and the picture is not: 1/50 R *is* roughly
+# this amplitude, so what the figure counts is how often the two sinusoids
+# cross zero together, while the wander's own median radius moves only 15 to
+# 17 R across the whole useful range. And it drifts with how much path you
+# measure — the same 0.023 reads 8.9% over 40 bars and 10.1% over 60 — because
+# the two wavelengths do not come back into phase inside a short sample.
+#
+# So quote it with the length attached, and judge the setting by rendering.
+# The number is a way to hold a judgement still between sessions, not a way to
+# make one.
+_DRIFT_K = 0.026  # curvature amplitude, both axes
 _DRIFT_WAVELENGTHS = (33.0, 48.0)  # world units — about 13 and 19 beats
 _DRIFT_PHASE = 1.7  # so the two axes do not cross zero together
 

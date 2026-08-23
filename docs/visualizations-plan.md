@@ -156,14 +156,23 @@ is radioactive):
    sweep). Under all of it sits a slow two-axis wander at about 18 R, at
    wavelengths that are neither equal nor a whole number of bars, so it never
    lines up with the schedule and never reads as part of it — dead-straight
-   time lands at **~10%**, and as a side effect the far end largely stops
-   piling into a bright knot, because the tunnel is rarely pointing down its
-   own axis. That 10% is a tuned figure and was approached from both sides:
-   the first wander amplitude took it to 3.3%, which never settled. Beware
-   reading the percentage as the knob — 1/50 R *is* roughly the amplitude, so
-   it is hypersensitive right there while the wander's own median radius
-   barely moves. Judge it by rendering; the number holds a judgement still, it
-   does not make one.
+   time lands at **~7%** (over 40 bars), and as a side effect the far end
+   largely stops piling into a bright knot, because the tunnel is rarely
+   pointing down its own axis.
+
+   That figure is tuned and was converged on from both sides: 53% before any
+   wander, 3.3% at the first amplitude tried (too restless), 8.9% at the
+   second (too straight), 6.8% now. Two warnings if you reach for it as a
+   knob. It is **hypersensitive** exactly here — 1/50 R is roughly the
+   amplitude itself, so what it counts is how often the two sinusoids cross
+   zero together, while the wander's own median radius moves only 15 to 17 R
+   across the whole useful range. And it **moves with how much path you
+   sample**, because the two wavelengths do not come back into phase inside a
+   short one: the same setting reads 8.9% over 40 bars and 10.1% over 60. So
+   quote it with a length attached, judge the setting by rendering, and treat
+   the number as a way to hold a judgement still rather than a way to make
+   one. Its test is a band (half to double), not a ceiling, since a value
+   converged on from both directions can regress in both.
 
    Stars are dots far out and four-point stars
    with a white core near, in three shades (grey and two washes of the
