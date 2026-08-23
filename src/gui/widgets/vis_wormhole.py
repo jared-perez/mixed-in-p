@@ -8,7 +8,7 @@ the camera, so the tunnel slides past as the camera advances, and paints them
 as antialiased polylines — the cost is O(lines), not O(pixels), which is why
 this renders at 608x256 for ~1.6 ms while the per-pixel modes stay at 152x64.
 Pixelated stars (blocks snapped to a coarse grid) stream past to place it in
-space.
+space; they are lit by the kick, barely visible between beats.
 
 Path properties are asserted by ``tests/gui/test_vis_wormhole.py`` through
 :func:`path_stats`: 15 turns, three straightaways of 22/37/46 units, minimum
@@ -56,6 +56,18 @@ _PEN_WIDTH = 1.2
 _PULSE_RIPPLE = 0.12  # near-ring radius bump on a full-strength kick
 _N_STARS = 110
 _STAR_PX = 4  # star block size in image px (doubled up close)
+# Stars are kick-driven: barely there between beats, full on the kick, then
+# released slowly. Same fast-attack/slow-release shape as the fractal's level
+# follower (max(new, prev * decay)), which is what makes that mode read as
+# pulsing rather than flickering — a bare `pulse` would strobe, since the
+# detector's own value collapses within a frame or two of the transient.
+# Measured against a 128 BPM kick (14 frames a beat at 30 fps): the fractal's
+# own 0.94 only falls to 0.45 before the next one lands, which reads as a mild
+# throb rather than "dark until the kick". 0.85 troughs at 0.13 and spends
+# about a third of each beat down there, while still taking ~0.6 s to get
+# there — a fade, not a strobe.
+_STAR_FLOOR = 0.15  # fraction of a star's depth alpha between kicks
+_STAR_DECAY = 0.85  # per-frame release of the glow
 _LOOP_SAMPLES = 4096
 
 # 25 waypoints (x, y, z), generated once and frozen here so the app carries no
@@ -234,6 +246,7 @@ class WormholeScene:
         self._prev_basis: np.ndarray | None = None
         self._prev_cam: np.ndarray | None = None
         self._ring_s = np.zeros(_RINGS)  # world arc-lengths of the last frame
+        self._star_glow = 0.0
         self.reset()
 
     # ── Public API ─────────────────────────────────────────────────────────
@@ -249,6 +262,7 @@ class WormholeScene:
         self._s = 0.0
         self._prev_basis = None
         self._prev_cam = None
+        self._star_glow = 0.0
         for i in range(_N_STARS):
             self._stars[i] = self._spawn_star(self._rng.uniform(1.0, self._far))
         self._image.fill(Qt.GlobalColor.transparent)
@@ -277,6 +291,7 @@ class WormholeScene:
         width, height = self._image.width(), self._image.height()
 
         self._s = (self._s + _BASE_SPEED * (1.0 + _SPEED_LEVEL * level)) % total
+        self._star_glow = max(pulse, self._star_glow * _STAR_DECAY)
         cam = pos[self._index(self._s, n, total)]
         up_hint = N[self._index(self._s, n, total)]
         look = pos[self._index(self._s + _LOOK_AHEAD, n, total)]
@@ -371,10 +386,14 @@ class WormholeScene:
         painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
         # Stars first, behind the mesh: blocks snapped to a coarse grid, which
         # is the "pixelated" half of the brief (the tunnel is the smooth half).
+        # The glow scales the whole field, so depth still orders them — a near
+        # star between kicks stays brighter than a far one, just barely lit.
+        glow = _STAR_FLOOR + (1.0 - _STAR_FLOOR) * self._star_glow
         for x, y, z in zip(star_x, star_y, star_z):
             if not (0 <= x < width and 0 <= y < height):
                 continue
-            alpha = int(np.clip(255 * (1.1 - z / self._far), 40, 255))
+            depth_alpha = np.clip(255 * (1.1 - z / self._far), 40, 255)
+            alpha = int(depth_alpha * glow)
             block = _STAR_PX if z > self._far * 0.35 else _STAR_PX * 2
             painter.fillRect(
                 int(x) // _STAR_PX * _STAR_PX,

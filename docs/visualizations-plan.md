@@ -116,7 +116,11 @@ is radioactive):
 5. **Wormhole** — a wireframe tunnel flown along a closed 3-D loop (a periodic
    cubic spline through 25 frozen waypoints: 15 turns, three straightaways,
    ~70 s per lap), with pixelated stars streaming past. Level drives travel
-   speed and brightness; the kick pulse ripples the near rings.
+   speed and brightness; the kick pulse ripples the near rings and lights the
+   stars, which sit at a dim floor between beats and are released slowly after
+   each one (the fractal's fast-attack/slow-release shape — a bare pulse
+   strobes, because the detector's value collapses a frame or two after the
+   transient).
 
    The exception to the small-image rule above, in two ways. Its cost is
    **O(lines), not O(pixels)** — QPainter calls dominate — so four times the

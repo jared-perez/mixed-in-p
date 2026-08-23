@@ -212,3 +212,58 @@ def test_a_frame_stays_cheap(qapp):
         renderer.render(_noise(rng), 44100)
         times.append(time.perf_counter() - start)
     assert float(np.median(times)) * 1000 < 15.0
+
+
+# ── Stars respond to the kick ──────────────────────────────────────────────
+
+
+def _brightest_star(image):
+    """Peak alpha among the star blocks.
+
+    Stars are white-blue and the mesh is the waveform colour, so the hue
+    separates them; alpha is what the kick drives.
+    """
+    best = 0
+    for y in range(0, image.height(), 2):
+        for x in range(0, image.width(), 2):
+            color = image.pixelColor(x, y)
+            if color.alpha() and color.blue() > color.red() >= 200:
+                best = max(best, color.alpha())
+    return best
+
+
+def test_stars_are_lit_by_the_kick(scene):
+    """Barely there between beats, full on the kick."""
+    for _ in range(30):  # settle: no kicks at all
+        scene.render(0.3, 0.0)
+    quiet = _brightest_star(scene.image())
+    scene.render(0.3, 1.0)
+    assert _brightest_star(scene.image()) > 3 * quiet
+
+
+def test_the_kick_glow_fades_rather_than_snapping_back(scene):
+    """Fast attack, slow release — the fractal's shape, driven by the pulse.
+
+    A bare `pulse` would strobe: the detector's own value collapses within a
+    frame or two of the transient.
+    """
+    scene.render(0.3, 1.0)
+    lit = _brightest_star(scene.image())
+    assert scene._star_glow == 1.0
+    glows = []
+    for _ in range(6):
+        scene.render(0.3, 0.0)
+        glows.append(scene._star_glow)
+    assert glows == sorted(glows, reverse=True)
+    assert 0.0 < glows[-1] < 1.0
+    assert _brightest_star(scene.image()) < lit
+
+
+def test_stars_never_go_out_entirely(scene):
+    """The floor keeps a starfield there for a track with no kick in it."""
+    scene.render(0.3, 1.0)
+    for _ in range(200):
+        scene.render(0.3, 0.0)
+    assert scene._star_glow < 0.01  # the glow really has gone
+    assert _brightest_star(scene.image()) > 0  # the stars have not
+
