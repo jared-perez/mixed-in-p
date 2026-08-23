@@ -121,16 +121,23 @@ def test_the_turns_are_a_lean_rather_than_an_elbow(long_path):
     assert long_path.min_radius() >= 3.0 * TUNNEL_R
 
 
-def test_the_tunnel_is_never_a_corridor(long_path):
-    """A straightaway should be a long lazy curve, not a dead straight.
+def test_a_straightaway_is_a_long_lazy_curve(long_path):
+    """Mostly not straight — but not restlessly curving either.
 
-    Without the drift laid under everything, 53% of the flight was straighter
-    than 1/50 R — which is what made the turns feel abrupt, since every one of
-    them was a departure from *nothing*. It is around 3% now, and those are
-    the moments the two drift sinusoids happen to cross zero together.
+    A **band**, not a ceiling, because this was tuned from both directions.
+    Before any drift, 53% of the flight was straighter than 1/50 R and every
+    turn was therefore a departure from nothing, which is what made them feel
+    abrupt. The first drift amplitude took that to 3.3%, which overshot — the
+    tunnel never settled. It sits around 10% now, and both neighbours are
+    regressions from a judgement someone made by watching it.
+
+    The bound is wide because the figure is hypersensitive at this amplitude
+    (1/50 R is roughly the amplitude itself), so it is pinned loosely enough
+    not to flake on a compiler's idea of sin() and tightly enough to fail if
+    the drift is removed (27.9%) or doubled (4.1%).
     """
     kappa = np.array(long_path.kappa[1:])
-    assert float((kappa < 0.02).mean()) < 0.10
+    assert 0.05 < float((kappa < 0.02).mean()) < 0.18
     # ...and the wander is gentle enough never to read as a turn of its own.
     assert np.median(kappa) < 1.0 / (5.0 * TUNNEL_R)
 

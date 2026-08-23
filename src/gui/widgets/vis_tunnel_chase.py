@@ -106,14 +106,24 @@ _COMPASS = 8  # directions a turn can take in the normal/binormal plane
 # curve rather than a corridor. Two sinusoids in arc length, one per frame
 # axis, at wavelengths that are neither equal nor a whole number of bars — so
 # the wander never lines up with the turn schedule and never reads as part of
-# it. The amplitude is a radius of curvature around 20 R: far too gentle to
-# see as a turn, and enough that the tunnel is never pointing straight down
+# it. The amplitude is a radius of curvature around 18 R: far too gentle to
+# see as a turn, and enough that the tunnel is rarely pointing straight down
 # its own axis (which is also what was piling the far end into a bright knot).
 #
 # Deliberately a pure function of arc length rather than a random walk: the
 # path can then be re-derived from any *s* without knowing how the camera got
 # there, which is the same property the wormhole's frozen waypoints have.
-_DRIFT_K = 0.05  # curvature amplitude, both axes
+#
+# 0.023 is tuned by eye to leave about **10%** of the flight straighter than
+# 1/50 R, down from 53% before any of this and back up from the 3.3% that the
+# first pass at it (0.05) produced, which was too much. Beware measuring the
+# knob by that percentage alone: 1/50 R *is* roughly this amplitude, so the
+# figure is hypersensitive right here (0.021 → 13%, 0.026 → 8%) while the
+# wander's own median radius barely moves across the whole range (17.7 to
+# 17.9). What the number really counts is how often the two sinusoids cross
+# zero together. Judge it by rendering; the percentage is a way to hold a
+# judgement still, not a way to make one.
+_DRIFT_K = 0.023  # curvature amplitude, both axes
 _DRIFT_WAVELENGTHS = (33.0, 48.0)  # world units — about 13 and 19 beats
 _DRIFT_PHASE = 1.7  # so the two axes do not cross zero together
 

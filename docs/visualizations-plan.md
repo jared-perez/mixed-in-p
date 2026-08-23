@@ -153,11 +153,17 @@ is radioactive):
    departure from nothing, and it read as a series of elbows. At 1.6 beats the
    sharpest turn opens to 3.4 R and each beat still gets a distinct swing
    (past about 2.2 consecutive bumps overlap and the turns blur into one
-   sweep). Under all of it sits a slow two-axis wander at about 20 R, at
+   sweep). Under all of it sits a slow two-axis wander at about 18 R, at
    wavelengths that are neither equal nor a whole number of bars, so it never
    lines up with the schedule and never reads as part of it — dead-straight
-   time drops to ~3%, and as a side effect the far end stops piling into a
-   bright knot, because the tunnel is no longer pointing down its own axis.
+   time lands at **~10%**, and as a side effect the far end largely stops
+   piling into a bright knot, because the tunnel is rarely pointing down its
+   own axis. That 10% is a tuned figure and was approached from both sides:
+   the first wander amplitude took it to 3.3%, which never settled. Beware
+   reading the percentage as the knob — 1/50 R *is* roughly the amplitude, so
+   it is hypersensitive right there while the wander's own median radius
+   barely moves. Judge it by rendering; the number holds a judgement still, it
+   does not make one.
 
    Stars are dots far out and four-point stars
    with a white core near, in three shades (grey and two washes of the
