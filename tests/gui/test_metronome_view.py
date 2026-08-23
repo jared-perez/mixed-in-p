@@ -19,7 +19,11 @@ from PySide6.QtGui import QMouseEvent
 
 from src.gui.widgets.keyboard_panel import KeyboardPanel
 from src.gui.widgets.metronome_engine import MAX_BPM, MIN_BPM
-from src.gui.widgets.metronome_view import BpmScrubBox, MetronomeView
+from src.gui.widgets.metronome_view import (
+    DEFAULT_CLICK_VOLUME,
+    BpmScrubBox,
+    MetronomeView,
+)
 
 
 class FakeStream:
@@ -273,16 +277,31 @@ class TestTap:
         assert view._bpm_box.value() == 120.0
 
 
-class TestVolumeComesFromThePanel:
-    def test_the_panels_slider_reaches_the_click(self, qtbot):
-        """One volume control for the panel, not a second one nobody asked
-        for."""
+class TestTheClickHasItsOwnVolume:
+    """It first followed the Keyboard panel's slider, which sits beside the
+    piano and says nothing about the click — the user's report was that the
+    metronome had no volume control at all. One slider on the view, and it is
+    the only thing that reaches the engine's gain."""
+
+    def test_the_slider_reaches_the_click(self, view):
+        view._volume_slider.setValue(40)
+
+        assert view._engine._gain == pytest.approx(0.4)
+        assert view.volume == pytest.approx(0.4)
+
+    def test_it_starts_at_the_level_the_click_used_to_have(self, view):
+        assert view._volume_slider.value() == DEFAULT_CLICK_VOLUME
+        assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
+
+    def test_the_panels_slider_no_longer_moves_it(self, qtbot):
         panel = KeyboardPanel()
         qtbot.addWidget(panel)
+        before = panel._metronome._engine._gain
 
-        panel._on_volume_change(40)
+        panel._on_volume_change(10)
 
-        assert panel._metronome._engine._gain == pytest.approx(0.4)
+        assert panel._engine.volume == pytest.approx(0.1)
+        assert panel._metronome._engine._gain == pytest.approx(before)
         panel.stop_audio()
 
 

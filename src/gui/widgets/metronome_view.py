@@ -27,6 +27,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QLineEdit,
     QPushButton,
+    QSlider,
     QVBoxLayout,
     QWidget,
 )
@@ -56,6 +57,11 @@ _BEND = 0.04
 # The eye's refresh. Deliberately coarse: the clicks are sample-scheduled, so
 # nothing about the sound depends on when this fires.
 _VIS_INTERVAL_MS = 33
+
+# Where the click's own slider starts, in percent. The same 50 the click was
+# born at when it followed the Keyboard panel's slider, so the first Start
+# after the change is no louder or softer than before it.
+DEFAULT_CLICK_VOLUME = 50
 
 
 class BpmScrubBox(QLineEdit):
@@ -274,6 +280,24 @@ class MetronomeView(QWidget):
         self._start_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._start_btn.toggled.connect(self._on_toggled)
         bend_row.addWidget(self._start_btn)
+        bend_row.addSpacing(12)
+
+        # The click's own volume. It used to follow the Keyboard panel's
+        # slider, which sits beside the piano with nothing to say it also
+        # governs the click — and a 1 kHz burst at the piano's level is not
+        # the level anyone wants a click at. One slider, one owner: the
+        # panel's slider no longer reaches the engine at all.
+        vol_glyph = QLabel("\u266b")  # the same mark the panel's slider wears
+        vol_glyph.setStyleSheet(f"color: {Theme.TEXT_PRIMARY}; font-size: 16px;")
+        bend_row.addWidget(vol_glyph)
+        self._volume_slider = QSlider(Qt.Orientation.Horizontal)
+        self._volume_slider.setRange(0, 100)
+        self._volume_slider.setValue(DEFAULT_CLICK_VOLUME)
+        self._volume_slider.setFixedWidth(100)
+        self._volume_slider.setToolTip(self.tr("Click volume"))
+        self._volume_slider.valueChanged.connect(self._on_volume_changed)
+        self._engine.set_gain(DEFAULT_CLICK_VOLUME / 100.0)
+        bend_row.addWidget(self._volume_slider)
         bend_row.addStretch(1)
         outer.addLayout(bend_row)
 
@@ -341,10 +365,14 @@ class MetronomeView(QWidget):
         if self._start_btn.isChecked():
             self._start_btn.setChecked(False)
 
-    def set_volume(self, fraction: float) -> None:
-        """Follow the Keyboard panel's own volume slider — one slider for the
-        panel, not a second one nobody asked for."""
-        self._engine.set_gain(fraction)
+    def _on_volume_changed(self, value: int) -> None:
+        self._engine.set_gain(value / 100.0)
+
+    @property
+    def volume(self) -> float:
+        """The click's level, 0.0-1.0 — what the slider says, session-only,
+        like the Keyboard panel's and the Player's own sliders."""
+        return self._volume_slider.value() / 100.0
 
     # ── the ear and the eye ─────────────────────────────────────────
 

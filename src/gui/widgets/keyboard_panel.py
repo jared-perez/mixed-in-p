@@ -705,10 +705,10 @@ class KeyboardPanel(QWidget):
         # the visible one is always current on switch. Hex grid shows by default.
         self._circle = CircleOfFifthsGrid()
         self._hex = HexKeyGrid()
+        # It has its own volume slider: the panel's, up beside the piano,
+        # gives no hint that it would also govern a click, and the two want
+        # different levels anyway.
         self._metronome = MetronomeView()
-        # It follows the panel's own volume slider rather than growing a
-        # second one — the row above already has the control.
-        self._metronome.set_volume(self._engine.volume)
         grid_holder = QWidget()
         grid_layout = QVBoxLayout(grid_holder)
         grid_layout.setContentsMargins(0, 0, 0, 0)
@@ -799,7 +799,6 @@ class KeyboardPanel(QWidget):
 
     def _on_volume_change(self, value: int) -> None:
         self._engine.volume = value / 100.0
-        self._metronome.set_volume(value / 100.0)
 
     def _on_chord_started(self, code: str) -> None:
         """Piano / QWERTY press — summarise it in the info box."""

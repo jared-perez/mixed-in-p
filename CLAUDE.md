@@ -12,7 +12,7 @@ Mixed in P is a desktop application for DJs that:
 - Slices audio files with visual range selection, nudge controls, and playback preview
 - Edits metadata tags (title, artist, album, genre, BPM, key, year, track, comment) with auto-save
 - Built-in audio player with playlist, transport controls, and drag-to-reorder
-- Interactive keyboard panel with 3-octave piano, harmonic key strip reference, chord playback, and a metronome with tap tempo and time-bend
+- Interactive keyboard panel with 3-octave piano, harmonic key strip reference, chord playback, and a metronome with tap tempo, time-bend and its own volume
 - Sidebar drag-and-drop: drop files onto nav buttons to route them to any panel
 
 ## Tech Stack

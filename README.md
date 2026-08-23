@@ -14,7 +14,7 @@ The full audio file preparation workflow for DJs.
 - Playlist view you can shape — cover art in the list (top / middle / full sleeve), optional Album, Genre, Track #, Label, Bitrate and Energy columns, and Small/Medium/Large text
 - Compatible Tracks — what else in your library mixes with the track in the player, ranked by key, tempo (half- and double-time count) and energy, with click-and-hold preview
 - "Open with Mixed in P" from Finder or Explorer, and an option to become your default audio player
-- Keyboard to play chords for key comparison, with a metronome (tap tempo, time-bend, 2-decimal BPM)
+- Keyboard to play chords for key comparison, with a metronome (tap tempo, time-bend, 2-decimal BPM, its own volume)
 - BPM detection using beat tracking (librosa)
 - Key detection using chroma analysis
 - Energy level detection — written to the comment, to its own tag field, or both
