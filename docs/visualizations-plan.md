@@ -147,13 +147,24 @@ track start by seconds.
 ### D. Settings + wiring
 
 - `AppConfig`: `visualizations_enabled: bool = False`,
-  `visualization_mode: str = "backdrop"` (persist last dropdown choice).
-- Settings panel: checkbox in a new "Visualizations" section; emits
-  `settings_changed` as usual; `MainWindow._on_settings_changed()` calls
-  `player_panel.set_visualizations_enabled(...)` which shows/hides the
-  dropdown (and tears down the popout when disabled).
-- Player header dropdown items: Off / Backdrop waveform / Oscilloscope /
-  Spectrum / Fire (last three open the popout).
+  `visualization_mode: str = "off"` (persist last dropdown choice).
+
+  **Superseded 2026-08-23**: there is no master switch any more. `"off"` is one
+  of the modes, the eye button is always in the Player header, and picking a
+  visual is what starts it — so `visualizations_enabled`, the Settings section
+  and `set_visualizations_enabled` are all gone, and nothing runs until the
+  user chooses. What that leaves is a config carrying a mode *and* a switch
+  that was **off by default**: reading the mode alone would start a visual for
+  everyone who never asked for one, so `_folded_vis_mode` in `config.py` reads
+  an explicitly-off switch as `"off"` whatever mode sits beside it. It needs no
+  version field to stay one-time — it keys on the legacy key still being
+  present, and the first save without it (`asdict` no longer has the field)
+  removes it for good.
+- Player eye-menu items, in order: the two richest visuals lead each group
+  (Backdrop fractal, Backdrop wormhole, then waveform/oscilloscope/spectrum/
+  fire; then the popouts in the same order), with **Visuals off** at the foot —
+  it is the way out, not the way in, and a menu that opens on its own "off" row
+  buries what it offers.
 - **i18n**: every new user-facing string wrapped with `self.tr()`, then
   `python scripts/build_translations.py` (per CLAUDE.md). Mode names in the
   dropdown are UI prose → translated; "BPM"-style tokens unaffected.

@@ -306,32 +306,6 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(art_frame)
 
-        # ── Section: Visualizations ────────────────────────────────────────
-        outer.addWidget(self._make_section_label(self.tr("Visualizations")))
-
-        vis_frame = QFrame()
-        vis_frame.setObjectName("settingsSection")
-        vis_layout = QVBoxLayout(vis_frame)
-        vis_layout.setContentsMargins(16, 10, 16, 10)
-        vis_layout.setSpacing(8)
-
-        self._visualizations_cb = QCheckBox(self.tr("Enable audio visualizations"))
-        self._visualizations_cb.setObjectName("circleCheckLg")
-        self._visualizations_cb.setChecked(False)
-        vis_layout.addWidget(self._visualizations_cb)
-
-        vis_hint = QLabel(
-            self.tr(
-                "Adds a visuals selector to the Player and an animated waveform "
-                "while analyzing or converting."
-            )
-        )
-        vis_hint.setObjectName("settingsHint")
-        vis_hint.setWordWrap(True)
-        vis_layout.addWidget(vis_hint)
-
-        outer.addWidget(vis_frame)
-
         # ── Section 1: Tempo Range ──────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Tempo Range")))
 
@@ -749,7 +723,6 @@ class SettingsPanel(QWidget):
         self._auto_write_bpm_cb.stateChanged.connect(self._emit_changed)
         self._auto_write_key_cb.stateChanged.connect(self._emit_changed)
         self._auto_analyze_cb.stateChanged.connect(self._emit_changed)
-        self._visualizations_cb.stateChanged.connect(self._emit_changed)
         self._export_absolute_cb.stateChanged.connect(self._emit_changed)
         self._persist_scratch_cb.stateChanged.connect(self._emit_changed)
         self._online_lookup_cb.stateChanged.connect(self._emit_changed)
@@ -1104,7 +1077,6 @@ class SettingsPanel(QWidget):
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
             energy_written_first=self._energy_written_first_cb.isChecked(),
             waveform_color=self._waveform_color,
-            visualizations_enabled=self._visualizations_cb.isChecked(),
             export_absolute_paths=self._export_absolute_cb.isChecked(),
             persist_scratch=self._persist_scratch_cb.isChecked(),
             duplicate_policy=self._duplicate_policy_combo.currentData(),
@@ -1148,9 +1120,6 @@ class SettingsPanel(QWidget):
         self._auto_analyze_cb.setChecked(cfg.auto_analyze)
         self._key_in_comment_cb.setChecked(cfg.key_in_comment_enabled)
 
-        self._visualizations_cb.blockSignals(True)
-        self._visualizations_cb.setChecked(cfg.visualizations_enabled)
-        self._visualizations_cb.blockSignals(False)
 
         self._export_absolute_cb.blockSignals(True)
         self._export_absolute_cb.setChecked(cfg.export_absolute_paths)

@@ -1340,8 +1340,8 @@ class PlayerPanel(QWidget):
         # Inline metadata editing is gated by the Edit Lock toggle; persisted.
         _cfg = load_config()
         self._edit_locked: bool = _cfg.player_edit_locked
-        # Visualizations: master switch (Settings) and last chosen visual.
-        self._visualizations_enabled: bool = _cfg.visualizations_enabled
+        # The visual showing in the Player. "off" is one of the modes, so the
+        # eye menu is the only control — there is no separate enable step.
         self._vis_mode: str = _cfg.visualization_mode
         # A popout visual doesn't survive a restart (a visualizer window
         # popping up at launch, before the main window, would be jarring);
@@ -1556,9 +1556,9 @@ class PlayerPanel(QWidget):
 
         # Visuals selector: a compact eye-icon button (default QPushButton
         # style — the same light fill as Clear Playlist) that opens a checkable
-        # menu of modes. Shown only when visualizations are enabled in
-        # Settings. Mode ids are persisted in config (visualization_mode);
-        # the menu labels are translated UI prose.
+        # menu of modes. Always shown: the menu's own "Visuals off" is the
+        # switch. Mode ids are persisted in config (visualization_mode); the
+        # menu labels are translated UI prose.
         self._vis_button = QPushButton()
         self._vis_button.setObjectName("visMenuButton")
         self._vis_button.setIcon(_make_eye_icon())
@@ -1569,19 +1569,23 @@ class PlayerPanel(QWidget):
         self._vis_action_group = QActionGroup(self)
         self._vis_action_group.setExclusive(True)
         self._vis_actions: dict[str, QAction] = {}
+        # Order is a recommendation: the two richest visuals lead each group,
+        # and the groups run in the same order so the halves read as parallel.
+        # "Visuals off" sits at the foot — it is the way out, not the way in,
+        # and a menu that opens on its own "off" row buries what it offers.
         for mode, label in (
-            ("off", self.tr("Visuals off")),
+            ("backdrop_fractal", self.tr("Backdrop fractal")),
+            ("backdrop_wormhole", self.tr("Backdrop wormhole")),
             ("backdrop", self.tr("Backdrop waveform")),
             ("backdrop_scope", self.tr("Backdrop oscilloscope")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_fire", self.tr("Backdrop fire")),
-            ("backdrop_fractal", self.tr("Backdrop fractal")),
-            ("backdrop_wormhole", self.tr("Backdrop wormhole")),
+            ("fractal", self.tr("Popout fractal")),
+            ("wormhole", self.tr("Popout wormhole")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
             ("fire", self.tr("Popout fire")),
-            ("fractal", self.tr("Popout fractal")),
-            ("wormhole", self.tr("Popout wormhole")),
+            ("off", self.tr("Visuals off")),
         ):
             action = QAction(label, self)
             action.setCheckable(True)
@@ -1589,12 +1593,12 @@ class PlayerPanel(QWidget):
             self._vis_action_group.addAction(action)
             self._vis_menu.addAction(action)
             self._vis_actions[mode] = action
-        # A separator sets the popouts apart from the backdrop modes.
-        self._vis_menu.insertSeparator(self._vis_actions["oscilloscope"])
+        # Separators set the three groups apart: backdrops, popouts, and off.
+        self._vis_menu.insertSeparator(self._vis_actions["fractal"])
+        self._vis_menu.insertSeparator(self._vis_actions["off"])
         if self._vis_mode in self._vis_actions:
             self._vis_actions[self._vis_mode].setChecked(True)
         self._vis_button.clicked.connect(self._show_vis_menu)
-        self._vis_button.setVisible(self._visualizations_enabled)
         title_row.addWidget(self._vis_button, 0, Qt.AlignmentFlag.AlignVCenter)
 
         # Compatible Tracks: the same 40×26 icon button, checkable, sitting
@@ -3243,16 +3247,10 @@ class PlayerPanel(QWidget):
         """Follow the Settings key-notation choice in the compatible list."""
         self._compat_panel.set_key_notation(notation)
 
-    def set_visualizations_enabled(self, enabled: bool) -> None:
-        """Show/hide the visuals selector to match the Settings master switch."""
-        self._visualizations_enabled = enabled
-        self._vis_button.setVisible(enabled)
-        self._apply_vis_mode()
-
     def _apply_vis_mode(self) -> None:
-        """Bring the active visual in line with the mode + master switch."""
+        """Bring the active visual in line with the chosen mode."""
         self._refresh_backdrop()
-        popout = self._visualizations_enabled and self._vis_mode in POPOUT_MODES
+        popout = self._vis_mode in POPOUT_MODES
         if popout:
             if self._vis_window is None:
                 self._vis_window = VisualizerWindow(self._engine, self)
@@ -3284,9 +3282,8 @@ class PlayerPanel(QWidget):
         self._refresh_backdrop()
 
     def _refresh_backdrop(self) -> None:
-        """Show/hide the playlist backdrop to match mode, switch, and track."""
-        enabled = self._visualizations_enabled
-        if enabled and self._vis_mode in _BACKDROP_VIS_MAP:
+        """Show/hide the playlist backdrop to match the mode and the track."""
+        if self._vis_mode in _BACKDROP_VIS_MAP:
             # Visualizer backdrop: frames arrive from the tick timer; the
             # stale envelope/image (if any) clears on the first frame.
             if self._backdrop_renderer is None:
@@ -3300,7 +3297,7 @@ class PlayerPanel(QWidget):
                 self._table.clear_backdrop()
             return
         self._vis_tick_timer.stop()
-        if not enabled or self._vis_mode != "backdrop" or self._backdrop_src is None:
+        if self._vis_mode != "backdrop" or self._backdrop_src is None:
             self._table.clear_backdrop()
             return
         path = self._current_path()

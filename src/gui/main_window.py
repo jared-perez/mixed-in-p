@@ -1423,17 +1423,16 @@ class MainWindow(QMainWindow):
             )
 
     def _apply_visualization_settings(self) -> None:
-        """Push the visualizations switch (and waveform color) to every consumer.
+        """Push the waveform colour to every consumer.
 
-        The Player shows/hides its visuals dropdown based on the switch. The
-        Analyze and Convert progress panels always show their moving waveform
-        (it's core progress feedback, not an opt-in visual), so the switch
-        doesn't gate them — only the waveform colour is pushed. Rename shares the
-        same ProgressPanel widget but is intentionally left plain.
+        There is nothing to enable any more: the Player's eye menu owns which
+        visual is showing, "Visuals off" included, so nothing here gates it.
+        The Analyze and Convert progress panels always show their moving
+        waveform (it's core progress feedback, not an opt-in visual) and never
+        were gated. Rename shares the same ProgressPanel widget but is
+        intentionally left plain.
         """
-        enabled = self._config.visualizations_enabled
         color = self._effective_waveform_color()
-        self._player_panel.set_visualizations_enabled(enabled)
         for panel in (self._analysis_panel, self._conversion_panel):
             panel.progress_panel.set_activity_color(color)
 

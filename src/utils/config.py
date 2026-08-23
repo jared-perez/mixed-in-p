@@ -124,11 +124,12 @@ class AppConfig:
     waveform_color: str = "#f0ff00"
     # When True, the Player playlist's inline metadata editing is locked off.
     player_edit_locked: bool = False
-    # Master switch for audio visualizations (Player visuals dropdown and the
-    # Analyze/Convert activity waveform).
-    visualizations_enabled: bool = False
-    # Last visual chosen in the Player's visuals dropdown (see _VALID_VIS_MODES).
-    visualization_mode: str = "backdrop"
+    # The visual showing in the Player, chosen from its eye-icon menu (see
+    # _VALID_VIS_MODES). "off" is one of the modes rather than a separate
+    # switch: picking a visual is what starts it. There was a
+    # visualizations_enabled master switch in Settings until 2026-08-23 —
+    # LEGACY_VIS_SWITCH below folds it into this field.
+    visualization_mode: str = "off"
     # Force absolute paths in exported playlists. Off by default: the
     # exporter writes relative paths when the tracks sit under the playlist
     # file's own folder, which is what makes an exported folder portable to
@@ -204,6 +205,30 @@ def _config_path() -> Path:
     """Return the path to the config JSON file."""
     from .app_dirs import get_app_data_dir
     return get_app_data_dir() / "config.json"
+
+
+# The Settings switch that used to gate the Player's visuals before the mode
+# became the only control. A config written by an older build still carries it.
+LEGACY_VIS_SWITCH = "visualizations_enabled"
+
+
+def _folded_vis_mode(data: dict) -> str:
+    """The stored visual, with the retired master switch folded in.
+
+    Every config in the wild carries a mode *and* a switch that was off by
+    default, so reading the mode alone would start a visual for everyone who
+    never asked for one — the switch was what had been suppressing it. An
+    explicitly off switch therefore means "off", whatever mode sits beside it.
+
+    No version field is needed to make this one-time: it keys on the legacy
+    key still being present, and the first save without it (``asdict`` no
+    longer has the field) removes it for good. Re-running until then is
+    harmless — it is the same fold onto the same value.
+    """
+    mode = str(data.get("visualization_mode", AppConfig.visualization_mode))
+    if not data.get(LEGACY_VIS_SWITCH, True):
+        return "off"
+    return mode
 
 
 def _optional_int(data: dict, key: str, default: int | None) -> int | None:
@@ -284,12 +309,7 @@ def load_config() -> AppConfig:
                 player_edit_locked=bool(
                     data.get("player_edit_locked", AppConfig.player_edit_locked)
                 ),
-                visualizations_enabled=bool(
-                    data.get("visualizations_enabled", AppConfig.visualizations_enabled)
-                ),
-                visualization_mode=str(
-                    data.get("visualization_mode", AppConfig.visualization_mode)
-                ),
+                visualization_mode=_folded_vis_mode(data),
                 export_absolute_paths=bool(
                     data.get("export_absolute_paths", AppConfig.export_absolute_paths)
                 ),
