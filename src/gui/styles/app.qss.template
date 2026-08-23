@@ -396,6 +396,68 @@ QWidget#playlistTreePanel {
     border: none;
 }
 
+/* ===== Metronome (Keyboard panel, third view) ===== */
+
+/* The +/- and bend buttons are 24px square, under the global QPushButton
+   padding of 8px/16px — which would leave no contents rect at all and draw
+   no glyph (the #discogsApplyButton law).
+   The size is STATED here rather than zeroed. `min-width: 0` alone was the
+   first attempt and it is worse than the padding: a stylesheet's min-width
+   replaces the minimum that setFixedSize(24, 24) set, the size hint then
+   collapses to the glyph's own width, and the layout hands the button 9px —
+   which renders as a squashed pill with the glyph clipped. Rendered and
+   looked at; no test in the suite can see either failure. */
+QPushButton#metroStepButton {
+    padding: 0;
+    min-width: 24px;
+    max-width: 24px;
+    min-height: 24px;
+    max-height: 24px;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: @BG_LIGHT@;
+    color: @TEXT_PRIMARY@;
+    border: none;
+    border-radius: 4px;
+}
+
+QPushButton#metroStepButton:hover {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+}
+
+QPushButton#metroTapButton,
+QPushButton#metroStartButton {
+    padding: 4px 14px;
+    min-height: 0;
+    font-weight: bold;
+}
+
+QPushButton#metroStartButton:checked {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+}
+
+/* The tempo, in a monospaced-ish weight so the two decimals do not jitter
+   the box width as they change under a drag. */
+QLineEdit#metroBpmBox {
+    background-color: @BG_DARK@;
+    color: @NEON_YELLOW@;
+    border: 1px solid @BG_LIGHT@;
+    border-radius: 4px;
+    font-size: 17px;
+    font-weight: bold;
+    padding: 0;
+}
+
+QLineEdit#metroBpmBox:focus {
+    border-color: @NEON_YELLOW@;
+}
+
+QWidget#metronomeView {
+    background-color: transparent;
+}
+
 /* The album-art box at the foot of the rail. A QFrame, so it takes both the
    global QWidget background and the global 1px frame border — neither of
    which belongs behind a picture that fills the whole widget. */

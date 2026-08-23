@@ -406,6 +406,14 @@ oder „Cover hinzufügen …“ klicken</translation>
     </message>
 </context>
 <context>
+    <name>BpmScrubBox</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="81"/>
+        <source>Drag up or down to change the tempo</source>
+        <translation>Zum Ändern des Tempos nach oben oder unten ziehen</translation>
+    </message>
+</context>
+<context>
     <name>CompatibleTracksPanel</name>
     <message>
         <location filename="../widgets/compatible_panel.py" line="169"/>
@@ -1121,59 +1129,64 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="585"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Keyboard</source>
         <translatorcomment>&apos;Klaviatur&apos; (piano keyboard) rather than &apos;Tastatur&apos; (computer keyboard), matching the piano-panel context.</translatorcomment>
         <translation>Klaviatur</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="588"/>
+        <location filename="../widgets/keyboard_panel.py" line="589"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Akkorde spielen, um Tonarten zu vergleichen. Tasten anklicken oder QWERTY-Kürzel nutzen (A-J, K-L-;). Z/X für Oktavwechsel.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="598"/>
+        <location filename="../widgets/keyboard_panel.py" line="599"/>
         <source>Notation can be changed in settings</source>
         <translation>Die Notation kann in den Einstellungen geändert werden</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="612"/>
+        <location filename="../widgets/keyboard_panel.py" line="613"/>
         <source>Minor Chord</source>
         <translation>Moll-Akkord</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="613"/>
+        <location filename="../widgets/keyboard_panel.py" line="614"/>
         <source>Major Chord</source>
         <translation>Dur-Akkord</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="680"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>View</source>
         <translation>Ansicht</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="685"/>
+        <location filename="../widgets/keyboard_panel.py" line="686"/>
         <source>Circle of Fifths</source>
         <translation>Quintenzirkel</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="684"/>
+        <location filename="../widgets/keyboard_panel.py" line="685"/>
         <source>Hex Grid</source>
         <translation>Hex-Raster</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="848"/>
-        <location filename="../widgets/keyboard_panel.py" line="851"/>
+        <location filename="../widgets/keyboard_panel.py" line="687"/>
+        <source>Metronome</source>
+        <translation>Metronom</translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="870"/>
+        <location filename="../widgets/keyboard_panel.py" line="873"/>
         <source>👑 Key Codes</source>
         <translation>👑 Key Codes</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="849"/>
+        <location filename="../widgets/keyboard_panel.py" line="871"/>
         <source>Traditional Key Notation</source>
         <translation>Traditionelle Tonart-Notation</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="850"/>
+        <location filename="../widgets/keyboard_panel.py" line="872"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -1951,6 +1964,50 @@ oder „Cover hinzufügen …“ klicken</translation>
         <location filename="../widgets/metadata_panel.py" line="1969"/>
         <source>Select cover art</source>
         <translation>Cover auswählen</translation>
+    </message>
+</context>
+<context>
+    <name>MetronomeView</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="228"/>
+        <source>One BPM slower</source>
+        <translation>1 BPM langsamer</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="237"/>
+        <source>One BPM faster</source>
+        <translation>1 BPM schneller</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="246"/>
+        <source>Tap</source>
+        <translation>Tippen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="249"/>
+        <source>Tap along to set the tempo</source>
+        <translation>Zum Tempo mittippen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="258"/>
+        <source>Hold to lean the beat back</source>
+        <translation>Gedrückt halten, um den Beat zurückzuziehen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="261"/>
+        <source>Hold to push the beat forward</source>
+        <translation>Gedrückt halten, um den Beat vorzuschieben</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="271"/>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Start</source>
+        <translation>Start</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Stop</source>
+        <translation>Stopp</translation>
     </message>
 </context>
 <context>

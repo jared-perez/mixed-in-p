@@ -31,6 +31,7 @@ from .circle_of_fifths_grid import CircleOfFifthsGrid
 from .hex_key_grid import HexKeyGrid
 from .key_info_box import KeyInfoBox
 from .linear_key_strip import LinearKeyStrip
+from .metronome_view import MetronomeView
 from .loop_player import output_stream_kwargs
 
 # ---------------------------------------------------------------------------
@@ -683,6 +684,7 @@ class KeyboardPanel(QWidget):
         self._view_combo = FittedComboBox()
         self._view_combo.addItem(self.tr("Hex Grid"))
         self._view_combo.addItem(self.tr("Circle of Fifths"))
+        self._view_combo.addItem(self.tr("Metronome"))
         self._view_combo.setCursor(Qt.CursorShape.PointingHandCursor)
         # Slim it down vertically so the switcher row takes less space; keep
         # horizontal padding + a min width so "Circle of Fifths" isn't clipped.
@@ -703,14 +705,26 @@ class KeyboardPanel(QWidget):
         # the visible one is always current on switch. Hex grid shows by default.
         self._circle = CircleOfFifthsGrid()
         self._hex = HexKeyGrid()
+        self._metronome = MetronomeView()
+        # It follows the panel's own volume slider rather than growing a
+        # second one — the row above already has the control.
+        self._metronome.set_volume(self._engine.volume)
         grid_holder = QWidget()
         grid_layout = QVBoxLayout(grid_holder)
         grid_layout.setContentsMargins(0, 0, 0, 0)
         top_left = Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignTop
         grid_layout.addWidget(self._hex, alignment=top_left)
         grid_layout.addWidget(self._circle, alignment=top_left)
-        grid_holder.setFixedWidth(max(self._hex.width(), self._circle.width()))
+        grid_layout.addWidget(self._metronome, alignment=top_left)
+        grid_holder.setFixedWidth(
+            max(
+                self._hex.width(),
+                self._circle.width(),
+                self._metronome.sizeHint().width(),
+            )
+        )
         self._circle.setVisible(False)
+        self._metronome.setVisible(False)
         self._view_combo.currentIndexChanged.connect(self._on_view_changed)
         right_col.addWidget(grid_holder, alignment=Qt.AlignmentFlag.AlignLeft)
 
@@ -770,14 +784,22 @@ class KeyboardPanel(QWidget):
         self._minor_btn.setStyleSheet(active_ss if self._minor_btn.isChecked() else inactive_ss)
         self._major_btn.setStyleSheet(active_ss if self._major_btn.isChecked() else inactive_ss)
 
+    # Switcher order: hex grid, circle of fifths, metronome.
+    _VIEW_HEX, _VIEW_CIRCLE, _VIEW_METRONOME = 0, 1, 2
+
     def _on_view_changed(self, index: int) -> None:
-        """Toggle the visible reference grid (0 = Hex, 1 = Circle of Fifths)."""
-        show_hex = index == 0
-        self._hex.setVisible(show_hex)
-        self._circle.setVisible(not show_hex)
+        """Show exactly one of the three views.
+
+        The metronome's own hideEvent stops its click, so switching away
+        silences it — there is no separate teardown here to forget.
+        """
+        self._hex.setVisible(index == self._VIEW_HEX)
+        self._circle.setVisible(index == self._VIEW_CIRCLE)
+        self._metronome.setVisible(index == self._VIEW_METRONOME)
 
     def _on_volume_change(self, value: int) -> None:
         self._engine.volume = value / 100.0
+        self._metronome.set_volume(value / 100.0)
 
     def _on_chord_started(self, code: str) -> None:
         """Piano / QWERTY press — summarise it in the info box."""
@@ -852,8 +874,15 @@ class KeyboardPanel(QWidget):
         )
 
     def stop_audio(self) -> None:
-        """Stop all audio (called when navigating away)."""
+        """Stop all audio (called when navigating away).
+
+        Two engines now: the keyboard's synth and the metronome's click. The
+        click has its own stream, so leaving the panel has to reach it — the
+        Keyboard panel going off screen does not hide the metronome *widget*,
+        which is still "visible" inside a hidden parent.
+        """
         self._engine.stop()
+        self._metronome.stop()
 
     def _ensure_audio(self) -> None:
         """Restart audio engine if stopped."""

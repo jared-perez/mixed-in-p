@@ -373,6 +373,14 @@ or click “Add Artwork…”</source>
     </message>
 </context>
 <context>
+    <name>BpmScrubBox</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="81"/>
+        <source>Drag up or down to change the tempo</source>
+        <translation>위아래로 드래그하여 템포 변경</translation>
+    </message>
+</context>
+<context>
     <name>CompatibleTracksPanel</name>
     <message>
         <location filename="../widgets/compatible_panel.py" line="169"/>
@@ -1095,63 +1103,68 @@ or click “Add Artwork…”</source>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="585"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Keyboard</source>
         <translatorcomment>The piano panel → 건반 (musical keyboard), NOT 키보드 (computer keyboard), per glossary.</translatorcomment>
         <translation>건반</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="588"/>
+        <location filename="../widgets/keyboard_panel.py" line="589"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translatorcomment>chords → 코드, musical keys → 조성, &quot;keys&quot; (the things you click) → 건반, octave → 옥타브. QWERTY/letter shortcuts kept Latin. 해요체. Flag for native review.</translatorcomment>
         <translation>코드를 연주해 조성을 비교해요. 건반을 클릭하거나 QWERTY 단축키(A–J, K–L–;)를 사용하세요. Z/X로 옥타브를 이동해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="598"/>
+        <location filename="../widgets/keyboard_panel.py" line="599"/>
         <source>Notation can be changed in settings</source>
         <translation>표기법은 설정에서 변경할 수 있습니다</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="612"/>
+        <location filename="../widgets/keyboard_panel.py" line="613"/>
         <source>Minor Chord</source>
         <translatorcomment>Chord button → 마이너 코드 (producer-context loanword, widely used). Note: distinct from the mode label 단조. Flag for native review.</translatorcomment>
         <translation>마이너 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="613"/>
+        <location filename="../widgets/keyboard_panel.py" line="614"/>
         <source>Major Chord</source>
         <translatorcomment>Chord button → 메이저 코드 (producer-context loanword). Flag for native review.</translatorcomment>
         <translation>메이저 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="680"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>View</source>
         <translation>보기</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="685"/>
+        <location filename="../widgets/keyboard_panel.py" line="686"/>
         <source>Circle of Fifths</source>
         <translation>5도권</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="684"/>
+        <location filename="../widgets/keyboard_panel.py" line="685"/>
         <source>Hex Grid</source>
         <translation>육각 그리드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="848"/>
-        <location filename="../widgets/keyboard_panel.py" line="851"/>
+        <location filename="../widgets/keyboard_panel.py" line="687"/>
+        <source>Metronome</source>
+        <translation>메트로놈</translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="870"/>
+        <location filename="../widgets/keyboard_panel.py" line="873"/>
         <source>👑 Key Codes</source>
         <translation>👑 키 코드</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="849"/>
+        <location filename="../widgets/keyboard_panel.py" line="871"/>
         <source>Traditional Key Notation</source>
         <translatorcomment>&quot;Traditional key notation&quot; → 전통 조성 표기 (key → 조성, notation → 표기). Flag for native review.</translatorcomment>
         <translation>전통 조성 표기</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="850"/>
+        <location filename="../widgets/keyboard_panel.py" line="872"/>
         <source>Traktor Open Key</source>
         <translatorcomment>Proper name of Traktor&apos;s notation system — kept in English (product term). Flag for native review.</translatorcomment>
         <translation>Traktor Open Key</translation>
@@ -1931,6 +1944,50 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/metadata_panel.py" line="1969"/>
         <source>Select cover art</source>
         <translation>커버 아트 선택</translation>
+    </message>
+</context>
+<context>
+    <name>MetronomeView</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="228"/>
+        <source>One BPM slower</source>
+        <translation>1 BPM 느리게</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="237"/>
+        <source>One BPM faster</source>
+        <translation>1 BPM 빠르게</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="246"/>
+        <source>Tap</source>
+        <translation>탭</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="249"/>
+        <source>Tap along to set the tempo</source>
+        <translation>탭하여 템포 설정</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="258"/>
+        <source>Hold to lean the beat back</source>
+        <translation>길게 눌러 비트를 뒤로</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="261"/>
+        <source>Hold to push the beat forward</source>
+        <translation>길게 눌러 비트를 앞으로</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="271"/>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Start</source>
+        <translation>시작</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Stop</source>
+        <translation>정지</translation>
     </message>
 </context>
 <context>

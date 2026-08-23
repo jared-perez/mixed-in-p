@@ -139,7 +139,7 @@
         <b>Playlists</b> button rather than the nav rail.</td></tr>
       <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
       <tr><td>Spectrum</td><td>Spek-style frequency view of a track.</td></tr>
-      <tr><td>Keyboard</td><td>3-octave piano + harmonic reference grid.</td></tr>
+      <tr><td>Keyboard</td><td>3-octave piano, harmonic reference grid, and a metronome.</td></tr>
       <tr><td>History</td><td>Undo past rename batches.</td></tr>
       <tr><td>Settings</td><td>Tempo range, notation, auto-rename, language, theme, and more.</td></tr>
     </table>
@@ -481,6 +481,12 @@
       with <b>Minor</b>/<b>Major</b> chord modes. A <b>linear key strip</b> and <b>hex grid</b> light up
       to show a key's harmonic neighbors — click any segment to hear that key. Key notation displayed in
       the top-right corner changes with your choice in <b>Settings</b>.</p>
+    <p>The view switcher beside the grid also holds a <b>metronome</b>. The tempo box reads to two
+      decimals — drag it up or down to scrub, hold <b>Shift</b> while dragging for hundredths, or use
+      the small <b>+</b>/<b>&minus;</b> buttons for whole beats. <b>Tap</b> sets the tempo from your own
+      timing, and the two hold-to-bend buttons lean the beat back or push it forward while held. The
+      click is scheduled sample by sample in the audio callback, so it holds a tempo indefinitely
+      without drifting.</p>
     <img class="shot-img" src="../assets/keyboard.webp" alt="Keyboard panel — piano and harmonic key strip">
 
     <h3>Spectrum view</h3>

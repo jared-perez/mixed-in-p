@@ -406,6 +406,14 @@ ou clique em “Adicionar capa…”</translation>
     </message>
 </context>
 <context>
+    <name>BpmScrubBox</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="81"/>
+        <source>Drag up or down to change the tempo</source>
+        <translation>Arraste para cima ou para baixo para mudar o tempo</translation>
+    </message>
+</context>
+<context>
     <name>CompatibleTracksPanel</name>
     <message>
         <location filename="../widgets/compatible_panel.py" line="169"/>
@@ -1124,58 +1132,63 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="585"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Keyboard</source>
         <translation>Teclado</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="588"/>
+        <location filename="../widgets/keyboard_panel.py" line="589"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>Toque acordes para comparar tonalidades. Clique nas teclas ou use os atalhos QWERTY (A-J, K-L-;). Z/X para mudar de oitava.</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="598"/>
+        <location filename="../widgets/keyboard_panel.py" line="599"/>
         <source>Notation can be changed in settings</source>
         <translation>A notação pode ser alterada em Ajustes</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="612"/>
+        <location filename="../widgets/keyboard_panel.py" line="613"/>
         <source>Minor Chord</source>
         <translation>Acorde menor</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="613"/>
+        <location filename="../widgets/keyboard_panel.py" line="614"/>
         <source>Major Chord</source>
         <translation>Acorde maior</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="680"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>View</source>
         <translation>Visualização</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="685"/>
+        <location filename="../widgets/keyboard_panel.py" line="686"/>
         <source>Circle of Fifths</source>
         <translation>Ciclo das quintas</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="684"/>
+        <location filename="../widgets/keyboard_panel.py" line="685"/>
         <source>Hex Grid</source>
         <translation>Grade hexagonal</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="848"/>
-        <location filename="../widgets/keyboard_panel.py" line="851"/>
+        <location filename="../widgets/keyboard_panel.py" line="687"/>
+        <source>Metronome</source>
+        <translation>Metrônomo</translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="870"/>
+        <location filename="../widgets/keyboard_panel.py" line="873"/>
         <source>👑 Key Codes</source>
         <translation>👑 Key Codes</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="849"/>
+        <location filename="../widgets/keyboard_panel.py" line="871"/>
         <source>Traditional Key Notation</source>
         <translation>Notação tradicional de tonalidade</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="850"/>
+        <location filename="../widgets/keyboard_panel.py" line="872"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -1951,6 +1964,50 @@ ou clique em “Adicionar capa…”</translation>
         <location filename="../widgets/metadata_panel.py" line="1969"/>
         <source>Select cover art</source>
         <translation>Selecionar capa</translation>
+    </message>
+</context>
+<context>
+    <name>MetronomeView</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="228"/>
+        <source>One BPM slower</source>
+        <translation>1 BPM mais lento</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="237"/>
+        <source>One BPM faster</source>
+        <translation>1 BPM mais rápido</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="246"/>
+        <source>Tap</source>
+        <translation>Marcar</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="249"/>
+        <source>Tap along to set the tempo</source>
+        <translation>Marque no ritmo para definir o tempo</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="258"/>
+        <source>Hold to lean the beat back</source>
+        <translation>Segure para atrasar o beat</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="261"/>
+        <source>Hold to push the beat forward</source>
+        <translation>Segure para adiantar o beat</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="271"/>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Start</source>
+        <translation>Iniciar</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Stop</source>
+        <translation>Parar</translation>
     </message>
 </context>
 <context>

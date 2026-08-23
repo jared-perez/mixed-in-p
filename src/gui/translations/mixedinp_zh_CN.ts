@@ -407,6 +407,14 @@ or click “Add Artwork…”</source>
     </message>
 </context>
 <context>
+    <name>BpmScrubBox</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="81"/>
+        <source>Drag up or down to change the tempo</source>
+        <translation>上下拖动以改变速度</translation>
+    </message>
+</context>
+<context>
     <name>CompatibleTracksPanel</name>
     <message>
         <location filename="../widgets/compatible_panel.py" line="169"/>
@@ -1126,60 +1134,65 @@ or click “Add Artwork…”</source>
 <context>
     <name>KeyboardPanel</name>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="585"/>
+        <location filename="../widgets/keyboard_panel.py" line="586"/>
         <source>Keyboard</source>
         <translation>键盘</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="588"/>
+        <location filename="../widgets/keyboard_panel.py" line="589"/>
         <source>Play chords to compare musical keys. Click keys or use QWERTY shortcuts (A-J, K-L-;). Z/X to shift octave.</source>
         <translation>弹奏和弦以比较调性。点击琴键或使用 QWERTY 快捷键（A-J、K-L-;）。Z/X 用于切换八度。</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="598"/>
+        <location filename="../widgets/keyboard_panel.py" line="599"/>
         <source>Notation can be changed in settings</source>
         <translation>记号法可在设置中更改</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="612"/>
+        <location filename="../widgets/keyboard_panel.py" line="613"/>
         <source>Minor Chord</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>小三和弦</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="613"/>
+        <location filename="../widgets/keyboard_panel.py" line="614"/>
         <source>Major Chord</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>大三和弦</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="680"/>
+        <location filename="../widgets/keyboard_panel.py" line="681"/>
         <source>View</source>
         <translation>视图</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="685"/>
+        <location filename="../widgets/keyboard_panel.py" line="686"/>
         <source>Circle of Fifths</source>
         <translation>五度圈</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="684"/>
+        <location filename="../widgets/keyboard_panel.py" line="685"/>
         <source>Hex Grid</source>
         <translation>六边形网格</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="848"/>
-        <location filename="../widgets/keyboard_panel.py" line="851"/>
+        <location filename="../widgets/keyboard_panel.py" line="687"/>
+        <source>Metronome</source>
+        <translation>节拍器</translation>
+    </message>
+    <message>
+        <location filename="../widgets/keyboard_panel.py" line="870"/>
+        <location filename="../widgets/keyboard_panel.py" line="873"/>
         <source>👑 Key Codes</source>
         <translation>👑 键码</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="849"/>
+        <location filename="../widgets/keyboard_panel.py" line="871"/>
         <source>Traditional Key Notation</source>
         <translation>传统调性记号</translation>
     </message>
     <message>
-        <location filename="../widgets/keyboard_panel.py" line="850"/>
+        <location filename="../widgets/keyboard_panel.py" line="872"/>
         <source>Traktor Open Key</source>
         <translation>Traktor Open Key</translation>
     </message>
@@ -1955,6 +1968,50 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/metadata_panel.py" line="1969"/>
         <source>Select cover art</source>
         <translation>选择封面</translation>
+    </message>
+</context>
+<context>
+    <name>MetronomeView</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="228"/>
+        <source>One BPM slower</source>
+        <translation>慢 1 BPM</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="237"/>
+        <source>One BPM faster</source>
+        <translation>快 1 BPM</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="246"/>
+        <source>Tap</source>
+        <translation>打拍</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="249"/>
+        <source>Tap along to set the tempo</source>
+        <translation>跟着打拍以设定速度</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="258"/>
+        <source>Hold to lean the beat back</source>
+        <translation>按住以让节拍后靠</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="261"/>
+        <source>Hold to push the beat forward</source>
+        <translation>按住以让节拍前推</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="271"/>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Start</source>
+        <translation>开始</translation>
+    </message>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="313"/>
+        <source>Stop</source>
+        <translation>停止</translation>
     </message>
 </context>
 <context>

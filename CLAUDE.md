@@ -12,7 +12,7 @@ Mixed in P is a desktop application for DJs that:
 - Slices audio files with visual range selection, nudge controls, and playback preview
 - Edits metadata tags (title, artist, album, genre, BPM, key, year, track, comment) with auto-save
 - Built-in audio player with playlist, transport controls, and drag-to-reorder
-- Interactive keyboard panel with 3-octave piano, harmonic key strip reference, and chord playback
+- Interactive keyboard panel with 3-octave piano, harmonic key strip reference, chord playback, and a metronome with tap tempo and time-bend
 - Sidebar drag-and-drop: drop files onto nav buttons to route them to any panel
 
 ## Tech Stack
@@ -89,10 +89,13 @@ src/
 │   │   ├── player_panel.py     # Audio player with playlist
 │   │   ├── metadata_panel.py   # Tag editor with auto-save
 │   │   ├── keyboard_panel.py   # Piano + harmonic key strip reference
+│   │   ├── metronome_engine.py # Sample-scheduled click train + tap tempo (Qt-free)
+│   │   ├── metronome_view.py   # Metronome controls (Keyboard panel's third view)
 │   │   ├── settings_panel.py   # App configuration
 │   │   ├── history_panel.py    # Rename undo history
 │   │   ├── queue_panel.py      # File queue management
 │   │   ├── sidebar.py          # Nav sidebar with drag-and-drop
+│   │   ├── sidebar_art_box.py  # Big album cover at the foot of the rail
 │   │   ├── header_bar.py       # Header with logo
 │   │   ├── range_slider.py     # Dual-handle range slider widget
 │   │   ├── droppable_table.py  # Base table with file drop support
