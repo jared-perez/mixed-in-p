@@ -115,7 +115,7 @@ is radioactive):
    ~0.7 ms/frame.
 5. **Wormhole** — a wireframe tunnel flown along a closed 3-D loop (a periodic
    cubic spline through 25 frozen waypoints: 15 turns, three straightaways,
-   ~70 s per lap), with pixelated cross-shaped stars streaming past. Level drives travel
+   ~70 s per lap), with small cross-shaped stars streaming past. Level drives travel
    speed and brightness; the kick pulse ripples the near rings and lights the
    stars, which sit at a dim floor between beats and are released over ~0.5 s
    after each one (the fractal's fast-attack/slow-release shape — a bare pulse

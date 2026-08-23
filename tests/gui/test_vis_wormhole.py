@@ -9,6 +9,7 @@ import time
 
 import numpy as np
 import pytest
+from PySide6.QtGui import QImage
 
 from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
 from src.gui.widgets.vis_canvas import FFT_SIZE, POPOUT_MODES, RENDER_MODES, VisRenderer
@@ -50,6 +51,27 @@ def test_loop_closes_seamlessly(loop):
 
 
 # ── The scene ──────────────────────────────────────────────────────────────
+
+
+def _star_pixels(image):
+    """``(alpha, star mask)`` for a frame, as numpy arrays.
+
+    Not ``pixelColor`` in a loop: a 608x256 frame is 150k calls, and sampling
+    every other pixel to make that bearable would step straight over a one
+    pixel star arm. Stars are white-blue and the mesh is the waveform colour,
+    so the hue is what separates them; alpha is what the kick drives.
+    """
+    image = image.convertToFormat(QImage.Format.Format_ARGB32)
+    raw = np.frombuffer(image.constBits(), dtype=np.uint8)
+    raw = raw.reshape(image.height(), image.bytesPerLine() // 4, 4)[:, : image.width()]
+    blue, red = raw[..., 0].astype(int), raw[..., 2].astype(int)
+    alpha = raw[..., 3].astype(int)
+    return alpha, (alpha > 0) & (blue > red) & (red >= 200)
+
+
+def _brightest_star(image):
+    alpha, stars = _star_pixels(image)
+    return int(alpha[stars].max()) if stars.any() else 0
 
 
 @pytest.fixture
@@ -118,7 +140,7 @@ def test_target_size_clamps(scene):
 
 
 def test_it_draws_a_tunnel_and_stars(scene):
-    """Rings down the middle, and at least one star block off to the side."""
+    """Rings down the middle, and stars off to the side."""
     for _ in range(4):
         scene.render(0.6, 0.0)
     image = scene.image()
@@ -131,17 +153,7 @@ def test_it_draws_a_tunnel_and_stars(scene):
     ]
     assert max(centre) > 0
 
-    # Stars are white-blue blocks; the mesh is the waveform colour, so look
-    # for a bluish pixel well outside the tunnel mouth.
-    def is_star(color):
-        return color.alpha() > 0 and color.blue() > color.red() >= 200
-
-    found = any(
-        is_star(image.pixelColor(x, y))
-        for y in range(0, height, 2)
-        for x in range(0, width, 2)
-    )
-    assert found
+    assert _star_pixels(image)[1].any()
 
 
 # ── VisRenderer integration ────────────────────────────────────────────────
@@ -218,21 +230,6 @@ def test_a_frame_stays_cheap(qapp):
 # ── Stars respond to the kick ──────────────────────────────────────────────
 
 
-def _brightest_star(image):
-    """Peak alpha among the star blocks.
-
-    Stars are white-blue and the mesh is the waveform colour, so the hue
-    separates them; alpha is what the kick drives.
-    """
-    best = 0
-    for y in range(0, image.height(), 2):
-        for x in range(0, image.width(), 2):
-            color = image.pixelColor(x, y)
-            if color.alpha() and color.blue() > color.red() >= 200:
-                best = max(best, color.alpha())
-    return best
-
-
 def test_stars_are_lit_by_the_kick(scene):
     """Barely there between beats, full on the kick."""
     for _ in range(30):  # settle: no kicks at all
@@ -279,23 +276,17 @@ def test_stars_are_crosses_rather_than_blocks(scene):
     """
     for _ in range(3):
         scene.render(0.3, 1.0)  # kick-lit, so the arms are at full alpha
-    image = scene.image()
+    _alpha, lit = _star_pixels(scene.image())
     cell = vis_wormhole._STAR_CELL
-    cols, rows = image.width() // cell, image.height() // cell
 
-    def lit(col, row):
-        if not (0 <= col < cols and 0 <= row < rows):
-            return False
-        color = image.pixelColor(col * cell + 1, row * cell + 1)
-        return bool(color.alpha()) and color.blue() > color.red() >= 200
+    def shifted(dx, dy):
+        return np.roll(np.roll(lit, dy * cell, axis=0), dx * cell, axis=1)
 
     # A "core" is a cell lit on all four sides — the centre of a cross, or an
     # interior cell of a block.
-    diagonals = [
-        sum(lit(c + dc, r + dr) for dc, dr in ((1, 1), (1, -1), (-1, 1), (-1, -1)))
-        for c in range(cols)
-        for r in range(rows)
-        if lit(c, r) and all(lit(c + dc, r + dr) for dc, dr in ((1, 0), (-1, 0), (0, 1), (0, -1)))
-    ]
-    assert len(diagonals) >= 10  # enough cores to be talking about the field
-    assert float(np.mean(diagonals)) < 1.0  # a block would score 4
+    core = lit & shifted(1, 0) & shifted(-1, 0) & shifted(0, 1) & shifted(0, -1)
+    diagonals = sum(
+        shifted(dx, dy).astype(int) for dx, dy in ((1, 1), (1, -1), (-1, 1), (-1, -1))
+    )
+    assert core.sum() >= 10  # enough cores to be talking about the field
+    assert float(diagonals[core].mean()) < 1.0  # a block would score 4

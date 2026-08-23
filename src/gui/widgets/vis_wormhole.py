@@ -56,15 +56,22 @@ _FADE_EXP = 2.0
 _PEN_WIDTH = 1.2
 _PULSE_RIPPLE = 0.12  # near-ring radius bump on a full-strength kick
 _N_STARS = 110
-# Stars are drawn as a grid-snapped cross — a horizontal and a vertical bar of
-# _STAR_CELL-sized cells — rather than a solid block, so they read as points of
-# light instead of confetti. The cell keeps them pixelated (the brief's word);
-# the arms are what makes them a star. Near ones get longer arms, which reads
-# as a closer star twinkling harder. The two bars overlap at the centre, and
-# the doubled alpha there is wanted: it gives each star a brighter core.
-_STAR_CELL = 3  # image px per star "pixel"
-_STAR_ARM_FAR = 1  # arm length in cells (so 3 cells across)
-_STAR_ARM_NEAR = 2  # 5 cells across, for stars inside 35% of the far plane
+# Stars are drawn as a cross — a horizontal and a vertical bar of _STAR_CELL
+# -sized cells — rather than a solid block, so they read as points of light
+# instead of confetti. Near ones get longer arms, which reads as a closer star
+# twinkling harder. The two bars overlap at the centre, and the doubled alpha
+# there is wanted: it gives each star a brighter core, which is most of what
+# makes it read as a star rather than a plus sign.
+#
+# How chunky a star looks is the *ratio* of bar thickness to span, not the
+# span: 3 px bars on a 9 px cross and 2 px bars on a 6 px cross look equally
+# blocky, just at different sizes. So the thin bar is what buys the fine look,
+# and the arms are then free to be short enough to stay small. At a cell of 1
+# the grid snap is a no-op and the crispness comes from the host's unsmoothed
+# upscale, which is what keeps them reading as pixels.
+_STAR_CELL = 1  # image px per star "pixel" (also the bar thickness)
+_STAR_ARM_FAR = 2  # arm length in cells (so 5 cells across)
+_STAR_ARM_NEAR = 3  # 7 cells across, for stars inside 35% of the far plane
 # Stars are kick-driven: barely there between beats, full on the kick, then
 # released slowly. Same fast-attack/slow-release shape as the fractal's level
 # follower (max(new, prev * decay)), which is what makes that mode read as
