@@ -139,10 +139,10 @@ class TestScrollOnAdd:
         assert bar(player).value() == 0
 
 
-def stocked_playlist(lib, player, tmp_path, name, prefix):
-    """A saved playlist of ROWS real files, ready to load."""
+def stocked_playlist(lib, player, tmp_path, name, prefix, rows=ROWS):
+    """A saved playlist of *rows* real files, ready to load."""
     paths = []
-    for i in range(ROWS):
+    for i in range(rows):
         f = tmp_path / f"{prefix}{i:02d}.wav"
         f.write_bytes(b"not-really-audio")
         paths.append(str(f))
@@ -192,6 +192,54 @@ class TestComingBackToAPlaylist:
         player.load_node(a)
 
         assert bar(player).value() == halfway
+
+    def test_coming_back_from_a_shorter_list_still_lands(
+        self, player, lib, tmp_path, qtbot
+    ):
+        """The lists visited in between are not all the same length, and the
+        scrollbar's range is the previous list's until Qt runs the pending
+        relayout — so a restore made against it is clamped to that list's
+        length. Every other test here uses ROWS-row playlists throughout,
+        which is exactly the case that cannot see it: the bug showed in the
+        app as "only the last playlist or two remember where they were"."""
+        long_one, _ = stocked_playlist(lib, player, tmp_path, "Long", "l")
+        short_one, _ = stocked_playlist(lib, player, tmp_path, "Short", "s", rows=5)
+        player.load_node(long_one)
+        settle_at_top(player, qtbot)
+        halfway = bar(player).maximum() // 2
+        assert halfway > 0, "nowhere to scroll; the test proves nothing"
+        bar(player).setValue(halfway)
+
+        player.load_node(short_one)
+        pump(qtbot)
+        assert bar(player).maximum() == 0, "the short list scrolls; the test proves nothing"
+        player.load_node(long_one)
+
+        assert bar(player).value() == halfway
+        pump(qtbot)
+        assert bar(player).value() == halfway, "clamped once Qt recomputed the range"
+
+    def test_a_longer_list_is_not_cut_to_the_shorter_ones_length(
+        self, player, lib, tmp_path, qtbot
+    ):
+        """The other direction: a position past the end of the list just
+        left is clamped to that list's range, not restored to its own."""
+        short_one, _ = stocked_playlist(lib, player, tmp_path, "Short", "s")
+        long_one, _ = stocked_playlist(lib, player, tmp_path, "Long", "l", rows=ROWS * 2)
+        player.load_node(short_one)
+        settle_at_top(player, qtbot)
+        short_reach = bar(player).maximum()
+        player.load_node(long_one)
+        settle_at_top(player, qtbot)
+        deep = bar(player).maximum() - 1
+        assert deep > short_reach, "the short list reaches that far; the test proves nothing"
+        bar(player).setValue(deep)
+
+        player.load_node(short_one)
+        pump(qtbot)  # as between two clicks: the range is the short list's now
+        player.load_node(long_one)
+
+        assert bar(player).value() == deep
 
     def test_scratch_is_no_different(self, player, lib, tmp_path, qtbot):
         """Scratch is a real node (id 1), not a special case — it keeps its

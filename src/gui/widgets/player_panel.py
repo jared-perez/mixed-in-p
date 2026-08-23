@@ -2661,11 +2661,21 @@ class PlayerPanel(QWidget):
             self._update_transport_state()
         self._update_context_label()
         # Restore last, after everything that could move the view: a
-        # selection restore calls scrollTo internally, and a value set before
-        # Qt has recomputed the range clamps instead of landing where it
-        # should (the lesson from the tree's own scroll fix, 4e6504d). A
-        # playlist opened for the first time has no entry and gets 0, which
-        # is the top — the behaviour every load had before.
+        # selection restore calls scrollTo internally. A playlist opened for
+        # the first time has no entry and gets 0, which is the top — the
+        # behaviour every load had before.
+        #
+        # The layout first, because the scrollbar's range is still the
+        # PREVIOUS list's: setRowCount only schedules a relayout, and the
+        # range is recomputed when Qt gets round to it. A value set against
+        # that stale range is clamped to it, so coming back to a 40-row list
+        # from a 5-row one landed at 0 and an 80-row one from a 40-row one at
+        # row 33 — it worked only when the list just left was at least as
+        # long, which read as "only the last playlist or two remember".
+        # doItemsLayout is the public way to run the pending relayout now
+        # (it calls updateGeometries); the tree's own restore (4e6504d) gets
+        # away without it only because its rebuild happens to force one.
+        self._table.doItemsLayout()
         self._table.verticalScrollBar().setValue(self._node_scroll.get(node_id, 0))
 
     def _store_read_comments(self, tracks) -> None:
