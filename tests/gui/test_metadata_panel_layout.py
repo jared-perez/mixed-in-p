@@ -1,8 +1,9 @@
 """What the Metadata panel gives to the file, and what it stops giving to itself.
 
-Two separable things, both about room. The cover column had been taking a
-quarter of the panel for a cover that never rendered above 132px of it, and the
-empty state kept prompting for a drop over a file that was plainly loaded.
+Three separable things. The cover column had been taking a quarter of the
+panel for a cover that never rendered above 132px of it; the empty state kept
+prompting for a drop over a file that was plainly loaded; and the cover sat a
+whole tab bar above everything it belongs with.
 """
 
 import numpy as np
@@ -82,6 +83,43 @@ class TestCoverColumn:
         art = ArtworkWidget()
         qtbot.addWidget(art)
         assert art._image_label.wordWrap()
+
+
+class TestCoverOffset:
+    """The cover starts where the tabs' *contents* do, not where the tabs do.
+
+    Level with the tab bar it began a row above every other thing in the
+    panel, beside a word rather than beside the tags.
+    """
+
+    def test_the_column_is_offset_by_the_tab_bar(self, panel):
+        # Asked of the tab bar, not written as a number: it is a font metric
+        # wearing a widget, and a larger font or another style moves it.
+        assert panel._art_column.contentsMargins().top() == (
+            panel._tabs.tabBar().sizeHint().height()
+        )
+
+    def test_the_cover_clears_the_tab_bar(self, panel, audio_file):
+        """The structural half, in a suite with no stylesheet: whatever the
+        style makes the bar, the cover starts below it and not at the top."""
+        panel._load_file(audio_file)
+        panel.layout().activate()
+
+        bar = panel._tabs.tabBar()
+        bar_bottom = bar.mapTo(panel, bar.rect().bottomLeft()).y()
+        cover_top = panel._artwork.mapTo(panel, panel._artwork.rect().topLeft()).y()
+        assert cover_top >= bar_bottom
+
+    def test_the_cover_sits_at_the_top_of_what_is_left(self, panel, audio_file):
+        """The margin above is the alignment now, in place of AlignTop — so
+        the slack has to go below the cover, not around it."""
+        panel._load_file(audio_file)
+        panel.layout().activate()
+
+        column = panel._art_column.geometry()
+        assert panel._artwork.y() == (
+            column.y() + panel._art_column.contentsMargins().top()
+        )
 
 
 class TestEmptyState:

@@ -224,6 +224,27 @@ class MetadataPanel(QWidget):
         super().resizeEvent(event)
         self._bg_overlay.setGeometry(self.rect())
 
+    def showEvent(self, event) -> None:
+        super().showEvent(event)
+        # The tab bar's height is what the cover is offset by, and it is not
+        # settled at construction: a stylesheet applied after this panel was
+        # built changes the tab font, and nothing re-runs _setup_ui.
+        self._sync_artwork_offset()
+
+    def _sync_artwork_offset(self) -> None:
+        """Drop the cover column to where the tabs' *contents* start.
+
+        Asked of the tab bar rather than written as a number, because it is a
+        font metric wearing a widget: a larger tab font, another platform
+        style or a stylesheet with more padding all move the line the cover is
+        meant to sit on. Reading the laid-out pane's position instead would be
+        the same number by a worse route — this runs to decide a geometry, so
+        the geometry it would read back is the one it is about to replace.
+        """
+        self._art_column.setContentsMargins(
+            0, self._tabs.tabBar().sizeHint().height(), 0, 0
+        )
+
     # ------------------------------------------------------------------ UI
 
     def _setup_ui(self) -> None:
@@ -415,10 +436,24 @@ class MetadataPanel(QWidget):
         # A fixed column, not a quarter of the panel. At 1:3 the cover column
         # was 225px wide for a cover that never rendered above 132 — and the
         # width it was taking is exactly what the Discogs tab beside it has
-        # too little of. Top-aligned so the cover sits level with the top of
-        # the tabs instead of floating in the middle of a 550px column.
+        # too little of.
         self._artwork.set_column_width(_ART_COLUMN_WIDTH)
-        body.addWidget(self._artwork, 0, Qt.AlignmentFlag.AlignTop)
+        # Pushed down past the tab bar, and pinned to the top of what the tabs
+        # actually contain. Level with the *tabs* — which is where a plain
+        # AlignTop put it — the cover started a row above every other thing in
+        # the panel, beside a word rather than beside the tags, and read as
+        # floating rather than as the third column of the same block. The
+        # offset is the tab bar's own height, so it follows the font and the
+        # style instead of guessing at them: see _sync_artwork_offset, which
+        # re-asks once the panel is on screen and the stylesheet has landed.
+        self._art_column = QVBoxLayout()
+        self._art_column.setSpacing(0)
+        self._art_column.addWidget(self._artwork)
+        # A stretch, not AlignTop: the margin above is the alignment now, and
+        # the slack has to go somewhere below the cover.
+        self._art_column.addStretch()
+        self._sync_artwork_offset()
+        body.addLayout(self._art_column, 0)
 
         layout.addLayout(body, 1)
 
