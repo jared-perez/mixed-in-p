@@ -144,7 +144,22 @@ is radioactive):
    music does. Speed is therefore the *tempo*; level only sets brightness. The
    schedule is the brief in two lines — a turn on the first beat of every bar,
    plus a gentler one on the third beat of every fourth bar — which is a
-   four-bar phrase you can feel. Stars are dots far out and four-point stars
+   four-bar phrase you can feel.
+
+   **A turn is a lean and a straightaway is a long curve.** The bump's
+   integral is the heading change, so its width and its sharpness trade off
+   directly: the first version turned over 0.9 beats, which spiked to a 2.27 R
+   radius and left **53% of the flight dead straight** — every turn was a
+   departure from nothing, and it read as a series of elbows. At 1.6 beats the
+   sharpest turn opens to 3.4 R and each beat still gets a distinct swing
+   (past about 2.2 consecutive bumps overlap and the turns blur into one
+   sweep). Under all of it sits a slow two-axis wander at about 20 R, at
+   wavelengths that are neither equal nor a whole number of bars, so it never
+   lines up with the schedule and never reads as part of it — dead-straight
+   time drops to ~3%, and as a side effect the far end stops piling into a
+   bright knot, because the tunnel is no longer pointing down its own axis.
+
+   Stars are dots far out and four-point stars
    with a white core near, in three shades (grey and two washes of the
    wireframe colour toward white), with three shaded planets drifting past.
    Measured **3.4 ms/frame at 1216×512** and 4.5 at popout size.

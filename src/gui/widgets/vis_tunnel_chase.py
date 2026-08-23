@@ -87,12 +87,35 @@ _DEPTH_FLOOR = 0.05  # keeps a projected point from flying a million pixels out
 
 # Turn shape. The bump is a raised cosine in arc length whose integral is the
 # heading change, centred a tenth of a beat after the kick so the swing peaks
-# just behind it.
+# just behind it. Because the integral is fixed, widening the bump lowers its
+# peak curvature in proportion: the turn still happens, it just takes longer.
+#
+# 0.9 beats was the prototype's, and it made the flight read as a series of
+# elbows — measured, 53% of it was dead straight (radius over 50 R) and the
+# turns spiked to 2.27 R. 1.6 opens the sharpest turn to 3.6 R while still
+# fitting a distinct swing between one bar's beat and the next, which is what
+# keeps the turn legible *as* a turn on the beat. Past about 2.2 consecutive
+# bumps overlap and the turns blur into one continuous sweep.
 _TURN_LAG = 0.1  # beats
-_TURN_WIDTH = 0.9  # beats, half-width of the bump
+_TURN_WIDTH = 1.6  # beats, half-width of the bump
 _BAR_TURN_RAD = (0.55, 1.0)  # heading change on the first beat of a bar
 _PHRASE_TURN_RAD = (0.4, 0.7)  # ...and on the phrase bar's third beat
 _COMPASS = 8  # directions a turn can take in the normal/binormal plane
+
+# A slow wander laid under everything, so a "straightaway" is a long lazy
+# curve rather than a corridor. Two sinusoids in arc length, one per frame
+# axis, at wavelengths that are neither equal nor a whole number of bars — so
+# the wander never lines up with the turn schedule and never reads as part of
+# it. The amplitude is a radius of curvature around 20 R: far too gentle to
+# see as a turn, and enough that the tunnel is never pointing straight down
+# its own axis (which is also what was piling the far end into a bright knot).
+#
+# Deliberately a pure function of arc length rather than a random walk: the
+# path can then be re-derived from any *s* without knowing how the camera got
+# there, which is the same property the wormhole's frozen waypoints have.
+_DRIFT_K = 0.05  # curvature amplitude, both axes
+_DRIFT_WAVELENGTHS = (33.0, 48.0)  # world units — about 13 and 19 beats
+_DRIFT_PHASE = 1.7  # so the two axes do not cross zero together
 
 _N_STARS = 160
 _N_PLANETS = 3
@@ -174,7 +197,13 @@ class PathAhead:
     # ── Building ───────────────────────────────────────────────────────────
 
     def curvature_at(self, s: float) -> tuple[float, float]:
-        """The (N, B) curvature at arc-length *s*, summed over nearby turns."""
+        """The (N, B) curvature at arc-length *s*: the turns, plus the wander.
+
+        The only place the tunnel's shape is decided. Everything downstream —
+        the frame integration, where the rings sit, the projection, the near
+        plane — reads the result and has no opinion about where it came from,
+        which is why the shape is two constants away at any time.
+        """
         kn = kb = 0.0
         half = _TURN_WIDTH * UNITS_PER_BEAT
         for beat, direction, heading in self.turns:
@@ -186,12 +215,24 @@ class PathAhead:
                 magnitude = heading / half * 0.5 * (1.0 + math.cos(math.pi * u))
                 kn += magnitude * math.cos(direction)
                 kb += magnitude * math.sin(direction)
+        first, second = _DRIFT_WAVELENGTHS
+        kn += _DRIFT_K * math.sin(s * 2 * math.pi / first)
+        kb += _DRIFT_K * math.sin(s * 2 * math.pi / second + _DRIFT_PHASE)
         return kn, kb
 
     def extend_to(self, s_needed: float) -> None:
         while self.s0 + (len(self.pos) - 1) * DS < s_needed:
             s = self.s0 + (len(self.pos) - 1) * DS
-            needed_beat = int(s / UNITS_PER_BEAT) + 2
+            # A turn centred up to _TURN_WIDTH beats ahead already bends the
+            # path *here*, so the schedule has to reach that far or the first
+            # half of every bump is silently missing and the turn comes out
+            # smaller than it was asked for. Today the `+ 16` below is what
+            # actually guarantees it — this trigger only decides *when* the
+            # next chunk is cut — but it was written as a bare `+ 2`, true
+            # only while the width was 0.9, and the two numbers have no
+            # business being independent. Derived, and a test asserts the
+            # frontier stays covered.
+            needed_beat = int(s / UNITS_PER_BEAT) + int(math.ceil(_TURN_WIDTH)) + 1
             if needed_beat >= self._scheduled_to:
                 self.turns += schedule_turns(
                     self._scheduled_to, needed_beat + 16, self._rng, self.bar_offset
@@ -221,9 +262,10 @@ class PathAhead:
         del self.binormal[:drop]
         del self.kappa[:drop]
         self.s0 += drop * DS
+        reach = math.ceil(_TURN_WIDTH) + 1
         self.turns = [
             t for t in self.turns
-            if (t[0] + 2) * UNITS_PER_BEAT > cam_s - 2 * _HISTORY
+            if (t[0] + reach) * UNITS_PER_BEAT > cam_s - 2 * _HISTORY
         ]
 
     def at(self, s: float):
@@ -241,6 +283,14 @@ class PathAhead:
         """
         peak = max(self.kappa)
         return 1.0 / max(peak, 1e-9)
+
+    def max_radius(self) -> float:
+        """Largest radius of curvature so far — how straight the flattest bit is.
+
+        The counterpart of the above, and the number that says whether the
+        tunnel ever becomes a corridor. The drift is what keeps it finite.
+        """
+        return 1.0 / max(min(self.kappa[1:], default=0.0), 1e-9)
 
 
 class TunnelChaseScene:

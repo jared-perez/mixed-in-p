@@ -111,6 +111,52 @@ def test_the_walls_never_fold_into_themselves(long_path):
     assert long_path.min_radius() >= 2.0 * TUNNEL_R
 
 
+def test_the_turns_are_a_lean_rather_than_an_elbow(long_path):
+    """The first version turned too fast, and it read as a series of corners.
+
+    The bump's integral is the heading change, so widening it lowers the peak
+    curvature in proportion — the turn still happens, it just takes longer.
+    Measured: 0.9 beats gave a sharpest turn of 2.27 R, 1.6 gives 3.4.
+    """
+    assert long_path.min_radius() >= 3.0 * TUNNEL_R
+
+
+def test_the_tunnel_is_never_a_corridor(long_path):
+    """A straightaway should be a long lazy curve, not a dead straight.
+
+    Without the drift laid under everything, 53% of the flight was straighter
+    than 1/50 R — which is what made the turns feel abrupt, since every one of
+    them was a departure from *nothing*. It is around 3% now, and those are
+    the moments the two drift sinusoids happen to cross zero together.
+    """
+    kappa = np.array(long_path.kappa[1:])
+    assert float((kappa < 0.02).mean()) < 0.10
+    # ...and the wander is gentle enough never to read as a turn of its own.
+    assert np.median(kappa) < 1.0 / (5.0 * TUNNEL_R)
+
+
+def test_the_curvature_is_continuous(long_path):
+    """A bump whose leading half was never scheduled would show up as a step.
+
+    The schedule is generated ahead of the camera in chunks, and a turn
+    centred up to _TURN_WIDTH beats away already bends the path here — so a
+    lookahead shorter than the bump's own reach would truncate it. Nothing in
+    the shape of the path may jump.
+    """
+    steps = np.abs(np.diff(np.array(long_path.kappa[1:])))
+    assert steps.max() < 0.05
+
+
+def test_the_schedule_always_covers_the_frontier():
+    """The invariant behind the test above, asserted rather than inferred."""
+    path = PathAhead()
+    for target in (10.0, 60.0, 200.0, 700.0):
+        path.extend_to(target)
+        frontier = path.s0 + (len(path.pos) - 1) * DS
+        reach = frontier / UNITS_PER_BEAT + tc._TURN_WIDTH
+        assert path._scheduled_to >= reach
+
+
 def test_the_path_is_forgotten_behind_the_camera():
     path = PathAhead()
     path.extend_to(400.0)
