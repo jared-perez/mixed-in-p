@@ -49,12 +49,14 @@ _VALID_VIS_MODES = {
     "backdrop_fire",
     "backdrop_fractal",
     "backdrop_wormhole",
+    "backdrop_tunnel_chase",
     # Popout visualizer window.
     "oscilloscope",
     "spectrum",
     "fire",
     "fractal",
     "wormhole",
+    "tunnel_chase",
 }
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 

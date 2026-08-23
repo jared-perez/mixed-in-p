@@ -41,6 +41,7 @@ class PlayerEngine(QObject):
     durationChanged = Signal(int)  # total track length, ms
     stateChanged = Signal(bool)    # True = playing, False = paused/stopped
     finished = Signal()            # playback reached the end of the track
+    seeked = Signal()              # the play head was moved, not merely advanced
 
     def __init__(self, parent: QObject | None = None) -> None:
         super().__init__(parent)
@@ -186,6 +187,11 @@ class PlayerEngine(QObject):
         # so without this a scrub (e.g. the slice zoom view) would move the play
         # head silently and the UI playhead/waveform would never follow.
         self.positionChanged.emit(new_ms)
+        # Separate from positionChanged, which also fires on ordinary playback:
+        # the beat visualization has to throw away the evidence it accumulated
+        # about where we *were*, and this is the one place every seek funnels
+        # through (the transport slider and the slice section both call here).
+        self.seeked.emit()
 
     # ----------------------------------------------------------------- A-B loop
 

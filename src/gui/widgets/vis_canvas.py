@@ -17,6 +17,11 @@ fast (non-smooth) transformation for a chunky pixel look:
   pixelated stars streaming past. The odd one out: it draws antialiased lines
   into its own larger, host-shaped image (see :mod:`.vis_wormhole`) rather
   than the shared low-res grid, because its cost is O(lines) not O(pixels).
+- ``tunnel_chase`` — the wormhole's sibling, flown to the beat: the tunnel is
+  generated ahead of the camera and turns on the first beat of every bar (see
+  :mod:`.vis_tunnel_chase`). It is the only mode that *counts beats*, so it is
+  also the only one with a tempo (:mod:`.beat_clock`), a per-mode frame rate
+  (60 fps in the popout) and a smooth upscale rather than chunky pixels.
 
 The rendering lives in :class:`VisRenderer` (no widget), shared by two hosts:
 the popout :class:`VisCanvas`, and the Player playlist's backdrop (which blits
@@ -38,11 +43,18 @@ from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPen
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from ..styles.theme import Theme
+from .beat_clock import BeatClock
+from .vis_tunnel_chase import TunnelChaseScene
 from .vis_wormhole import WormholeScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
 FRAME_MS = 33  # ~30 fps
+# Tunnel Chase alone runs at 60 in the popout: at 33 ms the kick flux is too
+# coarse for the beat clock to lock as tightly (measured), so this is a
+# correctness reason and not only a smoothness one. The backdrop stays at
+# FRAME_MS whatever the mode — see PlayerPanel's tick timer.
+TUNNEL_FRAME_MS = 16
 FFT_SIZE = 2048
 _N_BARS = 19
 _BAR_W = _W // _N_BARS  # px per bar incl. 1px gap
@@ -69,8 +81,18 @@ _JULIA_SPIN_LEVEL = 0.045  # extra spin at full level
 _JULIA_MORPH_BASE = 0.002  # c-orbit advance per frame (silence)
 _JULIA_MORPH_LEVEL = 0.022  # extra orbit speed at full level
 _JULIA_KICK_ZOOM = 0.14  # fraction of zoom-in on a full-strength kick
+# Kick flux (Tunnel Chase's beat feature): the half-wave-rectified rise in
+# 50-120 Hz energy, *gated* by the broadband log-spectral flux — a kick has a
+# click and a bass note does not, which is what separates the two on a track
+# whose bass line sits between the kicks. Each term is normalised by its own
+# slow peak follower, since the app cannot take the 99th percentile of a clip
+# it has not heard yet.
+_FLUX_PEAK_DECAY_AT_60FPS = 0.995  # ~3 s memory of "how big does this get"
+_PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 
-RENDER_MODES = ("oscilloscope", "spectrum", "fire", "fractal", "wormhole")
+RENDER_MODES = (
+    "oscilloscope", "spectrum", "fire", "fractal", "wormhole", "tunnel_chase",
+)
 POPOUT_MODES = RENDER_MODES
 
 
@@ -127,13 +149,90 @@ class VisRenderer:
         # Wormhole state, including its own image. Cheap to construct — the
         # loop path is built on its first render, not here.
         self._wormhole = WormholeScene()
+        # Tunnel Chase: its own image again, plus a beat clock. Both cheap to
+        # build; the path is generated on the first render.
+        self._tunnel = TunnelChaseScene()
+        self._clock = BeatClock(FRAME_MS / 1000.0)
+        self._frame_ms: float = FRAME_MS
+        self._bass_alpha = _PULSE_ATTACK
+        # Kick-flux state and the three peak followers that normalise it.
+        self._kick_flux: float = 0.0
+        self._bass: float = 0.0
+        self._prev_bass: float = 0.0
+        self._prev_log: np.ndarray | None = None
+        self._flux_peaks = np.zeros(3)
+        self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS
 
     # ── Public API ─────────────────────────────────────────────────────────
 
     def image(self) -> QImage:
         if self._mode == "wormhole":
             return self._wormhole.image()
+        if self._mode == "tunnel_chase":
+            return self._tunnel.image()
         return self._image
+
+    def frame_ms(self) -> int:
+        """How often this mode wants to be advanced, in milliseconds.
+
+        Only the popout acts on it. The playlist backdrop stays at FRAME_MS
+        whatever the mode, because its cost is the *host*: repainting the
+        visible rows behind the frame measures ~11 ms on its own, and at 60 fps
+        that alone would be two-thirds of a core.
+        """
+        return TUNNEL_FRAME_MS if self._mode == "tunnel_chase" else FRAME_MS
+
+    def smooth_upscale(self) -> bool:
+        """Whether the host should interpolate when scaling this mode up.
+
+        The retro modes are meant to look like big pixels. Tunnel Chase is
+        antialiased line work rendered near the host's own size, so a nearest
+        -neighbour blow-up would undo the thing it renders large for. Measured
+        at 0.4 ms for a full-frame upscale, i.e. free.
+        """
+        return self._mode == "tunnel_chase"
+
+    def set_frame_interval(self, frame_ms: float) -> None:
+        """Tell the renderer how often it is being advanced.
+
+        Every decay in here is a *time* constant wearing a per-frame number:
+        the bass average's 0.97, the star glow's 0.82, the beat clock's gain
+        and histogram decays. Left alone, the popout at 16 ms would behave
+        differently from the backdrop at 33 in ways that look like tuning.
+        """
+        if frame_ms <= 0:
+            return
+        self._frame_ms = float(frame_ms)
+        self._bass_alpha = _PULSE_ATTACK ** (frame_ms / FRAME_MS)
+        self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS ** (frame_ms / (1000.0 / 60.0))
+        self._clock.set_frame_interval(frame_ms / 1000.0)
+        self._tunnel.set_frame_interval(frame_ms)
+
+    def set_track_tempo(self, bpm: float | None) -> None:
+        """The playing track's tag BPM — the beat clock's period.
+
+        ``None`` means "no tag": the clock falls back to its own estimator.
+        """
+        self._clock.set_tempo(bpm)
+
+    def reset_beat_clock(self) -> None:
+        """A seek happened: the accumulated evidence belongs to where we were."""
+        self._clock.reset()
+
+    def beat_state(self) -> dict | None:
+        """What the clock currently believes, or None for a mode without one.
+
+        Read by ``scripts/vis_sheet.py`` so a contact sheet can be indexed by
+        beat and labelled with the lock.
+        """
+        if self._mode != "tunnel_chase":
+            return None
+        return {
+            "phase": self._clock.phase,
+            "beat_in_bar": self._clock.beat_in_bar,
+            "tempo_bpm": self._clock.tempo_bpm,
+            "locked": self._clock.locked,
+        }
 
     def set_mode(self, mode: str) -> None:
         if mode not in RENDER_MODES:
@@ -148,22 +247,35 @@ class VisRenderer:
         self._fract_angle = 0.0
         self._fract_phase = 0.0
         self._fract_level = 0.0
+        self._kick_flux = 0.0
+        self._prev_bass = 0.0
+        self._prev_log = None
+        self._flux_peaks[:] = 0.0
         if mode == "wormhole":
             self._wormhole.reset()
+        elif mode == "tunnel_chase":
+            self._tunnel.reset()
+            self._clock.reset()
 
     def set_color(self, color: str) -> None:
         self._color = QColor(color)
         self._fire_lut = _fire_palette(self._color)
         self._wormhole.set_color(self._color)
+        self._tunnel.set_color(self._color)
 
-    def set_target_size(self, width: int, height: int) -> None:
+    def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
 
-        Only the wormhole cares: it draws true circles, so its image has to
-        share the host's aspect or the rings come out as ellipses. The other
-        modes are a fixed low-res grid the host stretches to fit.
+        Only the two wireframe modes care: they draw true circles, so their
+        image has to share the host's aspect or the rings come out as
+        ellipses. The other modes are a fixed low-res grid the host stretches.
+
+        Tunnel Chase additionally wants **device** pixels and needs to know
+        which host is asking, because the two have different budgets — see
+        :meth:`TunnelChaseScene.set_target_size`.
         """
         self._wormhole.set_target_size(width, height)
+        self._tunnel.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -181,6 +293,8 @@ class VisRenderer:
                 # leaving a big image there would draw their next frame into
                 # the corner of it.
                 return self._render_wormhole(heights)
+            if self._mode == "tunnel_chase":
+                return self._render_tunnel(heights)
             if self._mode == "spectrum":
                 self._render_spectrum(heights)
             elif self._mode == "fractal":
@@ -213,6 +327,10 @@ class VisRenderer:
         # Hann coherent gain is 0.5 → a full-scale sine peaks its bin at N/4.
         spectrum /= FFT_SIZE / 4.0
         self._update_pulse(spectrum)
+        if self._mode == "tunnel_chase":
+            # Only here: a log1p over 1025 bins is 30 µs, which is nothing,
+            # but it is 30 µs of tax on five modes that have no use for it.
+            self._update_kick_flux(spectrum)
         db = 20.0 * np.log10(spectrum + 1e-9)
         heights = np.array([db[s].max() for s in self._band_slices])
         return np.clip((heights - _DB_FLOOR) / -_DB_FLOOR, 0.0, 1.0)
@@ -224,13 +342,45 @@ class VisRenderer:
             (spectrum[self._band_slices[0]] ** 2).mean()
             + (spectrum[self._band_slices[1]] ** 2).mean()
         )
-        self._bass_att = 0.97 * self._bass_att + 0.03 * bass
+        self._bass = bass
+        self._bass_att = self._bass_alpha * self._bass_att + (1.0 - self._bass_alpha) * bass
         if self._bass_att < 1e-7:
             self._pulse = 0.0
             return
         ratio = bass / self._bass_att
         # >1.2 counts as a beat; saturate by ~1.8 for a 0..1 accent value.
         self._pulse = float(np.clip((ratio - 1.2) / 0.6, 0.0, 1.0))
+
+    def _update_kick_flux(self, spectrum: np.ndarray) -> None:
+        """The beat clock's feature: a bass transient with a click on it.
+
+        The kick pulse above cannot count beats — measured over six tracks it
+        fires 1.2 to 3.5 times a beat, because an off-beat bass note lifts the
+        same band just as far. Gating the bass *rise* by the broadband rise
+        keeps the kicks and drops the bass notes, and that product is what the
+        clock's histogram is built from.
+
+        Each term is scaled by its own decaying peak, standing in for the
+        prototype's 99th percentile of a whole clip — which is not available to
+        something hearing the track for the first time.
+        """
+        rise = max(0.0, self._bass - self._prev_bass)
+        self._prev_bass = self._bass
+        log_spectrum = np.log1p(1000.0 * spectrum)
+        if self._prev_log is None:
+            self._prev_log = log_spectrum
+            self._kick_flux = 0.0
+            return
+        broadband = float(np.maximum(log_spectrum - self._prev_log, 0.0).mean())
+        self._prev_log = log_spectrum
+        product = self._normalise(0, rise) * self._normalise(1, broadband)
+        self._kick_flux = self._normalise(2, product)
+
+    def _normalise(self, index: int, value: float) -> float:
+        """Value against its own slow peak, clipped to 0..1."""
+        peak = max(value, self._flux_peaks[index] * self._flux_decay)
+        self._flux_peaks[index] = peak
+        return float(np.clip(value / peak, 0.0, 1.0)) if peak > 1e-12 else 0.0
 
     def _apply_ballistics(self, heights: np.ndarray) -> None:
         """Instant attack, linear release; accelerating peak-cap fall."""
@@ -368,6 +518,15 @@ class VisRenderer:
         level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
         return self._wormhole.render(level, self._pulse)
 
+    def _render_tunnel(self, heights: np.ndarray) -> QImage:
+        # Level no longer drives travel — the tempo does — so it only decides
+        # brightness here, alongside the kick.
+        level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
+        self._clock.tick(self._kick_flux)
+        return self._tunnel.render(
+            self._clock.phase, level, self._pulse, self._clock.bar_slot
+        )
+
 
 class VisCanvas(QWidget):
     """Popout widget that renders one visualization mode from fed samples."""
@@ -383,14 +542,33 @@ class VisCanvas(QWidget):
     def set_color(self, color: str) -> None:
         self._renderer.set_color(color)
 
+    def frame_ms(self) -> int:
+        return self._renderer.frame_ms()
+
+    def set_frame_interval(self, frame_ms: float) -> None:
+        self._renderer.set_frame_interval(frame_ms)
+
+    def set_track_tempo(self, bpm: float | None) -> None:
+        self._renderer.set_track_tempo(bpm)
+
+    def reset_beat_clock(self) -> None:
+        self._renderer.reset_beat_clock()
+
     def feed(self, samples: np.ndarray | None, sr: int) -> None:
-        self._renderer.set_target_size(self.width(), self.height())
+        # Device pixels, read from this widget rather than the primary screen:
+        # the popout can be dragged onto a display with a different ratio.
+        ratio = self.devicePixelRatioF()
+        self._renderer.set_target_size(
+            round(self.width() * ratio), round(self.height() * ratio), popout=True
+        )
         self._renderer.render(samples, sr)
         self.update()
 
     def paintEvent(self, event) -> None:
         painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
+        painter.setRenderHint(
+            QPainter.RenderHint.SmoothPixmapTransform, self._renderer.smooth_upscale()
+        )
         painter.fillRect(self.rect(), QColor("#0a0a0a"))
         painter.drawImage(self.rect(), self._renderer.image())
         painter.end()
@@ -417,9 +595,20 @@ class VisualizerWindow(QWidget):
 
     def set_mode(self, mode: str) -> None:
         self._canvas.set_mode(mode)
+        # Per-mode frame rate: Tunnel Chase asks for 60 fps, everything else
+        # for 30. Applied here rather than at construction because the window
+        # outlives the mode the user first chose.
+        self._timer.setInterval(self._canvas.frame_ms())
+        self._canvas.set_frame_interval(self._canvas.frame_ms())
 
     def set_color(self, color: str) -> None:
         self._canvas.set_color(color)
+
+    def set_track_tempo(self, bpm: float | None) -> None:
+        self._canvas.set_track_tempo(bpm)
+
+    def reset_beat_clock(self) -> None:
+        self._canvas.reset_beat_clock()
 
     def _on_tick(self) -> None:
         # While paused/stopped keep ticking with silence so bars fall and the

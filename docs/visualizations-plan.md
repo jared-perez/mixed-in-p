@@ -136,6 +136,76 @@ is radioactive):
    imports in 194 ms — the 25×25 dense solve that replaces it takes ~8 ms,
    lazily, on the first rendered frame).
 
+6. **Tunnel Chase** — the wormhole's sibling, flown to the beat. Same
+   wireframe tube and the same O(lines) cost, but the path is **generated
+   ahead of the camera in beat-space** rather than precomputed: arc length is
+   measured in beats (2.5 world units each), so a turn scheduled for beat 16
+   is a bend at 16 × 2.5 units and the camera reaches it exactly when the
+   music does. Speed is therefore the *tempo*; level only sets brightness. The
+   schedule is the brief in two lines — a turn on the first beat of every bar,
+   plus a gentler one on the third beat of every fourth bar — which is a
+   four-bar phrase you can feel. Stars are dots far out and four-point stars
+   with a white core near, in three shades (grey and two washes of the
+   wireframe colour toward white), with three shaded planets drifting past.
+   Measured **3.4 ms/frame at 1216×512** and 4.5 at popout size.
+
+   Two things it does that no other mode does. It renders from **device**
+   pixels and asks the host to upscale *smoothly* (`VisRenderer
+   .smooth_upscale()`), capped at 720 high for the popout and 512 for the
+   backdrop — a Retina popout at 1400×800 renders 1260×720 rather than
+   2800×1600, which would be ~10 ms. And it runs at **60 fps in the popout**
+   (`VisRenderer.frame_ms()`), which is a correctness reason and not only a
+   smoothness one: at 33 ms the kick flux is too coarse and the beat clock
+   measurably fails to lock on two of six test tracks.
+
+   The near plane needed two different treatments, found by rendering rather
+   than reasoning. A ring passing beside the camera on a bend projects a
+   correct but startling bright chord across the lens; clipping it away also
+   drops the nearest ring's spokes, and those spokes — arriving from
+   off-frame — are what put the viewer *inside* a tube rather than in front of
+   a cone. So spokes are **clipped at** the plane by interpolation and rings
+   are **faded out near** it. `src/gui/widgets/vis_tunnel_chase.py`.
+
+### The beat clock
+
+Tunnel Chase is the first visual that *counts beats*, which the kick pulse
+below cannot do: measured over six real tracks it fires 1.2–3.5 times per
+beat, because an off-beat bass line lifts the 50–120 Hz band as far as a kick
+does. A phase-locked loop correcting on every one of those onsets is dragged
+off the beat on four of the six.
+
+So the two halves come from different places (`src/gui/widgets/beat_clock.py`,
+no Qt, ~6 µs a frame):
+
+- **The period is the tag.** The file's own BPM — the app analysed it — and a
+  clock free-running at it drifts by nothing over a track. `_play_track`
+  pushes it to both renderers; a popout opened mid-track is given it too.
+- **The phase is accumulated evidence**, never a single onset: a decaying
+  16-bin histogram of a *kick-flux* feature (the rectified rise in bass
+  energy, **gated** by the broadband spectral flux — a kick has a click and a
+  bass note does not) against the clock's own beat, with the clock gliding
+  toward the mass. Measured on kick-led tracks: within 0.03–0.06 beat of
+  librosa's grid, 99–100 % of beats inside 1/8, and zero phase jumps in two
+  minutes.
+
+The lock is **sticky**, and that is load-bearing: a rival phase must out-mass
+the locked one by half again *and* hold it for two seconds. Without it one
+test track shows 22 visible jumps in two minutes; with it, none. The period
+additionally adapts by up to ±1 % to rescue a tag that is half a BPM out.
+
+The bar slot (four decaying accumulators of on-beat energy) is **consistency,
+not downbeat detection** — on one track the strongest slot is beat 4 — and it
+is applied to the *schedule* of beats not yet generated rather than to the
+camera's phase, so a slot flip changes which beats turn a few bars later
+instead of jumping the camera down the tunnel.
+
+An untagged file falls back to `TempoBank`: 91 candidate periods, each with
+its own phase histogram, peakiest wins (3 µs/frame, hysteresis on switching).
+Right on every track with a regular kick, wrong by a rational ratio (3:2, 4:3)
+on the two without. Running librosa during playback would be the accurate
+answer and is ruled out for the same GIL reason as everything else here — the
+real fix for an untagged track is to analyse it, which is the product.
+
 Beat pulses (drive flashes/accents): Milkdrop-style streaming detector —
 instant bass-band energy vs. its smoothed average (`bass > ~1.2 * bass_att`),
 a few numpy ops per frame inside VisCanvas. The originally-planned
@@ -160,11 +230,20 @@ track start by seconds.
   version field to stay one-time — it keys on the legacy key still being
   present, and the first save without it (`asdict` no longer has the field)
   removes it for good.
-- Player eye-menu items, in order: the two richest visuals lead each group
-  (Backdrop fractal, Backdrop wormhole, then waveform/oscilloscope/spectrum/
-  fire; then the popouts in the same order), with **Visuals off** at the foot —
+- Player eye-menu items, in order: the richest visuals lead each group
+  (Backdrop fractal, Backdrop wormhole, Backdrop tunnel chase, then
+  waveform/oscilloscope/spectrum/fire; then the popouts in the same order),
+  with **Visuals off** at the foot —
   it is the way out, not the way in, and a menu that opens on its own "off" row
   buries what it offers.
+- **Looking at it**: `python scripts/vis_sheet.py` runs a real track through
+  the real `VisRenderer` offscreen and writes a **1:1** contact sheet of chosen
+  frames, indexed by *beat* rather than by time (so "the frame at beat 16" is
+  the same moment on a 120 and a 135 BPM track) and labelled with the clock's
+  tempo and lock. It works for every mode, so it is a regression tool for all
+  six. Two rules it exists to enforce: tiles are never downscaled — a resized
+  still lies in both directions — and the frames it picks are the ones the
+  turns were scheduled for.
 - **i18n**: every new user-facing string wrapped with `self.tr()`, then
   `python scripts/build_translations.py` (per CLAUDE.md). Mode names in the
   dropdown are UI prose → translated; "BPM"-style tokens unaffected.

@@ -105,6 +105,7 @@ _BACKDROP_VIS_MAP = {
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
     "backdrop_wormhole": "wormhole",
+    "backdrop_tunnel_chase": "tunnel_chase",
 }
 from .dialogs.duplicate_policy import ADD as DUPLICATES_ADD
 from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
@@ -153,9 +154,11 @@ _BACKDROP_WINDOW_MS = 12_000
 # behind the playlist) — dim enough that the row text stays readable.
 _BACKDROP_VIS_OPACITY = 0.40
 
-# After pause/stop, keep feeding a visualizer backdrop silence for this many
-# frames so bars fall and fire burns down, then stop its timer.
-_VIS_DECAY_FRAMES = 60
+# After pause/stop, keep feeding a visualizer backdrop silence for this long so
+# bars fall and fire burns down, then stop its timer. In milliseconds rather
+# than frames: a frame count is a duration only at one frame rate, and the
+# modes no longer share one.
+_VIS_DECAY_MS = 2000
 
 # Most search matches shown at once. Past the cap the stats label reads
 # "2000+ results", so the count never lies about how many tracks matched.
@@ -551,6 +554,10 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         # Alternative backdrop kind: a visualizer frame (scope/spectrum/fire)
         # blitted dimmed behind the rows. Mutually exclusive with the envelope.
         self._backdrop_image: QImage | None = None
+        # Whether that image wants interpolating when it is stretched to the
+        # viewport. The retro modes are meant to be chunky; the wireframe ones
+        # render near the real size and would only be spoiled by it.
+        self._backdrop_smooth: bool = False
 
     # Keys the slice section claims while it is expanded.
     _SLICE_KEYS = frozenset({Qt.Key.Key_S, Qt.Key.Key_Q, Qt.Key.Key_E, Qt.Key.Key_L})
@@ -755,9 +762,10 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         self._backdrop_image = None
         self.viewport().update()
 
-    def set_backdrop_image(self, image: QImage) -> None:
+    def set_backdrop_image(self, image: QImage, smooth: bool = False) -> None:
         """Show a visualizer frame behind the rows (replaces the envelope)."""
         self._backdrop_image = image
+        self._backdrop_smooth = smooth
         self._backdrop_env = None
         self._backdrop_bps = 0.0
         self.viewport().update()
@@ -785,9 +793,13 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
 
     def _paint_backdrop(self, painter: QPainter) -> None:
         if self._backdrop_image is not None:
-            # Visualizer frame: stretch the low-res image over the viewport
-            # without smoothing (chunky retro pixels), dimmed so text reads.
-            painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
+            # Visualizer frame stretched over the viewport, dimmed so the row
+            # text still reads. Smoothing is per mode: chunky retro pixels for
+            # the low-res grid, interpolation for the wireframe modes, which
+            # render near the viewport's real size.
+            painter.setRenderHint(
+                QPainter.RenderHint.SmoothPixmapTransform, self._backdrop_smooth
+            )
             painter.setOpacity(_BACKDROP_VIS_OPACITY)
             painter.drawImage(self.viewport().rect(), self._backdrop_image)
             painter.setOpacity(1.0)
@@ -1361,6 +1373,10 @@ class PlayerPanel(QWidget):
         # Backdrop visualizer: same renderers, blitted behind the playlist.
         # Ticks only while playing (plus a short silence decay after pause).
         self._backdrop_renderer: VisRenderer | None = None
+        # The playing track's tag BPM, kept so a popout opened mid-track can be
+        # given it too — the beat visualization is the first one with any
+        # per-track state at all.
+        self._track_bpm: float | None = None
         self._vis_decay: int = 0
         self._vis_tick_timer = QTimer(self)
         self._vis_tick_timer.setInterval(FRAME_MS)
@@ -1576,12 +1592,14 @@ class PlayerPanel(QWidget):
         for mode, label in (
             ("backdrop_fractal", self.tr("Backdrop fractal")),
             ("backdrop_wormhole", self.tr("Backdrop wormhole")),
+            ("backdrop_tunnel_chase", self.tr("Backdrop tunnel chase")),
             ("backdrop", self.tr("Backdrop waveform")),
             ("backdrop_scope", self.tr("Backdrop oscilloscope")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_fire", self.tr("Backdrop fire")),
             ("fractal", self.tr("Popout fractal")),
             ("wormhole", self.tr("Popout wormhole")),
+            ("tunnel_chase", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
             ("fire", self.tr("Popout fire")),
@@ -2032,6 +2050,7 @@ class PlayerPanel(QWidget):
         self._engine.durationChanged.connect(self._on_duration_changed)
         self._engine.stateChanged.connect(self._on_playback_state_changed)
         self._engine.finished.connect(self._on_track_finished)
+        self._engine.seeked.connect(self._on_engine_seeked)
 
         # Transport buttons
         self._prev_btn.clicked.connect(self._on_previous)
@@ -3257,6 +3276,10 @@ class PlayerPanel(QWidget):
                 self._vis_window.set_color(self._waveform_color)
                 self._vis_window.closed.connect(self._on_vis_window_closed)
             self._vis_window.set_mode(self._vis_mode)
+            # A popout can be opened part-way through a track, so the tempo is
+            # pushed here as well as on play — otherwise a beat visualization
+            # opened mid-track would start out tagless and guess.
+            self._vis_window.set_track_tempo(self._track_bpm)
             self._vis_window.show()
             self._vis_window.raise_()
         elif self._vis_window is not None and self._vis_window.isVisible():
@@ -3288,10 +3311,12 @@ class PlayerPanel(QWidget):
             # stale envelope/image (if any) clears on the first frame.
             if self._backdrop_renderer is None:
                 self._backdrop_renderer = VisRenderer()
+                self._backdrop_renderer.set_frame_interval(FRAME_MS)
             self._backdrop_renderer.set_mode(_BACKDROP_VIS_MAP[self._vis_mode])
             self._backdrop_renderer.set_color(self._waveform_color)
+            self._backdrop_renderer.set_track_tempo(self._track_bpm)
             if self._engine.is_playing():
-                self._vis_decay = _VIS_DECAY_FRAMES
+                self._vis_decay = self._vis_decay_frames()
                 self._vis_tick_timer.start()
             else:
                 self._table.clear_backdrop()
@@ -3311,8 +3336,38 @@ class PlayerPanel(QWidget):
             self._backdrop_env_path = path
         self._table.set_backdrop_envelope(*self._backdrop_env)
 
+    def _vis_decay_frames(self) -> int:
+        """How many silent frames _VIS_DECAY_MS is at the backdrop's rate."""
+        return max(1, _VIS_DECAY_MS // max(self._vis_tick_timer.interval(), 1))
+
+    def _on_engine_seeked(self) -> None:
+        """The play head jumped: a beat clock's evidence is now about elsewhere.
+
+        The phase carries on so nothing lurches; only the histogram and the bar
+        slot are dropped, and the lock re-forms in a few seconds.
+        """
+        if self._backdrop_renderer is not None:
+            self._backdrop_renderer.reset_beat_clock()
+        if self._vis_window is not None:
+            self._vis_window.reset_beat_clock()
+
+    def _push_track_tempo(self, bpm: float | None) -> None:
+        """Hand the track's tag BPM to whichever renderers exist."""
+        self._track_bpm = bpm
+        if self._backdrop_renderer is not None:
+            self._backdrop_renderer.set_track_tempo(bpm)
+        if self._vis_window is not None:
+            self._vis_window.set_track_tempo(bpm)
+
     def _on_vis_backdrop_tick(self) -> None:
-        """Advance the visualizer backdrop one frame (30 fps while playing)."""
+        """Advance the visualizer backdrop one frame.
+
+        Always at FRAME_MS, whatever the mode: the cost here is the *host*, not
+        the frame. Repainting the visible playlist rows behind the image
+        measures ~11 ms on its own at a typical window size, so 60 fps would
+        spend two-thirds of a core on rows nobody asked to redraw. The 60 fps
+        experience is the popout, where the host does one drawImage.
+        """
         if self._backdrop_renderer is None:
             self._vis_tick_timer.stop()
             return
@@ -3321,11 +3376,17 @@ class PlayerPanel(QWidget):
         # The wormhole sizes its image from the host's aspect so its rings
         # stay circular; every other mode ignores this.
         viewport = self._table.viewport()
-        self._backdrop_renderer.set_target_size(viewport.width(), viewport.height())
+        # Device pixels: Tunnel Chase renders near the host's real resolution
+        # and lets the host scale, rather than being blown up 2x on a Retina
+        # display. The other modes ignore the size entirely.
+        ratio = viewport.devicePixelRatioF()
+        self._backdrop_renderer.set_target_size(
+            round(viewport.width() * ratio), round(viewport.height() * ratio)
+        )
         image = self._backdrop_renderer.render(samples, self._engine.sample_rate())
-        self._table.set_backdrop_image(image)
+        self._table.set_backdrop_image(image, self._backdrop_renderer.smooth_upscale())
         if playing:
-            self._vis_decay = _VIS_DECAY_FRAMES
+            self._vis_decay = self._vis_decay_frames()
         else:
             # Feed silence briefly so bars fall / fire burns down, then rest.
             self._vis_decay -= 1
@@ -4171,6 +4232,8 @@ class PlayerPanel(QWidget):
         self._current_index = index
         entry = self._playlist[index]
         self._playing_path = entry.file_path
+        # The tag, not a float: entry.bpm is a tag string ("128", "127.95", "").
+        self._push_track_tempo(_parse_bpm(entry.bpm))
         # A search result set is not a playlist — there is nothing to go back
         # to, so the link stays off rather than naming whichever node happened
         # to be loaded when the search started.
