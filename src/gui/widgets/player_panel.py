@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -45,6 +46,7 @@ from PySide6.QtGui import (
     QPainterPath,
     QPen,
     QPixmap,
+    QPolygon,
     QPolygonF,
     QShortcut,
 )
@@ -434,6 +436,10 @@ def _parse_int(text: str) -> int | None:
         return None
 
 
+# Leading number of a cell, so "3/12" sorts as 3 and "320" as 320.
+_LEADING_NUMBER_RE = re.compile(r"-?\d+(?:\.\d+)?")
+
+
 def _parse_duration(text: str) -> float | None:
     """Entry 'm:ss' duration -> seconds for the library row."""
     try:
@@ -441,6 +447,48 @@ def _parse_duration(text: str) -> float | None:
         return int(minutes) * 60 + int(seconds)
     except (AttributeError, ValueError):
         return None
+
+
+def _sort_number(text: str) -> float | None:
+    """Leading number of a cell's text, or None when there isn't one.
+
+    Tolerant on purpose: Track # is "3" or "3/12", and Bitrate/Year/Energy are
+    whatever the file's tag held.
+    """
+    match = _LEADING_NUMBER_RE.match(text.strip())
+    return float(match.group()) if match else None
+
+
+def _sort_duration(text: str) -> float | None:
+    """'m:ss' -> seconds. Sorting the string breaks at 10:00 ('1' < '9')."""
+    return _parse_duration(text)
+
+
+def _sort_key_code(text: str) -> str | None:
+    """A Key cell as a comparable key code.
+
+    The Player shows the tag *verbatim* — "Am" from one file, "8A" from the
+    next, whatever each was written with — so ordering the text puts two
+    spellings of one key in different places. Both go through key_to_keycode
+    (which accepts either) and then the zero-pad, so 2A sorts before 10A and
+    a track tagged "Am" sits with the ones tagged "8A".
+    """
+    value = text.strip()
+    if not value:
+        return None
+    try:
+        from src.analysis.keycode import key_to_keycode, keycode_sort_key
+
+        return keycode_sort_key(key_to_keycode(value))
+    except ValueError:
+        # Not a key this app knows. Order it among itself rather than
+        # dropping it in with the blanks — it is a value the user can see.
+        return value.casefold()
+
+
+def _sort_text(text: str) -> str | None:
+    value = text.strip()
+    return value.casefold() if value else None
 
 
 class SeparatorHeaderView(QHeaderView):
@@ -459,9 +507,49 @@ class SeparatorHeaderView(QHeaderView):
     _SEP_INSET = 6  # px trimmed off the top and bottom of each divider
     _TEXT_COLOR = QColor(Theme.CHROME)  # matches the global QHeaderView::section color
     _TEXT_PAD = 8  # px inset of the label from the section's left/right edges
+    _ARROW_W = 9  # px width of the sort triangle
+    _ARROW_H = 5  # px height of the sort triangle
+    _ARROW_GAP = 5  # px between the label's right edge and the triangle
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(Qt.Orientation.Horizontal, parent)
+        self._sort_section: int | None = None
+        self._sort_desc = False
+
+    def set_sort_state(self, section: int | None, descending: bool) -> None:
+        """Mark which column is sorted, and which way. None = not sorted.
+
+        Deliberately NOT ``setSortIndicator``: QHeaderView.saveState()
+        serialises the style's indicator, so using it would carry a stale
+        arrow into the saved column layout and back out on the next launch,
+        for a sort that is session-only by design. Painting our own glyph
+        keeps the saved state byte-identical to an unsorted one.
+        """
+        if (section, descending) == (self._sort_section, self._sort_desc):
+            return
+        self._sort_section = section
+        self._sort_desc = descending
+        self.viewport().update()
+
+    def _draw_sort_arrow(self, painter: QPainter, rect) -> None:
+        """A small filled triangle at the section's right edge."""
+        x = rect.right() - self._TEXT_PAD - self._ARROW_W
+        y = rect.center().y() - self._ARROW_H // 2
+        arrow = QPolygon()
+        if self._sort_desc:
+            arrow.append(QPoint(x, y))
+            arrow.append(QPoint(x + self._ARROW_W, y))
+            arrow.append(QPoint(x + self._ARROW_W // 2, y + self._ARROW_H))
+        else:
+            arrow.append(QPoint(x, y + self._ARROW_H))
+            arrow.append(QPoint(x + self._ARROW_W, y + self._ARROW_H))
+            arrow.append(QPoint(x + self._ARROW_W // 2, y))
+        painter.save()
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(QColor(Theme.NEON_YELLOW))
+        painter.drawPolygon(arrow)
+        painter.restore()
 
     def _title_font(self) -> QFont:
         """The bold font the section labels are painted in. Single source of
@@ -483,17 +571,28 @@ class SeparatorHeaderView(QHeaderView):
         self.style().drawControl(QStyle.ControlElement.CE_Header, opt, painter, self)
         painter.restore()
 
+        sorted_here = self._sort_section == logicalIndex
         if text:
             painter.save()
             painter.setFont(self._title_font())
             painter.setPen(self._TEXT_COLOR)
             text_rect = rect.adjusted(self._TEXT_PAD, 0, -self._TEXT_PAD, 0)
+            if sorted_here:
+                # The label is hand-drawn, so nothing reserves room for the
+                # arrow unless we take it off the text rect ourselves —
+                # otherwise a wide word runs straight under the triangle.
+                text_rect = text_rect.adjusted(
+                    0, 0, -(self._ARROW_W + self._ARROW_GAP), 0
+                )
             painter.drawText(
                 text_rect,
                 int(Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter),
                 text,
             )
             painter.restore()
+
+        if sorted_here:
+            self._draw_sort_arrow(painter, rect)
 
         # Draw the right-edge divider on every section, including the last one in
         # visual order: that column's right edge is still an interactive resize
@@ -527,6 +626,9 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self._drag_active = False
+        # Hand-dragging rows into a new order; switched off while the panel is
+        # showing a column sort (see set_reorder_enabled).
+        self._reorder_enabled = True
         self._placeholder_text = self.tr("Drop audio files here")
         self._default_placeholder = self._placeholder_text
         self.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop)
@@ -704,7 +806,21 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
 
         super().dropEvent(event)
 
+    def set_reorder_enabled(self, enabled: bool) -> None:
+        """Allow or refuse hand-dragging rows into a new order.
+
+        Off while the playlist is sorted by a column: the visible order is
+        then a *view*, so a drag has no meaning, and letting it through would
+        write the view back into the database as the stored order.
+        """
+        self._reorder_enabled = enabled
+
     def _handle_internal_reorder(self, event: QDropEvent) -> None:
+        if not self._reorder_enabled:
+            # Refuse rather than accept-and-ignore, so the rows visibly snap
+            # back instead of appearing to move and then reverting.
+            event.ignore()
+            return
         pos = event.position().toPoint()
         drop_index = self.indexAt(pos)
         if drop_index.isValid():
@@ -1290,6 +1406,15 @@ class PlayerPanel(QWidget):
         self._library: Library | None = None
         self._loaded_node_id: int = SCRATCH_NODE_ID
         self._loading_playlist = False
+        # View sort (§W4). None = off, showing the stored playlist order.
+        # The sort reorders _playlist ITSELF and rebuilds, rather than being a
+        # Qt view sort, because row == entry index is the invariant the whole
+        # panel stands on (~30 call sites). _unsorted_playlist is the
+        # canonical order kept alongside — the same entry objects, by
+        # identity — and it, never the visible order, is what gets persisted.
+        self._sort_column: int | None = None
+        self._sort_desc = False
+        self._unsorted_playlist: list[PlaylistEntry] | None = None
         # Where each playlist was scrolled to when we last left it, so
         # switching away and back returns to the same place instead of the
         # top. Session-only, deliberately: the vertical scroll mode is
@@ -2069,6 +2194,10 @@ class PlayerPanel(QWidget):
         self._col_save_timer.setInterval(600)
         self._col_save_timer.timeout.connect(self._save_column_state)
         header = self._table.horizontalHeader()
+        # Qt suppresses sectionClicked when the gesture turned into a column
+        # drag, so clickable sections and movable ones coexist untouched.
+        header.setSectionsClickable(True)
+        header.sectionClicked.connect(self._on_header_clicked)
         header.sectionMoved.connect(self._schedule_column_save)
         header.sectionResized.connect(self._schedule_column_save)
         header.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
@@ -2231,6 +2360,7 @@ class PlayerPanel(QWidget):
         """
         if not tracks and proposed:
             return
+        added: list[PlaylistEntry] = []
         for t in tracks:
             artist = t.get("artist", "")
             title = t.get("title", "")
@@ -2309,8 +2439,16 @@ class PlayerPanel(QWidget):
             # Duplicates were already resolved by add_tracks — whatever
             # reaches here has been cleared to land.
             self._playlist.append(entry)
+            added.append(entry)
 
-        self._rebuild_table()
+        if self._sorted and added:
+            # New rows go on the end of the *stored* list and wherever the
+            # sort puts them in the visible one. _apply_sort rebuilds, so the
+            # rebuild below is skipped rather than done twice.
+            self._record_arrivals(added)
+            self._apply_sort()
+        else:
+            self._rebuild_table()
         # Show where they landed. Only when rows were actually added — the
         # empty-refresh case above is a clear, not an add. Scroll only: the
         # selection stays where the user left it.
@@ -2469,6 +2607,10 @@ class PlayerPanel(QWidget):
         # list is about to replace whatever is showing.
         if self._search_active:
             self._dismiss_search()
+        # A different list is a different question, so it opens in its own
+        # stored order. Cleared without a rebuild — the load is about to
+        # replace every row anyway.
+        self._clear_sort()
         tracks = self._library.get_items(node_id)
         # Swap only the visible list — the engine keeps playing whatever it
         # was playing. The now-playing label (above the slicer) carries the
@@ -2567,6 +2709,13 @@ class PlayerPanel(QWidget):
         before = self._library.snapshot_items(self._loaded_node_id)
         # Entry fields mirror the file's tags (read at add time), so they're
         # passed through even when empty — clearing a tag clears the row.
+        #
+        # THE law of the column sort: while sorted, what gets written is the
+        # canonical order, never the visible one. A sort is a way of looking
+        # at the list, not an edit to it — and edits made *while* sorted
+        # (removing a row, adding files, retagging a cell) still have to
+        # persist, so this cannot simply bail the way a search does.
+        order = self._unsorted_playlist if self._sorted else self._playlist
         track_ids = [
             self._library.add_track(
                 e.file_path,
@@ -2584,7 +2733,7 @@ class PlayerPanel(QWidget):
                 energy=_parse_int(e.energy),
                 duration=_parse_duration(e.duration),
             )
-            for e in self._playlist
+            for e in order
         ]
         self._library.set_items(self._loaded_node_id, track_ids)
         self._push_items_undo(self._loaded_node_id, before, track_ids)
@@ -2789,6 +2938,10 @@ class PlayerPanel(QWidget):
         if not query or self._library is None:
             return
         if not self._search_active:
+            # Results are ranked by the search, not by a column, and column 0
+            # becomes a membership count — so the sort comes off first, while
+            # _playlist still holds the list the snapshot describes.
+            self._clear_sort()
             self._search_active = True
             self._base_entries = self._playlist
             # Search results take no drops: internal reorder has no order to
@@ -3050,6 +3203,138 @@ class PlayerPanel(QWidget):
             self._rebuild_table()
             self._persist_playlist()
 
+    # ── Column sort (view only — the stored order never changes) ──────
+
+    # column -> (entry attribute, key function). Absent columns cannot be
+    # sorted: 0 is the row number (handled separately — it *is* the canonical
+    # order) and 15 is the artwork thumbnail, which has nothing to order by.
+    _SORT_KEYS = {
+        1: ("display_name", _sort_text),
+        2: ("artist", _sort_text),
+        3: ("title", _sort_text),
+        4: ("bpm", _sort_number),
+        5: ("key", _sort_key_code),
+        6: ("comment", _sort_text),
+        7: ("duration", _sort_duration),
+        8: ("year", _sort_number),
+        9: ("album", _sort_text),
+        10: ("genre", _sort_text),
+        11: ("track_number", _sort_number),
+        12: ("label", _sort_text),
+        13: ("bitrate", _sort_number),
+        14: ("energy", _sort_number),
+    }
+
+    @property
+    def _sorted(self) -> bool:
+        return self._sort_column is not None
+
+    def _on_header_clicked(self, column: int) -> None:
+        """Cycle a column: ascending, descending, then back to stored order.
+
+        Ignored during a search, which owns its own order and whose column 0
+        holds a membership count rather than a position.
+        """
+        if self._search_active:
+            return
+        if column != 0 and column not in self._SORT_KEYS:
+            return  # the artwork column has nothing to order by
+        if self._sort_column != column:
+            self._sort_column, self._sort_desc = column, False
+        elif not self._sort_desc:
+            self._sort_desc = True
+        else:
+            self._clear_sort()
+            self._apply_sort()
+            return
+        self._apply_sort()
+
+    def _clear_sort(self, *, rebuild: bool = False) -> None:
+        """Drop back to the stored order. Safe to call when not sorted."""
+        if self._unsorted_playlist is not None:
+            self._playlist = list(self._unsorted_playlist)
+        self._sort_column = None
+        self._sort_desc = False
+        self._unsorted_playlist = None
+        self._sync_sort_indicator()
+        if rebuild:
+            self._apply_sort()
+
+    def _apply_sort(self) -> None:
+        """Reorder _playlist for the current sort state and redraw."""
+        if self._sorted:
+            if self._unsorted_playlist is None:
+                # First activation: the list as it stands *is* the canonical
+                # order. Shares the entry objects, so an inline edit to a row
+                # is an edit to the stored list too.
+                self._unsorted_playlist = list(self._playlist)
+            self._playlist = self._sorted_entries()
+        self._sync_sort_indicator()
+        self._rebuild_table()
+        # The playing row moved; both of these key off _playlist positions.
+        self._relink_playing_row()
+        self._highlight_current_row()
+        self._update_transport_state()
+        # A sorted view has no order to persist, so hand-dragging rows would
+        # only bake the visual order into the database.
+        self._table.set_reorder_enabled(not self._sorted)
+
+    def _sorted_entries(self) -> list[PlaylistEntry]:
+        """_playlist in the current sort order, blanks last in BOTH directions.
+
+        Blanks are partitioned out rather than given a sentinel key: a value
+        that sorts last ascending sorts *first* descending, which puts every
+        untagged track above the tagged ones the moment you reverse — the
+        opposite of what "show me the highest BPM" means.
+        """
+        canonical = self._unsorted_playlist or self._playlist
+        if self._sort_column == 0:
+            # '#' is the canonical position, so ascending IS the stored order
+            # and descending is a plain reverse. Nothing is ever blank.
+            ordered = list(canonical)
+            return list(reversed(ordered)) if self._sort_desc else ordered
+        attribute, key_fn = self._SORT_KEYS[self._sort_column]
+        keyed = [(key_fn(getattr(e, attribute) or ""), e) for e in self._playlist]
+        valued = [(k, e) for k, e in keyed if k is not None]
+        blanks = [e for k, e in keyed if k is None]
+        valued.sort(key=lambda pair: pair[0], reverse=self._sort_desc)
+        return [e for _, e in valued] + blanks
+
+    def _sync_sort_indicator(self) -> None:
+        header = self._table.horizontalHeader()
+        if isinstance(header, SeparatorHeaderView):
+            header.set_sort_state(self._sort_column, self._sort_desc)
+
+    def _canonical_positions(self) -> dict[int, int] | None:
+        """{id(entry): stored position} while sorted, else None.
+
+        Keyed on identity rather than on the file path because a playlist may
+        deliberately hold the same track twice.
+        """
+        if not self._sorted or self._unsorted_playlist is None:
+            return None
+        return {id(e): i for i, e in enumerate(self._unsorted_playlist)}
+
+    def _forget_entries(self, entries) -> None:
+        """Drop *entries* from the canonical order too, by identity."""
+        if self._unsorted_playlist is None:
+            return
+        gone = {id(e) for e in entries}
+        self._unsorted_playlist = [
+            e for e in self._unsorted_playlist if id(e) not in gone
+        ]
+
+    def _record_arrivals(self, entries) -> None:
+        """Append newly added *entries* to the canonical order.
+
+        The stored order records arrival — new tracks go on the end of the
+        playlist, exactly as they would unsorted — while the visible list puts
+        them wherever the current sort says they belong.
+        """
+        if self._unsorted_playlist is None:
+            return
+        self._unsorted_playlist.extend(entries)
+
     def _rebuild_table(self) -> None:
         self._rebuilding = True
         try:
@@ -3078,6 +3363,10 @@ class PlayerPanel(QWidget):
         self._table.blockSignals(True)
         try:
             self._missing_rows = set()
+            # While sorted, '#' keeps showing each track's *stored* position,
+            # so the original numbering stays legible and the third click's
+            # "back to how it was" is visibly what it says.
+            positions = self._canonical_positions()
             for row, entry in enumerate(self._playlist):
                 # All-playlists search: column 0 is the membership count, with
                 # the playlist names as its tooltip (§10 — the answer without
@@ -3086,6 +3375,8 @@ class PlayerPanel(QWidget):
                     num_item = QTableWidgetItem(str(self._search_counts[row]))
                     if self._search_tooltips is not None:
                         num_item.setToolTip(self._search_tooltips[row])
+                elif positions is not None:
+                    num_item = QTableWidgetItem(str(positions.get(id(entry), row) + 1))
                 else:
                     num_item = QTableWidgetItem(str(row + 1))
                 num_item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -4906,6 +5197,10 @@ class PlayerPanel(QWidget):
         for row in rows:
             if 0 <= row < len(self._playlist):
                 removed = self._playlist.pop(row)
+                # The canonical order holds the same objects, so the removal
+                # has to reach it too or the row would come back on the next
+                # sort — and would be written back to the database.
+                self._forget_entries([removed])
                 self._cache_discard([removed.file_path])
                 if playing_path and removed.file_path == playing_path:
                     # Unload to release the audio device and free the buffer
@@ -4941,6 +5236,7 @@ class PlayerPanel(QWidget):
         self._prefetch_queue.clear()
         self._pcm_cache.clear()
         self._playlist.clear()
+        self._clear_sort()
         self._current_index = -1
         self._hide_artwork()
         self._rebuild_table()

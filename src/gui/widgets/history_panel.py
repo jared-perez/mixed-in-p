@@ -1,6 +1,5 @@
 """History panel for viewing and undoing rename sessions."""
 
-import re
 from datetime import datetime
 from pathlib import Path
 
@@ -26,6 +25,7 @@ from PySide6.QtWidgets import (
 )
 
 from src.analysis.history import load_entries as load_analysis_entries
+from src.analysis.keycode import keycode_sort_key
 from src.renamer import RenameSession, delete_session, list_sessions, load_session
 from src.utils.config import DEFAULT_HISTORY_DISPLAY_LIMIT, HISTORY_DISPLAY_LIMITS
 from src.utils.export import write_csv
@@ -54,8 +54,6 @@ def _fit(button: QPushButton) -> None:
     needed = button.fontMetrics().horizontalAdvance(label) + _BUTTON_CHROME
     button.setMinimumWidth(needed)
 
-
-_KEYCODE_RE = re.compile(r"(\d{1,2})([AB])", re.IGNORECASE)
 
 # Rename Sessions table column order. Named so the display order can change
 # without hunting down bare indices — _get_selected_session in particular reads
@@ -124,23 +122,6 @@ class _SortableItem(QTableWidgetItem):
             except TypeError:
                 pass
         return self.text() < other.text()
-
-
-def _keycode_sort_key(keycode: str) -> str:
-    """Zero-pad a key code so it sorts 1A, 1B, 2A, … instead of 10A, 1A, 2A.
-
-    Compared as plain text "10A" sorts before "1A", because "0" < "A". Padding
-    the number to two digits restores numeric order, which also keeps each
-    number's A/B pair (relative minor/major) adjacent — so sorting by this
-    column groups harmonically compatible tracks together.
-
-    Unrecognized values (including "") are returned unchanged so they still
-    sort deterministically rather than raising.
-    """
-    match = _KEYCODE_RE.fullmatch(keycode.strip())
-    if not match:
-        return keycode
-    return f"{int(match.group(1)):02d}{match.group(2).upper()}"
 
 
 class HistoryPanel(QWidget):
@@ -491,7 +472,7 @@ class HistoryPanel(QWidget):
                 ),
             )
             self._keys_table.setItem(
-                row, 5, _item(keycode, sort_value=_keycode_sort_key(keycode))
+                row, 5, _item(keycode, sort_value=keycode_sort_key(keycode))
             )
             self._keys_table.setItem(
                 row, 6, _item(self._format_alternatives(entry.get("key_alternatives")))

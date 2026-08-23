@@ -6,6 +6,11 @@ to help DJs mix tracks harmonically. Compatible keys are:
 - ±1 on the same letter (adjacent key codes)
 """
 
+import re
+
+# A key code as it appears in a tag: one or two digits and an A or B.
+_KEYCODE_RE = re.compile(r"(\d{1,2})([AB])", re.IGNORECASE)
+
 # Map musical keys to key codes
 # Minor keys map to 'A' codes, major keys to 'B' codes
 KEY_TO_KEYCODE: dict[str, str] = {
@@ -247,3 +252,20 @@ def get_compatible_keys(keycode: str) -> list[str]:
     compatible.append(f"{next_num}{letter}")
 
     return compatible
+
+
+def keycode_sort_key(keycode: str) -> str:
+    """Zero-pad a key code so it sorts 1A, 1B, 2A, … instead of 10A, 1A, 2A.
+
+    Compared as plain text "10A" sorts before "1A", because "0" < "A". Padding
+    the number to two digits restores numeric order, which also keeps each
+    number's A/B pair (relative minor/major) adjacent — so sorting by this
+    column groups harmonically compatible tracks together.
+
+    Unrecognized values (including "") are returned unchanged so they still
+    sort deterministically rather than raising.
+    """
+    match = _KEYCODE_RE.fullmatch(keycode.strip())
+    if not match:
+        return keycode
+    return f"{int(match.group(1)):02d}{match.group(2).upper()}"

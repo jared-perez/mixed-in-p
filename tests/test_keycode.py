@@ -7,6 +7,7 @@ from src.analysis.keycode import (
     KEYCODE_TO_KEY,
     key_to_keycode,
     keycode_to_key,
+    keycode_sort_key,
     keycode_to_open_key,
     get_compatible_keys,
     normalize_key,
@@ -288,3 +289,51 @@ class TestRenderKey:
         assert render_key("", "8A", "traditional") == "8A"
         assert render_key("Am", "", "open_key") == "Am"
         assert render_key("Am", "", "keycode") == "Am"
+
+
+class TestKeyCodeSortKey:
+    """Zero-padding so key codes sort by number.
+
+    Shared by the History panel's Key column and the Player playlist's;
+    it lived in history_panel.py until the Player needed it too.
+    """
+
+    def test_pads_single_digit(self):
+        """Single-digit codes gain a leading zero."""
+        assert keycode_sort_key("8A") == "08A"
+        assert keycode_sort_key("1A") == "01A"
+        assert keycode_sort_key("9B") == "09B"
+
+    def test_leaves_two_digit_unchanged(self):
+        """Two-digit codes already sort correctly."""
+        assert keycode_sort_key("10A") == "10A"
+        assert keycode_sort_key("12B") == "12B"
+
+    def test_normalizes_case_and_whitespace(self):
+        """Lowercase letters and stray whitespace still parse."""
+        assert keycode_sort_key("1a") == "01A"
+        assert keycode_sort_key(" 7b ") == "07B"
+
+    def test_passes_through_unrecognized(self):
+        """Unparseable values are returned as-is rather than raising."""
+        assert keycode_sort_key("") == ""
+        assert keycode_sort_key("garbage") == "garbage"
+        assert keycode_sort_key("13A") == "13A"
+
+    def test_orders_codes_numerically(self):
+        """The whole 1A-12B range sorts by number, A/B pairs adjacent."""
+        codes = ["10A", "1A", "2B", "12B", "8A", "1B", "11B"]
+        assert sorted(codes, key=keycode_sort_key) == [
+            "1A",
+            "1B",
+            "2B",
+            "8A",
+            "10A",
+            "11B",
+            "12B",
+        ]
+
+    def test_plain_text_sort_is_wrong_without_the_key(self):
+        """Guards the reason this helper exists: "10A" < "1A" as plain text."""
+        assert sorted(["10A", "1A"]) == ["10A", "1A"]
+        assert sorted(["10A", "1A"], key=keycode_sort_key) == ["1A", "10A"]
