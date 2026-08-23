@@ -81,11 +81,12 @@ Two hosts share it:
 
 - **Popout**: `VisualizerWindow` (own QTimer) hosting `VisCanvas`, which fills
   black behind the frame.
-- **Backdrop**: the same three visuals blitted dimmed (~0.40 opacity) behind
+- **Backdrop**: the same visuals blitted dimmed (~0.40 opacity) behind
   the playlist rows via the table's image-backdrop path, driven by a
   PlayerPanel timer that runs while playing plus a ~2 s silence decay after
   pause so bars fall and fire burns down. Modes `backdrop_scope`,
-  `backdrop_spectrum`, `backdrop_fire`.
+  `backdrop_spectrum`, `backdrop_fire`, `backdrop_fractal`,
+  `backdrop_wormhole`.
 
 Data path per frame (GUI-thread QTimer, `Qt.PreciseTimer`, 16 ms):
 
@@ -108,6 +109,28 @@ is radioactive):
 3. **Fire bars** — same bars, palette ramp black→red→orange→yellow→white over
    bar height; optional "flames" = previous-frame upshift + color decay
    (small feedback QImage).
+4. **Fractal** — a spinning escape-time Julia set whose constant swings
+   through the rich arc of the classic |c| = 0.7885 orbit; level drives
+   spin/morph speed and brightness, the kick pulse punches the zoom.
+   ~0.7 ms/frame.
+5. **Wormhole** — a wireframe tunnel flown along a closed 3-D loop (a periodic
+   cubic spline through 25 frozen waypoints: 15 turns, three straightaways,
+   ~70 s per lap), with pixelated stars streaming past. Level drives travel
+   speed and brightness; the kick pulse ripples the near rings.
+
+   The exception to the small-image rule above, in two ways. Its cost is
+   **O(lines), not O(pixels)** — QPainter calls dominate — so four times the
+   resolution costs nothing, and it renders antialiased at 608×256 for
+   **1.6 ms/frame** (measured, against the fractal's 0.7) rather than as a
+   staircase on the 152×64 grid. And because a wireframe stretched
+   non-uniformly would draw *ellipses* for rings, it owns its image and
+   matches the aspect to the host: `VisRenderer.set_target_size(w, h)` (a
+   no-op for every other mode), called by both hosts before each frame, fixes
+   the height at 256 and derives the width, reallocating only on a real
+   resize. The path and scene live in `src/gui/widgets/vis_wormhole.py`;
+   numpy + QPainter only, no OpenGL and no scipy (`scipy.interpolate` alone
+   imports in 194 ms — the 25×25 dense solve that replaces it takes ~8 ms,
+   lazily, on the first rendered frame).
 
 Beat pulses (drive flashes/accents): Milkdrop-style streaming detector —
 instant bass-band energy vs. its smoothed average (`bass > ~1.2 * bass_att`),

@@ -1,6 +1,6 @@
 """Classic-style audio visualizer rendering, popout canvas, and popout window.
 
-Three retro visuals rendered into a small internal QImage and upscaled with
+Retro visuals rendered into an internal QImage and upscaled by the host with
 fast (non-smooth) transformation for a chunky pixel look:
 
 - ``oscilloscope`` — time-domain trace of the last ~576 samples, vertically
@@ -13,6 +13,10 @@ fast (non-smooth) transformation for a chunky pixel look:
   Julia constant orbits the classic radius so the branches continuously morph
   between dendrites and spirals; overall level drives morph/spin speed and
   brightness, and the kick pulse punches the zoom.
+- ``wormhole`` — a wireframe tunnel flown along a closed 3-D loop, with
+  pixelated stars streaming past. The odd one out: it draws antialiased lines
+  into its own larger, host-shaped image (see :mod:`.vis_wormhole`) rather
+  than the shared low-res grid, because its cost is O(lines) not O(pixels).
 
 The rendering lives in :class:`VisRenderer` (no widget), shared by two hosts:
 the popout :class:`VisCanvas`, and the Player playlist's backdrop (which blits
@@ -34,6 +38,7 @@ from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPen
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from ..styles.theme import Theme
+from .vis_wormhole import WormholeScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
@@ -65,7 +70,7 @@ _JULIA_MORPH_BASE = 0.002  # c-orbit advance per frame (silence)
 _JULIA_MORPH_LEVEL = 0.022  # extra orbit speed at full level
 _JULIA_KICK_ZOOM = 0.14  # fraction of zoom-in on a full-strength kick
 
-RENDER_MODES = ("oscilloscope", "spectrum", "fire", "fractal")
+RENDER_MODES = ("oscilloscope", "spectrum", "fire", "fractal", "wormhole")
 POPOUT_MODES = RENDER_MODES
 
 
@@ -119,10 +124,15 @@ class VisRenderer:
         xs = np.linspace(-0.5, 0.5, _W) * _JULIA_VIEW_SPAN
         ys = np.linspace(-0.5, 0.5, _H) * (_JULIA_VIEW_SPAN * _H / _W)
         self._fract_grid = (xs[None, :] + 1j * ys[:, None]).astype(np.complex64)
+        # Wormhole state, including its own image. Cheap to construct — the
+        # loop path is built on its first render, not here.
+        self._wormhole = WormholeScene()
 
     # ── Public API ─────────────────────────────────────────────────────────
 
     def image(self) -> QImage:
+        if self._mode == "wormhole":
+            return self._wormhole.image()
         return self._image
 
     def set_mode(self, mode: str) -> None:
@@ -138,10 +148,22 @@ class VisRenderer:
         self._fract_angle = 0.0
         self._fract_phase = 0.0
         self._fract_level = 0.0
+        if mode == "wormhole":
+            self._wormhole.reset()
 
     def set_color(self, color: str) -> None:
         self._color = QColor(color)
         self._fire_lut = _fire_palette(self._color)
+        self._wormhole.set_color(self._color)
+
+    def set_target_size(self, width: int, height: int) -> None:
+        """Tell the renderer the host's pixel size; a no-op for most modes.
+
+        Only the wormhole cares: it draws true circles, so its image has to
+        share the host's aspect or the rings come out as ellipses. The other
+        modes are a fixed low-res grid the host stretches to fit.
+        """
+        self._wormhole.set_target_size(width, height)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -153,6 +175,12 @@ class VisRenderer:
             self._render_scope(samples)
         else:
             heights = self._band_heights(samples, sr)
+            if self._mode == "wormhole":
+                # Returned directly, never assigned to self._image: the
+                # scope/spectrum renderers paint into that at _W x _H, and
+                # leaving a big image there would draw their next frame into
+                # the corner of it.
+                return self._render_wormhole(heights)
             if self._mode == "spectrum":
                 self._render_spectrum(heights)
             elif self._mode == "fractal":
@@ -333,6 +361,13 @@ class VisRenderer:
             bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
         ).copy()
 
+    def _render_wormhole(self, heights: np.ndarray) -> QImage:
+        # Same mean/max blend as the fractal: mean alone leaves a sparse
+        # spectrum nearly still, max alone never breathes. Level drives travel
+        # speed and brightness; the kick pulse ripples the near rings.
+        level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
+        return self._wormhole.render(level, self._pulse)
+
 
 class VisCanvas(QWidget):
     """Popout widget that renders one visualization mode from fed samples."""
@@ -349,6 +384,7 @@ class VisCanvas(QWidget):
         self._renderer.set_color(color)
 
     def feed(self, samples: np.ndarray | None, sr: int) -> None:
+        self._renderer.set_target_size(self.width(), self.height())
         self._renderer.render(samples, sr)
         self.update()
 

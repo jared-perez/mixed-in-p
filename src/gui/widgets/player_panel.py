@@ -104,6 +104,7 @@ _BACKDROP_VIS_MAP = {
     "backdrop_spectrum": "spectrum",
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
+    "backdrop_wormhole": "wormhole",
 }
 from .dialogs.duplicate_policy import ADD as DUPLICATES_ADD
 from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
@@ -148,8 +149,8 @@ _COMPAT_MAX_SHARE = 0.5
 # enough not to strobe behind the row text.
 _BACKDROP_WINDOW_MS = 12_000
 
-# Opacity for visualizer-frame backdrops (scope/spectrum/fire/fractal behind
-# the playlist) — dim enough that the row text stays readable.
+# Opacity for visualizer-frame backdrops (scope/spectrum/fire/fractal/wormhole
+# behind the playlist) — dim enough that the row text stays readable.
 _BACKDROP_VIS_OPACITY = 0.40
 
 # After pause/stop, keep feeding a visualizer backdrop silence for this many
@@ -1354,8 +1355,8 @@ class PlayerPanel(QWidget):
         self._backdrop_src: tuple | None = None  # (pcm, sr)
         self._backdrop_env: tuple | None = None  # (min, max, bins_per_sec)
         self._backdrop_env_path: str | None = None
-        # Popout visualizer (oscilloscope/spectrum/fire/fractal); created on
-        # first use.
+        # Popout visualizer (oscilloscope/spectrum/fire/fractal/wormhole);
+        # created on first use.
         self._vis_window: VisualizerWindow | None = None
         # Backdrop visualizer: same renderers, blitted behind the playlist.
         # Ticks only while playing (plus a short silence decay after pause).
@@ -1575,10 +1576,12 @@ class PlayerPanel(QWidget):
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_fire", self.tr("Backdrop fire")),
             ("backdrop_fractal", self.tr("Backdrop fractal")),
+            ("backdrop_wormhole", self.tr("Backdrop wormhole")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
             ("fire", self.tr("Popout fire")),
             ("fractal", self.tr("Popout fractal")),
+            ("wormhole", self.tr("Popout wormhole")),
         ):
             action = QAction(label, self)
             action.setCheckable(True)
@@ -3318,6 +3321,10 @@ class PlayerPanel(QWidget):
             return
         playing = self._engine.is_playing()
         samples = self._engine.recent_mono(FFT_SIZE) if playing else None
+        # The wormhole sizes its image from the host's aspect so its rings
+        # stay circular; every other mode ignores this.
+        viewport = self._table.viewport()
+        self._backdrop_renderer.set_target_size(viewport.width(), viewport.height())
         image = self._backdrop_renderer.render(samples, self._engine.sample_rate())
         self._table.set_backdrop_image(image)
         if playing:
