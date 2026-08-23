@@ -349,6 +349,10 @@ class MainWindow(QMainWindow):
             self._on_playing_playlist_clicked
         )
         self._player_panel.now_playing_changed.connect(self._sync_header_now_playing)
+        # The Player's header art is clickable; the sidebar owns the big box.
+        # Neither knows about the other, so the window joins them.
+        self._player_panel.art_clicked.connect(self._on_header_art_clicked)
+        self._player_panel.now_playing_changed.connect(self._sync_sidebar_art)
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -458,6 +462,19 @@ class MainWindow(QMainWindow):
         self._player_panel.load_node(node_id)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
+
+    def _on_header_art_clicked(self) -> None:
+        """Open the sidebar's cover box on the track that is playing."""
+        self._sidebar.show_art_box(self._player_panel.playing_artwork())
+
+    def _sync_sidebar_art(self) -> None:
+        """Follow the playing track while the box is open.
+
+        A closed box is left alone (``set_art`` no-ops), and a track with no
+        embedded cover — or no track at all — shows the placeholder rather
+        than closing the box: a panel that vanishes on Stop reads as a crash.
+        """
+        self._sidebar.set_art(self._player_panel.playing_artwork())
 
     def _sync_header_now_playing(self) -> None:
         """Put what's playing in the header — unless the Player is showing it.

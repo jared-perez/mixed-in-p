@@ -1121,6 +1121,32 @@ class NowPlayingLabel(HuggingElidedLabel):
         super().mouseReleaseEvent(event)
 
 
+class HeaderArtLabel(QLabel):
+    """The 56px cover in the Player's title row, clickable.
+
+    56px is enough to recognise a sleeve and not enough to look at one, so a
+    click opens the big box at the foot of the sidebar. It only ever *asks*:
+    the label knows nothing about the sidebar, and the panel's ``art_clicked``
+    signal is what MainWindow wires up.
+    """
+
+    clicked = Signal()
+
+    def __init__(self, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    def mouseReleaseEvent(self, event: QMouseEvent) -> None:
+        # Containment, not just the button: Qt delivers the release to
+        # whoever took the press, so a press here dragged off and let go
+        # elsewhere would otherwise count as a click.
+        if event.button() == Qt.MouseButton.LeftButton and self.rect().contains(
+            event.position().toPoint()
+        ):
+            self.clicked.emit()
+        super().mouseReleaseEvent(event)
+
+
 class PlayerPanel(QWidget):
     """Panel with playlist table, transport controls, seek bar, and volume slider."""
 
@@ -1147,6 +1173,10 @@ class PlayerPanel(QWidget):
     # Compatible Tracks opened/closed — the window sizer widens the window's
     # minimum while it is open, the same way the slicer does.
     compat_panel_toggled = Signal(bool)
+    # The header's album art was clicked: show the playing track's cover
+    # large, at the foot of the sidebar. The Player owns neither the sidebar
+    # nor the box, so it only announces the request.
+    art_clicked = Signal()
 
     # Playlist columns, in logical order. The first nine are the shipped
     # defaults; everything after them is optional and hidden until the user
@@ -1526,9 +1556,11 @@ class PlayerPanel(QWidget):
         title_row.addWidget(self._context_label)
         title_row.addSpacing(12)
 
-        self._art_label = QLabel()
+        self._art_label = HeaderArtLabel()
         self._art_label.setFixedSize(_HEADER_ART_SIZE, _HEADER_ART_SIZE)
         self._art_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self._art_label.setToolTip(self.tr("Show this cover in the sidebar"))
+        self._art_label.clicked.connect(self.art_clicked.emit)
         self._art_label.hide()
         title_row.addWidget(self._art_label, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -4330,6 +4362,25 @@ class PlayerPanel(QWidget):
     def _hide_artwork(self) -> None:
         self._art_label.clear()
         self._art_label.hide()
+
+    def playing_artwork(self) -> bytes | None:
+        """The playing track's embedded cover, full resolution, or None.
+
+        Re-read from the file rather than kept: the header only ever holds a
+        56px copy, and _art_cache holds cropped strip bands for the playlist
+        rows — the wrong pixels for a big square. This is the same synchronous
+        tag read the header already makes on every track change, so the cost
+        is one more parse per click.
+        """
+        path = self._current_path()
+        if path is None:
+            return None
+        try:
+            from src.metadata.tags import read_metadata
+
+            return read_metadata(path).artwork
+        except Exception:
+            return None
 
     # ── Background decode + PCM prefetch cache ──────────────────
 

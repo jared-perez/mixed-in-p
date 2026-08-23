@@ -27,9 +27,17 @@ from ..styles.theme import Theme
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME
 from .nav_icons import nav_icon
+from .sidebar_art_box import SidebarArtBox
 
 # Display size for the sidebar nav glyphs.
 _NAV_ICON_SIZE = QSize(30, 30)
+
+# Left/right margin of the rail's outer layout. Named because the album-art
+# box's side is the rail's *inner* width, so the two must stay in step: at
+# SIDEBAR_WIDTH 176 that is a 164px square. A literal 4x of the header's 56px
+# would be 224 and simply does not fit — widening the rail is the lever for
+# that, not a wider widget inside a narrow one.
+_RAIL_MARGIN = 6
 
 # A nav glyph spins while its panel is working, so a long analysis or
 # conversion is visible from anywhere in the app — including with the rail
@@ -213,7 +221,9 @@ class Sidebar(QFrame):
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
-        layout.setContentsMargins(6, 16, 6, 16)
+        layout.setContentsMargins(
+            _RAIL_MARGIN, 16, _RAIL_MARGIN, 16
+        )
         layout.setSpacing(4)
 
         # Top row: Playlists mode toggle (2/3) + collapse/expand toggle (1/3).
@@ -328,6 +338,22 @@ class Sidebar(QFrame):
 
         layout.addWidget(self._mode_stack, 1)
 
+        # The big album art, between the mode stack and the bottom buttons —
+        # "above Settings", where the brief asked for it. It starts hidden and
+        # a hidden widget contributes no layout hint, which is load-bearing:
+        # Sidebar.min_content_height sums these hints and WindowSizer turns
+        # that into the window's minimum height, so a permanently-present
+        # 164px box would raise that minimum by ~168px for every session that
+        # never opens it.
+        self._art_box = SidebarArtBox()
+        self._art_box.closed.connect(self.hide_art_box)
+        self._art_box.hide()
+        # Remembered across a collapse, which hides the box without closing
+        # it: 44px of cover on the 56px rail is noise, but the user did ask
+        # for it and expanding should bring it back.
+        self._art_box_open = False
+        layout.addWidget(self._art_box, 0, Qt.AlignmentFlag.AlignHCenter)
+
         # Bottom section
         # Settings button (no drop support)
         self._settings_btn = QPushButton(self.tr("Settings"))
@@ -412,6 +438,7 @@ class Sidebar(QFrame):
         # rail, so it hides while collapsed. The mode itself survives —
         # re-expanding brings the tree straight back.
         self._playlists_btn.setVisible(not collapsed)
+        self._sync_art_box()
         self._sync_mode_stack()
         self._apply_width()
         if self._auto_badge is not None:
@@ -484,6 +511,101 @@ class Sidebar(QFrame):
             on = not self._playlists_mode
         self.set_playlists_mode(on)
         self.playlists_toggled.emit(on)
+
+    # ------------------------------------------------------------ album art
+
+    # Smallest square worth drawing. Below this the box is not shown at all —
+    # a two-pixel sliver reads as damage rather than as a small cover.
+    _MIN_ART_SIDE = 48
+
+    def show_art_box(self, data: bytes | None = None) -> None:
+        """Open the cover box (and set what it shows)."""
+        self._art_box_open = True
+        self._art_box.set_artwork(data)
+        self._sync_art_box()
+
+    def hide_art_box(self) -> None:
+        """Close the cover box. Stays closed through a collapse/expand."""
+        self._art_box_open = False
+        self._art_box.hide()
+
+    def set_art(self, data: bytes | None) -> None:
+        """Update what an already-open box shows; a closed one is left alone."""
+        if self._art_box_open:
+            self._art_box.set_artwork(data)
+
+    def art_box_open(self) -> bool:
+        """Whether the user has the cover box open.
+
+        Not ``isVisible()``: that answers "is it on screen", which is False
+        for the whole sidebar while the window is hidden and False again
+        while the rail is collapsed — neither of which means the user closed
+        it (CLAUDE.md).
+        """
+        return self._art_box_open
+
+    def _art_side(self) -> int:
+        """How big the square can be — a *budget*, not a constant.
+
+        The rail cannot scroll, so a box pinned at its full 164px pushes
+        Settings and History off the bottom of a short window: measured at the
+        480px height floor, Settings landed at y=529 in a 470px rail. What it
+        can have is the room left once everything else in the outer layout has
+        what it needs — capped at the rail's inner width so it stays square
+        and never wider than the rail, and floored out of existence when even
+        that is too little.
+
+        Summed from ``minimumSizeHint``, never from laid-out heights: this
+        runs to *decide* a geometry, so the geometry it would read back is the
+        one it is about to replace, and a hidden widget's laid-out height is
+        stale (CLAUDE.md).
+        """
+        inner = self.width() - 2 * _RAIL_MARGIN
+        return max(0, min(inner, self.height() - self._art_reserve()))
+
+    def _art_reserve(self) -> int:
+        """Height the rest of the rail needs before the cover gets any."""
+        layout = self.layout()
+        margins = layout.contentsMargins()
+        reserved = margins.top() + margins.bottom()
+        for i in range(layout.count()):
+            item = layout.itemAt(i)
+            widget = item.widget()
+            if widget is self._art_box:
+                continue
+            if widget is not None:
+                # A widget with no layout of its own reports -1 here (the box
+                # itself does); floor it rather than subtracting.
+                reserved += max(0, widget.minimumSizeHint().height())
+            else:
+                reserved += max(0, item.sizeHint().height())
+            reserved += layout.spacing()
+        # One more gap for the box's own row.
+        return reserved + layout.spacing()
+
+    def _sync_art_box(self) -> None:
+        """Show the box at whatever size the rail can currently spare.
+
+        Hidden while the rail is collapsed (44px of cover is noise) and while
+        the room left is too small to be a picture — in both cases the box
+        stays *open*, so expanding the rail or the window brings it back
+        without the user having to click the art again.
+        """
+        if not self._art_box_open or self._collapsed:
+            self._art_box.hide()
+            return
+        side = self._art_side()
+        if side < self._MIN_ART_SIDE:
+            self._art_box.hide()
+            return
+        self._art_box.set_side(side)
+        self._art_box.show()
+
+    def resizeEvent(self, event) -> None:  # noqa: N802 (Qt override)
+        # A budget denominated in the rail's height is wrong the moment the
+        # window moves.
+        super().resizeEvent(event)
+        self._sync_art_box()
 
     def _sync_mode_stack(self) -> None:
         # Collapsed always shows the icon rail — a 56px tree would be useless.
