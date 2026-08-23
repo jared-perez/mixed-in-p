@@ -139,30 +139,120 @@ class TestScrollOnAdd:
         assert bar(player).value() == 0
 
 
-class TestLoadNodeShowsTheTop:
+def stocked_playlist(lib, player, tmp_path, name, prefix):
+    """A saved playlist of ROWS real files, ready to load."""
+    paths = []
+    for i in range(ROWS):
+        f = tmp_path / f"{prefix}{i:02d}.wav"
+        f.write_bytes(b"not-really-audio")
+        paths.append(str(f))
+    node = lib.create_playlist(name)
+    lib.set_items(node, [lib.add_track(p) for p in paths])
+    return node, paths
+
+
+class TestAFirstOpenStartsAtTheTop:
+    """A playlist nobody has scrolled has nothing to restore, so it opens at
+    its beginning — what every load did before scroll memory existed."""
+
     def test_opening_a_playlist_starts_at_its_beginning(
         self, player, lib, tmp_path, qtbot
     ):
-        paths = make_files(tmp_path, ROWS)
-        pl = lib.create_playlist("Peak Time")
-        lib.set_items(pl, [lib.add_track(p) for p in paths])
+        node, paths = stocked_playlist(lib, player, tmp_path, "Peak Time", "p")
         # Start from the far end, so landing at the top is a result rather
         # than the state the test happened to begin in.
         player.add_tracks(track_dicts(paths), allow_duplicates=True)
         settle_at_top(player, qtbot)
         player._table.scrollToBottom()
 
-        player.load_node(pl)
+        player.load_node(node)
 
         assert len(player._playlist) == ROWS
         assert bar(player).value() == 0
 
-    def test_scratch_reloads_at_the_top_too(self, player, lib, tmp_path, qtbot):
+
+class TestComingBackToAPlaylist:
+    """Where a list was left is where it reopens — per playlist, for the
+    session. The value is a row index (ScrollPerItem), not a pixel."""
+
+    def test_a_playlist_reopens_where_it_was_left(
+        self, player, lib, tmp_path, qtbot
+    ):
+        a, _ = stocked_playlist(lib, player, tmp_path, "A", "a")
+        b, _ = stocked_playlist(lib, player, tmp_path, "B", "b")
+        player.load_node(a)
+        settle_at_top(player, qtbot)
+        halfway = bar(player).maximum() // 2
+        assert halfway > 0, "nowhere to scroll; the test proves nothing"
+        bar(player).setValue(halfway)
+
+        player.load_node(b)
+        pump(qtbot)
+        assert bar(player).value() == 0, "B has never been opened"
+        player.load_node(a)
+
+        assert bar(player).value() == halfway
+
+    def test_scratch_is_no_different(self, player, lib, tmp_path, qtbot):
+        """Scratch is a real node (id 1), not a special case — it keeps its
+        place like any other list. This replaces the old assertion that it
+        always reloaded at the top."""
+        other, _ = stocked_playlist(lib, player, tmp_path, "Elsewhere", "e")
         paths = make_files(tmp_path, ROWS)
         player.add_tracks(track_dicts(paths), allow_duplicates=True)
         settle_at_top(player, qtbot)
-        player._table.scrollToBottom()
+        bar(player).setValue(bar(player).maximum())
+        parked = bar(player).value()
 
+        player.load_node(other)
         player.load_node(SCRATCH_NODE_ID)
 
-        assert bar(player).value() == 0
+        assert bar(player).value() == parked
+
+    def test_a_reload_of_the_showing_list_holds_its_place(
+        self, player, lib, tmp_path, qtbot
+    ):
+        """Dropping files onto the playlist that is already showing reloads
+        the same node (main_window._on_tracks_added), which used to throw the
+        view back to the top. Save-then-restore round-trips it for free."""
+        node, _ = stocked_playlist(lib, player, tmp_path, "Working Set", "w")
+        player.load_node(node)
+        settle_at_top(player, qtbot)
+        halfway = bar(player).maximum() // 2
+        assert halfway > 0, "nowhere to scroll; the test proves nothing"
+        bar(player).setValue(halfway)
+
+        player.load_node(node)
+
+        assert bar(player).value() == halfway
+
+    def test_a_search_does_not_take_the_playlists_place(
+        self, player, lib, tmp_path, qtbot
+    ):
+        """While a search is showing, the table holds the hits but
+        _loaded_node_id still names the underlying playlist — so saving the
+        scroll on the way out of a search would file the search's position
+        under the playlist's id.
+
+        The search's position has to differ from the playlist's for this to
+        mean anything: parked halfway, "searching" at the bottom. Note the
+        guard must be read before load_node dismisses the search, which
+        clears the flag — placed after it, this test passes against the bug.
+        """
+        node, _ = stocked_playlist(lib, player, tmp_path, "Deep", "d")
+        other, _ = stocked_playlist(lib, player, tmp_path, "Other", "o")
+        player.load_node(node)
+        settle_at_top(player, qtbot)
+        halfway = bar(player).maximum() // 2
+        assert halfway > 0, "nowhere to scroll; the test proves nothing"
+        bar(player).setValue(halfway)
+        player.load_node(other)
+        player.load_node(node)  # node's slot now holds halfway
+        pump(qtbot)
+
+        player._search_active = True  # stand in for a running search
+        bar(player).setValue(bar(player).maximum())
+        player.load_node(other)
+        player.load_node(node)
+
+        assert bar(player).value() == halfway

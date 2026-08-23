@@ -1260,6 +1260,15 @@ class PlayerPanel(QWidget):
         self._library: Library | None = None
         self._loaded_node_id: int = SCRATCH_NODE_ID
         self._loading_playlist = False
+        # Where each playlist was scrolled to when we last left it, so
+        # switching away and back returns to the same place instead of the
+        # top. Session-only, deliberately: the vertical scroll mode is
+        # ScrollPerItem, so a value here is a *row index*, and a row index
+        # goes stale the moment the list is edited from somewhere else —
+        # persisting it across launches would restore a position that no
+        # longer means anything. Same reasoning as the playlists sidebar
+        # width (main_window.py).
+        self._node_scroll: dict[int, int] = {}
         # Session undo stack (§11), owned by MainWindow — auto-save's safety
         # net. None until set_undo_stack, so the Player still works standalone.
         self._undo: UndoStack | None = None
@@ -2409,6 +2418,20 @@ class PlayerPanel(QWidget):
         """
         if self._library is None or self._library.get_node(node_id) is None:
             return
+        # Remember where the outgoing list was, before anything below can
+        # move it and before _loaded_node_id is overwritten — this is the
+        # last moment the id it belongs to is readable.
+        #
+        # Not while a search is showing: the table then holds the hits while
+        # _loaded_node_id still names the underlying playlist, so saving here
+        # would file the search's scroll under the playlist's id. The check
+        # has to come before _dismiss_search below, which clears the flag
+        # without putting the playlist's own rows back — read after it, this
+        # is always True and the guard does nothing at all.
+        if not self._search_active:
+            self._node_scroll[self._loaded_node_id] = (
+                self._table.verticalScrollBar().value()
+            )
         # Loading a playlist ends a search (§10: click a highlighted playlist
         # → it loads and the search clears). No list restore — the node's
         # list is about to replace whatever is showing.
@@ -2454,7 +2477,6 @@ class PlayerPanel(QWidget):
                 allow_duplicates=True,  # a saved list may repeat a track on purpose
                 scroll_to_end=False,  # a playlist opens at its top, not its end
             )
-            self._table.scrollToTop()
         finally:
             self._loading_playlist = False
         self._store_read_comments(tracks)
@@ -2464,6 +2486,13 @@ class PlayerPanel(QWidget):
             self._highlight_current_row()
             self._update_transport_state()
         self._update_context_label()
+        # Restore last, after everything that could move the view: a
+        # selection restore calls scrollTo internally, and a value set before
+        # Qt has recomputed the range clamps instead of landing where it
+        # should (the lesson from the tree's own scroll fix, 4e6504d). A
+        # playlist opened for the first time has no entry and gets 0, which
+        # is the top — the behaviour every load had before.
+        self._table.verticalScrollBar().setValue(self._node_scroll.get(node_id, 0))
 
     def _store_read_comments(self, tracks) -> None:
         """Keep comments the load just read from the files.
