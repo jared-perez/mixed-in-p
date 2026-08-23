@@ -7,8 +7,9 @@ frame projects a fixed number of rings sitting at *world* arc-lengths ahead of
 the camera, so the tunnel slides past as the camera advances, and paints them
 as antialiased polylines — the cost is O(lines), not O(pixels), which is why
 this renders at 608x256 for ~1.6 ms while the per-pixel modes stay at 152x64.
-Pixelated stars (blocks snapped to a coarse grid) stream past to place it in
-space; they are lit by the kick, barely visible between beats.
+Pixelated stars (crosses built from cells snapped to a coarse grid) stream
+past to place it in space; they are lit by the kick, barely visible between
+beats.
 
 Path properties are asserted by ``tests/gui/test_vis_wormhole.py`` through
 :func:`path_stats`: 15 turns, three straightaways of 22/37/46 units, minimum
@@ -55,7 +56,15 @@ _FADE_EXP = 2.0
 _PEN_WIDTH = 1.2
 _PULSE_RIPPLE = 0.12  # near-ring radius bump on a full-strength kick
 _N_STARS = 110
-_STAR_PX = 4  # star block size in image px (doubled up close)
+# Stars are drawn as a grid-snapped cross — a horizontal and a vertical bar of
+# _STAR_CELL-sized cells — rather than a solid block, so they read as points of
+# light instead of confetti. The cell keeps them pixelated (the brief's word);
+# the arms are what makes them a star. Near ones get longer arms, which reads
+# as a closer star twinkling harder. The two bars overlap at the centre, and
+# the doubled alpha there is wanted: it gives each star a brighter core.
+_STAR_CELL = 3  # image px per star "pixel"
+_STAR_ARM_FAR = 1  # arm length in cells (so 3 cells across)
+_STAR_ARM_NEAR = 2  # 5 cells across, for stars inside 35% of the far plane
 # Stars are kick-driven: barely there between beats, full on the kick, then
 # released slowly. Same fast-attack/slow-release shape as the fractal's level
 # follower (max(new, prev * decay)), which is what makes that mode read as
@@ -63,11 +72,11 @@ _STAR_PX = 4  # star block size in image px (doubled up close)
 # detector's own value collapses within a frame or two of the transient.
 # Measured against a 128 BPM kick (14 frames a beat at 30 fps): the fractal's
 # own 0.94 only falls to 0.45 before the next one lands, which reads as a mild
-# throb rather than "dark until the kick". 0.85 troughs at 0.13 and spends
-# about a third of each beat down there, while still taking ~0.6 s to get
-# there — a fade, not a strobe.
+# throb rather than "dark until the kick". 0.82 troughs at 0.08, spends about
+# 40% of each beat down there, and takes ~0.5 s to fall to nothing — still a
+# fade rather than a strobe, and the release the visual was tuned to by eye.
 _STAR_FLOOR = 0.15  # fraction of a star's depth alpha between kicks
-_STAR_DECAY = 0.85  # per-frame release of the glow
+_STAR_DECAY = 0.82  # per-frame release of the glow
 _LOOP_SAMPLES = 4096
 
 # 25 waypoints (x, y, z), generated once and frozen here so the app carries no
@@ -393,13 +402,13 @@ class WormholeScene:
             if not (0 <= x < width and 0 <= y < height):
                 continue
             depth_alpha = np.clip(255 * (1.1 - z / self._far), 40, 255)
-            alpha = int(depth_alpha * glow)
-            block = _STAR_PX if z > self._far * 0.35 else _STAR_PX * 2
-            painter.fillRect(
-                int(x) // _STAR_PX * _STAR_PX,
-                int(y) // _STAR_PX * _STAR_PX,
-                block, block, QColor(235, 235, 255, alpha),
-            )
+            color = QColor(235, 235, 255, int(depth_alpha * glow))
+            arm = _STAR_ARM_NEAR if z <= self._far * 0.35 else _STAR_ARM_FAR
+            cx = int(x) // _STAR_CELL * _STAR_CELL
+            cy = int(y) // _STAR_CELL * _STAR_CELL
+            span = (2 * arm + 1) * _STAR_CELL
+            painter.fillRect(cx - arm * _STAR_CELL, cy, span, _STAR_CELL, color)
+            painter.fillRect(cx, cy - arm * _STAR_CELL, _STAR_CELL, span, color)
         fade = np.clip(1.0 - (ring_s - self._s) / self._far, 0.0, 1.0) ** _FADE_EXP
         bright = 0.55 + 0.45 * min(1.0, level * 1.5 + pulse)
         for k in range(_RINGS):

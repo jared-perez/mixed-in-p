@@ -12,6 +12,7 @@ import pytest
 
 from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
 from src.gui.widgets.vis_canvas import FFT_SIZE, POPOUT_MODES, RENDER_MODES, VisRenderer
+from src.gui.widgets import vis_wormhole
 from src.gui.widgets.vis_wormhole import (
     TUNNEL_R,
     WormholeScene,
@@ -267,3 +268,34 @@ def test_stars_never_go_out_entirely(scene):
     assert scene._star_glow < 0.01  # the glow really has gone
     assert _brightest_star(scene.image()) > 0  # the stars have not
 
+
+
+def test_stars_are_crosses_rather_than_blocks(scene):
+    """A star's diagonal cells are empty; a solid block's would not be.
+
+    Counting rather than picking one star, because stars overlap each other
+    and the mesh — so the question is the shape of the field, not of a
+    hand-chosen sample.
+    """
+    for _ in range(3):
+        scene.render(0.3, 1.0)  # kick-lit, so the arms are at full alpha
+    image = scene.image()
+    cell = vis_wormhole._STAR_CELL
+    cols, rows = image.width() // cell, image.height() // cell
+
+    def lit(col, row):
+        if not (0 <= col < cols and 0 <= row < rows):
+            return False
+        color = image.pixelColor(col * cell + 1, row * cell + 1)
+        return bool(color.alpha()) and color.blue() > color.red() >= 200
+
+    # A "core" is a cell lit on all four sides — the centre of a cross, or an
+    # interior cell of a block.
+    diagonals = [
+        sum(lit(c + dc, r + dr) for dc, dr in ((1, 1), (1, -1), (-1, 1), (-1, -1)))
+        for c in range(cols)
+        for r in range(rows)
+        if lit(c, r) and all(lit(c + dc, r + dr) for dc, dr in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+    ]
+    assert len(diagonals) >= 10  # enough cores to be talking about the field
+    assert float(np.mean(diagonals)) < 1.0  # a block would score 4
