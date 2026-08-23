@@ -179,6 +179,23 @@ is radioactive):
    wireframe colour toward white), with three shaded planets drifting past.
    Measured **3.4 ms/frame at 1216×512** and 4.5 at popout size.
 
+   A planet's tint and its rings are rolled **once, at spawn** — so it cannot
+   change while it is on screen — and they are chances rather than counts,
+   because with only three planets at a time a "small percentage" is a property
+   of the stream: measured, about fifty planets a minute at 128 BPM, of which
+   nine are dusky, nine wear the wireframe's own colour instead of the pale
+   wash, and ten carry one to three thin rings in a plane of their own. The
+   rings cost 0.02 ms a frame, and they are drawn in three passes — the arc
+   behind the planet, the disc, then the arc in front — which is the Saturn
+   silhouette for the price of a depth comparison per segment. They are drawn
+   **brighter than the disc they circle** (1.8×, ceiling 0.85) and have to be:
+   the disc spreads its alpha over thousands of pixels and the ring over a
+   one-pixel line, so at the disc's own alpha the first cut of them was
+   invisible in the app while passing every structural test. That was found by
+   rendering a real flight — `planet_sheet.py --flight` in the evidence
+   directory, which grabs the ringed planets as they actually pass rather than
+   placing one by hand at an alpha nothing produces.
+
    Two things it does that no other mode does. It renders from **device**
    pixels and asks the host to upscale *smoothly* (`VisRenderer
    .smooth_upscale()`), capped at 720 high for the popout and 512 for the

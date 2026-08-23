@@ -14,7 +14,8 @@ import time
 
 import numpy as np
 import pytest
-from PySide6.QtGui import QImage
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QColor, QImage, QPainter
 
 from src.gui.widgets import vis_tunnel_chase as tc
 from src.gui.widgets.beat_clock import DEFAULT_BPM
@@ -33,6 +34,7 @@ from src.gui.widgets.vis_tunnel_chase import (
     POPOUT_CAP,
     TUNNEL_R,
     UNITS_PER_BEAT,
+    _STAR_FLOOR,
     PathAhead,
     TunnelChaseScene,
     schedule_turns,
@@ -315,6 +317,214 @@ def test_the_sky_is_paler_than_the_wireframe(scene):
     mesh = scene._color
     for colour in palette:
         assert colour.blue() > mesh.blue()
+
+
+# ── Planets: three tints, and rings on a few ───────────────────────────────
+
+
+def _place_planet(scene, kind=0, rings=(), depth=12.0, radius=1.4, seed=4):
+    """One planet dead ahead, everything else in the sky moved out of frame.
+
+    The stars go behind the camera rather than being deleted so the arrays keep
+    their shape; nothing with a negative depth is drawn.
+    """
+    scene.reset()
+    scene._stars[:, 2] = -1.0
+    scene._planets[:] = 0.0
+    scene._planets[:, 2] = -1.0
+    scene._planet_ring_radii[:] = 0.0
+    scene._planets[0] = [0.0, 0.0, depth, radius]
+    scene._planet_kind[0] = kind
+    rng = np.random.default_rng(seed)
+    normal = rng.normal(size=3)
+    normal /= np.linalg.norm(normal)
+    aside = np.array([0.0, 0.0, 1.0]) if abs(normal[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
+    u = np.cross(normal, aside)
+    u /= np.linalg.norm(u)
+    scene._planet_ring_basis[0] = np.stack([u, np.cross(normal, u)])
+    for slot, value in enumerate(rings):
+        scene._planet_ring_radii[0, slot] = value
+    return scene
+
+
+def test_the_three_planet_tints_are_the_old_one_plus_two(scene):
+    """Most planets are exactly the shade they were; the other two vary from it.
+
+    The brightness of the pale one was settled by eye in the running app, so
+    this pins it to the star palette's own wash rather than to a number: if that
+    wash moves, the planets should move with it.
+    """
+    pale, dark, tint = scene._planet_tints()
+    assert pale == scene._palette()[1]  # unchanged, and still the same wash
+    for channel in ("red", "green", "blue"):
+        assert getattr(dark, channel)() < getattr(pale, channel)()
+    # Less washed toward white is more of the wireframe's own colour, and the
+    # theme colour is what the wash is pulling away from.
+    assert abs(tint.blue() - scene._color.blue()) < abs(pale.blue() - scene._color.blue())
+
+
+def test_a_planet_keeps_its_tint_and_rings_until_it_is_replaced(scene):
+    """Everything about a planet is rolled at spawn, so it cannot change on screen."""
+    spawned = []
+    real = type(scene)._spawn_planet
+
+    def spy(self, index, depth=None):
+        spawned.append(index)
+        real(self, index, depth)
+
+    type(scene)._spawn_planet = spy
+    try:
+        step = 128.0 / 60.0 / 60.0
+        beat = 0.0
+        before = scene._planet_kind.copy()
+        for _ in range(400):
+            spawned.clear()
+            scene.render(beat, 0.6, 0.0)
+            beat += step
+            unchanged = [i for i in range(tc._N_PLANETS) if i not in spawned]
+            assert (scene._planet_kind[unchanged] == before[unchanged]).all()
+            before = scene._planet_kind.copy()
+    finally:
+        type(scene)._spawn_planet = real
+
+
+def test_only_a_few_planets_are_dusky_tinted_or_ringed(scene):
+    """"A small percentage" of a stream of three at a time — most stay pale."""
+    kinds: list[int] = []
+    ringed = 0
+    real = type(scene)._spawn_planet
+
+    def spy(self, index, depth=None):
+        real(self, index, depth)
+        nonlocal ringed
+        kinds.append(int(self._planet_kind[index]))
+        ringed += bool((self._planet_ring_radii[index] > 0).any())
+
+    type(scene)._spawn_planet = spy
+    try:
+        _fly(scene, 0.0, 240.0)
+    finally:
+        type(scene)._spawn_planet = real
+    assert len(kinds) > 60  # the sample is big enough to say anything at all
+    assert 0.5 < kinds.count(0) / len(kinds)  # pale is still the rule
+    assert 0 < kinds.count(1) < len(kinds) * 0.35
+    assert 0 < kinds.count(2) < len(kinds) * 0.35
+    assert 0 < ringed < len(kinds) * 0.4
+
+
+def test_a_ring_is_drawn_around_the_planet_and_not_only_over_it(scene):
+    """The same planet with and without rings, differenced.
+
+    Differential because the mesh and the stars are in the frame too and are
+    identical between the two renders — the only thing that moved is the rings.
+    Whether they are *legible* is not a question this can answer; that was
+    settled by rendering a real flight (``planet_sheet.py --flight``), and the
+    first cut of them passed a test like this while being invisible in the app.
+    """
+    plain = _pixels(_place_planet(scene, rings=()).render(0.0, 0.6, 1.0)).copy()
+    ringed = _pixels(_place_planet(scene, rings=(1.5, 2.0)).render(0.0, 0.6, 1.0))
+    changed = (plain != ringed).any(axis=2)
+    assert changed.sum() > 200
+
+    # The outer ring sits at 2.0 planet radii, so most of what changed has to be
+    # outside the disc rather than crossing its face.
+    height, width = changed.shape
+    ys, xs = np.nonzero(changed)
+    radius = scene._focal * 1.4 / 12.0
+    beyond = np.hypot(xs - width / 2, ys - height / 2) > radius
+    assert beyond.mean() > 0.5
+
+
+def test_a_ring_passes_behind_the_planet_as_well_as_in_front(scene):
+    """A tilted ring is split at the planet's own depth — the Saturn silhouette."""
+    _place_planet(scene, rings=(1.6,))
+    behind, in_front = scene._ring_arcs(0, 1216, 512)
+    assert behind and in_front
+    assert len(behind) + len(in_front) <= tc._PLANET_RING_SEGMENTS
+
+
+def test_a_planet_without_rings_has_no_arcs(scene):
+    _place_planet(scene, rings=())
+    assert scene._ring_arcs(0, 1216, 512) == ([], [])
+
+
+def _planets_alone(scene, size=400, glow=_STAR_FLOOR):
+    """The planet layer on its own, with no mesh over it to confuse a sample.
+
+    *glow* defaults to the floor the sky sits at between kicks, which is where a
+    planet spends most of its life and the state the rings had to read in.
+    """
+    image = QImage(size, size, QImage.Format.Format_ARGB32_Premultiplied)
+    image.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(image)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+    scene._paint_planets(painter, scene._planet_tints(), size, size, glow, 1.0)
+    painter.end()
+    return image
+
+
+def test_a_ring_is_brighter_than_the_planet_it_circles(scene):
+    """A one-pixel line needs more alpha than a disc does, or it is not there.
+
+    The disc spreads its alpha over thousands of pixels and the ring over a
+    line, so matching them — which is what the first cut did — leaves the rings
+    invisible in the app. *How much* more is a judgement made by rendering a
+    real flight (``planet_sheet.py --flight``), not here; this pins the shape of
+    the rule and its ceiling.
+    """
+    disc = QColor(scene._planet_tints()[0])
+    disc.setAlphaF(0.4)  # about what the depth fade and the glow floor leave
+    assert scene._ring_colour(disc).alphaF() > disc.alphaF() * 1.5
+
+    close = QColor(disc)
+    close.setAlphaF(1.0)  # a rare close pass, where the disc is at full alpha
+    assert scene._ring_colour(close).alphaF() < 1.0  # never as bright as the mesh
+
+
+def test_the_painted_ring_really_is_the_brighter_colour(scene):
+    """That the rule above is the one the painter uses, and not bypassed.
+
+    Against the value the rule gives for *this* disc rather than against the
+    disc itself: the ring's two arcs composite where they meet, which alone puts
+    the band's brightest pixel half again above the disc — so "brighter than the
+    disc" is satisfied by a ring drawn at the disc's own colour, which is the
+    version that could not be seen in the app.
+    """
+    _place_planet(scene, rings=(1.8,))
+    depth, radius = scene._planets[0, 2], scene._planets[0, 3]
+    alpha = _pixels(_planets_alone(scene))[..., 3].astype(int)
+    height, width = alpha.shape
+    ys, xs = np.indices(alpha.shape)
+    span = np.hypot(xs - width / 2, ys - height / 2) / (scene._focal * radius / depth)
+
+    disc = QColor(scene._planet_tints()[0])
+    disc.setAlphaF(float(alpha[span < 0.9].max()) / 255)  # the gradient's own peak
+    expected = scene._ring_colour(disc).alphaF() * 255
+    assert alpha[(span > 1.5) & (span < 2.1)].max() >= expected - 2
+
+
+def test_the_ring_plane_is_fixed_in_the_world_not_to_the_camera(scene):
+    """It rotates with the camera each frame, and stays a rotation while it does.
+
+    Two halves of one property. If the rigid transform were not applied to the
+    basis the vectors would simply never change, and the rings would face the
+    camera the same way through every turn; if it were applied wrongly they
+    would stop being orthonormal within a few frames and the ring would shear
+    into an ellipse of its own.
+    """
+    _place_planet(scene, rings=(1.6,))
+    scene._planets[0, 2] = 20.0  # far enough not to be culled during the run
+    first = scene._planet_ring_basis[0].copy()
+    step = 128.0 / 60.0 / 60.0
+    beat = 0.0
+    for _ in range(240):  # four beats: a scheduled turn is inside this
+        scene.render(beat, 0.6, 0.0)
+        beat += step
+        u, v = scene._planet_ring_basis[0]
+        assert np.isclose(np.linalg.norm(u), 1.0, atol=1e-6)
+        assert np.isclose(np.linalg.norm(v), 1.0, atol=1e-6)
+        assert abs(float(u @ v)) < 1e-6
+    assert not np.allclose(scene._planet_ring_basis[0], first, atol=1e-3)
 
 
 # ── Stars respond to the kick ──────────────────────────────────────────────

@@ -140,6 +140,48 @@ _STAR_FLOOR = 0.15  # a star's depth alpha between kicks
 _STAR_DECAY_AT_33MS = 0.82  # the wormhole's release, as a time constant
 _STAR_POINT_MIN = 1.8  # below this a star is a dot rather than a 4-point star
 _PLANET_RADIUS = (0.6, 1.8)  # world units
+
+# Planet variety. The pale cream the whole field used to be is still most of
+# it — its brightness was judged right in the running app, so nothing below
+# touches it — and these are the exceptions rolled once, at spawn.
+#
+# They are chances rather than counts because there are only three planets on
+# screen at a time, and a "small percentage" is a property of the stream rather
+# than of the three. Measured over three minutes at 128 BPM: **about fifty
+# planets a minute**, of which nine are dusky, nine wear the wireframe's own
+# colour and ten carry rings. (Fifty is more churn than the geometry suggests —
+# a planet spawns 22 to 42 units out and travels at 5.3 units a second, so it
+# should last four to eight — because a turn swings the ones off to the side
+# out of the depth window early. Same for the stars; it is not new here.)
+_PLANET_DARK_CHANCE = 0.18
+_PLANET_TINT_CHANCE = 0.18
+_PLANET_DARK = 0.62  # value multiplier on the cream: a rock, not an ice ball
+_PLANET_TINT_WASH = 0.22  # how far the tinted one is washed toward white
+
+# Rings: thin, concentric, and in a plane of their own per planet. The span is
+# in planet radii, and the rings are spread across it rather than drawn at
+# random radii, so two of them never land on top of each other and read as one
+# thick band. 36 segments is enough that a ring seen nearly face-on has no
+# visible corners at the sizes a planet ever reaches (its radius is capped by
+# `_PLANET_RADIUS` and it is culled below 1.5 px).
+_PLANET_RING_CHANCE = 0.22
+_PLANET_RING_COUNT = 3  # at most; 1 to this many
+_PLANET_RING_SPAN = (1.35, 2.15)  # planet radii
+_PLANET_RING_SEGMENTS = 36
+_PLANET_RING_PEN = 1.15  # px at the 512-high reference
+
+# A ring is brighter than the planet it circles, and has to be: the disc gets
+# its alpha over thousands of pixels and the ring over a one-pixel line, so at
+# the alpha the disc is comfortable at — around 0.3 by the time the depth fade
+# and the between-kicks glow floor have both been applied — the ring simply is
+# not there. Rendered against a real flight, 1.0 was invisible and this reads at
+# every distance a planet is drawn at. The ceiling is what stops a close pass —
+# where the disc's own alpha is already near 1 — from putting the brightest line
+# in the frame around a planet: the tunnel is the subject, and the sky, rings
+# included, is depth behind it.
+_PLANET_RING_ALPHA = 1.8  # multiplier on the planet's own alpha
+_PLANET_RING_MAX_ALPHA = 0.85
+
 _HISTORY = 4.0  # world units of path kept behind the camera
 
 _GREY = (205, 205, 215)
@@ -335,6 +377,12 @@ class TunnelChaseScene:
         self._stars = np.empty((_N_STARS, 3))
         self._star_kind = np.empty(_N_STARS, int)
         self._planets = np.empty((_N_PLANETS, 4))  # x, y, z, radius
+        self._planet_kind = np.zeros(_N_PLANETS, int)
+        # Two perpendicular directions spanning each planet's ring plane, and
+        # the radii (in planet radii) of the rings drawn in it — 0 for a ring
+        # slot this planet does not use.
+        self._planet_ring_basis = np.zeros((_N_PLANETS, 2, 3))
+        self._planet_ring_radii = np.zeros((_N_PLANETS, _PLANET_RING_COUNT))
         self._prev_basis: np.ndarray | None = None
         self._prev_cam: np.ndarray | None = None
         self._star_glow = 0.0
@@ -374,10 +422,10 @@ class TunnelChaseScene:
             self._stars[i] = self._spawn(self._rng.uniform(1.0, self._far))
             self._star_kind[i] = self._rng.integers(0, 3)
         for i in range(_N_PLANETS):
-            self._planets[i, :3] = self._spawn(
-                self._rng.uniform(self._far * 0.5, self._far * 1.5), margin=2.5
-            )
-            self._planets[i, 3] = self._rng.uniform(*_PLANET_RADIUS)
+            # Nearer than a respawn on purpose: the first seconds should have
+            # planets in them rather than an empty sky waiting for the first
+            # one to arrive.
+            self._spawn_planet(i, self._rng.uniform(self._far * 0.5, self._far * 1.5))
         self._image.fill(Qt.GlobalColor.transparent)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
@@ -453,10 +501,8 @@ class TunnelChaseScene:
         self._geometry = geometry = self._project(rel)
         self._fade_rings(geometry, ring_s)
 
-        self._advance(self._stars, basis, cam, margin=1.6, z_min=_NEAR,
-                      z_max=self._far * 1.2, far_spawn=False)
-        self._advance(self._planets, basis, cam, margin=2.5, z_min=0.5,
-                      z_max=self._far * 1.6, far_spawn=True)
+        self._advance_stars(basis, cam)
+        self._advance_planets(basis, cam)
         self._prev_basis, self._prev_cam = basis, cam
         self._paint(geometry, ring_s, level, pulse)
         return self._image
@@ -508,25 +554,95 @@ class TunnelChaseScene:
             if x * x + y * y > (TUNNEL_R * margin) ** 2:
                 return np.array([x, y, depth])
 
-    def _advance(self, points: np.ndarray, basis, cam, margin, z_min, z_max,
-                 far_spawn: bool) -> None:
-        """Keep the sky still in the world by re-expressing it each frame.
+    def _spawn_planet(self, index: int, depth: float | None = None) -> None:
+        """A fresh planet: where, how big, which tint, and whether it wears rings.
 
-        Stars and planets live in camera coordinates — projecting is then a
-        divide — so every frame applies the exact rigid transform between the
-        old camera and the new one instead of re-deriving world positions.
+        Everything about a planet is decided here and then left alone, so a
+        planet does not change colour or grow rings while it is on screen.
         """
-        if self._prev_basis is not None:
-            rotation = basis.T @ self._prev_basis
-            points[:, :3] = points[:, :3] @ rotation.T + (
-                basis.T @ (self._prev_cam - cam)
-            )
-        z = points[:, 2]
-        for i in np.flatnonzero((z < z_min) | (z > z_max)):
-            depth = self._rng.uniform(self._far * 0.8, self._far * 1.5) if far_spawn else None
-            points[i, :3] = self._spawn(depth, margin=margin)
-            if points.shape[1] == 4:
-                points[i, 3] = self._rng.uniform(*_PLANET_RADIUS)
+        if depth is None:
+            depth = self._rng.uniform(self._far * 0.8, self._far * 1.5)
+        self._planets[index, :3] = self._spawn(depth, margin=2.5)
+        self._planets[index, 3] = self._rng.uniform(*_PLANET_RADIUS)
+
+        roll = self._rng.random()
+        if roll < _PLANET_DARK_CHANCE:
+            self._planet_kind[index] = 1
+        elif roll < _PLANET_DARK_CHANCE + _PLANET_TINT_CHANCE:
+            self._planet_kind[index] = 2
+        else:
+            self._planet_kind[index] = 0
+
+        self._planet_ring_radii[index] = 0.0
+        if self._rng.random() >= _PLANET_RING_CHANCE:
+            return
+        # A plane through the planet at a random attitude: take a normal off
+        # the sphere and any two perpendiculars to it. The normal is drawn from
+        # a Gaussian rather than from two uniform angles because that is
+        # uniform on the sphere — polar angles bunch the normals at the poles,
+        # which would give most ringed planets a near-edge-on band.
+        normal = self._rng.normal(size=3)
+        normal /= np.linalg.norm(normal)
+        aside = np.array([0.0, 0.0, 1.0]) if abs(normal[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
+        u = np.cross(normal, aside)
+        u /= np.linalg.norm(u)
+        self._planet_ring_basis[index] = np.stack([u, np.cross(normal, u)])
+
+        count = int(self._rng.integers(1, _PLANET_RING_COUNT + 1))
+        inner, outer = _PLANET_RING_SPAN
+        for slot in range(count):
+            band = (outer - inner) / count
+            low = inner + band * slot
+            self._planet_ring_radii[index, slot] = self._rng.uniform(low, low + band * 0.65)
+
+    def _rigid(self, basis, cam):
+        """Rotation and offset carrying last frame's camera coordinates into this one's.
+
+        ``None`` on the first frame, where there is no previous camera to come
+        from. Stars and planets live in camera coordinates — projecting is then
+        a divide — so every frame applies this exact rigid transform instead of
+        re-deriving world positions.
+        """
+        if self._prev_basis is None:
+            return None
+        return basis.T @ self._prev_basis, basis.T @ (self._prev_cam - cam)
+
+    def _advance_stars(self, basis, cam) -> None:
+        """Keep the stars still in the world, and refill the ones that fall off."""
+        move = self._rigid(basis, cam)
+        if move is not None:
+            rotation, offset = move
+            self._stars[:] = self._stars @ rotation.T + offset
+        z = self._stars[:, 2]
+        for i in np.flatnonzero((z < _NEAR) | (z > self._far * 1.2)):
+            self._stars[i] = self._spawn()
+
+    def _advance_planets(self, basis, cam) -> None:
+        """As the stars, plus the ring planes.
+
+        A ring's plane is fixed in the world like the planet it belongs to, so
+        its two basis vectors take the rotation and **not** the offset: they are
+        directions, not points. Skipping that would leave the rings facing the
+        camera the same way through every turn, which reads as the plane
+        swinging round to follow you.
+        """
+        move = self._rigid(basis, cam)
+        if move is not None:
+            rotation, offset = move
+            self._planets[:, :3] = self._planets[:, :3] @ rotation.T + offset
+            self._planet_ring_basis[:] = self._planet_ring_basis @ rotation.T
+        z = self._planets[:, 2]
+        for i in np.flatnonzero((z < 0.5) | (z > self._far * 1.6)):
+            self._spawn_planet(i)
+
+    def _wash(self, white: float) -> QColor:
+        """The wireframe colour mixed *white* of the way toward white."""
+        main = self._color
+        return QColor(
+            int(main.red() * (1 - white) + 255 * white),
+            int(main.green() * (1 - white) + 255 * white),
+            int(main.blue() * (1 - white) + 255 * white),
+        )
 
     def _palette(self) -> list[QColor]:
         """Grey, and two washes of the wireframe colour toward white.
@@ -534,16 +650,26 @@ class TunnelChaseScene:
         Paler than the mesh on purpose (the brief): the tunnel is the subject
         and the sky is depth behind it.
         """
-        main = self._color
+        return [QColor(*_GREY), self._wash(0.65), self._wash(0.4)]
 
-        def wash(white: float) -> QColor:
-            return QColor(
-                int(main.red() * (1 - white) + 255 * white),
-                int(main.green() * (1 - white) + 255 * white),
-                int(main.blue() * (1 - white) + 255 * white),
-            )
+    def _planet_tints(self) -> list[QColor]:
+        """Cream, a dusky one, and one wearing the wireframe's own colour.
 
-        return [QColor(*_GREY), wash(0.65), wash(0.4)]
+        The first is the shade every planet used to be, unchanged: its
+        brightness was judged right in the running app, and the point of the
+        other two is variety at the same brightness budget rather than a
+        different one. The dusky planet is that cream taken down in value, so
+        it stays the same hue and reads as rock beside an ice ball; the tinted
+        one is barely washed at all, which is the only way the colour survives
+        being drawn at a fraction of full alpha on black.
+        """
+        pale = self._wash(0.65)
+        dark = QColor(
+            int(pale.red() * _PLANET_DARK),
+            int(pale.green() * _PLANET_DARK),
+            int(pale.blue() * _PLANET_DARK),
+        )
+        return [pale, dark, self._wash(_PLANET_TINT_WASH)]
 
     # ── Paint ──────────────────────────────────────────────────────────────
 
@@ -556,15 +682,20 @@ class TunnelChaseScene:
         palette = self._palette()
         glow = _STAR_FLOOR + (1.0 - _STAR_FLOOR) * self._star_glow
 
-        self._paint_planets(painter, palette[1], width, height, glow, scale)
+        self._paint_planets(painter, self._planet_tints(), width, height, glow, scale)
         self._paint_stars(painter, palette, width, height, glow, scale)
         self._paint_mesh(painter, geometry, ring_s, level, pulse)
         painter.end()
 
-    def _paint_planets(self, painter, tint, width, height, glow, scale) -> None:
-        """Sparse shaded discs, behind everything. Three at a time, far out."""
-        painter.setPen(Qt.PenStyle.NoPen)
-        for x, y, z, radius in self._planets:
+    def _paint_planets(self, painter, tints, width, height, glow, scale) -> None:
+        """Sparse shaded discs, behind everything. Three at a time, far out.
+
+        A ringed planet is drawn in three passes — the half of each ring behind
+        the planet, the disc, then the half in front — which is what makes the
+        band pass *through* rather than sit on top. The disc's own alpha is
+        what dims the far half; nothing else is done about it.
+        """
+        for index, (x, y, z, radius) in enumerate(self._planets):
             if z <= 0.2:
                 continue
             px = width / 2 + self._focal * x / z
@@ -573,15 +704,69 @@ class TunnelChaseScene:
             if pr < 1.5 * scale or not (-pr <= px <= width + pr and -pr <= py <= height + pr):
                 continue
             alpha = float(np.clip(1.15 - z / (self._far * 1.6), 0.15, 1.0))
-            near = QColor(tint)
+            near = QColor(tints[int(self._planet_kind[index])])
             near.setAlphaF(alpha * (0.35 + 0.65 * glow))
+
+            behind, in_front = self._ring_arcs(index, width, height)
+            self._paint_ring_arcs(painter, behind, near, scale)
+
             limb = QColor(near)
             limb.setAlphaF(near.alphaF() * 0.25)
             shade = QRadialGradient(px - pr * 0.35, py - pr * 0.35, pr * 1.3)
             shade.setColorAt(0.0, near)
             shade.setColorAt(1.0, limb)
+            painter.setPen(Qt.PenStyle.NoPen)
             painter.setBrush(QBrush(shade))
             painter.drawEllipse(QPointF(px, py), pr, pr)
+
+            self._paint_ring_arcs(painter, in_front, near, scale)
+
+    def _ring_arcs(self, index: int, width: int, height: int):
+        """This planet's rings, projected and split into behind-it and in-front-of-it.
+
+        Returns two lists of :class:`QLineF`. A ring is a circle in the world,
+        so it projects to an ellipse and is drawn as segments; splitting them by
+        whether each end is nearer than the planet's centre is exactly the
+        Saturn silhouette, and costs a comparison per segment.
+        """
+        radii = self._planet_ring_radii[index]
+        if not radii.any():
+            return [], []
+        cx, cy, cz, radius = self._planets[index]
+        u, v = self._planet_ring_basis[index]
+        theta = np.linspace(0, 2 * np.pi, _PLANET_RING_SEGMENTS, endpoint=False)
+        rim = np.cos(theta)[:, None] * u + np.sin(theta)[:, None] * v
+        centre = np.array([cx, cy, cz])
+        behind: list[QLineF] = []
+        in_front: list[QLineF] = []
+        for factor in radii:
+            if factor <= 0.0:
+                continue
+            points = centre + rim * (factor * radius)
+            depth = points[:, 2]
+            if depth.min() <= 0.2 or self._focal * factor * radius / cz < 2.0:
+                continue  # behind the lens, or too small to be anything but a smudge
+            sx = width / 2 + self._focal * points[:, 0] / depth
+            sy = height / 2 - self._focal * points[:, 1] / depth
+            nearer = depth < cz
+            for m in range(_PLANET_RING_SEGMENTS):
+                n = (m + 1) % _PLANET_RING_SEGMENTS
+                line = QLineF(sx[m], sy[m], sx[n], sy[n])
+                (in_front if nearer[m] and nearer[n] else behind).append(line)
+        return behind, in_front
+
+    def _ring_colour(self, disc: QColor) -> QColor:
+        """The disc's colour, brightened for a line and held under the ceiling."""
+        lit = QColor(disc)
+        lit.setAlphaF(min(_PLANET_RING_MAX_ALPHA, disc.alphaF() * _PLANET_RING_ALPHA))
+        return lit
+
+    def _paint_ring_arcs(self, painter, lines, colour: QColor, scale: float) -> None:
+        if not lines:
+            return
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.setPen(QPen(self._ring_colour(colour), max(_PLANET_RING_PEN * scale, 0.8)))
+        painter.drawLines(lines)
 
     def _paint_stars(self, painter, palette, width, height, glow, scale) -> None:
         """Dots far out, four-point stars with a white core near.
