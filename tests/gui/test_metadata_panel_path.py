@@ -53,6 +53,40 @@ class TestPathDisplay:
 
         assert panel._path_label.toolTip() == audio_file
 
+    def test_the_filename_elides(self, panel, audio_file):
+        """The filename is the side of the header row that gives way — the
+        props beside it keep their natural width — so it is the side that
+        needs an ellipsis to admit it. A plain QLabel would draw past its own
+        edge and cut a glyph in half."""
+        panel._load_file(audio_file)
+
+        assert isinstance(panel._file_label, ElidedLabel)
+        assert panel._file_label.text() == "a track.wav"
+
+    def test_a_name_too_long_for_the_row_is_recoverable_without_a_resize(
+        self, panel, qtbot, tmp_path
+    ):
+        """The label maintains its own tooltip in resizeEvent only, and a
+        longer name at an unchanged width starts overflowing with no resize to
+        follow — so _load_file sets it too."""
+        sf = pytest.importorskip("soundfile")
+        panel.resize(500, 600)
+        # A second file with the *same* audio properties, so the props label
+        # beside it is unchanged and the filename's share of the row is too:
+        # nothing resizes, and only the explicit set reaches the tooltip.
+        short = tmp_path / "a.wav"
+        name = "Some Artist - A Very Long Track Title (Extended Club Mix).wav"
+        long = tmp_path / name
+        for path in (short, long):
+            sf.write(str(path), np.zeros(4410, dtype=np.float32), 44100,
+                     subtype="PCM_16")
+        panel._load_file(str(short))
+        qtbot.wait(10)
+
+        panel._load_file(str(long))
+
+        assert panel._file_label.toolTip() == name
+
     def test_the_path_is_not_an_editable_tag_field(self, panel, audio_file):
         """In the header, not the form: _do_save writes every _field_edits
         entry back to the file as a tag."""
@@ -69,6 +103,8 @@ class TestPathDisplay:
 
         assert panel._path_label.text() == ""
         assert panel._path_label.toolTip() == ""
+        assert panel._file_label.text() == ""
+        assert panel._file_label.toolTip() == ""
         assert not panel._file_header_widget.isVisible()
 
 

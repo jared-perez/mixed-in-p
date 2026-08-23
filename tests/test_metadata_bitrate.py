@@ -10,7 +10,7 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from src.metadata.tags import _read_bitrate, read_metadata
+from src.metadata.tags import read_bitrate, read_metadata
 
 SR = 44100
 
@@ -57,7 +57,7 @@ class TestRealFiles:
 
 
 class TestWhichNumberWins:
-    """`_read_bitrate` in isolation. Bit depth decides: a lossy stream has
+    """`read_bitrate` in isolation. Bit depth decides: a lossy stream has
     none and is taken at its reported rate; a lossless one is measured from
     its format, whatever it managed to compress to."""
 
@@ -80,15 +80,15 @@ class TestWhichNumberWins:
         bitrate = 0
 
     def test_a_lossy_stream_is_taken_at_its_word(self):
-        assert _read_bitrate(self.Lossy()) == 320
+        assert read_bitrate(self.Lossy()) == 320
 
     def test_a_lossless_stream_beats_its_own_compressed_figure(self):
-        assert _read_bitrate(self.Lossless()) == 1411
+        assert read_bitrate(self.Lossless()) == 1411
 
     def test_hi_res_scales_with_rate_and_depth(self):
-        assert _read_bitrate(self.HiRes()) == 4608
+        assert read_bitrate(self.HiRes()) == 4608
 
     def test_a_stream_that_says_nothing_gives_nothing(self):
         """Not a zero — a missing bitrate must read as unknown, or the column
         would claim every such file was silent."""
-        assert _read_bitrate(self.Silent()) is None
+        assert read_bitrate(self.Silent()) is None

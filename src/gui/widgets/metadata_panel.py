@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from pathlib import Path
 
-from PySide6.QtCore import QT_TRANSLATE_NOOP, Qt, QUrl, Signal
+from PySide6.QtCore import QT_TRANSLATE_NOOP, QCoreApplication, Qt, QUrl, Signal
 from PySide6.QtWidgets import (
     QComboBox,
     QFileDialog,
@@ -38,6 +38,7 @@ from PySide6.QtGui import (
 
 from src.metadata.tags import (
     TrackMetadata,
+    read_bitrate,
     read_metadata,
     write_metadata,
     write_comment,
@@ -115,8 +116,46 @@ def _format_duration(seconds: float) -> str:
     return f"{total // 60}:{total % 60:02d}"
 
 
+def _depth_or_bitrate(info: object) -> tuple[str, str]:
+    """The second half of the summary: '(label, value)' for *info*.
+
+    Which measure a file has depends on the format, so the **label** changes
+    with it rather than the value alone. A lossy container carries no bit
+    depth — mutagen answers None for every MP3 — and the field read as a bare
+    dash, which looks like a failure to read the file rather than a fact about
+    the format. Bit depth is the tell (the same rule `read_bitrate` sorts a
+    lossy stream from a lossless one by), so a stream without one is described
+    by the number it does have.
+
+    The bitrate is marked approximate for a VBR/ABR stream, where the figure
+    mutagen reports is the file's average rather than a setting anyone chose.
+    """
+    bit_depth = (
+        getattr(info, "bits_per_sample", None)
+        or getattr(info, "sample_size", None)
+    )
+    if bit_depth:
+        return (
+            QCoreApplication.translate("MetadataPanel", "Bit Depth:"),
+            f"{int(bit_depth)}-bit",
+        )
+    bitrate = read_bitrate(info)
+    if bitrate:
+        mode = getattr(getattr(info, "bitrate_mode", None), "name", "")
+        prefix = "~" if mode in ("VBR", "ABR") else ""
+        return (
+            QCoreApplication.translate("MetadataPanel", "Bitrate:"),
+            f"{prefix}{bitrate} kbps",
+        )
+    return QCoreApplication.translate("MetadataPanel", "Bit Depth:"), "—"
+
+
 def _format_audio_props(path: str) -> str:
-    """Return a short 'Sample Rate: 44.1 kHz   Bit Depth: 16-bit' summary."""
+    """A short 'Sample Rate: 44.1 kHz    Bit Depth: 16-bit' summary.
+
+    The second half is whichever measure the file actually has — see
+    `_depth_or_bitrate`, which decides both its label and its value.
+    """
     try:
         from mutagen import File
         audio = File(path)
@@ -124,13 +163,10 @@ def _format_audio_props(path: str) -> str:
         if info is None:
             return ""
         sample_rate = getattr(info, "sample_rate", None)
-        bit_depth = (
-            getattr(info, "bits_per_sample", None)
-            or getattr(info, "sample_size", None)
-        )
         sr_text = f"{sample_rate / 1000:g} kHz" if sample_rate else "—"
-        bd_text = f"{int(bit_depth)}-bit" if bit_depth else "—"
-        return f"Sample Rate: {sr_text}    Bit Depth: {bd_text}"
+        sr_label = QCoreApplication.translate("MetadataPanel", "Sample Rate:")
+        second_label, second_text = _depth_or_bitrate(info)
+        return f"{sr_label} {sr_text}    {second_label} {second_text}"
     except Exception:
         return ""
 
@@ -217,15 +253,18 @@ class MetadataPanel(QWidget):
         file_row.setContentsMargins(0, 0, 0, 0)
         file_row.setSpacing(Theme.PADDING)
 
-        # The filename can be long; let it shrink and clip at the panel edge
-        # rather than forcing the window wider than the Metadata minimum. The
-        # info label keeps its natural width so the props stay readable.
-        self._file_label = QLabel("")
+        # The filename can be long; let it shrink rather than force the window
+        # wider than the Metadata minimum, since the info label beside it keeps
+        # its natural width so the props stay readable. ElidedLabel, not a bare
+        # QLabel: this is the side that gives way, so it is the side that needs
+        # an ellipsis to admit it — a QLabel just draws past its own edge and
+        # cuts a glyph in half, which reads as a rendering fault rather than as
+        # a name too long for the room. The squeeze is worst where the props
+        # are longest: "Fréquence d'échantillonnage :" is 147px more label
+        # than the English.
+        self._file_label = ElidedLabel("")
         self._file_label.setStyleSheet(
             f"color: {Theme.NEON_YELLOW}; font-size: 15px; background: transparent;"
-        )
-        self._file_label.setSizePolicy(
-            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
         )
         file_row.addWidget(self._file_label, 1)
 
@@ -1127,6 +1166,10 @@ class MetadataPanel(QWidget):
         self._clear_provenance()
         self._file_path = path
         self._file_label.setText(Path(path).name)
+        # Set here as well as by the label's own resize handling, which only
+        # runs on a resize: a longer name at an unchanged width starts
+        # overflowing with no resize to follow.
+        self._file_label.setToolTip(Path(path).name)
         self._path_label.setText(path)
         # Set here rather than left to the label's own resize handling, which
         # only runs on a resize — otherwise a shorter path inherits the
@@ -1139,7 +1182,9 @@ class MetadataPanel(QWidget):
             meta = read_metadata(path)
         except Exception as e:
             logger.error("Failed to read metadata: %s", e)
-            self._file_label.setText(self.tr("Error: {0}").format(e))
+            message = self.tr("Error: {0}").format(e)
+            self._file_label.setText(message)
+            self._file_label.setToolTip(message)
             self._info_label.setText("")
             return
 
@@ -1426,6 +1471,8 @@ class MetadataPanel(QWidget):
         self._set_empty_state(True)
         self._file_header_widget.setVisible(False)
         self._info_label.setText("")
+        self._file_label.setText("")
+        self._file_label.setToolTip("")
         self._path_label.setText("")
         self._path_label.setToolTip("")
         self._tabs.setVisible(False)

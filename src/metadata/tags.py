@@ -316,7 +316,7 @@ def read_metadata(file_path: str) -> TrackMetadata:
         try:
             if audio.info is not None:
                 metadata.duration = float(audio.info.length)
-                metadata.bitrate = _read_bitrate(audio.info)
+                metadata.bitrate = read_bitrate(audio.info)
         except Exception:
             pass
         # Read separately because the easy interface cannot see a TXXX frame.
@@ -329,7 +329,7 @@ def read_metadata(file_path: str) -> TrackMetadata:
         del audio
 
 
-def _read_bitrate(info: Any) -> int | None:
+def read_bitrate(info: Any) -> int | None:
     """Bitrate in kbps from an already-open mutagen stream info, or None.
 
     Read here rather than opened for separately: this is the file handle the
