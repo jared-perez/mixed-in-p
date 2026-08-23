@@ -72,8 +72,6 @@ import time
 from PySide6.QtCore import QCoreApplication, QEvent, QObject, QThread, Signal
 from PySide6.QtNetwork import QLocalServer, QLocalSocket
 
-from ..utils.app_dirs import get_app_data_dir
-
 logger = logging.getLogger(__name__)
 
 APP_ID = "MixedInP"
@@ -321,6 +319,19 @@ class SingleInstance(QObject):
         which is two primaries again by a slower route.
         """
         import fcntl
+
+        # Imported here, not at module scope, and that is not a style
+        # preference: a module-level `from ..utils.app_dirs import
+        # get_app_data_dir` binds the function into *this* module's namespace,
+        # so patching it on its defining module — which is exactly what
+        # tests/conftest.py::isolated_app_data does — would not reach this
+        # call. It did not, for as long as this line existed: the
+        # single-instance tests wrote their lock files into the developer's
+        # real application-support directory instead of the throwaway one, and
+        # left 3336 of them there before anyone noticed. Every other caller of
+        # get_app_data_dir in the app already imports it inside the function
+        # that needs it, for this reason.
+        from ..utils.app_dirs import get_app_data_dir
 
         try:
             path = str(get_app_data_dir() / f"{self._name}.lock")

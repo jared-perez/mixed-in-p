@@ -12,6 +12,7 @@ from __future__ import annotations
 import itertools
 import json
 import os
+import sys
 
 import pytest
 from PySide6.QtCore import QEventLoop, QSemaphore, QThread, QTimer
@@ -250,6 +251,49 @@ def instances(qtbot, app_id):
     yield make
     for inst in made:
         inst.close()
+
+
+class TestItStaysInsideTheTestSandbox:
+    """The claim's lock file must land in the isolated data directory.
+
+    It did not, for as long as this module said
+    ``from ..utils.app_dirs import get_app_data_dir`` at the top: that binds
+    the function into ``single_instance``'s own namespace, and
+    ``isolated_app_data`` patches it on the module that *defines* it, so the
+    patch never reached the one call that matters. Every run of this file wrote
+    its locks into the developer's real application-support directory instead;
+    3336 of them had piled up there before anyone looked.
+
+    Nothing user-facing broke — the names carry a pid, so they never collide —
+    which is exactly why it needs a test rather than a comment.
+    """
+
+    @pytest.mark.skipif(sys.platform == "win32", reason="POSIX is the one that locks a file")
+    def test_the_lock_file_lands_in_the_isolated_data_dir(
+        self, instances, isolated_app_data
+    ):
+        inst = instances()
+        assert inst.try_claim()
+
+        # Globbed rather than named: the lock carries the *scoped* name (user
+        # and session), not the bare app id, and what is being asserted is the
+        # directory it went into.
+        assert [p.name for p in isolated_app_data.glob("*.lock")] == [
+            f"{inst.name}.lock"
+        ]
+
+    def test_the_helper_is_not_bound_at_import_time(self):
+        """The binding *is* the bug, so assert the binding.
+
+        Cheaper and more direct than watching for a file in the wrong place,
+        and it fails on the line someone would write to reintroduce it.
+        """
+        import src.gui.single_instance as single_instance
+
+        assert not hasattr(single_instance, "get_app_data_dir"), (
+            "import get_app_data_dir inside the function that calls it, or the "
+            "test suite's app-data isolation cannot reach it"
+        )
 
 
 class TestTheHarnessItself:
