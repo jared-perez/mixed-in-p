@@ -487,83 +487,84 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="136"/>
-        <location filename="../widgets/conversion_panel.py" line="308"/>
+        <location filename="../widgets/conversion_panel.py" line="138"/>
+        <location filename="../widgets/conversion_panel.py" line="331"/>
+        <location filename="../widgets/conversion_panel.py" line="552"/>
         <source>Convert</source>
         <translatorcomment>Dual-use title/button → bare noun 변환.</translatorcomment>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="139"/>
+        <location filename="../widgets/conversion_panel.py" line="141"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>오디오 파일을 다른 형식으로 변환해요 (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="151"/>
+        <location filename="../widgets/conversion_panel.py" line="153"/>
         <source>Target Format:</source>
         <translation>대상 형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="160"/>
+        <location filename="../widgets/conversion_panel.py" line="162"/>
         <source>Sample Rate:</source>
         <translatorcomment>DSP term &quot;sample rate&quot; (not the producer &quot;sample&quot;) → 샘플 레이트, the standard loanword in Korean audio software. Flag for native review.</translatorcomment>
         <translation>샘플 레이트:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="167"/>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="169"/>
+        <location filename="../widgets/conversion_panel.py" line="187"/>
         <source>Keep source</source>
         <translatorcomment>Combo item: keep the source file&apos;s own sample rate / bit depth (the engine leaves that axis alone).</translatorcomment>
         <translation>원본 유지</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="168"/>
+        <location filename="../widgets/conversion_panel.py" line="170"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="169"/>
+        <location filename="../widgets/conversion_panel.py" line="171"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="172"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="171"/>
+        <location filename="../widgets/conversion_panel.py" line="173"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="181"/>
+        <location filename="../widgets/conversion_panel.py" line="183"/>
         <source>Bit Depth:</source>
         <translatorcomment>bit depth → 비트 심도 (standard Korean DSP term).</translatorcomment>
         <translation>비트 심도:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="186"/>
+        <location filename="../widgets/conversion_panel.py" line="188"/>
         <source>32 bit</source>
         <translation>32비트</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="189"/>
         <source>24 bit (DVD)</source>
         <translation>24비트 (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="188"/>
+        <location filename="../widgets/conversion_panel.py" line="190"/>
         <source>16 bit (CD)</source>
         <translation>16비트 (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="189"/>
+        <location filename="../widgets/conversion_panel.py" line="191"/>
         <source>8 bit</source>
         <translation>8비트</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="199"/>
+        <location filename="../widgets/conversion_panel.py" line="201"/>
         <source>Bitrate:</source>
         <translation>비트레이트:</translation>
     </message>
@@ -572,88 +573,113 @@ or click “Add Artwork…”</source>
         <translation type="vanished">저장 위치:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="221"/>
-        <location filename="../widgets/conversion_panel.py" line="548"/>
+        <location filename="../widgets/conversion_panel.py" line="223"/>
+        <location filename="../widgets/conversion_panel.py" line="769"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>변환된 파일을 저장할 폴더 선택</translation>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="541"/>
+        <source>Turn off the pipeline — Convert goes back to converting only.</source>
+        <translation>파이프라인 끄기 — 변환은 다시 변환만 합니다.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="544"/>
+        <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
+        <translation>파이프라인 켜기: 변환 → 분석 → 여기에 지정한 재생목록에 추가.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="549"/>
+        <source>Start</source>
+        <translation>시작</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="550"/>
+        <source>Send the tracks through the pipeline</source>
+        <translation>트랙을 파이프라인으로 보냅니다</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="762"/>
         <source>Save converted files next to the originals</source>
         <translation>변환된 파일을 원본 옆에 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="266"/>
+        <location filename="../widgets/conversion_panel.py" line="268"/>
         <source>Files</source>
         <translatorcomment>파일 (Hangul) per glossary — Apple Korean Finder standard, never 문서.</translatorcomment>
         <translation>파일</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="233"/>
+        <location filename="../widgets/conversion_panel.py" line="235"/>
         <source>Source</source>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="269"/>
+        <location filename="../widgets/conversion_panel.py" line="271"/>
         <source>Drop audio files here to add them</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="272"/>
+        <location filename="../widgets/conversion_panel.py" line="274"/>
         <source>Filename</source>
         <translation>파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="273"/>
+        <location filename="../widgets/conversion_panel.py" line="275"/>
         <source>From</source>
         <translatorcomment>Column = source format → 원본 (rather than literal &quot;~에서&quot;). Pairs with 대상 below. Flag for native review.</translatorcomment>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="274"/>
+        <location filename="../widgets/conversion_panel.py" line="276"/>
         <source>To</source>
         <translatorcomment>Column = target format → 대상. Pairs with 원본 above.</translatorcomment>
         <translation>대상</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="275"/>
+        <location filename="../widgets/conversion_panel.py" line="277"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="302"/>
-        <location filename="../widgets/conversion_panel.py" line="792"/>
+        <location filename="../widgets/conversion_panel.py" line="304"/>
+        <location filename="../widgets/conversion_panel.py" line="1013"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="315"/>
+        <location filename="../widgets/conversion_panel.py" line="326"/>
+        <source>Playlist name</source>
+        <translation>재생목록 이름</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="338"/>
         <source>Send To</source>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="317"/>
+        <location filename="../widgets/conversion_panel.py" line="340"/>
         <source>Select at least one file to send.</source>
         <translation>보낼 파일을 하나 이상 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="319"/>
+        <location filename="../widgets/conversion_panel.py" line="342"/>
         <source>Analyze</source>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="320"/>
+        <location filename="../widgets/conversion_panel.py" line="343"/>
         <source>Rename</source>
         <translatorcomment>이름 변경 = Apple Korean Finder term for Rename.</translatorcomment>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="321"/>
+        <location filename="../widgets/conversion_panel.py" line="344"/>
         <source>Player</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="330"/>
+        <location filename="../widgets/conversion_panel.py" line="355"/>
         <source>Lossy files not allowed</source>
         <translatorcomment>lossy → 손실 (audio term). Flag for native review.</translatorcomment>
         <translation>손실 파일은 허용되지 않아요</translation>
@@ -663,27 +689,27 @@ or click “Add Artwork…”</source>
         <translation type="vanished">각 원본 파일과 같은 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="520"/>
+        <location filename="../widgets/conversion_panel.py" line="741"/>
         <source>Same folder as source</source>
         <translation>원본과 같은 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="539"/>
+        <location filename="../widgets/conversion_panel.py" line="760"/>
         <source>Save converted files to a folder instead</source>
         <translation>변환된 파일을 폴더에 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="569"/>
+        <location filename="../widgets/conversion_panel.py" line="790"/>
         <source>Choose Output Folder</source>
         <translation>출력 폴더 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="625"/>
+        <location filename="../widgets/conversion_panel.py" line="846"/>
         <source>Output Folder Unavailable</source>
         <translation>출력 폴더를 사용할 수 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="626"/>
+        <location filename="../widgets/conversion_panel.py" line="847"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -692,76 +718,76 @@ or click “Add Artwork…”</source>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="671"/>
+        <location filename="../widgets/conversion_panel.py" line="892"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="673"/>
+        <location filename="../widgets/conversion_panel.py" line="894"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="748"/>
-        <location filename="../widgets/conversion_panel.py" line="952"/>
+        <location filename="../widgets/conversion_panel.py" line="969"/>
+        <location filename="../widgets/conversion_panel.py" line="1180"/>
         <source>Done</source>
         <translation>완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="761"/>
+        <location filename="../widgets/conversion_panel.py" line="982"/>
         <source>Same format</source>
         <translation>동일한 형식</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="764"/>
+        <location filename="../widgets/conversion_panel.py" line="985"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>이 파일을 변환하려면 더 낮은 샘플 레이트 또는 비트 심도를 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="767"/>
+        <location filename="../widgets/conversion_panel.py" line="988"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>원본보다 높음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="770"/>
+        <location filename="../widgets/conversion_panel.py" line="991"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>이 파일보다 높지 않은 샘플 레이트와 비트 심도를 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="773"/>
-        <location filename="../widgets/conversion_panel.py" line="944"/>
-        <location filename="../widgets/conversion_panel.py" line="974"/>
+        <location filename="../widgets/conversion_panel.py" line="994"/>
+        <location filename="../widgets/conversion_panel.py" line="1172"/>
+        <location filename="../widgets/conversion_panel.py" line="1202"/>
         <source>Ready</source>
         <translation>준비됨</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="787"/>
+        <location filename="../widgets/conversion_panel.py" line="1008"/>
         <source>{count} files</source>
         <translation>파일 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="789"/>
+        <location filename="../widgets/conversion_panel.py" line="1010"/>
         <source>{count} to convert</source>
         <translation>변환 대상 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="791"/>
+        <location filename="../widgets/conversion_panel.py" line="1012"/>
         <source>({count} lossy skipped)</source>
         <translation>(손실 {count}개 건너뜀)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="916"/>
+        <location filename="../widgets/conversion_panel.py" line="1144"/>
         <source>Converting</source>
         <translation>변환 중</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="937"/>
+        <location filename="../widgets/conversion_panel.py" line="1165"/>
         <source>Incomplete</source>
         <translation>미완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="937"/>
+        <location filename="../widgets/conversion_panel.py" line="1165"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
@@ -1388,74 +1414,74 @@ or click “Add Artwork…”</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="120"/>
+        <location filename="../main_window.py" line="122"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="543"/>
-        <location filename="../main_window.py" line="572"/>
+        <location filename="../main_window.py" line="556"/>
+        <location filename="../main_window.py" line="585"/>
         <source>Export All Playlists</source>
         <translation>모든 재생목록 내보내기</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="564"/>
+        <location filename="../main_window.py" line="577"/>
         <source>Export failed</source>
         <translation>내보내기 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="565"/>
+        <location filename="../main_window.py" line="578"/>
         <source>Could not write the file:
 {0}</source>
         <translation>파일을 쓸 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="573"/>
+        <location filename="../main_window.py" line="586"/>
         <source>There are no playlists to export yet.</source>
         <translation>아직 내보낼 재생목록이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="578"/>
+        <location filename="../main_window.py" line="591"/>
         <source>Export complete</source>
         <translation>내보내기 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="579"/>
+        <location filename="../main_window.py" line="592"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>재생목록 {0}개({1}곡)를 다음 위치로 내보냈습니다:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="670"/>
+        <location filename="../main_window.py" line="683"/>
         <source>Select Audio Files</source>
         <translation>오디오 파일 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="681"/>
+        <location filename="../main_window.py" line="694"/>
         <source>Select Folder</source>
         <translation>폴더 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="911"/>
+        <location filename="../main_window.py" line="924"/>
         <source>No Audio Files</source>
         <translation>오디오 파일 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="912"/>
+        <location filename="../main_window.py" line="925"/>
         <source>No audio files found in:
 {0}</source>
         <translation>다음 위치에서 오디오 파일을 찾을 수 없어요:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="917"/>
+        <location filename="../main_window.py" line="930"/>
         <source>Invalid Folder</source>
         <translation>잘못된 폴더</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="918"/>
+        <location filename="../main_window.py" line="931"/>
         <source>Not a valid directory:
 {0}</source>
         <translatorcomment>directory → 디렉터리 (Apple Korean spelling). Flag for native review.</translatorcomment>
@@ -1471,17 +1497,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이미 분석이 실행 중이에요. 잠시 기다리거나 먼저 취소하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1060"/>
+        <location filename="../main_window.py" line="1073"/>
         <source>Analyzing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1092"/>
+        <location filename="../main_window.py" line="1105"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>완료: {0}개 분석, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1096"/>
+        <location filename="../main_window.py" line="1109"/>
         <source>Complete: {0} files analyzed</source>
         <translation>완료: 파일 {0}개 분석</translation>
     </message>
@@ -1490,52 +1516,67 @@ or click “Add Artwork…”</source>
         <translation type="vanished">취소됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1278"/>
+        <location filename="../main_window.py" line="1300"/>
         <source>Conversion in Progress</source>
         <translation>변환 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1279"/>
+        <location filename="../main_window.py" line="1301"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>이미 변환이 실행 중이에요. 잠시 기다리세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1332"/>
+        <location filename="../main_window.py" line="1512"/>
+        <source>Pipeline complete: {added} added to {playlist}</source>
+        <translation>파이프라인 완료: {playlist}에 {added}개 추가됨</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1517"/>
+        <source>{n} skipped</source>
+        <translation>{n}개 건너뜀</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1519"/>
+        <source>{n} errors</source>
+        <translation>오류 {n}개</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1558"/>
         <source>Converting...</source>
         <translation>변환 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1348"/>
+        <location filename="../main_window.py" line="1574"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>완료: {0}개 변환, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1352"/>
+        <location filename="../main_window.py" line="1578"/>
         <source>Complete: {0} files converted</source>
         <translation>완료: 파일 {0}개 변환</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1589"/>
+        <location filename="../main_window.py" line="1902"/>
         <source>Rename in Progress</source>
         <translation>이름 변경 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1590"/>
+        <location filename="../main_window.py" line="1903"/>
         <source>A rename operation is already running.</source>
         <translation>이미 이름 변경 작업이 실행 중이에요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1648"/>
+        <location filename="../main_window.py" line="1999"/>
         <source>Rename Failed</source>
         <translation>이름 변경 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1682"/>
+        <location filename="../main_window.py" line="2033"/>
         <source>Undo Rename</source>
         <translation>이름 변경 취소</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1713"/>
+        <location filename="../main_window.py" line="2068"/>
         <source>Undo Failed</source>
         <translation>실행 취소 실패</translation>
     </message>
@@ -1548,22 +1589,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1654"/>
+        <location filename="../main_window.py" line="2005"/>
         <source>No Session</source>
         <translation>세션 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1654"/>
+        <location filename="../main_window.py" line="2005"/>
         <source>No rename session to undo.</source>
         <translation>실행 취소할 이름 변경 세션이 없어요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1663"/>
+        <location filename="../main_window.py" line="2014"/>
         <source>Confirm Undo</source>
         <translation>실행 취소 확인</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1664"/>
+        <location filename="../main_window.py" line="2015"/>
         <source>Undo renaming of {0} files?</source>
         <translatorcomment>Object particle avoided via 의 + 을 on 이름 변경. Counter 개. Flag for native review.</translatorcomment>
         <translation>파일 {0}개의 이름 변경을 실행 취소할까요?</translation>
@@ -1573,7 +1614,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이름 변경 실행 취소 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1683"/>
+        <location filename="../main_window.py" line="2034"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>실행 취소: 파일 {0}개, 오류 {1}개</translation>
     </message>
@@ -2004,7 +2045,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1702"/>
-        <location filename="../widgets/player_panel.py" line="2935"/>
+        <location filename="../widgets/player_panel.py" line="2952"/>
         <source>Search all playlists…</source>
         <translation>모든 재생목록 검색…</translation>
     </message>
@@ -2085,7 +2126,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1305"/>
-        <location filename="../widgets/player_panel.py" line="3052"/>
+        <location filename="../widgets/player_panel.py" line="3069"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -2133,7 +2174,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1892"/>
-        <location filename="../widgets/player_panel.py" line="3049"/>
+        <location filename="../widgets/player_panel.py" line="3066"/>
         <source>Playlists</source>
         <translation>재생목록</translation>
     </message>
@@ -2228,8 +2269,8 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="2042"/>
-        <location filename="../widgets/player_panel.py" line="2892"/>
-        <location filename="../widgets/player_panel.py" line="2897"/>
+        <location filename="../widgets/player_panel.py" line="2909"/>
+        <location filename="../widgets/player_panel.py" line="2914"/>
         <source>Save Playlist</source>
         <translation>재생목록 저장</translation>
     </message>
@@ -2252,7 +2293,7 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/player_panel.py" line="2345"/>
         <location filename="../widgets/player_panel.py" line="2831"/>
-        <location filename="../widgets/player_panel.py" line="2879"/>
+        <location filename="../widgets/player_panel.py" line="2896"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
@@ -2267,184 +2308,184 @@ or click “Add Artwork…”</source>
         <translation>재생목록: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2876"/>
+        <location filename="../widgets/player_panel.py" line="2893"/>
         <source>Search: {0}</source>
         <translation>검색: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2893"/>
+        <location filename="../widgets/player_panel.py" line="2910"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>재생목록이 비어 있어요. 먼저 곡을 추가하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2897"/>
+        <location filename="../widgets/player_panel.py" line="2914"/>
         <source>Playlist name:</source>
         <translation>재생목록 이름:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2932"/>
+        <location filename="../widgets/player_panel.py" line="2949"/>
         <source>Search scope: {0}</source>
         <translation>검색 범위: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2937"/>
+        <location filename="../widgets/player_panel.py" line="2954"/>
         <source>Search this playlist…</source>
         <translation>이 재생목록 검색…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2960"/>
+        <location filename="../widgets/player_panel.py" line="2977"/>
         <source>No matching tracks</source>
         <translation>일치하는 곡이 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3411"/>
+        <location filename="../widgets/player_panel.py" line="3428"/>
         <source>File not found:
 {0}</source>
         <translation>파일을 찾을 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3586"/>
+        <location filename="../widgets/player_panel.py" line="3603"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>재생 중인 트랙과 어울리는 곡 숨기기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3588"/>
+        <location filename="../widgets/player_panel.py" line="3605"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>재생 중인 트랙과 어울리는 곡 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3910"/>
+        <location filename="../widgets/player_panel.py" line="3927"/>
         <source>{0}+ results</source>
         <translation>{0}+개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3913"/>
+        <location filename="../widgets/player_panel.py" line="3930"/>
         <source>{0} result</source>
         <translation>{0}개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3915"/>
+        <location filename="../widgets/player_panel.py" line="3932"/>
         <source>{0} results</source>
         <translation>{0}개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3919"/>
+        <location filename="../widgets/player_panel.py" line="3936"/>
         <source>{0} track</source>
         <translatorcomment>Counter for tracks/songs → 곡 per glossary. Korean has no plural; {0} track and {0} tracks render identically. Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3921"/>
+        <location filename="../widgets/player_panel.py" line="3938"/>
         <source>{0} tracks</source>
         <translatorcomment>Counter 곡. Same form as the singular (no Korean plural). Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4450"/>
+        <location filename="../widgets/player_panel.py" line="4467"/>
         <source>Reset Columns</source>
         <translation>열 초기화</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5143"/>
+        <location filename="../widgets/player_panel.py" line="5160"/>
         <source>“{0}” has moved.</source>
         <translation>‘{0}’이(가) 이동되었습니다.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5145"/>
+        <location filename="../widgets/player_panel.py" line="5162"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>선택한 파일 중 %n개가 이동되었습니다.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5148"/>
+        <location filename="../widgets/player_panel.py" line="5165"/>
         <source>File Has Moved</source>
         <translation>파일이 이동됨</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5152"/>
+        <location filename="../widgets/player_panel.py" line="5169"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>저장된 위치에 더 이상 없으므로 재생목록에 추가하거나 밖으로 끌어낼 수 없습니다. 이미 재생 중인 곡은 계속 재생됩니다. 파일이 이동되기 전에 메모리로 불러왔기 때문입니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5157"/>
+        <location filename="../widgets/player_panel.py" line="5174"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>곡을 마우스 오른쪽 버튼으로 클릭하고 ‘누락된 파일 찾기…’를 선택하세요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5304"/>
+        <location filename="../widgets/player_panel.py" line="5321"/>
         <source>Locate Missing File…</source>
         <translation>누락된 파일 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5306"/>
+        <location filename="../widgets/player_panel.py" line="5323"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5307"/>
+        <location filename="../widgets/player_panel.py" line="5324"/>
         <source>Open in Metadata Panel</source>
         <translation>메타데이터 패널에서 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5308"/>
+        <location filename="../widgets/player_panel.py" line="5325"/>
         <source>Reload Metadata from File</source>
         <translation>파일에서 메타데이터 다시 불러오기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5312"/>
+        <location filename="../widgets/player_panel.py" line="5329"/>
         <source>Look Up Online…</source>
         <translation>온라인에서 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5314"/>
+        <location filename="../widgets/player_panel.py" line="5331"/>
         <source>Remove from Playlist</source>
         <translation>재생목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5370"/>
-        <location filename="../widgets/player_panel.py" line="5398"/>
-        <location filename="../widgets/player_panel.py" line="5498"/>
-        <location filename="../widgets/player_panel.py" line="5571"/>
-        <location filename="../widgets/player_panel.py" line="5601"/>
+        <location filename="../widgets/player_panel.py" line="5387"/>
+        <location filename="../widgets/player_panel.py" line="5415"/>
+        <location filename="../widgets/player_panel.py" line="5515"/>
+        <location filename="../widgets/player_panel.py" line="5588"/>
+        <location filename="../widgets/player_panel.py" line="5618"/>
         <source>Look Up Online</source>
         <translation>온라인에서 찾기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5372"/>
+        <location filename="../widgets/player_panel.py" line="5389"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>선택한 트랙에는 검색에 쓸 아티스트나 제목이 없고, 파일 이름에서도 알 수 없어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5392"/>
+        <location filename="../widgets/player_panel.py" line="5409"/>
         <source>Looking up track details…</source>
         <translation>트랙 정보를 찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5393"/>
+        <location filename="../widgets/player_panel.py" line="5410"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5423"/>
+        <location filename="../widgets/player_panel.py" line="5440"/>
         <source>Looking up {0} of {1}…</source>
         <translation>{1}개 중 {0}번째 찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5431"/>
+        <location filename="../widgets/player_panel.py" line="5448"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Discogs 요청 제한이 풀리기를 기다리는 중…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5594"/>
+        <location filename="../widgets/player_panel.py" line="5611"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n개 트랙은 일치하는 항목이 없어요.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5597"/>
+        <location filename="../widgets/player_panel.py" line="5614"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n개 트랙을 업데이트했어요.</numerusform>
@@ -2454,7 +2495,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlaylistTree</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="477"/>
+        <location filename="../widgets/playlist_tree.py" line="478"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
@@ -2463,182 +2504,182 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이 폴더 안에 새로운 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="770"/>
+        <location filename="../widgets/playlist_tree.py" line="771"/>
         <source>New playlist inside this folder</source>
         <translation>이 폴더 안에 새로운 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="772"/>
+        <location filename="../widgets/playlist_tree.py" line="773"/>
         <source>New playlist below this one</source>
         <translation>이 아래에 새로운 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="858"/>
-        <location filename="../widgets/playlist_tree.py" line="952"/>
-        <location filename="../widgets/playlist_tree.py" line="972"/>
+        <location filename="../widgets/playlist_tree.py" line="859"/>
+        <location filename="../widgets/playlist_tree.py" line="953"/>
+        <location filename="../widgets/playlist_tree.py" line="973"/>
         <source>New Playlist</source>
         <translation>새로운 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="858"/>
-        <location filename="../widgets/playlist_tree.py" line="953"/>
-        <location filename="../widgets/playlist_tree.py" line="973"/>
+        <location filename="../widgets/playlist_tree.py" line="859"/>
+        <location filename="../widgets/playlist_tree.py" line="954"/>
+        <location filename="../widgets/playlist_tree.py" line="974"/>
         <source>New Folder</source>
         <translation>새로운 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="917"/>
+        <location filename="../widgets/playlist_tree.py" line="918"/>
         <source>Delete folder &quot;{0}&quot; and everything inside it?</source>
         <translation>폴더 ‘{0}’과(와) 그 안의 모든 항목을 삭제할까요?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="919"/>
+        <location filename="../widgets/playlist_tree.py" line="920"/>
         <source>Delete playlist &quot;{0}&quot;?</source>
         <translation>재생목록 ‘{0}’을(를) 삭제할까요?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="922"/>
+        <location filename="../widgets/playlist_tree.py" line="923"/>
         <source>Delete</source>
         <translation>삭제</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="955"/>
-        <location filename="../widgets/playlist_tree.py" line="961"/>
+        <location filename="../widgets/playlist_tree.py" line="956"/>
+        <location filename="../widgets/playlist_tree.py" line="962"/>
         <source>Rename</source>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="956"/>
-        <location filename="../widgets/playlist_tree.py" line="962"/>
+        <location filename="../widgets/playlist_tree.py" line="957"/>
+        <location filename="../widgets/playlist_tree.py" line="963"/>
         <source>Delete…</source>
         <translation>삭제…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="958"/>
+        <location filename="../widgets/playlist_tree.py" line="959"/>
         <source>Export Folder…</source>
         <translation>폴더 내보내기…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="966"/>
+        <location filename="../widgets/playlist_tree.py" line="967"/>
         <source>Export…</source>
         <translation>내보내기…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="968"/>
+        <location filename="../widgets/playlist_tree.py" line="969"/>
         <source>Export and Copy Tracks…</source>
         <translation>내보내고 곡 복사…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="987"/>
-        <location filename="../widgets/playlist_tree.py" line="994"/>
+        <location filename="../widgets/playlist_tree.py" line="988"/>
+        <location filename="../widgets/playlist_tree.py" line="995"/>
         <source>Export Playlist</source>
         <translation>재생목록 내보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="988"/>
-        <location filename="../widgets/playlist_tree.py" line="1057"/>
+        <location filename="../widgets/playlist_tree.py" line="989"/>
+        <location filename="../widgets/playlist_tree.py" line="1058"/>
         <source>This playlist is empty — there is nothing to export.</source>
         <translation>이 재생목록은 비어 있어서 내보낼 항목이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1009"/>
-        <location filename="../widgets/playlist_tree.py" line="1117"/>
+        <location filename="../widgets/playlist_tree.py" line="1010"/>
+        <location filename="../widgets/playlist_tree.py" line="1118"/>
         <source>Exported {0} tracks to:
 {1}</source>
         <translation>{0}곡을 다음 위치로 내보냈습니다:
 {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1019"/>
+        <location filename="../widgets/playlist_tree.py" line="1020"/>
         <source>Export Folder</source>
         <translation>폴더 내보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1037"/>
+        <location filename="../widgets/playlist_tree.py" line="1038"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>재생목록 {0}개({1}곡)를 다음 위치로 내보냈습니다:
 {2}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1056"/>
-        <location filename="../widgets/playlist_tree.py" line="1083"/>
+        <location filename="../widgets/playlist_tree.py" line="1057"/>
+        <location filename="../widgets/playlist_tree.py" line="1084"/>
         <source>Export and Copy Tracks</source>
         <translation>내보내고 곡 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1063"/>
+        <location filename="../widgets/playlist_tree.py" line="1064"/>
         <source>Export in Progress</source>
         <translation>내보내기 진행 중</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1064"/>
+        <location filename="../widgets/playlist_tree.py" line="1065"/>
         <source>An export is already running. Please wait.</source>
         <translation>이미 내보내기가 진행 중입니다. 잠시 기다려 주세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1068"/>
+        <location filename="../widgets/playlist_tree.py" line="1069"/>
         <source>Choose Where to Create the Folder</source>
         <translation>폴더를 만들 위치 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1081"/>
+        <location filename="../widgets/playlist_tree.py" line="1082"/>
         <source>Copying tracks…</source>
         <translation>곡 복사 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1081"/>
+        <location filename="../widgets/playlist_tree.py" line="1082"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1108"/>
+        <location filename="../widgets/playlist_tree.py" line="1109"/>
         <source>Copying {0}</source>
         <translation>{0} 복사 중</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/playlist_tree.py" line="1124"/>
+        <location filename="../widgets/playlist_tree.py" line="1125"/>
         <source>%n track(s) could not be found and were skipped.</source>
         <translation>
             <numerusform>%n곡을 찾을 수 없어 건너뛰었습니다.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1132"/>
-        <location filename="../widgets/playlist_tree.py" line="1190"/>
+        <location filename="../widgets/playlist_tree.py" line="1133"/>
+        <location filename="../widgets/playlist_tree.py" line="1191"/>
         <source>Export failed</source>
         <translation>내보내기 실패</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1133"/>
-        <location filename="../widgets/playlist_tree.py" line="1191"/>
+        <location filename="../widgets/playlist_tree.py" line="1134"/>
+        <location filename="../widgets/playlist_tree.py" line="1192"/>
         <source>Could not write the file:
 {0}</source>
         <translation>파일을 쓸 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1164"/>
+        <location filename="../widgets/playlist_tree.py" line="1165"/>
         <source>Serato — drag the file onto the crate panel</source>
         <translation>Serato — 파일을 crate 패널로 끌어다 놓기</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1165"/>
+        <location filename="../widgets/playlist_tree.py" line="1166"/>
         <source>Rekordbox — File → Import Playlist</source>
         <translation>Rekordbox — File → Import Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1166"/>
+        <location filename="../widgets/playlist_tree.py" line="1167"/>
         <source>Traktor — File → Import</source>
         <translation>Traktor — File → Import</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1179"/>
+        <location filename="../widgets/playlist_tree.py" line="1180"/>
         <source>Export complete</source>
         <translation>내보내기 완료</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1182"/>
+        <location filename="../widgets/playlist_tree.py" line="1183"/>
         <source>To import it:</source>
         <translation>가져오는 방법:</translation>
     </message>
@@ -2646,27 +2687,27 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlaylistTreePanel</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1553"/>
+        <location filename="../widgets/playlist_tree.py" line="1573"/>
         <source>+ Playlist</source>
         <translation>+ 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1554"/>
+        <location filename="../widgets/playlist_tree.py" line="1574"/>
         <source>+ Folder</source>
         <translation>+ 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1577"/>
+        <location filename="../widgets/playlist_tree.py" line="1597"/>
         <source>Playlist name…</source>
         <translation>재생목록 이름…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1624"/>
+        <location filename="../widgets/playlist_tree.py" line="1644"/>
         <source>Close the playlist filter</source>
         <translation>재생목록 필터 닫기</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1626"/>
+        <location filename="../widgets/playlist_tree.py" line="1646"/>
         <source>Filter playlists by name</source>
         <translation>이름으로 재생목록 필터링</translation>
     </message>
@@ -3917,7 +3958,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="584"/>
+        <location filename="../widgets/vis_canvas.py" line="586"/>
         <source>Visualizer</source>
         <translation>시각 효과</translation>
     </message>
