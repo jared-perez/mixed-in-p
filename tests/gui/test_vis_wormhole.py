@@ -15,6 +15,8 @@ from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
 from src.gui.widgets.vis_canvas import FFT_SIZE, POPOUT_MODES, RENDER_MODES, VisRenderer
 from src.gui.widgets import vis_wormhole
 from src.gui.widgets.vis_wormhole import (
+    BACKDROP_CAP,
+    POPOUT_CAP,
     TUNNEL_R,
     WormholeScene,
     build_loop,
@@ -109,10 +111,44 @@ def test_level_speeds_travel_up(scene):
     assert loud._s > scene._s
 
 
-def test_target_size_follows_the_host_aspect(scene):
+def test_target_size_follows_the_host_aspect_and_size(scene):
+    """Under the cap it renders at the host's own resolution, not a fixed one."""
     scene.set_target_size(1000, 500)
-    assert scene.image().width() == 512  # round(256 * 2)
-    assert scene.image().height() == 256
+    assert (scene.image().width(), scene.image().height()) == (1000, 500)
+
+
+def test_a_retina_popout_is_capped_and_left_to_the_host_to_upscale(qapp):
+    """1400x800 logical at 2x: 2100x1200 — not 2800x1600, and not the old 448x256.
+
+    The cap bounds a frame at about 8 ms of the 33 this mode has; native would
+    be 10.7 here and unbounded on a larger display.
+    """
+    scene = WormholeScene()
+    scene.set_target_size(2800, 1600, popout=True)
+    assert (scene.image().width(), scene.image().height()) == (2100, 1200)
+    assert scene.image().height() <= POPOUT_CAP[1]
+
+
+def test_the_backdrop_gets_the_smaller_budget(qapp):
+    """The playlist repaint behind it costs ~11 ms; the frame must not add to that."""
+    scene = WormholeScene()
+    scene.set_target_size(2800, 1600)
+    assert scene.image().width() <= BACKDROP_CAP[0]
+    assert scene.image().height() <= BACKDROP_CAP[1]
+
+
+def test_the_focal_length_follows_the_image_height(qapp):
+    """Fixed vertical field of view: it is derived from the height, not frozen.
+
+    Left at construction's value, every resize would silently change the field
+    of view — a taller image would show *less* of the tunnel, not more of it at
+    a finer grain.
+    """
+    scene = WormholeScene()
+    scene.set_target_size(500, 250)  # both sizes under the cap, so both are native
+    half = scene._focal
+    scene.set_target_size(1000, 500)
+    assert scene._focal == pytest.approx(half * 2)
 
 
 def test_target_size_does_not_reallocate_when_unchanged(scene):
@@ -132,11 +168,56 @@ def test_target_size_ignores_an_unshown_host(scene):
     assert scene.image() is before
 
 
-def test_target_size_clamps(scene):
-    scene.set_target_size(10000, 100)  # absurdly wide
-    assert scene.image().width() == 1024
-    scene.set_target_size(10, 1000)  # absurdly tall
-    assert scene.image().width() == 128
+def test_the_cap_never_distorts_the_aspect(qapp):
+    """A stretched wireframe draws ellipses where the rings should be."""
+    scene = WormholeScene()
+    for width, height in ((3000, 600), (2800, 1600), (600, 1200)):
+        scene.set_target_size(width, height, popout=True)
+        image = scene.image()
+        assert image.width() / image.height() == pytest.approx(width / height, rel=0.01)
+
+
+def test_a_star_keeps_its_apparent_size_as_the_resolution_changes(qapp):
+    """The cell is a size at _REF_H, scaled with the image.
+
+    This is the property that lets the render resolution move at all: the image
+    is drawn into a fixed logical rect, so a star cell of ``n * height /
+    _REF_H`` lands at the same size on screen whatever height the image is. Left
+    as a constant, raising the resolution would have shrunk the stars to
+    hairlines — the wireframe would have got its detail by deleting the sky.
+    """
+    scene = WormholeScene()
+    scene.set_target_size(512, 256, popout=True)
+    small = scene.star_cell()
+    scene.set_target_size(2048, 1024, popout=True)  # popout: both under its cap
+    assert scene.star_cell() == small * 4
+
+
+def test_the_pen_keeps_its_apparent_width_as_the_resolution_changes(qapp):
+    """Same rule for the wireframe: finer, not thinner.
+
+    Measured on the rendered frame rather than on the constant, because the
+    constant is applied at the paint and a test on it would pass against a paint
+    that ignored it. A ring at the same place in the same flight should cover
+    the same *fraction* of the frame at either resolution.
+    """
+    def lit_fraction(height: int) -> float:
+        scene = WormholeScene()
+        scene.set_target_size(height * 2, height)
+        for _ in range(6):
+            scene.render(0.6, 0.0)
+        image = scene.image().convertToFormat(QImage.Format.Format_ARGB32)
+        raw = np.frombuffer(image.constBits(), dtype=np.uint8)
+        raw = raw.reshape(image.height(), image.bytesPerLine() // 4, 4)[:, : image.width()]
+        return float((raw[..., 3] > 80).mean())
+
+    assert lit_fraction(512) == pytest.approx(lit_fraction(256), rel=0.25)
+
+
+def test_a_host_smaller_than_the_cap_renders_at_its_own_size(qapp):
+    scene = WormholeScene()
+    scene.set_target_size(400, 200)
+    assert (scene.image().width(), scene.image().height()) == (400, 200)
 
 
 def test_it_draws_a_tunnel_and_stars(scene):
@@ -168,8 +249,26 @@ def test_renderer_returns_the_wormholes_own_image(qapp):
     renderer.set_mode("wormhole")
     renderer.set_target_size(1000, 500)
     image = renderer.render(_noise(np.random.default_rng(0)), 44100)
-    assert (image.width(), image.height()) == (512, 256)
+    assert (image.width(), image.height()) == (1000, 500)
     assert renderer.image() is image
+
+
+def test_the_renderer_tells_the_scene_which_host_is_asking(qapp):
+    """The popout's cap is more than twice the backdrop's, and only this passes it.
+
+    Dropped, the fix is half-applied and silent: the popout renders at the
+    backdrop's 512 and looks better than it did but not as it should, with
+    nothing anywhere to say why.
+    """
+    renderer = VisRenderer()
+    renderer.set_mode("wormhole")
+    renderer.set_target_size(2800, 1600, popout=True)
+    popout = renderer.render(_noise(np.random.default_rng(0)), 44100)
+    assert popout.height() > BACKDROP_CAP[1]
+
+    renderer.set_target_size(2800, 1600)
+    backdrop = renderer.render(_noise(np.random.default_rng(0)), 44100)
+    assert backdrop.height() <= BACKDROP_CAP[1]
 
 
 def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
@@ -209,14 +308,15 @@ def test_mode_is_allow_listed_and_offered_by_both_hosts():
 def test_a_frame_stays_cheap(qapp):
     """A loose guard against an accidental O(pixels) rewrite.
 
-    The mode measures ~1.6 ms/frame against a 33 ms budget; the bound here is
-    an order of magnitude above that so it can't flake under a full-suite
+    At the popout's cap — which is where the mode is most expensive, and what
+    it renders on a Retina display — it measures ~8 ms against a 33 ms budget.
+    The bound here is well above that so it can't flake under a full-suite
     load. If it ever does flake anyway, delete it rather than widen it — the
     real cost lives in the plan, not in this number.
     """
     renderer = VisRenderer()
     renderer.set_mode("wormhole")
-    renderer.set_target_size(608, 256)
+    renderer.set_target_size(2800, 1600, popout=True)
     rng = np.random.default_rng(0)
     renderer.render(_noise(rng), 44100)  # first frame builds the loop path
     times = []
@@ -224,7 +324,7 @@ def test_a_frame_stays_cheap(qapp):
         start = time.perf_counter()
         renderer.render(_noise(rng), 44100)
         times.append(time.perf_counter() - start)
-    assert float(np.median(times)) * 1000 < 15.0
+    assert float(np.median(times)) * 1000 < 25.0
 
 
 # ── Stars respond to the kick ──────────────────────────────────────────────
@@ -277,7 +377,7 @@ def test_stars_are_crosses_rather_than_blocks(scene):
     for _ in range(3):
         scene.render(0.3, 1.0)  # kick-lit, so the arms are at full alpha
     _alpha, lit = _star_pixels(scene.image())
-    cell = vis_wormhole._STAR_CELL
+    cell = scene.star_cell()
 
     def shifted(dx, dy):
         return np.roll(np.roll(lit, dy * cell, axis=0), dx * cell, axis=1)

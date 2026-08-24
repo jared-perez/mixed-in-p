@@ -185,12 +185,13 @@ class VisRenderer:
     def smooth_upscale(self) -> bool:
         """Whether the host should interpolate when scaling this mode up.
 
-        The retro modes are meant to look like big pixels. Tunnel Chase is
-        antialiased line work rendered near the host's own size, so a nearest
-        -neighbour blow-up would undo the thing it renders large for. Measured
-        at 0.4 ms for a full-frame upscale, i.e. free.
+        The retro modes are meant to look like big pixels. Both wireframe modes
+        are antialiased line work rendered near the host's own size, so a
+        nearest-neighbour blow-up would undo the thing they render large for —
+        it is what made the wormhole read as a staircase. Measured at 0.4 ms for
+        a full-frame upscale, i.e. free.
         """
-        return self._mode == "tunnel_chase"
+        return self._mode in ("tunnel_chase", "wormhole")
 
     def set_frame_interval(self, frame_ms: float) -> None:
         """Tell the renderer how often it is being advanced.
@@ -267,14 +268,15 @@ class VisRenderer:
         """Tell the renderer the host's pixel size; a no-op for most modes.
 
         Only the two wireframe modes care: they draw true circles, so their
-        image has to share the host's aspect or the rings come out as
-        ellipses. The other modes are a fixed low-res grid the host stretches.
+        image has to share the host's aspect or the rings come out as ellipses,
+        and they render near the host's own resolution rather than being blown
+        up. The other modes are a fixed low-res grid the host stretches.
 
-        Tunnel Chase additionally wants **device** pixels and needs to know
-        which host is asking, because the two have different budgets — see
+        Both therefore want **device** pixels and need to know which host is
+        asking, because the two have different budgets — see
         :meth:`TunnelChaseScene.set_target_size`.
         """
-        self._wormhole.set_target_size(width, height)
+        self._wormhole.set_target_size(width, height, popout)
         self._tunnel.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:

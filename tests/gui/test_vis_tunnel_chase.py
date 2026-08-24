@@ -694,12 +694,22 @@ def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
 
 
 def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
-    """60 fps and interpolation for this one; 30 and chunky pixels for the rest."""
+    """60 fps for this one alone; interpolation for both wireframe modes.
+
+    The two are separate axes and only look like one here. The frame rate is
+    about the beat clock (33 ms is too coarse a kick flux to lock on); the
+    smoothing is about what the mode draws — line work rendered near the host's
+    own size, where a nearest-neighbour blow-up undoes the resolution, against
+    the retro modes, which are meant to look like big pixels.
+    """
     renderer = VisRenderer()
     renderer.set_mode("tunnel_chase")
     assert renderer.frame_ms() == TUNNEL_FRAME_MS
     assert renderer.smooth_upscale() is True
-    for mode in ("spectrum", "fire", "fractal", "wormhole", "oscilloscope"):
+    renderer.set_mode("wormhole")
+    assert renderer.frame_ms() == FRAME_MS
+    assert renderer.smooth_upscale() is True
+    for mode in ("spectrum", "fire", "fractal", "oscilloscope"):
         renderer.set_mode(mode)
         assert renderer.frame_ms() == FRAME_MS
         assert renderer.smooth_upscale() is False

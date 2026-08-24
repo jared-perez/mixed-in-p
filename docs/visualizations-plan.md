@@ -123,15 +123,40 @@ is radioactive):
    transient).
 
    The exception to the small-image rule above, in two ways. Its cost is
-   **O(lines), not O(pixels)** — QPainter calls dominate — so four times the
-   resolution costs nothing, and it renders antialiased at 608×256 for
-   **1.6 ms/frame** (measured, against the fractal's 0.7) rather than as a
-   staircase on the 152×64 grid. And because a wireframe stretched
-   non-uniformly would draw *ellipses* for rings, it owns its image and
-   matches the aspect to the host: `VisRenderer.set_target_size(w, h)` (a
-   no-op for every other mode), called by both hosts before each frame, fixes
-   the height at 256 and derives the width, reallocating only on a real
-   resize. The path and scene live in `src/gui/widgets/vis_wormhole.py`;
+   **O(lines), not O(pixels)** — QPainter calls dominate — so resolution is
+   cheap here in a way it is not for the per-pixel modes, and it renders
+   antialiased rather than as a staircase on the 152×64 grid. And because a
+   wireframe stretched non-uniformly would draw *ellipses* for rings, it owns
+   its image and matches the aspect to the host:
+   `VisRenderer.set_target_size(w, h, popout)` (a no-op for every other mode),
+   called by both hosts before each frame, reallocating only on a real resize.
+
+   It used to fix the height at **256** whatever was asking and let the host
+   blow it up with nearest-neighbour, which on a Retina popout is 448×256
+   stretched to 2800×1600 — one image pixel per 6.25 device pixels, and the
+   wireframe read as a staircase. It now sizes from **device** pixels under
+   caps of its own (1216×512 backdrop, 2400×1200 popout) and the host
+   interpolates the remainder (`VisRenderer.smooth_upscale()`, true for both
+   wireframe modes). Measured, one frame: 1.6 ms at the old 448×256, 3.1 at
+   the backdrop's 896×512, **8.0 at the popout's 2100×1200**, 10.7 rendering
+   a 2800×1600 host natively. The popout's cap is more than Tunnel Chase's
+   despite looking like the same decision, and the reason is the frame rate,
+   not the picture: the tunnel runs at 60 fps and has 16 ms, this runs at 30
+   and has 33. Native is sharper at 1:1 and was declined because it is a third
+   of the frame here and unbounded on a larger display (5K would be ~20 ms).
+
+   Two sizes had to become *reference* sizes for any of that to be safe — the
+   pen width and the star cell, both scaled by `height / 256`. The image is
+   drawn into a fixed logical rect, so scaling them keeps a line's and a
+   star's **apparent** size constant while the resolution changes; left as
+   constants, raising the resolution would have made the wireframe thinner and
+   shrunk the pixel stars to hairlines, i.e. bought the tunnel its detail by
+   deleting the sky. The focal length is derived from the image height for the
+   same reason, and re-derived on every resize — frozen at construction, a
+   resize would silently change the field of view. Before and after at 1:1
+   device pixels: `evidence/wormhole/resolution_sheet.py`.
+
+   The path and scene live in `src/gui/widgets/vis_wormhole.py`;
    numpy + QPainter only, no OpenGL and no scipy (`scipy.interpolate` alone
    imports in 194 ms — the 25×25 dense solve that replaces it takes ~8 ms,
    lazily, on the first rendered frame).

@@ -3755,9 +3755,9 @@ class PlayerPanel(QWidget):
         # The wormhole sizes its image from the host's aspect so its rings
         # stay circular; every other mode ignores this.
         viewport = self._table.viewport()
-        # Device pixels: Tunnel Chase renders near the host's real resolution
-        # and lets the host scale, rather than being blown up 2x on a Retina
-        # display. The other modes ignore the size entirely.
+        # Device pixels: both wireframe modes render near the host's real
+        # resolution and let the host scale, rather than being blown up 2x on a
+        # Retina display. The other modes ignore the size entirely.
         ratio = viewport.devicePixelRatioF()
         self._backdrop_renderer.set_target_size(
             round(viewport.width() * ratio), round(viewport.height() * ratio)
