@@ -1,8 +1,8 @@
 """Tunnel Chase: the wormhole's sibling, flown to the beat.
 
-Same wireframe tube and the same O(lines) cost, but where the wormhole flies a
-frozen closed loop at a speed set by the level, this one is **generated ahead
-of the camera in beat-space**: arc length is measured in beats
+Same tube geometry as the wormhole's, but where that one flies a frozen closed
+loop at a speed set by the level, this one is **generated ahead of the camera
+in beat-space**: arc length is measured in beats
 (``UNITS_PER_BEAT`` world units each), so a turn scheduled for beat 16 is a
 bend in the tube at 16 × U units, and the camera reaches it exactly when the
 music does. Speed is therefore the tempo, not the volume.
@@ -16,6 +16,15 @@ Why it cannot be a precomputed loop like the wormhole's: the turns have to
 fall where the *beats* fall, so the loop's turn spacing would have to be
 locked to the beat grid and its length to the tempo, and every tempo change
 would need a new loop. Generating ahead is both simpler and exact.
+
+**The wall is a nebula, not a wireframe.** The ring mesh is still what the
+picture is built on — the bends, the drift, the pulse ripple and the depth
+fades all live in it — but what gets *drawn* at its vertices is a wall of
+additive cloud puffs, translucent enough that the stars and planets carry
+straight through it. See "The nebula wall" below for the whole of it. The
+wireframe itself survives as a knob (``_NEBULA_MESH_ALPHA``, off) because the
+beat-locked turns are this mode's soul and cloud may soften the turn read on a
+real track — a judgement only the running app can settle.
 
 Three things the prototype taught about the picture, all of which the code
 below is shaped by:
@@ -32,8 +41,8 @@ below is shaped by:
   the horizontal through the vanishing point. Hence the half-segment angle
   offset below, and hence ``scripts/vis_sheet.py``.
 * **It owns its image and follows the host's aspect**, like the wormhole —
-  a wireframe stretched non-uniformly draws ellipses for rings — and that
-  image is never assigned to ``VisRenderer._image``.
+  a tube stretched non-uniformly draws ellipses for rings — and that image is
+  never assigned to ``VisRenderer._image``.
 
 The beat itself comes from :class:`~.beat_clock.BeatClock`; no audio and no
 tempo estimation happens here. :meth:`TunnelChaseScene.render` takes a phase
@@ -45,7 +54,7 @@ from __future__ import annotations
 import math
 
 import numpy as np
-from PySide6.QtCore import QLineF, QPointF, Qt
+from PySide6.QtCore import QLineF, QPointF, QRectF, Qt
 from PySide6.QtGui import (
     QBrush,
     QColor,
@@ -148,7 +157,7 @@ _PLANET_RADIUS = (0.6, 1.8)  # world units
 # They are chances rather than counts because there are only three planets on
 # screen at a time, and a "small percentage" is a property of the stream rather
 # than of the three. Measured over three minutes at 128 BPM: **about fifty
-# planets a minute**, of which nine are dusky, nine wear the wireframe's own
+# planets a minute**, of which nine are dusky, nine wear the accent's own
 # colour and ten carry rings. (Fifty is more churn than the geometry suggests —
 # a planet spawns 22 to 42 units out and travels at 5.3 units a second, so it
 # should last four to eight — because a turn swings the ones off to the side
@@ -185,6 +194,151 @@ _PLANET_RING_MAX_ALPHA = 0.85
 _HISTORY = 4.0  # world units of path kept behind the camera
 
 _GREY = (205, 205, 215)
+
+# ── The nebula wall ────────────────────────────────────────────────────────
+#
+# The tube's wall is not a wireframe but a cloud: additive pre-rendered puffs
+# anchored to the ring mesh's own vertices, drawn in the mesh's slot of the
+# paint order (planets → stars → wall). Everything the geometry already knows
+# — the beat-locked bends, the drift, the pulse ripple on the radius, the
+# depth fades — is inherited by the cloud for free, because a puff is drawn
+# *at* a mesh vertex rather than in screen space.
+#
+# It is a pure function of world arc length, like the path itself: every
+# property of a puff is hashed from ``ring_s`` and the segment index, never
+# from the ring *slot* k, which re-seats every ``_SPACING`` and would make the
+# texture swim. There is no per-frame state, so nothing here belongs in
+# :meth:`TunnelChaseScene.set_frame_interval` and the 16 ms and 33 ms hosts
+# render identical worlds.
+#
+# Measured (PoC, 1600×720, the popout cap): the cost is per pixel *covered*,
+# so the culls below are coverage caps rather than taste. Smooth filtering off
+# is 1.65 ms against 2.19 ms on for the same puffs, which is why three sprite
+# sizes are baked — a soft blob tolerates nearest-neighbour sampling as long as
+# it is not being scaled by a factor of four.
+_NEBULA_PALETTE = [  # blue → violet → magenta → teal → green
+    (45, 95, 255),
+    (115, 65, 255),
+    (185, 70, 235),
+    (45, 200, 185),
+    (70, 220, 130),
+]
+# Deliberately the nebula's own colours and not the theme accent: the wireframe
+# colour stays on the sky's tinted stars and planets, so `_palette()` and
+# `_planet_tints()` are untouched and `set_color` does not rebuild a sprite.
+_NEBULA_WALL_R = 1.45  # puffs sit this far out from the tube axis, in wall radii
+_PUFF_WORLD_R = 0.5  # world-unit radius of one puff
+_PUFF_ALPHA = 0.5  # base opacity, before every fade
+_PUFF_FADE_EXP = 2.2  # *extra* far fade over the mesh's own; see below
+_PUFF_VARIANTS = 4  # distinct cloud shapes baked
+# Pixel sizes at the 512-high reference, scaled like every other one. The PoC
+# proved 3.5 / 7.0 / 300 at 720 high, which is what these are at that height.
+_PUFF_MIN_PX = 2.5  # smaller than this is a blit nobody sees
+_PUFF_THIN_PX = 5.0  # below this only every other segment is drawn
+_PUFF_MAX_PX = 210.0  # a puff passing the lens may not fill the frame twice over
+_PUFF_ALPHA_CULL = 0.02
+# The hue field: two nested sinusoids over (arc length, angle), so one colour
+# holds for a stretch of tube and a stretch of wall rather than banding by ring
+# or by segment, plus a ±1-stop hash jitter that scatters the boundary.
+_HUE_FIELD_S = 0.16  # how fast the colour walks along the tube
+_HUE_FIELD_SWIRL = 1.4  # how far the angular term bends the walk
+_HUE_FIELD_THETA = 2.0  # lobes around the wall
+_HUE_FIELD_TWIST = 0.045  # ...and how fast those lobes rotate along it
+_HUE_JITTER = 1.2  # stops of per-puff scatter across a boundary
+# Sprite pixel sizes, and the drawn diameters they hand over at (the geometric
+# means, so each sprite is used within √2 of its own resolution). All three are
+# the *same* cloud downsampled, never separately generated noise: a puff
+# crossing a threshold as it approaches would otherwise change texture.
+_PUFF_SPRITE_SIZES = (32, 64, 128)
+_PUFF_SIZE_SWITCH = (45.3, 90.5)
+# A whisper of the old wireframe under the cloud, off by default. It is kept
+# because the beat-locked turns are this mode's soul and cloud may soften the
+# turn read on a real track — that is a judgement from the running app, and at
+# 0.18 it costs a measured 3.5 ms.
+_NEBULA_MESH_ALPHA = 0.0
+
+_SPRITE_CACHE: dict[int, list] = {}
+
+
+def _value_noise(size: int, cells: int, rng: np.random.Generator) -> np.ndarray:
+    """One octave of bilinear-interpolated value noise, ``size`` square, 0..1."""
+    grid = rng.random((cells + 1, cells + 1))
+    idx = np.linspace(0, cells - 1e-6, size)
+    i0 = idx.astype(int)
+    frac = idx - i0
+    a = grid[i0][:, i0]
+    b = grid[i0 + 1][:, i0]
+    c = grid[i0][:, i0 + 1]
+    d = grid[i0 + 1][:, i0 + 1]
+    fy, fx = frac[:, None], frac[None, :]
+    return a * (1 - fy) * (1 - fx) + b * fy * (1 - fx) + c * (1 - fy) * fx + d * fy * fx
+
+
+def _puff_alpha_master(size: int, rng: np.random.Generator) -> np.ndarray:
+    """One cloud's coverage, 0..1: three octaves of noise inside a soft disc."""
+    yy, xx = np.mgrid[0:size, 0:size]
+    cx = (xx - size / 2) / (size / 2)
+    cy = (yy - size / 2) / (size / 2)
+    falloff = np.clip(1.0 - (cx * cx + cy * cy), 0.0, 1.0) ** 2
+    noise = (
+        _value_noise(size, 4, rng)
+        + 0.5 * _value_noise(size, 9, rng)
+        + 0.25 * _value_noise(size, 18, rng)
+    )
+    noise = (noise - noise.min()) / (noise.max() - noise.min() + 1e-9)
+    return falloff * (0.25 + 0.75 * noise ** 1.4)
+
+
+def _bake_nebula_sprites(seed: int) -> list[list[list[QImage]]]:
+    """``[size][hue][variant]`` premultiplied cloud sprites, baked once.
+
+    Noise is evaluated *here* and never per frame or per pixel: the per-frame
+    work is a handful of hashes and a run of blits. About 1.7 MB in total for
+    all sixty images, and cached per seed because every scene built from the
+    same seed wants the same clouds — including the forty in the test suite.
+    """
+    cached = _SPRITE_CACHE.get(seed)
+    if cached is not None:
+        return cached
+    rng = np.random.default_rng(seed + 500)
+    biggest = max(_PUFF_SPRITE_SIZES)
+    masters = [_puff_alpha_master(biggest, rng) for _ in range(_PUFF_VARIANTS)]
+    sprites: list[list[list[QImage]]] = []
+    for size in _PUFF_SPRITE_SIZES:
+        step = biggest // size
+        # Area-average down from the one master, so the three sizes are the
+        # same cloud at three resolutions rather than three different clouds.
+        scaled = [
+            m.reshape(size, step, size, step).mean(axis=(1, 3)) if step > 1 else m
+            for m in masters
+        ]
+        by_hue: list[list[QImage]] = []
+        for red, green, blue in _NEBULA_PALETTE:
+            row: list[QImage] = []
+            for cover in scaled:
+                # Format_ARGB32_Premultiplied is BGRA in memory on a
+                # little-endian host, and premultiplied means every channel is
+                # already scaled by the coverage.
+                buf = np.empty((size, size, 4), np.uint8)
+                buf[..., 0] = blue * cover
+                buf[..., 1] = green * cover
+                buf[..., 2] = red * cover
+                buf[..., 3] = cover * 255
+                image = QImage(
+                    buf.tobytes(), size, size,
+                    QImage.Format.Format_ARGB32_Premultiplied,
+                )
+                row.append(image.copy())  # own the pixels; buf is about to go
+            by_hue.append(row)
+        sprites.append(by_hue)
+    _SPRITE_CACHE[seed] = sprites
+    return sprites
+
+
+def _hash01(value: np.ndarray, scale: float) -> np.ndarray:
+    """The usual sine hash, as a fraction: deterministic, cheap, world-anchored."""
+    raw = np.sin(value) * scale
+    return raw - np.floor(raw)
 
 
 def schedule_turns(beat_from: int, beat_to: int, rng: np.random.Generator,
@@ -374,6 +528,12 @@ class TunnelChaseScene:
         # neighbours.
         theta = np.linspace(0, 2 * np.pi, _SEGMENTS, endpoint=False) + np.pi / _SEGMENTS
         self._cos, self._sin = np.cos(theta), np.sin(theta)
+        self._sprites = _bake_nebula_sprites(seed)
+        # Rows, not columns: every per-puff array below is (ring, segment), so
+        # these broadcast against ``ring_s[:, None]`` without a reshape a frame.
+        self._seg = np.arange(_SEGMENTS)[None, :]
+        self._seg_theta = theta[None, :]
+        self._seg_odd = (self._seg % 2 == 1)
         self._stars = np.empty((_N_STARS, 3))
         self._star_kind = np.empty(_N_STARS, int)
         self._planets = np.empty((_N_PLANETS, 4))  # x, y, z, radius
@@ -439,7 +599,7 @@ class TunnelChaseScene:
         it natively would cost around 10 ms a frame for no visible gain.
 
         The aspect is preserved exactly and never upscaled: a stretched
-        wireframe draws ellipses where the rings should be, and a host smaller
+        tube draws ellipses where the rings should be, and a host smaller
         than the cap is better served at its own size.
         """
         if width <= 0 or height <= 0:
@@ -495,10 +655,21 @@ class TunnelChaseScene:
             + self._sin[None, :, None] * ring_b[:, None, :]
         )
         rel = (points - cam) @ basis
+        # The cloud is anchored *outside* the wall, not on it. Pushed in world
+        # space rather than screen space on purpose: the obvious screen-space
+        # version scales each vertex away from the ring's projected centroid,
+        # and the centroid of a ring that is partly behind the camera is
+        # garbage — which the near rings always are on a bend, i.e. exactly
+        # where it shows. Anchored at the wall radius itself the puffs smear
+        # across the flight path and the bore fills in.
+        puff_rel = (
+            centres[:, None, :] + (points - centres[:, None, :]) * _NEBULA_WALL_R - cam
+        ) @ basis
         # Kept rather than passed straight through: a QPainter cannot be
         # recorded (its draw methods are not virtual), so the near-plane rules
         # are asserted against the numbers the painter is handed.
         self._geometry = geometry = self._project(rel)
+        geometry.update(self._project_puffs(puff_rel))
         self._fade_rings(geometry, ring_s)
 
         self._advance_stars(basis, cam)
@@ -537,6 +708,23 @@ class TunnelChaseScene:
             "spoke_ok": spoke_ok,
             "spoke_x": width / 2 + self._focal * clipped[..., 0] / cd,
             "spoke_y": height / 2 - self._focal * clipped[..., 1] / cd,
+        }
+
+    def _project_puffs(self, rel: np.ndarray) -> dict:
+        """Screen position and camera depth for each puff anchor.
+
+        The near-plane *spoke* machinery above is deliberately not applied. A
+        spoke is a line with a far end to interpolate toward; a puff is a local
+        blob with nothing to clip along, so one whose anchor has reached the
+        plane is simply dropped — and the alpha it would have been drawn at is
+        already zero by then, for the same reason a ring's is.
+        """
+        width, height = self._image.width(), self._image.height()
+        depth = np.maximum(rel[..., 2], _DEPTH_FLOOR)
+        return {
+            "puff_x": width / 2 + self._focal * rel[..., 0] / depth,
+            "puff_y": height / 2 - self._focal * rel[..., 1] / depth,
+            "puff_z": rel[..., 2],
         }
 
     # ── Sky ────────────────────────────────────────────────────────────────
@@ -636,7 +824,7 @@ class TunnelChaseScene:
             self._spawn_planet(i)
 
     def _wash(self, white: float) -> QColor:
-        """The wireframe colour mixed *white* of the way toward white."""
+        """The accent colour mixed *white* of the way toward white."""
         main = self._color
         return QColor(
             int(main.red() * (1 - white) + 255 * white),
@@ -645,7 +833,7 @@ class TunnelChaseScene:
         )
 
     def _palette(self) -> list[QColor]:
-        """Grey, and two washes of the wireframe colour toward white.
+        """Grey, and two washes of the accent colour toward white.
 
         Paler than the mesh on purpose (the brief): the tunnel is the subject
         and the sky is depth behind it.
@@ -653,7 +841,7 @@ class TunnelChaseScene:
         return [QColor(*_GREY), self._wash(0.65), self._wash(0.4)]
 
     def _planet_tints(self) -> list[QColor]:
-        """Cream, a dusky one, and one wearing the wireframe's own colour.
+        """Cream, a dusky one, and one wearing the accent's own colour.
 
         The first is the shade every planet used to be, unchanged: its
         brightness was judged right in the running app, and the point of the
@@ -684,7 +872,11 @@ class TunnelChaseScene:
 
         self._paint_planets(painter, self._planet_tints(), width, height, glow, scale)
         self._paint_stars(painter, palette, width, height, glow, scale)
-        self._paint_mesh(painter, geometry, ring_s, level, pulse)
+        if _NEBULA_MESH_ALPHA > 0:
+            self._paint_mesh(
+                painter, geometry, ring_s, level, pulse, _NEBULA_MESH_ALPHA
+            )
+        self._paint_nebula(painter, geometry, ring_s, level, pulse, scale)
         painter.end()
 
     def _paint_planets(self, painter, tints, width, height, glow, scale) -> None:
@@ -815,11 +1007,18 @@ class TunnelChaseScene:
             (geometry["nearest"] - _NEAR) / _NEAR_FADE, 0.0, 1.0
         )
 
-    def _paint_mesh(self, painter, geometry, ring_s, level, pulse) -> None:
+    def _paint_mesh(self, painter, geometry, ring_s, level, pulse,
+                    alpha_scale: float = 1.0) -> None:
+        """The old wireframe tube, now a whisper under the cloud.
+
+        *alpha_scale* dims it through the pen colours rather than through
+        ``self._color``, which the sky's palette is derived from: scaling the
+        attribute instead would fade the stars and planets along with it.
+        """
         sx, sy = geometry["sx"], geometry["sy"]
         ahead, spoke_ok = geometry["ahead"], geometry["spoke_ok"]
         depth_fade, ring_fade = geometry["spoke_fade"], geometry["ring_fade"]
-        bright = 0.55 + 0.45 * min(1.0, level * 1.5 + pulse)
+        bright = (0.55 + 0.45 * min(1.0, level * 1.5 + pulse)) * alpha_scale
         painter.setBrush(Qt.BrushStyle.NoBrush)
         for k in range(_RINGS):
             ring_alpha = int(255 * ring_fade[k] * bright)
@@ -851,3 +1050,112 @@ class TunnelChaseScene:
                            sx[k + 1, m], sy[k + 1, m])
                     for m in range(_SEGMENTS) if spoke_ok[k, m]
                 ])
+
+    def _puff_field(self, geometry, ring_s, level, pulse, scale) -> dict:
+        """Every puff's colour, size, opacity and fate, as ``(ring, segment)`` grids.
+
+        Deciding is separated from drawing for the reason the row menus are: a
+        test can then ask what the wall *is* without a painter, and the loop
+        that blits has nothing left to work out inside it.
+
+        Everything here is a pure function of world arc length and the segment
+        index — there is no per-frame state, so the 16 ms and 33 ms hosts
+        render identical worlds and ``set_frame_interval`` has nothing to add.
+        """
+        sx, sy, z = geometry["puff_x"], geometry["puff_y"], geometry["puff_z"]
+        width, height = self._image.width(), self._image.height()
+        bright = 0.55 + 0.45 * min(1.0, level * 1.5 + pulse)
+        arc = ring_s[:, None]
+        seg = self._seg
+
+        # Two independent hashes of the world position. Anchored to ``ring_s``
+        # and never to the ring slot: slots re-seat every ``_SPACING`` unit, so
+        # a property hashed from k makes the whole texture swim forward with
+        # the camera instead of streaming past it.
+        h1 = _hash01(arc * 12.9898 + seg * 78.233, 43758.5453)
+        h2 = _hash01(arc * 39.3468 + seg * 11.135, 27183.1)
+
+        # Additive puffs stack where the tube converges — the wireframe's
+        # "bright knot" problem squared — so the cloud gets an extra far fade
+        # over the mesh's own, and the far rings get half their puffs below.
+        fade = geometry["spoke_fade"][:, None] ** _PUFF_FADE_EXP
+        near = np.clip((z - _NEAR) / _NEAR_FADE, 0.0, 1.0)
+        alpha = _PUFF_ALPHA * fade * near * bright * (0.6 + 0.4 * h2)
+
+        radius = self._focal * _PUFF_WORLD_R * (0.7 + 0.6 * h1) / np.maximum(
+            z, _DEPTH_FLOOR
+        )
+        np.minimum(radius, _PUFF_MAX_PX * scale, out=radius)
+
+        keep = (z >= _NEAR) & (alpha >= _PUFF_ALPHA_CULL)
+        keep &= radius >= _PUFF_MIN_PX * scale
+        keep &= ~((radius < _PUFF_THIN_PX * scale) & self._seg_odd)
+        # Off-screen with the puff's own radius as the margin, so one whose
+        # centre has left the frame still paints the part that has not.
+        keep &= (sx > -radius) & (sx < width + radius)
+        keep &= (sy > -radius) & (sy < height + radius)
+
+        hues = len(_NEBULA_PALETTE)
+        # A smooth hue field over (arc length, angle) so one colour holds for a
+        # stretch of tube and a stretch of wall, plus a hash jitter that
+        # scatters its boundary rather than drawing it as a seam.
+        field = 0.5 + 0.5 * np.sin(
+            arc * _HUE_FIELD_S
+            + _HUE_FIELD_SWIRL
+            * np.sin(self._seg_theta * _HUE_FIELD_THETA + arc * _HUE_FIELD_TWIST)
+        )
+        hue = np.clip(
+            field * hues + (h1 - 0.5) * _HUE_JITTER, 0.0, hues - 1e-6
+        ).astype(int)
+        variant = (h2 * _PUFF_VARIANTS).astype(int)
+        # Nearest baked resolution to the diameter actually being drawn, which
+        # is what lets smooth filtering stay off: measured 1.65 ms against 2.19
+        # for the same puffs, and a soft blob within √2 of its own resolution
+        # does not read as blocky.
+        sprite = np.digitize(2.0 * radius, _PUFF_SIZE_SWITCH)
+
+        return {
+            "x": sx, "y": sy, "radius": radius, "alpha": alpha,
+            "hue": hue, "variant": variant, "sprite": sprite, "keep": keep,
+        }
+
+    def _paint_nebula(self, painter, geometry, ring_s, level, pulse, scale) -> None:
+        """The wall: additive cloud puffs at the mesh's own vertices.
+
+        QPainter has no batched image-draw, so the blits stay a Python loop —
+        but a short one, over the survivors of :meth:`_puff_field`'s culls
+        alone, with every number already decided.
+
+        Draw order does not matter: ``CompositionMode_Plus`` is addition, and
+        addition commutes, so there is no back-to-front sort to pay for.
+        """
+        field = self._puff_field(geometry, ring_s, level, pulse, scale)
+        keep = field["keep"].ravel()
+        if not keep.any():
+            return
+        xs = field["x"].ravel()[keep].tolist()
+        ys = field["y"].ravel()[keep].tolist()
+        rs = field["radius"].ravel()[keep].tolist()
+        alphas = field["alpha"].ravel()[keep].tolist()
+        hue = field["hue"].ravel()[keep].tolist()
+        variant = field["variant"].ravel()[keep].tolist()
+        sprite = field["sprite"].ravel()[keep].tolist()
+
+        was_smooth = painter.testRenderHint(
+            QPainter.RenderHint.SmoothPixmapTransform
+        )
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Plus)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
+        sprites = self._sprites
+        for x, y, r, a, hu, var, size in zip(
+            xs, ys, rs, alphas, hue, variant, sprite
+        ):
+            painter.setOpacity(a)
+            painter.drawImage(
+                QRectF(x - r, y - r, 2 * r, 2 * r), sprites[size][hu][var]
+            )
+        # Put the painter back: nothing follows the wall today, but whatever is
+        # added after it would inherit Plus, an opacity and a render hint.
+        painter.setOpacity(1.0)
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, was_smooth)

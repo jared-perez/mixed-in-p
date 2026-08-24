@@ -18,7 +18,8 @@ fast (non-smooth) transformation for a chunky pixel look:
   into its own larger, host-shaped image (see :mod:`.vis_wormhole`) rather
   than the shared low-res grid, because its cost is O(lines) not O(pixels).
 - ``tunnel_chase`` — the wormhole's sibling, flown to the beat: the tunnel is
-  generated ahead of the camera and turns on the first beat of every bar (see
+  generated ahead of the camera, turns on the first beat of every bar, and
+  wears a wall of translucent nebula cloud rather than a wireframe (see
   :mod:`.vis_tunnel_chase`). It is the only mode that *counts beats*, so it is
   also the only one with a tempo (:mod:`.beat_clock`), a per-mode frame rate
   (60 fps in the popout) and a smooth upscale rather than chunky pixels.
@@ -185,8 +186,8 @@ class VisRenderer:
     def smooth_upscale(self) -> bool:
         """Whether the host should interpolate when scaling this mode up.
 
-        The retro modes are meant to look like big pixels. Both wireframe modes
-        are antialiased line work rendered near the host's own size, so a
+        The retro modes are meant to look like big pixels. Both tunnel modes
+        are drawn near the host's own size, antialiased, so a
         nearest-neighbour blow-up would undo the thing they render large for —
         it is what made the wormhole read as a staircase. Measured at 0.4 ms for
         a full-frame upscale, i.e. free.
@@ -267,7 +268,7 @@ class VisRenderer:
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
 
-        Only the two wireframe modes care: they draw true circles, so their
+        Only the two tunnel modes care: they draw true circles, so their
         image has to share the host's aspect or the rings come out as ellipses,
         and they render near the host's own resolution rather than being blown
         up. The other modes are a fixed low-res grid the host stretches.

@@ -270,48 +270,189 @@ def test_spokes_are_clipped_at_the_near_plane_not_dropped(scene):
     assert clipped_frames > 10
 
 
-def test_the_viewer_stays_inside_the_tube_as_a_ring_passes(scene):
-    """The cone regression, measured where it actually shows.
+def test_the_bore_stays_open_so_the_tunnel_reads_as_a_tunnel(scene):
+    """The round-2 lesson, and why the puffs are not anchored on the wall.
 
-    Only the frames in which the nearest ring has come inside the near plane
-    can tell the two treatments apart, and only the *mesh* can — stars cover
-    the whole frame, so an alpha test passes against a cone. Measured: with
-    the spokes clipped at the plane the mesh reaches at least three of the four
-    edges in every such frame; with them dropped instead it reaches **none**,
-    which is the tube collapsing to a cone floating mid-frame.
+    Anchored at the wall radius itself the cloud smears across the flight path
+    and the tunnel stops reading as one — the bore fills in. Every puff is
+    therefore pushed radially outward off the wall, in *world* space: the
+    obvious screen-space version scales each vertex away from the ring's
+    projected centroid, and a ring partly behind the camera has a vertex
+    thousands of pixels out, so its centroid is nowhere near the tube. The
+    near rings are always partly behind on a bend.
+
+    Measured against the projected centroid of the rings that are wholly
+    ahead — where the centroid is a fair stand-in for the centre — the closest
+    puff of a ring still sits 1.26× as far out as the wall it hangs off. The
+    bound below is a good deal looser than that and still fails outright at
+    ``_NEBULA_WALL_R = 1.0``, which is the regression it is here for.
+
+    *Enclosure* — whether the cloud reaches past the lens the way the spokes
+    used to — is deliberately not asserted anywhere. It is a judgement from
+    the running app and it is on the tuning agenda; a test written before that
+    lands would pin the untuned look.
     """
     checked = 0
-    for beat in np.arange(4.5, 8.0, 128.0 / 60.0 / 60.0):
-        image = scene.render(float(beat), 0.6, 0.0)
-        if scene._geometry["nearest"][0] >= tc._NEAR:
-            continue
-        checked += 1
-        raw = _pixels(image)
-        blue, green, red, alpha = (raw[..., i].astype(int) for i in range(4))
-        mesh = (alpha > 0) & (red > 150) & (green > 150) & (blue < 80)
-        edges = [mesh[0].any(), mesh[-1].any(), mesh[:, 0].any(), mesh[:, -1].any()]
-        assert sum(bool(e) for e in edges) >= 3
-    assert checked > 10  # the run really did pass some rings
+    for beat in np.arange(6.0, 20.0, 0.05):
+        scene.render(float(beat), 0.6, 0.0)
+        geometry = scene._geometry
+        for k in range(tc._RINGS):
+            if not geometry["ahead"][k].all():
+                continue
+            checked += 1
+            cx = geometry["sx"][k].mean()
+            cy = geometry["sy"][k].mean()
+            wall = np.hypot(geometry["sx"][k] - cx, geometry["sy"][k] - cy)
+            cloud = np.hypot(geometry["puff_x"][k] - cx, geometry["puff_y"][k] - cy)
+            assert (cloud > wall * 1.1).all()
+    assert checked > 1000
 
 
-def test_it_draws_a_tunnel_stars_and_planets(scene):
-    """Wireframe down the middle, pale sky behind it, a shaded disc among it."""
+def test_it_draws_a_nebula_wall_stars_and_planets(scene):
+    """Cloud down the middle, pale sky behind it, a shaded disc among it.
+
+    The wall used to be the theme gold and the mask used to look for it. It is
+    the nebula's own palette now — blue, violet, magenta, teal, green, every
+    one of which leaves red a long way behind, which nothing in the sky does:
+    stars and planets are washed toward white and the greys are balanced.
+    """
     image = _fly(scene, 0.0, 4.0, pulse_at=4.0)
     raw = _pixels(image)
     blue, green, red, alpha = (raw[..., i].astype(int) for i in range(4))
     lit = alpha > 0
-    # The wireframe is the theme colour: saturated, almost no blue.
-    mesh = lit & (red > 150) & (green > 150) & (blue < 80)
-    # Stars and planets are washed toward white, so they carry blue.
-    pale = lit & (blue > 120)
+    cloud = lit & ((blue > red + 40) | (green > red + 40))
+    pale = lit & (red > 120) & (green > 120) & (blue > 120) & (abs(red - blue) < 60)
     cores = lit & (red > 230) & (green > 230) & (blue > 230)
-    assert mesh.sum() > 500
+    gold = lit & (red > 150) & (green > 150) & (blue < 80)
+    assert cloud.sum() > 50_000
     assert pale.sum() > 100
     assert cores.sum() > 20  # the white centres of the near four-point stars
+    # The wireframe was replaced, not joined: `_NEBULA_MESH_ALPHA` is 0, so
+    # the only gold left in the frame is what the sky's own tints carry.
+    assert gold.sum() < 500
 
 
-def test_the_sky_is_paler_than_the_wireframe(scene):
-    """The brief: stars and planets pale versions of the colour, plus some grey."""
+def test_the_cloud_is_anchored_to_the_world_not_to_the_ring_slot(scene):
+    """Hash a puff from the ring *slot* and the whole texture swims forward.
+
+    Rings sit at fixed world arc-lengths and re-seat a slot at a time as the
+    camera advances, so slot k holds a different piece of tube every
+    ``_SPACING`` units. Advance by exactly one spacing and every ring must be
+    wearing the cloud it wore in the slot above — same colours, same shapes,
+    one row down. Anchored to k they would instead sit still and the cloud
+    would ride along with the camera rather than stream past it.
+    """
+    one_slot = tc._SPACING / UNITS_PER_BEAT
+    _fly(scene, 0.0, 9.0)
+    scene.render(9.0, 0.6, 0.0)
+    before = scene._puff_field(scene._geometry, scene._ring_s, 0.6, 0.0, 1.0)
+    slots = scene._ring_s.copy()
+
+    _fly(scene, 9.0, 9.0 + one_slot)
+    scene.render(9.0 + one_slot, 0.6, 0.0)
+    after = scene._puff_field(scene._geometry, scene._ring_s, 0.6, 0.0, 1.0)
+
+    assert np.allclose(slots[1:], scene._ring_s[:-1])  # everything moved down one
+    assert np.array_equal(before["hue"][1:], after["hue"][:-1])
+    assert np.array_equal(before["variant"][1:], after["variant"][:-1])
+
+
+def test_the_cloud_is_the_same_world_at_either_frame_rate(qapp):
+    """The sibling of the star glow's two-rate test, from the other direction.
+
+    The glow needed ``set_frame_interval`` because a decay written per frame is
+    a duration only at one rate. The nebula is stateless — a pure function of
+    arc length — so it needs nothing there, and this is what says so: the same
+    second of flight fed at 16 ms and at 33 ms leaves an identical wall.
+    """
+    fields = []
+    for frame_ms, fps in ((1000.0 / 60.0, 60), (1000.0 / 30.0, 30)):
+        scene = TunnelChaseScene()
+        scene.set_target_size(1216, 512)
+        scene.set_frame_interval(frame_ms)
+        _fly(scene, 0.0, 8.0, fps=fps)
+        scene.render(8.0, 0.6, 0.0)
+        fields.append(scene._puff_field(scene._geometry, scene._ring_s, 0.6, 0.0, 1.0))
+    for key in ("hue", "variant", "sprite", "radius", "alpha", "keep"):
+        assert np.array_equal(fields[0][key], fields[1][key]), key
+
+
+def test_the_culls_bound_what_is_drawn(scene):
+    """The guardrails are in code, not in hope — and they are counted, not eyeballed.
+
+    The cost of the wall is per pixel covered, so every cull is a coverage cap:
+    the alpha floor, the minimum size, half the puffs on the far rings, the
+    screen-radius ceiling and the off-screen reject. Together they take roughly
+    half the grid out of the frame. Counted as survivors rather than as pixels,
+    because that is the number the blit loop runs over.
+    """
+    counts = []
+    for beat in np.arange(0.0, 20.0, 0.05):
+        scene.render(float(beat), 0.6, 0.0)
+        field = scene._puff_field(scene._geometry, scene._ring_s, 0.6, 0.0, 1.0)
+        counts.append(int(field["keep"].sum()))
+    grid = tc._RINGS * tc._SEGMENTS
+    assert max(counts) < 0.6 * grid  # measured 250-270 of 560
+    assert min(counts) > 100  # ...and never so few that the wall goes missing
+
+
+def _nebula_only(scene, background):
+    """Paint the wall alone onto *background*, and hand back the painter used."""
+    canvas = QImage(
+        scene.image().width(), scene.image().height(),
+        QImage.Format.Format_ARGB32_Premultiplied,
+    )
+    canvas.fill(background)
+    painter = QPainter(canvas)
+    scene._paint_nebula(
+        painter, scene._geometry, scene._ring_s, 0.6, 0.0,
+        canvas.height() / tc._REF_H,
+    )
+    return canvas, painter
+
+
+def test_the_wall_never_paints_opaque_over_the_sky(scene):
+    """The brief in one assertion: the stars still show through the cloud.
+
+    The wall is drawn last, over planets and stars that are already down, and
+    it is additive — so it can only ever brighten what it covers. An ordinary
+    ``SourceOver`` pass at the same alphas would dim the sky behind every puff,
+    which is the difference between a nebula and a painted tube.
+    """
+    _fly(scene, 0.0, 6.0)
+    canvas, painter = _nebula_only(scene, QColor(40, 40, 40))
+    painter.end()
+    raw = _pixels(canvas)[..., :3].astype(int)
+    assert (raw >= 40).all()  # nothing the cloud covered got darker...
+    assert (raw > 60).any()  # ...and the cloud is really there
+
+
+def test_the_painter_is_handed_back_as_it_was_found(scene):
+    """Nothing follows the wall today; the next pass added after it would inherit.
+
+    The puff pass switches to ``Plus``, drops the opacity per blit and turns
+    smooth transforms off, and every one of those is painter-wide state.
+    """
+    _fly(scene, 0.0, 6.0)
+    canvas, painter = _nebula_only(scene, QColor(0, 0, 0))
+    painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+    scene._paint_nebula(
+        painter, scene._geometry, scene._ring_s, 0.6, 0.0,
+        canvas.height() / tc._REF_H,
+    )
+    assert painter.compositionMode() == QPainter.CompositionMode.CompositionMode_SourceOver
+    assert painter.opacity() == 1.0
+    assert painter.testRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+    painter.end()
+
+
+def test_the_sky_is_paler_than_the_accent(scene):
+    """The brief: stars and planets pale versions of the colour, plus some grey.
+
+    The accent used to be the wall's colour too. The wall is the nebula's own
+    palette now, so this is the last thing wearing it — which is exactly why
+    `_palette()` and `_planet_tints()` were left alone by that change.
+    """
     _fly(scene, 0.0, 4.0, pulse_at=4.0)
     palette = scene._palette()
     mesh = scene._color
@@ -358,7 +499,7 @@ def test_the_three_planet_tints_are_the_old_one_plus_two(scene):
     assert pale == scene._palette()[1]  # unchanged, and still the same wash
     for channel in ("red", "green", "blue"):
         assert getattr(dark, channel)() < getattr(pale, channel)()
-    # Less washed toward white is more of the wireframe's own colour, and the
+    # Less washed toward white is more of the accent's own colour, and the
     # theme colour is what the wash is pulling away from.
     assert abs(tint.blue() - scene._color.blue()) < abs(pale.blue() - scene._color.blue())
 
@@ -606,7 +747,7 @@ def test_the_backdrop_gets_the_smaller_budget(qapp):
 
 
 def test_the_cap_never_distorts_the_aspect(qapp):
-    """A stretched wireframe draws ellipses where the rings should be."""
+    """A stretched tube draws ellipses where the rings should be."""
     scene = TunnelChaseScene()
     for width, height in ((3000, 600), (2800, 1600), (600, 1200)):
         scene.set_target_size(width, height, popout=True)
@@ -694,7 +835,7 @@ def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
 
 
 def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
-    """60 fps for this one alone; interpolation for both wireframe modes.
+    """60 fps for this one alone; interpolation for both tunnel modes.
 
     The two are separate axes and only look like one here. The frame rate is
     about the beat clock (33 ms is too coarse a kick flux to lock on); the

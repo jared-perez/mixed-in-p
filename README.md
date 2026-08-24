@@ -23,7 +23,7 @@ The full audio file preparation workflow for DJs.
 - Freeze toggle — analyze and read the results without writing anything to your files
 - Auto-write metadata to file tags & Manual metadata editing, with the full path of the file you're editing and a jump to it in Finder/Explorer
 - Online lookup (opt-in) — fill in title, artist, album, label, genre, year, track number and cover art from Discogs, one file or a whole selection, with every value reviewed before anything is written. Off by default; BPM, key and energy always come from your own analysis
-- Player visualizations — six of them behind the playlist or in their own window, including a wireframe tunnel that turns on the beat of the track it is playing
+- Player visualizations — six of them behind the playlist or in their own window, including a nebula tunnel that turns on the beat of the track it is playing
 - Dark/Light modes and waveform color customization
 
 ## Install

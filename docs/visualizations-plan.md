@@ -161,8 +161,8 @@ is radioactive):
    imports in 194 ms — the 25×25 dense solve that replaces it takes ~8 ms,
    lazily, on the first rendered frame).
 
-6. **Tunnel Chase** — the wormhole's sibling, flown to the beat. Same
-   wireframe tube and the same O(lines) cost, but the path is **generated
+6. **Tunnel Chase** — the wormhole's sibling, flown to the beat. Same tube
+   geometry as the wormhole's, but the path is **generated
    ahead of the camera in beat-space** rather than precomputed: arc length is
    measured in beats (2.5 world units each), so a turn scheduled for beat 16
    is a bend at 16 × 2.5 units and the camera reaches it exactly when the
@@ -201,14 +201,14 @@ is radioactive):
 
    Stars are dots far out and four-point stars
    with a white core near, in three shades (grey and two washes of the
-   wireframe colour toward white), with three shaded planets drifting past.
+   accent colour toward white), with three shaded planets drifting past.
    Measured **3.4 ms/frame at 1216×512** and 4.5 at popout size.
 
    A planet's tint and its rings are rolled **once, at spawn** — so it cannot
    change while it is on screen — and they are chances rather than counts,
    because with only three planets at a time a "small percentage" is a property
    of the stream: measured, about fifty planets a minute at 128 BPM, of which
-   nine are dusky, nine wear the wireframe's own colour instead of the pale
+   nine are dusky, nine wear the accent's own colour instead of the pale
    wash, and ten carry one to three thin rings in a plane of their own. The
    rings cost 0.02 ms a frame, and they are drawn in three passes — the arc
    behind the planet, the disc, then the arc in front — which is the Saturn
@@ -229,6 +229,44 @@ is radioactive):
    (`VisRenderer.frame_ms()`), which is a correctness reason and not only a
    smoothness one: at 33 ms the kick flux is too coarse and the beat clock
    measurably fails to lock on two of six test tracks.
+
+   **The wall is a nebula, not a wireframe.** The mesh is still what the
+   picture is built on, but what is drawn at its vertices is a wall of
+   translucent cloud: pre-rendered additive sprites ("puffs"), scattered blue,
+   violet, magenta, teal and green, that the stars and planets read straight
+   through. Sprites won on more than cost — they inherit every hard-won piece
+   of the existing geometry for free, because a puff is drawn *at* a mesh
+   vertex, so the bends, the drift and the pulse ripple on the wall radius all
+   come along without a line of new maths. Measured against the alternatives
+   at the popout cap: filled quads per mesh cell cost +6.25 ms and read
+   faceted; a low-res screen-space noise field is the cheapest of all (+0.6
+   ms) and cannot follow a bent tube without the per-pixel ray/tube mapping
+   that is the whole cost being avoided; and true raymarched volumetrics are
+   shader-only, i.e. a new architecture for one mode.
+
+   Three things the build is shaped by, all of them found by rendering.
+   **Additive puffs stack where the tube converges** — the wireframe's bright
+   knot squared — so the cloud gets an extra far fade over the mesh's own, a
+   minimum-size cull, and half its puffs dropped on the far rings. **The bore
+   fills in unless the puffs sit outside the wall**, so each is pushed
+   radially outward (1.45 × the wall radius) — in *world* space, because the
+   obvious screen-space version scales each vertex off the ring's projected
+   centroid and the centroid of a partly-behind-camera ring is garbage, which
+   the near rings always are on a bend. And **everything about a puff is
+   hashed from its world arc length**, never from the ring slot, which
+   re-seats every spacing: hashed from the slot the cloud rides along with the
+   camera instead of streaming past it. There is no per-frame state anywhere
+   in it — the wall is a pure function of arc length, like the path — so
+   `set_frame_interval` has nothing to add and the 16 ms and 33 ms hosts
+   render identical worlds.
+
+   Cost: **4.7 ms/frame at 1600×720** and 3.5 at the backdrop's 1216×512,
+   against a 16 ms budget. The per-puff work is vectorized over the whole
+   (ring, segment) grid in numpy and reduced to one boolean mask, so the
+   Python loop that remains blits ~260 survivors of 560 with every number
+   already decided; the noise is baked into sixty sprites at init (four cloud
+   shapes × five hues × three resolutions, ~1.7 MB) and never evaluated per
+   frame. The proof-of-concept, before that pass, was 8.2 ms.
 
    The near plane needed two different treatments, found by rendering rather
    than reasoning. A ring passing beside the camera on a bend projects a

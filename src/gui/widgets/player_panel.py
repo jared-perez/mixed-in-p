@@ -657,7 +657,7 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         # blitted dimmed behind the rows. Mutually exclusive with the envelope.
         self._backdrop_image: QImage | None = None
         # Whether that image wants interpolating when it is stretched to the
-        # viewport. The retro modes are meant to be chunky; the wireframe ones
+        # viewport. The retro modes are meant to be chunky; the tunnel ones
         # render near the real size and would only be spoiled by it.
         self._backdrop_smooth: bool = False
 
@@ -911,7 +911,7 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
         if self._backdrop_image is not None:
             # Visualizer frame stretched over the viewport, dimmed so the row
             # text still reads. Smoothing is per mode: chunky retro pixels for
-            # the low-res grid, interpolation for the wireframe modes, which
+            # the low-res grid, interpolation for the tunnel modes, which
             # render near the viewport's real size.
             painter.setRenderHint(
                 QPainter.RenderHint.SmoothPixmapTransform, self._backdrop_smooth
@@ -3755,7 +3755,7 @@ class PlayerPanel(QWidget):
         # The wormhole sizes its image from the host's aspect so its rings
         # stay circular; every other mode ignores this.
         viewport = self._table.viewport()
-        # Device pixels: both wireframe modes render near the host's real
+        # Device pixels: both tunnel modes render near the host's real
         # resolution and let the host scale, rather than being blown up 2x on a
         # Retina display. The other modes ignore the size entirely.
         ratio = viewport.devicePixelRatioF()
