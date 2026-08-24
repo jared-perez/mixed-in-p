@@ -24,6 +24,7 @@ from PySide6.QtCore import QObject
 
 from src.analysis import history as analysis_history
 from src.analysis.result import AnalysisResult
+from src.gui.convert_pipeline import ConvertPipeline
 from src.gui.main_window import MainWindow
 from src.gui.models.state import TrackState
 from src.gui.models.track_model import TrackStore
@@ -141,6 +142,13 @@ class _ProgressStub:
         self.messages.append("cancelled")
 
 
+class _ConversionPanelStub:
+    """Only what the pipeline's summary line touches."""
+
+    def __init__(self):
+        self.progress_panel = _ProgressStub()
+
+
 class WindowStub(QObject):
     """The real gating methods, run against a minimal self."""
 
@@ -148,6 +156,9 @@ class WindowStub(QObject):
     _on_analysis_finished = MainWindow._on_analysis_finished
     _on_analysis_cancelled = MainWindow._on_analysis_cancelled
     _on_write_freeze_toggled = MainWindow._on_write_freeze_toggled
+    _pipeline_analysis_idle = MainWindow._pipeline_analysis_idle
+    _finish_pipeline_if_done = MainWindow._finish_pipeline_if_done
+    _finish_pipeline_summary = MainWindow._finish_pipeline_summary
 
     def __init__(self, store):
         super().__init__()
@@ -160,6 +171,10 @@ class WindowStub(QObject):
         self._analyzing_track_ids = []
         self._analysis_thread = None
         self._pending_rename_operations = []
+        # The analysis end paths now consult the pipeline; an unarmed one is
+        # inert, which is what every test in this file wants.
+        self._pipeline = ConvertPipeline()
+        self._conversion_panel = _ConversionPanelStub()
         self.renamed = []
 
     def _auto_rename_after_analysis(self, results):

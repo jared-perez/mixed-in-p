@@ -58,6 +58,7 @@ from .window_sizer import CurrentPageStack, WindowSizer
 from src.conversion.result import ConversionResult
 
 from .widgets.analysis_panel import AnalysisPanel
+from .convert_pipeline import ConvertPipeline
 from .widgets.conversion_panel import ConversionPanel
 from .widgets.dialogs.about_dialog import AboutDialog
 from .widgets.header_bar import HeaderBar
@@ -183,6 +184,9 @@ class MainWindow(QMainWindow):
         # startup (creating the database on first run) because Scratch
         # persistence — the Player's list surviving a restart — needs it.
         self._library = library.Library()
+        # One run of Convert -> Analyze -> playlist at a time. Qt-free; every
+        # event it needs already arrives at a handler on this window.
+        self._pipeline = ConvertPipeline()
         self._playlists_panel.set_library(self._library)
         self._player_panel.set_library(self._library)
         # Read/update only — the Metadata panel never adds a row. It uses the
@@ -203,6 +207,12 @@ class MainWindow(QMainWindow):
         # panel so it lands before the undo stack is live — otherwise the
         # clear would be undoable and yesterday's Scratch could come back.
         apply_scratch_policy(self._library, self._config.persist_scratch)
+        # The Convert panel never opens the library itself; it is fed the
+        # playlists from here, at startup and on every nodes_changed.
+        self._refresh_pipeline_playlists()
+        self._conversion_panel.restore_pipeline_target(
+            self._config.convert_pipeline_playlist
+        )
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._load_last_session()
 
@@ -343,6 +353,7 @@ class MainWindow(QMainWindow):
         self._playlists_panel.tree.nodes_changed.connect(
             self._player_panel.refresh_playing_playlist
         )
+        self._playlists_panel.tree.nodes_changed.connect(self._refresh_pipeline_playlists)
         self._player_panel.playlist_saved.connect(self._on_playlist_saved)
         self._player_panel.tree_highlight_changed.connect(self._on_tree_highlight)
         self._player_panel.playing_playlist_clicked.connect(
@@ -364,6 +375,7 @@ class MainWindow(QMainWindow):
         self._conversion_panel.send_to_analyze.connect(self._send_convert_to_analyze)
         self._conversion_panel.send_to_rename.connect(self._send_convert_to_rename)
         self._conversion_panel.send_to_player.connect(self._on_send_to_player)
+        self._conversion_panel.pipeline_toggled.connect(self._on_pipeline_toggled)
 
         # Analysis panel signals
         self._analysis_panel.files_dropped.connect(self._add_and_analyze_files)
@@ -1120,6 +1132,9 @@ class MainWindow(QMainWindow):
 
         # Pick up anything dropped into the panel while this batch was running.
         self._start_pending_analysis()
+        # ...then the pipeline, which fills the gap the auto pick-up leaves in
+        # manual mode and decides when the run is over.
+        self._pipeline_analysis_idle()
 
     def _start_pending_analysis(self) -> None:
         """Analyze tracks that were enqueued while a previous batch was running.
@@ -1192,6 +1207,12 @@ class MainWindow(QMainWindow):
                 ) for t in completed]
             )
         self._pending_rename_operations = None
+
+        # A cancel ends the run. Tracks analysed before it are already in the
+        # playlist (they land one at a time); the rest stay PENDING in Analyze,
+        # so the user can press Analyze again — they just will not be added.
+        if self._pipeline.active:
+            self._finish_pipeline_summary()
 
     def _auto_rename_after_analysis(self, current_results: list[AnalysisResult]) -> None:
         """Build rename previews for the current analysis batch and start rename thread."""
@@ -1280,7 +1301,20 @@ class MainWindow(QMainWindow):
             )
             return
 
+        # Armed only here, after the busy check: a run armed for a conversion
+        # that never started would wait for results that are not coming.
+        pipeline = self._conversion_panel.pipeline_enabled()
+        if pipeline:
+            file_paths = self._arm_pipeline(file_paths)
+            if not self._pipeline.active:
+                return  # no target resolved (blank name) — nothing to run
+
         if not file_paths:
+            # A pipeline run with nothing to convert skips the thread entirely
+            # (a zero-file worker emits an error and no `finished`) and goes
+            # straight to analysis.
+            if pipeline:
+                self._pipeline_analyse(self._pipeline.take_passthrough())
             return
 
         # Start progress
@@ -1305,7 +1339,193 @@ class MainWindow(QMainWindow):
         self._conversion_thread.conversion_error.connect(self._on_conversion_error)
         self._conversion_thread.conversion_cancelled.connect(self._on_conversion_cancelled)
         self._conversion_thread.start()
+        self._conversion_panel.set_pipeline_controls_enabled(False)
         self._sidebar.set_page_busy("convert", True)
+
+    # ------------------------------------------------- Convert -> Analyze -> playlist
+
+    def _refresh_pipeline_playlists(self) -> None:
+        """Feed the Convert panel every playlist in the library, in tree order.
+
+        Walked here rather than in the panel: the tree's nodes_changed never
+        fires before its first load, so the panel would open with an empty list
+        and a remembered name it could not resolve.
+        """
+        rows: list[tuple[int, str]] = []
+
+        def walk(parent_id: int | None, prefix: str) -> None:
+            for node in self._library.get_children(parent_id):
+                label = f"{prefix}{node.name}"
+                if node.kind == "folder":
+                    walk(node.id, f"{label} / ")
+                else:
+                    rows.append((node.id, label))
+
+        walk(None, "")
+        self._conversion_panel.set_playlists(rows)
+
+    def _unique_playlist_name(self, name: str) -> str:
+        """`name`, or the first free `name (N)`.
+
+        Names are not unique in the library — nothing stops two playlists
+        sharing one — so this is a courtesy for the typed-name case, not a
+        constraint. Same ` (N)` convention resolve_output_path uses for files.
+        """
+        taken: set[str] = set()
+
+        def walk(parent_id: int | None) -> None:
+            for node in self._library.get_children(parent_id):
+                if node.kind == "folder":
+                    walk(node.id)
+                else:
+                    taken.add(node.name)
+
+        walk(None)
+        if name not in taken:
+            return name
+        counter = 1
+        while f"{name} ({counter})" in taken:
+            counter += 1
+        return f"{name} ({counter})"
+
+    def _resolve_pipeline_target(self) -> tuple[int, str] | None:
+        """The playlist a Start press is aimed at, creating it if need be.
+
+        A pick is used as-is. Typed text makes a new playlist at root — and the
+        combo is then pointed at it, so a second Start with the same text
+        reuses it instead of making `Test (2)`, `Test (3)` and so on for ever.
+        """
+        node_id, text = self._conversion_panel.pipeline_target()
+        if node_id is not None:
+            return node_id, text
+        if not text:
+            return None
+        name = self._unique_playlist_name(text)
+        new_id = self._library.create_playlist(name)
+        self._playlists_panel.ensure_loaded()
+        self._playlists_panel.tree.refresh()
+        self._conversion_panel.select_node(new_id)
+        return new_id, name
+
+    def _arm_pipeline(self, file_paths: list[str]) -> list[str]:
+        """Arm a run for a Start press. Returns the files to convert.
+
+        Called from _start_conversion, after its busy check — arming for a
+        conversion that never started would leave the run waiting for results
+        that are not coming.
+        """
+        target = self._resolve_pipeline_target()
+        if target is None:
+            return file_paths
+        node_id, name = target
+        _to_convert, passthrough = self._conversion_panel.pipeline_rows()
+        # Rows already converted in an earlier batch travel by their output.
+        forwarded = [self._conversion_panel._effective_path(p) for p in passthrough]
+
+        # Warm the tag reader on this thread before the analysis thread starts
+        # importing librosa: the first _track_id_for read otherwise races that
+        # lazy import, and two threads inside importlib abort the process.
+        from src.metadata.tags import read_metadata
+
+        for path in (file_paths or forwarded):
+            try:
+                read_metadata(path)
+            except Exception:
+                pass
+            break
+
+        self._pipeline.arm(node_id, name, file_paths, forwarded)
+        # They are Analyze's rows now, exactly as Send To hands them over.
+        self._conversion_panel.forget_rows(passthrough)
+        return file_paths
+
+    def _pipeline_analyse(self, paths: list[str]) -> None:
+        """Add pipeline outputs to the store and start analysing them.
+
+        Deliberately not _add_and_analyze_files: that one starts a batch only
+        when auto_analyze is on, and a pipeline the user pressed Start on must
+        run whatever that setting says.
+
+        The store resolves a path and the library normalizes it, and on macOS
+        the two differ for anything under /var — so the run records both, keyed
+        on the spelling an AnalysisResult will come back wearing.
+        """
+        if not paths:
+            self._finish_pipeline_if_done()
+            return
+        track_ids: list[str] = []
+        pairs: dict[str, str] = {}
+        self._store.begin_batch_update()
+        for path in paths:
+            track = self._store.add_from_path(path)
+            if track is None:
+                track = self._store.get_by_path(path)
+            if track is not None:
+                track_ids.append(track.id)
+                pairs[track.file_path] = normalize_track_path(path)
+                self._store.update(track.id, state=TrackState.PENDING)
+        self._store.end_batch_update()
+        self._pipeline.await_analysis(pairs)
+
+        if track_ids:
+            self._sidebar.set_current_page("analysis")
+            self._on_page_changed("analysis")
+            self._pending_rename_operations = []  # enable auto-rename gate
+            self._start_analysis(track_ids)
+
+    def _pipeline_analysis_idle(self) -> None:
+        """Carry a run past the end of a batch.
+
+        _start_analysis leaves tracks PENDING while a thread is running. In
+        auto mode _start_pending_analysis picks them up; in manual mode nothing
+        does, so this is what does — and it also decides when the run is over.
+        """
+        if self._pipeline.analysis_idle():
+            if self._analysis_thread is not None and self._analysis_thread.isRunning():
+                return
+            pending = set(self._pipeline.analysis_batch_paths())
+            ids = [
+                t.id
+                for t in self._store.get_by_state(TrackState.PENDING)
+                if t.file_path in pending
+            ]
+            if ids:
+                self._pending_rename_operations = []
+                self._start_analysis(ids)
+                return
+        self._finish_pipeline_if_done()
+
+    def _finish_pipeline_if_done(self) -> None:
+        """Report the run on the Convert panel's progress line and end it."""
+        if not self._pipeline.finished():
+            return
+        self._finish_pipeline_summary()
+
+    def _finish_pipeline_summary(self) -> None:
+        """Report and end the run, whether or not it ran to the end."""
+        if not self._pipeline.active:
+            return
+        added, skipped, errors = self._pipeline.summary()
+        name = self._pipeline.run.playlist_name if self._pipeline.run else ""
+        parts = [
+            self.tr("Pipeline complete: {added} added to {playlist}").format(
+                added=added, playlist=name
+            )
+        ]
+        if skipped:
+            parts.append(self.tr("{n} skipped").format(n=skipped))
+        if errors:
+            parts.append(self.tr("{n} errors").format(n=errors))
+        self._conversion_panel.progress_panel.complete(", ".join(parts))
+        self._pipeline.end()
+
+    def _on_pipeline_toggled(self, enabled: bool) -> None:
+        """The pipeline ends in an analysis, so switching it on switches
+        auto-analyze on with it. The implication is one-way: switching the
+        pipeline off leaves auto-analyze alone."""
+        if enabled and not self._config.auto_analyze:
+            self._analysis_panel.set_auto_analyze(True)
+            self._on_auto_analyze_toggled(True)
 
     def _cancel_conversion(self) -> None:
         """Cancel the current conversion.
@@ -1325,7 +1545,12 @@ class MainWindow(QMainWindow):
         # rows still marked Converting revert to Ready.
         self._conversion_panel.mark_converted([])
         self._conversion_thread = None
+        self._conversion_panel.set_pipeline_controls_enabled(True)
         self._sidebar.set_page_busy("convert", False)
+        # A cancel is "stop". Half-forwarding a batch the user just stopped is
+        # exactly the half-applied result to avoid — the rows that finished
+        # keep their Done status and can be sent on by hand.
+        self._pipeline.conversion_cancelled()
 
     def _on_conversion_started(self) -> None:
         """Handle conversion started."""
@@ -1354,13 +1579,23 @@ class MainWindow(QMainWindow):
 
         self._conversion_panel.mark_converted(results)
         self._conversion_thread = None
+        self._conversion_panel.set_pipeline_controls_enabled(True)
         self._sidebar.set_page_busy("convert", False)
+
+        if self._pipeline.active:
+            sources = [r.source_path for r in results if not r.error and not r.skipped]
+            paths = [normalize_track_path(p) for p in self._pipeline.conversion_done(results)]
+            self._conversion_panel.forget_rows(sources)
+            self._pipeline_analyse(paths)
 
     def _on_conversion_error(self, error: str) -> None:
         """Handle conversion error."""
         self._conversion_panel.progress_panel.set_error(error)
         self._conversion_thread = None
+        self._conversion_panel.set_pipeline_controls_enabled(True)
         self._sidebar.set_page_busy("convert", False)
+        # The batch never produced results, so there is nothing to forward.
+        self._pipeline.conversion_cancelled()
 
     def _on_spectrum_sensitivity(self, dr: float) -> None:
         """Persist the spectrum colour sensitivity when the slider is released."""
@@ -1384,6 +1619,10 @@ class MainWindow(QMainWindow):
         self._persist_config()
         self._settings_panel.set_auto_analyze(enabled)
         self._sidebar.set_auto_analyze_badge(enabled)
+        # The pipeline ends in an analysis, so it cannot outlive auto-analyze.
+        # One-way: switching Auto back ON leaves the pipeline where it was.
+        if not enabled:
+            self._conversion_panel.set_pipeline_enabled(False)
 
     def _on_write_freeze_toggled(self, frozen: bool) -> None:
         """Handle the Analyze panel's Freeze toggle.
@@ -1424,6 +1663,10 @@ class MainWindow(QMainWindow):
         self._apply_visualization_settings()
         self._apply_online_lookup_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
+        # Same coupling as the Analyze panel's Auto button, from the other
+        # direction: Auto off takes the pipeline with it, Auto on does not.
+        if not self._config.auto_analyze:
+            self._conversion_panel.set_pipeline_enabled(False)
 
     def _apply_online_lookup_settings(self) -> None:
         """Push the online-metadata switch and token to the two panels that use it.
