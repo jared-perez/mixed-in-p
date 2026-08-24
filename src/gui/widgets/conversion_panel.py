@@ -55,6 +55,7 @@ class ConversionPanel(QWidget):
     send_to_analyze = Signal(list)  # list of file path strings
     send_to_rename = Signal(list)  # list of file path strings
     send_to_player = Signal(list)  # list of track dicts for player
+    pipeline_toggled = Signal(bool)  # the `|` toggle; MainWindow owns the coupling
 
     def __init__(
         self,
@@ -70,6 +71,7 @@ class ConversionPanel(QWidget):
         # Feeds both the "From" label and the same-format downgrade test, so one
         # sf.info() per file covers both.
         self._quality_cache: dict[str, tuple[int | None, int | None]] = {}
+        self._convertible_count = 0  # READY rows, as of the last _refresh_table
         self._config = load_config()
         # The folder last picked, remembered even while the Source toggle is on
         # so switching back to it costs one click. load_config has already
@@ -305,6 +307,27 @@ class ConversionPanel(QWidget):
 
         bottom_row.addStretch()
 
+        # The pipeline: Convert -> Analyze -> into a playlist, in one press.
+        # `|` is a glyph, not a word — deliberately not tr()'d — and the
+        # tooltip carries the meaning, saying what the NEXT click does.
+        self._pipeline_toggle = QPushButton("|")
+        self._pipeline_toggle.setObjectName("pipelineToggle")
+        self._pipeline_toggle.setCheckable(True)
+        bottom_row.addWidget(self._pipeline_toggle)
+
+        # Editable: picking an item targets that playlist, typing a name
+        # creates one. The default completer would silently turn a typed name
+        # into a pick, and the two have to stay distinguishable, so it is off.
+        self._pipeline_target = FittedComboBox()
+        self._pipeline_target.setEditable(True)
+        self._pipeline_target.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
+        self._pipeline_target.setCompleter(None)
+        self._pipeline_target.setMinimumWidth(160)
+        self._pipeline_target.lineEdit().setPlaceholderText(self.tr("Playlist name"))
+        bottom_row.addWidget(self._pipeline_target)
+
+        bottom_row.addStretch()
+
         self._convert_btn = QPushButton(self.tr("Convert"))
         self._convert_btn.setObjectName("primaryButton")
         self._convert_btn.setMinimumWidth(160)
@@ -322,7 +345,9 @@ class ConversionPanel(QWidget):
         self._send_to_btn.setMenu(send_to_menu)
         bottom_row.addWidget(self._send_to_btn)
 
+        bottom_row.setSpacing(Theme.SPACING)  # or spacing() reads back -1
         layout.addLayout(bottom_row)
+        self._bottom_row = bottom_row
 
         # Transient centered notice shown when a dropped lossy file is rejected.
         # It floats over the panel (not in the layout); auto-hides after 3s or
@@ -343,6 +368,12 @@ class ConversionPanel(QWidget):
         # Apply initial visibility based on persisted target format
         self._on_format_changed(self._format_combo.currentText())
 
+        # Restore the pipeline's toggle and target. _loading_settings is still
+        # on here, so neither write straight back to disk.
+        self._pipeline_toggle.setChecked(self._config.convert_pipeline_enabled)
+        self.restore_pipeline_target(self._config.convert_pipeline_playlist)
+        self._sync_pipeline_controls()
+
     def _connect_signals(self) -> None:
         """Connect internal signals."""
         self._format_combo.currentTextChanged.connect(self._on_format_changed)
@@ -354,6 +385,9 @@ class ConversionPanel(QWidget):
         self._samplerate_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitdepth_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitrate_combo.currentTextChanged.connect(self._save_convert_settings)
+        self._pipeline_toggle.toggled.connect(self._on_pipeline_toggled)
+        self._pipeline_target.currentIndexChanged.connect(self._on_pipeline_target_changed)
+        self._pipeline_target.editTextChanged.connect(self._on_pipeline_target_changed)
         self._dest_choose_btn.clicked.connect(self._on_choose_output_dir)
         self._dest_source_toggle.toggled.connect(self._on_source_toggled)
         self._file_table.files_dropped.connect(self.add_files)
@@ -492,8 +526,195 @@ class ConversionPanel(QWidget):
         cfg.convert_bit_depth = None if bd is None else int(bd)
         cfg.convert_output_dir = self._output_dir
         cfg.convert_use_source_dir = self._use_source_dir
+        cfg.convert_pipeline_enabled = self._pipeline_toggle.isChecked()
+        cfg.convert_pipeline_playlist = self._pipeline_target.currentText().strip()
         save_config(cfg)
         self._config = cfg
+
+    # --------------------------------------------------------------- pipeline
+
+    def _sync_pipeline_controls(self) -> None:
+        """Reflect the toggle in the Convert button's label, tooltip and
+        enablement, and in whether the target field is offered at all."""
+        on = self._pipeline_toggle.isChecked()
+        self._pipeline_toggle.setToolTip(
+            self.tr("Turn off the pipeline — Convert goes back to converting only.")
+            if on
+            else self.tr(
+                "Turn on the pipeline: Convert → Analyze → add to the playlist named here."
+            )
+        )
+        self._pipeline_target.setEnabled(on)
+        if on:
+            self._convert_btn.setText(self.tr("Start"))
+            self._convert_btn.setToolTip(self.tr("Send the tracks through the pipeline"))
+        else:
+            self._convert_btn.setText(self.tr("Convert"))
+            self._convert_btn.setToolTip("")
+        self._sync_convert_enabled()
+
+    def _sync_convert_enabled(self) -> None:
+        """Convert needs a convertible row; Start needs a forwardable one and
+        somewhere to put it."""
+        if self._pipeline_toggle.isChecked():
+            to_convert, passthrough = self.pipeline_rows()
+            enabled = bool(to_convert or passthrough) and bool(
+                self._pipeline_target.currentText().strip()
+            )
+        else:
+            enabled = self._convertible_count > 0
+        self._convert_btn.setEnabled(enabled)
+
+    def _on_pipeline_toggled(self, checked: bool) -> None:
+        self._sync_pipeline_controls()
+        self._save_convert_settings()
+        self.pipeline_toggled.emit(checked)
+
+    def _on_pipeline_target_changed(self, *_args) -> None:
+        self._sync_convert_enabled()
+        self._save_convert_settings()
+
+    def restore_pipeline_target(self, name: str) -> None:
+        """Point the field at a remembered playlist.
+
+        Called twice: once in __init__ (when the list is still empty, so the
+        name can only be typed back) and again by MainWindow once it has fed
+        the real playlists in, which is the pass that can resolve it.
+
+        A name that still matches a playlist is *selected*, so the next Start
+        reuses it. Only a name that matches nothing is set as edit text, which
+        reads as "create". Setting the text alone would make a new numbered
+        playlist on every launch.
+        """
+        if not name:
+            return
+        index = self._pipeline_target.findText(name, Qt.MatchFlag.MatchExactly)
+        if index >= 0:
+            self._pipeline_target.setCurrentIndex(index)
+        else:
+            self._pipeline_target.setCurrentIndex(-1)
+            self._pipeline_target.setEditText(name)
+
+    def pipeline_enabled(self) -> bool:
+        return self._pipeline_toggle.isChecked()
+
+    def set_pipeline_enabled(self, enabled: bool) -> None:
+        """Reflect the toggle without re-entering the handler that saves.
+
+        MainWindow calls this when auto-analyze goes off, which switches the
+        pipeline off with it — a reflect, never an act.
+        """
+        if self._pipeline_toggle.isChecked() == enabled:
+            return
+        self._pipeline_toggle.blockSignals(True)
+        self._pipeline_toggle.setChecked(enabled)
+        self._pipeline_toggle.blockSignals(False)
+        self._sync_pipeline_controls()
+        self._save_convert_settings()
+
+    def pipeline_target(self) -> tuple[int | None, str]:
+        """(node id, text) for the target. The id is set only when an existing
+        playlist was picked from the list — typed text that happens to equal a
+        listed name still reads as "create", which is why the completer is off.
+        """
+        text = self._pipeline_target.currentText().strip()
+        index = self._pipeline_target.currentIndex()
+        if index >= 0 and self._pipeline_target.itemText(index) == text:
+            node_id = self._pipeline_target.itemData(index)
+            if node_id is not None:
+                return int(node_id), text
+        return None, text
+
+    def set_playlists(self, rows: list[tuple[int, str]]) -> None:
+        """Fill the target list with (node_id, label) in tree order.
+
+        The panel never opens the library itself; MainWindow feeds it at
+        startup and on every nodes_changed. A refill keeps whatever the user
+        had — the same playlist if it survived, the same typed text if not.
+        """
+        picked_id, text = self.pipeline_target()
+        blocked = self._pipeline_target.blockSignals(True)
+        self._pipeline_target.clear()
+        for node_id, label in rows:
+            self._pipeline_target.addItem(label, node_id)
+        if picked_id is not None and self.select_node(picked_id):
+            pass
+        else:
+            self._pipeline_target.setCurrentIndex(-1)
+            self._pipeline_target.setEditText(text)
+        self._pipeline_target.blockSignals(blocked)
+        self._sync_convert_enabled()
+
+    def select_node(self, node_id: int) -> bool:
+        """Point the field at a playlist by id. True when it was in the list.
+
+        Called after the pipeline creates a playlist, so the next Start reuses
+        it instead of making a second one with the same name.
+        """
+        for i in range(self._pipeline_target.count()):
+            if self._pipeline_target.itemData(i) == node_id:
+                self._pipeline_target.setCurrentIndex(i)
+                return True
+        return False
+
+    def pipeline_rows(self) -> tuple[list[str], list[str]]:
+        """(to convert, forwarded as-is) for a Start press.
+
+        Start takes every lossless row that is not blocked, because the user's
+        model is "these tracks, into that playlist, analysed" — a batch that
+        already happens to be in the target format would otherwise leave the
+        button dead and the pipeline unusable. A refused upsample stays in the
+        table; it is the one thing the pipeline cannot honour.
+        """
+        target_ext = self._target_ext()
+        is_mp3 = self._format_combo.currentText() == "MP3"
+        to_convert: list[str] = []
+        passthrough: list[str] = []
+        for path in self._lossless_paths():
+            if path in self._converted_outputs:
+                passthrough.append(path)
+                continue
+            verdict = self._verdict(path, target_ext, is_mp3)
+            if verdict == self.READY:
+                to_convert.append(path)
+            elif verdict == self.SAME_FORMAT:
+                passthrough.append(path)
+        return to_convert, passthrough
+
+    def forget_rows(self, sources: list[str]) -> None:
+        """Drop rows the pipeline has handed on to Analyze, as Send To does."""
+        self._remove_sources(sources)
+
+    def set_pipeline_controls_enabled(self, enabled: bool) -> None:
+        """Lock the two controls while a conversion runs — the batch in flight
+        is already armed one way or the other."""
+        self._pipeline_toggle.setEnabled(enabled)
+        self._pipeline_target.setEnabled(enabled and self._pipeline_toggle.isChecked())
+
+    def bottom_row_min_width(self) -> int:
+        """Panel width the bottom row needs, including the panel's padding.
+
+        Measured the way format_row_min_width is: a size *hint* ignores
+        setFixedWidth, so each contributor is capped at the width it is
+        allowed, and the row's own spacing is read back only because
+        _setup_ui sets it (an unset QLayout answers -1 and the sum would
+        subtract where it means to add). The stats label is left out — it is
+        the one thing here that may shrink.
+        """
+        widgets = (
+            self._pipeline_toggle,
+            self._pipeline_target,
+            self._convert_btn,
+            self._send_to_btn,
+        )
+        margins = self._bottom_row.contentsMargins()
+        return (
+            sum(min(w.sizeHint().width(), w.maximumWidth()) for w in widgets)
+            + self._bottom_row.spacing() * (len(widgets) - 1)
+            + margins.left()
+            + margins.right()
+            + Theme.PADDING * 2  # the panel's own contents margins
+        )
 
     # ------------------------------------------------------------ destination
 
@@ -791,8 +1012,11 @@ class ConversionPanel(QWidget):
             parts.append(self.tr("({count} lossy skipped)").format(count=lossy_count))
         self._stats_label.setText(" | ".join(parts) if parts else self.tr("No files"))
 
-        # Enable convert button only if there are convertible files
-        self._convert_btn.setEnabled(convertible_count > 0)
+        # Enable convert button only if there are convertible files. With the
+        # pipeline on the test is a different one (see _sync_convert_enabled),
+        # so the count is remembered rather than applied here.
+        self._convertible_count = convertible_count
+        self._sync_convert_enabled()
         # Send To enablement is driven by selection via _on_selection_changed.
         if not self._file_table.selectedItems():
             self._send_to_btn.setEnabled(False)
@@ -802,6 +1026,7 @@ class ConversionPanel(QWidget):
         target_format = self._format_combo.currentText()
         target_ext = self._target_ext()
         is_mp3 = target_format == "MP3"
+        pipeline = self._pipeline_toggle.isChecked()
 
         # Collect only convertible file paths (skip already converted). Shares
         # _verdict with the table so what runs matches what says "Ready".
@@ -812,8 +1037,11 @@ class ConversionPanel(QWidget):
             and self._verdict(p, target_ext, is_mp3) == self.READY
         ]
 
-        if file_paths:
-            if not self._output_dir_is_writable():
+        # A pipeline run with nothing to convert is still a run — its rows go
+        # straight to Analyze — so it emits with an empty list and MainWindow
+        # takes the no-conversion branch.
+        if file_paths or pipeline:
+            if file_paths and not self._output_dir_is_writable():
                 return
             bitrate = int(self._bitrate_combo.currentText())
             # Passed through as-is: None means "Keep source" all the way down

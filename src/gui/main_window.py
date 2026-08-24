@@ -1815,6 +1815,11 @@ class MainWindow(QMainWindow):
         # destination — or silently drops the folder the user meant to keep.
         self._config.convert_output_dir = disk.convert_output_dir
         self._config.convert_use_source_dir = disk.convert_use_source_dir
+        # The pipeline's toggle and target are written by the Convert panel the
+        # same way, so they belong on this list too — left off, closing the
+        # window would revert whatever the user set this session.
+        self._config.convert_pipeline_enabled = disk.convert_pipeline_enabled
+        self._config.convert_pipeline_playlist = disk.convert_pipeline_playlist
         self._config.player_edit_locked = disk.player_edit_locked
         # These three are one value in three fields and must always be copied
         # together: the count says how many sections the state describes (a

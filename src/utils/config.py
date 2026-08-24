@@ -121,6 +121,12 @@ class AppConfig:
     # a stale path.
     convert_output_dir: str = ""
     convert_use_source_dir: bool = True
+    # The Convert -> Analyze -> playlist fast track. The target is stored as
+    # the playlist's NAME, not a node id: an id means nothing once the
+    # playlist it named has been deleted, while a name that no longer matches
+    # anything reads as "create one", which is the right answer.
+    convert_pipeline_enabled: bool = False
+    convert_pipeline_playlist: str = ""
     spectrum_dynamic_range: float = 110.0
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
@@ -304,6 +310,12 @@ def load_config() -> AppConfig:
                 convert_use_source_dir=bool(
                     data.get("convert_use_source_dir", AppConfig.convert_use_source_dir)
                 ),
+                convert_pipeline_enabled=bool(
+                    data.get("convert_pipeline_enabled", AppConfig.convert_pipeline_enabled)
+                ),
+                convert_pipeline_playlist=str(
+                    data.get("convert_pipeline_playlist", AppConfig.convert_pipeline_playlist)
+                ),
                 spectrum_dynamic_range=float(
                     data.get("spectrum_dynamic_range", AppConfig.spectrum_dynamic_range)
                 ),
@@ -394,6 +406,12 @@ def load_config() -> AppConfig:
                 cfg.convert_use_source_dir = True
             if not cfg.convert_output_dir:
                 cfg.convert_use_source_dir = True
+            # The pipeline ends in an analysis, so it cannot be on while
+            # auto-analyze is off — the two toggles are coupled in the UI, and
+            # this is what keeps a hand-edited (or half-written) config out of
+            # the one state that coupling forbids.
+            if not cfg.auto_analyze:
+                cfg.convert_pipeline_enabled = False
             cfg.spectrum_dynamic_range = max(60.0, min(cfg.spectrum_dynamic_range, 150.0))
             if not _HEX_COLOR_RE.match(cfg.waveform_color):
                 cfg.waveform_color = AppConfig.waveform_color

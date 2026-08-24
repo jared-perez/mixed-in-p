@@ -298,6 +298,44 @@ QPushButton#autoToggle:checked:hover {
     border-color: @ACCENT_HOVER@;
 }
 
+/* The Convert panel's pipeline toggle — the `|` at the foot of the panel that
+   turns Convert into Convert -> Analyze -> playlist. Same on/off colours as
+   #autoToggle, because it is the same kind of switch, but its label is one
+   glyph and it sits between the stats and the Convert button, so its footprint
+   is stated rather than left to the global 8px/16px padding: that padding
+   inside a 28px square leaves no contents rect and draws nothing at all (the
+   #discogsApplyButton law), and `min-width: 0` alone collapses the button to
+   the glyph's own width (the #metroStepButton law). */
+QPushButton#pipelineToggle {
+    padding: 0;
+    min-width: 28px;
+    max-width: 28px;
+    min-height: 28px;
+    max-height: 28px;
+    font-size: 15px;
+    font-weight: bold;
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_SECONDARY@;
+    border: 1px solid @CHROME_DARK@;
+    border-radius: 4px;
+}
+
+QPushButton#pipelineToggle:hover {
+    border-color: @CHROME@;
+    color: @TEXT_PRIMARY@;
+}
+
+QPushButton#pipelineToggle:checked {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+    border-color: @NEON_YELLOW@;
+}
+
+QPushButton#pipelineToggle:checked:hover {
+    background-color: @ACCENT_HOVER@;
+    border-color: @ACCENT_HOVER@;
+}
+
 /* "Freeze" toggle beside it — analysis stops writing to disk for the session.
    Same chrome outline when off, but fills WARNING rather than the accent when
    on: "frozen" must not read as one more thing switched on. */

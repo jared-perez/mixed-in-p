@@ -138,10 +138,13 @@ class WindowSizer:
             # user's language, and a constant left the longest of them clipped
             # instead of widening the window. Same shape as the player's slice
             # row above, including the live sidebar width.
+            panel = self.window._conversion_panel
             base = max(
                 _PANEL_MIN_WIDTH["convert"],
                 self.window._sidebar.width()
-                + self.window._conversion_panel.format_row_min_width()
+                # The bottom row grew a pipeline toggle and a playlist field,
+                # so it can now be the wider of the two and has to be asked.
+                + max(panel.format_row_min_width(), panel.bottom_row_min_width())
                 + _SLACK,
             )
         else:
