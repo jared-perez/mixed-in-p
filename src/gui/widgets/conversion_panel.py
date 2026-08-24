@@ -42,6 +42,14 @@ from .droppable_table import DroppableTableWidget
 from .progress_bar import ProgressPanel
 
 
+# The pipeline's playlist field. Stated rather than measured: it holds user
+# data of no fixed length, so there is no width that fits every name, and a
+# box that resized itself as playlists were renamed read as a glitch. Wide
+# enough for the "Playlist name" placeholder in all eleven languages —
+# rendered and looked at, not calculated.
+_PIPELINE_TARGET_WIDTH = 174
+
+
 class ConversionPanel(QWidget):
     """Panel for converting audio files between lossless formats."""
 
@@ -322,11 +330,31 @@ class ConversionPanel(QWidget):
         self._pipeline_target.setEditable(True)
         self._pipeline_target.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
         self._pipeline_target.setCompleter(None)
-        self._pipeline_target.setMinimumWidth(160)
+        # A stated width, and the items are stopped from driving it. An
+        # editable combo sizes itself to its WIDEST ITEM by default, so the
+        # box grew with whoever had the longest playlist name — 232px for one
+        # called "Warmup / Long folder name" — and changed size whenever a
+        # playlist was renamed. A field you type into wants to stay put; the
+        # popup is where the full names are read, and FittedComboBox floors
+        # that at the box's own width.
+        # AdjustToContents, not the default AdjustToContentsOnFirstShow: the
+        # hint is what the popup is floored at below, and "on first show" locks
+        # it at whatever the list held when the panel was first shown — which
+        # is nothing, because MainWindow feeds the playlists in afterwards.
+        # It does not affect the box, whose width is stated on the next line.
+        self._pipeline_target.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToContents
+        )
+        self._pipeline_target.setFixedWidth(_PIPELINE_TARGET_WIDTH)
+        # The box is capped; the LIST must not be. FittedComboBox floors the
+        # popup at the box's own width, which was right while the box sized
+        # itself to its widest item — capped, it left the popup rendering
+        # "Gigs / Satur…ing set 2026". Fitting the popup to the contents asks
+        # the combo for the width it *would* have had, which is the same
+        # arithmetic as before and needs no chrome constant of its own.
+        self._pipeline_target.set_popup_fits_contents(True)
         self._pipeline_target.lineEdit().setPlaceholderText(self.tr("Playlist name"))
         bottom_row.addWidget(self._pipeline_target)
-
-        bottom_row.addStretch()
 
         self._convert_btn = QPushButton(self.tr("Convert"))
         self._convert_btn.setObjectName("primaryButton")
@@ -709,7 +737,14 @@ class ConversionPanel(QWidget):
         )
         margins = self._bottom_row.contentsMargins()
         return (
-            sum(min(w.sizeHint().width(), w.maximumWidth()) for w in widgets)
+            # A hint ignores setFixedWidth in BOTH directions: the icon-sized
+            # buttons hint wider than they are laid out, and the playlist field
+            # hints at its (now item-independent) contents and is laid out at
+            # its stated width. Cap at the maximum, then floor at the minimum.
+            sum(
+                max(w.minimumWidth(), min(w.sizeHint().width(), w.maximumWidth()))
+                for w in widgets
+            )
             + self._bottom_row.spacing() * (len(widgets) - 1)
             + margins.left()
             + margins.right()

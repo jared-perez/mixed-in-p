@@ -270,6 +270,63 @@ def test_the_bottom_row_reports_a_real_minimum(panel):
     assert panel.bottom_row_min_width() > panel._convert_btn.sizeHint().width()
 
 
+def test_the_target_box_does_not_grow_with_its_playlists(panel):
+    """An editable combo sizes itself to its widest item by default, so the
+    box grew with whoever had the longest playlist name and changed size when
+    one was renamed. A field you type into has to stay put."""
+    before = panel._pipeline_target.width()
+    panel.set_playlists([(1, "Set")])
+    assert panel._pipeline_target.width() == before
+    panel.set_playlists([(1, "Gigs / Saturday closing set 2026 extended mix")])
+    assert panel._pipeline_target.width() == before
+    assert panel._pipeline_target.minimumWidth() == panel._pipeline_target.maximumWidth()
+
+
+def test_the_list_is_not_capped_with_the_box(panel, qtbot):
+    """The popup is floored at the box's width, which was right while the box
+    sized itself to its items — capped, it opened the list elided."""
+    panel.set_playlists([(1, "Set"), (2, "Gigs / Saturday closing set 2026")])
+    panel.show()
+    qtbot.waitExposed(panel)
+    combo = panel._pipeline_target
+    combo.showPopup()
+    try:
+        assert combo.view().width() > combo.width()
+        assert combo.view().width() >= combo.view().sizeHintForColumn(0)
+    finally:
+        combo.hidePopup()
+
+
+def test_the_target_sizes_from_contents_not_first_show(panel):
+    """MainWindow feeds the playlists in after the panel exists, so the
+    default AdjustToContentsOnFirstShow would lock the hint at an empty list
+    and the popup floor would read that stale number for ever."""
+    from PySide6.QtWidgets import QComboBox
+
+    assert (panel._pipeline_target.sizeAdjustPolicy()
+            == QComboBox.SizeAdjustPolicy.AdjustToContents)
+
+
+def test_the_pipeline_controls_sit_beside_the_convert_button(panel):
+    """Ordered [stats][stretch][toggle][playlist][Convert][Send To]: the two
+    pipeline controls are adjacent to the button they arm, not adrift in the
+    middle of the row."""
+    row = panel._bottom_row
+    order = [row.itemAt(i).widget() for i in range(row.count())]
+    widgets = [w for w in order if w is not None]
+    assert widgets == [
+        panel._stats_label,
+        panel._pipeline_toggle,
+        panel._pipeline_target,
+        panel._convert_btn,
+        panel._send_to_btn,
+    ]
+    # ...and the only stretch is the one before the toggle.
+    stretches = [i for i in range(row.count()) if row.itemAt(i).widget() is None]
+    assert len(stretches) == 1
+    assert stretches[0] == order.index(panel._pipeline_toggle) - 1
+
+
 def test_the_toggle_glyph_is_not_translated(panel):
     assert panel._pipeline_toggle.text() == "|"
     assert panel._pipeline_toggle.objectName() == "pipelineToggle"

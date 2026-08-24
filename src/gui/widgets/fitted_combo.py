@@ -48,6 +48,28 @@ from PySide6.QtWidgets import QComboBox
 class FittedComboBox(QComboBox):
     """A ``QComboBox`` that widens its popup to its own width before opening."""
 
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._popup_fits_contents = False
+
+    def set_popup_fits_contents(self, enabled: bool) -> None:
+        """Also floor the popup at the width this combo's CONTENTS want.
+
+        Off by default, and deliberately opt-in. The rule above holds because
+        a combo is normally laid out at least as wide as its own size hint, so
+        the box's width already carries the widest item — the exception is a
+        combo given a stated width narrower than its contents, where the floor
+        then shrinks the popup with the box and the list opens elided. Turning
+        this on restores the width the box would have chosen for itself.
+
+        Not the default, because the docstring's bounded-ness argument still
+        stands for a combo holding free text: the lookup dialog's release
+        switcher would drop a screen-wide menu out of a 400px control. A combo
+        opts in when its own width has been capped and its items are worth
+        reading in full.
+        """
+        self._popup_fits_contents = enabled
+
     def showPopup(self) -> None:  # noqa: N802 - Qt naming
         self._fit_popup_width()
         super().showPopup()
@@ -56,8 +78,15 @@ class FittedComboBox(QComboBox):
         view = self.view()
         if view is None or self.count() == 0:
             return
+        floor = self.width()
+        if self._popup_fits_contents:
+            # sizeHint() is the style's own arithmetic over the widest item
+            # plus the padding and the arrow — the very number that made this
+            # rule correct before the box was capped. Asking for it costs no
+            # chrome constant, and a constant is what would differ per style.
+            floor = max(floor, self.sizeHint().width())
         # A minimum, never a fixed width: a style that has already worked out a
         # wider popup for itself must keep it. Recomputed on every open rather
         # than set once, so a combo that is resized, retranslated or refilled
         # is measured as it now is.
-        view.setMinimumWidth(self.width())
+        view.setMinimumWidth(floor)

@@ -514,81 +514,81 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="138"/>
-        <location filename="../widgets/conversion_panel.py" line="331"/>
-        <location filename="../widgets/conversion_panel.py" line="552"/>
+        <location filename="../widgets/conversion_panel.py" line="146"/>
+        <location filename="../widgets/conversion_panel.py" line="347"/>
+        <location filename="../widgets/conversion_panel.py" line="568"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="149"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>Convertissez des fichiers audio entre formats (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="153"/>
+        <location filename="../widgets/conversion_panel.py" line="161"/>
         <source>Target Format:</source>
         <translation>Format cible :</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="162"/>
+        <location filename="../widgets/conversion_panel.py" line="170"/>
         <source>Sample Rate:</source>
         <translation>Fréquence d&apos;échantillonnage :</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="169"/>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="177"/>
+        <location filename="../widgets/conversion_panel.py" line="195"/>
         <source>Keep source</source>
         <translatorcomment>Combo item: keep the source file&apos;s own sample rate / bit depth (the engine leaves that axis alone).</translatorcomment>
         <translation>Conserver la source</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="178"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="171"/>
+        <location filename="../widgets/conversion_panel.py" line="179"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="172"/>
+        <location filename="../widgets/conversion_panel.py" line="180"/>
         <source>44.1 kHz (CD)</source>
         <translation>44,1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="173"/>
+        <location filename="../widgets/conversion_panel.py" line="181"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="191"/>
         <source>Bit Depth:</source>
         <translation>Profondeur de bits :</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="188"/>
+        <location filename="../widgets/conversion_panel.py" line="196"/>
         <source>32 bit</source>
         <translation>32 bits</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="189"/>
+        <location filename="../widgets/conversion_panel.py" line="197"/>
         <source>24 bit (DVD)</source>
         <translation>24 bits (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="190"/>
+        <location filename="../widgets/conversion_panel.py" line="198"/>
         <source>16 bit (CD)</source>
         <translation>16 bits (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="191"/>
+        <location filename="../widgets/conversion_panel.py" line="199"/>
         <source>8 bit</source>
         <translation>8 bits</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="201"/>
+        <location filename="../widgets/conversion_panel.py" line="209"/>
         <source>Bitrate:</source>
         <translation>Débit binaire :</translation>
     </message>
@@ -597,79 +597,79 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Enregistrer dans :</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="223"/>
-        <location filename="../widgets/conversion_panel.py" line="769"/>
+        <location filename="../widgets/conversion_panel.py" line="231"/>
+        <location filename="../widgets/conversion_panel.py" line="785"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>Choisir le dossier où sont enregistrés les fichiers convertis</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="326"/>
+        <location filename="../widgets/conversion_panel.py" line="344"/>
         <source>Playlist name</source>
         <translation>Nom de la liste</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="541"/>
+        <location filename="../widgets/conversion_panel.py" line="557"/>
         <source>Turn off the pipeline — Convert goes back to converting only.</source>
         <translation>Désactiver la chaîne — Convertir se contente à nouveau de convertir.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="544"/>
+        <location filename="../widgets/conversion_panel.py" line="560"/>
         <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
         <translation>Activer la chaîne : Convertir → Analyser → ajouter à la liste nommée ici.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="549"/>
+        <location filename="../widgets/conversion_panel.py" line="565"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="550"/>
+        <location filename="../widgets/conversion_panel.py" line="566"/>
         <source>Send the tracks through the pipeline</source>
         <translation>Envoyer les morceaux dans la chaîne</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="762"/>
+        <location filename="../widgets/conversion_panel.py" line="778"/>
         <source>Save converted files next to the originals</source>
         <translation>Enregistrer les fichiers convertis à côté des originaux</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="268"/>
+        <location filename="../widgets/conversion_panel.py" line="276"/>
         <source>Files</source>
         <translation>Fichiers</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="235"/>
+        <location filename="../widgets/conversion_panel.py" line="243"/>
         <source>Source</source>
         <translation>Source</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="271"/>
+        <location filename="../widgets/conversion_panel.py" line="279"/>
         <source>Drop audio files here to add them</source>
         <translation>Déposez des fichiers audio ici pour les ajouter</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="274"/>
+        <location filename="../widgets/conversion_panel.py" line="282"/>
         <source>Filename</source>
         <translation>Nom de fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="275"/>
+        <location filename="../widgets/conversion_panel.py" line="283"/>
         <source>From</source>
         <translation>De</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="276"/>
+        <location filename="../widgets/conversion_panel.py" line="284"/>
         <source>To</source>
         <translation>Vers</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="277"/>
+        <location filename="../widgets/conversion_panel.py" line="285"/>
         <source>Status</source>
         <translation>État</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="304"/>
-        <location filename="../widgets/conversion_panel.py" line="1013"/>
+        <location filename="../widgets/conversion_panel.py" line="312"/>
+        <location filename="../widgets/conversion_panel.py" line="1029"/>
         <source>No files</source>
         <translation>Aucun fichier</translation>
     </message>
@@ -678,32 +678,32 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Supprimer la sélection</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="338"/>
+        <location filename="../widgets/conversion_panel.py" line="354"/>
         <source>Send To</source>
         <translation>Envoyer vers</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="340"/>
+        <location filename="../widgets/conversion_panel.py" line="356"/>
         <source>Select at least one file to send.</source>
         <translation>Sélectionnez au moins un fichier à envoyer.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="342"/>
+        <location filename="../widgets/conversion_panel.py" line="358"/>
         <source>Analyze</source>
         <translation>Analyser</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="343"/>
+        <location filename="../widgets/conversion_panel.py" line="359"/>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="344"/>
+        <location filename="../widgets/conversion_panel.py" line="360"/>
         <source>Player</source>
         <translation>Lecteur</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="355"/>
+        <location filename="../widgets/conversion_panel.py" line="371"/>
         <source>Lossy files not allowed</source>
         <translation>Fichiers avec perte non autorisés</translation>
     </message>
@@ -712,27 +712,27 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Même dossier que chaque fichier source</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="741"/>
+        <location filename="../widgets/conversion_panel.py" line="757"/>
         <source>Same folder as source</source>
         <translation>Dossier source</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="760"/>
+        <location filename="../widgets/conversion_panel.py" line="776"/>
         <source>Save converted files to a folder instead</source>
         <translation>Enregistrer les fichiers convertis dans un dossier</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="790"/>
+        <location filename="../widgets/conversion_panel.py" line="806"/>
         <source>Choose Output Folder</source>
         <translation>Choisir le dossier de destination</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="846"/>
+        <location filename="../widgets/conversion_panel.py" line="862"/>
         <source>Output Folder Unavailable</source>
         <translation>Dossier de destination indisponible</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="847"/>
+        <location filename="../widgets/conversion_panel.py" line="863"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -741,76 +741,76 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="892"/>
+        <location filename="../widgets/conversion_panel.py" line="908"/>
         <source>Open File Location</source>
         <translation>Ouvrir l&apos;emplacement du fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="894"/>
+        <location filename="../widgets/conversion_panel.py" line="910"/>
         <source>Remove</source>
         <translation>Supprimer</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="969"/>
-        <location filename="../widgets/conversion_panel.py" line="1180"/>
+        <location filename="../widgets/conversion_panel.py" line="985"/>
+        <location filename="../widgets/conversion_panel.py" line="1196"/>
         <source>Done</source>
         <translation>Terminé</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="982"/>
+        <location filename="../widgets/conversion_panel.py" line="998"/>
         <source>Same format</source>
         <translation>Même format</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="985"/>
+        <location filename="../widgets/conversion_panel.py" line="1001"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>Choisissez une fréquence d’échantillonnage ou une profondeur de bits inférieure pour convertir ce fichier.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="988"/>
+        <location filename="../widgets/conversion_panel.py" line="1004"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>Trop élevé</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="991"/>
+        <location filename="../widgets/conversion_panel.py" line="1007"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>Choisissez une fréquence d’échantillonnage et une profondeur de bits qui ne dépassent pas celles de ce fichier.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="994"/>
-        <location filename="../widgets/conversion_panel.py" line="1172"/>
-        <location filename="../widgets/conversion_panel.py" line="1202"/>
+        <location filename="../widgets/conversion_panel.py" line="1010"/>
+        <location filename="../widgets/conversion_panel.py" line="1188"/>
+        <location filename="../widgets/conversion_panel.py" line="1218"/>
         <source>Ready</source>
         <translation>Prêt</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1008"/>
+        <location filename="../widgets/conversion_panel.py" line="1024"/>
         <source>{count} files</source>
         <translation>{count} fichiers</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1010"/>
+        <location filename="../widgets/conversion_panel.py" line="1026"/>
         <source>{count} to convert</source>
         <translation>{count} à convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1012"/>
+        <location filename="../widgets/conversion_panel.py" line="1028"/>
         <source>({count} lossy skipped)</source>
         <translation>({count} avec perte ignorés)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1144"/>
+        <location filename="../widgets/conversion_panel.py" line="1160"/>
         <source>Converting</source>
         <translation>Conversion en cours</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1165"/>
+        <location filename="../widgets/conversion_panel.py" line="1181"/>
         <source>Incomplete</source>
         <translation>Incomplet</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1165"/>
+        <location filename="../widgets/conversion_panel.py" line="1181"/>
         <source>Error</source>
         <translation>Erreur</translation>
     </message>

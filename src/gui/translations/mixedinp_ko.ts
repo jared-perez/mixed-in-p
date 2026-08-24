@@ -487,84 +487,84 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="138"/>
-        <location filename="../widgets/conversion_panel.py" line="331"/>
-        <location filename="../widgets/conversion_panel.py" line="552"/>
+        <location filename="../widgets/conversion_panel.py" line="146"/>
+        <location filename="../widgets/conversion_panel.py" line="347"/>
+        <location filename="../widgets/conversion_panel.py" line="568"/>
         <source>Convert</source>
         <translatorcomment>Dual-use title/button → bare noun 변환.</translatorcomment>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="141"/>
+        <location filename="../widgets/conversion_panel.py" line="149"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>오디오 파일을 다른 형식으로 변환해요 (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="153"/>
+        <location filename="../widgets/conversion_panel.py" line="161"/>
         <source>Target Format:</source>
         <translation>대상 형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="162"/>
+        <location filename="../widgets/conversion_panel.py" line="170"/>
         <source>Sample Rate:</source>
         <translatorcomment>DSP term &quot;sample rate&quot; (not the producer &quot;sample&quot;) → 샘플 레이트, the standard loanword in Korean audio software. Flag for native review.</translatorcomment>
         <translation>샘플 레이트:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="169"/>
-        <location filename="../widgets/conversion_panel.py" line="187"/>
+        <location filename="../widgets/conversion_panel.py" line="177"/>
+        <location filename="../widgets/conversion_panel.py" line="195"/>
         <source>Keep source</source>
         <translatorcomment>Combo item: keep the source file&apos;s own sample rate / bit depth (the engine leaves that axis alone).</translatorcomment>
         <translation>원본 유지</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="178"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="171"/>
+        <location filename="../widgets/conversion_panel.py" line="179"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="172"/>
+        <location filename="../widgets/conversion_panel.py" line="180"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="173"/>
+        <location filename="../widgets/conversion_panel.py" line="181"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="191"/>
         <source>Bit Depth:</source>
         <translatorcomment>bit depth → 비트 심도 (standard Korean DSP term).</translatorcomment>
         <translation>비트 심도:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="188"/>
+        <location filename="../widgets/conversion_panel.py" line="196"/>
         <source>32 bit</source>
         <translation>32비트</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="189"/>
+        <location filename="../widgets/conversion_panel.py" line="197"/>
         <source>24 bit (DVD)</source>
         <translation>24비트 (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="190"/>
+        <location filename="../widgets/conversion_panel.py" line="198"/>
         <source>16 bit (CD)</source>
         <translation>16비트 (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="191"/>
+        <location filename="../widgets/conversion_panel.py" line="199"/>
         <source>8 bit</source>
         <translation>8비트</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="201"/>
+        <location filename="../widgets/conversion_panel.py" line="209"/>
         <source>Bitrate:</source>
         <translation>비트레이트:</translation>
     </message>
@@ -573,113 +573,113 @@ or click “Add Artwork…”</source>
         <translation type="vanished">저장 위치:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="223"/>
-        <location filename="../widgets/conversion_panel.py" line="769"/>
+        <location filename="../widgets/conversion_panel.py" line="231"/>
+        <location filename="../widgets/conversion_panel.py" line="785"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>변환된 파일을 저장할 폴더 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="541"/>
+        <location filename="../widgets/conversion_panel.py" line="557"/>
         <source>Turn off the pipeline — Convert goes back to converting only.</source>
         <translation>파이프라인 끄기 — 변환은 다시 변환만 합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="544"/>
+        <location filename="../widgets/conversion_panel.py" line="560"/>
         <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
         <translation>파이프라인 켜기: 변환 → 분석 → 여기에 지정한 재생목록에 추가.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="549"/>
+        <location filename="../widgets/conversion_panel.py" line="565"/>
         <source>Start</source>
         <translation>시작</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="550"/>
+        <location filename="../widgets/conversion_panel.py" line="566"/>
         <source>Send the tracks through the pipeline</source>
         <translation>트랙을 파이프라인으로 보냅니다</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="762"/>
+        <location filename="../widgets/conversion_panel.py" line="778"/>
         <source>Save converted files next to the originals</source>
         <translation>변환된 파일을 원본 옆에 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="268"/>
+        <location filename="../widgets/conversion_panel.py" line="276"/>
         <source>Files</source>
         <translatorcomment>파일 (Hangul) per glossary — Apple Korean Finder standard, never 문서.</translatorcomment>
         <translation>파일</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="235"/>
+        <location filename="../widgets/conversion_panel.py" line="243"/>
         <source>Source</source>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="271"/>
+        <location filename="../widgets/conversion_panel.py" line="279"/>
         <source>Drop audio files here to add them</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="274"/>
+        <location filename="../widgets/conversion_panel.py" line="282"/>
         <source>Filename</source>
         <translation>파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="275"/>
+        <location filename="../widgets/conversion_panel.py" line="283"/>
         <source>From</source>
         <translatorcomment>Column = source format → 원본 (rather than literal &quot;~에서&quot;). Pairs with 대상 below. Flag for native review.</translatorcomment>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="276"/>
+        <location filename="../widgets/conversion_panel.py" line="284"/>
         <source>To</source>
         <translatorcomment>Column = target format → 대상. Pairs with 원본 above.</translatorcomment>
         <translation>대상</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="277"/>
+        <location filename="../widgets/conversion_panel.py" line="285"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="304"/>
-        <location filename="../widgets/conversion_panel.py" line="1013"/>
+        <location filename="../widgets/conversion_panel.py" line="312"/>
+        <location filename="../widgets/conversion_panel.py" line="1029"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="326"/>
+        <location filename="../widgets/conversion_panel.py" line="344"/>
         <source>Playlist name</source>
         <translation>재생목록 이름</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="338"/>
+        <location filename="../widgets/conversion_panel.py" line="354"/>
         <source>Send To</source>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="340"/>
+        <location filename="../widgets/conversion_panel.py" line="356"/>
         <source>Select at least one file to send.</source>
         <translation>보낼 파일을 하나 이상 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="342"/>
+        <location filename="../widgets/conversion_panel.py" line="358"/>
         <source>Analyze</source>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="343"/>
+        <location filename="../widgets/conversion_panel.py" line="359"/>
         <source>Rename</source>
         <translatorcomment>이름 변경 = Apple Korean Finder term for Rename.</translatorcomment>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="344"/>
+        <location filename="../widgets/conversion_panel.py" line="360"/>
         <source>Player</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="355"/>
+        <location filename="../widgets/conversion_panel.py" line="371"/>
         <source>Lossy files not allowed</source>
         <translatorcomment>lossy → 손실 (audio term). Flag for native review.</translatorcomment>
         <translation>손실 파일은 허용되지 않아요</translation>
@@ -689,27 +689,27 @@ or click “Add Artwork…”</source>
         <translation type="vanished">각 원본 파일과 같은 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="741"/>
+        <location filename="../widgets/conversion_panel.py" line="757"/>
         <source>Same folder as source</source>
         <translation>원본과 같은 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="760"/>
+        <location filename="../widgets/conversion_panel.py" line="776"/>
         <source>Save converted files to a folder instead</source>
         <translation>변환된 파일을 폴더에 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="790"/>
+        <location filename="../widgets/conversion_panel.py" line="806"/>
         <source>Choose Output Folder</source>
         <translation>출력 폴더 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="846"/>
+        <location filename="../widgets/conversion_panel.py" line="862"/>
         <source>Output Folder Unavailable</source>
         <translation>출력 폴더를 사용할 수 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="847"/>
+        <location filename="../widgets/conversion_panel.py" line="863"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -718,76 +718,76 @@ or click “Add Artwork…”</source>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="892"/>
+        <location filename="../widgets/conversion_panel.py" line="908"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="894"/>
+        <location filename="../widgets/conversion_panel.py" line="910"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="969"/>
-        <location filename="../widgets/conversion_panel.py" line="1180"/>
+        <location filename="../widgets/conversion_panel.py" line="985"/>
+        <location filename="../widgets/conversion_panel.py" line="1196"/>
         <source>Done</source>
         <translation>완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="982"/>
+        <location filename="../widgets/conversion_panel.py" line="998"/>
         <source>Same format</source>
         <translation>동일한 형식</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="985"/>
+        <location filename="../widgets/conversion_panel.py" line="1001"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>이 파일을 변환하려면 더 낮은 샘플 레이트 또는 비트 심도를 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="988"/>
+        <location filename="../widgets/conversion_panel.py" line="1004"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>원본보다 높음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="991"/>
+        <location filename="../widgets/conversion_panel.py" line="1007"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>이 파일보다 높지 않은 샘플 레이트와 비트 심도를 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="994"/>
-        <location filename="../widgets/conversion_panel.py" line="1172"/>
-        <location filename="../widgets/conversion_panel.py" line="1202"/>
+        <location filename="../widgets/conversion_panel.py" line="1010"/>
+        <location filename="../widgets/conversion_panel.py" line="1188"/>
+        <location filename="../widgets/conversion_panel.py" line="1218"/>
         <source>Ready</source>
         <translation>준비됨</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1008"/>
+        <location filename="../widgets/conversion_panel.py" line="1024"/>
         <source>{count} files</source>
         <translation>파일 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1010"/>
+        <location filename="../widgets/conversion_panel.py" line="1026"/>
         <source>{count} to convert</source>
         <translation>변환 대상 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1012"/>
+        <location filename="../widgets/conversion_panel.py" line="1028"/>
         <source>({count} lossy skipped)</source>
         <translation>(손실 {count}개 건너뜀)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1144"/>
+        <location filename="../widgets/conversion_panel.py" line="1160"/>
         <source>Converting</source>
         <translation>변환 중</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1165"/>
+        <location filename="../widgets/conversion_panel.py" line="1181"/>
         <source>Incomplete</source>
         <translation>미완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1165"/>
+        <location filename="../widgets/conversion_panel.py" line="1181"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
