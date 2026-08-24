@@ -153,6 +153,7 @@ class WindowStub(QObject):
     """The real gating methods, run against a minimal self."""
 
     _update_track_from_result = MainWindow._update_track_from_result
+    _apply_analysis_result = MainWindow._apply_analysis_result
     _on_analysis_finished = MainWindow._on_analysis_finished
     _on_analysis_cancelled = MainWindow._on_analysis_cancelled
     _on_write_freeze_toggled = MainWindow._on_write_freeze_toggled

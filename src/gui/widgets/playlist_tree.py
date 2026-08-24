@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import logging
 import shutil
+from collections.abc import Callable
 from pathlib import Path
 
 from PySide6.QtCore import (
@@ -1419,11 +1420,24 @@ class PlaylistTree(QTreeView):
         # nothing simply leaves the source view untouched, as it would anyway.
         self._add_paths_to_node(node_id, paths)
 
-    def _add_paths_to_node(self, node_id: int, paths: list[str]) -> bool:
+    def _add_paths_to_node(
+        self,
+        node_id: int,
+        paths: list[str],
+        policy: str | None = None,
+        on_committed: Callable[[list[str]], None] | None = None,
+    ) -> bool:
         """Append tracks to a playlist, with undo. The one add chokepoint.
 
         Duplicates the playlist already holds are resolved first — added,
         skipped, or put to the user, per the ``duplicate_policy`` setting.
+        ``policy`` overrides that setting for a caller that must not ask: the
+        convert pipeline adds one track at a time from inside an analysis
+        progress signal, and a modal there would pile up behind the next result.
+
+        ``on_committed`` is handed what was actually written, so a caller can
+        tell an add from a skip — the resolution may be asynchronous, so the
+        return value cannot say.
         That resolution can be **asynchronous** (the prompt cannot open inside
         a drop event), so a ``True`` return means "the add was started", not
         "the tracks are in". Anything that must run afterwards belongs in
@@ -1438,12 +1452,18 @@ class PlaylistTree(QTreeView):
         node = library.get_node(node_id)
         if node is None:
             return False
+        def commit(resolved: list[str]) -> None:
+            self._commit_added_paths(node_id, resolved)
+            if on_committed is not None:
+                on_committed(resolved)
+
         resolve_additions(
             self,
             paths,
             lambda: [t.path for t in library.get_items(node_id)],
             node.name,
-            lambda resolved: self._commit_added_paths(node_id, resolved),
+            commit,
+            policy=policy,
         )
         return True
 

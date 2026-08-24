@@ -543,3 +543,213 @@ def test_auto_analyze_going_on_leaves_the_pipeline_off(library):
     win, panel = _window(library, enabled=False)
     win._on_auto_analyze_toggled(True)
     assert panel.pipeline_enabled() is False
+
+
+# ------------------------------------------------- W4: the per-track add
+
+# From here the tests drive the real tree and a real Library on the isolated
+# app-data directory, because what is being tested is the add itself.
+
+
+@pytest.fixture(scope="session", autouse=True)
+def warm_tag_reader(tmp_path_factory):
+    """Pull mutagen's lazy imports in on the main thread, once, up front —
+    two threads entering the import lock together abort the process."""
+    from src.metadata import read_metadata
+
+    warm = tmp_path_factory.mktemp("warm") / "warm.wav"
+    warm.write_bytes(b"not really audio")
+    try:
+        read_metadata(str(warm))
+    except Exception:  # noqa: BLE001 — we want the imports, not the tags
+        pass
+
+
+def _flac(path, bpm=None) -> str:
+    sf = pytest.importorskip("soundfile")
+    import numpy as np
+
+    t = np.linspace(0, 0.1, 4410, endpoint=False)
+    sf.write(str(path), (0.2 * np.sin(2 * np.pi * 440 * t)).astype("float32"),
+             44100, subtype="PCM_16")
+    return str(path)
+
+
+def _wav(path) -> str:
+    sf = pytest.importorskip("soundfile")
+    import numpy as np
+
+    t = np.linspace(0, 0.1, 4410, endpoint=False)
+    sf.write(str(path), (0.2 * np.sin(2 * np.pi * 440 * t)).astype("float32"),
+             44100, subtype="PCM_16")
+    return str(path)
+
+
+def _result(path, error=None):
+    from src.analysis.result import AnalysisResult
+
+    return AnalysisResult(
+        file_path=path,
+        bpm=128.0,
+        bpm_confidence=0.9,
+        key="Am",
+        key_confidence=0.8,
+        keycode="8A",
+        energy=7,
+        error=error,
+    )
+
+
+class _AddingWindow(WindowStub):
+    """The stub plus the two methods that do the adding."""
+
+    _update_track_from_result = MainWindow._update_track_from_result
+    _pipeline_add_to_playlist = MainWindow._pipeline_add_to_playlist
+
+    def _apply_analysis_result(self, result):
+        # The tag/history writes are covered by test_analysis_write_freeze;
+        # here only the store row matters, so the result can reach the add.
+        track = self._store.get_by_path(result.file_path)
+        if track is not None:
+            self._store.update(
+                track.id,
+                state=TrackState.ERROR if result.error else TrackState.ANALYSED,
+                bpm=result.bpm,
+                key=result.key,
+                keycode=result.keycode,
+                energy=result.energy,
+            )
+
+
+@pytest.fixture
+def adding(qtbot, library, monkeypatch):
+    """A window whose tree and library are real, aimed at one playlist."""
+    from src.gui.widgets.playlist_tree import PlaylistTreePanel
+
+    panel = _PanelStub()
+    win = _AddingWindow(TrackStore(), library, panel)
+    tree_panel = PlaylistTreePanel()
+    qtbot.addWidget(tree_panel)
+    tree_panel.set_library(library)
+    tree_panel.ensure_loaded()
+    win._playlists_panel = tree_panel
+    return win
+
+
+def _arm_at(win, name="Pipeline test"):
+    node_id = win._library.create_playlist(name)
+    win._pipeline.arm(node_id, name, [], [])
+    return node_id
+
+
+def _await(win, path):
+    track = win._store.add_from_path(path)
+    win._pipeline.await_analysis({track.file_path: path})
+    return track
+
+
+def test_an_analysed_track_lands_in_the_target(adding, tmp_path):
+    node_id = _arm_at(adding)
+    path = _flac(tmp_path / "a.flac")
+    track = _await(adding, path)
+    adding._update_track_from_result(_result(track.file_path))
+    items = adding._library.get_items(node_id)
+    assert [i.path for i in items] == [path]
+    row = adding._library.get_track_by_path(path)
+    assert row.bpm == pytest.approx(128.0)
+    assert row.key == "8A"
+    assert row.energy == 7
+
+
+def test_a_wav_lands_with_the_values_the_analysis_found(adding, tmp_path):
+    """A WAV has nowhere to keep BPM or key, so the tag read on the way in
+    finds nothing — the row is patched from the result instead."""
+    node_id = _arm_at(adding)
+    path = _wav(tmp_path / "a.wav")
+    track = _await(adding, path)
+    adding._update_track_from_result(_result(track.file_path))
+    row = adding._library.get_track_by_path(path)
+    assert row.bpm == pytest.approx(128.0)
+    assert row.key == "8A"
+
+
+def test_a_file_the_library_already_knew_gets_its_row_patched(adding, tmp_path):
+    """_track_id_for reuses an existing row without re-reading its tags, so a
+    passthrough file would otherwise keep whatever it was imported with."""
+    node_id = _arm_at(adding)
+    path = _flac(tmp_path / "a.flac")
+    adding._library.add_track(path, title="Old", bpm=90.0, key="1A")
+    track = _await(adding, path)
+    adding._update_track_from_result(_result(track.file_path))
+    row = adding._library.get_track_by_path(path)
+    assert row.bpm == pytest.approx(128.0)
+    assert row.key == "8A"
+    assert row.title == "Old"  # untouched: only non-None fields overwrite
+
+
+def test_an_analysis_error_does_not_land(adding, tmp_path):
+    node_id = _arm_at(adding)
+    path = _flac(tmp_path / "a.flac")
+    track = _await(adding, path)
+    adding._update_track_from_result(_result(track.file_path, error="unreadable"))
+    assert adding._library.get_items(node_id) == []
+    assert adding._pipeline.summary() == (0, 0, 1)
+
+
+def test_a_track_the_run_never_armed_does_not_land(adding, tmp_path):
+    """A file the user drops into Analyze alongside the batch is analysed in
+    the same run and must stay out of the playlist."""
+    node_id = _arm_at(adding)
+    mine = _flac(tmp_path / "a.flac")
+    stranger = _flac(tmp_path / "dropped.flac")
+    _await(adding, mine)
+    other = adding._store.add_from_path(stranger)
+    adding._update_track_from_result(_result(other.file_path))
+    assert adding._library.get_items(node_id) == []
+
+
+def test_a_duplicate_is_skipped_and_counted_never_asked(adding, tmp_path, monkeypatch):
+    """ASK is read as SKIP here: a modal per track, fired from inside an
+    analysis progress signal, is a pile-up."""
+    from src.gui.widgets.dialogs import duplicate_policy
+
+    monkeypatch.setattr(duplicate_policy, "current_policy",
+                        lambda: duplicate_policy.ASK)
+    monkeypatch.setattr(
+        duplicate_policy, "_prompt",
+        lambda *a, **k: pytest.fail("the pipeline must never prompt"),
+    )
+    node_id = _arm_at(adding)
+    path = _flac(tmp_path / "a.flac")
+    track = _await(adding, path)
+    adding._update_track_from_result(_result(track.file_path))
+    assert len(adding._library.get_items(node_id)) == 1
+
+    # The same file again, as a second run would send it.
+    adding._pipeline.arm(node_id, "Pipeline test", [], [])
+    adding._pipeline.await_analysis({track.file_path: path})
+    adding._update_track_from_result(_result(track.file_path))
+    assert len(adding._library.get_items(node_id)) == 1
+    assert adding._pipeline.run is None  # finished, and reported
+    assert any("skipped" in m[1] for m in adding._conversion_panel.progress_panel.messages
+               if m[0] == "complete")
+
+
+def test_the_summary_names_the_playlist_and_the_count(adding, tmp_path):
+    _arm_at(adding, "Friday")
+    path = _flac(tmp_path / "a.flac")
+    track = _await(adding, path)
+    adding._update_track_from_result(_result(track.file_path))
+    done = [m for m in adding._conversion_panel.progress_panel.messages
+            if m[0] == "complete"]
+    assert done and done[-1][1] == "Pipeline complete: 1 added to Friday"
+    assert adding._pipeline.run is None
+
+
+def test_a_run_whose_playlist_was_deleted_ends_rather_than_hanging(adding, tmp_path):
+    node_id = _arm_at(adding)
+    path = _flac(tmp_path / "a.flac")
+    track = _await(adding, path)
+    adding._library.delete_node(node_id)
+    adding._update_track_from_result(_result(track.file_path))
+    assert adding._pipeline.run is None

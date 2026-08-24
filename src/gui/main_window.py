@@ -60,6 +60,7 @@ from src.conversion.result import ConversionResult
 from .widgets.analysis_panel import AnalysisPanel
 from .convert_pipeline import ConvertPipeline
 from .widgets.conversion_panel import ConversionPanel
+from .widgets.dialogs import duplicate_policy
 from .widgets.dialogs.about_dialog import AboutDialog
 from .widgets.header_bar import HeaderBar
 from .widgets.history_panel import HistoryPanel
@@ -1697,7 +1698,76 @@ class MainWindow(QMainWindow):
             panel.progress_panel.set_activity_color(color)
 
     def _update_track_from_result(self, result: AnalysisResult) -> None:
-        """Update a track with analysis results."""
+        """Update a track with analysis results, then let the pipeline have it.
+
+        This is the single point every completed track passes through exactly
+        once — the progress signal handles most of them and the finished
+        handler sweeps up whatever it missed — so it is the one place the
+        pipeline's per-track add belongs. The add runs *after* the tag writes,
+        so the tag read on the way into the library sees the new BPM and key.
+
+        The writes themselves are in _apply_analysis_result because that one
+        returns early under the session write-freeze, and the pipeline's add
+        must happen either way.
+        """
+        self._apply_analysis_result(result)
+        library_path = self._pipeline.track_analysed(result.file_path, result.error)
+        if library_path:
+            self._pipeline_add_to_playlist(library_path, result)
+
+    def _pipeline_add_to_playlist(self, path: str, result: AnalysisResult) -> None:
+        """Put one analysed file into the run's playlist.
+
+        Never asks about duplicates: this runs from inside an analysis progress
+        signal with the next result queued behind it, so a modal per track is
+        the pile-up "Open with" already forces its way past. ASK is read as
+        SKIP and the count goes in the summary.
+        """
+        run = self._pipeline.run
+        if run is None:
+            return
+        tree = self._playlists_panel.tree
+        # _commit_added_paths rebuilds the tree, which a tree that has never
+        # been opened this session cannot do.
+        self._playlists_panel.ensure_loaded()
+
+        def committed(resolved: list[str]) -> None:
+            if not resolved:
+                self._pipeline.record_skipped()
+                self._finish_pipeline_if_done()
+                return
+            self._pipeline.record_added(path)
+            # Patch the row with what the analysis found. The tag read inside
+            # _track_id_for cannot supply it in three cases: a WAV has nowhere
+            # to keep BPM or key, a write-frozen session wrote nothing, and a
+            # file the library already knew keeps its stored tags untouched on
+            # the way in (deliberately — an inline edit must not be rolled
+            # back). Only non-None fields overwrite, so this is a no-op when
+            # the read already had them.
+            self._library.add_track(
+                path,
+                bpm=result.bpm or None,
+                key=render_key(
+                    result.key or "", result.keycode or "", self._config.key_notation
+                ) or None,
+                energy=result.energy,
+            )
+            self._finish_pipeline_if_done()
+
+        policy = duplicate_policy.current_policy()
+        started = tree._add_paths_to_node(
+            run.node_id,
+            [path],
+            policy=duplicate_policy.SKIP if policy == duplicate_policy.ASK else policy,
+            on_committed=committed,
+        )
+        if not started:
+            # No library, or the playlist was deleted mid-run.
+            self._pipeline.record_skipped()
+            self._finish_pipeline_if_done()
+
+    def _apply_analysis_result(self, result: AnalysisResult) -> None:
+        """Write one analysis result to the track row, the history and the file."""
         track = self._store.get_by_path(result.file_path)
         if track is None:
             return

@@ -14,6 +14,7 @@ import pytest
 from PySide6.QtCore import QObject
 
 from src.analysis.result import AnalysisResult
+from src.gui.convert_pipeline import ConvertPipeline
 from src.gui.main_window import MainWindow
 from src.gui.models.track_model import TrackStore
 from src.gui.widgets.player_panel import PlayerPanel
@@ -42,6 +43,7 @@ class PanelStub(QObject):
 
 class WindowStub(QObject):
     _update_track_from_result = MainWindow._update_track_from_result
+    _apply_analysis_result = MainWindow._apply_analysis_result
 
     def __init__(self, store, config):
         super().__init__()
@@ -49,6 +51,9 @@ class WindowStub(QObject):
         self._config = config
         self._analysis_panel = PanelStub()
         self._analysis_writes_frozen = False
+        # The write path now ends by offering the result to the convert
+        # pipeline; an unarmed one is inert.
+        self._pipeline = ConvertPipeline()
 
 
 def analyse(flac, **config_overrides):
