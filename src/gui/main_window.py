@@ -1950,11 +1950,49 @@ class MainWindow(QMainWindow):
         except Exception as e:
             logger.warning(f"Failed to update library paths: {e}")
 
+        self._reload_player_for_renamed([r.original_path for r in session.records])
+
         # Refresh preview (paths updated in store), then mark renamed rows
         self._rename_panel.refresh()
         self._rename_panel.mark_renamed(session)
         self._rename_panel._clear_operations()
         self._rename_thread = None
+
+    def _reload_player_for_renamed(self, old_paths: list[str]) -> None:
+        """Re-read the Player's list when a rename moved a file it is showing.
+
+        library.update_paths has already re-pointed the rows, so the playlist
+        is right on disk — but the Player's visible entries still hold the old
+        path, and its next _persist_playlist would add_track() a fresh row for
+        a file that no longer exists and point the playlist at that. The
+        hazard predates the pipeline; the pipeline makes it the common case,
+        because watching a run fill a playlist is the natural thing to do.
+
+        Known cost, accepted: if the renamed track was the one *playing*, the
+        playing-row marker is lost (_relink_playing_row matches by path and the
+        engine holds the old one). That is what happens on this path today, and
+        the audio keeps playing.
+
+        Both spellings of each path go in: the rename records carry the store's
+        resolved spelling while the Player's entries carry the library's
+        normalized one, and on macOS the two differ under /var.
+        """
+        if not old_paths:
+            return
+        wanted: set[str] = set()
+        for path in old_paths:
+            wanted.add(path)
+            wanted.add(normalize_track_path(path))
+        node_id = self._player_panel.loaded_node_id
+        # Not while a search is showing. The rows on screen are then the hits
+        # rather than the playlist, so _persist_playlist already refuses to
+        # write and there is no hazard to fix — and load_node does not decline,
+        # it *dismisses* the search, which would throw away what the user is
+        # in the middle of looking at.
+        if not self._player_panel.is_showing_node(node_id):
+            return
+        if self._player_panel.shows_any_path(wanted):
+            self._player_panel.load_node(node_id)
 
     def _on_rename_error(self, error: str) -> None:
         """Handle rename error."""
@@ -2015,6 +2053,10 @@ class MainWindow(QMainWindow):
                 )
             except Exception as e:
                 logger.warning(f"Failed to update library paths: {e}")
+
+            self._reload_player_for_renamed(
+                [r.new_path for r in self._last_session.records]
+            )
 
         self._last_session = None
         self._rename_panel.set_undo_enabled(False)

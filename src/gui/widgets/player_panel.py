@@ -2867,6 +2867,23 @@ class PlayerPanel(QWidget):
         """
         return not self._search_active and self._loaded_node_id == node_id
 
+    def shows_any_path(self, paths: set[str] | list[str]) -> bool:
+        """True when any of *paths* is a row in the visible list.
+
+        Asked after a rename has re-pointed the library rows: the visible
+        entries still hold the old path, and the next _persist_playlist would
+        add_track() a fresh row for a file that no longer exists and point the
+        playlist at it. Compares against the canonical order as well as the
+        visible one, since a sorted list writes the canonical order back.
+        """
+        wanted = set(paths)
+        if not wanted:
+            return False
+        return any(
+            e.file_path in wanted
+            for e in (self._unsorted_playlist if self._sorted else self._playlist)
+        )
+
     def _update_context_label(self) -> None:
         if self._library is None:
             self._context_label.setText("")
