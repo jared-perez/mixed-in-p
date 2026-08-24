@@ -8,6 +8,7 @@ The full audio file preparation workflow for DJs.
 
 - Batch file renaming with undo
 - Audio conversion (MP3/WAV/FLAC/AIFF) — quality is only ever kept or lowered, including same-format downgrades (96k/24-bit FLAC → 44.1k/16-bit FLAC), writing beside each source or into a folder of your choosing, toggled per batch
+- Pipeline — one press takes a batch through Convert, then Analyze, then into a playlist, each track landing as its analysis finishes; pick an existing playlist or type a name and one gets made
 - Acoustic spectrum analyzer
 - Audio Player + Slicer for sample lifting
 - Playlist library — folders, saved playlists, a name filter for the tree, search across every playlist at once, export to `.m3u8`/`.m3u`/tracklist, and Shift+Tab to show or hide the tree from anywhere
