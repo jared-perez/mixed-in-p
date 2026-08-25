@@ -523,7 +523,7 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/conversion_panel.py" line="146"/>
         <location filename="../widgets/conversion_panel.py" line="359"/>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="613"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
@@ -605,7 +605,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="231"/>
-        <location filename="../widgets/conversion_panel.py" line="804"/>
+        <location filename="../widgets/conversion_panel.py" line="837"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>选择转换后文件的保存文件夹</translation>
     </message>
@@ -615,27 +615,27 @@ or click “Add Artwork…”</source>
         <translation>播放列表名称</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="569"/>
+        <location filename="../widgets/conversion_panel.py" line="602"/>
         <source>Turn off the pipeline — Convert goes back to converting only.</source>
         <translation>关闭流水线 — 转换将只做转换。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="572"/>
+        <location filename="../widgets/conversion_panel.py" line="605"/>
         <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
         <translation>开启流水线：转换 → 分析 → 添加到此处指定的播放列表。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="577"/>
+        <location filename="../widgets/conversion_panel.py" line="610"/>
         <source>Start</source>
         <translation>开始</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="578"/>
+        <location filename="../widgets/conversion_panel.py" line="611"/>
         <source>Send the tracks through the pipeline</source>
         <translation>将曲目送入流水线</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="797"/>
+        <location filename="../widgets/conversion_panel.py" line="830"/>
         <source>Save converted files next to the originals</source>
         <translation>将转换后的文件保存在原文件旁边</translation>
     </message>
@@ -678,7 +678,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="312"/>
-        <location filename="../widgets/conversion_panel.py" line="1048"/>
+        <location filename="../widgets/conversion_panel.py" line="1081"/>
         <source>No files</source>
         <translation>无文件</translation>
     </message>
@@ -713,6 +713,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="383"/>
+        <location filename="../widgets/conversion_panel.py" line="512"/>
         <source>Lossy files not allowed</source>
         <translation>不允许有损文件</translation>
     </message>
@@ -721,27 +722,27 @@ or click “Add Artwork…”</source>
         <translation type="vanished">与每个源文件相同的文件夹</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="776"/>
+        <location filename="../widgets/conversion_panel.py" line="809"/>
         <source>Same folder as source</source>
         <translation>源文件所在文件夹</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="795"/>
+        <location filename="../widgets/conversion_panel.py" line="828"/>
         <source>Save converted files to a folder instead</source>
         <translation>将转换后的文件保存到文件夹</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="825"/>
+        <location filename="../widgets/conversion_panel.py" line="858"/>
         <source>Choose Output Folder</source>
         <translation>选择输出文件夹</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="881"/>
+        <location filename="../widgets/conversion_panel.py" line="914"/>
         <source>Output Folder Unavailable</source>
         <translation>输出文件夹不可用</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="882"/>
+        <location filename="../widgets/conversion_panel.py" line="915"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -750,79 +751,79 @@ or click “Add Artwork…”</source>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="927"/>
+        <location filename="../widgets/conversion_panel.py" line="960"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="929"/>
+        <location filename="../widgets/conversion_panel.py" line="962"/>
         <source>Remove</source>
         <translation>移除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1004"/>
-        <location filename="../widgets/conversion_panel.py" line="1215"/>
+        <location filename="../widgets/conversion_panel.py" line="1037"/>
+        <location filename="../widgets/conversion_panel.py" line="1257"/>
         <source>Done</source>
         <translation>完成</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1017"/>
+        <location filename="../widgets/conversion_panel.py" line="1050"/>
         <source>Same format</source>
         <translation>相同格式</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1020"/>
+        <location filename="../widgets/conversion_panel.py" line="1053"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>选择更低的采样率或位深度即可转换此文件。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1023"/>
+        <location filename="../widgets/conversion_panel.py" line="1056"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>高于源文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1026"/>
+        <location filename="../widgets/conversion_panel.py" line="1059"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>请选择不高于此文件的采样率和位深度。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1029"/>
-        <location filename="../widgets/conversion_panel.py" line="1207"/>
-        <location filename="../widgets/conversion_panel.py" line="1237"/>
+        <location filename="../widgets/conversion_panel.py" line="1062"/>
+        <location filename="../widgets/conversion_panel.py" line="1249"/>
+        <location filename="../widgets/conversion_panel.py" line="1279"/>
         <source>Ready</source>
         <translation>就绪</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1043"/>
+        <location filename="../widgets/conversion_panel.py" line="1076"/>
         <source>{count} files</source>
         <translatorcomment>File count measure word 个: {count}个文件.</translatorcomment>
         <translation>{count}个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1045"/>
+        <location filename="../widgets/conversion_panel.py" line="1078"/>
         <source>{count} to convert</source>
         <translatorcomment>Measure word 个: {count}个待转换.</translatorcomment>
         <translation>{count}个待转换</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1047"/>
+        <location filename="../widgets/conversion_panel.py" line="1080"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Reviewed (zh pass): measure word confirmed (个 for items; 首 for music tracks).</translatorcomment>
         <translation>（已跳过{count}个有损文件）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1179"/>
+        <location filename="../widgets/conversion_panel.py" line="1221"/>
         <source>Converting</source>
         <translation>转换中</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1200"/>
+        <location filename="../widgets/conversion_panel.py" line="1242"/>
         <source>Incomplete</source>
         <translation>未完成</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1200"/>
+        <location filename="../widgets/conversion_panel.py" line="1242"/>
         <source>Error</source>
         <translation>错误</translation>
     </message>
@@ -1446,69 +1447,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="556"/>
-        <location filename="../main_window.py" line="585"/>
+        <location filename="../main_window.py" line="558"/>
+        <location filename="../main_window.py" line="587"/>
         <source>Export All Playlists</source>
         <translation>导出所有播放列表</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="577"/>
+        <location filename="../main_window.py" line="579"/>
         <source>Export failed</source>
         <translation>导出失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="578"/>
+        <location filename="../main_window.py" line="580"/>
         <source>Could not write the file:
 {0}</source>
         <translation>无法写入文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="586"/>
+        <location filename="../main_window.py" line="588"/>
         <source>There are no playlists to export yet.</source>
         <translation>暂无可导出的播放列表。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="591"/>
+        <location filename="../main_window.py" line="593"/>
         <source>Export complete</source>
         <translation>导出完成</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="592"/>
+        <location filename="../main_window.py" line="594"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>已将 {0} 个播放列表（{1} 首曲目）导出到：
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="683"/>
+        <location filename="../main_window.py" line="685"/>
         <source>Select Audio Files</source>
         <translation>选择音频文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="694"/>
+        <location filename="../main_window.py" line="696"/>
         <source>Select Folder</source>
         <translation>选择文件夹</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="924"/>
+        <location filename="../main_window.py" line="926"/>
         <source>No Audio Files</source>
         <translation>无音频文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="925"/>
+        <location filename="../main_window.py" line="927"/>
         <source>No audio files found in:
 {0}</source>
         <translation>未在以下位置找到音频文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="930"/>
+        <location filename="../main_window.py" line="932"/>
         <source>Invalid Folder</source>
         <translation>无效文件夹</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="931"/>
+        <location filename="../main_window.py" line="933"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>不是有效的目录：
@@ -1523,17 +1524,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已有分析正在运行。请等待或先取消。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1073"/>
+        <location filename="../main_window.py" line="1075"/>
         <source>Analyzing...</source>
         <translation>分析中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1105"/>
+        <location filename="../main_window.py" line="1107"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完成：已分析{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1109"/>
+        <location filename="../main_window.py" line="1111"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完成：已分析{0}个文件</translation>
     </message>
@@ -1542,69 +1543,99 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已取消</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1300"/>
+        <location filename="../main_window.py" line="1302"/>
         <source>Conversion in Progress</source>
         <translation>转换进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1301"/>
+        <location filename="../main_window.py" line="1303"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>已有转换正在运行。请稍候。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1512"/>
+        <location filename="../main_window.py" line="1317"/>
+        <source>Pipeline in Progress</source>
+        <translation>流水线进行中</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1318"/>
+        <source>The last pipeline run is still finishing — wait for it to complete.</source>
+        <translation>上一次流水线尚未结束 — 请等待其完成。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1529"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>流水线完成：已将 {added} 个添加到 {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1517"/>
+        <location filename="../main_window.py" line="1534"/>
         <source>{n} skipped</source>
         <translation>跳过{n}个</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1519"/>
+        <location filename="../main_window.py" line="1536"/>
         <source>{n} errors</source>
         <translation>{n}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1558"/>
+        <location filename="../main_window.py" line="1575"/>
         <source>Converting...</source>
         <translation>转换中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1574"/>
+        <location filename="../main_window.py" line="1591"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完成：已转换{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1578"/>
+        <location filename="../main_window.py" line="1595"/>
         <source>Complete: {0} files converted</source>
         <translation>完成：已转换{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1902"/>
+        <location filename="../main_window.py" line="1919"/>
         <source>Rename in Progress</source>
         <translation>重命名进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1903"/>
+        <location filename="../main_window.py" line="1920"/>
         <source>A rename operation is already running.</source>
         <translation>已有重命名操作正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1999"/>
+        <location filename="../main_window.py" line="2016"/>
         <source>Rename Failed</source>
         <translation>重命名失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2033"/>
+        <location filename="../main_window.py" line="2050"/>
         <source>Undo Rename</source>
         <translation>撤销重命名</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2068"/>
+        <location filename="../main_window.py" line="2085"/>
         <source>Undo Failed</source>
         <translation>撤销失败</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2131"/>
+        <source>Set pipeline settings in the Convert panel first.</source>
+        <translation>请先在“转换”面板中设置流水线。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2133"/>
+        <source>A conversion is already running.</source>
+        <translation>已有转换正在运行。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2135"/>
+        <source>The last pipeline run is still finishing.</source>
+        <translation>上一次流水线尚未结束。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2162"/>
+        <source>Lossy files stayed in Convert — the pipeline converts lossless sources only.</source>
+        <translation>有损文件留在“转换”中 — 流水线只转换无损源文件。</translation>
     </message>
     <message>
         <source>Renaming files...</source>
@@ -1615,22 +1646,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2005"/>
+        <location filename="../main_window.py" line="2022"/>
         <source>No Session</source>
         <translation>无会话</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2005"/>
+        <location filename="../main_window.py" line="2022"/>
         <source>No rename session to undo.</source>
         <translation>没有可撤销的重命名会话。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2014"/>
+        <location filename="../main_window.py" line="2031"/>
         <source>Confirm Undo</source>
         <translation>确认撤销</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2015"/>
+        <location filename="../main_window.py" line="2032"/>
         <source>Undo renaming of {0} files?</source>
         <translation>撤销{0}个文件的重命名？</translation>
     </message>
@@ -1639,7 +1670,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">正在撤销重命名……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2034"/>
+        <location filename="../main_window.py" line="2051"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>已撤销：{0}个文件，{1}个错误</translation>
     </message>
@@ -2936,12 +2967,12 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="123"/>
+        <location filename="../widgets/rename_panel.py" line="130"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="126"/>
+        <location filename="../widgets/rename_panel.py" line="133"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>从下方所有文件名的开头和结尾修剪字符。在所有文件名的开头（前缀）或结尾（后缀）添加文本。</translation>
     </message>
@@ -2950,177 +2981,192 @@ or click “Add Artwork…”</source>
         <translation type="vanished">操作</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="144"/>
+        <location filename="../widgets/rename_panel.py" line="151"/>
         <source>Trim Start:</source>
         <translation>修剪开头：</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="148"/>
-        <location filename="../widgets/rename_panel.py" line="160"/>
+        <location filename="../widgets/rename_panel.py" line="155"/>
+        <location filename="../widgets/rename_panel.py" line="167"/>
         <source> chars</source>
         <translation>个字符</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="149"/>
+        <location filename="../widgets/rename_panel.py" line="156"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>从文件名开头移除字符</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="156"/>
+        <location filename="../widgets/rename_panel.py" line="163"/>
         <source>Trim End:</source>
         <translation>修剪结尾：</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="161"/>
+        <location filename="../widgets/rename_panel.py" line="168"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>从文件名结尾（扩展名之前）移除字符</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="166"/>
+        <location filename="../widgets/rename_panel.py" line="173"/>
         <source>Clear</source>
         <translation>清除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="181"/>
+        <location filename="../widgets/rename_panel.py" line="188"/>
         <source>Remove Underscores</source>
         <translation>移除下划线</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="192"/>
         <source>Space Dashes</source>
         <translation>连字符加空格</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="191"/>
+        <location filename="../widgets/rename_panel.py" line="198"/>
         <source>Put spaces around a dash: Artist-Track → Artist - Track</source>
         <translation>在连字符两侧加上空格：Artist-Track → Artist - Track</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="216"/>
+        <location filename="../widgets/rename_panel.py" line="223"/>
         <source>Prepend Text</source>
         <translation>添加前缀文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="219"/>
+        <location filename="../widgets/rename_panel.py" line="226"/>
         <source>Append Text</source>
         <translation>添加后缀文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="248"/>
-        <location filename="../widgets/rename_panel.py" line="256"/>
+        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="263"/>
         <source>Preview</source>
         <translation>预览</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="251"/>
+        <location filename="../widgets/rename_panel.py" line="258"/>
         <source>Drop audio files here to add them</source>
         <translation>将音频文件拖到此处以添加</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="256"/>
+        <location filename="../widgets/rename_panel.py" line="263"/>
         <source>Original</source>
         <translation>原始</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="256"/>
+        <location filename="../widgets/rename_panel.py" line="263"/>
         <source>Status</source>
         <translation>状态</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="302"/>
+        <location filename="../widgets/rename_panel.py" line="309"/>
         <source>No files to rename</source>
         <translation>无可重命名的文件</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="308"/>
+        <location filename="../widgets/rename_panel.py" line="315"/>
         <source>Undo Last</source>
         <translation>撤销上一步</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="313"/>
+        <location filename="../widgets/rename_panel.py" line="320"/>
         <source>Remove All</source>
         <translation>全部移除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="318"/>
+        <location filename="../widgets/rename_panel.py" line="325"/>
         <source>Apply Rename</source>
         <translation>应用重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="325"/>
+        <location filename="../widgets/rename_panel.py" line="332"/>
         <source>Send To</source>
         <translation>发送到</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="328"/>
+        <location filename="../widgets/rename_panel.py" line="338"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="329"/>
+        <location filename="../widgets/rename_panel.py" line="339"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="390"/>
+        <location filename="../widgets/rename_panel.py" line="340"/>
+        <source>Auto Pipeline</source>
+        <translation>自动流水线</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="345"/>
+        <source>Set pipeline settings in the Convert panel first.</source>
+        <translation>请先在“转换”面板中设置流水线。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="410"/>
         <source>Text to add at end of filename</source>
         <translation>添加到文件名结尾的文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="392"/>
+        <location filename="../widgets/rename_panel.py" line="412"/>
         <source>Text to add at start of filename</source>
         <translation>添加到文件名开头的文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="433"/>
+        <location filename="../widgets/rename_panel.py" line="453"/>
         <source>No files</source>
         <translation>无文件</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="477"/>
+        <location filename="../widgets/rename_panel.py" line="497"/>
         <source>Conflict</source>
         <translation>冲突</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="494"/>
+        <location filename="../widgets/rename_panel.py" line="514"/>
         <source>{0} files</source>
         <translatorcomment>Measure word 个: {0}个文件.</translatorcomment>
         <translation>{0}个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="496"/>
+        <location filename="../widgets/rename_panel.py" line="516"/>
         <source>{0} to rename</source>
         <translatorcomment>Measure word 个: {0}个待重命名.</translatorcomment>
         <translation>{0}个待重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="498"/>
+        <location filename="../widgets/rename_panel.py" line="518"/>
         <source>{0} conflicts</source>
         <translatorcomment>Measure word 个: {0}个冲突.</translatorcomment>
         <translation>{0}个冲突</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="636"/>
+        <location filename="../widgets/rename_panel.py" line="578"/>
+        <source>Convert with the Convert panel&apos;s settings, analyze, add to &quot;{name}&quot;.</source>
+        <translation>使用“转换”面板的设置进行转换、分析，并添加到“{name}”。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="681"/>
         <source>Changed</source>
         <translation>已更改</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="711"/>
+        <location filename="../widgets/rename_panel.py" line="756"/>
         <source>Copy text</source>
         <translation>复制文本</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="711"/>
+        <location filename="../widgets/rename_panel.py" line="756"/>
         <source>Copy {0} names</source>
         <translation>复制 {0} 个名称</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="717"/>
+        <location filename="../widgets/rename_panel.py" line="762"/>
         <source>Remove from list</source>
         <translation>从列表中移除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="717"/>
+        <location filename="../widgets/rename_panel.py" line="762"/>
         <source>Remove {0} from list</source>
         <translation>从列表中移除{0}</translation>
     </message>
@@ -3983,7 +4029,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="593"/>
+        <location filename="../widgets/vis_canvas.py" line="632"/>
         <source>Visualizer</source>
         <translation>视觉效果</translation>
     </message>

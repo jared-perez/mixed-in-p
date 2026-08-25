@@ -489,7 +489,7 @@ or click “Add Artwork…”</source>
     <message>
         <location filename="../widgets/conversion_panel.py" line="146"/>
         <location filename="../widgets/conversion_panel.py" line="359"/>
-        <location filename="../widgets/conversion_panel.py" line="580"/>
+        <location filename="../widgets/conversion_panel.py" line="613"/>
         <source>Convert</source>
         <translatorcomment>Dual-use title/button → bare noun 변환.</translatorcomment>
         <translation>변환</translation>
@@ -574,32 +574,32 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="231"/>
-        <location filename="../widgets/conversion_panel.py" line="804"/>
+        <location filename="../widgets/conversion_panel.py" line="837"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>변환된 파일을 저장할 폴더 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="569"/>
+        <location filename="../widgets/conversion_panel.py" line="602"/>
         <source>Turn off the pipeline — Convert goes back to converting only.</source>
         <translation>파이프라인 끄기 — 변환은 다시 변환만 합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="572"/>
+        <location filename="../widgets/conversion_panel.py" line="605"/>
         <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
         <translation>파이프라인 켜기: 변환 → 분석 → 여기에 지정한 재생목록에 추가.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="577"/>
+        <location filename="../widgets/conversion_panel.py" line="610"/>
         <source>Start</source>
         <translation>시작</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="578"/>
+        <location filename="../widgets/conversion_panel.py" line="611"/>
         <source>Send the tracks through the pipeline</source>
         <translation>트랙을 파이프라인으로 보냅니다</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="797"/>
+        <location filename="../widgets/conversion_panel.py" line="830"/>
         <source>Save converted files next to the originals</source>
         <translation>변환된 파일을 원본 옆에 저장</translation>
     </message>
@@ -643,7 +643,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="312"/>
-        <location filename="../widgets/conversion_panel.py" line="1048"/>
+        <location filename="../widgets/conversion_panel.py" line="1081"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
@@ -680,6 +680,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="383"/>
+        <location filename="../widgets/conversion_panel.py" line="512"/>
         <source>Lossy files not allowed</source>
         <translatorcomment>lossy → 손실 (audio term). Flag for native review.</translatorcomment>
         <translation>손실 파일은 허용되지 않아요</translation>
@@ -689,27 +690,27 @@ or click “Add Artwork…”</source>
         <translation type="vanished">각 원본 파일과 같은 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="776"/>
+        <location filename="../widgets/conversion_panel.py" line="809"/>
         <source>Same folder as source</source>
         <translation>원본과 같은 폴더</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="795"/>
+        <location filename="../widgets/conversion_panel.py" line="828"/>
         <source>Save converted files to a folder instead</source>
         <translation>변환된 파일을 폴더에 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="825"/>
+        <location filename="../widgets/conversion_panel.py" line="858"/>
         <source>Choose Output Folder</source>
         <translation>출력 폴더 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="881"/>
+        <location filename="../widgets/conversion_panel.py" line="914"/>
         <source>Output Folder Unavailable</source>
         <translation>출력 폴더를 사용할 수 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="882"/>
+        <location filename="../widgets/conversion_panel.py" line="915"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -718,76 +719,76 @@ or click “Add Artwork…”</source>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="927"/>
+        <location filename="../widgets/conversion_panel.py" line="960"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="929"/>
+        <location filename="../widgets/conversion_panel.py" line="962"/>
         <source>Remove</source>
         <translation>제거</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1004"/>
-        <location filename="../widgets/conversion_panel.py" line="1215"/>
+        <location filename="../widgets/conversion_panel.py" line="1037"/>
+        <location filename="../widgets/conversion_panel.py" line="1257"/>
         <source>Done</source>
         <translation>완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1017"/>
+        <location filename="../widgets/conversion_panel.py" line="1050"/>
         <source>Same format</source>
         <translation>동일한 형식</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1020"/>
+        <location filename="../widgets/conversion_panel.py" line="1053"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>이 파일을 변환하려면 더 낮은 샘플 레이트 또는 비트 심도를 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1023"/>
+        <location filename="../widgets/conversion_panel.py" line="1056"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>원본보다 높음</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1026"/>
+        <location filename="../widgets/conversion_panel.py" line="1059"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>이 파일보다 높지 않은 샘플 레이트와 비트 심도를 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1029"/>
-        <location filename="../widgets/conversion_panel.py" line="1207"/>
-        <location filename="../widgets/conversion_panel.py" line="1237"/>
+        <location filename="../widgets/conversion_panel.py" line="1062"/>
+        <location filename="../widgets/conversion_panel.py" line="1249"/>
+        <location filename="../widgets/conversion_panel.py" line="1279"/>
         <source>Ready</source>
         <translation>준비됨</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1043"/>
+        <location filename="../widgets/conversion_panel.py" line="1076"/>
         <source>{count} files</source>
         <translation>파일 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1045"/>
+        <location filename="../widgets/conversion_panel.py" line="1078"/>
         <source>{count} to convert</source>
         <translation>변환 대상 {count}개</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1047"/>
+        <location filename="../widgets/conversion_panel.py" line="1080"/>
         <source>({count} lossy skipped)</source>
         <translation>(손실 {count}개 건너뜀)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1179"/>
+        <location filename="../widgets/conversion_panel.py" line="1221"/>
         <source>Converting</source>
         <translation>변환 중</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1200"/>
+        <location filename="../widgets/conversion_panel.py" line="1242"/>
         <source>Incomplete</source>
         <translation>미완료</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1200"/>
+        <location filename="../widgets/conversion_panel.py" line="1242"/>
         <source>Error</source>
         <translation>오류</translation>
     </message>
@@ -1419,69 +1420,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="556"/>
-        <location filename="../main_window.py" line="585"/>
+        <location filename="../main_window.py" line="558"/>
+        <location filename="../main_window.py" line="587"/>
         <source>Export All Playlists</source>
         <translation>모든 재생목록 내보내기</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="577"/>
+        <location filename="../main_window.py" line="579"/>
         <source>Export failed</source>
         <translation>내보내기 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="578"/>
+        <location filename="../main_window.py" line="580"/>
         <source>Could not write the file:
 {0}</source>
         <translation>파일을 쓸 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="586"/>
+        <location filename="../main_window.py" line="588"/>
         <source>There are no playlists to export yet.</source>
         <translation>아직 내보낼 재생목록이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="591"/>
+        <location filename="../main_window.py" line="593"/>
         <source>Export complete</source>
         <translation>내보내기 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="592"/>
+        <location filename="../main_window.py" line="594"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>재생목록 {0}개({1}곡)를 다음 위치로 내보냈습니다:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="683"/>
+        <location filename="../main_window.py" line="685"/>
         <source>Select Audio Files</source>
         <translation>오디오 파일 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="694"/>
+        <location filename="../main_window.py" line="696"/>
         <source>Select Folder</source>
         <translation>폴더 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="924"/>
+        <location filename="../main_window.py" line="926"/>
         <source>No Audio Files</source>
         <translation>오디오 파일 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="925"/>
+        <location filename="../main_window.py" line="927"/>
         <source>No audio files found in:
 {0}</source>
         <translation>다음 위치에서 오디오 파일을 찾을 수 없어요:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="930"/>
+        <location filename="../main_window.py" line="932"/>
         <source>Invalid Folder</source>
         <translation>잘못된 폴더</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="931"/>
+        <location filename="../main_window.py" line="933"/>
         <source>Not a valid directory:
 {0}</source>
         <translatorcomment>directory → 디렉터리 (Apple Korean spelling). Flag for native review.</translatorcomment>
@@ -1497,17 +1498,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이미 분석이 실행 중이에요. 잠시 기다리거나 먼저 취소하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1073"/>
+        <location filename="../main_window.py" line="1075"/>
         <source>Analyzing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1105"/>
+        <location filename="../main_window.py" line="1107"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>완료: {0}개 분석, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1109"/>
+        <location filename="../main_window.py" line="1111"/>
         <source>Complete: {0} files analyzed</source>
         <translation>완료: 파일 {0}개 분석</translation>
     </message>
@@ -1516,69 +1517,99 @@ or click “Add Artwork…”</source>
         <translation type="vanished">취소됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1300"/>
+        <location filename="../main_window.py" line="1302"/>
         <source>Conversion in Progress</source>
         <translation>변환 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1301"/>
+        <location filename="../main_window.py" line="1303"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>이미 변환이 실행 중이에요. 잠시 기다리세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1512"/>
+        <location filename="../main_window.py" line="1317"/>
+        <source>Pipeline in Progress</source>
+        <translation>파이프라인 진행 중</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1318"/>
+        <source>The last pipeline run is still finishing — wait for it to complete.</source>
+        <translation>마지막 파이프라인 실행이 아직 끝나지 않았어요 — 완료될 때까지 기다리세요.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1529"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>파이프라인 완료: {playlist}에 {added}개 추가됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1517"/>
+        <location filename="../main_window.py" line="1534"/>
         <source>{n} skipped</source>
         <translation>{n}개 건너뜀</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1519"/>
+        <location filename="../main_window.py" line="1536"/>
         <source>{n} errors</source>
         <translation>오류 {n}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1558"/>
+        <location filename="../main_window.py" line="1575"/>
         <source>Converting...</source>
         <translation>변환 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1574"/>
+        <location filename="../main_window.py" line="1591"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>완료: {0}개 변환, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1578"/>
+        <location filename="../main_window.py" line="1595"/>
         <source>Complete: {0} files converted</source>
         <translation>완료: 파일 {0}개 변환</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1902"/>
+        <location filename="../main_window.py" line="1919"/>
         <source>Rename in Progress</source>
         <translation>이름 변경 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1903"/>
+        <location filename="../main_window.py" line="1920"/>
         <source>A rename operation is already running.</source>
         <translation>이미 이름 변경 작업이 실행 중이에요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1999"/>
+        <location filename="../main_window.py" line="2016"/>
         <source>Rename Failed</source>
         <translation>이름 변경 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2033"/>
+        <location filename="../main_window.py" line="2050"/>
         <source>Undo Rename</source>
         <translation>이름 변경 취소</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2068"/>
+        <location filename="../main_window.py" line="2085"/>
         <source>Undo Failed</source>
         <translation>실행 취소 실패</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2131"/>
+        <source>Set pipeline settings in the Convert panel first.</source>
+        <translation>먼저 변환 패널에서 파이프라인을 설정하세요.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2133"/>
+        <source>A conversion is already running.</source>
+        <translation>이미 변환이 실행 중이에요.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2135"/>
+        <source>The last pipeline run is still finishing.</source>
+        <translation>마지막 파이프라인 실행이 아직 끝나지 않았어요.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="2162"/>
+        <source>Lossy files stayed in Convert — the pipeline converts lossless sources only.</source>
+        <translation>손실 파일은 변환에 남아요 — 파이프라인은 무손실 소스만 변환해요.</translation>
     </message>
     <message>
         <source>Renaming files...</source>
@@ -1589,22 +1620,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2005"/>
+        <location filename="../main_window.py" line="2022"/>
         <source>No Session</source>
         <translation>세션 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2005"/>
+        <location filename="../main_window.py" line="2022"/>
         <source>No rename session to undo.</source>
         <translation>실행 취소할 이름 변경 세션이 없어요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2014"/>
+        <location filename="../main_window.py" line="2031"/>
         <source>Confirm Undo</source>
         <translation>실행 취소 확인</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2015"/>
+        <location filename="../main_window.py" line="2032"/>
         <source>Undo renaming of {0} files?</source>
         <translatorcomment>Object particle avoided via 의 + 을 on 이름 변경. Counter 개. Flag for native review.</translatorcomment>
         <translation>파일 {0}개의 이름 변경을 실행 취소할까요?</translation>
@@ -1614,7 +1645,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이름 변경 실행 취소 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2034"/>
+        <location filename="../main_window.py" line="2051"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>실행 취소: 파일 {0}개, 오류 {1}개</translation>
     </message>
@@ -2910,12 +2941,12 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="123"/>
+        <location filename="../widgets/rename_panel.py" line="130"/>
         <source>Rename</source>
         <translation>이름 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="126"/>
+        <location filename="../widgets/rename_panel.py" line="133"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translatorcomment>해요체 descriptive text. Prepend/Append rendered inline as 앞에 추가 / 뒤에 추가. Flag for native review (spacing + clarity).</translatorcomment>
         <translation>아래 모든 파일명의 앞뒤에서 문자를 잘라내요. 모든 파일명의 앞(앞에 추가) 또는 뒤(뒤에 추가)에 텍스트를 추가해요.</translation>
@@ -2925,177 +2956,192 @@ or click “Add Artwork…”</source>
         <translation type="vanished">작업</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="144"/>
+        <location filename="../widgets/rename_panel.py" line="151"/>
         <source>Trim Start:</source>
         <translation>앞 잘라내기:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="148"/>
-        <location filename="../widgets/rename_panel.py" line="160"/>
+        <location filename="../widgets/rename_panel.py" line="155"/>
+        <location filename="../widgets/rename_panel.py" line="167"/>
         <source> chars</source>
         <translatorcomment>Suffix after a number (e.g. &quot;5자&quot;). Korean uses the counter 자 for characters with no preceding space, so the English leading space is intentionally dropped. Flag for native review (spacing).</translatorcomment>
         <translation>자</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="149"/>
+        <location filename="../widgets/rename_panel.py" line="156"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>파일명 앞부분의 문자를 제거해요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="156"/>
+        <location filename="../widgets/rename_panel.py" line="163"/>
         <source>Trim End:</source>
         <translation>뒤 잘라내기:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="161"/>
+        <location filename="../widgets/rename_panel.py" line="168"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>파일명 뒷부분(확장자 앞)의 문자를 제거해요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="166"/>
+        <location filename="../widgets/rename_panel.py" line="173"/>
         <source>Clear</source>
         <translation>지우기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="181"/>
+        <location filename="../widgets/rename_panel.py" line="188"/>
         <source>Remove Underscores</source>
         <translatorcomment>underscore → 밑줄. Flag for native review.</translatorcomment>
         <translation>밑줄 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="185"/>
+        <location filename="../widgets/rename_panel.py" line="192"/>
         <source>Space Dashes</source>
         <translation>하이픈 앞뒤 공백</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="191"/>
+        <location filename="../widgets/rename_panel.py" line="198"/>
         <source>Put spaces around a dash: Artist-Track → Artist - Track</source>
         <translation>하이픈 앞뒤에 공백을 넣어요: Artist-Track → Artist - Track</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="216"/>
+        <location filename="../widgets/rename_panel.py" line="223"/>
         <source>Prepend Text</source>
         <translation>앞에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="219"/>
+        <location filename="../widgets/rename_panel.py" line="226"/>
         <source>Append Text</source>
         <translation>뒤에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="248"/>
-        <location filename="../widgets/rename_panel.py" line="256"/>
+        <location filename="../widgets/rename_panel.py" line="255"/>
+        <location filename="../widgets/rename_panel.py" line="263"/>
         <source>Preview</source>
         <translatorcomment>Preview → 미리 보기 (Apple Korean Finder exact term).</translatorcomment>
         <translation>미리 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="251"/>
+        <location filename="../widgets/rename_panel.py" line="258"/>
         <source>Drop audio files here to add them</source>
         <translation>오디오 파일을 여기에 끌어다 놓으면 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="256"/>
+        <location filename="../widgets/rename_panel.py" line="263"/>
         <source>Original</source>
         <translation>원본</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="256"/>
+        <location filename="../widgets/rename_panel.py" line="263"/>
         <source>Status</source>
         <translation>상태</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="302"/>
+        <location filename="../widgets/rename_panel.py" line="309"/>
         <source>No files to rename</source>
         <translation>이름 변경할 파일이 없어요</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="308"/>
+        <location filename="../widgets/rename_panel.py" line="315"/>
         <source>Undo Last</source>
         <translation>마지막 작업 실행 취소</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="313"/>
+        <location filename="../widgets/rename_panel.py" line="320"/>
         <source>Remove All</source>
         <translation>전체 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="318"/>
+        <location filename="../widgets/rename_panel.py" line="325"/>
         <source>Apply Rename</source>
         <translation>이름 변경 적용</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="325"/>
+        <location filename="../widgets/rename_panel.py" line="332"/>
         <source>Send To</source>
         <translation>보내기</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="328"/>
+        <location filename="../widgets/rename_panel.py" line="338"/>
         <source>Convert</source>
         <translation>변환</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="329"/>
+        <location filename="../widgets/rename_panel.py" line="339"/>
         <source>Analyze</source>
         <translation>분석</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="390"/>
+        <location filename="../widgets/rename_panel.py" line="340"/>
+        <source>Auto Pipeline</source>
+        <translation>자동 파이프라인</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="345"/>
+        <source>Set pipeline settings in the Convert panel first.</source>
+        <translation>먼저 변환 패널에서 파이프라인을 설정하세요.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="410"/>
         <source>Text to add at end of filename</source>
         <translation>파일명 끝에 추가할 텍스트</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="392"/>
+        <location filename="../widgets/rename_panel.py" line="412"/>
         <source>Text to add at start of filename</source>
         <translation>파일명 앞에 추가할 텍스트</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="433"/>
+        <location filename="../widgets/rename_panel.py" line="453"/>
         <source>No files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="477"/>
+        <location filename="../widgets/rename_panel.py" line="497"/>
         <source>Conflict</source>
         <translation>충돌</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="494"/>
+        <location filename="../widgets/rename_panel.py" line="514"/>
         <source>{0} files</source>
         <translation>파일 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="496"/>
+        <location filename="../widgets/rename_panel.py" line="516"/>
         <source>{0} to rename</source>
         <translation>이름 변경 대상 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="498"/>
+        <location filename="../widgets/rename_panel.py" line="518"/>
         <source>{0} conflicts</source>
         <translation>충돌 {0}개</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="636"/>
+        <location filename="../widgets/rename_panel.py" line="578"/>
+        <source>Convert with the Convert panel&apos;s settings, analyze, add to &quot;{name}&quot;.</source>
+        <translation>변환 패널 설정으로 변환하고 분석한 뒤 “{name}”에 추가해요.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="681"/>
         <source>Changed</source>
         <translation>변경됨</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="711"/>
+        <location filename="../widgets/rename_panel.py" line="756"/>
         <source>Copy text</source>
         <translation>텍스트 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="711"/>
+        <location filename="../widgets/rename_panel.py" line="756"/>
         <source>Copy {0} names</source>
         <translation>이름 {0}개 복사</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="717"/>
+        <location filename="../widgets/rename_panel.py" line="762"/>
         <source>Remove from list</source>
         <translation>목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="717"/>
+        <location filename="../widgets/rename_panel.py" line="762"/>
         <source>Remove {0} from list</source>
         <translatorcomment>{0} (a filename) placed before 제거 with a space to avoid attaching a particle to a variable. Flag for native review.</translatorcomment>
         <translation>목록에서 {0} 제거</translation>
@@ -3957,7 +4003,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="593"/>
+        <location filename="../widgets/vis_canvas.py" line="632"/>
         <source>Visualizer</source>
         <translation>시각 효과</translation>
     </message>
