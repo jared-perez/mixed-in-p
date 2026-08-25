@@ -549,6 +549,77 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(energy_frame)
 
+        # ── Section: Online Metadata ────────────────────────────────────────
+        outer.addWidget(self._make_section_label(self.tr("Online Metadata")))
+
+        online_frame = QFrame()
+        online_frame.setObjectName("settingsSection")
+        online_layout = QVBoxLayout(online_frame)
+        online_layout.setContentsMargins(16, 10, 16, 10)
+        online_layout.setSpacing(8)
+
+        self._online_lookup_cb = QCheckBox(
+            self.tr("Look up track details online (Discogs)")
+        )
+        self._online_lookup_cb.setObjectName("circleCheckLg")
+        self._online_lookup_cb.setChecked(False)
+        online_layout.addWidget(self._online_lookup_cb)
+
+        online_hint = QLabel(
+            self.tr(
+                "Off by default, and the app makes no network requests until you "
+                "turn it on. A lookup sends the artist and title of the track you "
+                "chose — never your audio, and never your library. BPM, key and "
+                "energy always come from this app's own analysis."
+            )
+        )
+        online_hint.setObjectName("settingsHint")
+        online_hint.setWordWrap(True)
+        online_layout.addWidget(online_hint)
+
+        token_row = self._row_layout()
+        token_row.addWidget(QLabel(self.tr("Discogs token:")))
+        # Whether the token box held anything before the keystroke being
+        # handled. See _on_token_text_changed.
+        self._had_token = False
+        self._discogs_token_edit = QLineEdit()
+        self._discogs_token_edit.setEchoMode(QLineEdit.EchoMode.Password)
+        self._discogs_token_edit.setPlaceholderText(self.tr("Paste your token"))
+        self._discogs_token_edit.setMinimumWidth(260)
+        token_row.addWidget(self._discogs_token_edit, 1)
+        self._token_help_btn = QPushButton(self.tr("Get a Token…"))
+        self._token_help_btn.clicked.connect(self._on_token_help_clicked)
+        token_row.addWidget(self._token_help_btn)
+        online_layout.addLayout(token_row)
+
+        token_hint = QLabel(
+            self.tr(
+                "Discogs needs a free personal token to answer with cover images "
+                "and at full speed. It is read-only, and you can revoke it on "
+                "your Discogs account page at any time."
+            )
+        )
+        token_hint.setObjectName("settingsHint")
+        token_hint.setWordWrap(True)
+        online_layout.addWidget(token_hint)
+
+        self._fetch_artwork_cb = QCheckBox(self.tr("Fetch cover art with lookups"))
+        self._fetch_artwork_cb.setObjectName("circleCheckLg")
+        self._fetch_artwork_cb.setChecked(True)
+        online_layout.addWidget(self._fetch_artwork_cb)
+
+        artwork_hint = QLabel(
+            self.tr(
+                "Shows the release's cover next to your file's, so you can "
+                "compare them. Nothing is written until you approve it."
+            )
+        )
+        artwork_hint.setObjectName("settingsHint")
+        artwork_hint.setWordWrap(True)
+        online_layout.addWidget(artwork_hint)
+
+        outer.addWidget(online_frame)
+
         # ── Section: Playlists ──────────────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Playlists")))
 
@@ -639,77 +710,6 @@ class SettingsPanel(QWidget):
         playlist_layout.addWidget(export_all_hint)
 
         outer.addWidget(playlist_frame)
-
-        # ── Section: Online Metadata ────────────────────────────────────────
-        outer.addWidget(self._make_section_label(self.tr("Online Metadata")))
-
-        online_frame = QFrame()
-        online_frame.setObjectName("settingsSection")
-        online_layout = QVBoxLayout(online_frame)
-        online_layout.setContentsMargins(16, 10, 16, 10)
-        online_layout.setSpacing(8)
-
-        self._online_lookup_cb = QCheckBox(
-            self.tr("Look up track details online (Discogs)")
-        )
-        self._online_lookup_cb.setObjectName("circleCheckLg")
-        self._online_lookup_cb.setChecked(False)
-        online_layout.addWidget(self._online_lookup_cb)
-
-        online_hint = QLabel(
-            self.tr(
-                "Off by default, and the app makes no network requests until you "
-                "turn it on. A lookup sends the artist and title of the track you "
-                "chose — never your audio, and never your library. BPM, key and "
-                "energy always come from this app's own analysis."
-            )
-        )
-        online_hint.setObjectName("settingsHint")
-        online_hint.setWordWrap(True)
-        online_layout.addWidget(online_hint)
-
-        token_row = self._row_layout()
-        token_row.addWidget(QLabel(self.tr("Discogs token:")))
-        # Whether the token box held anything before the keystroke being
-        # handled. See _on_token_text_changed.
-        self._had_token = False
-        self._discogs_token_edit = QLineEdit()
-        self._discogs_token_edit.setEchoMode(QLineEdit.EchoMode.Password)
-        self._discogs_token_edit.setPlaceholderText(self.tr("Paste your token"))
-        self._discogs_token_edit.setMinimumWidth(260)
-        token_row.addWidget(self._discogs_token_edit, 1)
-        self._token_help_btn = QPushButton(self.tr("Get a Token…"))
-        self._token_help_btn.clicked.connect(self._on_token_help_clicked)
-        token_row.addWidget(self._token_help_btn)
-        online_layout.addLayout(token_row)
-
-        token_hint = QLabel(
-            self.tr(
-                "Discogs needs a free personal token to answer with cover images "
-                "and at full speed. It is read-only, and you can revoke it on "
-                "your Discogs account page at any time."
-            )
-        )
-        token_hint.setObjectName("settingsHint")
-        token_hint.setWordWrap(True)
-        online_layout.addWidget(token_hint)
-
-        self._fetch_artwork_cb = QCheckBox(self.tr("Fetch cover art with lookups"))
-        self._fetch_artwork_cb.setObjectName("circleCheckLg")
-        self._fetch_artwork_cb.setChecked(True)
-        online_layout.addWidget(self._fetch_artwork_cb)
-
-        artwork_hint = QLabel(
-            self.tr(
-                "Shows the release's cover next to your file's, so you can "
-                "compare them. Nothing is written until you approve it."
-            )
-        )
-        artwork_hint.setObjectName("settingsHint")
-        artwork_hint.setWordWrap(True)
-        online_layout.addWidget(artwork_hint)
-
-        outer.addWidget(online_frame)
 
         outer.addStretch()
 

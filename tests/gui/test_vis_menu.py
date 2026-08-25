@@ -153,7 +153,8 @@ class TestTheEyeMenu:
         assert labels[0] == "Backdrop fractal"
         assert labels[1] == "Backdrop wormhole"
         assert labels[-1] == "Visuals off"
-        # The popout half runs in the same order, so the groups read as pairs.
+        # The popout half leads with the same two, so the groups read as pairs
+        # at the head (the tails diverge — the backdrops order theirs to taste).
         popouts = labels[labels.index("Popout fractal") :]
         assert popouts[:2] == ["Popout fractal", "Popout wormhole"]
         assert len(modes) == len(player._vis_actions)

@@ -1751,10 +1751,13 @@ class PlayerPanel(QWidget):
         self._vis_action_group = QActionGroup(self)
         self._vis_action_group.setExclusive(True)
         self._vis_actions: dict[str, QAction] = {}
-        # Order is a recommendation: the two richest visuals lead each group,
-        # and the groups run in the same order so the halves read as parallel.
-        # "Visuals off" sits at the foot — it is the way out, not the way in,
-        # and a menu that opens on its own "off" row buries what it offers.
+        # Order is a recommendation: the two richest visuals lead each group.
+        # The halves no longer run strictly in step — the backdrops put
+        # spectrum above oscilloscope and waveform below it, which is the
+        # order the user reaches for them in, and waveform has no popout twin
+        # to keep parallel with anyway. "Visuals off" sits at the foot — it is
+        # the way out, not the way in, and a menu that opens on its own "off"
+        # row buries what it offers.
         #
         # The two tunnels' labels read crossed against their mode ids, and that
         # is the design rather than a slip: the ids name the mechanism, the
@@ -1766,9 +1769,9 @@ class PlayerPanel(QWidget):
             ("backdrop_fractal", self.tr("Backdrop fractal")),
             ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
             ("backdrop_loop_tunnel", self.tr("Backdrop tunnel chase")),
-            ("backdrop", self.tr("Backdrop waveform")),
-            ("backdrop_scope", self.tr("Backdrop oscilloscope")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
+            ("backdrop_scope", self.tr("Backdrop oscilloscope")),
+            ("backdrop", self.tr("Backdrop waveform")),
             ("backdrop_fire", self.tr("Backdrop fire")),
             ("fractal", self.tr("Popout fractal")),
             ("beat_tunnel", self.tr("Popout wormhole")),
