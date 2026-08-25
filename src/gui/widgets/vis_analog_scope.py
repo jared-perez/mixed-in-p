@@ -15,7 +15,9 @@ out of one float32 *phosphor buffer* the size of the host:
    vertical neighbours,
 3. blur it once for the line's softness and add a 4x-decimated, blurred,
    re-upsampled copy back for the wide halo,
-4. look the result up in a black -> green -> white ramp.
+4. lay the graticule — the faceplate grid — over the top, after the blurs so
+   it stays a crisp line and outside the buffer so it never decays or blooms,
+5. look the result up in a black -> green -> white ramp.
 
 The obvious alternative — drawing the polyline three or four times with wide
 antialiased round-cap pens under ``CompositionMode_Plus`` — was measured and is
@@ -47,11 +49,11 @@ from PySide6.QtGui import QColor, QImage
 # where it runs over the whole frame (see _stamp).
 #
 #                        bass    bright
-#   912x384   (0.35 Mpx)  2.3 ms   3.1 ms
-#   1216x512  (0.62 Mpx)  4.0 ms   5.6 ms   <- default popout, Retina, native
-#   1250x720  (0.90 Mpx)  5.8 ms   7.7 ms   <- the cap: half a 16 ms frame
-#   1600x672  (1.08 Mpx)  7.0 ms   9.2 ms
-#   2400x1200 (2.88 Mpx) 18.4 ms  24.4 ms   <- would drop frames at 60 fps
+#   912x384   (0.35 Mpx)  2.4 ms   3.1 ms
+#   1216x512  (0.62 Mpx)  4.2 ms   5.7 ms   <- default popout, Retina, native
+#   1250x720  (0.90 Mpx)  6.2 ms   8.1 ms   <- the cap: about half a 16 ms frame
+#   1600x672  (1.08 Mpx)  7.3 ms   9.9 ms
+#   2400x1200 (2.88 Mpx) 19.7 ms  26.0 ms   <- would drop frames at 60 fps
 #
 # The popout runs at 60 fps (see VisRenderer.frame_ms), so the ceiling is half
 # of 16 ms *for the expensive kind of music*, not for the cheap kind — which
@@ -128,6 +130,31 @@ _DISPLAY_GAIN = 1.0
 # that ever grates, deriving the ramp from the colour is the three lines
 # _fire_palette already spells out in vis_canvas.
 _PHOSPHOR = (51, 255, 102)
+
+# The graticule: the etched grid on a scope's faceplate. Drawn into a layer
+# built once per size and added after the blurs, so it stays a crisp one-pixel
+# line rather than a smear, and does not decay, bloom or feed the persistence.
+# It is added to the same intensity buffer the trace lives in, so it wears the
+# same phosphor ramp and the trace crossing a line reads brighter — which is
+# what an illuminated graticule does anyway.
+_GRID_ON = True
+_GRID_ROWS = 8  # the classic 8 vertical divisions
+# A scope's screen is about 4:3 and its divisions are square. A popout is
+# 2.4:1, so the choice is 10 columns of visibly stretched cells or square cells
+# and however many of them fit. Square, because a stretched grid reads as a
+# spreadsheet rather than as an instrument.
+_GRID_SQUARE_CELLS = True
+_GRID_COLS = 10  # used only when _GRID_SQUARE_CELLS is off
+_GRID_LEVEL = 0.09  # a division line, in the same units as the beam
+_AXIS_LEVEL = 0.18  # the two centre lines, which a real faceplate picks out
+_TICKS_PER_DIV = 5  # minor ticks along the centre axes; 0 for none
+_TICK_LEVEL = 0.18
+_TICK_SPAN = 0.10  # tick length as a fraction of a division
+# Line weight is a *reference* size scaled with the image, like the tunnels'
+# star cell: an etched line is a physical width, so a one-pixel line drawn into
+# a 950-row buffer is a third of the line the same code draws into a 256-row
+# one, and the grid would quietly thin out as the window grew.
+_GRID_REF_H = 512
 _LUT_CORE = 0.78  # index fraction at which the ramp starts heading for white
 _LUT_RISE = 0.45  # index fraction over which it reaches full phosphor
 _ALPHA_GAIN = 2.5  # so the faintest halo is faint rather than a grey wash
@@ -151,6 +178,49 @@ def build_lut(color: tuple[int, int, int] = _PHOSPHOR) -> np.ndarray:
     lut[:, 2] = rgb[:, 0].astype(np.uint8)  # R
     lut[:, 3] = (np.clip(t * _ALPHA_GAIN, 0.0, 1.0) * 255).astype(np.uint8)
     return lut
+
+
+def build_graticule(height: int, width: int) -> np.ndarray | None:
+    """The faceplate grid as an intensity layer, or None when it is switched off.
+
+    Built once per size — it costs a few array writes and is then one add per
+    frame. Lines are snapped to whole pixels because a half-covered row of a
+    one-pixel line reads as a dimmer line, not as a smoother one, and the whole
+    point of adding it after the blurs is that it stays sharp.
+    """
+    if not _GRID_ON or height < 16 or width < 16:
+        return None
+    grid = np.zeros((height, width), dtype=np.float32)
+    rows = max(2, _GRID_ROWS)
+    cols = max(2, round(rows * width / height) if _GRID_SQUARE_CELLS else _GRID_COLS)
+    pen = max(1, int(round(height / _GRID_REF_H)))
+    # Interior division lines only: the frame's own edges are its border.
+    ys = np.round(np.linspace(0, height - 1, rows + 1)).astype(int)[1:-1]
+    xs = np.round(np.linspace(0, width - 1, cols + 1)).astype(int)[1:-1]
+    for offset in range(pen):
+        grid[np.minimum(ys + offset, height - 1), :] = _GRID_LEVEL
+        grid[:, np.minimum(xs + offset, width - 1)] = _GRID_LEVEL
+    mid_y, mid_x = (height - 1) // 2, (width - 1) // 2
+    for offset in range(pen):
+        grid[min(mid_y + offset, height - 1), :] = _AXIS_LEVEL
+        grid[:, min(mid_x + offset, width - 1)] = _AXIS_LEVEL
+    if _TICKS_PER_DIV > 0:
+        div_h = height / rows
+        div_w = width / cols
+        arm_y = max(1, int(round(_TICK_SPAN * div_h)))
+        arm_x = max(1, int(round(_TICK_SPAN * div_w)))
+        # Ticks sit on the centre axes, at _TICKS_PER_DIV steps per division,
+        # and run across the *other* axis — the vertical axis wears horizontal
+        # ticks, as a real faceplate does.
+        tick_ys = np.round(
+            np.arange(0, height, div_h / _TICKS_PER_DIV)
+        ).astype(int)
+        tick_xs = np.round(np.arange(0, width, div_w / _TICKS_PER_DIV)).astype(int)
+        for y in tick_ys[(tick_ys >= 0) & (tick_ys < height - pen)]:
+            grid[y : y + pen, max(0, mid_x - arm_x) : mid_x + arm_x + 1] = _TICK_LEVEL
+        for x in tick_xs[(tick_xs >= 0) & (tick_xs < width - pen)]:
+            grid[max(0, mid_y - arm_y) : mid_y + arm_y + 1, x : x + pen] = _TICK_LEVEL
+    return grid
 
 
 def find_trigger(samples: np.ndarray, target: int, window: int = _WINDOW) -> int:
@@ -219,6 +289,7 @@ class AnalogScopeScene:
         # One row taller: a span's "one past the end" marker can name row H.
         self._fill = np.zeros((height + 1, width), dtype=np.float32)
         self._image = QImage(width, height, QImage.Format.Format_ARGB32)
+        self._grid: np.ndarray | None = None  # built on the first frame at a size
         self._trigger = 0
         self.reset()
 
@@ -276,6 +347,7 @@ class AnalogScopeScene:
             return
         self._buf = np.zeros((target_h, target_w), dtype=np.float32)
         self._fill = np.zeros((target_h + 1, target_w), dtype=np.float32)
+        self._grid = None
         self._image = QImage(target_w, target_h, QImage.Format.Format_ARGB32)
         self._image.fill(0)
 
@@ -298,6 +370,7 @@ class AnalogScopeScene:
         glow = _blur121(buf, 1)
         self._add_bloom(glow, buf)
         glow = _blur121(glow, _LINE_BLURS - 1)
+        self._add_graticule(glow)
         self._paint(glow)
         return self._image
 
@@ -385,6 +458,13 @@ class AnalogScopeScene:
             np.add.at(fill, (past, steep_cols), -density)
             np.cumsum(fill, axis=0, out=fill)
             self._buf += fill[:height]
+
+    def _add_graticule(self, glow: np.ndarray) -> None:
+        """Lay the faceplate grid over the frame, building it if the size moved."""
+        if self._grid is None or self._grid.shape != glow.shape:
+            self._grid = build_graticule(*glow.shape)
+        if self._grid is not None:
+            glow += self._grid
 
     def _ensure_fill(self, height: int, width: int) -> np.ndarray:
         """The span accumulator, matched to the buffer.

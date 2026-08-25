@@ -5,10 +5,12 @@ most of what matters here is the *split*: the backdrop's renderer must keep the
 152x64 retro grid it has always drawn, and only a renderer that has been told
 ``popout=True`` gets the phosphor scene.
 
-Assertions are on the scene's buffer and on image *sizes*, never on pixel
-colours at coordinates. The suite runs styleless and offscreen, and both
-pixel-diff traps in CLAUDE.md (device pixel ratio, the missing stylesheet)
-apply; the look itself is judged by rendering stills with
+Assertions are on the scene's arrays and on image *sizes*, never on a pixel
+being a particular colour at a particular place. The suite runs styleless and
+offscreen, and both pixel-diff traps in CLAUDE.md (device pixel ratio, the
+missing stylesheet) apply. Where a pixel is read at all it is only compared
+against *the same pixel of another frame of the same scene*, which those traps
+do not reach; the look itself is judged by rendering stills with
 ``scripts/vis_sheet.py --mode oscilloscope --popout``, as it is for every
 visual.
 """
@@ -17,11 +19,16 @@ import numpy as np
 import pytest
 
 from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
+from src.gui.widgets import vis_analog_scope
 from src.gui.widgets.vis_analog_scope import (
+    _AXIS_LEVEL,
     _BACKDROP_CAP_PX,
+    _GRID_LEVEL,
+    _GRID_ROWS,
     _POPOUT_CAP_PX,
     _WINDOW,
     AnalogScopeScene,
+    build_graticule,
     build_lut,
     find_trigger,
 )
@@ -341,3 +348,85 @@ def test_the_colour_setting_is_deliberately_ignored(scene):
     before = scene._lut.copy()
     scene.set_color("#ff00ff")
     assert np.array_equal(scene._lut, before)
+
+
+# ── The graticule ──────────────────────────────────────────────────────────
+
+
+def test_the_divisions_are_square_on_a_wide_host():
+    """A 2.4:1 popout with 10 fixed columns draws a spreadsheet, not a scope."""
+    grid = build_graticule(512, 1216)
+    assert grid is not None
+    lit_rows = np.flatnonzero((grid > 0).sum(axis=1) > grid.shape[1] * 0.5)
+    lit_cols = np.flatnonzero((grid > 0).sum(axis=0) > grid.shape[0] * 0.5)
+    # Interior division lines, plus the centre axis which is one of them.
+    row_gap = np.diff(lit_rows).max()
+    col_gap = np.diff(lit_cols).max()
+    assert row_gap == pytest.approx(col_gap, rel=0.1)
+    assert len(lit_rows) >= _GRID_ROWS - 1
+
+
+def test_the_centre_axes_are_picked_out():
+    grid = build_graticule(512, 1216)
+    assert grid[(512 - 1) // 2].max() == pytest.approx(_AXIS_LEVEL)
+    division = grid[grid > 0]
+    assert division.min() == pytest.approx(_GRID_LEVEL)
+
+
+def test_the_line_weight_follows_the_resolution():
+    """An etched line is a physical width, not a pixel; see _GRID_REF_H."""
+
+    def axis_thickness(grid):
+        mid = (grid.shape[0] - 1) // 2
+        column = grid[:, grid.shape[1] // 4]
+        return int((column >= _AXIS_LEVEL)[mid : mid + 6].sum())
+
+    thin = build_graticule(512, 1216)
+    thick = build_graticule(1024, 880)
+    assert axis_thickness(thick) > axis_thickness(thin)
+
+
+def test_it_is_switched_off_cleanly(monkeypatch):
+    monkeypatch.setattr(vis_analog_scope, "_GRID_ON", False)
+    assert build_graticule(512, 1216) is None
+    scene = AnalogScopeScene()
+    scene.set_target_size(640, 320, popout=True)
+    image = scene.render(tone()[:FFT_SIZE], SR)  # no grid, no crash
+    assert (image.width(), image.height()) == (640, 320)
+
+
+def test_a_host_too_small_to_divide_gets_none():
+    assert build_graticule(8, 8) is None
+
+
+def test_the_grid_never_enters_the_phosphor(scene):
+    """It is laid over the frame, not stamped into it.
+
+    Inside the buffer it would decay, bloom, and — because the buffer is
+    multiplied and added to every frame — accumulate to its own steady state,
+    so a static grid would drift in brightness for the first second and pick up
+    a halo it should not have.
+    """
+    for _ in range(40):
+        scene.render(None, SR)  # silence: only the flat line is drawn
+    height, width = scene._buf.shape
+    middle = height // 2
+    away = scene._buf[np.abs(np.arange(height) - middle) > 4]
+    assert away.max() == pytest.approx(0.0, abs=1e-6)
+
+
+def test_the_grid_is_the_same_every_frame(scene):
+    """Constant, not accumulating — the layer is added, never fed back."""
+    first = scene.render(None, SR).copy()
+    second = scene.render(None, SR).copy()
+    corner = (scene.image().width() // 4, 4)
+    assert first.pixelColor(*corner) == second.pixelColor(*corner)
+
+
+def test_it_is_rebuilt_when_the_host_resizes(scene):
+    scene.render(tone()[:FFT_SIZE], SR)
+    assert scene._grid is not None and scene._grid.shape == scene._buf.shape
+    scene.set_target_size(900, 300, popout=True)
+    assert scene._grid is None  # dropped, not stretched
+    scene.render(tone()[:FFT_SIZE], SR)
+    assert scene._grid.shape == (300, 900)
