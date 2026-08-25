@@ -523,8 +523,8 @@ o tocca “Aggiungi copertina…”</translation>
     <name>ConversionPanel</name>
     <message>
         <location filename="../widgets/conversion_panel.py" line="146"/>
-        <location filename="../widgets/conversion_panel.py" line="347"/>
-        <location filename="../widgets/conversion_panel.py" line="568"/>
+        <location filename="../widgets/conversion_panel.py" line="359"/>
+        <location filename="../widgets/conversion_panel.py" line="580"/>
         <source>Convert</source>
         <translation>Converti</translation>
     </message>
@@ -608,38 +608,38 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="231"/>
-        <location filename="../widgets/conversion_panel.py" line="785"/>
+        <location filename="../widgets/conversion_panel.py" line="804"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>Scegli la cartella in cui salvare i file convertiti</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="344"/>
+        <location filename="../widgets/conversion_panel.py" line="356"/>
         <source>Playlist name</source>
         <translatorcomment>Il campo è largo 174px: la forma lunga veniva tagliata di 4px.</translatorcomment>
         <translation>Nome playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="557"/>
+        <location filename="../widgets/conversion_panel.py" line="569"/>
         <source>Turn off the pipeline — Convert goes back to converting only.</source>
         <translation>Disattiva la catena — Converti torna a convertire soltanto.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="560"/>
+        <location filename="../widgets/conversion_panel.py" line="572"/>
         <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
         <translation>Attiva la catena: Converti → Analizza → aggiungi alla playlist indicata qui.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="565"/>
+        <location filename="../widgets/conversion_panel.py" line="577"/>
         <source>Start</source>
         <translation>Avvia</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="566"/>
+        <location filename="../widgets/conversion_panel.py" line="578"/>
         <source>Send the tracks through the pipeline</source>
         <translation>Invia le tracce attraverso la catena</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="778"/>
+        <location filename="../widgets/conversion_panel.py" line="797"/>
         <source>Save converted files next to the originals</source>
         <translation>Salva i file convertiti accanto agli originali</translation>
     </message>
@@ -680,7 +680,7 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/conversion_panel.py" line="312"/>
-        <location filename="../widgets/conversion_panel.py" line="1029"/>
+        <location filename="../widgets/conversion_panel.py" line="1048"/>
         <source>No files</source>
         <translation>Nessun file</translation>
     </message>
@@ -689,33 +689,33 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Rimuovi selezionati</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="354"/>
+        <location filename="../widgets/conversion_panel.py" line="366"/>
         <source>Send To</source>
         <translation>Invia a</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="356"/>
+        <location filename="../widgets/conversion_panel.py" line="368"/>
         <source>Select at least one file to send.</source>
         <translation>Seleziona almeno un file da inviare.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="358"/>
+        <location filename="../widgets/conversion_panel.py" line="370"/>
         <source>Analyze</source>
         <translation>Analizza</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="359"/>
+        <location filename="../widgets/conversion_panel.py" line="371"/>
         <source>Rename</source>
         <translation>Rinomina</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="360"/>
+        <location filename="../widgets/conversion_panel.py" line="372"/>
         <source>Player</source>
         <translatorcomment>Kept as product/feature term &apos;Player&apos; (Apple Italian commonly retains it for media players).</translatorcomment>
         <translation>Player</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="371"/>
+        <location filename="../widgets/conversion_panel.py" line="383"/>
         <source>Lossy files not allowed</source>
         <translation>File con perdita non consentiti</translation>
     </message>
@@ -724,27 +724,27 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Stessa cartella di ogni file di origine</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="757"/>
+        <location filename="../widgets/conversion_panel.py" line="776"/>
         <source>Same folder as source</source>
         <translation>Cartella di origine</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="776"/>
+        <location filename="../widgets/conversion_panel.py" line="795"/>
         <source>Save converted files to a folder instead</source>
         <translation>Salva i file convertiti in una cartella</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="806"/>
+        <location filename="../widgets/conversion_panel.py" line="825"/>
         <source>Choose Output Folder</source>
         <translation>Scegli cartella di destinazione</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="862"/>
+        <location filename="../widgets/conversion_panel.py" line="881"/>
         <source>Output Folder Unavailable</source>
         <translation>Cartella di destinazione non disponibile</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="863"/>
+        <location filename="../widgets/conversion_panel.py" line="882"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -753,79 +753,79 @@ o tocca “Aggiungi copertina…”</translation>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="908"/>
+        <location filename="../widgets/conversion_panel.py" line="927"/>
         <source>Open File Location</source>
         <translation>Apri posizione del file</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="910"/>
+        <location filename="../widgets/conversion_panel.py" line="929"/>
         <source>Remove</source>
         <translation>Rimuovi</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="985"/>
-        <location filename="../widgets/conversion_panel.py" line="1196"/>
+        <location filename="../widgets/conversion_panel.py" line="1004"/>
+        <location filename="../widgets/conversion_panel.py" line="1215"/>
         <source>Done</source>
         <translation>Fatto</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="998"/>
+        <location filename="../widgets/conversion_panel.py" line="1017"/>
         <source>Same format</source>
         <translatorcomment>Adjective agrees with implicit masculine &apos;formato&apos; -&gt; &apos;Stesso formato&apos;.</translatorcomment>
         <translation>Stesso formato</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1001"/>
+        <location filename="../widgets/conversion_panel.py" line="1020"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>Scegli una frequenza di campionamento o una profondità di bit inferiore per convertire questo file.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1004"/>
+        <location filename="../widgets/conversion_panel.py" line="1023"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>Oltre la sorgente</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1007"/>
+        <location filename="../widgets/conversion_panel.py" line="1026"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>Scegli una frequenza di campionamento e una profondità di bit non superiori a quelle di questo file.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1010"/>
-        <location filename="../widgets/conversion_panel.py" line="1188"/>
-        <location filename="../widgets/conversion_panel.py" line="1218"/>
+        <location filename="../widgets/conversion_panel.py" line="1029"/>
+        <location filename="../widgets/conversion_panel.py" line="1207"/>
+        <location filename="../widgets/conversion_panel.py" line="1237"/>
         <source>Ready</source>
         <translation>Pronto</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1024"/>
+        <location filename="../widgets/conversion_panel.py" line="1043"/>
         <source>{count} files</source>
         <translation>{count} file</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1026"/>
+        <location filename="../widgets/conversion_panel.py" line="1045"/>
         <source>{count} to convert</source>
         <translatorcomment>Implicit &apos;file&apos; is invariable masculine; &apos;da convertire&apos; is form-neutral.</translatorcomment>
         <translation>{count} da convertire</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1028"/>
+        <location filename="../widgets/conversion_panel.py" line="1047"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Reviewed (it pass): &apos;lossy&apos; kept (audio term); &apos;ignorati&apos; agrees with &apos;file&apos; (m.pl) - confirmed.</translatorcomment>
         <translation>({count} lossy ignorati)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1160"/>
+        <location filename="../widgets/conversion_panel.py" line="1179"/>
         <source>Converting</source>
         <translation>Conversione in corso</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1181"/>
+        <location filename="../widgets/conversion_panel.py" line="1200"/>
         <source>Incomplete</source>
         <translation>Incompleto</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1181"/>
+        <location filename="../widgets/conversion_panel.py" line="1200"/>
         <source>Error</source>
         <translation>Errore</translation>
     </message>
@@ -2076,7 +2076,7 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1702"/>
-        <location filename="../widgets/player_panel.py" line="2952"/>
+        <location filename="../widgets/player_panel.py" line="2959"/>
         <source>Search all playlists…</source>
         <translation>Cerca in tutte le playlist…</translation>
     </message>
@@ -2096,68 +2096,68 @@ o tocca “Aggiungi copertina…”</translation>
         <translation>Scegli una visualizzazione</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1772"/>
+        <location filename="../widgets/player_panel.py" line="1779"/>
         <source>Visuals off</source>
         <translation>Nessuna visualizzazione</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1762"/>
+        <location filename="../widgets/player_panel.py" line="1769"/>
         <source>Backdrop waveform</source>
         <translation>Sfondo: forma d&apos;onda</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1763"/>
+        <location filename="../widgets/player_panel.py" line="1770"/>
         <source>Backdrop oscilloscope</source>
         <translation>Sfondo: oscilloscopio</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1764"/>
+        <location filename="../widgets/player_panel.py" line="1771"/>
         <source>Backdrop spectrum</source>
         <translation>Sfondo: spettro</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1765"/>
+        <location filename="../widgets/player_panel.py" line="1772"/>
         <source>Backdrop fire</source>
         <translation>Sfondo: fuoco</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1759"/>
+        <location filename="../widgets/player_panel.py" line="1766"/>
         <source>Backdrop fractal</source>
         <translation>Sfondo: frattale</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1769"/>
+        <location filename="../widgets/player_panel.py" line="1776"/>
         <source>Popout oscilloscope</source>
         <translation>Finestra: oscilloscopio</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1770"/>
+        <location filename="../widgets/player_panel.py" line="1777"/>
         <source>Popout spectrum bars</source>
         <translation>Finestra: barre dello spettro</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1771"/>
+        <location filename="../widgets/player_panel.py" line="1778"/>
         <source>Popout fire</source>
         <translation>Finestra: fuoco</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1766"/>
+        <location filename="../widgets/player_panel.py" line="1773"/>
         <source>Popout fractal</source>
         <translation>Finestra: frattale</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1805"/>
+        <location filename="../widgets/player_panel.py" line="1812"/>
         <source>Edit Lock</source>
         <translation>Blocco modifica</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1809"/>
+        <location filename="../widgets/player_panel.py" line="1816"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Blocca la modifica dei metadati nella playlist</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1305"/>
-        <location filename="../widgets/player_panel.py" line="3069"/>
+        <location filename="../widgets/player_panel.py" line="3076"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -2243,62 +2243,62 @@ o tocca “Aggiungi copertina…”</translation>
         <translation>Mostra questa copertina nella barra laterale</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1760"/>
+        <location filename="../widgets/player_panel.py" line="1767"/>
         <source>Backdrop wormhole</source>
         <translation>Sfondo: wormhole</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1761"/>
+        <location filename="../widgets/player_panel.py" line="1768"/>
         <source>Backdrop tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Sfondo: inseguimento nel tunnel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1767"/>
+        <location filename="../widgets/player_panel.py" line="1774"/>
         <source>Popout wormhole</source>
         <translation>Finestra: wormhole</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1768"/>
+        <location filename="../widgets/player_panel.py" line="1775"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Finestra: inseguimento nel tunnel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1892"/>
-        <location filename="../widgets/player_panel.py" line="3066"/>
+        <location filename="../widgets/player_panel.py" line="1899"/>
+        <location filename="../widgets/player_panel.py" line="3073"/>
         <source>Playlists</source>
         <translation>Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1999"/>
+        <location filename="../widgets/player_panel.py" line="2006"/>
         <source>Previous</source>
         <translation>Precedente</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2010"/>
+        <location filename="../widgets/player_panel.py" line="2017"/>
         <source>Play / Pause  (Space)</source>
         <translation>Riproduci / Pausa  (Spazio)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2017"/>
+        <location filename="../widgets/player_panel.py" line="2024"/>
         <source>Stop</source>
         <translation>Stop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2024"/>
+        <location filename="../widgets/player_panel.py" line="2031"/>
         <source>Next</source>
         <translation>Successivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2042"/>
-        <location filename="../widgets/player_panel.py" line="2909"/>
-        <location filename="../widgets/player_panel.py" line="2914"/>
+        <location filename="../widgets/player_panel.py" line="2049"/>
+        <location filename="../widgets/player_panel.py" line="2916"/>
+        <location filename="../widgets/player_panel.py" line="2921"/>
         <source>Save Playlist</source>
         <translation>Salva playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1980"/>
+        <location filename="../widgets/player_panel.py" line="1987"/>
         <source>Vol</source>
         <translation>Vol</translation>
     </message>
@@ -2307,121 +2307,121 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Rimuovi selezionati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2047"/>
+        <location filename="../widgets/player_panel.py" line="2054"/>
         <source>Clear Playlist</source>
         <translation>Cancella playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2087"/>
+        <location filename="../widgets/player_panel.py" line="2094"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>Trascina qui su una playlist per aggiungere la traccia in riproduzione</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2106"/>
+        <location filename="../widgets/player_panel.py" line="2113"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>Apri la playlist da cui viene riprodotta la traccia corrente</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2345"/>
-        <location filename="../widgets/player_panel.py" line="2831"/>
-        <location filename="../widgets/player_panel.py" line="2896"/>
+        <location filename="../widgets/player_panel.py" line="2352"/>
+        <location filename="../widgets/player_panel.py" line="2838"/>
+        <location filename="../widgets/player_panel.py" line="2903"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2791"/>
+        <location filename="../widgets/player_panel.py" line="2798"/>
         <source>Playing: {0}</source>
         <translation>In riproduzione: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2841"/>
+        <location filename="../widgets/player_panel.py" line="2848"/>
         <source>In Playlist: {0}</source>
         <translation>Nella playlist: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2893"/>
+        <location filename="../widgets/player_panel.py" line="2900"/>
         <source>Search: {0}</source>
         <translation>Ricerca: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2910"/>
+        <location filename="../widgets/player_panel.py" line="2917"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>La playlist è vuota: aggiungi prima qualche traccia.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2914"/>
+        <location filename="../widgets/player_panel.py" line="2921"/>
         <source>Playlist name:</source>
         <translation>Nome della playlist:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2949"/>
+        <location filename="../widgets/player_panel.py" line="2956"/>
         <source>Search scope: {0}</source>
         <translation>Ambito di ricerca: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2954"/>
+        <location filename="../widgets/player_panel.py" line="2961"/>
         <source>Search this playlist…</source>
         <translation>Cerca in questa playlist…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2977"/>
+        <location filename="../widgets/player_panel.py" line="2984"/>
         <source>No matching tracks</source>
         <translation>Nessuna traccia corrispondente</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3428"/>
+        <location filename="../widgets/player_panel.py" line="3435"/>
         <source>File not found:
 {0}</source>
         <translation>File non trovato:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3603"/>
+        <location filename="../widgets/player_panel.py" line="3610"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Nascondi le tracce che si mixano con quella in riproduzione</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3605"/>
+        <location filename="../widgets/player_panel.py" line="3612"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Mostra le tracce che si mixano con quella in riproduzione</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3927"/>
+        <location filename="../widgets/player_panel.py" line="3934"/>
         <source>{0}+ results</source>
         <translation>{0}+ risultati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3930"/>
+        <location filename="../widgets/player_panel.py" line="3937"/>
         <source>{0} result</source>
         <translation>{0} risultato</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3932"/>
+        <location filename="../widgets/player_panel.py" line="3939"/>
         <source>{0} results</source>
         <translation>{0} risultati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3936"/>
+        <location filename="../widgets/player_panel.py" line="3943"/>
         <source>{0} track</source>
         <translation>{0} traccia</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3938"/>
+        <location filename="../widgets/player_panel.py" line="3945"/>
         <source>{0} tracks</source>
         <translation>{0} tracce</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4467"/>
+        <location filename="../widgets/player_panel.py" line="4474"/>
         <source>Reset Columns</source>
         <translation>Reimposta colonne</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5160"/>
+        <location filename="../widgets/player_panel.py" line="5167"/>
         <source>“{0}” has moved.</source>
         <translation>«{0}» è stato spostato.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5162"/>
+        <location filename="../widgets/player_panel.py" line="5169"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n dei file selezionati è stato spostato.</numerusform>
@@ -2429,86 +2429,86 @@ o tocca “Aggiungi copertina…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5165"/>
+        <location filename="../widgets/player_panel.py" line="5172"/>
         <source>File Has Moved</source>
         <translation>Il file è stato spostato</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5169"/>
+        <location filename="../widgets/player_panel.py" line="5176"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Non si trova più nella posizione salvata, quindi non può essere aggiunto a una playlist né trascinato fuori. Una traccia già in riproduzione continua a suonare: è stata caricata in memoria prima che il file venisse spostato.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5174"/>
+        <location filename="../widgets/player_panel.py" line="5181"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Fai clic destro sulla traccia e scegli «Individua il file mancante…»</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5321"/>
+        <location filename="../widgets/player_panel.py" line="5328"/>
         <source>Locate Missing File…</source>
         <translation>Individua il file mancante…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5323"/>
+        <location filename="../widgets/player_panel.py" line="5330"/>
         <source>Open File Location</source>
         <translation>Apri posizione del file</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5324"/>
+        <location filename="../widgets/player_panel.py" line="5331"/>
         <source>Open in Metadata Panel</source>
         <translation>Apri nel pannello Metadati</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5325"/>
+        <location filename="../widgets/player_panel.py" line="5332"/>
         <source>Reload Metadata from File</source>
         <translation>Ricarica i metadati dal file</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5329"/>
+        <location filename="../widgets/player_panel.py" line="5336"/>
         <source>Look Up Online…</source>
         <translation>Cerca online…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5331"/>
+        <location filename="../widgets/player_panel.py" line="5338"/>
         <source>Remove from Playlist</source>
         <translation>Rimuovi dalla playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5387"/>
-        <location filename="../widgets/player_panel.py" line="5415"/>
-        <location filename="../widgets/player_panel.py" line="5515"/>
-        <location filename="../widgets/player_panel.py" line="5588"/>
-        <location filename="../widgets/player_panel.py" line="5618"/>
+        <location filename="../widgets/player_panel.py" line="5394"/>
+        <location filename="../widgets/player_panel.py" line="5422"/>
+        <location filename="../widgets/player_panel.py" line="5522"/>
+        <location filename="../widgets/player_panel.py" line="5595"/>
+        <location filename="../widgets/player_panel.py" line="5625"/>
         <source>Look Up Online</source>
         <translation>Cerca online</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5389"/>
+        <location filename="../widgets/player_panel.py" line="5396"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>Nessuna delle tracce selezionate ha artista o titolo con cui cercare, e nemmeno i nomi dei file li forniscono.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5409"/>
+        <location filename="../widgets/player_panel.py" line="5416"/>
         <source>Looking up track details…</source>
         <translation>Ricerca dei dati delle tracce…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5410"/>
+        <location filename="../widgets/player_panel.py" line="5417"/>
         <source>Cancel</source>
         <translation>Annulla</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5440"/>
+        <location filename="../widgets/player_panel.py" line="5447"/>
         <source>Looking up {0} of {1}…</source>
         <translation>Ricerca {0} di {1}…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5448"/>
+        <location filename="../widgets/player_panel.py" line="5455"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>In attesa del limite di richieste di Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5611"/>
+        <location filename="../widgets/player_panel.py" line="5618"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n traccia senza corrispondenza.</numerusform>
@@ -2516,7 +2516,7 @@ o tocca “Aggiungi copertina…”</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5614"/>
+        <location filename="../widgets/player_panel.py" line="5621"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n traccia aggiornata.</numerusform>
@@ -3995,7 +3995,7 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="586"/>
+        <location filename="../widgets/vis_canvas.py" line="588"/>
         <source>Visualizer</source>
         <translation>Visualizzatore</translation>
     </message>

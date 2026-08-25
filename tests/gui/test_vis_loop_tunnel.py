@@ -1,8 +1,9 @@
-"""The wormhole visualization: its path, its image, and its wiring.
+"""The loop tunnel — the visual the menu calls Tunnel chase: its path, its
+image, and its wiring.
 
 The brief the path has to meet is asserted directly (§5.1) — at least 13
 turns, at least three straightaways, walls that never fold into themselves —
-so a regenerated loop can't quietly stop being a wormhole.
+so a regenerated loop can't quietly stop being a tunnel.
 """
 
 import time
@@ -13,12 +14,12 @@ from PySide6.QtGui import QImage
 
 from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
 from src.gui.widgets.vis_canvas import FFT_SIZE, POPOUT_MODES, RENDER_MODES, VisRenderer
-from src.gui.widgets import vis_wormhole
-from src.gui.widgets.vis_wormhole import (
+from src.gui.widgets import vis_loop_tunnel
+from src.gui.widgets.vis_loop_tunnel import (
     BACKDROP_CAP,
     POPOUT_CAP,
     TUNNEL_R,
-    WormholeScene,
+    LoopTunnelScene,
     build_loop,
     path_stats,
 )
@@ -78,8 +79,8 @@ def _brightest_star(image):
 
 @pytest.fixture
 def scene(qapp):
-    """A WormholeScene. Needs qapp because painting a QImage needs QGuiApplication."""
-    return WormholeScene()
+    """A LoopTunnelScene. Needs qapp because painting a QImage needs QGuiApplication."""
+    return LoopTunnelScene()
 
 
 def test_rings_slide_past_rather_than_riding_along(scene):
@@ -105,7 +106,7 @@ def test_silence_still_travels(scene):
 
 
 def test_level_speeds_travel_up(scene):
-    loud = WormholeScene()
+    loud = LoopTunnelScene()
     scene.render(0.0, 0.0)
     loud.render(1.0, 0.0)
     assert loud._s > scene._s
@@ -123,7 +124,7 @@ def test_a_retina_popout_is_capped_and_left_to_the_host_to_upscale(qapp):
     The cap bounds a frame at about 8 ms of the 33 this mode has; native would
     be 10.7 here and unbounded on a larger display.
     """
-    scene = WormholeScene()
+    scene = LoopTunnelScene()
     scene.set_target_size(2800, 1600, popout=True)
     assert (scene.image().width(), scene.image().height()) == (2100, 1200)
     assert scene.image().height() <= POPOUT_CAP[1]
@@ -131,7 +132,7 @@ def test_a_retina_popout_is_capped_and_left_to_the_host_to_upscale(qapp):
 
 def test_the_backdrop_gets_the_smaller_budget(qapp):
     """The playlist repaint behind it costs ~11 ms; the frame must not add to that."""
-    scene = WormholeScene()
+    scene = LoopTunnelScene()
     scene.set_target_size(2800, 1600)
     assert scene.image().width() <= BACKDROP_CAP[0]
     assert scene.image().height() <= BACKDROP_CAP[1]
@@ -144,7 +145,7 @@ def test_the_focal_length_follows_the_image_height(qapp):
     of view — a taller image would show *less* of the tunnel, not more of it at
     a finer grain.
     """
-    scene = WormholeScene()
+    scene = LoopTunnelScene()
     scene.set_target_size(500, 250)  # both sizes under the cap, so both are native
     half = scene._focal
     scene.set_target_size(1000, 500)
@@ -170,7 +171,7 @@ def test_target_size_ignores_an_unshown_host(scene):
 
 def test_the_cap_never_distorts_the_aspect(qapp):
     """A stretched wireframe draws ellipses where the rings should be."""
-    scene = WormholeScene()
+    scene = LoopTunnelScene()
     for width, height in ((3000, 600), (2800, 1600), (600, 1200)):
         scene.set_target_size(width, height, popout=True)
         image = scene.image()
@@ -186,7 +187,7 @@ def test_a_star_keeps_its_apparent_size_as_the_resolution_changes(qapp):
     as a constant, raising the resolution would have shrunk the stars to
     hairlines — the wireframe would have got its detail by deleting the sky.
     """
-    scene = WormholeScene()
+    scene = LoopTunnelScene()
     scene.set_target_size(512, 256, popout=True)
     small = scene.star_cell()
     scene.set_target_size(2048, 1024, popout=True)  # popout: both under its cap
@@ -202,7 +203,7 @@ def test_the_pen_keeps_its_apparent_width_as_the_resolution_changes(qapp):
     the same *fraction* of the frame at either resolution.
     """
     def lit_fraction(height: int) -> float:
-        scene = WormholeScene()
+        scene = LoopTunnelScene()
         scene.set_target_size(height * 2, height)
         for _ in range(6):
             scene.render(0.6, 0.0)
@@ -215,7 +216,7 @@ def test_the_pen_keeps_its_apparent_width_as_the_resolution_changes(qapp):
 
 
 def test_a_host_smaller_than_the_cap_renders_at_its_own_size(qapp):
-    scene = WormholeScene()
+    scene = LoopTunnelScene()
     scene.set_target_size(400, 200)
     assert (scene.image().width(), scene.image().height()) == (400, 200)
 
@@ -244,9 +245,9 @@ def _noise(rng):
     return (rng.standard_normal(FFT_SIZE) * 0.2).astype(np.float32)
 
 
-def test_renderer_returns_the_wormholes_own_image(qapp):
+def test_renderer_returns_the_loop_tunnels_own_image(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("wormhole")
+    renderer.set_mode("loop_tunnel")
     renderer.set_target_size(1000, 500)
     image = renderer.render(_noise(np.random.default_rng(0)), 44100)
     assert (image.width(), image.height()) == (1000, 500)
@@ -261,7 +262,7 @@ def test_the_renderer_tells_the_scene_which_host_is_asking(qapp):
     nothing anywhere to say why.
     """
     renderer = VisRenderer()
-    renderer.set_mode("wormhole")
+    renderer.set_mode("loop_tunnel")
     renderer.set_target_size(2800, 1600, popout=True)
     popout = renderer.render(_noise(np.random.default_rng(0)), 44100)
     assert popout.height() > BACKDROP_CAP[1]
@@ -272,14 +273,14 @@ def test_the_renderer_tells_the_scene_which_host_is_asking(qapp):
 
 
 def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
-    """The wormhole image must never land in VisRenderer._image (trap 7.1).
+    """The loop tunnel image must never land in VisRenderer._image (trap 7.1).
 
     The scope and spectrum renderers paint into that image at 152x64; if a
     608-wide one were left there they would draw into a corner of it and every
     host would happily stretch the result.
     """
     renderer = VisRenderer()
-    renderer.set_mode("wormhole")
+    renderer.set_mode("loop_tunnel")
     renderer.render(_noise(np.random.default_rng(0)), 44100)
     renderer.set_mode("spectrum")
     image = renderer.render(_noise(np.random.default_rng(1)), 44100)
@@ -298,11 +299,11 @@ def test_set_target_size_is_harmless_for_the_other_modes(qapp):
 
 
 def test_mode_is_allow_listed_and_offered_by_both_hosts():
-    assert "wormhole" in RENDER_MODES
-    assert "wormhole" in POPOUT_MODES
-    assert "wormhole" in _VALID_VIS_MODES
-    assert "backdrop_wormhole" in _VALID_VIS_MODES
-    assert _BACKDROP_VIS_MAP["backdrop_wormhole"] == "wormhole"
+    assert "loop_tunnel" in RENDER_MODES
+    assert "loop_tunnel" in POPOUT_MODES
+    assert "loop_tunnel" in _VALID_VIS_MODES
+    assert "backdrop_loop_tunnel" in _VALID_VIS_MODES
+    assert _BACKDROP_VIS_MAP["backdrop_loop_tunnel"] == "loop_tunnel"
 
 
 def test_a_frame_stays_cheap(qapp):
@@ -315,7 +316,7 @@ def test_a_frame_stays_cheap(qapp):
     real cost lives in the plan, not in this number.
     """
     renderer = VisRenderer()
-    renderer.set_mode("wormhole")
+    renderer.set_mode("loop_tunnel")
     renderer.set_target_size(2800, 1600, popout=True)
     rng = np.random.default_rng(0)
     renderer.render(_noise(rng), 44100)  # first frame builds the loop path

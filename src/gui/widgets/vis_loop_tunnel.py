@@ -1,4 +1,8 @@
-"""Wireframe wormhole: a camera flying a closed 3-D loop, drawn as rings.
+"""Loop Tunnel: a camera flying a frozen closed 3-D loop, drawn as wireframe rings.
+
+**The menu calls this one "Tunnel chase"**, and calls its sibling
+:mod:`.vis_beat_tunnel` "Wormhole" — see that module's header for why the
+labels read the other way round from the module names.
 
 The tunnel is a periodic cubic spline through 25 frozen waypoints, resampled
 uniformly by arc length, with rotation-minimising (parallel-transported)
@@ -11,14 +15,14 @@ per-pixel modes stay at 152x64. Pixelated stars (crosses built from cells
 snapped to a coarse grid) stream past to place it in space; they are lit by the
 kick, barely visible between beats.
 
-Path properties are asserted by ``tests/gui/test_vis_wormhole.py`` through
+Path properties are asserted by ``tests/gui/test_vis_loop_tunnel.py`` through
 :func:`path_stats`: 15 turns, three straightaways of 22/37/46 units, minimum
 radius of curvature 2.45 tunnel radii (the walls never fold into themselves).
 Curvature comes from the spline's analytic derivatives — finite differences
 over the resampled polyline over-count turns, because the resample is
 piecewise-linear.
 
-No audio code lives here: :meth:`WormholeScene.render` takes a level and a
+No audio code lives here: :meth:`LoopTunnelScene.render` takes a level and a
 kick pulse as plain numbers and :class:`~.vis_canvas.VisRenderer` supplies
 them.
 """
@@ -33,7 +37,7 @@ from ..styles.theme import Theme
 
 TUNNEL_R = 1.0
 
-# The wormhole owns its own image rather than the shared 152x64 grid: a
+# The loop tunnel owns its own image rather than the shared 152x64 grid: a
 # wireframe stretched non-uniformly by the host would draw ellipses for rings,
 # and the two hosts have different aspects. Both the shape and the size follow
 # the host — see set_target_size — capped by what a frame may cost.
@@ -44,14 +48,14 @@ TUNNEL_R = 1.0
 # as a staircase. It now renders from **device** pixels and asks the host to
 # interpolate whatever is left over.
 #
-# The popout's cap is higher than Tunnel Chase's identical-looking one, and the
+# The popout's cap is higher than the beat tunnel's identical-looking one, and the
 # reason is the frame rate, not the picture: the tunnel runs at 60 fps, so its
 # 4 ms is a quarter of a 16 ms frame, while this runs at 30 and has 33 ms to
-# spend. Measured on the M-series Mac, one frame of the wormhole:
+# spend. Measured on the M-series Mac, one frame of the loop tunnel:
 #
 #   448x256    1.6 ms   (what it used to render, whatever the host)
 #   896x512    3.1 ms   (the backdrop, capped)
-#   1260x720   4.4 ms   (Tunnel Chase's cap, for comparison)
+#   1260x720   4.4 ms   (the beat tunnel's cap, for comparison)
 #   2100x1200  8.0 ms   (this cap on a 2800x1600 host — a quarter of the frame)
 #   2800x1600 10.7 ms   (native; sharper at 1:1, but a third of the frame and
 #                        unbounded on a larger display, which is what a cap is
@@ -274,8 +278,8 @@ def path_stats(kappa: np.ndarray, total: float, turn_k: float = 0.12,
     return len(peaks), straights, 1.0 / max(float(kappa.max()), 1e-9)
 
 
-class WormholeScene:
-    """The wormhole's own state and image; driven by level and kick pulse."""
+class LoopTunnelScene:
+    """The loop tunnel's own state and image; driven by level and kick pulse."""
 
     def __init__(self) -> None:
         self._loop: tuple | None = None  # built on first render (~3-9 ms)

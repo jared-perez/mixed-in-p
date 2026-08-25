@@ -13,8 +13,11 @@ import pytest
 from src.gui.widgets.player_panel import PlayerPanel
 from src.utils.config import (
     LEGACY_VIS_SWITCH,
+    RETIRED_VIS_MODES,
     AppConfig,
     _config_path,
+    _renamed_vis_mode,
+    _VALID_VIS_MODES,
     load_config,
     save_config,
 )
@@ -44,8 +47,8 @@ class TestTheRetiredSwitch:
         assert load_config().visualization_mode == "backdrop_fire"
 
     def test_a_config_without_the_switch_is_taken_at_its_word(self):
-        write_raw(visualization_mode="backdrop_wormhole")
-        assert load_config().visualization_mode == "backdrop_wormhole"
+        write_raw(visualization_mode="backdrop_loop_tunnel")
+        assert load_config().visualization_mode == "backdrop_loop_tunnel"
 
     def test_saving_drops_the_legacy_key_for_good(self, qtbot, player):
         """What makes the fold one-time without a version field: the key stops
@@ -58,6 +61,65 @@ class TestTheRetiredSwitch:
 
     def test_the_field_is_gone_from_the_config(self):
         assert not hasattr(AppConfig(), LEGACY_VIS_SWITCH)
+
+
+
+class TestTheRetiredTunnelNames:
+    """The two tunnels were renamed on 2026-08-24, and why they were renamed.
+
+    Both were named for their *look*, and the look swapped: once the
+    beat-locked tunnel's wall became nebula cloud it was plainly the
+    wormhole-looking one, so the labels traded places. The ids were not
+    swapped to match — they were retired and replaced with mechanism names,
+    which is what makes this migration safe to re-run. See
+    `config._renamed_vis_mode`.
+    """
+
+    def test_an_old_config_keeps_the_picture_it_chose(self):
+        """The row the user picked changed its name; the visual behind it did not.
+
+        A config saying `tunnel_chase` chose the beat-locked tunnel. That
+        visual is `beat_tunnel` now and wears the label "Wormhole" — so this
+        must land on the same picture, and emphatically *not* on whichever id
+        inherited the label `tunnel_chase` used to have.
+        """
+        write_raw(visualization_mode="tunnel_chase")
+        assert load_config().visualization_mode == "beat_tunnel"
+
+        write_raw(visualization_mode="wormhole")
+        assert load_config().visualization_mode == "loop_tunnel"
+
+    def test_the_backdrop_halves_move_with_them(self):
+        write_raw(visualization_mode="backdrop_tunnel_chase")
+        assert load_config().visualization_mode == "backdrop_beat_tunnel"
+
+        write_raw(visualization_mode="backdrop_wormhole")
+        assert load_config().visualization_mode == "backdrop_loop_tunnel"
+
+    def test_running_it_again_changes_nothing(self):
+        """The property a straight swap could not have had.
+
+        Swapping the two ids would have needed a version counter to stay
+        one-shot, and re-running one would silently flip the user's setting
+        back. Retiring the names instead makes the trigger the stored value
+        itself, so a second pass — or a crash before the first save — is inert.
+        """
+        for retired, current in RETIRED_VIS_MODES.items():
+            once = _renamed_vis_mode(retired)
+            assert once == current
+            assert _renamed_vis_mode(once) == once
+
+    def test_the_retired_names_cannot_be_chosen_again(self):
+        """They are gone from the valid set, so nothing can write one back."""
+        for retired in RETIRED_VIS_MODES:
+            assert retired not in _VALID_VIS_MODES
+        for current in RETIRED_VIS_MODES.values():
+            assert current in _VALID_VIS_MODES
+
+    def test_a_switched_off_config_is_still_off(self):
+        """The older migration runs first and wins; this one never sees it."""
+        write_raw(**{LEGACY_VIS_SWITCH: False, "visualization_mode": "wormhole"})
+        assert load_config().visualization_mode == "off"
 
 
 class TestTheDefault:
@@ -107,10 +169,10 @@ class TestTheEyeMenu:
 
 class TestPickingAVisualStartsIt:
     def test_choosing_a_backdrop_builds_its_renderer(self, player):
-        player._select_vis_mode("backdrop_wormhole")
+        player._select_vis_mode("backdrop_loop_tunnel")
         assert player._backdrop_renderer is not None
-        assert player._backdrop_renderer._mode == "wormhole"
-        assert load_config().visualization_mode == "backdrop_wormhole"
+        assert player._backdrop_renderer._mode == "loop_tunnel"
+        assert load_config().visualization_mode == "backdrop_loop_tunnel"
 
     def test_choosing_off_stops_it(self, player):
         player._select_vis_mode("backdrop_fractal")

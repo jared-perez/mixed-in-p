@@ -1,6 +1,7 @@
-"""Tunnel Chase: the turn schedule, the path, the picture, and the wiring.
+"""The beat tunnel — the visual the menu calls Wormhole: its turn schedule,
+its path, its picture, and its wiring.
 
-The wormhole's tests are the template, with one change of substance: its
+The loop tunnel's tests are the template, with one change of substance: its
 "rings slide past" and "silence still travels" tests encode *level drives
 speed*, and here speed is the tempo. The shape of those tests is ported; the
 assertions are not.
@@ -17,7 +18,7 @@ import pytest
 from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor, QImage, QPainter
 
-from src.gui.widgets import vis_tunnel_chase as tc
+from src.gui.widgets import vis_beat_tunnel as tc
 from src.gui.widgets.beat_clock import DEFAULT_BPM
 from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP, PlayerPanel
 from src.gui.widgets.vis_canvas import (
@@ -25,10 +26,10 @@ from src.gui.widgets.vis_canvas import (
     FRAME_MS,
     POPOUT_MODES,
     RENDER_MODES,
-    TUNNEL_FRAME_MS,
+    BEAT_TUNNEL_FRAME_MS,
     VisRenderer,
 )
-from src.gui.widgets.vis_tunnel_chase import (
+from src.gui.widgets.vis_beat_tunnel import (
     BACKDROP_CAP,
     DS,
     POPOUT_CAP,
@@ -36,7 +37,7 @@ from src.gui.widgets.vis_tunnel_chase import (
     UNITS_PER_BEAT,
     _STAR_FLOOR,
     PathAhead,
-    TunnelChaseScene,
+    BeatTunnelScene,
     schedule_turns,
 )
 from src.utils.config import _VALID_VIS_MODES
@@ -186,7 +187,7 @@ def test_the_path_is_forgotten_behind_the_camera():
 @pytest.fixture
 def scene(qapp):
     """A scene at backdrop size. qapp because painting a QImage needs QGuiApplication."""
-    scene = TunnelChaseScene()
+    scene = BeatTunnelScene()
     scene.set_target_size(1216, 512)
     return scene
 
@@ -211,7 +212,7 @@ def _fly(scene, from_beat=0.0, to_beat=8.0, fps=60, bpm=128.0, pulse_at=None):
 
 
 def test_speed_is_the_tempo_not_the_level(scene):
-    """The wormhole's level-driven travel is exactly what this replaces."""
+    """The loop tunnel's level-driven travel is exactly what this replaces."""
     scene.render(0.0, 0.0, 0.0)
     scene.render(4.0, 0.0, 0.0)
     quiet = scene._cam_s
@@ -367,7 +368,7 @@ def test_the_cloud_is_the_same_world_at_either_frame_rate(qapp):
     """
     fields = []
     for frame_ms, fps in ((1000.0 / 60.0, 60), (1000.0 / 30.0, 30)):
-        scene = TunnelChaseScene()
+        scene = BeatTunnelScene()
         scene.set_target_size(1216, 512)
         scene.set_frame_interval(frame_ms)
         _fly(scene, 0.0, 8.0, fps=fps)
@@ -702,7 +703,7 @@ def test_the_glow_release_is_the_same_length_of_time_at_both_frame_rates(qapp):
     """0.82 a frame is half a second at 33 ms and a quarter at 16 — a different visual."""
     half_second = []
     for frame_ms in (33.0, 1000.0 / 60.0):
-        scene = TunnelChaseScene()
+        scene = BeatTunnelScene()
         scene.set_frame_interval(frame_ms)
         scene.render(0.0, 0.3, 1.0)
         beat, elapsed = 0.0, 0.0
@@ -732,7 +733,7 @@ def test_the_image_follows_the_host_aspect(scene):
 
 def test_a_retina_popout_is_capped_and_left_to_the_host_to_upscale(qapp):
     """1400x800 logical at 2x: 1260x720, not 2800x1600 (~10 ms a frame)."""
-    scene = TunnelChaseScene()
+    scene = BeatTunnelScene()
     scene.set_target_size(2800, 1600, popout=True)
     assert (scene.image().width(), scene.image().height()) == (1260, 720)
     assert scene.image().height() <= POPOUT_CAP[1]
@@ -740,7 +741,7 @@ def test_a_retina_popout_is_capped_and_left_to_the_host_to_upscale(qapp):
 
 def test_the_backdrop_gets_the_smaller_budget(qapp):
     """The playlist repaint behind it costs ~11 ms; the frame must not add to that."""
-    scene = TunnelChaseScene()
+    scene = BeatTunnelScene()
     scene.set_target_size(2800, 1600)
     assert scene.image().height() <= BACKDROP_CAP[1]
     assert scene.image().width() <= BACKDROP_CAP[0]
@@ -748,7 +749,7 @@ def test_the_backdrop_gets_the_smaller_budget(qapp):
 
 def test_the_cap_never_distorts_the_aspect(qapp):
     """A stretched tube draws ellipses where the rings should be."""
-    scene = TunnelChaseScene()
+    scene = BeatTunnelScene()
     for width, height in ((3000, 600), (2800, 1600), (600, 1200)):
         scene.set_target_size(width, height, popout=True)
         image = scene.image()
@@ -756,7 +757,7 @@ def test_the_cap_never_distorts_the_aspect(qapp):
 
 
 def test_a_host_smaller_than_the_cap_renders_at_its_own_size(qapp):
-    scene = TunnelChaseScene()
+    scene = BeatTunnelScene()
     scene.set_target_size(400, 200)
     assert (scene.image().width(), scene.image().height()) == (400, 200)
 
@@ -811,7 +812,7 @@ def _noise(rng):
 
 def test_the_renderer_returns_the_scenes_own_image(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("tunnel_chase")
+    renderer.set_mode("beat_tunnel")
     renderer.set_target_size(1000, 500)
     image = renderer.render(_noise(np.random.default_rng(0)), 44100)
     assert (image.width(), image.height()) == (1000, 500)
@@ -826,7 +827,7 @@ def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
     would happily stretch the result.
     """
     renderer = VisRenderer()
-    renderer.set_mode("tunnel_chase")
+    renderer.set_mode("beat_tunnel")
     renderer.set_target_size(1216, 512)
     renderer.render(_noise(np.random.default_rng(0)), 44100)
     renderer.set_mode("spectrum")
@@ -844,10 +845,10 @@ def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
     the retro modes, which are meant to look like big pixels.
     """
     renderer = VisRenderer()
-    renderer.set_mode("tunnel_chase")
-    assert renderer.frame_ms() == TUNNEL_FRAME_MS
+    renderer.set_mode("beat_tunnel")
+    assert renderer.frame_ms() == BEAT_TUNNEL_FRAME_MS
     assert renderer.smooth_upscale() is True
-    renderer.set_mode("wormhole")
+    renderer.set_mode("loop_tunnel")
     assert renderer.frame_ms() == FRAME_MS
     assert renderer.smooth_upscale() is True
     for mode in ("spectrum", "fire", "fractal", "oscilloscope"):
@@ -859,10 +860,10 @@ def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
 def test_the_bass_average_keeps_its_time_constant_at_either_rate(qapp):
     """0.97 a frame is 1.1 s at 33 ms and half that at 16 — a different pulse."""
     settled = []
-    for frame_ms in (FRAME_MS, TUNNEL_FRAME_MS):
+    for frame_ms in (FRAME_MS, BEAT_TUNNEL_FRAME_MS):
         renderer = VisRenderer()
         renderer.set_frame_interval(frame_ms)
-        renderer.set_mode("tunnel_chase")
+        renderer.set_mode("beat_tunnel")
         rng = np.random.default_rng(0)
         elapsed = 0.0
         while elapsed < 1.0:  # one second of the same audio, either way
@@ -880,7 +881,7 @@ def test_the_kick_flux_is_only_computed_where_it_is_used(qapp):
         renderer.render(_noise(np.random.default_rng(0)), 44100)
     assert renderer._prev_log is None
     assert renderer._kick_flux == 0.0
-    renderer.set_mode("tunnel_chase")
+    renderer.set_mode("beat_tunnel")
     for _ in range(4):
         renderer.render(_noise(np.random.default_rng(0)), 44100)
     assert renderer._prev_log is not None
@@ -888,7 +889,7 @@ def test_the_kick_flux_is_only_computed_where_it_is_used(qapp):
 
 def test_a_tag_reaches_the_beat_clock_and_no_tag_falls_back(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("tunnel_chase")
+    renderer.set_mode("beat_tunnel")
     renderer.set_track_tempo(135.0)
     assert renderer.beat_state()["tempo_bpm"] == pytest.approx(135.0)
     renderer.set_track_tempo(None)
@@ -897,13 +898,13 @@ def test_a_tag_reaches_the_beat_clock_and_no_tag_falls_back(qapp):
 
 def test_beat_state_is_only_offered_by_the_mode_that_has_one(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("wormhole")
+    renderer.set_mode("loop_tunnel")
     assert renderer.beat_state() is None
 
 
 def test_a_seek_drops_the_evidence_and_keeps_the_flight(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("tunnel_chase")
+    renderer.set_mode("beat_tunnel")
     renderer.set_track_tempo(128.0)
     rng = np.random.default_rng(0)
     for _ in range(30):
@@ -915,11 +916,11 @@ def test_a_seek_drops_the_evidence_and_keeps_the_flight(qapp):
 
 
 def test_mode_is_allow_listed_and_offered_by_both_hosts():
-    assert "tunnel_chase" in RENDER_MODES
-    assert "tunnel_chase" in POPOUT_MODES
-    assert "tunnel_chase" in _VALID_VIS_MODES
-    assert "backdrop_tunnel_chase" in _VALID_VIS_MODES
-    assert _BACKDROP_VIS_MAP["backdrop_tunnel_chase"] == "tunnel_chase"
+    assert "beat_tunnel" in RENDER_MODES
+    assert "beat_tunnel" in POPOUT_MODES
+    assert "beat_tunnel" in _VALID_VIS_MODES
+    assert "backdrop_beat_tunnel" in _VALID_VIS_MODES
+    assert _BACKDROP_VIS_MAP["backdrop_beat_tunnel"] == "beat_tunnel"
 
 
 # ── PlayerPanel wiring ─────────────────────────────────────────────────────
@@ -941,24 +942,24 @@ def _track(tmp_path, name="a.wav", bpm="128"):
 
 
 def test_playing_a_track_pushes_its_tag_to_the_backdrop(player, tmp_path):
-    player._select_vis_mode("backdrop_tunnel_chase")
+    player._select_vis_mode("backdrop_beat_tunnel")
     player.add_tracks([_track(tmp_path)])
     player._play_track(0)
     assert player._backdrop_renderer.beat_state()["tempo_bpm"] == pytest.approx(128.0)
 
 
 def test_a_popout_opened_mid_track_is_given_the_tempo_too(player, tmp_path):
-    """The wormhole had no per-track state at all, so this plumbing is new."""
+    """The loop tunnel had no per-track state at all, so this plumbing is new."""
     player.add_tracks([_track(tmp_path, bpm="135")])
     player._play_track(0)
-    player._select_vis_mode("tunnel_chase")
+    player._select_vis_mode("beat_tunnel")
     canvas = player._vis_window._canvas
     assert canvas._renderer.beat_state()["tempo_bpm"] == pytest.approx(135.0)
 
 
 def test_an_untagged_track_leaves_the_clock_to_work_it_out(player, tmp_path):
     """entry.bpm is a tag string, and an empty one is not a float."""
-    player._select_vis_mode("backdrop_tunnel_chase")
+    player._select_vis_mode("backdrop_beat_tunnel")
     player.add_tracks([_track(tmp_path, bpm="")])
     player._play_track(0)
     assert player._backdrop_renderer.beat_state()["tempo_bpm"] == pytest.approx(
@@ -967,7 +968,7 @@ def test_an_untagged_track_leaves_the_clock_to_work_it_out(player, tmp_path):
 
 
 def test_a_seek_reaches_the_backdrops_clock(player, tmp_path, qtbot):
-    player._select_vis_mode("backdrop_tunnel_chase")
+    player._select_vis_mode("backdrop_beat_tunnel")
     player.add_tracks([_track(tmp_path)])
     player._play_track(0)
     player._backdrop_renderer._clock._locked_bin = 3  # pretend it locked
@@ -976,26 +977,29 @@ def test_a_seek_reaches_the_backdrops_clock(player, tmp_path, qtbot):
 
 
 def test_the_popout_timer_follows_the_modes_frame_rate(player, qtbot):
-    player._select_vis_mode("wormhole")
+    player._select_vis_mode("loop_tunnel")
     assert player._vis_window._timer.interval() == FRAME_MS
-    player._select_vis_mode("tunnel_chase")
-    assert player._vis_window._timer.interval() == TUNNEL_FRAME_MS
+    player._select_vis_mode("beat_tunnel")
+    assert player._vis_window._timer.interval() == BEAT_TUNNEL_FRAME_MS
     player._select_vis_mode("fractal")
     assert player._vis_window._timer.interval() == FRAME_MS
 
 
 def test_the_backdrop_stays_at_thirty_whatever_the_mode(player):
     """Its cost is the host: repainting the rows behind the frame is ~11 ms."""
-    player._select_vis_mode("backdrop_tunnel_chase")
+    player._select_vis_mode("backdrop_beat_tunnel")
     assert player._vis_tick_timer.interval() == FRAME_MS
     assert player._vis_decay_frames() == 2000 // FRAME_MS
 
 
 def test_both_rows_are_in_the_visuals_menu(player):
-    labels = [player._vis_actions[m].text() for m in ("backdrop_tunnel_chase", "tunnel_chase")]
+    labels = [player._vis_actions[m].text() for m in ("backdrop_beat_tunnel", "beat_tunnel")]
     assert all(labels)
     modes = list(player._vis_actions)
-    # Each sits beside the wormhole it is a sibling of, near the head of its
-    # group — the menu leads with the richest visuals in each half.
-    assert modes.index("backdrop_tunnel_chase") == modes.index("backdrop_wormhole") + 1
-    assert modes.index("tunnel_chase") == modes.index("wormhole") + 1
+    # Each sits beside the loop tunnel it is a sibling of, at the head of its
+    # group — the menu leads with the richest visuals in each half, and since
+    # the nebula wall that is this one, ahead of the wireframe it used to
+    # follow. Which also keeps the menu's *labels* in their long-standing
+    # order, because the two swapped names at the same moment.
+    assert modes.index("backdrop_loop_tunnel") == modes.index("backdrop_beat_tunnel") + 1
+    assert modes.index("loop_tunnel") == modes.index("beat_tunnel") + 1

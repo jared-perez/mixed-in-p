@@ -1,6 +1,6 @@
 """A beat counter for the visuals: a tempo, a phase, and a bar slot.
 
-Tunnel Chase turns on beat 1 of every bar and again on beat 3 of every fourth
+The beat tunnel turns on beat 1 of every bar and again on beat 3 of every fourth
 bar, which means something has to *count beats* — the first visual that does.
 The kick detector the other modes use cannot: measured over six real tracks it
 fires 1.2–3.5 times per beat, because an off-beat bass line and an eighth-note

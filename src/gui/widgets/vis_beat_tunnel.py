@@ -1,8 +1,18 @@
-"""Tunnel Chase: the wormhole's sibling, flown to the beat.
+"""Beat Tunnel: a tunnel generated ahead of the camera and flown to the beat.
 
-Same tube geometry as the wormhole's, but where that one flies a frozen closed
-loop at a speed set by the level, this one is **generated ahead of the camera
-in beat-space**: arc length is measured in beats
+**The menu calls this one "Wormhole"**, and calls its sibling
+:mod:`.vis_loop_tunnel` "Tunnel chase". The module, the class and the config
+value name the *mechanism* instead, deliberately. The two labels used to sit
+the other way round, and they were right until this one's wall became nebula
+cloud — at which point the beat tunnel was plainly the wormhole-looking one
+and the names had to be swapped. **A name for the look goes stale when the
+look changes; a name for the mechanism does not.** The retired ``wormhole``
+and ``tunnel_chase`` config values are migrated in
+:func:`~src.utils.config._renamed_vis_mode`.
+
+Same tube geometry as the loop tunnel's, but where that one flies a frozen
+closed loop at a speed set by the level, this one is **generated ahead of the
+camera in beat-space**: arc length is measured in beats
 (``UNITS_PER_BEAT`` world units each), so a turn scheduled for beat 16 is a
 bend in the tube at 16 × U units, and the camera reaches it exactly when the
 music does. Speed is therefore the tempo, not the volume.
@@ -12,7 +22,7 @@ every bar, and a second one on the third beat of every fourth bar.** That
 gives a plain four-bar phrase you can feel — three ordinary bars and one that
 swings twice.
 
-Why it cannot be a precomputed loop like the wormhole's: the turns have to
+Why it cannot be a precomputed loop like the loop tunnel's: the turns have to
 fall where the *beats* fall, so the loop's turn spacing would have to be
 locked to the beat grid and its length to the tempo, and every tempo change
 would need a new loop. Generating ahead is both simpler and exact.
@@ -40,12 +50,12 @@ below is shaped by:
   line" that an instrumented render proved to be an ordinary spoke lying on
   the horizontal through the vanishing point. Hence the half-segment angle
   offset below, and hence ``scripts/vis_sheet.py``.
-* **It owns its image and follows the host's aspect**, like the wormhole —
+* **It owns its image and follows the host's aspect**, like the loop tunnel —
   a tube stretched non-uniformly draws ellipses for rings — and that image is
   never assigned to ``VisRenderer._image``.
 
 The beat itself comes from :class:`~.beat_clock.BeatClock`; no audio and no
-tempo estimation happens here. :meth:`TunnelChaseScene.render` takes a phase
+tempo estimation happens here. :meth:`BeatTunnelScene.render` takes a phase
 in beats, a level and a kick pulse as plain numbers.
 """
 
@@ -121,7 +131,7 @@ _COMPASS = 8  # directions a turn can take in the normal/binormal plane
 #
 # Deliberately a pure function of arc length rather than a random walk: the
 # path can then be re-derived from any *s* without knowing how the camera got
-# there, which is the same property the wormhole's frozen waypoints have.
+# there, which is the same property the loop tunnel's frozen waypoints have.
 #
 # 0.026 is tuned by eye, converging from both sides: 53% of the flight was
 # straighter than 1/50 R before any of this, 0.05 took it to 3.3% (too much
@@ -146,7 +156,7 @@ _DRIFT_PHASE = 1.7  # so the two axes do not cross zero together
 _N_STARS = 160
 _N_PLANETS = 3
 _STAR_FLOOR = 0.15  # a star's depth alpha between kicks
-_STAR_DECAY_AT_33MS = 0.82  # the wormhole's release, as a time constant
+_STAR_DECAY_AT_33MS = 0.82  # the loop tunnel's release, as a time constant
 _STAR_POINT_MIN = 1.8  # below this a star is a dot rather than a 4-point star
 _PLANET_RADIUS = (0.6, 1.8)  # world units
 
@@ -208,7 +218,7 @@ _GREY = (205, 205, 215)
 # property of a puff is hashed from ``ring_s`` and the segment index, never
 # from the ring *slot* k, which re-seats every ``_SPACING`` and would make the
 # texture swim. There is no per-frame state, so nothing here belongs in
-# :meth:`TunnelChaseScene.set_frame_interval` and the 16 ms and 33 ms hosts
+# :meth:`BeatTunnelScene.set_frame_interval` and the 16 ms and 33 ms hosts
 # render identical worlds.
 #
 # Measured (PoC, 1600×720, the popout cap): the cost is per pixel *covered*,
@@ -384,7 +394,7 @@ class PathAhead:
     A **Bishop frame** is stepped along arc length: ``dT = (kN·N + kB·B) ds``,
     ``dN = -kN·T ds``, ``dB = -kB·T ds``. It is rotation-minimising by
     construction, so the mesh never rolls on a straight and never corkscrews
-    into a bend — the property the wormhole's closed loop had to buy with a
+    into a bend — the property the loop tunnel's closed loop had to buy with a
     post-pass that spread the leftover twist around the seam. Nothing closes
     here, so there is no seam and no twist to spread.
 
@@ -506,7 +516,7 @@ class PathAhead:
         return 1.0 / max(min(self.kappa[1:], default=0.0), 1e-9)
 
 
-class TunnelChaseScene:
+class BeatTunnelScene:
     """The scene's own state and image, driven by a beat phase and the audio."""
 
     def __init__(self, seed: int = 1) -> None:

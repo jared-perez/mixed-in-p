@@ -68,7 +68,7 @@ def test_every_mode_renders_frames(qapp, vis_sheet, sine, mode, tmp_path):
 def test_frames_are_selected_by_beat(qapp, vis_sheet, sine):
     """--at picks the frame nearest that beat, not that second."""
     args = vis_sheet.build_parser().parse_args(
-        ["--mode", "wormhole", "--track", sine, "--bpm", "120", "--fps", "60",
+        ["--mode", "loop_tunnel", "--track", sine, "--bpm", "120", "--fps", "60",
          "--seconds", "1.5", "--at", "1.0,2.0", "--size", "608x256"]
     )
     run = vis_sheet.Run(args)

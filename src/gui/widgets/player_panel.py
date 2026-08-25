@@ -106,8 +106,8 @@ _BACKDROP_VIS_MAP = {
     "backdrop_spectrum": "spectrum",
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
-    "backdrop_wormhole": "wormhole",
-    "backdrop_tunnel_chase": "tunnel_chase",
+    "backdrop_loop_tunnel": "loop_tunnel",
+    "backdrop_beat_tunnel": "beat_tunnel",
 }
 from .dialogs.duplicate_policy import ADD as DUPLICATES_ADD
 from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
@@ -152,8 +152,8 @@ _COMPAT_MAX_SHARE = 0.5
 # enough not to strobe behind the row text.
 _BACKDROP_WINDOW_MS = 12_000
 
-# Opacity for visualizer-frame backdrops (scope/spectrum/fire/fractal/wormhole
-# behind the playlist) — dim enough that the row text stays readable.
+# Opacity for visualizer-frame backdrops (scope/spectrum/fire/fractal and the
+# two tunnels behind the playlist) — dim enough that the row text stays readable.
 _BACKDROP_VIS_OPACITY = 0.40
 
 # After pause/stop, keep feeding a visualizer backdrop silence for this long so
@@ -1531,7 +1531,7 @@ class PlayerPanel(QWidget):
         self._backdrop_src: tuple | None = None  # (pcm, sr)
         self._backdrop_env: tuple | None = None  # (min, max, bins_per_sec)
         self._backdrop_env_path: str | None = None
-        # Popout visualizer (oscilloscope/spectrum/fire/fractal/wormhole);
+        # Popout visualizer (oscilloscope/spectrum/fire/fractal/the two tunnels);
         # created on first use.
         self._vis_window: VisualizerWindow | None = None
         # Backdrop visualizer: same renderers, blitted behind the playlist.
@@ -1755,17 +1755,24 @@ class PlayerPanel(QWidget):
         # and the groups run in the same order so the halves read as parallel.
         # "Visuals off" sits at the foot — it is the way out, not the way in,
         # and a menu that opens on its own "off" row buries what it offers.
+        #
+        # The two tunnels' labels read crossed against their mode ids, and that
+        # is the design rather than a slip: the ids name the mechanism, the
+        # labels name the look, and it is the look that swapped when the beat
+        # tunnel's wall became nebula cloud. See :mod:`.vis_beat_tunnel`. The
+        # beat tunnel leads because it is now the richer of the two — which
+        # also leaves this menu's *text* in the order it has always been in.
         for mode, label in (
             ("backdrop_fractal", self.tr("Backdrop fractal")),
-            ("backdrop_wormhole", self.tr("Backdrop wormhole")),
-            ("backdrop_tunnel_chase", self.tr("Backdrop tunnel chase")),
+            ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
+            ("backdrop_loop_tunnel", self.tr("Backdrop tunnel chase")),
             ("backdrop", self.tr("Backdrop waveform")),
             ("backdrop_scope", self.tr("Backdrop oscilloscope")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_fire", self.tr("Backdrop fire")),
             ("fractal", self.tr("Popout fractal")),
-            ("wormhole", self.tr("Popout wormhole")),
-            ("tunnel_chase", self.tr("Popout tunnel chase")),
+            ("beat_tunnel", self.tr("Popout wormhole")),
+            ("loop_tunnel", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
             ("fire", self.tr("Popout fire")),
@@ -3752,7 +3759,7 @@ class PlayerPanel(QWidget):
             return
         playing = self._engine.is_playing()
         samples = self._engine.recent_mono(FFT_SIZE) if playing else None
-        # The wormhole sizes its image from the host's aspect so its rings
+        # The tunnels size their image from the host's aspect so their rings
         # stay circular; every other mode ignores this.
         viewport = self._table.viewport()
         # Device pixels: both tunnel modes render near the host's real

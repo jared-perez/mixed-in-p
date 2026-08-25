@@ -86,7 +86,7 @@ Two hosts share it:
   PlayerPanel timer that runs while playing plus a ~2 s silence decay after
   pause so bars fall and fire burns down. Modes `backdrop_scope`,
   `backdrop_spectrum`, `backdrop_fire`, `backdrop_fractal`,
-  `backdrop_wormhole`.
+  `backdrop_loop_tunnel`.
 
 Data path per frame (GUI-thread QTimer, `Qt.PreciseTimer`, 16 ms):
 
@@ -113,7 +113,7 @@ is radioactive):
    through the rich arc of the classic |c| = 0.7885 orbit; level drives
    spin/morph speed and brightness, the kick pulse punches the zoom.
    ~0.7 ms/frame.
-5. **Wormhole** — a wireframe tunnel flown along a closed 3-D loop (a periodic
+5. **Tunnel Chase** (`loop_tunnel`) — a wireframe tunnel flown along a closed 3-D loop (a periodic
    cubic spline through 25 frozen waypoints: 15 turns, three straightaways,
    ~70 s per lap), with small cross-shaped stars streaming past. Level drives travel
    speed and brightness; the kick pulse ripples the near rings and lights the
@@ -139,7 +139,7 @@ is radioactive):
    interpolates the remainder (`VisRenderer.smooth_upscale()`, true for both
    wireframe modes). Measured, one frame: 1.6 ms at the old 448×256, 3.1 at
    the backdrop's 896×512, **8.0 at the popout's 2100×1200**, 10.7 rendering
-   a 2800×1600 host natively. The popout's cap is more than Tunnel Chase's
+   a 2800×1600 host natively. The popout's cap is more than the beat tunnel's
    despite looking like the same decision, and the reason is the frame rate,
    not the picture: the tunnel runs at 60 fps and has 16 ms, this runs at 30
    and has 33. Native is sharper at 1:1 and was declined because it is a third
@@ -156,13 +156,13 @@ is radioactive):
    resize would silently change the field of view. Before and after at 1:1
    device pixels: `evidence/wormhole/resolution_sheet.py`.
 
-   The path and scene live in `src/gui/widgets/vis_wormhole.py`;
+   The path and scene live in `src/gui/widgets/vis_loop_tunnel.py`;
    numpy + QPainter only, no OpenGL and no scipy (`scipy.interpolate` alone
    imports in 194 ms — the 25×25 dense solve that replaces it takes ~8 ms,
    lazily, on the first rendered frame).
 
-6. **Tunnel Chase** — the wormhole's sibling, flown to the beat. Same tube
-   geometry as the wormhole's, but the path is **generated
+6. **Wormhole** (`beat_tunnel`) — the loop tunnel's sibling, flown to the beat. Same tube
+   geometry as the loop tunnel's, but the path is **generated
    ahead of the camera in beat-space** rather than precomputed: arc length is
    measured in beats (2.5 world units each), so a turn scheduled for beat 16
    is a bend at 16 × 2.5 units and the camera reaches it exactly when the
@@ -274,11 +274,11 @@ is radioactive):
    drops the nearest ring's spokes, and those spokes — arriving from
    off-frame — are what put the viewer *inside* a tube rather than in front of
    a cone. So spokes are **clipped at** the plane by interpolation and rings
-   are **faded out near** it. `src/gui/widgets/vis_tunnel_chase.py`.
+   are **faded out near** it. `src/gui/widgets/vis_beat_tunnel.py`.
 
 ### The beat clock
 
-Tunnel Chase is the first visual that *counts beats*, which the kick pulse
+The beat tunnel is the first visual that *counts beats*, which the kick pulse
 below cannot do: measured over six real tracks it fires 1.2–3.5 times per
 beat, because an off-beat bass line lifts the 50–120 Hz band as far as a kick
 does. A phase-locked loop correcting on every one of those onsets is dragged

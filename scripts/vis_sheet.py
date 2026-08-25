@@ -9,7 +9,7 @@ frame, feeding it exactly the block the hosts feed it
 position), and writes the chosen frames out as a contact sheet.
 
 Two rules it exists to enforce, both learned the hard way (see CLAUDE.md and
-the wormhole handoff):
+the loop tunnel's handoff):
 
 * **Tiles are drawn 1:1.** A resized still lies in both directions: a
   half-scale sheet invented a "pale white line" that turned out to be an
@@ -19,15 +19,15 @@ the wormhole handoff):
 * **Frames are chosen by *beat*, not by time.** "The frame at beat 16.0" then
   means the same thing on a 120 BPM track and a 135 BPM one, which is the only
   way two tracks can be compared on a turn that is supposed to land on the
-  bar. For ``tunnel_chase`` the beat comes from the renderer's own clock; for
+  bar. For ``beat_tunnel`` the beat comes from the renderer's own clock; for
   the modes with no clock it is the nominal grid at the given tempo.
 
 Examples::
 
-    python scripts/vis_sheet.py --mode wormhole --track a.aiff --seconds 8
-    python scripts/vis_sheet.py --mode tunnel_chase --track a.aiff --bpm 128 \\
+    python scripts/vis_sheet.py --mode loop_tunnel --track a.aiff --seconds 8
+    python scripts/vis_sheet.py --mode beat_tunnel --track a.aiff --bpm 128 \\
         --from-beat 15 --to-beat 19 --every 0.25
-    python scripts/vis_sheet.py --mode tunnel_chase --track a.aiff --no-tag \\
+    python scripts/vis_sheet.py --mode beat_tunnel --track a.aiff --no-tag \\
         --at 16.0,16.25,18.0 --size 1400x800 --dpr 2
 
 It prints one summary line per run — frames, median/p95 render ms, the tempo
@@ -296,7 +296,7 @@ def parse_size(text: str) -> tuple[int, int]:
 def build_parser() -> argparse.ArgumentParser:
     """Separate from main() so the smoke test can build an args object."""
     parser = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    parser.add_argument("--mode", default="tunnel_chase", choices=sorted(RENDER_MODES))
+    parser.add_argument("--mode", default="beat_tunnel", choices=sorted(RENDER_MODES))
     parser.add_argument("--track", required=True, help="audio file to render")
     parser.add_argument("--bpm", type=float, default=None, help="override the tag BPM")
     parser.add_argument(

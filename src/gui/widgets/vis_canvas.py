@@ -13,14 +13,15 @@ fast (non-smooth) transformation for a chunky pixel look:
   Julia constant orbits the classic radius so the branches continuously morph
   between dendrites and spirals; overall level drives morph/spin speed and
   brightness, and the kick pulse punches the zoom.
-- ``wormhole`` — a wireframe tunnel flown along a closed 3-D loop, with
-  pixelated stars streaming past. The odd one out: it draws antialiased lines
-  into its own larger, host-shaped image (see :mod:`.vis_wormhole`) rather
-  than the shared low-res grid, because its cost is O(lines) not O(pixels).
-- ``tunnel_chase`` — the wormhole's sibling, flown to the beat: the tunnel is
+- ``loop_tunnel`` — **labelled "Tunnel chase"**: a wireframe tunnel flown
+  along a closed 3-D loop, with pixelated stars streaming past. The odd one
+  out: it draws antialiased lines into its own larger, host-shaped image (see
+  :mod:`.vis_loop_tunnel`) rather than the shared low-res grid, because its
+  cost is O(lines) not O(pixels).
+- ``beat_tunnel`` — **labelled "Wormhole"**, its sibling flown to the beat: the tunnel is
   generated ahead of the camera, turns on the first beat of every bar, and
   wears a wall of translucent nebula cloud rather than a wireframe (see
-  :mod:`.vis_tunnel_chase`). It is the only mode that *counts beats*, so it is
+  :mod:`.vis_beat_tunnel`). It is the only mode that *counts beats*, so it is
   also the only one with a tempo (:mod:`.beat_clock`), a per-mode frame rate
   (60 fps in the popout) and a smooth upscale rather than chunky pixels.
 
@@ -45,17 +46,17 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from ..styles.theme import Theme
 from .beat_clock import BeatClock
-from .vis_tunnel_chase import TunnelChaseScene
-from .vis_wormhole import WormholeScene
+from .vis_beat_tunnel import BeatTunnelScene
+from .vis_loop_tunnel import LoopTunnelScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
 FRAME_MS = 33  # ~30 fps
-# Tunnel Chase alone runs at 60 in the popout: at 33 ms the kick flux is too
+# The beat tunnel alone runs at 60 in the popout: at 33 ms the kick flux is too
 # coarse for the beat clock to lock as tightly (measured), so this is a
 # correctness reason and not only a smoothness one. The backdrop stays at
 # FRAME_MS whatever the mode — see PlayerPanel's tick timer.
-TUNNEL_FRAME_MS = 16
+BEAT_TUNNEL_FRAME_MS = 16
 FFT_SIZE = 2048
 _N_BARS = 19
 _BAR_W = _W // _N_BARS  # px per bar incl. 1px gap
@@ -82,7 +83,7 @@ _JULIA_SPIN_LEVEL = 0.045  # extra spin at full level
 _JULIA_MORPH_BASE = 0.002  # c-orbit advance per frame (silence)
 _JULIA_MORPH_LEVEL = 0.022  # extra orbit speed at full level
 _JULIA_KICK_ZOOM = 0.14  # fraction of zoom-in on a full-strength kick
-# Kick flux (Tunnel Chase's beat feature): the half-wave-rectified rise in
+# Kick flux (the beat tunnel's feature): the half-wave-rectified rise in
 # 50-120 Hz energy, *gated* by the broadband log-spectral flux — a kick has a
 # click and a bass note does not, which is what separates the two on a track
 # whose bass line sits between the kicks. Each term is normalised by its own
@@ -92,7 +93,7 @@ _FLUX_PEAK_DECAY_AT_60FPS = 0.995  # ~3 s memory of "how big does this get"
 _PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 
 RENDER_MODES = (
-    "oscilloscope", "spectrum", "fire", "fractal", "wormhole", "tunnel_chase",
+    "oscilloscope", "spectrum", "fire", "fractal", "loop_tunnel", "beat_tunnel",
 )
 POPOUT_MODES = RENDER_MODES
 
@@ -147,12 +148,12 @@ class VisRenderer:
         xs = np.linspace(-0.5, 0.5, _W) * _JULIA_VIEW_SPAN
         ys = np.linspace(-0.5, 0.5, _H) * (_JULIA_VIEW_SPAN * _H / _W)
         self._fract_grid = (xs[None, :] + 1j * ys[:, None]).astype(np.complex64)
-        # Wormhole state, including its own image. Cheap to construct — the
+        # Loop tunnel state, including its own image. Cheap to construct — the
         # loop path is built on its first render, not here.
-        self._wormhole = WormholeScene()
-        # Tunnel Chase: its own image again, plus a beat clock. Both cheap to
+        self._loop_tunnel = LoopTunnelScene()
+        # Beat tunnel: its own image again, plus a beat clock. Both cheap to
         # build; the path is generated on the first render.
-        self._tunnel = TunnelChaseScene()
+        self._beat_tunnel = BeatTunnelScene()
         self._clock = BeatClock(FRAME_MS / 1000.0)
         self._frame_ms: float = FRAME_MS
         self._bass_alpha = _PULSE_ATTACK
@@ -167,10 +168,10 @@ class VisRenderer:
     # ── Public API ─────────────────────────────────────────────────────────
 
     def image(self) -> QImage:
-        if self._mode == "wormhole":
-            return self._wormhole.image()
-        if self._mode == "tunnel_chase":
-            return self._tunnel.image()
+        if self._mode == "loop_tunnel":
+            return self._loop_tunnel.image()
+        if self._mode == "beat_tunnel":
+            return self._beat_tunnel.image()
         return self._image
 
     def frame_ms(self) -> int:
@@ -181,7 +182,7 @@ class VisRenderer:
         visible rows behind the frame measures ~11 ms on its own, and at 60 fps
         that alone would be two-thirds of a core.
         """
-        return TUNNEL_FRAME_MS if self._mode == "tunnel_chase" else FRAME_MS
+        return BEAT_TUNNEL_FRAME_MS if self._mode == "beat_tunnel" else FRAME_MS
 
     def smooth_upscale(self) -> bool:
         """Whether the host should interpolate when scaling this mode up.
@@ -189,10 +190,10 @@ class VisRenderer:
         The retro modes are meant to look like big pixels. Both tunnel modes
         are drawn near the host's own size, antialiased, so a
         nearest-neighbour blow-up would undo the thing they render large for —
-        it is what made the wormhole read as a staircase. Measured at 0.4 ms for
+        it is what made the loop tunnel read as a staircase. Measured at 0.4 ms for
         a full-frame upscale, i.e. free.
         """
-        return self._mode in ("tunnel_chase", "wormhole")
+        return self._mode in ("beat_tunnel", "loop_tunnel")
 
     def set_frame_interval(self, frame_ms: float) -> None:
         """Tell the renderer how often it is being advanced.
@@ -208,7 +209,7 @@ class VisRenderer:
         self._bass_alpha = _PULSE_ATTACK ** (frame_ms / FRAME_MS)
         self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS ** (frame_ms / (1000.0 / 60.0))
         self._clock.set_frame_interval(frame_ms / 1000.0)
-        self._tunnel.set_frame_interval(frame_ms)
+        self._beat_tunnel.set_frame_interval(frame_ms)
 
     def set_track_tempo(self, bpm: float | None) -> None:
         """The playing track's tag BPM — the beat clock's period.
@@ -227,7 +228,7 @@ class VisRenderer:
         Read by ``scripts/vis_sheet.py`` so a contact sheet can be indexed by
         beat and labelled with the lock.
         """
-        if self._mode != "tunnel_chase":
+        if self._mode != "beat_tunnel":
             return None
         return {
             "phase": self._clock.phase,
@@ -253,17 +254,17 @@ class VisRenderer:
         self._prev_bass = 0.0
         self._prev_log = None
         self._flux_peaks[:] = 0.0
-        if mode == "wormhole":
-            self._wormhole.reset()
-        elif mode == "tunnel_chase":
-            self._tunnel.reset()
+        if mode == "loop_tunnel":
+            self._loop_tunnel.reset()
+        elif mode == "beat_tunnel":
+            self._beat_tunnel.reset()
             self._clock.reset()
 
     def set_color(self, color: str) -> None:
         self._color = QColor(color)
         self._fire_lut = _fire_palette(self._color)
-        self._wormhole.set_color(self._color)
-        self._tunnel.set_color(self._color)
+        self._loop_tunnel.set_color(self._color)
+        self._beat_tunnel.set_color(self._color)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
@@ -275,10 +276,10 @@ class VisRenderer:
 
         Both therefore want **device** pixels and need to know which host is
         asking, because the two have different budgets — see
-        :meth:`TunnelChaseScene.set_target_size`.
+        :meth:`BeatTunnelScene.set_target_size`.
         """
-        self._wormhole.set_target_size(width, height, popout)
-        self._tunnel.set_target_size(width, height, popout)
+        self._loop_tunnel.set_target_size(width, height, popout)
+        self._beat_tunnel.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -290,14 +291,14 @@ class VisRenderer:
             self._render_scope(samples)
         else:
             heights = self._band_heights(samples, sr)
-            if self._mode == "wormhole":
+            if self._mode == "loop_tunnel":
                 # Returned directly, never assigned to self._image: the
                 # scope/spectrum renderers paint into that at _W x _H, and
                 # leaving a big image there would draw their next frame into
                 # the corner of it.
-                return self._render_wormhole(heights)
-            if self._mode == "tunnel_chase":
-                return self._render_tunnel(heights)
+                return self._render_loop_tunnel(heights)
+            if self._mode == "beat_tunnel":
+                return self._render_beat_tunnel(heights)
             if self._mode == "spectrum":
                 self._render_spectrum(heights)
             elif self._mode == "fractal":
@@ -330,7 +331,7 @@ class VisRenderer:
         # Hann coherent gain is 0.5 → a full-scale sine peaks its bin at N/4.
         spectrum /= FFT_SIZE / 4.0
         self._update_pulse(spectrum)
-        if self._mode == "tunnel_chase":
+        if self._mode == "beat_tunnel":
             # Only here: a log1p over 1025 bins is 30 µs, which is nothing,
             # but it is 30 µs of tax on five modes that have no use for it.
             self._update_kick_flux(spectrum)
@@ -514,19 +515,19 @@ class VisRenderer:
             bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
         ).copy()
 
-    def _render_wormhole(self, heights: np.ndarray) -> QImage:
+    def _render_loop_tunnel(self, heights: np.ndarray) -> QImage:
         # Same mean/max blend as the fractal: mean alone leaves a sparse
         # spectrum nearly still, max alone never breathes. Level drives travel
         # speed and brightness; the kick pulse ripples the near rings.
         level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
-        return self._wormhole.render(level, self._pulse)
+        return self._loop_tunnel.render(level, self._pulse)
 
-    def _render_tunnel(self, heights: np.ndarray) -> QImage:
+    def _render_beat_tunnel(self, heights: np.ndarray) -> QImage:
         # Level no longer drives travel — the tempo does — so it only decides
         # brightness here, alongside the kick.
         level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
         self._clock.tick(self._kick_flux)
-        return self._tunnel.render(
+        return self._beat_tunnel.render(
             self._clock.phase, level, self._pulse, self._clock.bar_slot
         )
 
@@ -598,7 +599,7 @@ class VisualizerWindow(QWidget):
 
     def set_mode(self, mode: str) -> None:
         self._canvas.set_mode(mode)
-        # Per-mode frame rate: Tunnel Chase asks for 60 fps, everything else
+        # Per-mode frame rate: the beat tunnel asks for 60 fps, everything else
         # for 30. Applied here rather than at construction because the window
         # outlives the mode the user first chose.
         self._timer.setInterval(self._canvas.frame_ms())
