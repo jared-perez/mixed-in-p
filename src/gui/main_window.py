@@ -55,7 +55,7 @@ from .models import TrackState, TrackStore
 from .models.undo_stack import UndoStack
 from .styles.theme import NoFocusDelegate, Theme
 from .window_sizer import CurrentPageStack, WindowSizer
-from src.conversion.result import ConversionResult
+from src.conversion.result import LOSSY_EXTENSIONS, ConversionResult
 
 from .widgets.analysis_panel import AnalysisPanel
 from .convert_pipeline import ConvertPipeline
@@ -391,6 +391,8 @@ class MainWindow(QMainWindow):
         self._rename_panel.apply_rename.connect(self._start_rename)
         self._rename_panel.undo_last.connect(self._undo_last_rename)
         self._rename_panel.send_to_convert.connect(self._send_rename_to_convert)
+        self._rename_panel.send_to_auto_pipeline.connect(self._send_rename_to_auto_pipeline)
+        self._rename_panel.auto_pipeline_state_query.connect(self._answer_auto_pipeline_state)
 
         # History panel signals
         self._history_panel.undo_session.connect(self._undo_session_from_history)
@@ -1302,6 +1304,21 @@ class MainWindow(QMainWindow):
             )
             return
 
+        # A run whose conversion is done but whose analyses are still landing
+        # is still a run: set_pipeline_controls_enabled(True) has already put
+        # Start back, and arming again replaces ConvertPipeline.run wholesale
+        # — orphaning the in-flight run's awaiting_analysis, so its tracks
+        # finish analysing and never reach the playlist. A plain conversion is
+        # blocked too: _on_conversion_finished would forward *its* results
+        # into the older run.
+        if self._pipeline.active:
+            QMessageBox.warning(
+                self,
+                self.tr("Pipeline in Progress"),
+                self.tr("The last pipeline run is still finishing — wait for it to complete."),
+            )
+            return
+
         # Armed only here, after the busy check: a run armed for a conversion
         # that never started would wait for results that are not coming.
         pipeline = self._conversion_panel.pipeline_enabled()
@@ -2100,6 +2117,54 @@ class MainWindow(QMainWindow):
         self._conversion_panel.add_files(file_paths)
         self._sidebar.set_current_page("convert")
         self._on_page_changed("convert")
+
+    def _auto_pipeline_readiness(self) -> tuple[bool, str]:
+        """(can Auto Pipeline run now, why not / the target playlist's name).
+
+        The gate is the pipeline toggle ON *and* a target — the literal
+        reading of "as if the user had pressed Start", and the reason the
+        Rename gesture never flips the toggle itself: _on_pipeline_toggled
+        drags auto-analyze on with it and both persist to config.
+        """
+        _node_id, target_name = self._conversion_panel.pipeline_target()
+        if not self._conversion_panel.pipeline_enabled() or not target_name:
+            return False, self.tr("Set pipeline settings in the Convert panel first.")
+        if self._conversion_thread is not None and self._conversion_thread.isRunning():
+            return False, self.tr("A conversion is already running.")
+        if self._pipeline.active:
+            return False, self.tr("The last pipeline run is still finishing.")
+        return True, target_name
+
+    def _answer_auto_pipeline_state(self) -> None:
+        """Answer the Rename panel's aboutToShow query, before the menu paints."""
+        self._rename_panel.set_auto_pipeline_ready(*self._auto_pipeline_readiness())
+
+    def _send_rename_to_auto_pipeline(self, file_paths: list[str]) -> None:
+        """Send Rename's queue to Convert and press Start for the user.
+
+        Re-checks readiness because state moves between the menu opening and
+        the click (a conversion started from a drop, a run that has just
+        ended). When it has moved, this degrades to exactly Send To Convert
+        plus a line saying why nothing started — the files are never lost.
+        """
+        ready, reason = self._auto_pipeline_readiness()
+        self._conversion_panel.add_files(file_paths)
+        self._sidebar.set_current_page("convert")
+        self._on_page_changed("convert")
+        if not ready:
+            self._conversion_panel.show_notice(reason)
+            return
+        # pipeline_rows() walks lossless paths only, so a lossy file sent here
+        # sits in the table and is never converted, analysed or added. Say so
+        # rather than hand back an emptier playlist than the user expects.
+        if any(Path(p).suffix.lower() in LOSSY_EXTENSIONS for p in file_paths):
+            self._conversion_panel.show_notice(
+                self.tr("Lossy files stayed in Convert — the pipeline converts lossless sources only.")
+            )
+        # Through the same button the user would press: every invariant the
+        # pipeline holds (passthrough rows, the zero-file thread skip, the two
+        # path spellings, the warm-import guard) lives behind it.
+        self._conversion_panel.press_convert()
 
     def _on_send_to_player(self, tracks: list[dict]) -> None:
         """Send tracks from analysis to the player panel."""

@@ -382,6 +382,9 @@ class ConversionPanel(QWidget):
         # as soon as an allowed file is added.
         self._lossy_notice = QLabel(self.tr("Lossy files not allowed"), self)
         self._lossy_notice.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # show_notice puts sentences here, not two words, so it wraps rather
+        # than running off both edges of the panel.
+        self._lossy_notice.setWordWrap(True)
         self._lossy_notice.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
         self._lossy_notice.setStyleSheet(
             f"color: {Theme.TEXT_PRIMARY}; font-size: 18px; font-weight: bold;"
@@ -506,17 +509,47 @@ class ConversionPanel(QWidget):
         if added_allowed > 0:
             self._hide_lossy_notice()
         elif dropped_lossy > 0:
+            self._lossy_notice.setText(self.tr("Lossy files not allowed"))
             self._show_lossy_notice()
 
     def _position_lossy_notice(self) -> None:
-        """Center the transient notice over the panel."""
-        self._lossy_notice.adjustSize()
+        """Size and center the transient notice over the panel.
+
+        Sized by hand rather than by adjustSize(): word wrap is on, so the
+        label is only as tall as the width it is given, and it is floated
+        rather than laid out — there is no parent to ask heightForWidth for
+        it. Measured off the string with QFontMetrics, never asked of the
+        label, and capped at the panel so a long sentence wraps instead of
+        overhanging both edges.
+        """
+        available = max(1, self.width() - Theme.PADDING * 2)
+        metrics = self._lossy_notice.fontMetrics()
+        text = self._lossy_notice.text()
+        # +2: an advance can round just under what the wrapper needs, which
+        # would break a fitting line in two.
+        width = min(available, metrics.horizontalAdvance(text) + 2)
+        rect = metrics.boundingRect(
+            0, 0, width, 0,
+            int(Qt.TextFlag.TextWordWrap) | int(Qt.AlignmentFlag.AlignCenter),
+            text,
+        )
+        self._lossy_notice.resize(width, rect.height())
         x = (self.width() - self._lossy_notice.width()) // 2
         y = (self.height() - self._lossy_notice.height()) // 2
         self._lossy_notice.move(max(0, x), max(0, y))
 
+    def show_notice(self, text: str) -> None:
+        """Float a transient line over the panel for 3s.
+
+        The app has no status bar, and the progress line is owned by the run
+        (_on_conversion_started overwrites it a moment later), so this is where
+        a one-off word to the user goes.
+        """
+        self._lossy_notice.setText(text)
+        self._show_lossy_notice()
+
     def _show_lossy_notice(self) -> None:
-        """Show the 'lossy not allowed' notice and (re)start its 3s timeout."""
+        """Show the current notice text and (re)start its 3s timeout."""
         self._position_lossy_notice()
         self._lossy_notice.show()
         self._lossy_notice.raise_()  # above the faint background overlay
@@ -1055,6 +1088,15 @@ class ConversionPanel(QWidget):
         # Send To enablement is driven by selection via _on_selection_changed.
         if not self._file_table.selectedItems():
             self._send_to_btn.setEnabled(False)
+
+    def press_convert(self) -> None:
+        """Press Start from outside the panel (the Rename panel's Auto Pipeline).
+
+        A wrapper rather than a second arming path on purpose: the empty-file
+        list with the pipeline on is what makes an all-passthrough batch run,
+        so a caller must go through here and never re-derive the file list.
+        """
+        self._on_convert_clicked()
 
     def _on_convert_clicked(self) -> None:
         """Handle convert button click."""

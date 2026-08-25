@@ -90,6 +90,13 @@ class RenamePanel(QWidget):
     files_dropped = Signal(list)             # str paths → _add_files
     analyze_and_rename = Signal(list, list)  # (track_ids, operations) → full pipeline
     send_to_convert = Signal(list)           # list of file path strings
+    send_to_auto_pipeline = Signal(list)     # list of file path strings
+    # Asked on every Send To menu open; MainWindow answers synchronously with
+    # set_auto_pipeline_ready. A pull, not a push — the readiness depends on
+    # six things today (toggle, target, conversion thread start/finish/cancel/
+    # error, pipeline end) and more tomorrow, and one cheap query per menu
+    # open is always fresh where a web of change-signals rots.
+    auto_pipeline_state_query = Signal()
 
     def __init__(
         self,
@@ -325,8 +332,19 @@ class RenamePanel(QWidget):
         self._send_to_btn = QPushButton(self.tr("Send To"))
         self._send_to_btn.setEnabled(False)
         send_to_menu = QMenu(self._send_to_btn)
+        # QMenu hides action tooltips by default, which would leave Auto
+        # Pipeline greyed out with no way to learn why.
+        send_to_menu.setToolTipsVisible(True)
         self._send_to_convert_action = send_to_menu.addAction(self.tr("Convert"))
         self._send_to_analyze_action = send_to_menu.addAction(self.tr("Analyze"))
+        self._send_to_pipeline_action = send_to_menu.addAction(self.tr("Auto Pipeline"))
+        # Disabled until MainWindow answers the aboutToShow query, so a panel
+        # with nobody listening never offers a run it cannot start.
+        self._send_to_pipeline_action.setEnabled(False)
+        self._send_to_pipeline_action.setToolTip(
+            self.tr("Set pipeline settings in the Convert panel first.")
+        )
+        self._send_to_menu = send_to_menu
         self._send_to_btn.setMenu(send_to_menu)
         bottom_row.addWidget(self._send_to_btn)
 
@@ -347,6 +365,8 @@ class RenamePanel(QWidget):
         self._preview_table.customContextMenuRequested.connect(self._on_context_menu)
         self._send_to_convert_action.triggered.connect(self._on_send_to_convert)
         self._send_to_analyze_action.triggered.connect(self._on_analyze_clicked)
+        self._send_to_pipeline_action.triggered.connect(self._on_send_to_auto_pipeline)
+        self._send_to_menu.aboutToShow.connect(self.auto_pipeline_state_query)
         self._clear_ops_btn.clicked.connect(self._clear_operations)
         self._remove_underscores_btn.clicked.connect(self._on_remove_underscores)
         self._space_dashes_btn.clicked.connect(self._on_space_dashes)
@@ -534,6 +554,31 @@ class RenamePanel(QWidget):
             self.send_to_convert.emit(file_paths)
             for track in queued:
                 self._store.remove(track.id)
+
+    def _on_send_to_auto_pipeline(self) -> None:
+        """Send all queued files to Convert and start the pipeline there."""
+        queued = self._store.get_by_state(TrackState.QUEUED)
+        file_paths = [t.file_path for t in queued]
+        if file_paths:
+            self.send_to_auto_pipeline.emit(file_paths)
+            for track in queued:
+                self._store.remove(track.id)
+
+    def set_auto_pipeline_ready(self, ready: bool, reason: str) -> None:
+        """Answer the aboutToShow query: enable the action and say what it does.
+
+        ``reason`` is the target playlist's name when ready, and the
+        greyed-out explanation when not.
+        """
+        self._send_to_pipeline_action.setEnabled(ready)
+        if ready:
+            # One literal, not adjacent-concatenated: lupdate harvests the
+            # source text it can see, and a split string is not it.
+            self._send_to_pipeline_action.setToolTip(
+                self.tr('Convert with the Convert panel\'s settings, analyze, add to "{name}".').format(name=reason)
+            )
+        else:
+            self._send_to_pipeline_action.setToolTip(reason)
 
     def _on_apply_clicked(self) -> None:
         """Handle apply button click."""
