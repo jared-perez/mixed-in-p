@@ -64,14 +64,17 @@ class TestTheRetiredSwitch:
 
 
 
-class TestTheRetiredTunnelNames:
-    """The two tunnels were renamed on 2026-08-24, and why they were renamed.
+class TestTheRetiredModeNames:
+    """Mode ids the menu no longer offers, and what a config holding one gets.
 
-    Both were named for their *look*, and the look swapped: once the
-    beat-locked tunnel's wall became nebula cloud it was plainly the
-    wormhole-looking one, so the labels traded places. The ids were not
-    swapped to match — they were retired and replaced with mechanism names,
-    which is what makes this migration safe to re-run. See
+    Most of them are the two tunnels, renamed on 2026-08-24. Both were named
+    for their *look*, and the look swapped: once the beat-locked tunnel's wall
+    became nebula cloud it was plainly the wormhole-looking one, so the labels
+    traded places. The ids were not swapped to match — they were retired and
+    replaced with mechanism names, which is what makes this migration safe to
+    re-run. The popout fire (dropped 2026-08-24) is the other kind: a mode
+    withdrawn outright rather than renamed. Both follow the one rule — hand
+    back whatever still draws the picture that was chosen. See
     `config._renamed_vis_mode`.
     """
 
@@ -120,6 +123,41 @@ class TestTheRetiredTunnelNames:
         """The older migration runs first and wins; this one never sees it."""
         write_raw(**{LEGACY_VIS_SWITCH: False, "visualization_mode": "wormhole"})
         assert load_config().visualization_mode == "off"
+
+
+class TestThePopoutFireIsGone:
+    """Withdrawn from the menu on 2026-08-24 — it did not look good full-window.
+
+    The flames themselves stayed, as a backdrop, which is what a config that
+    had chosen them gets back.
+    """
+
+    def test_the_menu_does_not_offer_it(self, player):
+        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        assert "Popout fire" not in labels
+        assert "fire" not in player._vis_actions
+
+    def test_the_backdrop_still_offers_it(self, player):
+        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        assert "Backdrop fire" in labels
+        assert "backdrop_fire" in player._vis_actions
+
+    def test_the_renderer_still_draws_fire(self):
+        """The backdrop asks for exactly this mode, so it cannot be deleted.
+
+        A mode may render and not be offered as a popout; the reverse would be
+        a menu row that raises.
+        """
+        from src.gui.widgets.vis_canvas import POPOUT_MODES, RENDER_MODES
+
+        assert "fire" in RENDER_MODES
+        assert "fire" not in POPOUT_MODES
+        assert set(POPOUT_MODES) <= set(RENDER_MODES)
+
+    def test_a_config_that_chose_it_keeps_the_flames(self):
+        """Not "off" — the picture it picked still exists, so hand it back."""
+        write_raw(visualization_mode="fire")
+        assert load_config().visualization_mode == "backdrop_fire"
 
 
 class TestTheDefault:

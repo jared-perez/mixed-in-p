@@ -53,7 +53,6 @@ _VALID_VIS_MODES = {
     # Popout visualizer window.
     "oscilloscope",
     "spectrum",
-    "fire",
     "fractal",
     "loop_tunnel",
     "beat_tunnel",
@@ -239,32 +238,41 @@ def _folded_vis_mode(data: dict) -> str:
     return _renamed_vis_mode(mode)
 
 
-# The two tunnels' mode ids, before they were named for their mechanism. They
-# were named for their *look* — and the look swapped: once the beat-locked
-# tunnel's wall became nebula cloud it was plainly the wormhole-looking one,
-# so the labels had to trade places. Renaming the ids rather than swapping
-# them is what makes this migration safe, and it is the same reasoning as
-# :func:`_folded_vis_mode`'s above: it keys on the stored value still being a
-# retired name, so it is one-way and **harmless to re-run**. A straight swap
-# would have no such trigger — both names are valid before and after, so it
-# would need a version counter, and re-running one would silently flip the
-# user's setting back.
+# Mode ids the menu no longer offers, and what each one becomes.
+#
+# The four tunnels were named for their *look* — and the look swapped: once the
+# beat-locked tunnel's wall became nebula cloud it was plainly the
+# wormhole-looking one, so the labels had to trade places. Renaming the ids
+# rather than swapping them is what makes this migration safe, and it is the
+# same reasoning as :func:`_folded_vis_mode`'s above: it keys on the stored
+# value still being a retired name, so it is one-way and **harmless to
+# re-run**. A straight swap would have no such trigger — both names are valid
+# before and after, so it would need a version counter, and re-running one
+# would silently flip the user's setting back.
+#
+# ``fire`` is a retirement rather than a rename: the popout window no longer
+# offers it. It maps to the backdrop that draws the same flames instead of to
+# "off", by the same rule the tunnels follow — a stored mode names the picture
+# the user picked, and that picture still exists, so hand it back rather than
+# taking their visual away without a word.
 RETIRED_VIS_MODES = {
     "wormhole": "loop_tunnel",
     "tunnel_chase": "beat_tunnel",
     "backdrop_wormhole": "backdrop_loop_tunnel",
     "backdrop_tunnel_chase": "backdrop_beat_tunnel",
+    "fire": "backdrop_fire",
 }
 
 
 def _renamed_vis_mode(mode: str) -> str:
-    """The stored visual under its current id, keeping the picture it chose.
+    """The stored visual under a live id, keeping the picture it chose.
 
-    A config written before the rename names the *visual the user picked*, so
-    it maps to whichever id renders that same visual today — not to whichever
-    id now wears the label it used to have. The menu row they chose has since
+    A config written before a rename names the *visual the user picked*, so it
+    maps to whichever id renders that same visual today — not to whichever id
+    now wears the label it used to have. The menu row they chose has since
     changed its name; the picture behind it has not, and the picture is what
-    was chosen.
+    was chosen. A mode the menu has dropped altogether follows the same rule
+    and lands on whatever still draws it.
     """
     return RETIRED_VIS_MODES.get(mode, mode)
 

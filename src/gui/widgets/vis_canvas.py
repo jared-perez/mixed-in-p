@@ -95,7 +95,12 @@ _PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 RENDER_MODES = (
     "oscilloscope", "spectrum", "fire", "fractal", "loop_tunnel", "beat_tunnel",
 )
-POPOUT_MODES = RENDER_MODES
+# What the popout window offers, which is no longer everything the renderer can
+# draw: fire was retired from the menu's popout half and kept as a backdrop,
+# where it reads as lit rows rather than as the whole window. So a mode may
+# render and not be offered — never the other way round, which is derived here
+# rather than written out so a new render mode cannot be silently unreachable.
+POPOUT_MODES = tuple(m for m in RENDER_MODES if m != "fire")
 
 
 def _fire_palette(color: QColor) -> np.ndarray:

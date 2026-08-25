@@ -1778,7 +1778,6 @@ class PlayerPanel(QWidget):
             ("loop_tunnel", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
-            ("fire", self.tr("Popout fire")),
             ("off", self.tr("Visuals off")),
         ):
             action = QAction(label, self)
