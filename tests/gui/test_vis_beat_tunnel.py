@@ -26,7 +26,7 @@ from src.gui.widgets.vis_canvas import (
     FRAME_MS,
     POPOUT_MODES,
     RENDER_MODES,
-    BEAT_TUNNEL_FRAME_MS,
+    FAST_FRAME_MS,
     VisRenderer,
 )
 from src.gui.widgets.vis_beat_tunnel import (
@@ -836,31 +836,37 @@ def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
 
 
 def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
-    """60 fps for this one alone; interpolation for both tunnel modes.
+    """60 fps for this one and the popout scope; interpolation for the tunnels.
 
     The two are separate axes and only look like one here. The frame rate is
     about the beat clock (33 ms is too coarse a kick flux to lock on); the
     smoothing is about what the mode draws — line work rendered near the host's
     own size, where a nearest-neighbour blow-up undoes the resolution, against
     the retro modes, which are meant to look like big pixels.
+
+    The oscilloscope's own split lives in test_vis_analog_scope.py; what is
+    pinned here is that this renderer — which never claimed to be a popout —
+    keeps the chunky blow-up for it.
     """
     renderer = VisRenderer()
     renderer.set_mode("beat_tunnel")
-    assert renderer.frame_ms() == BEAT_TUNNEL_FRAME_MS
+    assert renderer.frame_ms() == FAST_FRAME_MS
     assert renderer.smooth_upscale() is True
     renderer.set_mode("loop_tunnel")
     assert renderer.frame_ms() == FRAME_MS
     assert renderer.smooth_upscale() is True
-    for mode in ("spectrum", "fire", "fractal", "oscilloscope"):
+    for mode in ("spectrum", "fire", "fractal"):
         renderer.set_mode(mode)
         assert renderer.frame_ms() == FRAME_MS
         assert renderer.smooth_upscale() is False
+    renderer.set_mode("oscilloscope")
+    assert renderer.smooth_upscale() is False
 
 
 def test_the_bass_average_keeps_its_time_constant_at_either_rate(qapp):
     """0.97 a frame is 1.1 s at 33 ms and half that at 16 — a different pulse."""
     settled = []
-    for frame_ms in (FRAME_MS, BEAT_TUNNEL_FRAME_MS):
+    for frame_ms in (FRAME_MS, FAST_FRAME_MS):
         renderer = VisRenderer()
         renderer.set_frame_interval(frame_ms)
         renderer.set_mode("beat_tunnel")
@@ -980,7 +986,7 @@ def test_the_popout_timer_follows_the_modes_frame_rate(player, qtbot):
     player._select_vis_mode("loop_tunnel")
     assert player._vis_window._timer.interval() == FRAME_MS
     player._select_vis_mode("beat_tunnel")
-    assert player._vis_window._timer.interval() == BEAT_TUNNEL_FRAME_MS
+    assert player._vis_window._timer.interval() == FAST_FRAME_MS
     player._select_vis_mode("fractal")
     assert player._vis_window._timer.interval() == FRAME_MS
 

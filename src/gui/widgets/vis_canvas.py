@@ -3,8 +3,14 @@
 Retro visuals rendered into an internal QImage and upscaled by the host with
 fast (non-smooth) transformation for a chunky pixel look:
 
-- ``oscilloscope`` — time-domain trace of the last ~576 samples, vertically
-  quantized to a small number of levels.
+- ``oscilloscope`` — the one mode with **two faces**, chosen by which host is
+  asking. In the playlist backdrop it is the retro original: a time-domain
+  trace of the last ~576 samples, vertically quantized to a small number of
+  levels. In the popout, where it fills a window rather than sitting dimmed
+  behind text, it is a green phosphor CRT — host-resolution, 60 fps, glow and
+  persistence (see :mod:`.vis_analog_scope`). Same mode id, same menu label,
+  no migration: fire is the same idea from the other end (one mode, backdrop
+  only), and what decides is the ``popout`` flag ``set_target_size`` carries.
 - ``spectrum`` — log-banded FFT bars with instant attack, linear falloff and
   peak-hold caps that drop with accelerating speed.
 - ``fire`` — the classic heat-propagation fire effect, stoked from the bottom
@@ -46,17 +52,21 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from ..styles.theme import Theme
 from .beat_clock import BeatClock
+from .vis_analog_scope import AnalogScopeScene
 from .vis_beat_tunnel import BeatTunnelScene
 from .vis_loop_tunnel import LoopTunnelScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
 FRAME_MS = 33  # ~30 fps
-# The beat tunnel alone runs at 60 in the popout: at 33 ms the kick flux is too
-# coarse for the beat clock to lock as tightly (measured), so this is a
-# correctness reason and not only a smoothness one. The backdrop stays at
-# FRAME_MS whatever the mode — see PlayerPanel's tick timer.
-BEAT_TUNNEL_FRAME_MS = 16
+# Two modes run at 60 in the popout, for unrelated reasons — which is why this
+# is named for the rate and not for either of them. The beat tunnel needs it to
+# be *right*: at 33 ms the kick flux is too coarse for the beat clock to lock
+# as tightly (measured). The analog scope needs it to be *smooth*: it is a
+# moving line filling a window, and the phosphor decay is what a frame's worth
+# of judder shows up in. The backdrop stays at FRAME_MS whatever the mode — see
+# PlayerPanel's tick timer.
+FAST_FRAME_MS = 16
 FFT_SIZE = 2048
 _N_BARS = 19
 _BAR_W = _W // _N_BARS  # px per bar incl. 1px gap
@@ -169,10 +179,17 @@ class VisRenderer:
         self._prev_log: np.ndarray | None = None
         self._flux_peaks = np.zeros(3)
         self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS
+        # The popout's face of the oscilloscope, and the flag that selects it.
+        # Trustworthy by construction: VisCanvas.feed passes popout=True before
+        # every render, and the backdrop's own VisRenderer instance never does.
+        self._analog_scope = AnalogScopeScene()
+        self._popout = False
 
     # ── Public API ─────────────────────────────────────────────────────────
 
     def image(self) -> QImage:
+        if self._mode == "oscilloscope" and self._popout:
+            return self._analog_scope.image()
         if self._mode == "loop_tunnel":
             return self._loop_tunnel.image()
         if self._mode == "beat_tunnel":
@@ -185,9 +202,11 @@ class VisRenderer:
         Only the popout acts on it. The playlist backdrop stays at FRAME_MS
         whatever the mode, because its cost is the *host*: repainting the
         visible rows behind the frame measures ~11 ms on its own, and at 60 fps
-        that alone would be two-thirds of a core.
+        that alone would be two-thirds of a core. That is also why this asks
+        only the mode and not the host: the answer the backdrop would get is
+        one it never reads.
         """
-        return BEAT_TUNNEL_FRAME_MS if self._mode == "beat_tunnel" else FRAME_MS
+        return FAST_FRAME_MS if self._mode in ("beat_tunnel", "oscilloscope") else FRAME_MS
 
     def smooth_upscale(self) -> bool:
         """Whether the host should interpolate when scaling this mode up.
@@ -197,7 +216,13 @@ class VisRenderer:
         nearest-neighbour blow-up would undo the thing they render large for —
         it is what made the loop tunnel read as a staircase. Measured at 0.4 ms for
         a full-frame upscale, i.e. free.
+
+        The oscilloscope answers for whichever face this instance is drawing:
+        the popout's glow field would staircase once the area cap bites, and
+        the backdrop's 152x64 grid is meant to be chunky.
         """
+        if self._mode == "oscilloscope":
+            return self._popout
         return self._mode in ("beat_tunnel", "loop_tunnel")
 
     def set_frame_interval(self, frame_ms: float) -> None:
@@ -215,6 +240,7 @@ class VisRenderer:
         self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS ** (frame_ms / (1000.0 / 60.0))
         self._clock.set_frame_interval(frame_ms / 1000.0)
         self._beat_tunnel.set_frame_interval(frame_ms)
+        self._analog_scope.set_frame_interval(frame_ms)
 
     def set_track_tempo(self, bpm: float | None) -> None:
         """The playing track's tag BPM — the beat clock's period.
@@ -259,7 +285,9 @@ class VisRenderer:
         self._prev_bass = 0.0
         self._prev_log = None
         self._flux_peaks[:] = 0.0
-        if mode == "loop_tunnel":
+        if mode == "oscilloscope":
+            self._analog_scope.reset()
+        elif mode == "loop_tunnel":
             self._loop_tunnel.reset()
         elif mode == "beat_tunnel":
             self._beat_tunnel.reset()
@@ -270,21 +298,28 @@ class VisRenderer:
         self._fire_lut = _fire_palette(self._color)
         self._loop_tunnel.set_color(self._color)
         self._beat_tunnel.set_color(self._color)
+        self._analog_scope.set_color(self._color)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
 
-        Only the two tunnel modes care: they draw true circles, so their
-        image has to share the host's aspect or the rings come out as ellipses,
-        and they render near the host's own resolution rather than being blown
-        up. The other modes are a fixed low-res grid the host stretches.
+        The two tunnel modes and the popout's analog scope care: the tunnels
+        draw true circles, so their image has to share the host's aspect or the
+        rings come out as ellipses, and all three render near the host's own
+        resolution rather than being blown up. The remaining modes are a fixed
+        low-res grid the host stretches.
 
-        Both therefore want **device** pixels and need to know which host is
-        asking, because the two have different budgets — see
+        They therefore want **device** pixels and need to know which host is
+        asking, because the hosts have different budgets — see
         :meth:`BeatTunnelScene.set_target_size`.
+
+        *popout* is also remembered, because it is what picks the oscilloscope's
+        face; the backdrop's own renderer never passes True.
         """
+        self._popout = popout
         self._loop_tunnel.set_target_size(width, height, popout)
         self._beat_tunnel.set_target_size(width, height, popout)
+        self._analog_scope.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -293,6 +328,10 @@ class VisRenderer:
         else:
             samples = samples[-FFT_SIZE:]
         if self._mode == "oscilloscope":
+            if self._popout:
+                # Returned, never assigned to self._image — same trap as the
+                # tunnels below.
+                return self._analog_scope.render(samples, sr)
             self._render_scope(samples)
         else:
             heights = self._band_heights(samples, sr)
