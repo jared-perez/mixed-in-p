@@ -1,6 +1,6 @@
 """Optional Player columns: what shows, what persists, what upgrades cleanly.
 
-Seven columns join the shipped nine (six of data, plus Art — see
+Nine columns join the shipped nine (eight of data, plus Art — see
 test_player_artwork.py for what that one carries), hidden until asked for from the header's
 right-click menu. Most of the risk is not in showing them — it is in what a
 *saved* header state means once the table is wider than the state is.
@@ -20,6 +20,7 @@ mechanism, because the mechanism is exactly the part Qt does not promise.
 
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import pytest
@@ -31,7 +32,7 @@ from src.library import Library
 from src.utils.config import AppConfig, load_config, save_config
 
 FIRST_OPTIONAL = 9
-TOTAL_COLUMNS = 16
+TOTAL_COLUMNS = 18
 
 
 @pytest.fixture
@@ -112,7 +113,7 @@ class TestTheHeaderMenu:
         labels = [a.text() for a in toggles]
         assert "Filename" not in labels and "#" not in labels
         assert {"Album", "Genre", "Track #", "Label", "Bitrate", "Energy",
-                "Art"} <= set(labels)
+                "Art", "Date Added", "Date Created"} <= set(labels)
 
     def test_the_checkmarks_report_the_current_state(self, player, qtbot):
         actions = self._menu_actions(player, qtbot)
@@ -408,6 +409,12 @@ class TestTheDataReachesThem:
             for col, attribute in player._OPTIONAL_COLUMNS
             if attribute is not None
         }
+        # The two dates are asserted by shape rather than by value — they say
+        # when this ran — and in full in test_player_date_columns.py.
+        dates = {
+            shown.pop("Date Added"),
+            shown.pop("Date Created"),
+        }
         assert shown == {
             "Album": "Modus Operandi",
             "Genre": "Drum & Bass",
@@ -416,6 +423,7 @@ class TestTheDataReachesThem:
             "Bitrate": "706",
             "Energy": "6",
         }
+        assert all(re.fullmatch(r"\d{4}-\d\d-\d\d", d) for d in dates), dates
 
     def test_the_cells_exist_even_while_hidden(self, player, qtbot, tmp_path):
         """Built regardless of visibility, so unhiding one shows its data

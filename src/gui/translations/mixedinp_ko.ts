@@ -2168,68 +2168,68 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1670"/>
+        <location filename="../widgets/player_panel.py" line="1768"/>
         <source>Player</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1702"/>
-        <location filename="../widgets/player_panel.py" line="2961"/>
+        <location filename="../widgets/player_panel.py" line="1800"/>
+        <location filename="../widgets/player_panel.py" line="3126"/>
         <source>Search all playlists…</source>
         <translation>모든 재생목록 검색…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1721"/>
+        <location filename="../widgets/player_panel.py" line="1819"/>
         <source>This playlist</source>
         <translation>이 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1722"/>
+        <location filename="../widgets/player_panel.py" line="1820"/>
         <source>All playlists</source>
         <translation>모든 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1747"/>
+        <location filename="../widgets/player_panel.py" line="1845"/>
         <source>Choose a visualization</source>
         <translation>시각 효과 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1781"/>
+        <location filename="../widgets/player_panel.py" line="1879"/>
         <source>Visuals off</source>
         <translation>시각 효과 끔</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1774"/>
+        <location filename="../widgets/player_panel.py" line="1872"/>
         <source>Backdrop waveform</source>
         <translation>배경: 파형</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1773"/>
+        <location filename="../widgets/player_panel.py" line="1871"/>
         <source>Backdrop oscilloscope</source>
         <translation>배경: 오실로스코프</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1772"/>
+        <location filename="../widgets/player_panel.py" line="1869"/>
         <source>Backdrop spectrum</source>
         <translation>배경: 스펙트럼</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1775"/>
+        <location filename="../widgets/player_panel.py" line="1873"/>
         <source>Backdrop fire</source>
         <translation>배경: 불꽃</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1769"/>
+        <location filename="../widgets/player_panel.py" line="1867"/>
         <source>Backdrop fractal</source>
         <translation>배경: 프랙털</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1779"/>
+        <location filename="../widgets/player_panel.py" line="1876"/>
         <source>Popout oscilloscope</source>
         <translation>별도 창: 오실로스코프</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1780"/>
+        <location filename="../widgets/player_panel.py" line="1877"/>
         <source>Popout spectrum bars</source>
         <translation>별도 창: 스펙트럼 막대</translation>
     </message>
@@ -2238,382 +2238,392 @@ or click “Add Artwork…”</source>
         <translation type="vanished">별도 창: 불꽃</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1776"/>
+        <location filename="../widgets/player_panel.py" line="1874"/>
         <source>Popout fractal</source>
         <translation>별도 창: 프랙털</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1814"/>
+        <location filename="../widgets/player_panel.py" line="1912"/>
         <source>Edit Lock</source>
         <translation>편집 잠금</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1818"/>
+        <location filename="../widgets/player_panel.py" line="1916"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>재생목록의 메타데이터 편집 잠금</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1305"/>
-        <location filename="../widgets/player_panel.py" line="3078"/>
+        <location filename="../widgets/player_panel.py" line="1380"/>
+        <location filename="../widgets/player_panel.py" line="3243"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1306"/>
+        <location filename="../widgets/player_panel.py" line="1381"/>
         <source>Filename</source>
         <translation>파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1307"/>
+        <location filename="../widgets/player_panel.py" line="1382"/>
         <source>Artist</source>
         <translation>아티스트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1308"/>
+        <location filename="../widgets/player_panel.py" line="1383"/>
         <source>Title</source>
         <translation>제목</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1309"/>
+        <location filename="../widgets/player_panel.py" line="1384"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1310"/>
+        <location filename="../widgets/player_panel.py" line="1385"/>
         <source>Key</source>
         <translatorcomment>Playlist column for the musical key → 조성. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1311"/>
+        <location filename="../widgets/player_panel.py" line="1386"/>
         <source>Comment</source>
         <translation>코멘트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1312"/>
+        <location filename="../widgets/player_panel.py" line="1387"/>
         <source>Duration</source>
         <translatorcomment>Duration → 재생 시간 (playback length).</translatorcomment>
         <translation>재생 시간</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1313"/>
+        <location filename="../widgets/player_panel.py" line="1388"/>
         <source>Year</source>
         <translation>연도</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1901"/>
-        <location filename="../widgets/player_panel.py" line="3075"/>
+        <location filename="../widgets/player_panel.py" line="2004"/>
+        <location filename="../widgets/player_panel.py" line="3240"/>
         <source>Playlists</source>
         <translation>재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2008"/>
+        <location filename="../widgets/player_panel.py" line="2111"/>
         <source>Previous</source>
         <translation>이전</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2019"/>
+        <location filename="../widgets/player_panel.py" line="2122"/>
         <source>Play / Pause  (Space)</source>
         <translatorcomment>Playback → 재생; Pause → 일시정지. Key name &quot;Space&quot; kept Latin.</translatorcomment>
         <translation>재생 / 일시정지  (Space)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2026"/>
+        <location filename="../widgets/player_panel.py" line="2129"/>
         <source>Stop</source>
         <translation>정지</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2033"/>
+        <location filename="../widgets/player_panel.py" line="2136"/>
         <source>Next</source>
         <translation>다음</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1989"/>
+        <location filename="../widgets/player_panel.py" line="2092"/>
         <source>Vol</source>
         <translatorcomment>Volume abbreviation → 볼륨. Flag for native review (vs 음량).</translatorcomment>
         <translation>볼륨</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1314"/>
+        <location filename="../widgets/player_panel.py" line="1389"/>
         <source>Album</source>
         <translation>앨범</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1315"/>
+        <location filename="../widgets/player_panel.py" line="1390"/>
         <source>Genre</source>
         <translation>장르</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1316"/>
+        <location filename="../widgets/player_panel.py" line="1391"/>
         <source>Track #</source>
         <translation>트랙 번호</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1317"/>
+        <location filename="../widgets/player_panel.py" line="1392"/>
         <source>Label</source>
         <translation>레이블</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1318"/>
+        <location filename="../widgets/player_panel.py" line="1393"/>
         <source>Bitrate</source>
         <translation>비트레이트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1319"/>
+        <location filename="../widgets/player_panel.py" line="1394"/>
         <source>Energy</source>
         <translation>에너지</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1320"/>
+        <location filename="../widgets/player_panel.py" line="1395"/>
         <source>Art</source>
         <translation>아트워크</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1687"/>
+        <location filename="../widgets/player_panel.py" line="1785"/>
         <source>Show this cover in the sidebar</source>
         <translation>이 커버를 사이드바에 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1770"/>
+        <location filename="../widgets/player_panel.py" line="1870"/>
         <source>Backdrop wormhole</source>
         <translation>배경: 웜홀</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1771"/>
+        <location filename="../widgets/player_panel.py" line="1868"/>
         <source>Backdrop tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>배경: 터널 추격</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1777"/>
+        <location filename="../widgets/player_panel.py" line="1878"/>
         <source>Popout wormhole</source>
         <translation>별도 창: 웜홀</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1778"/>
+        <location filename="../widgets/player_panel.py" line="1875"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>별도 창: 터널 추격</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2051"/>
-        <location filename="../widgets/player_panel.py" line="2918"/>
-        <location filename="../widgets/player_panel.py" line="2923"/>
+        <location filename="../widgets/player_panel.py" line="1396"/>
+        <source>Date Added</source>
+        <translation>추가된 날짜</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1397"/>
+        <source>Date Created</source>
+        <translation>생성 날짜</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="2154"/>
+        <location filename="../widgets/player_panel.py" line="3083"/>
+        <location filename="../widgets/player_panel.py" line="3088"/>
         <source>Save Playlist</source>
         <translation>재생목록 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2056"/>
+        <location filename="../widgets/player_panel.py" line="2159"/>
         <source>Clear Playlist</source>
         <translatorcomment>playlist → 재생목록; action button → -기 (비우기).</translatorcomment>
         <translation>재생목록 비우기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2096"/>
+        <location filename="../widgets/player_panel.py" line="2199"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>이것을 재생목록으로 끌어다 놓으면 재생 중인 곡이 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2115"/>
+        <location filename="../widgets/player_panel.py" line="2218"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>현재 곡이 재생되고 있는 재생목록을 열어요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2354"/>
-        <location filename="../widgets/player_panel.py" line="2840"/>
-        <location filename="../widgets/player_panel.py" line="2905"/>
+        <location filename="../widgets/player_panel.py" line="2457"/>
+        <location filename="../widgets/player_panel.py" line="3005"/>
+        <location filename="../widgets/player_panel.py" line="3070"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2800"/>
+        <location filename="../widgets/player_panel.py" line="2965"/>
         <source>Playing: {0}</source>
         <translation>재생 중: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2850"/>
+        <location filename="../widgets/player_panel.py" line="3015"/>
         <source>In Playlist: {0}</source>
         <translation>재생목록: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2902"/>
+        <location filename="../widgets/player_panel.py" line="3067"/>
         <source>Search: {0}</source>
         <translation>검색: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2919"/>
+        <location filename="../widgets/player_panel.py" line="3084"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>재생목록이 비어 있어요. 먼저 곡을 추가하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2923"/>
+        <location filename="../widgets/player_panel.py" line="3088"/>
         <source>Playlist name:</source>
         <translation>재생목록 이름:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2958"/>
+        <location filename="../widgets/player_panel.py" line="3123"/>
         <source>Search scope: {0}</source>
         <translation>검색 범위: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2963"/>
+        <location filename="../widgets/player_panel.py" line="3128"/>
         <source>Search this playlist…</source>
         <translation>이 재생목록 검색…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2986"/>
+        <location filename="../widgets/player_panel.py" line="3151"/>
         <source>No matching tracks</source>
         <translation>일치하는 곡이 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3437"/>
+        <location filename="../widgets/player_panel.py" line="3618"/>
         <source>File not found:
 {0}</source>
         <translation>파일을 찾을 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3612"/>
+        <location filename="../widgets/player_panel.py" line="3793"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>재생 중인 트랙과 어울리는 곡 숨기기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3614"/>
+        <location filename="../widgets/player_panel.py" line="3795"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>재생 중인 트랙과 어울리는 곡 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3936"/>
+        <location filename="../widgets/player_panel.py" line="4117"/>
         <source>{0}+ results</source>
         <translation>{0}+개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3939"/>
+        <location filename="../widgets/player_panel.py" line="4120"/>
         <source>{0} result</source>
         <translation>{0}개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3941"/>
+        <location filename="../widgets/player_panel.py" line="4122"/>
         <source>{0} results</source>
         <translation>{0}개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3945"/>
+        <location filename="../widgets/player_panel.py" line="4126"/>
         <source>{0} track</source>
         <translatorcomment>Counter for tracks/songs → 곡 per glossary. Korean has no plural; {0} track and {0} tracks render identically. Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3947"/>
+        <location filename="../widgets/player_panel.py" line="4128"/>
         <source>{0} tracks</source>
         <translatorcomment>Counter 곡. Same form as the singular (no Korean plural). Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4476"/>
+        <location filename="../widgets/player_panel.py" line="4712"/>
         <source>Reset Columns</source>
         <translation>열 초기화</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5169"/>
+        <location filename="../widgets/player_panel.py" line="5418"/>
         <source>“{0}” has moved.</source>
         <translation>‘{0}’이(가) 이동되었습니다.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5171"/>
+        <location filename="../widgets/player_panel.py" line="5420"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>선택한 파일 중 %n개가 이동되었습니다.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5174"/>
+        <location filename="../widgets/player_panel.py" line="5423"/>
         <source>File Has Moved</source>
         <translation>파일이 이동됨</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5178"/>
+        <location filename="../widgets/player_panel.py" line="5427"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>저장된 위치에 더 이상 없으므로 재생목록에 추가하거나 밖으로 끌어낼 수 없습니다. 이미 재생 중인 곡은 계속 재생됩니다. 파일이 이동되기 전에 메모리로 불러왔기 때문입니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5183"/>
+        <location filename="../widgets/player_panel.py" line="5432"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>곡을 마우스 오른쪽 버튼으로 클릭하고 ‘누락된 파일 찾기…’를 선택하세요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5330"/>
+        <location filename="../widgets/player_panel.py" line="5579"/>
         <source>Locate Missing File…</source>
         <translation>누락된 파일 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5332"/>
+        <location filename="../widgets/player_panel.py" line="5581"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5333"/>
+        <location filename="../widgets/player_panel.py" line="5582"/>
         <source>Open in Metadata Panel</source>
         <translation>메타데이터 패널에서 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5334"/>
+        <location filename="../widgets/player_panel.py" line="5583"/>
         <source>Reload Metadata from File</source>
         <translation>파일에서 메타데이터 다시 불러오기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5338"/>
+        <location filename="../widgets/player_panel.py" line="5587"/>
         <source>Look Up Online…</source>
         <translation>온라인에서 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5340"/>
+        <location filename="../widgets/player_panel.py" line="5589"/>
         <source>Remove from Playlist</source>
         <translation>재생목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5396"/>
-        <location filename="../widgets/player_panel.py" line="5424"/>
-        <location filename="../widgets/player_panel.py" line="5524"/>
-        <location filename="../widgets/player_panel.py" line="5597"/>
-        <location filename="../widgets/player_panel.py" line="5627"/>
+        <location filename="../widgets/player_panel.py" line="5645"/>
+        <location filename="../widgets/player_panel.py" line="5673"/>
+        <location filename="../widgets/player_panel.py" line="5773"/>
+        <location filename="../widgets/player_panel.py" line="5846"/>
+        <location filename="../widgets/player_panel.py" line="5876"/>
         <source>Look Up Online</source>
         <translation>온라인에서 찾기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5398"/>
+        <location filename="../widgets/player_panel.py" line="5647"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>선택한 트랙에는 검색에 쓸 아티스트나 제목이 없고, 파일 이름에서도 알 수 없어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5418"/>
+        <location filename="../widgets/player_panel.py" line="5667"/>
         <source>Looking up track details…</source>
         <translation>트랙 정보를 찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5419"/>
+        <location filename="../widgets/player_panel.py" line="5668"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5449"/>
+        <location filename="../widgets/player_panel.py" line="5698"/>
         <source>Looking up {0} of {1}…</source>
         <translation>{1}개 중 {0}번째 찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5457"/>
+        <location filename="../widgets/player_panel.py" line="5706"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Discogs 요청 제한이 풀리기를 기다리는 중…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5620"/>
+        <location filename="../widgets/player_panel.py" line="5869"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n개 트랙은 일치하는 항목이 없어요.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5623"/>
+        <location filename="../widgets/player_panel.py" line="5872"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n개 트랙을 업데이트했어요.</numerusform>
@@ -3253,7 +3263,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="632"/>
+        <location filename="../widgets/player_panel.py" line="707"/>
         <source>Drop audio files here</source>
         <translation>오디오 파일을 여기에 끌어다 놓으세요</translation>
     </message>

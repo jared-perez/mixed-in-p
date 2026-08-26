@@ -6,6 +6,7 @@ import logging
 import re
 from collections import OrderedDict
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 import shiboken6
@@ -418,6 +419,84 @@ class PlaylistEntry:
     label: str = ""
     bitrate: str = ""  # kbps, unformatted
     energy: str = ""  # 1-10, read from the file's own energy field
+    # Both "YYYY-MM-DD", or "" when unknown. Neither is a tag: date_added
+    # is the library's `tracks.added_at` (when this file first entered the
+    # library, which is why re-adding it never moves it), date_created is the
+    # file's own birth time off the disk.
+    date_added: str = ""
+    date_created: str = ""
+
+
+# Displayed date spelling for both date columns. ISO order on purpose: it is
+# unambiguous in every locale AND it sorts lexicographically, so the two date
+# columns need no sort key of their own — _sort_text over the displayed string
+# is already chronological.
+#
+# The date only, no time of day. The consequence to know is that a day's worth
+# of additions is one undifferentiated block: everything added today compares
+# equal, so sorting by Date Added leaves them in list order rather than in the
+# order they arrived. That is the trade the format makes, and the underlying
+# `tracks.added_at` still holds the second if a finer answer is ever wanted.
+_STAMP_FORMAT = "%Y-%m-%d"
+# What every stamp looks like, for measuring the columns that hold one. Kept
+# beside the format rather than derived from it (the codes are not the width of
+# what they expand to), and pinned to it by a test.
+_STAMP_SHAPE = "0000-00-00"
+
+
+def _format_stamp(when: datetime | None) -> str:
+    return when.strftime(_STAMP_FORMAT) if when is not None else ""
+
+
+def _format_iso_stamp(iso: str | None) -> str:
+    """`Library.added_at` ('2026-08-25T14:03:11') -> the displayed spelling."""
+    if not iso:
+        return ""
+    try:
+        return _format_stamp(datetime.fromisoformat(iso))
+    except ValueError:
+        return ""
+
+
+def _widest_stamp(widget: QWidget) -> str:
+    """A stamp in the widest digits *this* font has, for measuring a column.
+
+    Every stamp is the same sixteen characters, so the only thing that varies
+    is which digits land in them — and digits are equal-width only in a font
+    with tabular figures, which is not a promise any UI font makes. Picking the
+    worst digit here is what makes "measure the widest member of a closed set"
+    literally true rather than approximately.
+
+    Only the *choice* is made from font metrics; the resulting width is
+    measured through the style. See `PlayerPanel._measure_stamp_width`.
+    """
+    fm = QFontMetrics(widget.font())
+    digit = max("0123456789", key=fm.horizontalAdvance)
+    return _STAMP_SHAPE.replace("0", digit)
+
+
+def _file_created_at(path: str) -> str:
+    """When *path* was created on disk, in the displayed spelling.
+
+    `st_birthtime` is the real answer and exists on macOS and (since 3.12)
+    Windows; elsewhere `st_ctime` is the closest thing there is — on Windows it
+    *is* the creation time, on Linux it is the inode-change time, which is the
+    creation time for a file nobody has moved. Guarded with `or` rather than a
+    plain getattr default because a filesystem with no birth time to give
+    reports 0 rather than omitting the field.
+
+    A stat, never an open: this runs per row, including for a whole page of
+    search results, so the cost has to stay in the same class as `_art_key`'s.
+    """
+    try:
+        st = Path(path).stat()
+    except OSError:
+        return ""  # missing file, or one we cannot see: no date to show
+    stamp = getattr(st, "st_birthtime", None) or st.st_ctime
+    try:
+        return _format_stamp(datetime.fromtimestamp(stamp))
+    except (OSError, OverflowError, ValueError):
+        return ""
 
 
 def _parse_bpm(text: str) -> float | None:
@@ -1318,6 +1397,8 @@ class PlayerPanel(QWidget):
         QT_TRANSLATE_NOOP("PlayerPanel", "Bitrate"),
         QT_TRANSLATE_NOOP("PlayerPanel", "Energy"),
         QT_TRANSLATE_NOOP("PlayerPanel", "Art"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Date Added"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Date Created"),
     )
     # Optional columns: (logical index, PlaylistEntry attribute). A None
     # attribute has no text of its own — Art carries a thumbnail instead, read
@@ -1330,15 +1411,22 @@ class PlayerPanel(QWidget):
         (13, "bitrate"),
         (14, "energy"),
         (15, None),
+        (16, "date_added"),
+        (17, "date_created"),
     )
     _ARTWORK_COLUMN = 15
+    # Named because `_fill_dates_added` patches this one cell in place.
+    _DATE_ADDED_COLUMN = 16
+    _DATE_CREATED_COLUMN = 17
     # The shipped layout, as a *visual* order over those fixed logical indexes:
     # #, Art, Artist, Title, BPM, Key, Comment, Duration, Year, Filename, and
     # then the optional ones in their own order. Expressed this way because the
     # logical order can never change (a saved state addresses sections by
     # number, and every existing user has one), so "the default order" is a
     # separate thing from "the order the columns were declared in".
-    _DEFAULT_COLUMN_ORDER = (0, 15, 2, 3, 4, 5, 6, 7, 8, 1, 9, 10, 11, 12, 13, 14)
+    _DEFAULT_COLUMN_ORDER = (
+        0, 15, 2, 3, 4, 5, 6, 7, 8, 1, 9, 10, 11, 12, 13, 14, 16, 17,
+    )
     # Optional columns that are nonetheless shown out of the box. Art earns it:
     # it is the one column that says what a track *is* at a glance.
     _DEFAULT_SHOWN_OPTIONAL = frozenset({_ARTWORK_COLUMN})
@@ -1358,6 +1446,14 @@ class PlayerPanel(QWidget):
     # from one the user hid on purpose. Neither 1 nor 2 shipped. `Reset
     # Columns` in the header menu exists so this is the last time a bump is
     # the only way back.
+    #
+    # Still 3 after Date Added / Date Created, deliberately. Those only
+    # *appended* to `_DEFAULT_COLUMN_ORDER`, and a section a saved state has
+    # never heard of is already handled without a bump: `player_column_count`
+    # says how far the state's opinion reaches, and `_restore_column_state`
+    # applies default visibility (hidden) beyond it. Bumping would throw away
+    # every existing user's widths and order to tell them about two columns
+    # that arrive switched off anyway.
     _COLUMN_DEFAULTS_VERSION = 3
     # Starting widths for the columns that are not sized from their own header
     # word. Measured against the English labels, so they are a *base* rather
@@ -1379,6 +1475,18 @@ class PlayerPanel(QWidget):
         12: 150,  # Label
         13: 80,   # Bitrate
         14: 70,   # Energy
+        # Both dates render as "YYYY-MM-DD" — see _format_stamp, which picks
+        # that spelling precisely so the text sorts as the date does. Unlike
+        # every other entry here this base is not the answer and is not meant
+        # to be: these two are the only columns floored by their *contents* as
+        # well as their header word, and between them those two floors are what
+        # actually decides the width. Both directions occur — the header word
+        # wins in every Latin and Cyrillic language, the stamp wins in ja/zh/ko
+        # where the word is three or four glyphs. 100 is the stamp's width at
+        # the largest text preset, i.e. "never narrower than the widest date we
+        # draw", which is the one number that means something on its own.
+        16: 100,  # Date Added
+        17: 100,  # Date Created
     }
     # Never offered in the hide menu. Filename is the row's identity, and '#'
     # doubles as the membership-count column during an All-playlists search
@@ -1890,6 +1998,11 @@ class PlayerPanel(QWidget):
             width = header_fm.horizontalAdvance(label) + 2 * SeparatorHeaderView._TEXT_PAD + 4
             self._word_fit_widths[col] = width
             self._default_column_widths[col] = width
+        # The two date columns are floored by their *contents* as well as by
+        # their header word — the only ones that can be, and the only ones that
+        # must be. Measured before the floor is applied, since it reads this.
+        self._content_fit_widths: dict[int, int] = {}
+        self._remeasure_stamp_widths()
         # The rest keep their English-measured base width unless a translation
         # needs more room than it allows for.
         self._apply_header_fit_floor(header_fm)
@@ -2444,6 +2557,9 @@ class PlayerPanel(QWidget):
                 label=label,
                 bitrate=bitrate,
                 energy=energy,
+                date_added=_format_iso_stamp(t.get("added_at"))
+                or self._library_added_at(t["file_path"]),
+                date_created=_file_created_at(t["file_path"]),
             )
             # Duplicates were already resolved by add_tracks — whatever
             # reaches here has been cleared to land.
@@ -2472,6 +2588,62 @@ class PlayerPanel(QWidget):
         # instant instead of waiting on a full decode.
         self._prefetch_default_target()
         self._persist_playlist()
+        # After the persist, because that is what gives a file the library had
+        # never seen an `added_at` in the first place.
+        self._fill_dates_added()
+
+    def _library_added_at(self, path: str) -> str:
+        """`tracks.added_at` for *path*, or "" when the library has no row.
+
+        The library is the only place this can come from: it is when the file
+        first entered *this* app, which nothing on disk records and no tag
+        holds. A file being added right now has no row yet — that case is left
+        blank here and filled by `_fill_dates_added` once the persist has made
+        one.
+        """
+        if self._library is None:
+            return ""
+        track = self._library.get_track_by_path(path)
+        return _format_iso_stamp(track.added_at) if track is not None else ""
+
+    def _fill_dates_added(self) -> None:
+        """Give the rows of a brand-new file the date the persist just stamped.
+
+        Only ever fills blanks, and only queries for the blanks, so the steady
+        state — every row already dated — costs nothing. The cells are patched
+        in place rather than rebuilt: this runs at the end of an add, and a
+        second full rebuild there would redraw every row to change one column.
+        """
+        if self._library is None:
+            return
+        blanks = [
+            (row, entry)
+            for row, entry in enumerate(self._playlist)
+            if not entry.date_added
+        ]
+        if not blanks:
+            return
+        # Setting an item's text emits itemChanged, which the panel reads as an
+        # inline metadata edit — and this is a display refresh, not one.
+        self._table.blockSignals(True)
+        filled = False
+        try:
+            for row, entry in blanks:
+                stamp = self._library_added_at(entry.file_path)
+                if not stamp:
+                    continue
+                entry.date_added = stamp
+                filled = True
+                item = self._table.item(row, self._DATE_ADDED_COLUMN)
+                if item is not None:
+                    item.setText(stamp)
+        finally:
+            self._table.blockSignals(False)
+        # The one case the in-place patch is not enough for: sorted BY this
+        # column, the new rows sorted as blanks (last, in both directions) and
+        # would sit there wearing the date they should have been placed by.
+        if filled and self._sort_column == self._DATE_ADDED_COLUMN:
+            self._apply_sort()
 
     def play_path_if_idle(self, path: str) -> bool:
         """Start playing *path*, but only if nothing is under way. True if it did.
@@ -2654,6 +2826,9 @@ class PlayerPanel(QWidget):
                         "bitrate": str(t.bitrate) if t.bitrate else "",
                         "energy": str(t.energy) if t.energy else "",
                         "duration": t.duration,
+                        # Passed so the load needs no second query per row to
+                        # date a list it has already fetched in full.
+                        "added_at": t.added_at,
                     }
                     for t in tracks
                 ],
@@ -3122,6 +3297,10 @@ class PlayerPanel(QWidget):
             label=track.label or "",
             bitrate=str(track.bitrate) if track.bitrate else "",
             energy=str(track.energy) if track.energy else "",
+            date_added=_format_iso_stamp(track.added_at),
+            # The one field here not off the row, because the row does not hold
+            # it. A stat is not an open, so the promise above stands.
+            date_created=_file_created_at(track.path),
         )
 
     @staticmethod
@@ -3228,6 +3407,11 @@ class PlayerPanel(QWidget):
         if dialog.new_path is not None:
             entry.file_path = dialog.new_path
             entry.display_name = Path(dialog.new_path).name
+            # A different file on disk has a different birth time, and the old
+            # one's was blank anyway — the row was missing, which is how it got
+            # here. (Date Added belongs to the library row, which relocating
+            # does not move, so it is deliberately left alone.)
+            entry.date_created = _file_created_at(dialog.new_path)
         if self._search_active:
             self._run_search()
         elif dialog.relinked:
@@ -3259,6 +3443,14 @@ class PlayerPanel(QWidget):
         12: ("label", _sort_text),
         13: ("bitrate", _sort_number),
         14: ("energy", _sort_number),
+        # _sort_text is chronological here, and only because _STAMP_FORMAT is
+        # ISO-ordered: "2026-08-25" against "2026-09-01" compares the same way
+        # the dates do, digit for digit. A localized spelling (25/08/2026)
+        # would need a parser of its own here — which is the reason that
+        # spelling was not chosen. Same-day rows compare *equal* (the stamp
+        # carries no time), and the sort is stable, so they keep list order.
+        16: ("date_added", _sort_text),
+        17: ("date_created", _sort_text),
     }
 
     @property
@@ -4376,7 +4568,57 @@ class PlayerPanel(QWidget):
             self._default_column_widths[col] = width
             if self._table.columnWidth(col) < width:
                 self._table.setColumnWidth(col, width)
+        # The date stamps grew with the same font the header word did, and a
+        # cell that outgrows its column loses its tail silently.
+        self._remeasure_stamp_widths()
         self._apply_header_fit_floor(header_fm)
+
+    def _measure_stamp_width(self) -> int:
+        """Width a "YYYY-MM-DD" cell needs, asked of the style.
+
+        The two date columns are the only ones here whose contents are a
+        **closed set of one width**, so unlike Album or Comment they can be
+        sized so the value never clips — and they have to be, because
+        `NoElideDelegate` means a cut stamp loses its tail with no ellipsis to
+        admit it: "2026-08-2" reads as a date rather than as damage.
+
+        A constant cannot do it. The stamp wants 74 / 85 / 100px across the
+        small / medium / large text presets — the constant this started as was
+        right at one of them and clipped at another, which is the "a width
+        written as a
+        constant is an English width" trap one axis over — the axis here is the
+        user's text size rather than their language.
+
+        Nor can font metrics plus a padding constant: the QSS ``::item``
+        padding and the style's own per-cell margin are both invisible to
+        `QFontMetrics`, and the second differs per platform
+        (`PM_FocusFrameHMargin` is 2 on Fusion and 4 on macOS). So this goes
+        through `sizeHintForColumn` → `sizeFromContents`, the path that paints
+        the cell, and lets whichever style is running do its own arithmetic.
+
+        Measured in a throwaway row on the **real** table, because a scratch
+        widget would not carry the stylesheet rule that supplies the padding.
+        """
+        col = self._DATE_ADDED_COLUMN
+        row = self._table.rowCount()
+        self._table.blockSignals(True)
+        try:
+            self._table.insertRow(row)
+            self._table.setItem(row, col, QTableWidgetItem(_widest_stamp(self._table)))
+            width = self._table.sizeHintForColumn(col)
+        finally:
+            self._table.removeRow(row)
+            self._table.blockSignals(False)
+        # The same couple of pixels `_header_fit_width` adds, for the same
+        # reason: the hint is the width at which the text exactly reaches the
+        # section divider, which reads as clipped even when it is not.
+        return width + 4
+
+    def _remeasure_stamp_widths(self) -> None:
+        """Refresh the date columns' content floor. Cheap: one throwaway row."""
+        width = self._measure_stamp_width()
+        for col in (self._DATE_ADDED_COLUMN, self._DATE_CREATED_COLUMN):
+            self._content_fit_widths[col] = width
 
     def _header_fit_width(self, col: int, header_fm: QFontMetrics | None = None) -> int:
         """Width at which column ``col`` shows its whole header word.
@@ -4416,7 +4658,13 @@ class PlayerPanel(QWidget):
         `_set_column_visible`, which applies the default on reveal.
         """
         for col, base in self._BASE_COLUMN_WIDTHS.items():
-            fit = self._header_fit_width(col, header_fm)
+            # `_content_fit_widths` is the same guarantee for the *value* where
+            # a column has a closed set of them (the two date stamps). Empty
+            # for every other column, whose contents have no width to fit.
+            fit = max(
+                self._header_fit_width(col, header_fm),
+                self._content_fit_widths.get(col, 0),
+            )
             self._default_column_widths[col] = max(base, fit)
             if (
                 not self._table.isColumnHidden(col)
@@ -4522,6 +4770,28 @@ class PlayerPanel(QWidget):
         if shown and self._table.columnWidth(col) <= 0:
             # A section hidden at zero width would come back invisible.
             self._table.setColumnWidth(col, self._default_column_widths.get(col, 100))
+        if shown and col in self._content_fit_widths:
+            # And a section hidden at a *stale* width comes back too narrow.
+            # `_apply_header_fit_floor` cannot cover it — a hidden section
+            # reports a width of 0 whatever it is set to, so it skips them and
+            # leaves the reveal to apply the floor, which until now only
+            # covered the zero case above.
+            #
+            # Two ways to reach it, and the second is the common one. Change
+            # the text size while the column is hidden and it comes back at the
+            # width the previous preset wanted; or restore a *saved* state, in
+            # which the width was measured against whatever header font and
+            # language were in force when it was saved. Both were found by
+            # sweeping the twelve languages against the three text presets.
+            #
+            # The floor is the column's whole default — base, header word and
+            # stamp — not just the stamp, because the header word is what wins
+            # in every Latin and Cyrillic language. Only these two columns,
+            # because only they have a content floor at all: widening any other
+            # optional column on reveal would undo a narrowing the user chose.
+            floor = self._default_column_widths.get(col, 0)
+            if self._table.columnWidth(col) < floor:
+                self._table.setColumnWidth(col, floor)
         if col == self._ARTWORK_COLUMN:
             # In the Full view the rows are tall enough to hold a whole cover,
             # which is only right while there is one on screen — so both
