@@ -16,15 +16,17 @@ it.
 
 import numpy as np
 import pytest
+from PySide6.QtGui import QColor
 
 from src.gui.widgets import vis_silly_scope
 from src.gui.widgets.vis_silly_scope import (
     _BACKDROP_CAP_PX,
     _POPOUT_CAP_PX,
     _WINDOW_SECONDS,
+    _GOLD_BASE_HSV,
     SillyScopeScene,
+    build_color_lut,
     build_env_ramp,
-    build_gold_lut,
 )
 from src.gui.widgets.vis_canvas import (
     FRAME_MS,
@@ -489,8 +491,8 @@ def test_the_environment_ramp_has_more_than_one_step_in_it():
     assert np.count_nonzero(turns) >= 6
 
 
-def test_the_gold_runs_dark_to_light_and_is_gold_all_the_way():
-    lut = build_gold_lut()
+def test_the_default_lut_is_the_gold_and_runs_dark_to_light():
+    lut = build_color_lut(QColor.fromHsvF(*_GOLD_BASE_HSV))
     assert lut.shape == (256, 4)
     blue, green, red = lut[:, 0].astype(int), lut[:, 1].astype(int), lut[:, 2].astype(int)
     assert np.all(np.diff(red) >= 0)
@@ -499,13 +501,29 @@ def test_the_gold_runs_dark_to_light_and_is_gold_all_the_way():
     assert np.all(red >= green) and np.all(green >= blue)
 
 
-def test_the_colour_setting_is_accepted_and_ignored(scene):
-    """It exists so the renderer can forward the setting without asking who cares."""
-    before = scene.render(_loud(), 0.0).copy()
-    scene.set_color("#00ff00")
+def test_the_lut_wears_the_selected_hue_and_still_peaks_near_white():
+    """The recipe is hue-generic: a blue selection makes a blue liquid whose
+    highlights still burn out toward white, exactly as the gold's do."""
+    lut = build_color_lut(QColor("#2266ff"))
+    mid = slice(64, 192)
+    assert lut[mid, 0].mean() > lut[mid, 2].mean()  # B leads R through the body
+    assert min(int(v) for v in lut[255, :3]) > 210  # top of the ramp is near-white
+
+
+def test_the_colour_setting_recolours_the_stream(scene):
+    """The stream wears the waveform colour now — the fixed-gold ruling was
+    reversed on request. Same music, two colours, different pixels, and the
+    hue really lands on the sheet."""
+    _run(scene, 2.0)
+    gold = _bgra_of(scene.render(_loud(), 0.0))
+    scene.set_color("#2266ff")
     scene.reset()
-    after = scene.render(_loud(), 0.0)
-    assert before == after
+    _run(scene, 2.0)
+    blue = _bgra_of(scene.render(_loud(), 0.0))
+    lit = blue[..., 3] > 0
+    assert blue[..., 0][lit].mean() > blue[..., 2][lit].mean()  # blue leads red
+    gold_lit = gold[..., 3] > 0
+    assert gold[..., 2][gold_lit].mean() > gold[..., 0][gold_lit].mean()
 
 
 # ── How it joins the renderer ──────────────────────────────────────────────

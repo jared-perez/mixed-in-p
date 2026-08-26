@@ -91,7 +91,7 @@ src/
 │   │   ├── player_panel.py     # Audio player with playlist
 │   │   ├── metadata_panel.py   # Tag editor with auto-save
 │   │   ├── keyboard_panel.py   # Piano + harmonic key strip reference
-│   │   ├── vis_silly_scope.py  # Backdrop liquid-gold sheet, wiggled at the source
+│   │   ├── vis_silly_scope.py  # Backdrop liquid-metal sheet in the waveform colour, wiggled at the source
 │   │   ├── metronome_engine.py # Sample-scheduled click train + tap tempo (Qt-free)
 │   │   ├── metronome_view.py   # Metronome controls (Keyboard panel's third view)
 │   │   ├── settings_panel.py   # App configuration

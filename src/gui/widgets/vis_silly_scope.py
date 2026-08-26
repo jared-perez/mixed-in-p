@@ -48,7 +48,9 @@ The pipeline, per frame, over a crop of the rows the sheet actually touches:
    every fold), a side glint, and a rim boost that **leans with the twist**.
    Then one 1-2-1 blur over the shade field, which is what dissolves the harsh
    band edges everywhere at once.
-5. A gold ramp, and an alpha that fades out over the last pixel of the edge.
+5. The colour ramp — the waveform colour's liquid-metal ramp, gold by
+   default (see :func:`build_color_lut`) — and an alpha that fades out over
+   the last pixel of the edge.
 
 Why this shape and not another: a QPainterPath ribbon with gradient fills is
 cheap and reads as *plastic*, because a gradient that does not follow the
@@ -275,24 +277,31 @@ _RIM_LEAN = 0.55  # the rim brightens on the edge the twist turns toward
 # dissolver: it softens every band edge at once, wherever it came from.
 _SHADE_BLURS = 1
 
-# Gold. Fixed rather than following the waveform-colour setting: this is the
-# one visual whose whole subject is the logo's liquid gold, so set_color exists
-# and is deliberately ignored, exactly as the analog scope ignores it for green
-# phosphor.
-# Retinted toward yellow on request (the first cut read as orange): green
-# sits closer under red through the body — G/R ~0.78 in the mids against the
-# original ~0.70 — which is the yellow-gold axis, while the R >= G >= B
-# ordering that keeps the ramp *gold* rather than grey still holds at every
-# stop (and therefore everywhere, since the channels interpolate linearly
-# between the same abscissae).
-_GOLD_STOPS = (
-    (0.00, (28, 17, 2)),
-    (0.20, (118, 80, 8)),
-    (0.42, (202, 156, 24)),
-    (0.66, (243, 208, 62)),
-    (0.85, (255, 240, 138)),
-    (1.00, (255, 254, 238)),
+# The colour ramp. It followed the fixed logo gold until the user asked for
+# the stream to wear the **waveform colour selection**, so the shipped gold
+# stops were decoded into the HSV recipe they always were and the recipe now
+# takes any base colour: an *absolute* dark -> body -> bright -> near-white
+# value ramp (the base's own value is ignored on purpose — a dark selection
+# must still produce bright liquid), the base's hue and saturation carried
+# through, the hue warmed a few degrees in the shadows and cooled toward the
+# highlights (the liquid-metal tell), and the top desaturated to near-white.
+# Each stop is (position, value, saturation multiplier, hue shift in
+# degrees); feeding the gold base reproduces the shipped gold LUT to within
+# a couple of counts per channel. An achromatic base degrades to a grey
+# ramp, which is the right answer for a white waveform. The analog scope
+# still ignores set_color for its green phosphor — that ruling was per-mode.
+_LUT_STOPS = (
+    (0.00, 0.110, 1.06, -10.0),
+    (0.20, 0.463, 1.06, -5.0),
+    (0.42, 0.792, 1.00, 0.0),
+    (0.66, 0.953, 0.85, 4.0),
+    (0.85, 1.000, 0.52, 8.0),
+    (1.00, 1.000, 0.076, 11.0),
 )
+# The default base: the hue/saturation/value the gold stops decode to. Used
+# for a bare scene (tests, a host that never calls set_color); the app hands
+# the waveform colour over before the first frame.
+_GOLD_BASE_HSV = (44.5 / 360.0, 0.88, 0.792)
 _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 
 # ── The beat, stamped at the source ────────────────────────────────────────
@@ -366,17 +375,32 @@ def build_env_ramp(size: int = _ENV_SIZE) -> np.ndarray:
     return np.clip(ramp, 0.0, 1.0).astype(np.float32)
 
 
-def build_gold_lut() -> np.ndarray:
-    """256 BGRA rows: deep amber -> body gold -> bright gold -> white.
+def build_color_lut(base: QColor | str) -> np.ndarray:
+    """256 BGRA rows: a liquid-metal ramp of *base* — deep shade -> body ->
+    bright -> near-white — via :data:`_LUT_STOPS`.
 
     Straight (non-premultiplied) alpha like the fire renderer's, so the
     playlist grey composites correctly under the backdrop's 0.40 opacity. The
     alpha column is a placeholder — every pixel's real alpha comes from the
     sheet coordinate and is written over the packed word (see :meth:`_paint`).
     """
+    color = QColor(base)
+    if not color.isValid():
+        color = QColor.fromHsvF(*_GOLD_BASE_HSV)
+    hue = color.hsvHueF()
+    sat = color.hsvSaturationF()
+    if hue < 0.0:  # achromatic: Qt reports hue -1; a grey ramp is correct
+        hue, sat = 0.0, 0.0
+    stops = np.array([s[0] for s in _LUT_STOPS])
+    cols = np.empty((len(_LUT_STOPS), 3), dtype=np.float64)
+    for row, (_, value, sat_mult, hue_shift) in enumerate(_LUT_STOPS):
+        c = QColor.fromHsvF(
+            (hue + hue_shift / 360.0) % 1.0,
+            float(np.clip(sat * sat_mult, 0.0, 1.0)),
+            value,
+        )
+        cols[row] = (c.red(), c.green(), c.blue())
     t = np.linspace(0.0, 1.0, 256)
-    stops = np.array([s[0] for s in _GOLD_STOPS])
-    cols = np.array([s[1] for s in _GOLD_STOPS], dtype=np.float64)
     rgb = np.empty((256, 3))
     for channel in range(3):
         rgb[:, channel] = np.interp(t, stops, cols[:, channel])
@@ -446,12 +470,7 @@ class SillyScopeScene:
 
     def __init__(self) -> None:
         self._env = build_env_ramp()
-        self._lut = build_gold_lut()
-        # The same table packed one pixel to a word. Indexing a (256, 4) uint8
-        # table with an (H, W) index gathers four separate bytes per pixel; the
-        # (256,) uint32 view gathers one word for a byte-identical result, and
-        # is what took the analog scope's paint from 5.0 ms to 0.8.
-        self._lut32 = self._lut.view(np.uint32).reshape(256)
+        self.set_color(QColor.fromHsvF(*_GOLD_BASE_HSV))
         self._dt = 33.0 / 1000.0
         self._level_fast = 0.0
         self._level_slow = 0.0
@@ -490,10 +509,17 @@ class SillyScopeScene:
         return self._image
 
     def set_color(self, color: QColor | str) -> None:
-        """Ignored on purpose — see :data:`_GOLD_STOPS`. Present so the
-        renderer can forward the setting to every scene without asking which
-        ones care.
+        """Recolour the stream from the waveform-colour setting.
+
+        Rebuilds the LUT (a once-per-change cost, nothing per frame). The
+        packed view beside it is the same table one pixel to a word: indexing
+        a (256, 4) uint8 table with an (H, W) index gathers four separate
+        bytes per pixel; the (256,) uint32 view gathers one word for a
+        byte-identical result, and is what took the analog scope's paint from
+        5.0 ms to 0.8.
         """
+        self._lut = build_color_lut(color)
+        self._lut32 = self._lut.view(np.uint32).reshape(256)
 
     def set_frame_interval(self, frame_ms: float) -> None:
         """Re-derive the per-frame follower alphas from the host's tick rate.
