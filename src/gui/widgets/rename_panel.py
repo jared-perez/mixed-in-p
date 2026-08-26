@@ -175,7 +175,7 @@ class RenamePanel(QWidget):
         trim_row.addSpacing(20)
         self._clear_ops_btn = QPushButton(self.tr("Clear"))
         # Size to the translated label (with a floor) so it never clips in
-        # longer-text languages, matching the Prepend/Append pair below.
+        # longer-text languages, like the Prepend/Append buttons below.
         self._clear_ops_btn.setMinimumWidth(
             max(70, self._clear_ops_btn.sizeHint().width())
         )
@@ -217,40 +217,58 @@ class RenamePanel(QWidget):
         self._trim_row_widget.setLayout(trim_row)
         ops_layout.addWidget(self._trim_row_widget)
 
-        # Prepend/Append text row
+        # Prepend/Append text row. The two are independent on/off toggles, each
+        # with its own box, so a batch can gain a prefix AND a suffix in one
+        # pass: [Prepend][its text] [Append][its text].
         prepend_row = QHBoxLayout()
         prepend_row.setContentsMargins(0, 0, 0, 0)
 
-        # Mode toggle: Prepend (default) vs Append. Only one active at a time.
-        self._append_mode = False
+        self._prepend_on = False
         self._prepend_btn = QPushButton(self.tr("Prepend Text"))
         self._prepend_btn.setCheckable(True)
-        self._prepend_btn.setChecked(True)
+        self._append_on = False
         self._append_btn = QPushButton(self.tr("Append Text"))
         self._append_btn.setCheckable(True)
-        # Size the pair to the wider of the two translated labels (with a floor)
-        # so they stay equal width and never clip in longer-text languages.
-        _btn_w = max(140,
-                     self._prepend_btn.sizeHint().width(),
-                     self._append_btn.sizeHint().width())
-        self._prepend_btn.setMinimumWidth(_btn_w)
-        self._append_btn.setMinimumWidth(_btn_w)
-        prepend_row.addWidget(self._prepend_btn)
-        prepend_row.addWidget(self._append_btn)
+        # Each button is sized to its OWN translated label rather than to a
+        # constant or to the pair's wider member: they are no longer adjacent
+        # (a box sits between them), so there is nothing for an equal width to
+        # line up with, and a constant is an English width that clips in the
+        # longer-text languages. sizeHint() is the style's own arithmetic over
+        # the label actually being drawn, so this travels to every language.
+        for _btn in (self._prepend_btn, self._append_btn):
+            _btn.setMinimumWidth(_btn.sizeHint().width())
 
         self._prepend_edit = QLineEdit()
         self._prepend_edit.setMaxLength(200)
-        # Widen the input ~20% past its default hint (the trailing stretch
-        # otherwise pins it to the default sizeHint width).
-        self._prepend_edit.setMinimumWidth(int(self._prepend_edit.sizeHint().width() * 1.2))
-        prepend_row.addWidget(self._prepend_edit)
-        prepend_row.addStretch()
+        self._prepend_edit.setPlaceholderText(self.tr("Text to add at start of filename"))
+        self._append_edit = QLineEdit()
+        self._append_edit.setMaxLength(200)
+        self._append_edit.setPlaceholderText(self.tr("Text to add at end of filename"))
+        # The boxes take the row's slack (stretch 1 each) instead of a trailing
+        # spacer, so they stay equal and Space Dashes still sits flush right.
+        # Their floor is measured in the box's own font (roughly 16 characters)
+        # rather than written as a pixel count, so it follows the text size
+        # instead of being a number that is only right at one of them.
+        for _edit in (self._prepend_edit, self._append_edit):
+            _edit.setMinimumWidth(_edit.fontMetrics().averageCharWidth() * 16)
+
+        prepend_row.addWidget(self._prepend_btn)
+        prepend_row.addWidget(self._prepend_edit, 1)
+        prepend_row.addWidget(self._append_btn)
+        prepend_row.addWidget(self._append_edit, 1)
         # Space Dashes anchors the right edge here, directly under Remove
         # Underscores on the trim row above (both flush-right, equal width).
         prepend_row.addWidget(self._space_dashes_btn)
-        ops_layout.addLayout(prepend_row)
+        # Hosted in a widget (like the trim row) so the window sizer can read
+        # the row's pushed-together width. A layout handed to a widget takes the
+        # Qt style default spacing (6px) instead of inheriting ops_layout's, so
+        # restate it or wrapping the row silently narrows it.
+        prepend_row.setSpacing(Theme.SPACING)
+        self._prepend_row_widget = QWidget()
+        self._prepend_row_widget.setLayout(prepend_row)
+        ops_layout.addWidget(self._prepend_row_widget)
 
-        self._update_add_mode_buttons()
+        self._sync_add_text_buttons()
 
         layout.addWidget(ops_widget)
 
@@ -344,8 +362,9 @@ class RenamePanel(QWidget):
         self._trim_start_spin.valueChanged.connect(self._on_operation_changed)
         self._trim_end_spin.valueChanged.connect(self._on_operation_changed)
         self._prepend_edit.textChanged.connect(self._on_prepend_changed)
-        self._prepend_btn.clicked.connect(lambda: self._set_add_mode(append=False))
-        self._append_btn.clicked.connect(lambda: self._set_add_mode(append=True))
+        self._append_edit.textChanged.connect(self._on_append_changed)
+        self._prepend_btn.clicked.connect(self._on_prepend_toggled)
+        self._append_btn.clicked.connect(self._on_append_toggled)
         self._store.track_updated.connect(self._on_store_changed)
         self._store.track_removed.connect(self._on_store_changed)
         self._store.batch_update_finished.connect(self._on_batch_finished)
@@ -370,32 +389,47 @@ class RenamePanel(QWidget):
         self._update_preview()
 
     def _on_prepend_changed(self, text: str) -> None:
+        # Typing in a box arms it. Before the toggles existed, text in this box
+        # simply applied; requiring a separate click to make typed text do
+        # anything would read as the field being broken. Switching a toggle off
+        # by hand is what keeps the text without applying it.
+        if text and not self._prepend_on:
+            self._prepend_on = True
+            self._sync_add_text_buttons()
         self._update_preview()
 
-    def _set_add_mode(self, append: bool) -> None:
-        """Switch between prepend and append modes (mutually exclusive)."""
-        self._append_mode = append
-        self._update_add_mode_buttons()
+    def _on_append_changed(self, text: str) -> None:
+        if text and not self._append_on:
+            self._append_on = True
+            self._sync_add_text_buttons()
         self._update_preview()
 
-    def _update_add_mode_buttons(self) -> None:
-        """Reflect the active add mode: active button yellow, other grayed out.
+    def _on_prepend_toggled(self) -> None:
+        """Switch the prepend step on or off (independent of append)."""
+        self._prepend_on = self._prepend_btn.isChecked()
+        self._sync_add_text_buttons()
+        self._update_preview()
 
-        Also updates the placeholder hint and keeps the checked state in sync
-        so a click on the already-active button can't toggle it off.
+    def _on_append_toggled(self) -> None:
+        """Switch the append step on or off (independent of prepend)."""
+        self._append_on = self._append_btn.isChecked()
+        self._sync_add_text_buttons()
+        self._update_preview()
+
+    def _sync_add_text_buttons(self) -> None:
+        """Reflect each add toggle: on is yellow, off is the default chrome.
+
+        Matches the Remove Underscores / Space Dashes toggles beside them, and
+        keeps the checked state in sync with the flag so a state set in code
+        (a clear, or a box being typed into) shows on the button.
         """
-        self._prepend_btn.setChecked(not self._append_mode)
-        self._append_btn.setChecked(self._append_mode)
-
-        active_style = f"background-color: {Theme.NEON_YELLOW}; color: #000000; font-weight: bold;"
-        inactive_style = "color: #777777;"
-        self._prepend_btn.setStyleSheet(inactive_style if self._append_mode else active_style)
-        self._append_btn.setStyleSheet(active_style if self._append_mode else inactive_style)
-
-        if self._append_mode:
-            self._prepend_edit.setPlaceholderText(self.tr("Text to add at end of filename"))
-        else:
-            self._prepend_edit.setPlaceholderText(self.tr("Text to add at start of filename"))
+        on_style = f"background-color: {Theme.NEON_YELLOW}; color: #000000; font-weight: bold;"
+        for btn, on in (
+            (self._prepend_btn, self._prepend_on),
+            (self._append_btn, self._append_on),
+        ):
+            btn.setChecked(on)
+            btn.setStyleSheet(on_style if on else "")
 
     def _on_store_changed(self, *args) -> None:
         """Handle store changes — refresh preview immediately."""
@@ -413,12 +447,13 @@ class RenamePanel(QWidget):
         if trim_end > 0:
             operations.append(TrimEnd(trim_end))
 
-        add_text = self._prepend_edit.text()
-        if add_text:
-            if self._append_mode:
-                operations.append(AddSuffix(add_text))
-            else:
-                operations.append(AddPrefix(add_text))
+        prefix = self._prepend_edit.text()
+        if self._prepend_on and prefix:
+            operations.append(AddPrefix(prefix))
+
+        suffix = self._append_edit.text()
+        if self._append_on and suffix:
+            operations.append(AddSuffix(suffix))
 
         if self._remove_underscores:
             operations.append(Replace("_", " "))
@@ -575,6 +610,20 @@ class RenamePanel(QWidget):
             can = has_changes(self._previews) and not has_conflicts(self._previews)
         self._apply_btn.setEnabled(can)
 
+    def ops_row_min_width(self) -> int:
+        """Width at which both operations rows still show every control.
+
+        Measured, never a constant: every label on these rows is translated, and
+        a constant is an English width — the panel's window minimum was one, and
+        Dutch/Polish/Russian have overflowed it since they were translated. Both
+        rows are asked because either can be the wider one (the add-text row
+        gained a second box and a second button, so in es/nl/pl it now is).
+        """
+        return max(
+            self._trim_row_widget.minimumSizeHint().width(),
+            self._prepend_row_widget.minimumSizeHint().width(),
+        )
+
     def has_rename_changes(self) -> bool:
         """True when the configured operations actually rename something."""
         return has_changes(self._previews)
@@ -621,8 +670,10 @@ class RenamePanel(QWidget):
         self._trim_start_spin.setValue(0)
         self._trim_end_spin.setValue(0)
         self._prepend_edit.clear()
-        self._append_mode = False
-        self._update_add_mode_buttons()
+        self._append_edit.clear()
+        self._prepend_on = False
+        self._append_on = False
+        self._sync_add_text_buttons()
         self._remove_underscores = False
         self._remove_underscores_btn.setChecked(False)
         self._remove_underscores_btn.setStyleSheet("")

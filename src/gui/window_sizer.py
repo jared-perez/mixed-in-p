@@ -133,6 +133,16 @@ class WindowSizer:
             # window has to be able to hold both. Measured from the panel's own
             # columns (translated header words included), never a constant.
             base += player.compat_panel_min_width()
+        elif page_id == "rename":
+            # Measured for the same reason as convert below: the trim and
+            # add-text rows are labelled in the user's language, and the
+            # constant left them clipped rather than widening the window.
+            base = max(
+                _PANEL_MIN_WIDTH["rename"],
+                self.window._sidebar.width()
+                + self.window._rename_panel.ops_row_min_width()
+                + _SLACK,
+            )
         elif page_id == "convert":
             # Measured, not assumed: the format selectors are labelled in the
             # user's language, and a constant left the longest of them clipped
