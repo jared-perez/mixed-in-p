@@ -305,8 +305,8 @@ class AboutDialog(QDialog):
                 '<span style="color: {s};">'
                 'WAV ↔ FLAC ↔ AIFF ↔ MP3</span>'
                 '<br><br>'
-                'Use <span style="color: {y};">Send To</span>'
-                ' to move files between panels.'
+                'Switch on a panel\'s <span style="color: {y};">pipeline</span>'
+                ' step to run a batch straight through.'
                 '</div>'
             ).format(p=p, y=y, s=s)
         )
