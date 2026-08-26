@@ -143,31 +143,31 @@ def _ask(win):
 
 
 def test_the_query_greys_the_action_when_the_pipeline_is_off(window):
-    win = window(convert_pipeline_enabled=False,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=False,
+                 pipeline_playlist="Friday set")
     action = _ask(win)
     assert not action.isEnabled()
     assert action.toolTip() == NOT_SET_UP
 
 
 def test_the_query_greys_the_action_when_the_target_is_blank(window):
-    win = window(convert_pipeline_enabled=True, convert_pipeline_playlist="")
+    win = window(pipeline_convert_enabled=True, pipeline_playlist="")
     action = _ask(win)
     assert not action.isEnabled()
     assert action.toolTip() == NOT_SET_UP
 
 
 def test_the_query_enables_the_action_when_the_pipeline_is_set_up(window):
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     action = _ask(win)
     assert action.isEnabled()
     assert '"Friday set"' in action.toolTip()
 
 
 def test_the_query_reports_an_analysis_tail(window):
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     win._pipeline.arm(1, "Friday set", ["/x.wav"], [])
     assert win._pipeline.active
     action = _ask(win)
@@ -176,8 +176,8 @@ def test_the_query_reports_an_analysis_tail(window):
 
 
 def test_a_conversion_in_flight_greys_the_action(window, monkeypatch):
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
 
     class _Running:
         def isRunning(self):
@@ -195,8 +195,8 @@ def test_a_conversion_in_flight_greys_the_action(window, monkeypatch):
 def test_the_gesture_converts_analyses_and_files_the_tracks(window, qtbot, tmp_path):
     """End to end on an all-passthrough batch: WAVs into a WAV pipeline, so
     there is no conversion thread and the run goes straight to analysis."""
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     paths = [_wav(tmp_path / f"{n}.wav") for n in ("a", "b")]
     _queue(win, paths)
 
@@ -218,8 +218,8 @@ def test_the_gesture_converts_analyses_and_files_the_tracks(window, qtbot, tmp_p
 def test_a_run_that_is_no_longer_ready_falls_back_to_send_to_convert(window, tmp_path):
     """State can move between the menu opening and the click. The files land
     in Convert either way, and the panel says why nothing started."""
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     paths = [str(tmp_path / "a.wav")]
     win._pipeline.arm(1, "Elsewhere", ["/x.wav"], [])
 
@@ -237,8 +237,8 @@ def test_a_run_that_is_no_longer_ready_falls_back_to_send_to_convert(window, tmp
 def test_lossy_files_get_a_word_because_the_pipeline_will_not_take_them(
     window, tmp_path, monkeypatch
 ):
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     pressed = []
     monkeypatch.setattr(type(win._conversion_panel), "press_convert",
                         lambda self: pressed.append(True))
@@ -251,8 +251,8 @@ def test_lossy_files_get_a_word_because_the_pipeline_will_not_take_them(
 
 
 def test_a_lossless_only_batch_gets_no_notice(window, tmp_path, monkeypatch):
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     monkeypatch.setattr(type(win._conversion_panel), "press_convert",
                         lambda self: None)
     win._send_rename_to_auto_pipeline([_wav(tmp_path / "a.wav")])
@@ -262,8 +262,8 @@ def test_a_lossless_only_batch_gets_no_notice(window, tmp_path, monkeypatch):
 def test_the_gesture_presses_the_panels_own_button(window, tmp_path, monkeypatch):
     """Never a second arming path: everything the pipeline guarantees lives
     behind _on_convert_clicked."""
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     seen = []
     monkeypatch.setattr(type(win._conversion_panel), "_on_convert_clicked",
                         lambda self: seen.append(True))
@@ -280,8 +280,8 @@ def test_starting_again_during_the_analysis_tail_leaves_the_first_run_intact(
     """Conversion done, analyses still landing: Start is enabled again, and
     arming a second run would replace ConvertPipeline.run wholesale — the
     first run's tracks would finish analysing and never reach the playlist."""
-    win = window(convert_pipeline_enabled=True,
-                 convert_pipeline_playlist="Friday set")
+    win = window(pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
     win._pipeline.arm(1, "Friday set", [], ["/a.wav"])
     win._pipeline.await_analysis({"/a.wav": "/a.wav"})
     before = dict(win._pipeline.run.awaiting_analysis)

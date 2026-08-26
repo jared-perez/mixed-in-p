@@ -513,36 +513,28 @@ def test_the_idle_hook_only_takes_this_run_s_files(library, monkeypatch, tmp_pat
     assert win.analysed == [[win._store.get_by_path(mine).id]]
 
 
-# ---------------------------------------------------------------- coupling
+# ------------------------------------------------- auto-analyze is not coupled
+
+# These four used to assert the opposite of each other: the pipeline toggle
+# dragged auto-analyze on, and auto-analyze going off switched the pipeline
+# off. That coupling dates from when the pipeline was a Convert-panel feature
+# whose last step was always an analysis. It drives its own analysis now, so
+# the two settings are independent — see
+# test_a_whole_run_completes_with_auto_analyze_off for the measurement.
 
 
-def test_the_pipeline_going_on_turns_auto_analyze_on(library):
-    win, panel = _window(library)
+def test_a_step_toggle_leaves_auto_analyze_alone(library):
+    win, _ = _window(library)
     win._config.auto_analyze = False
     win._on_pipeline_toggled(True)
-    assert win._config.auto_analyze is True
-    assert win._analysis_panel.auto is True
-    assert win._settings_panel.auto is True
-    assert win._sidebar.badge is True
+    assert win._config.auto_analyze is False
+    assert win._analysis_panel.auto is None  # never told
 
 
-def test_the_pipeline_going_off_leaves_auto_analyze_alone(library):
-    win, _ = _window(library)
-    win._config.auto_analyze = True
-    win._on_pipeline_toggled(False)
-    assert win._config.auto_analyze is True
-
-
-def test_auto_analyze_going_off_turns_the_pipeline_off(library):
+def test_auto_analyze_going_off_leaves_the_pipeline_on(library):
     win, panel = _window(library)
     win._on_auto_analyze_toggled(False)
-    assert panel.pipeline_enabled() is False
-
-
-def test_auto_analyze_going_on_leaves_the_pipeline_off(library):
-    win, panel = _window(library, enabled=False)
-    win._on_auto_analyze_toggled(True)
-    assert panel.pipeline_enabled() is False
+    assert panel.pipeline_enabled() is True
 
 
 # ------------------------------------------------- W4: the per-track add
@@ -752,4 +744,29 @@ def test_a_run_whose_playlist_was_deleted_ends_rather_than_hanging(adding, tmp_p
     track = _await(adding, path)
     adding._library.delete_node(node_id)
     adding._update_track_from_result(_result(track.file_path))
+    assert adding._pipeline.run is None
+
+
+def test_a_whole_run_completes_with_auto_analyze_off(adding, tmp_path, monkeypatch):
+    """The measurement behind decoupling the two settings.
+
+    Auto-analyze says what happens to files that merely *arrive*. A pipeline
+    run drives its own analysis (_pipeline_analyse calls _start_analysis
+    outright, and _pipeline_analysis_idle carries the batch on where auto mode
+    would have), so it owes that setting nothing — Start to playlist with it
+    off, end to end.
+    """
+    _fake_threads(monkeypatch)
+    path = _flac(tmp_path / "a.flac")
+    adding._config.auto_analyze = False
+    adding._conversion_panel._target = (None, "Manual mode")
+    adding._conversion_panel._rows = ([], [path])
+
+    adding._start_conversion([], "FLAC")
+    node_id = adding._pipeline.run.node_id
+    track = adding._store.get_by_path(path)
+    assert track.state == TrackState.ANALYSING  # started, not merely queued
+
+    adding._update_track_from_result(_result(track.file_path))
+    assert [i.path for i in adding._library.get_items(node_id)] == [path]
     assert adding._pipeline.run is None

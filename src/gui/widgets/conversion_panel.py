@@ -401,8 +401,8 @@ class ConversionPanel(QWidget):
 
         # Restore the pipeline's toggle and target. _loading_settings is still
         # on here, so neither write straight back to disk.
-        self._pipeline_toggle.setChecked(self._config.convert_pipeline_enabled)
-        self.restore_pipeline_target(self._config.convert_pipeline_playlist)
+        self._pipeline_toggle.setChecked(self._config.pipeline_convert_enabled)
+        self.restore_pipeline_target(self._config.pipeline_playlist)
         self._sync_pipeline_controls()
 
     def _connect_signals(self) -> None:
@@ -587,8 +587,8 @@ class ConversionPanel(QWidget):
         cfg.convert_bit_depth = None if bd is None else int(bd)
         cfg.convert_output_dir = self._output_dir
         cfg.convert_use_source_dir = self._use_source_dir
-        cfg.convert_pipeline_enabled = self._pipeline_toggle.isChecked()
-        cfg.convert_pipeline_playlist = self._pipeline_target.currentText().strip()
+        cfg.pipeline_convert_enabled = self._pipeline_toggle.isChecked()
+        cfg.pipeline_playlist = self._pipeline_target.currentText().strip()
         save_config(cfg)
         self._config = cfg
 

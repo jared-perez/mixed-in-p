@@ -120,12 +120,22 @@ class AppConfig:
     # a stale path.
     convert_output_dir: str = ""
     convert_use_source_dir: bool = True
-    # The Convert -> Analyze -> playlist fast track. The target is stored as
-    # the playlist's NAME, not a node id: an id means nothing once the
-    # playlist it named has been deleted, while a name that no longer matches
-    # anything reads as "create one", which is the right answer.
-    convert_pipeline_enabled: bool = False
-    convert_pipeline_playlist: str = ""
+    # Which steps a pipeline run performs. The order is fixed (rename ->
+    # convert -> analyze -> playlist); these only say which of the three run,
+    # and a run started from a panel flows through the later enabled ones.
+    #
+    # There is no toggle for the playlist add: it is where every run ends, so
+    # with analyze off the files land there un-analysed rather than not at all.
+    # The target is stored as the playlist's NAME, not a node id: an id means
+    # nothing once the playlist it named has been deleted, while a name that no
+    # longer matches anything reads as "create one", which is the right answer.
+    #
+    # These replaced a single convert_pipeline_enabled flag — see
+    # _folded_pipeline_steps for what an old config becomes.
+    pipeline_rename_enabled: bool = False
+    pipeline_convert_enabled: bool = False
+    pipeline_analyze_enabled: bool = False
+    pipeline_playlist: str = ""
     spectrum_dynamic_range: float = 110.0
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
@@ -277,6 +287,42 @@ def _renamed_vis_mode(mode: str) -> str:
     return RETIRED_VIS_MODES.get(mode, mode)
 
 
+# The pipeline's controls before it grew per-step toggles: one flag that meant
+# "convert, then analyse, then file into the playlist", and one playlist name.
+LEGACY_PIPELINE_ENABLED = "convert_pipeline_enabled"
+LEGACY_PIPELINE_PLAYLIST = "convert_pipeline_playlist"
+
+
+def _folded_pipeline_steps(data: dict) -> tuple[bool, bool, bool]:
+    """(rename, convert, analyze) with a pre-toggle pipeline flag folded in.
+
+    The old flag was one switch over two steps, so ON becomes both of them ON —
+    that is what it meant. Rename had no flag to inherit and starts off.
+
+    No version field is needed to make this one-time, for the same reason
+    _folded_vis_mode needs none: it keys on the old key still being present,
+    and each new key wins wherever it exists, so the first save — which writes
+    the new fields and not the old one — retires the fold for good. Re-running
+    until then is the same fold onto the same value.
+    """
+    legacy = bool(data.get(LEGACY_PIPELINE_ENABLED, False))
+    return (
+        bool(data.get("pipeline_rename_enabled", AppConfig.pipeline_rename_enabled)),
+        bool(data.get("pipeline_convert_enabled", legacy)),
+        bool(data.get("pipeline_analyze_enabled", legacy)),
+    )
+
+
+def _folded_pipeline_playlist(data: dict) -> str:
+    """The target playlist's name, from whichever key holds it."""
+    return str(
+        data.get(
+            "pipeline_playlist",
+            data.get(LEGACY_PIPELINE_PLAYLIST, AppConfig.pipeline_playlist),
+        )
+    )
+
+
 def _optional_int(data: dict, key: str, default: int | None) -> int | None:
     """Read a setting that is either a number or null.
 
@@ -301,6 +347,7 @@ def load_config() -> AppConfig:
     try:
         if path.exists():
             data = json.loads(path.read_text(encoding="utf-8"))
+            step_rename, step_convert, step_analyze = _folded_pipeline_steps(data)
             cfg = AppConfig(
                 min_bpm=float(data.get("min_bpm", AppConfig.min_bpm)),
                 max_bpm=float(data.get("max_bpm", AppConfig.max_bpm)),
@@ -348,12 +395,10 @@ def load_config() -> AppConfig:
                 convert_use_source_dir=bool(
                     data.get("convert_use_source_dir", AppConfig.convert_use_source_dir)
                 ),
-                convert_pipeline_enabled=bool(
-                    data.get("convert_pipeline_enabled", AppConfig.convert_pipeline_enabled)
-                ),
-                convert_pipeline_playlist=str(
-                    data.get("convert_pipeline_playlist", AppConfig.convert_pipeline_playlist)
-                ),
+                pipeline_rename_enabled=step_rename,
+                pipeline_convert_enabled=step_convert,
+                pipeline_analyze_enabled=step_analyze,
+                pipeline_playlist=_folded_pipeline_playlist(data),
                 spectrum_dynamic_range=float(
                     data.get("spectrum_dynamic_range", AppConfig.spectrum_dynamic_range)
                 ),
@@ -444,12 +489,6 @@ def load_config() -> AppConfig:
                 cfg.convert_use_source_dir = True
             if not cfg.convert_output_dir:
                 cfg.convert_use_source_dir = True
-            # The pipeline ends in an analysis, so it cannot be on while
-            # auto-analyze is off — the two toggles are coupled in the UI, and
-            # this is what keeps a hand-edited (or half-written) config out of
-            # the one state that coupling forbids.
-            if not cfg.auto_analyze:
-                cfg.convert_pipeline_enabled = False
             cfg.spectrum_dynamic_range = max(60.0, min(cfg.spectrum_dynamic_range, 150.0))
             if not _HEX_COLOR_RE.match(cfg.waveform_color):
                 cfg.waveform_color = AppConfig.waveform_color

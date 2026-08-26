@@ -211,9 +211,7 @@ class MainWindow(QMainWindow):
         # The Convert panel never opens the library itself; it is fed the
         # playlists from here, at startup and on every nodes_changed.
         self._refresh_pipeline_playlists()
-        self._conversion_panel.restore_pipeline_target(
-            self._config.convert_pipeline_playlist
-        )
+        self._conversion_panel.restore_pipeline_target(self._config.pipeline_playlist)
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._load_last_session()
 
@@ -1538,12 +1536,17 @@ class MainWindow(QMainWindow):
         self._pipeline.end()
 
     def _on_pipeline_toggled(self, enabled: bool) -> None:
-        """The pipeline ends in an analysis, so switching it on switches
-        auto-analyze on with it. The implication is one-way: switching the
-        pipeline off leaves auto-analyze alone."""
-        if enabled and not self._config.auto_analyze:
-            self._analysis_panel.set_auto_analyze(True)
-            self._on_auto_analyze_toggled(True)
+        """A step toggle moved.
+
+        Nothing to couple: auto-analyze says what happens to files that merely
+        *arrive*, while a pipeline run drives its own analysis outright
+        (_pipeline_analyse calls _start_analysis whatever the setting says, and
+        _pipeline_analysis_idle carries the batch on where auto mode would
+        have). The two used to drag each other about, from a time when the
+        pipeline was a Convert-panel feature that could only end in an
+        analysis; test_a_whole_run_completes_with_auto_analyze_off is the
+        measurement that retired it.
+        """
 
     def _cancel_conversion(self) -> None:
         """Cancel the current conversion.
@@ -1637,10 +1640,6 @@ class MainWindow(QMainWindow):
         self._persist_config()
         self._settings_panel.set_auto_analyze(enabled)
         self._sidebar.set_auto_analyze_badge(enabled)
-        # The pipeline ends in an analysis, so it cannot outlive auto-analyze.
-        # One-way: switching Auto back ON leaves the pipeline where it was.
-        if not enabled:
-            self._conversion_panel.set_pipeline_enabled(False)
 
     def _on_write_freeze_toggled(self, frozen: bool) -> None:
         """Handle the Analyze panel's Freeze toggle.
@@ -1681,10 +1680,6 @@ class MainWindow(QMainWindow):
         self._apply_visualization_settings()
         self._apply_online_lookup_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
-        # Same coupling as the Analyze panel's Auto button, from the other
-        # direction: Auto off takes the pipeline with it, Auto on does not.
-        if not self._config.auto_analyze:
-            self._conversion_panel.set_pipeline_enabled(False)
 
     def _apply_online_lookup_settings(self) -> None:
         """Push the online-metadata switch and token to the two panels that use it.
@@ -2235,11 +2230,15 @@ class MainWindow(QMainWindow):
         # destination — or silently drops the folder the user meant to keep.
         self._config.convert_output_dir = disk.convert_output_dir
         self._config.convert_use_source_dir = disk.convert_use_source_dir
-        # The pipeline's toggle and target are written by the Convert panel the
+        # The pipeline's step toggles and target are written by the panels the
         # same way, so they belong on this list too — left off, closing the
-        # window would revert whatever the user set this session.
-        self._config.convert_pipeline_enabled = disk.convert_pipeline_enabled
-        self._config.convert_pipeline_playlist = disk.convert_pipeline_playlist
+        # window would revert whatever the user set this session. All four,
+        # every time: a new field beside one already here and not added to it
+        # is the same bug, one field narrower.
+        self._config.pipeline_rename_enabled = disk.pipeline_rename_enabled
+        self._config.pipeline_convert_enabled = disk.pipeline_convert_enabled
+        self._config.pipeline_analyze_enabled = disk.pipeline_analyze_enabled
+        self._config.pipeline_playlist = disk.pipeline_playlist
         self._config.player_edit_locked = disk.player_edit_locked
         # These three are one value in three fields and must always be copied
         # together: the count says how many sections the state describes (a

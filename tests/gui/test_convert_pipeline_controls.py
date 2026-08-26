@@ -87,7 +87,7 @@ def test_set_pipeline_enabled_is_a_reflect_not_an_act(panel):
     assert seen == [True]  # no echo
     assert not panel.pipeline_enabled()
     assert panel._convert_btn.text() == "Convert"
-    assert load_config().convert_pipeline_enabled is False
+    assert load_config().pipeline_convert_enabled is False
 
 
 # ---------------------------------------------------------------- enablement
@@ -216,13 +216,13 @@ def test_the_toggle_and_the_name_are_saved(qtbot, tmp_path):
     panel._pipeline_toggle.setChecked(True)
     panel._pipeline_target.setEditText("Pipeline test")
     disk = load_config()
-    assert disk.convert_pipeline_enabled is True
-    assert disk.convert_pipeline_playlist == "Pipeline test"
+    assert disk.pipeline_convert_enabled is True
+    assert disk.pipeline_playlist == "Pipeline test"
 
 
 def test_a_remembered_name_that_matches_nothing_is_typed_back(qtbot):
-    panel = _panel(qtbot, convert_pipeline_enabled=True,
-                   convert_pipeline_playlist="Gone")
+    panel = _panel(qtbot, pipeline_convert_enabled=True,
+                   pipeline_playlist="Gone")
     assert panel.pipeline_enabled()
     assert panel.pipeline_target() == (None, "Gone")
 
@@ -230,8 +230,8 @@ def test_a_remembered_name_that_matches_nothing_is_typed_back(qtbot):
 def test_a_remembered_name_resolves_to_the_same_playlist(qtbot):
     """The whole point of storing a name: it must be *picked* on the way back,
     or every launch creates one more numbered playlist."""
-    panel = _panel(qtbot, convert_pipeline_enabled=True,
-                   convert_pipeline_playlist="Set")
+    panel = _panel(qtbot, pipeline_convert_enabled=True,
+                   pipeline_playlist="Set")
     panel.set_playlists([(4, "Set"), (9, "Warmup")])
     # set_playlists cannot re-pick what was never picked, so restore again the
     # way MainWindow does once the list has arrived.
@@ -239,24 +239,26 @@ def test_a_remembered_name_resolves_to_the_same_playlist(qtbot):
     assert panel.pipeline_target() == (4, "Set")
 
 
-def test_the_toggle_cannot_come_back_on_with_auto_analyze_off(qtbot):
-    save_config(AppConfig(auto_analyze=False, convert_pipeline_enabled=True,
-                          convert_pipeline_playlist="Set"))
-    assert load_config().convert_pipeline_enabled is False
+def test_the_toggle_survives_auto_analyze_being_off(qtbot):
+    """The two settings were coupled while the pipeline was a Convert feature
+    that could only end in an analysis. It drives its own now."""
+    save_config(AppConfig(auto_analyze=False, pipeline_convert_enabled=True,
+                          pipeline_playlist="Set"))
+    assert load_config().pipeline_convert_enabled is True
     panel = ConversionPanel(TrackStore())
     qtbot.addWidget(panel)
-    assert not panel.pipeline_enabled()
+    assert panel.pipeline_enabled()
 
 
 def test_loading_the_panel_does_not_write_back(qtbot):
     """The restore runs inside the _loading_settings guard."""
-    save_config(AppConfig(convert_pipeline_enabled=True,
-                          convert_pipeline_playlist="Set",
+    save_config(AppConfig(pipeline_convert_enabled=True,
+                          pipeline_playlist="Set",
                           convert_target_format="WAV"))
     panel = ConversionPanel(TrackStore())
     qtbot.addWidget(panel)
     disk = load_config()
-    assert disk.convert_pipeline_playlist == "Set"
+    assert disk.pipeline_playlist == "Set"
     assert disk.convert_target_format == "WAV"
 
 
