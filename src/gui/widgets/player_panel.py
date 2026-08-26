@@ -139,6 +139,7 @@ from .droppable_table import (
 )
 from .compatible_panel import CompatibleTracksPanel
 from .player_engine import PlayerEngine
+from .metronome_section import MetronomeSection
 from .slice_section import SliceSection
 
 logger = logging.getLogger(__name__)
@@ -1365,6 +1366,8 @@ class PlayerPanel(QWidget):
     # Re-emits the slicer's expand/collapse so the window sizer can widen the
     # window's minimum to fit the slicer controls while it is open.
     slice_expanded = Signal(bool)
+    # Metronome section opened/closed — same job for its own row's width.
+    metronome_expanded = Signal(bool)
     # A new saved playlist was created via Save Playlist (payload: node id).
     playlist_saved = Signal(int)
     # The "In Playlist" link beside the now-playing line was clicked (payload:
@@ -2260,6 +2263,14 @@ class PlayerPanel(QWidget):
         # Route S/Q/E through the panel only while the section is open.
         self._table.set_slice_keys_active(self._slice.is_expanded)
 
+        # Collapsible metronome, its own section below the slicer's. It moved
+        # here from the Keyboard panel's view dropdown: a tempo you set once
+        # and then work over belongs beside the transport, not three clicks
+        # deep in another panel. Nothing in it touches the engine or the
+        # track — it holds its own click stream.
+        self._metronome_section = MetronomeSection(self)
+        layout.addWidget(self._metronome_section)
+
         self._scroll.setWidget(content)
         # Keep the header inside the visible width (see _sync_title_row_width).
         # The panel's own resize covers the window being dragged; the scrollbar
@@ -2415,6 +2426,7 @@ class PlayerPanel(QWidget):
         # the waveform lazily, and forward its playhead seeks to the engine.
         # Both toggles land on one slot, which recomputes from both states.
         self._slice.expanded_changed.connect(self._on_slice_view_changed)
+        self._metronome_section.expanded_changed.connect(self._on_metronome_toggled)
         self._slice.waveform_shown_changed.connect(self._on_slice_view_changed)
         self._slice.request_waveform.connect(self._build_waveform_for_current)
         self._slice.seek_requested.connect(self._on_seek)
@@ -2746,7 +2758,29 @@ class PlayerPanel(QWidget):
 
     def closeEvent(self, event) -> None:
         self.shutdown_workers()
+        self.shutdown_metronome()
+        self._flush_column_save()
         super().closeEvent(event)
+
+    def _flush_column_save(self) -> None:
+        """Write a debounced column save now, rather than leaving it pending.
+
+        The 600 ms timer resolves ``get_app_data_dir`` when it *fires*, not
+        when it is armed, so a pending save that outlives its panel writes
+        into whatever app-data directory is current by then. In the app that
+        is merely a late write; in the suite, where every test gets its own
+        throwaway directory, it is one test's column layout landing in the
+        next test's config — which the next PlayerPanel then restores instead
+        of applying the shipped defaults, and which is the shape of
+        test_player_column_order's long-standing intermittent failure
+        (sighted 2026-08-13, -22, -23, never reproducibly).
+
+        Flushed rather than cancelled: a width the user changed in the last
+        600 ms before closing is a real change and should not be dropped.
+        """
+        if self._col_save_timer.isActive():
+            self._col_save_timer.stop()
+            self._save_column_state()
 
     def refresh(self) -> None:
         """Refresh UI state."""
@@ -5264,12 +5298,41 @@ class PlayerPanel(QWidget):
         """
         expanded = self._slice.is_expanded()
         self._seek_row_widget.setVisible(not self._slice.is_waveform_shown())
-        self._apply_table_height(self._slice.is_open())
-        if not self._slice.is_open():
+        self._apply_table_height(self._any_section_open())
+        if not self._any_section_open():
             # Return to the top so the user isn't left scrolled past the slicer.
             self._scroll.verticalScrollBar().setValue(0)
         # Only the tray's time row needs the wider window minimum.
         self.slice_expanded.emit(expanded)
+
+    def _any_section_open(self) -> bool:
+        """Whether anything below the playlist is asking for room.
+
+        The pin is about the *panel* growing past the viewport, not about the
+        slicer specifically — so the metronome counts. Keying it off the slice
+        section alone let an opened metronome be squeezed by a stretchy
+        playlist, which is the bug the pin exists to prevent.
+        """
+        return self._slice.is_open() or self._metronome_section.is_expanded()
+
+    def _on_metronome_toggled(self, expanded: bool) -> None:
+        """Reflow around the metronome, and tell the sizer its minimum moved."""
+        self._apply_table_height(self._any_section_open())
+        if not self._any_section_open():
+            self._scroll.verticalScrollBar().setValue(0)
+        self.metronome_expanded.emit(expanded)
+
+    def metronome_row_min_width(self) -> int:
+        """Width the metronome's own controls need, for the window minimum."""
+        return self._metronome_section.row_min_width()
+
+    def leave_metronome(self) -> None:
+        """Navigating off the Player. Honours the click's Global Click mode."""
+        self._metronome_section.leave()
+
+    def shutdown_metronome(self) -> None:
+        """The close path: no mode gets a vote, and no stream outlives it."""
+        self._metronome_section.stop()
 
     # QWIDGETSIZE_MAX — what setMaximumHeight is reset to when the pin comes off.
     _UNPINNED_HEIGHT = 16_777_215
@@ -5298,6 +5361,7 @@ class PlayerPanel(QWidget):
         if not self._now_playing_row.isHidden():
             rows.append(self._now_playing_row.sizeHint().height())
         rows.append(self._slice.first_screen_height())
+        rows.append(self._metronome_section.first_screen_height())
         margins = self._content_layout.contentsMargins()
         # One gap per row: the rows plus the playlist are len(rows) + 1 items.
         return (

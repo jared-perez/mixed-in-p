@@ -58,14 +58,22 @@ def visual_order(player, visible_only=True):
 def why(player):
     """Everything that decided the layout, for an assertion message.
 
-    This test has failed intermittently three times (2026-08-13, -22, -23),
-    never reproducibly, and each sighting produced nothing usable because
-    pytest truncates the repr of two ten-item lists and prints
+    This test failed intermittently three times (2026-08-13, -22, -23), never
+    reproducibly, and each sighting produced nothing usable because pytest
+    truncates the repr of two ten-item lists and prints
     ``['#', 'Art', ...', 'Filename'] == ['#', 'Art', ...`` — from which the
     only inference available is that the difference is somewhere in the
     middle. A comparison whose failure cannot be read is not much of a test,
     so it now shows its working: the full order, what is hidden, and the three
     config fields ``_restore_column_state`` branches on.
+
+    That working is what caught it on 2026-08-26: a fourth sighting reported
+    ``defaults_version=3`` and ``wearing the shipped defaults: False``, i.e.
+    the panel took the *restore* branch on what should have been a virgin
+    config — so the config had already been written before this test built
+    anything. See :class:`TestAClosedPanelWritesNothingLater` below for the
+    mechanism and the fix; this docstring is kept because a fifth sighting
+    would mean the diagnosis was wrong.
     """
     header = player._table.horizontalHeader()
     hidden = [
@@ -360,3 +368,42 @@ class TestTheWindowDoesNotRevertTheVersion:
         assert saved.player_column_defaults_version == (
             PlayerPanel._COLUMN_DEFAULTS_VERSION
         )
+
+
+class TestAClosedPanelWritesNothingLater:
+    """The column save is debounced by 600 ms, and the timer resolves the
+    app-data directory when it *fires* — not when it was armed.
+
+    So a pending save that outlives its panel writes wherever the process is
+    pointing by then. In the app that is a late write and harmless. In the
+    suite, where ``isolated_app_data`` hands every test its own throwaway
+    directory, it is one test's column layout landing in the *next* test's
+    config — which the next PlayerPanel dutifully restores instead of applying
+    the shipped defaults. That is the whole of the intermittent failure above,
+    and why it was never reproducible: it needs a test that arms the timer,
+    then a following test slow enough to let 600 ms elapse.
+
+    Asserted as an invariant rather than by racing a timer, which is the only
+    kind of assertion that means anything for a fault this shape.
+    """
+
+    def test_closing_leaves_nothing_pending(self, qtbot, lib):
+        player = make_player(qtbot, lib)
+        player._schedule_column_save()
+        assert player._col_save_timer.isActive(), "nothing armed; proves nothing"
+
+        player.close()
+
+        assert not player._col_save_timer.isActive()
+
+    def test_it_flushes_rather_than_dropping_the_write(self, qtbot, lib, tmp_path):
+        """A width changed in the last 600 ms before closing is a real change.
+        Cancelling the timer would silently lose it."""
+        player = make_player(qtbot, lib)
+        player._table.setColumnWidth(0, 123)
+        player._schedule_column_save()
+        save_config(AppConfig())  # blank the state the panel is about to write
+
+        player.close()
+
+        assert load_config().player_column_state != ""

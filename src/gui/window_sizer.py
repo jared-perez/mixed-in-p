@@ -88,6 +88,10 @@ class WindowSizer:
         # Whether the player's loop slicer is currently expanded (raises the
         # player's minimum width to fit its controls).
         self._slice_expanded = False
+        # Same, for the metronome section stacked below it. Its own flag
+        # rather than one "a section is open" boolean: the two sections want
+        # different widths, and the wider of the two is what the window owes.
+        self._metronome_expanded = False
         # Re-entrancy guard for sizer-initiated resizes.
         self._applying = False
         # True between startup and the deferred first responsive sync, so a
@@ -129,6 +133,16 @@ class WindowSizer:
                 # sidebar can be up to 600px wide and the constant would
                 # understate the window minimum by the difference.
                 base = max(base, self.window._sidebar.width() + row + _SLACK)
+            if self._metronome_expanded:
+                # Measured from the section, for the reason the convert row is:
+                # every label in it is translated, and a constant is an English
+                # width. Polish is the widest and wants ~110px more than English.
+                base = max(
+                    base,
+                    self.window._sidebar.width()
+                    + player.metronome_row_min_width()
+                    + _SLACK,
+                )
             # Compatible Tracks takes its width out of the playlist's, so the
             # window has to be able to hold both. Measured from the panel's own
             # columns (translated header words included), never a constant.
@@ -201,6 +215,13 @@ class WindowSizer:
 
     def on_slicer_expanded(self, expanded: bool) -> None:
         self._slice_expanded = expanded
+        self._resync_player_min()
+
+    def on_metronome_expanded(self, expanded: bool) -> None:
+        self._metronome_expanded = expanded
+        self._resync_player_min()
+
+    def _resync_player_min(self) -> None:
         # Only matters while the player is the active page.
         if self.window._current_page == "player":
             self._apply_page_min("player")

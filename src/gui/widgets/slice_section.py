@@ -40,6 +40,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from . import section_header
 from .fitted_combo import FittedComboBox
 
 from src.conversion.result import FORMAT_EXTENSION
@@ -333,45 +334,14 @@ class SliceSection(QWidget):
 
     # Disclosure arrows. Kept out of the translatable strings — they are
     # punctuation, not words, and doubling every header string to carry them
-    # doubles the translation work for nothing.
-    _ARROW_CLOSED = "▸"
-    _ARROW_OPEN = "▾"
+    # doubles the translation work for nothing. The look itself lives in
+    # section_header, shared with the metronome section stacked below this
+    # one — three disclosure toggles that must read as one family.
+    _ARROW_CLOSED = section_header.ARROW_CLOSED
+    _ARROW_OPEN = section_header.ARROW_OPEN
 
-    def _header_button(self, label: str) -> QPushButton:
-        """A borderless accent-text disclosure toggle sized to its own label."""
-        btn = QPushButton(f"{self._ARROW_CLOSED}  {label}")
-        btn.setCheckable(True)
-        btn.setProperty("headerLabel", label)
-        btn.setStyleSheet(
-            f"text-align: left; font-weight: bold; color: {Theme.ACCENT_TEXT};"
-            " padding: 0px; border: none;"
-        )
-        # Derived from the button's own font, not the section's: a style is free
-        # to give QPushButton a different default from a plain QWidget's, and
-        # the width below is only honest if it measures what actually paints.
-        # Bump the point size a couple steps so the headers read clearly.
-        font = btn.font()
-        font.setBold(True)
-        font.setPointSize(font.pointSize() + 2)
-        btn.setFont(font)
-        fm = QFontMetrics(font)
-        # Size from font metrics, not sizeHint: a QPushButton *centres* rather
-        # than elides, so a width that's short by a few pixels cuts the label at
-        # both ends with nothing to show it happened. Width the wider arrow so
-        # the label neither shifts nor clips when the view is opened.
-        arrow_w = max(
-            fm.horizontalAdvance(self._ARROW_CLOSED),
-            fm.horizontalAdvance(self._ARROW_OPEN),
-        )
-        btn.setFixedWidth(arrow_w + fm.horizontalAdvance(f"  {label}") + 8)
-        # Shrink the bar to just the text height (+1px) so it stops hogging
-        # vertical space; the default button padding made it far too tall.
-        btn.setFixedHeight(fm.height() + 1)
-        return btn
-
-    def _sync_header_arrow(self, btn: QPushButton, open_: bool) -> None:
-        arrow = self._ARROW_OPEN if open_ else self._ARROW_CLOSED
-        btn.setText(f"{arrow}  {btn.property('headerLabel')}")
+    _header_button = staticmethod(section_header.header_button)
+    _sync_header_arrow = staticmethod(section_header.sync_header_arrow)
 
     @staticmethod
     def _nudge_button(style: str, text: str) -> QPushButton:

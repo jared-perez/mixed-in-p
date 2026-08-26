@@ -203,7 +203,11 @@ class TestComingBackToAPlaylist:
         which is exactly the case that cannot see it: the bug showed in the
         app as "only the last playlist or two remember where they were"."""
         long_one, _ = stocked_playlist(lib, player, tmp_path, "Long", "l")
-        short_one, _ = stocked_playlist(lib, player, tmp_path, "Short", "s", rows=5)
+        # Short enough not to scroll in the 400px fixture. It was 5 until the
+        # metronome section added a collapsed header row to the panel, at
+        # which point 5 rows overflowed by one pixel and the guard below —
+        # correctly — said the test was proving nothing.
+        short_one, _ = stocked_playlist(lib, player, tmp_path, "Short", "s", rows=3)
         player.load_node(long_one)
         settle_at_top(player, qtbot)
         halfway = bar(player).maximum() // 2

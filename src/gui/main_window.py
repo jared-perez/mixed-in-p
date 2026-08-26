@@ -434,6 +434,9 @@ class MainWindow(QMainWindow):
         self._metadata_panel.play_requested.connect(self._play_from_metadata)
         self._player_panel.open_in_metadata.connect(self._open_in_metadata_panel)
         self._player_panel.slice_expanded.connect(self._sizer.on_slicer_expanded)
+        self._player_panel.metronome_expanded.connect(
+            self._sizer.on_metronome_expanded
+        )
         self._player_panel.compat_panel_toggled.connect(self._sizer.on_compat_panel_toggled)
 
         # Spectrum panel signals
@@ -476,6 +479,13 @@ class MainWindow(QMainWindow):
         # Stop keyboard audio when navigating away
         if page_id != "keyboard":
             self._keyboard_panel.stop_audio()
+
+        # The Player's metronome is asked to *leave* rather than to stop: its
+        # Global Click mode is precisely the setting that says navigating away
+        # is not a reason to go quiet. Playback itself is untouched either way
+        # — the Player has always kept playing off its own page.
+        if page_id != "player":
+            self._player_panel.leave_metronome()
 
         # Refresh panels when switching to them
         if page_id == "rename":
@@ -2556,6 +2566,9 @@ class MainWindow(QMainWindow):
         self._config.player_column_count = disk.player_column_count
         self._config.player_column_defaults_version = disk.player_column_defaults_version
         self._config.visualization_mode = disk.visualization_mode
+        # Written by MetronomeView as the user clicks it, like the fields
+        # above — off this list, closing the window reverts the toggle.
+        self._config.metronome_global_click = disk.metronome_global_click
         save_config(self._config)
 
     def closeEvent(self, event) -> None:
@@ -2566,6 +2579,8 @@ class MainWindow(QMainWindow):
 
         # Stop media players
         self._player_panel.stop_playback()
+        # Not leave_metronome: closing the window overrides Global Click.
+        self._player_panel.shutdown_metronome()
         self._keyboard_panel.stop_audio()
 
         # ...and the threads still *reading* files. Stopping playback does not

@@ -213,6 +213,11 @@ class AppConfig:
     # same either way; "full" keeps the whole square and lets the row grow to
     # fit it. Applied live, like the text size it scales with.
     player_artwork_view: str = "top"
+    # Whether the Keyboard panel's metronome keeps clicking once you leave it
+    # (its "Global Click" toggle). On by default: a DJ setting a tempo wants
+    # it while they work, and the click is easy to find and stop. Written by
+    # the view itself, so it is on _persist_config's merge list.
+    metronome_global_click: bool = True
     # Base64-encoded QMainWindow.saveGeometry() (size + position + maximized
     # state). Empty = open at the default size, centered. The Keyboard panel's
     # transient resize is never stored here.
@@ -447,6 +452,11 @@ def load_config() -> AppConfig:
                 ),
                 player_artwork_view=data.get(
                     "player_artwork_view", AppConfig.player_artwork_view
+                ),
+                metronome_global_click=bool(
+                    data.get(
+                        "metronome_global_click", AppConfig.metronome_global_click
+                    )
                 ),
                 window_geometry=data.get(
                     "window_geometry", AppConfig.window_geometry

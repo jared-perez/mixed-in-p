@@ -17,10 +17,11 @@ import pytest
 from PySide6.QtCore import QEvent, QPoint, QPointF, Qt
 from PySide6.QtGui import QMouseEvent
 
-from src.gui.widgets.keyboard_panel import KeyboardPanel
-from src.gui.widgets.metronome_engine import MAX_BPM, MIN_BPM
+from src.utils.config import load_config, save_config
+from src.gui.widgets.metronome_engine import MAX_BPM, MIN_BPM, SHARP, SOFT
 from src.gui.widgets.metronome_view import (
     DEFAULT_CLICK_VOLUME,
+    SILENT,
     BpmScrubBox,
     MetronomeView,
 )
@@ -38,6 +39,18 @@ class FakeStream:
 
     def close(self):
         self.closed = True
+
+
+def store_global_click(on):
+    """Put the setting on disk BEFORE the widget is built.
+
+    MetronomeView imports load_config at module level, so patching it on the
+    config module would not be seen — and the suite's isolated_app_data makes
+    this a throwaway file per test. Same rule the panel settings follow.
+    """
+    cfg = load_config()
+    cfg.metronome_global_click = on
+    save_config(cfg)
 
 
 @pytest.fixture
@@ -217,9 +230,13 @@ class TestTheTransport:
         assert view._start_btn.text() == "Stop"
 
     def test_hiding_the_view_stops_it(self, opened, qtbot):
-        """Switching to another view in the switcher, or off the panel: the
-        click is not background music."""
+        """Switching to another view in the switcher, or off the panel.
+
+        With Global Click off, which is not the default — see
+        TestGlobalClickSurvivesLeavingTheView for the other half.
+        """
         view, streams = opened
+        view._global_btn.setChecked(False)
         view.show()
         qtbot.waitExposed(view)
         view._start_btn.setChecked(True)
@@ -277,86 +294,163 @@ class TestTap:
         assert view._bpm_box.value() == 120.0
 
 
-class TestTheClickHasItsOwnVolume:
-    """It first followed the Keyboard panel's slider, which sits beside the
-    piano and says nothing about the click — the user's report was that the
-    metronome had no volume control at all. One slider on the view, and it is
-    the only thing that reaches the engine's gain."""
+class TestTheClickRowPicksWhichClick:
+    """Three exclusive toggles where the volume slider was: silent, soft,
+    sharp. The level is a constant now — it is which click that varies."""
 
-    def test_the_slider_reaches_the_click(self, view):
-        view._volume_slider.setValue(40)
-
-        assert view._engine._gain == pytest.approx(0.4)
-        assert view.volume == pytest.approx(0.4)
-
-    def test_it_starts_at_the_level_the_click_used_to_have(self, view):
-        assert view._volume_slider.value() == DEFAULT_CLICK_VOLUME
+    def test_it_starts_on_the_soft_click_at_the_old_level(self, view):
+        assert view.click_choice == SOFT
+        assert view._engine.voice == SOFT
         assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
 
-    def test_the_panels_slider_no_longer_moves_it(self, qtbot):
-        panel = KeyboardPanel()
-        qtbot.addWidget(panel)
-        before = panel._metronome._engine._gain
+    def test_the_sharp_choice_reaches_the_engine(self, view):
+        view.set_click_choice(SHARP)
 
-        panel._on_volume_change(10)
+        assert view._engine.voice == SHARP
+        assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
 
-        assert panel._engine.volume == pytest.approx(0.1)
-        assert panel._metronome._engine._gain == pytest.approx(before)
-        panel.stop_audio()
+    def test_silence_is_a_gain_of_zero(self, view):
+        view.set_click_choice(SILENT)
+
+        assert view.volume == 0.0
+        assert view._engine._gain == 0.0
+
+    def test_silence_leaves_the_voice_alone_so_coming_back_restores_it(self, view):
+        view.set_click_choice(SHARP)
+        view.set_click_choice(SILENT)
+
+        assert view._engine.voice == SHARP
+        view.set_click_choice(SHARP)
+        assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
+
+    def test_only_one_is_ever_on(self, view):
+        for choice in (SILENT, SOFT, SHARP):
+            view.set_click_choice(choice)
+            on = [c for c, b in view._click_buttons.items() if b.isChecked()]
+            assert on == [choice]
+
+    def test_the_light_keeps_time_while_silent(self, view):
+        """Silence is a gain, not a stopped grid — the beat light reads the
+        engine, so a silent metronome still has to be a running one."""
+        view.set_click_choice(SILENT)
+        view._start_btn.setChecked(True)
+
+        assert view.running
+        assert view._vis_timer.isActive()
+
+    def test_a_switch_applies_once_though_it_is_announced_twice(self, view):
+        """An exclusive group announces both halves. Both would apply the
+        same choice — Qt has already checked the incoming button when the
+        outgoing one emits — so this is about the redundant call, not about
+        correctness, and the handler's docstring says so."""
+        view.set_click_choice(SILENT)
+        applied = []
+        view._apply_click_choice = lambda: applied.append(view.click_choice)
+
+        view.set_click_choice(SHARP)
+
+        assert applied == [SHARP]
+
+class TestGlobalClickSurvivesLeavingTheView:
+    """On by default and remembered. Off, hiding the view silences it.
+
+    Hiding is the whole mechanism — collapsing the Player's metronome section
+    is what hides this widget — so it is tested here rather than at the
+    section. What the *host* does with it is in test_player_metronome.py.
+    """
+
+    def test_it_is_on_by_default(self, view):
+        assert view.global_click
+
+    def test_hiding_the_view_still_stops_it_when_off(self, opened, qtbot):
+        view, streams = opened
+        view._global_btn.setChecked(False)
+        view.show()
+        qtbot.waitExposed(view)
+        view._start_btn.setChecked(True)
+
+        view.hide()
+
+        assert not view.running
+
+    def test_hiding_the_view_keeps_it_when_on(self, opened, qtbot):
+        view, streams = opened
+        view.show()
+        qtbot.waitExposed(view)
+        view._start_btn.setChecked(True)
+
+        view.hide()
+
+        assert view.running
+        assert not streams[0].stopped
+        assert view._start_btn.isChecked()
+        view.stop()
+
+    def test_the_tooltip_says_what_the_next_click_does(self, view):
+        before = view._global_btn.toolTip()
+        view._global_btn.setChecked(False)
+
+        assert view._global_btn.toolTip() != before
+        assert "leave this view" in view._global_btn.toolTip()
+
+    def test_the_tooltip_starts_on_the_sentence_the_stored_state_earns(self, qtbot):
+        """setChecked runs before the tooltip is first synced, so a stored
+        'on' must not open wearing the 'off' sentence — the blockSignals law
+        one door along: housekeeping a caller can skip has to be re-run."""
+        store_global_click(False)
+        off = MetronomeView(stream_factory=lambda: None)
+        qtbot.addWidget(off)
+        store_global_click(True)
+        on = MetronomeView(stream_factory=lambda: None)
+        qtbot.addWidget(on)
+
+        assert "Keep the click going" in off._global_btn.toolTip()
+        assert "Stop the click" in on._global_btn.toolTip()
 
 
-class TestItIsTheThirdViewInTheSwitcher:
-    def test_the_switcher_offers_three_views(self, qtbot):
-        panel = KeyboardPanel()
-        qtbot.addWidget(panel)
-        try:
-            assert panel._view_combo.count() == 3
-            assert panel._view_combo.itemText(2) == "Metronome"
-        finally:
-            panel.stop_audio()
+class TestGlobalClickIsRemembered:
+    """It is a mode, not a gesture — a DJ who wants the click everywhere wants
+    it there next launch too."""
 
-    def test_exactly_one_view_shows_at_a_time(self, qtbot):
-        panel = KeyboardPanel()
-        qtbot.addWidget(panel)
-        try:
-            views = [panel._hex, panel._circle, panel._metronome]
-            for index in range(3):
-                panel._view_combo.setCurrentIndex(index)
-                visible = [i for i, w in enumerate(views) if not w.isHidden()]
-                assert visible == [index]
-        finally:
-            panel.stop_audio()
+    def test_a_stored_off_is_restored(self, qtbot):
+        store_global_click(False)
+        view = MetronomeView(stream_factory=lambda: None)
+        qtbot.addWidget(view)
 
-    def test_leaving_the_panel_stops_the_click(self, qtbot):
-        """MainWindow calls stop_audio on a page change and on close. The
-        Keyboard panel going off screen does NOT hide the metronome widget —
-        a child of a hidden parent gets no hideEvent — so stop_audio has to
-        reach the click itself.
-        """
-        panel = KeyboardPanel()
-        qtbot.addWidget(panel)
-        streams = []
-        panel._metronome._stream_factory = lambda: streams.append(FakeStream()) or streams[-1]
-        panel._view_combo.setCurrentIndex(2)
-        panel._metronome._start_btn.setChecked(True)
-        assert panel._metronome.running
+        assert not view.global_click
 
-        panel.stop_audio()
+    def test_a_stored_on_is_restored(self, qtbot):
+        store_global_click(False)
+        store_global_click(True)
+        view = MetronomeView(stream_factory=lambda: None)
+        qtbot.addWidget(view)
 
-        assert not panel._metronome.running
-        assert streams[0].stopped
+        assert view.global_click
 
-    def test_the_holder_is_wide_enough_for_all_three(self, qtbot):
-        """The holder's width is fixed to the widest view so the column does
-        not slide sideways when the switcher changes it."""
-        panel = KeyboardPanel()
-        qtbot.addWidget(panel)
-        try:
-            holder = panel._metronome.parentWidget()
-            assert holder.width() >= panel._metronome.sizeHint().width()
-            assert holder.width() >= panel._hex.width()
-        finally:
-            panel.stop_audio()
+    def test_clicking_it_writes_through(self, view):
+        view._global_btn.setChecked(False)
+
+        assert load_config().metronome_global_click is False
+        view._global_btn.setChecked(True)
+        assert load_config().metronome_global_click is True
+
+    def test_it_defaults_on_for_a_config_that_never_heard_of_it(self):
+        """Every config in the wild predates the field."""
+        assert load_config().metronome_global_click is True
+
+    def test_the_window_does_not_revert_it_on_close(self):
+        """_persist_config re-reads the fields panels write before saving its
+        own startup snapshot. A new one missing from that merge list is
+        reverted by the very act of closing the window."""
+        source = pathlib.Path("src/gui/main_window.py").read_text()
+        start = source.index("def _persist_config")
+        merge = source[start : source.index("save_config(self._config)", start)]
+        assert "metronome_global_click = disk.metronome_global_click" in merge
+
+    def test_it_sits_beside_tap(self, view):
+        row = view._tap_btn.parentWidget().layout().itemAt(0).layout()
+        widgets = [row.itemAt(i).widget() for i in range(row.count())]
+        assert widgets.index(view._global_btn) == widgets.index(view._tap_btn) + 1
 
 
 class TestTheSmallButtonsSurviveTheStylesheet:
@@ -388,3 +482,17 @@ class TestTheSmallButtonsSurviveTheStylesheet:
         assert "min-width: 0" not in rule, "collapses the button to its glyph"
         assert "min-width: 24px;" in rule
         assert "max-width: 24px;" in rule
+
+    def test_the_click_toggles_obey_the_same_rule(self):
+        rule = self.rule_for("metroClickButton")
+        assert "padding: 0;" in rule
+        assert "min-width: 0" not in rule, "collapses the button to its glyph"
+        assert "min-width: 24px;" in rule
+        assert "max-width: 24px;" in rule
+
+    def test_a_checked_click_toggle_reads_as_on(self):
+        """The one thing #metroStepButton has no use for: these hold a state
+        rather than firing an action."""
+        text = pathlib.Path("src/gui/styles/app.qss.template").read_text()
+        assert "QPushButton#metroClickButton:checked {" in text
+        assert "QPushButton#metroGlobalButton:checked" in text

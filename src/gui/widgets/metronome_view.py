@@ -1,4 +1,9 @@
-"""The Keyboard panel's third view: a metronome with a BPM counter.
+"""The metronome: a BPM counter, a click train, and a beat light.
+
+Hosted by :class:`~src.gui.widgets.metronome_section.MetronomeSection`, a
+collapsible section in the Player panel. It was the Keyboard panel's third
+view until 2026-08-26 and nothing in this file changed in the move — the host
+supplies a place to sit and the two lifecycle calls at the bottom.
 
 The sound is the clock. :class:`MetronomeEngine` schedules every click by
 sample count inside the audio callback, which is the only way to hold a tempo
@@ -12,6 +17,15 @@ audition player documents the same thing. It is opened only when the user
 presses Start, and it swallows its own failures the way ``_AudioEngine.start``
 does, so a machine with no output device degrades to a silent-but-working
 visual rather than an exception.
+
+Leaving silences it, and Global Click — on by default, and remembered in the
+user's config — is the exception. That split is why there are two teardowns
+rather than one: :meth:`MetronomeView.leave` is the
+navigation path and honours the setting, :meth:`MetronomeView.stop` is the
+unconditional one. ``KeyboardPanel`` mirrors the pair (``stop_audio`` /
+``shutdown_audio``) because the synth has no such setting — a held note that
+followed you off the panel would be a stuck note, not a feature — and because
+closing the window is the one place no mode gets a vote.
 """
 
 from __future__ import annotations
@@ -23,19 +37,22 @@ import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
 from PySide6.QtGui import QColor, QPainter
 from PySide6.QtWidgets import (
+    QButtonGroup,
     QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
-    QSlider,
     QVBoxLayout,
     QWidget,
 )
 
+from ...utils.config import load_config, save_config
 from ..styles.theme import Theme
 from .loop_player import output_stream_kwargs
 from .metronome_engine import (
     BEATS_PER_BAR,
+    SHARP,
+    SOFT,
     MetronomeEngine,
     TapTempo,
     clamp_bpm,
@@ -58,10 +75,18 @@ _BEND = 0.04
 # nothing about the sound depends on when this fires.
 _VIS_INTERVAL_MS = 33
 
-# Where the click's own slider starts, in percent. The same 50 the click was
-# born at when it followed the Keyboard panel's slider, so the first Start
-# after the change is no louder or softer than before it.
+# The level both audible choices sound at, in percent. It was a slider once,
+# and this is the 50 that slider started at — so a click is exactly as loud
+# as it has always been, and the choice on the row is now *which* click.
 DEFAULT_CLICK_VOLUME = 50
+
+# The three settings the click row offers, left to right. Silence is one of
+# them rather than a level, because that is the only thing the level was ever
+# used for here: the light keeps time either way, so a silent metronome is a
+# useful state and not a broken one.
+SILENT = "silent"
+CLICK_CHOICES = (SILENT, SOFT, SHARP)
+DEFAULT_CLICK = SOFT
 
 
 class BpmScrubBox(QLineEdit):
@@ -255,6 +280,26 @@ class MetronomeView(QWidget):
         self._tap_btn.setToolTip(self.tr("Tap along to set the tempo"))
         self._tap_btn.clicked.connect(self._on_tap)
         tempo_row.addWidget(self._tap_btn)
+
+        # On, the click keeps going once you leave — so a tempo can be held
+        # while renaming or digging through a playlist. Off, leaving silences
+        # it. On by default and remembered across launches: the click is easy
+        # to find and stop, and a DJ setting a tempo wants it while they work.
+        self._global_btn = QPushButton(self.tr("Global Click"))
+        self._global_btn.setObjectName("metroGlobalButton")
+        self._global_btn.setCheckable(True)
+        self._global_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        # Nothing reflects this control — it has one owner and no mirror — so
+        # `toggled` is the whole story. A control shown in two places would
+        # have to hang this off checkStateSet() instead, or a blockSignals'd
+        # reflect would light up wearing the other state's sentence.
+        self._global_btn.toggled.connect(self._on_global_toggled)
+        # setChecked before the connect would leave the tooltip on the wrong
+        # sentence, so the stored value is applied here and the sync runs off
+        # the signal like any other change.
+        self._global_btn.setChecked(load_config().metronome_global_click)
+        self._sync_global_tooltip(self._global_btn.isChecked())
+        tempo_row.addWidget(self._global_btn)
         tempo_row.addStretch(1)
         outer.addLayout(tempo_row)
 
@@ -282,22 +327,31 @@ class MetronomeView(QWidget):
         bend_row.addWidget(self._start_btn)
         bend_row.addSpacing(12)
 
-        # The click's own volume. It used to follow the Keyboard panel's
-        # slider, which sits beside the piano with nothing to say it also
-        # governs the click — and a 1 kHz burst at the piano's level is not
-        # the level anyone wants a click at. One slider, one owner: the
-        # panel's slider no longer reaches the engine at all.
-        vol_glyph = QLabel("\u266b")  # the same mark the panel's slider wears
-        vol_glyph.setStyleSheet(f"color: {Theme.TEXT_PRIMARY}; font-size: 16px;")
-        bend_row.addWidget(vol_glyph)
-        self._volume_slider = QSlider(Qt.Orientation.Horizontal)
-        self._volume_slider.setRange(0, 100)
-        self._volume_slider.setValue(DEFAULT_CLICK_VOLUME)
-        self._volume_slider.setFixedWidth(100)
-        self._volume_slider.setToolTip(self.tr("Click volume"))
-        self._volume_slider.valueChanged.connect(self._on_volume_changed)
-        self._engine.set_gain(DEFAULT_CLICK_VOLUME / 100.0)
-        bend_row.addWidget(self._volume_slider)
+        # Which click, in the slider's old place. A level was never what
+        # anyone reached for here — the useful answers are "not this one",
+        # "the one that sits in a mix" and "the one that sits on top of it" —
+        # so the row states those three and the level is a constant. The
+        # panel's own slider, up beside the piano, still does not reach the
+        # engine: one owner, and it is this row.
+        self._click_group = QButtonGroup(self)
+        self._click_group.setExclusive(True)
+        self._click_buttons: dict[str, QPushButton] = {}
+        for choice, glyph, tip in (
+            (SILENT, "\u2298", self.tr("Silent — the light keeps time")),
+            (SOFT, ")", self.tr("Standard click")),
+            (SHARP, "))", self.tr("Higher-pitched click")),
+        ):
+            button = QPushButton(glyph)
+            button.setObjectName("metroClickButton")
+            button.setCheckable(True)
+            button.setFixedSize(24, 24)
+            button.setToolTip(tip)
+            button.setCursor(Qt.CursorShape.PointingHandCursor)
+            self._click_group.addButton(button)
+            self._click_buttons[choice] = button
+            bend_row.addWidget(button)
+        self._click_group.buttonToggled.connect(self._on_click_choice)
+        self._click_buttons[DEFAULT_CLICK].setChecked(True)
         bend_row.addStretch(1)
         outer.addLayout(bend_row)
 
@@ -349,6 +403,40 @@ class MetronomeView(QWidget):
         # output the light should still keep time rather than looking broken.
         self._vis_timer.start()
 
+    @property
+    def global_click(self) -> bool:
+        """Whether the click survives leaving the view."""
+        return self._global_btn.isChecked()
+
+    def _on_global_toggled(self, on: bool) -> None:
+        self._sync_global_tooltip(on)
+        # Re-loaded first so this never clobbers a field another panel wrote
+        # since startup — the player_edit_locked pattern.
+        cfg = load_config()
+        if cfg.metronome_global_click != on:
+            cfg.metronome_global_click = on
+            save_config(cfg)
+
+    def _sync_global_tooltip(self, on: bool) -> None:
+        # A toggle's tooltip says what the NEXT click will do, in both
+        # directions — the label alone cannot convey which way it is pointing.
+        self._global_btn.setToolTip(
+            self.tr("Stop the click when you leave this view")
+            if on
+            else self.tr("Keep the click going when you leave this view")
+        )
+
+    def leave(self) -> None:
+        """Navigating away — to another view, or off the Keyboard panel.
+
+        The one place Global Click means anything. Everything that really
+        ends the session — closing the window — calls :meth:`stop` instead,
+        because a mode the user set is not a licence to outlive the app.
+        """
+        if self.global_click:
+            return
+        self.stop()
+
     def stop(self) -> None:
         self._vis_timer.stop()
         with self._stream_lock:
@@ -365,14 +453,47 @@ class MetronomeView(QWidget):
         if self._start_btn.isChecked():
             self._start_btn.setChecked(False)
 
-    def _on_volume_changed(self, value: int) -> None:
-        self._engine.set_gain(value / 100.0)
+    def _on_click_choice(self, button: QPushButton, checked: bool) -> None:
+        """Apply whichever of the three is now on.
+
+        The group is exclusive, so every switch arrives twice — once for the
+        button going off and once for the one coming on. Both halves would
+        apply the *same* choice, because Qt has already checked the incoming
+        button by the time the outgoing one emits, so this guard buys one
+        redundant call rather than correctness. Stated because the obvious
+        comment to write here — "acting on the first would set the gain from
+        the choice just left" — is not true, and a mutation test refused to
+        fail against it.
+        """
+        if not checked:
+            return
+        self._apply_click_choice()
+
+    def _apply_click_choice(self) -> None:
+        choice = self.click_choice
+        # Silence is a gain of zero rather than a stopped stream: the grid
+        # has to keep running, because the beat light is reading it.
+        self._engine.set_gain(0.0 if choice == SILENT else DEFAULT_CLICK_VOLUME / 100.0)
+        if choice != SILENT:
+            self._engine.set_voice(choice)
+
+    @property
+    def click_choice(self) -> str:
+        """Which of :data:`CLICK_CHOICES` is on — session-only, like the
+        Keyboard panel's and the Player's own volume settings."""
+        for choice, button in self._click_buttons.items():
+            if button.isChecked():
+                return choice
+        return SILENT
+
+    def set_click_choice(self, choice: str) -> None:
+        self._click_buttons[choice].setChecked(True)
 
     @property
     def volume(self) -> float:
-        """The click's level, 0.0-1.0 — what the slider says, session-only,
-        like the Keyboard panel's and the Player's own sliders."""
-        return self._volume_slider.value() / 100.0
+        """The click's level, 0.0-1.0. Two values now, not a hundred: the row
+        chose which click, and silence is the only level anyone wanted."""
+        return 0.0 if self.click_choice == SILENT else DEFAULT_CLICK_VOLUME / 100.0
 
     # ── the ear and the eye ─────────────────────────────────────────
 
@@ -427,7 +548,8 @@ class MetronomeView(QWidget):
     # ── lifecycle ───────────────────────────────────────────────────
 
     def hideEvent(self, event) -> None:
-        # Switching away from the view — or off the panel — silences it. The
-        # click is not background music.
-        self.stop()
+        # Switching away from the view — or off the panel — silences it,
+        # unless the user has said otherwise. The click is not background
+        # music by default; Global Click is how it becomes that.
+        self.leave()
         super().hideEvent(event)

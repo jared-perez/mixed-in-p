@@ -35,10 +35,29 @@ import numpy as np
 # Beats per bar. Beat 1 gets the higher click so the bar is audible.
 BEATS_PER_BAR = 4
 
-# The click itself: a short decaying sine burst. Two pitches, one accented.
+# The soft voice: a short decaying sine burst, the click this started as.
 _CLICK_MS = 5.0
-_CLICK_HZ = 1000.0
-_ACCENT_HZ = 1500.0
+
+# The sharp voice: a beep rather than a tick, because the job is to be heard
+# over a track and a 5 ms burst is the wrong tool for that twice over. The ear
+# integrates loudness over ~100-200 ms, so a tone eight times as long reads as
+# far louder at the same peak; and 5 ms is too short to carry a pitch, so a
+# tick has nothing for the ear to lock onto once a mix is playing. 40 ms at
+# 2-3 kHz — the band the ear is most sensitive in — has both.
+#
+# The ramps are what keep it a beep instead of two extra clicks: a tone that
+# starts and stops on a hard edge has a broadband transient at each end, which
+# is audibly a pop. Raised cosine, short in and longer out, so the attack still
+# lands on the beat.
+_BEEP_MS = 40.0
+_BEEP_ATTACK_MS = 2.0
+_BEEP_RELEASE_MS = 12.0
+
+# Two voices to choose between, each a (shape, beat, accent) — the accent is
+# the 3:2 partner in both, so a bar reads the same way whichever voice is on.
+SOFT = "soft"
+SHARP = "sharp"
+VOICES = (SOFT, SHARP)
 
 # What the BPM box will accept. Wide enough for half-time and drum'n'bass.
 MIN_BPM = 20.0
@@ -46,7 +65,7 @@ MAX_BPM = 300.0
 
 
 def _make_click(freq: float, sr: int) -> np.ndarray:
-    """One burst, rendered once at construction and only ever sliced after.
+    """One tick, rendered once at construction and only ever sliced after.
 
     Building this in the audio callback would allocate on the audio thread,
     which is the one place in the app that must not.
@@ -55,6 +74,29 @@ def _make_click(freq: float, sr: int) -> np.ndarray:
     t = np.arange(count) / sr
     envelope = np.exp(-t / (_CLICK_MS / 1000.0 / 4.0))
     return (np.sin(2 * np.pi * freq * t) * envelope).astype(np.float32)
+
+
+def _make_beep(freq: float, sr: int) -> np.ndarray:
+    """One beep: a sustained tone with a raised-cosine edge at each end.
+
+    Same contract as :func:`_make_click` — built once, sliced thereafter.
+    """
+    count = int(sr * _BEEP_MS / 1000.0)
+    t = np.arange(count) / sr
+    envelope = np.ones(count)
+    attack = int(sr * _BEEP_ATTACK_MS / 1000.0)
+    release = int(sr * _BEEP_RELEASE_MS / 1000.0)
+    envelope[:attack] = 0.5 * (1.0 - np.cos(np.pi * np.arange(attack) / attack))
+    envelope[count - release :] = 0.5 * (
+        1.0 + np.cos(np.pi * np.arange(release) / release)
+    )
+    return (np.sin(2 * np.pi * freq * t) * envelope).astype(np.float32)
+
+
+_VOICE_SPECS = {
+    SOFT: (_make_click, 1000.0, 1500.0),
+    SHARP: (_make_beep, 2000.0, 3000.0),
+}
 
 
 def clamp_bpm(bpm: float) -> float:
@@ -71,8 +113,14 @@ class MetronomeEngine:
         self._bpm = clamp_bpm(bpm)
         self._bend = 1.0
         self._gain = 1.0
-        self._click = _make_click(_CLICK_HZ, sr)
-        self._accent = _make_click(_ACCENT_HZ, sr)
+        # Both voices are rendered here, once, for the same reason there is
+        # only ever one of each: a template built in the audio callback would
+        # allocate on the audio thread. Switching voice is then a dict lookup.
+        self._voices = {
+            name: (shape(beat, sr), shape(accent, sr))
+            for name, (shape, beat, accent) in _VOICE_SPECS.items()
+        }
+        self._voice = SOFT
         self._pos = 0  # absolute sample position of the next block's start
         self._next_beat = 0.0  # absolute float sample of the next onset
         self._beat_index = 0
@@ -112,6 +160,22 @@ class MetronomeEngine:
         with self._lock:
             self._gain = max(0.0, min(1.0, float(gain)))
 
+    @property
+    def voice(self) -> str:
+        return self._voice
+
+    def set_voice(self, voice: str) -> None:
+        """Pick which pair of bursts the grid sounds with.
+
+        A click already sounding keeps the template it started with — it is
+        held in ``_active`` by reference — so a mid-bar change never cuts a
+        burst off halfway or splices two pitches into one.
+        """
+        if voice not in self._voices:
+            raise ValueError(f"unknown click voice: {voice!r}")
+        with self._lock:
+            self._voice = voice
+
     def reset(self) -> None:
         """Start the grid again from beat 1 of the bar."""
         with self._lock:
@@ -134,11 +198,12 @@ class MetronomeEngine:
             bpm = self._bpm
             bend = self._bend
             gain = self._gain
+            click, accent = self._voices[self._voice]
         end = self._pos + frames
         while self._next_beat < end:
             onset = int(round(self._next_beat))
             accented = self._beat_index % BEATS_PER_BAR == 0
-            self._active.append((onset, self._accent if accented else self._click, 0))
+            self._active.append((onset, accent if accented else click, 0))
             self._next_beat += self.sr * 60.0 / (bpm * bend)
             self._beat_index += 1
         still: list[tuple[int, np.ndarray, int]] = []

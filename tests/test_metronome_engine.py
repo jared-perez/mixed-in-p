@@ -17,6 +17,9 @@ from src.gui.widgets.metronome_engine import (
     BEATS_PER_BAR,
     MAX_BPM,
     MIN_BPM,
+    SHARP,
+    SOFT,
+    VOICES,
     MetronomeEngine,
     TapTempo,
     clamp_bpm,
@@ -40,14 +43,26 @@ def render(engine, seconds, block=256):
 
 
 def onsets(buf, threshold=0.05, min_gap=400):
-    """Rising edges of the click train, in samples."""
+    """Rising edges of the click train, in samples.
+
+    *min_gap* is a run of SILENCE, measured from the last hot sample — not
+    from the last onset. Measuring it from the onset works only while every
+    burst is shorter than the gap, which was true of the 5 ms tick and is not
+    true of the 40 ms beep: one beep then reads as five onsets 400 samples
+    apart, and every assertion downstream lines up against the wrong beat.
+    The sub-threshold notches a sine puts at its own zero crossings are under
+    a sample wide, and the beep's fade-out tail is ~75, so both stay well
+    inside the gap.
+    """
     hot = np.flatnonzero(np.abs(buf) > threshold)
     if len(hot) == 0:
         return np.array([], dtype=int)
     starts = [hot[0]]
+    last = hot[0]
     for i in hot[1:]:
-        if i - starts[-1] > min_gap:
+        if i - last > min_gap:
             starts.append(i)
+        last = i
     return np.array(starts)
 
 
@@ -178,6 +193,119 @@ class TestTheBar:
         accented = [crossings(found[i]) for i in range(0, 8, BEATS_PER_BAR)]
         plain = [crossings(found[i]) for i in range(1, 8) if i % BEATS_PER_BAR]
         assert min(accented) > max(plain), "the accent is not the higher pitch"
+
+
+class TestTheTwoVoices:
+    """Which pair of bursts the grid sounds with. Counted in zero crossings
+    rather than trusted from a label, the same way the accent is above."""
+
+    def test_the_sharp_voice_is_a_beep_not_a_tick(self):
+        """The whole point of it: long enough for the ear to integrate and to
+        hear a pitch, which is what carries over a track."""
+        engine = MetronomeEngine(120.0, sr=SR)
+        engine.set_voice(SHARP)
+        soft_burst, _ = engine._voices[SOFT]
+        sharp_burst, _ = engine._voices[SHARP]
+
+        assert len(sharp_burst) > 4 * len(soft_burst)
+        # A sustained body, not a decay: the tick is long past its peak by
+        # its own midpoint and the beep is still at full height.
+        assert abs(sharp_burst).max() > 0.99
+        mid = len(sharp_burst) // 2
+        assert abs(sharp_burst[mid : mid + 40]).max() > 0.95
+        assert abs(soft_burst[len(soft_burst) // 2 :]).max() < 0.3
+
+    def test_both_ends_are_ramped_so_the_beep_does_not_pop(self):
+        """A tone starting or stopping on a hard edge is a broadband
+        transient — audibly a click at each end of the thing meant to
+        replace clicking."""
+        for burst in engine_bursts(SHARP):
+            assert abs(burst[0]) < 0.01
+            assert abs(burst[-1]) < 0.01
+
+    @staticmethod
+    def _beat_crossings(engine):
+        buf = render(engine, 2.1)
+        found = onsets(buf)
+        assert len(found) >= 4
+        # Beat 2, i.e. an unaccented one, so this measures the voice and not
+        # the 3:2 partner every voice shares.
+        burst = buf[found[1] : found[1] + int(SR * 0.004)]
+        return int(np.sum(np.diff(np.signbit(burst)) != 0))
+
+    def test_it_starts_soft(self):
+        assert MetronomeEngine(120.0, sr=SR).voice == SOFT
+
+    def test_sharp_is_the_higher_of_the_two(self):
+        soft = MetronomeEngine(120.0, sr=SR)
+        sharp = MetronomeEngine(120.0, sr=SR)
+        sharp.set_voice(SHARP)
+
+        assert self._beat_crossings(sharp) > self._beat_crossings(soft)
+
+    def test_each_voice_keeps_its_own_accent_on_beat_one(self):
+        for voice in VOICES:
+            engine = MetronomeEngine(120.0, sr=SR)
+            engine.set_voice(voice)
+            buf = render(engine, 4.1)
+            found = onsets(buf)
+
+            def crossings(start):
+                burst = buf[start : start + int(SR * 0.004)]
+                return int(np.sum(np.diff(np.signbit(burst)) != 0))
+
+            accented = [crossings(found[i]) for i in range(0, 8, BEATS_PER_BAR)]
+            plain = [crossings(found[i]) for i in range(1, 8) if i % BEATS_PER_BAR]
+            assert min(accented) > max(plain), f"{voice} lost its accent"
+
+    def test_switching_does_not_disturb_the_grid(self):
+        """A voice change is not a tempo change: no click is lost or doubled
+        across it, and each stretch sits on the grid.
+
+        Measured per stretch rather than over the join, because a beep is
+        detected a few samples later inside its own burst than a tick is — it
+        ramps in and a tick does not — so the one gap that spans the switch
+        is about the envelope, not about the schedule.
+        """
+        engine = MetronomeEngine(120.0, sr=SR)
+        soft = onsets(render(engine, 1.1))
+        sharp = onsets(_switched(engine, SHARP, 1.0))
+
+        # 2.1 s at 120 BPM is five beats: 0, .5, 1.0 | 1.5, 2.0.
+        assert (len(soft), len(sharp)) == (3, 2)
+        assert np.allclose(np.diff(soft), SR // 2, atol=1)
+        # The beep's tolerance is one attack ramp, and it has to be: a
+        # threshold is crossed a little later at 2 kHz than at 3 kHz, so a
+        # plain beat and the accent that follows it are detected 2 samples
+        # apart even when both land on the grid exactly. Nothing the schedule
+        # could get wrong is that small — a lost or doubled click moves an
+        # onset by a whole beat, and the count above is what catches it.
+        ramp = int(SR * 2.0 / 1000.0)
+        assert np.allclose(np.diff(sharp), SR // 2, atol=ramp)
+
+    def test_an_unknown_voice_is_refused(self):
+        with pytest.raises(ValueError):
+            MetronomeEngine(120.0, sr=SR).set_voice("cowbell")
+
+    def test_it_allocates_nothing_per_change(self):
+        """Both templates are rendered at construction, so a switch is a dict
+        lookup — never a burst built on the audio thread."""
+        engine = MetronomeEngine(120.0, sr=SR)
+        before = {k: (id(a), id(b)) for k, (a, b) in engine._voices.items()}
+        engine.set_voice(SHARP)
+        engine.set_voice(SOFT)
+
+        assert {k: (id(a), id(b)) for k, (a, b) in engine._voices.items()} == before
+
+
+def engine_bursts(voice):
+    engine = MetronomeEngine(120.0, sr=SR)
+    return engine._voices[voice]
+
+
+def _switched(engine, voice, seconds):
+    engine.set_voice(voice)
+    return render(engine, seconds)
 
 
 class TestClamping:
