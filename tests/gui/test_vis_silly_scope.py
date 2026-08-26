@@ -173,6 +173,7 @@ def test_the_same_second_of_audio_looks_the_same_at_either_rate():
             scene._scroll,
             scene._twist_phase,
             scene._presence,
+            scene._glow,
         ))
 
     fast, slow = states
@@ -180,6 +181,7 @@ def test_the_same_second_of_audio_looks_the_same_at_either_rate():
     assert fast[1] == pytest.approx(slow[1], rel=0.01)
     assert fast[2] == pytest.approx(slow[2], rel=0.01)
     assert fast[3] == pytest.approx(slow[3], abs=0.02)
+    assert fast[4] == pytest.approx(slow[4], abs=0.02)
 
 
 def test_setting_the_rate_is_not_undone_by_a_reset(scene):
@@ -308,6 +310,29 @@ def test_the_flicker_is_brightness_only_and_never_moves_the_silhouette():
     exact frame the scene always did."""
     calm, kicked = _twin_scenes_final_frames((0.0, 1.0))
     assert np.array_equal(_alpha_of(calm), _alpha_of(kicked))
+
+
+def test_no_sound_dims_the_whole_sheet_to_nothing(scene):
+    """The fractal's fade, on the sheet: silence releases the glow envelope
+    and the shade *and* the alpha follow it, so the frame ends fully
+    transparent rather than as a dark opaque ribbon over the playlist."""
+    _run(scene, 10.0)
+    assert _alpha_of(scene.render(_loud(), 0.0)).max() == 255
+    _run(scene, 4.0, heights=np.zeros(19))
+    assert _alpha_of(scene.render(np.zeros(19), 0.0)).max() == 0
+
+
+def test_the_fade_is_a_release_and_the_return_is_instant(scene):
+    """Fast attack, slow release — the fractal's envelope shape. Part-way
+    through the fade the sheet is dimmed, not gone; the first loud frame
+    brings it back at full strength."""
+    _run(scene, 10.0)
+    _run(scene, 0.3, heights=np.zeros(19))
+    mid = _alpha_of(scene.render(np.zeros(19), 0.0)).max()
+    assert 0 < mid < 255
+    _run(scene, 4.0, heights=np.zeros(19))
+    assert _alpha_of(scene.render(np.zeros(19), 0.0)).max() == 0
+    assert _alpha_of(scene.render(_loud(), 0.0)).max() == 255
 
 
 def test_the_droplets_are_gone():

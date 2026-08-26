@@ -49,7 +49,10 @@ already wear: one multiplicative lift of the whole shade field on the kick
 pulse, applied just before the gold LUT, so every pool flashes toward white
 at once and a pulse of zero renders the frame it always did. (Droplet sprites
 popping off the crest were tried here first and retired — next to the sheet
-they read as clutter, not as beat.)
+they read as clutter, not as beat.) Its other half is the fractal's silence
+fade: a saturating glow envelope — instant attack, exponential release —
+multiplies the shade *and* the alpha, so the whole sheet dims to nothing over
+~2 s without sound and snaps back the frame the music returns.
 
 Every constant is expressed in **seconds**, never per frame. The backdrop only
 ever runs at 33 ms, but ``scripts/vis_sheet.py`` can drive this at any rate and
@@ -100,15 +103,18 @@ _MIN_W, _MIN_H = 96, 48
 _DEFAULT_SIZE = (912, 384)
 
 # ── The hose ───────────────────────────────────────────────────────────────
-# How long the wave takes to cross the window. Shipped at 10.0 and retuned to
-# a third of that on request — the pour read as far too slow. Everything else
-# in here is expressed in time, so the change is this one number: the history
-# still holds the same music per second, each feature just crosses three times
-# as fast (and therefore sits three times wider on screen).
-_WINDOW_SECONDS = 10.0 / 3.0
+# How long the wave takes to cross the window. Shipped at 10.0 and retuned
+# twice on request — to a third, then half of that again — so the crossing is
+# now ~1.7 s. Everything else in here is expressed in time, so each retune is
+# this one number: the history still holds the same music per second, each
+# feature just crosses faster (and sits proportionally wider on screen).
+_WINDOW_SECONDS = 10.0 / 6.0
 # Nozzle history resolution. In bins per *second* so the buffer holds the same
-# stretch of music however often it is fed.
-_HISTORY_BINS_PER_S = 20.0
+# stretch of music however often it is fed. Doubled from 20 when the crossing
+# dropped to ~1.7 s, keeping a bin (width / (crossing * rate) pixels, ~18 px
+# here) comfortably inside the centerline smoother's kernel — a bin wider
+# than the smoother shows its smoothstep knots as facets.
+_HISTORY_BINS_PER_S = 40.0
 # Loudness followers. The difference of the two is the band-passed wiggle: the
 # fast one tracks the phrase, the slow one is what it is measured against, so a
 # steady loud passage sits still and a dynamic one swings.
@@ -136,16 +142,21 @@ _SWING_FRAC = 0.48
 # amplifies any kink in the centerline into a vertical crease down the whole
 # sheet, so the centerline has to be smooth before anything differentiates it.
 _HISTORY_BLURS = 3
-# The pixel-space smoother, as a fraction of the image width so the look does
-# not change with the render size. It has to be this wide: the centerline's
-# *real* curvature — not noise, the signal genuinely turning — is what the
-# x-gradient (scaled by 0.2 * width to keep the side glints) multiplies by
-# ~240 and paints as fine vertical corduroy over the whole sheet. Measured at
-# the original 10 s crossing, where one bin was ~6 px: it took the second
-# difference from 0.126 rms to what a smooth wave of that wavelength really
-# has. The faster flow stretches every feature 3x in px, so the curvature
-# under this kernel only fell.
-_CENTER_SMOOTH = 0.018
+# The pixel-space smoother over the sampled centerline — expressed in
+# **seconds of signal**, converted through the transport speed at the call
+# site (sigma_px = seconds / _WINDOW_SECONDS * width), so it survives both a
+# render-size change and a flow retune. It shipped as a width fraction
+# (0.018), which is the same family of mistake as a decay written per frame:
+# a fraction of the width is a duration only at one flow speed. At 10 s it
+# meant 0.18 s of signal; by the 1.7 s crossing it meant 0.03 s, a real
+# nozzle turnover spanned ~70 px, and every crest wore a visible corner —
+# and doubling the bin rate did not touch it, because the kinks were the
+# *signal*, not the knots. 0.06 s is the identity 0.018 * width at the
+# 3.33 s window, i.e. exactly the smoothing the look was judged smooth at.
+# Its original job is unchanged: the x-gradient (scaled by 0.2 * width for
+# the side glints) multiplies the centerline's second difference by ~240 and
+# paints any kink as vertical corduroy or a crease down the whole sheet.
+_CENTER_SMOOTH_SECONDS = 0.06
 
 # ── The sheet ──────────────────────────────────────────────────────────────
 # Half-width at full flare, as a fraction of the image height — and it is a
@@ -262,6 +273,16 @@ _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 # kick flashes every pool toward white at once and a pulse of zero renders
 # the frame it always did. This replaced the droplet sprites as the beat.
 _FLICKER_GAIN = 0.35
+# The silence fade, the fractal's other half. Instant attack, exponential
+# release: the sheet is at full strength the frame music plays and dims to
+# nothing over ~2 s without it (e^(-2/0.5) ~= 0.02 — the fractal's
+# 0.94-per-frame at 30 fps is the same curve, written as a time). The knee
+# saturates the envelope, so any music above a low level shows the sheet at
+# full strength and the fade only speaks when the sound actually stops. It
+# multiplies the shade AND the alpha: dimming the shade alone would leave an
+# opaque near-black ribbon lying over the playlist rows.
+_GLOW_KNEE = 0.25
+_GLOW_RELEASE_TAU = 0.5
 
 
 def build_env_ramp(size: int = _ENV_SIZE) -> np.ndarray:
@@ -374,6 +395,7 @@ class SillyScopeScene:
         self._und_phase = [0.0, 0.0]
         self._marble_phase = [0.0, 0.0]
         self._pulse = 0.0
+        self._glow = 0.0
         width, height = _DEFAULT_SIZE
         self._size = (width, height)
         self._image = QImage(width, height, QImage.Format.Format_ARGB32)
@@ -404,6 +426,7 @@ class SillyScopeScene:
         self._fast_alpha = float(np.exp(-self._dt / _LEVEL_FAST_TAU))
         self._slow_alpha = float(np.exp(-self._dt / _LEVEL_SLOW_TAU))
         self._presence_alpha = float(np.exp(-self._dt / _PRESENCE_TAU))
+        self._glow_release = float(np.exp(-self._dt / _GLOW_RELEASE_TAU))
 
     def reset(self) -> None:
         """Forget the stream: the wave in flight and the phases."""
@@ -418,6 +441,7 @@ class SillyScopeScene:
         self._level_slow = 0.0
         self._presence = 0.0
         self._pulse = 0.0
+        self._glow = 0.0
         width, height = self._size
         self._image = QImage(width, height, QImage.Format.Format_ARGB32)
         self._image.fill(0)
@@ -471,6 +495,14 @@ class SillyScopeScene:
         self._level_slow = self._slow_alpha * self._level_slow + (1.0 - self._slow_alpha) * level
         self._presence = self._presence_alpha * self._presence + (1.0 - self._presence_alpha) * level
         gate = float(np.clip(self._presence / _PRESENCE_KNEE, 0.0, 1.0))
+        # The silence fade's envelope: attack is the max, release the decay,
+        # snapped to zero once it is below what an alpha byte can show.
+        self._glow = max(
+            float(np.clip(level / _GLOW_KNEE, 0.0, 1.0)),
+            self._glow * self._glow_release,
+        )
+        if self._glow < 1.0 / 512.0:
+            self._glow = 0.0
         nozzle = float(np.tanh(_HOSE_GAIN * (self._level_fast - self._level_slow)) * gate)
 
         # Push the nozzle into the history at a fixed rate in *time*, so the
@@ -526,7 +558,10 @@ class SillyScopeScene:
         frac = (index - base).astype(np.float32)
         frac = frac * frac * (3.0 - 2.0 * frac)
         offsets = history[base] * (1.0 - frac) + history[base + 1] * frac
-        offsets = _smooth1d(offsets.astype(np.float32), _CENTER_SMOOTH * width)
+        offsets = _smooth1d(
+            offsets.astype(np.float32),
+            _CENTER_SMOOTH_SECONDS / _WINDOW_SECONDS * width,
+        )
         return (0.5 * height + offsets * _SWING_FRAC * height).astype(np.float32)
 
     # ── Paint ──────────────────────────────────────────────────────────────
@@ -552,7 +587,7 @@ class SillyScopeScene:
         low = int(max(0, np.floor(np.min(centre - half)) - 2))
         high = int(min(height, np.ceil(np.max(centre + half)) + 3))
         bgra = np.zeros((height, width, 4), dtype=np.uint8)
-        if high > low:
+        if high > low and self._glow > 0.0:
             rows = np.arange(low, high, dtype=np.float32)
             self._paint_sheet(bgra[low:high], rows, centre, half, u, sin_twist)
         self._image = QImage(
@@ -618,16 +653,19 @@ class SillyScopeScene:
         # turning in depth rather than as a flat band changing width.
         rim = np.clip((absr - _RIM_START) / (1.0 - _RIM_START), 0.0, 1.0) ** 2
         shade += _RIM_GAIN * rim * (1.0 + _RIM_LEAN * sin_twist[None, :] * np.sign(s))
-        # The beat: everything above shapes the liquid, this one line is the
-        # flicker. See _FLICKER_GAIN.
-        if self._pulse > 0.0:
-            shade *= 1.0 + _FLICKER_GAIN * self._pulse
+        # The beat and the silence share one brightness: the kick lifts it,
+        # no sound releases it. See _FLICKER_GAIN / _GLOW_RELEASE_TAU.
+        bright = self._glow * (1.0 + _FLICKER_GAIN * self._pulse)
+        if bright != 1.0:
+            shade *= bright
         np.clip(shade, 0.0, 1.0, out=shade)
         shade = _blur121(shade, _SHADE_BLURS)
 
         packed = self._lut32[(shade * 255.0).astype(np.uint8)]
         view = packed.view(np.uint8).reshape(packed.shape[0], width, 4)
         alpha = np.clip((1.0 - absr) * half[None, :] / _EDGE_AA_PX, 0.0, 1.0)
+        if self._glow < 1.0:
+            alpha *= self._glow
         view[..., 3] = (alpha * 255.0).astype(np.uint8)
         out[:] = view
 
