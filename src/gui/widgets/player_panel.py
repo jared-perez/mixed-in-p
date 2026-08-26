@@ -1751,33 +1751,33 @@ class PlayerPanel(QWidget):
         self._vis_action_group = QActionGroup(self)
         self._vis_action_group.setExclusive(True)
         self._vis_actions: dict[str, QAction] = {}
-        # Order is a recommendation: the two richest visuals lead each group.
-        # The halves no longer run strictly in step — the backdrops put
-        # spectrum above oscilloscope and waveform below it, which is the
-        # order the user reaches for them in, and waveform has no popout twin
-        # to keep parallel with anyway. "Visuals off" sits at the foot — it is
-        # the way out, not the way in, and a menu that opens on its own "off"
-        # row buries what it offers.
+        # Order is a recommendation, and it is the user's: fractal leads each
+        # group, the wormhole sits below spectrum in both halves, and the rest
+        # follow in the order they are reached for. The halves do not run
+        # strictly in step — waveform has no popout twin to keep parallel with
+        # anyway. "Visuals off" sits at the foot — it is the way out, not the
+        # way in, and a menu that opens on its own "off" row buries what it
+        # offers.
         #
         # The two tunnels' labels read crossed against their mode ids, and that
         # is the design rather than a slip: the ids name the mechanism, the
         # labels name the look, and it is the look that swapped when the beat
-        # tunnel's wall became nebula cloud. See :mod:`.vis_beat_tunnel`. The
-        # beat tunnel leads because it is now the richer of the two — which
-        # also leaves this menu's *text* in the order it has always been in.
+        # tunnel's wall became nebula cloud. See :mod:`.vis_beat_tunnel`. So
+        # ``beat_tunnel`` is the row reading "wormhole", and the two tunnels no
+        # longer sit next to each other in either half.
         for mode, label in (
             ("backdrop_fractal", self.tr("Backdrop fractal")),
-            ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
             ("backdrop_loop_tunnel", self.tr("Backdrop tunnel chase")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
+            ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
             ("backdrop_scope", self.tr("Backdrop oscilloscope")),
             ("backdrop", self.tr("Backdrop waveform")),
             ("backdrop_fire", self.tr("Backdrop fire")),
             ("fractal", self.tr("Popout fractal")),
-            ("beat_tunnel", self.tr("Popout wormhole")),
             ("loop_tunnel", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
+            ("beat_tunnel", self.tr("Popout wormhole")),
             ("off", self.tr("Visuals off")),
         ):
             action = QAction(label, self)

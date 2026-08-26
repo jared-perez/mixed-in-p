@@ -1250,10 +1250,8 @@ def test_both_rows_are_in_the_visuals_menu(player):
     labels = [player._vis_actions[m].text() for m in ("backdrop_beat_tunnel", "beat_tunnel")]
     assert all(labels)
     modes = list(player._vis_actions)
-    # Each sits beside the loop tunnel it is a sibling of, at the head of its
-    # group — the menu leads with the richest visuals in each half, and since
-    # the nebula wall that is this one, ahead of the wireframe it used to
-    # follow. Which also keeps the menu's *labels* in their long-standing
-    # order, because the two swapped names at the same moment.
-    assert modes.index("backdrop_loop_tunnel") == modes.index("backdrop_beat_tunnel") + 1
-    assert modes.index("loop_tunnel") == modes.index("beat_tunnel") + 1
+    # It no longer sits beside the loop tunnel it is a sibling of: the user
+    # placed the wormhole — which is this mode, the labels being crossed
+    # against the ids on purpose — directly below spectrum in each half.
+    assert modes.index("backdrop_beat_tunnel") == modes.index("backdrop_spectrum") + 1
+    assert modes.index("beat_tunnel") == modes.index("spectrum") + 1

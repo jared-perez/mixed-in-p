@@ -181,7 +181,7 @@ class TestTheEyeMenu:
         assert not hasattr(player, "set_visualizations_enabled")
         assert not hasattr(player, "_visualizations_enabled")
 
-    def test_the_two_richest_visuals_lead_each_group(self, player):
+    def test_fractal_leads_each_group_and_wormhole_follows_spectrum(self, player):
         modes = [
             a.data() or a.text()
             for a in player._vis_menu.actions()
@@ -189,12 +189,13 @@ class TestTheEyeMenu:
         ]
         labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
         assert labels[0] == "Backdrop fractal"
-        assert labels[1] == "Backdrop wormhole"
         assert labels[-1] == "Visuals off"
-        # The popout half leads with the same two, so the groups read as pairs
-        # at the head (the tails diverge — the backdrops order theirs to taste).
+        # Both halves lead with fractal and put the wormhole directly below
+        # spectrum; the tails diverge (waveform and fire have no popout twin).
         popouts = labels[labels.index("Popout fractal") :]
-        assert popouts[:2] == ["Popout fractal", "Popout wormhole"]
+        assert popouts[0] == "Popout fractal"
+        assert labels.index("Backdrop wormhole") == labels.index("Backdrop spectrum") + 1
+        assert labels.index("Popout wormhole") == labels.index("Popout spectrum bars") + 1
         assert len(modes) == len(player._vis_actions)
 
     def test_every_mode_is_offered_exactly_once(self, player):
