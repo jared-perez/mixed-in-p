@@ -3352,10 +3352,9 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Neu starten, um die Designänderungen zu übernehmen.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation>Wellenform</translation>
+        <translation type="vanished">Wellenform</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="187"/>
@@ -3720,6 +3719,12 @@ oder „Cover hinzufügen …“ klicken</translation>
         <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Online-Metadaten</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="179"/>
+        <source>Waveform / Visuals</source>
+        <translatorcomment>Beide Abschnittsteile aus den vorhandenen Strings „Wellenform“ und „Visualisierungen“ übernommen.</translatorcomment>
+        <translation>Wellenform / Visualisierungen</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="565"/>
@@ -4150,7 +4155,7 @@ oder „Cover hinzufügen …“ klicken</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="641"/>
+        <location filename="../widgets/vis_canvas.py" line="648"/>
         <source>Visualizer</source>
         <translation>Visualizer</translation>
     </message>

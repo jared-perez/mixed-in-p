@@ -3354,10 +3354,9 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation>Redémarrez pour appliquer les changements de thème.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation>Forme d&apos;onde</translation>
+        <translation type="vanished">Forme d&apos;onde</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="187"/>
@@ -3715,6 +3714,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Métadonnées en ligne</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="179"/>
+        <source>Waveform / Visuals</source>
+        <translatorcomment>Les deux moitiés reprennent les chaînes existantes « Forme d&apos;onde » et « Visualisations ».</translatorcomment>
+        <translation>Forme d&apos;onde / Visualisations</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="565"/>
@@ -4134,7 +4139,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="641"/>
+        <location filename="../widgets/vis_canvas.py" line="648"/>
         <source>Visualizer</source>
         <translation>Visualiseur</translation>
     </message>

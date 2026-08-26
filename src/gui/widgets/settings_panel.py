@@ -176,7 +176,7 @@ class SettingsPanel(QWidget):
         outer.addWidget(theme_frame)
 
         # ── Section: Waveform color ────────────────────────────────────────
-        outer.addWidget(self._make_section_label(self.tr("Waveform")))
+        outer.addWidget(self._make_section_label(self.tr("Waveform / Visuals")))
 
         wave_frame = QFrame()
         wave_frame.setObjectName("settingsSection")

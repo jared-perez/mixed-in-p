@@ -3404,10 +3404,9 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation>Uruchom ponownie, aby zastosować zmiany motywu.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation>Kształt fali</translation>
+        <translation type="vanished">Kształt fali</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="187"/>
@@ -3776,6 +3775,12 @@ lub kliknij „Dodaj okładkę…”</translation>
         <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Metadane online</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="179"/>
+        <source>Waveform / Visuals</source>
+        <translatorcomment>Obie części pochodzą z istniejących ciągów „Kształt fali” i „Wizualizacje”.</translatorcomment>
+        <translation>Kształt fali / Wizualizacje</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="565"/>
@@ -4203,7 +4208,7 @@ lub kliknij „Dodaj okładkę…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="641"/>
+        <location filename="../widgets/vis_canvas.py" line="648"/>
         <source>Visualizer</source>
         <translation>Wizualizator</translation>
     </message>

@@ -3375,10 +3375,9 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Reinicie para aplicar as alterações de tema.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation>Forma de onda</translation>
+        <translation type="vanished">Forma de onda</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="187"/>
@@ -3743,6 +3742,12 @@ ou clique em “Adicionar capa…”</translation>
         <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Metadados on-line</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="179"/>
+        <source>Waveform / Visuals</source>
+        <translatorcomment>As duas metades reaproveitam as cadeias existentes “Forma de onda” e “Visualizações”.</translatorcomment>
+        <translation>Forma de onda / Visualizações</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="565"/>
@@ -4172,7 +4177,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="641"/>
+        <location filename="../widgets/vis_canvas.py" line="648"/>
         <source>Visualizer</source>
         <translation>Visualizador</translation>
     </message>

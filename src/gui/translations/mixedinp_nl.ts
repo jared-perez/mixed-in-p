@@ -3345,10 +3345,9 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Start opnieuw op om themawijzigingen toe te passen.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation>Golfvorm</translation>
+        <translation type="vanished">Golfvorm</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="187"/>
@@ -3709,6 +3708,12 @@ of klik op “Artwork toevoegen…”</translation>
         <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Online metagegevens</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="179"/>
+        <source>Waveform / Visuals</source>
+        <translatorcomment>Beide helften hergebruiken de bestaande strings &apos;Golfvorm&apos; en &apos;Visualisaties&apos;.</translatorcomment>
+        <translation>Golfvorm / Visualisaties</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="565"/>
@@ -4133,7 +4138,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="641"/>
+        <location filename="../widgets/vis_canvas.py" line="648"/>
         <source>Visualizer</source>
         <translation>Visualizer</translation>
     </message>

@@ -3379,10 +3379,9 @@ o tocca “Aggiungi copertina…”</translation>
         <translation>Riavvia per applicare le modifiche del tema.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation>Forma d&apos;onda</translation>
+        <translation type="vanished">Forma d&apos;onda</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="187"/>
@@ -3745,6 +3744,12 @@ o tocca “Aggiungi copertina…”</translation>
         <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Metadati online</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="179"/>
+        <source>Waveform / Visuals</source>
+        <translatorcomment>Entrambe le metà riusano le stringhe esistenti «Forma d&apos;onda» e «Visualizzazioni».</translatorcomment>
+        <translation>Forma d&apos;onda / Visualizzazioni</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="565"/>
@@ -4178,7 +4183,7 @@ o tocca “Aggiungi copertina…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="641"/>
+        <location filename="../widgets/vis_canvas.py" line="648"/>
         <source>Visualizer</source>
         <translation>Visualizzatore</translation>
     </message>
