@@ -786,22 +786,94 @@ QSpinBox, QDoubleSpinBox {
     border: 1px solid @BG_LIGHTER@;
     border-radius: 4px;
     padding: 6px;
-    padding-right: 20px;
+    /* Room for the two arrow buttons below (2 x 15px + a 4px gap). */
+    padding-right: 34px;
 }
 
 QSpinBox:focus, QDoubleSpinBox:focus {
     border-color: @NEON_YELLOW@;
 }
 
-/* The spin buttons and their arrows are deliberately UNSTYLED — the same rule
-   as the combo drop-down below, found the same way. Styling ::up-button /
-   ::down-button stops Qt drawing the style's own arrows, and the ::up-arrow /
-   ::down-arrow rules that replaced them used the web-CSS triangle trick,
-   which Qt's stylesheet engine does not implement: it filled each sub-control
-   box with the border colour, so every spin box in the app wore two small
-   grey SQUARES. Styling the buttons and dropping only the arrow rules is
-   worse still — verified, that draws no arrows at all. Left alone, the
-   platform draws real triangles and keeps the field's dark background. */
+/* The spin buttons ARE styled, and they are the one exception to the rule
+   stated for the combo drop-down below — read that note first, because every
+   word of it still applies to why this looks the way it does.
+
+   Left to the platform, QMacStyle draws the stepper as a native control over
+   the BORDER box: it paints out the right-hand edge of the frame (the yellow
+   focus ring stops dead where the stepper begins, which reads as a half-drawn
+   box) and its arrows are hairline chevrons at this control height — reported
+   as "only a dot for the symbol". Windows 11 draws two proper side-by-side
+   triangles and looks right, so one control disagreed across the two
+   platforms. Styling the sub-controls is what fixes both, because the frame is
+   then ours to draw and nothing native paints over it.
+
+   What made that impossible before was the arrow, and this is the part not to
+   undo: styling ::up-button stops Qt drawing the style's own arrow, and the
+   web-CSS triangle trick that replaced it (a zero-size box with a thick top
+   border and transparent sides) is NOT implemented by Qt's stylesheet engine —
+   it fills the sub-control with the border colour, which is how every spin box
+   in the app once wore two small grey SQUARES. Dropping the arrow rules while
+   keeping the button rules is worse still: verified, that draws no arrow at
+   all. An image is the alternative that works, and a committed one could not
+   work because theme.py ships four palettes. So the image is generated per
+   palette at load — see styles/spin_arrows.py — and the paths below are
+   substituted in. If that generation ever fails, load_stylesheet drops
+   everything between the markers and the platform stepper comes back. */
+
+/* @SPIN_ARROWS_BEGIN@ */
+QSpinBox::up-button, QSpinBox::down-button,
+QDoubleSpinBox::up-button, QDoubleSpinBox::down-button {
+    subcontrol-origin: border;
+    subcontrol-position: center right;
+    background: transparent;
+    border: none;
+    border-radius: 3px;
+    width: 15px;
+    height: 20px;
+    margin-right: 2px;
+}
+
+/* Side by side, the Windows 11 arrangement: the up button is shifted left by
+   its own width so the pair reads as one stepper rather than a stack. */
+QSpinBox::up-button, QDoubleSpinBox::up-button {
+    right: 15px;
+}
+
+QSpinBox::up-button:hover, QSpinBox::down-button:hover,
+QDoubleSpinBox::up-button:hover, QDoubleSpinBox::down-button:hover {
+    background: @BG_LIGHT@;
+}
+
+QSpinBox::up-button:pressed, QSpinBox::down-button:pressed,
+QDoubleSpinBox::up-button:pressed, QDoubleSpinBox::down-button:pressed {
+    background: @BG_LIGHTER@;
+}
+
+QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {
+    image: url("@SPIN_ARROW_UP@");
+    width: 9px;
+    height: 6px;
+}
+
+QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {
+    image: url("@SPIN_ARROW_DOWN@");
+    width: 9px;
+    height: 6px;
+}
+
+/* :off is Qt's state for "this end of the range is reached"; :disabled is the
+   whole widget. Both get a dimmed arrow rather than none, so a spin box sitting
+   at its limit still reads as a spin box. */
+QSpinBox::up-arrow:off, QSpinBox::up-arrow:disabled,
+QDoubleSpinBox::up-arrow:off, QDoubleSpinBox::up-arrow:disabled {
+    image: url("@SPIN_ARROW_UP_OFF@");
+}
+
+QSpinBox::down-arrow:off, QSpinBox::down-arrow:disabled,
+QDoubleSpinBox::down-arrow:off, QDoubleSpinBox::down-arrow:disabled {
+    image: url("@SPIN_ARROW_DOWN_OFF@");
+}
+/* @SPIN_ARROWS_END@ */
 
 /* ===== Combo Box ===== */
 QComboBox {

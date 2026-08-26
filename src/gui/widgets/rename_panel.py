@@ -45,6 +45,18 @@ from .droppable_table import DroppableTableWidget
 from .pipeline_toggle import PipelineToggle
 
 
+def _spin_width(spin: QSpinBox, floor: int = 120) -> int:
+    """Width that shows a spin box's widest value plus its arrow buttons.
+
+    A cap written as a number is an English width, and this one also has to pay
+    for whatever the stylesheet reserves on the right for the two arrows — the
+    suffix is translated (" chars" is " Zeichen" in de) and the widest value is
+    "100". The app sheet is applied before any widget is built, so the hint here
+    already counts that padding; the floor keeps the shipped English size.
+    """
+    return max(floor, spin.sizeHint().width())
+
+
 class _SelectableTextDelegate(QStyledItemDelegate):
     """Cell delegate that opens a read-only, text-selectable editor.
 
@@ -157,7 +169,7 @@ class RenamePanel(QWidget):
         self._trim_start_spin.setValue(0)
         self._trim_start_spin.setSuffix(self.tr(" chars"))
         self._trim_start_spin.setToolTip(self.tr("Remove characters from the beginning of the filename"))
-        self._trim_start_spin.setMaximumWidth(120)
+        self._trim_start_spin.setMaximumWidth(_spin_width(self._trim_start_spin))
         trim_row.addWidget(self._trim_start_spin)
 
         trim_row.addSpacing(20)
@@ -169,7 +181,7 @@ class RenamePanel(QWidget):
         self._trim_end_spin.setValue(0)
         self._trim_end_spin.setSuffix(self.tr(" chars"))
         self._trim_end_spin.setToolTip(self.tr("Remove characters from the end of the filename (before extension)"))
-        self._trim_end_spin.setMaximumWidth(120)
+        self._trim_end_spin.setMaximumWidth(_spin_width(self._trim_end_spin))
         trim_row.addWidget(self._trim_end_spin)
 
         trim_row.addSpacing(20)

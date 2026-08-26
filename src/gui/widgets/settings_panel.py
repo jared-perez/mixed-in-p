@@ -326,7 +326,10 @@ class SettingsPanel(QWidget):
         self._min_bpm_spin = QSpinBox()
         self._min_bpm_spin.setRange(50, 248)
         self._min_bpm_spin.setValue(99)
-        self._min_bpm_spin.setFixedWidth(80)
+        # Measured, not 80: the stylesheet reserves room on the right for the
+        # two arrow buttons, so a constant that fitted the number alone put
+        # them on top of it. The floor keeps the shipped size.
+        self._min_bpm_spin.setFixedWidth(max(80, self._min_bpm_spin.sizeHint().width()))
         low_row.addWidget(low_label)
         low_row.addStretch(1)
         low_row.addWidget(self._min_bpm_spin)
@@ -340,7 +343,7 @@ class SettingsPanel(QWidget):
         self._max_bpm_spin = QSpinBox()
         self._max_bpm_spin.setRange(52, 250)
         self._max_bpm_spin.setValue(199)
-        self._max_bpm_spin.setFixedWidth(80)
+        self._max_bpm_spin.setFixedWidth(max(80, self._max_bpm_spin.sizeHint().width()))
         high_row.addWidget(high_label)
         high_row.addStretch(1)
         high_row.addWidget(self._max_bpm_spin)
@@ -862,7 +865,11 @@ class SettingsPanel(QWidget):
                 color: {Theme.TEXT_PRIMARY};
                 border: 1px solid {Theme.CHROME_DARK};
                 border-radius: {Theme.BORDER_RADIUS}px;
-                padding: 4px 6px;
+                /* Shorthand, so it also overrides the app sheet's
+                   padding-right — which is what reserves room for the two
+                   arrow buttons. Restated here or the arrows sit on the
+                   number. Keep it equal to the app sheet's. */
+                padding: 4px 34px 4px 6px;
                 font-size: 13px;
             }}
             QSpinBox:focus {{

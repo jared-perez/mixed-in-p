@@ -64,14 +64,47 @@ def load_stylesheet() -> str:
     colour from :class:`Theme` (whichever palette is currently applied). A plain
     token replacement is used rather than ``str.format`` so Qt's own ``{ }``
     rule braces in the QSS pass through untouched.
+
+    The spin-box arrows are the one token here that is not a colour: they are
+    PNGs drawn in the active palette (see ``styles/spin_arrows.py``) and their
+    paths are substituted the same way. If they cannot be written, the rules
+    between the markers are dropped rather than left pointing at files that do
+    not exist — a styled sub-control with a missing image draws nothing at all,
+    where no rule at all gets the platform's own stepper back.
     """
     base = _get_base_path()
     template_path = base / "src" / "gui" / "styles" / "app.qss.template"
     if not template_path.exists():
         return ""
     qss = template_path.read_text(encoding="utf-8")
+    qss = _apply_spin_arrows(qss)
     for token, color in Theme.tokens().items():
         qss = qss.replace(f"@{token}@", color)
+    return qss
+
+
+_SPIN_BEGIN = "/* @SPIN_ARROWS_BEGIN@ */"
+_SPIN_END = "/* @SPIN_ARROWS_END@ */"
+
+
+def _apply_spin_arrows(qss: str) -> str:
+    """Fill in the generated arrow paths, or drop the rules that need them."""
+    from .styles.spin_arrows import arrow_urls
+
+    urls = arrow_urls(Theme.TEXT_PRIMARY, Theme.TEXT_DISABLED)
+    if urls is None:
+        start = qss.find(_SPIN_BEGIN)
+        end = qss.find(_SPIN_END)
+        if start == -1 or end == -1:
+            return qss
+        return qss[:start] + qss[end + len(_SPIN_END):]
+    for token, key in (
+        ("SPIN_ARROW_UP", "up"),
+        ("SPIN_ARROW_DOWN", "down"),
+        ("SPIN_ARROW_UP_OFF", "up_off"),
+        ("SPIN_ARROW_DOWN_OFF", "down_off"),
+    ):
+        qss = qss.replace(f"@{token}@", urls[key])
     return qss
 
 
