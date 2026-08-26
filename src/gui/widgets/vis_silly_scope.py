@@ -52,8 +52,8 @@ earlier beat answers are retired: droplet sprites read as clutter next to
 the sheet, and a whole-frame flicker blinked the picture without ever making
 the stream *carry* the beat.) Under it sits the fractal's silence fade: a
 saturating glow envelope — instant attack, exponential release — multiplies
-the shade *and* the alpha, so the whole sheet dims to nothing over ~2 s
-without sound and snaps back the frame the music returns.
+the shade *and* the alpha, so the whole sheet dims to nothing in well under
+a second without sound and snaps back the frame the music returns.
 
 Every constant is expressed in **seconds**, never per frame. The backdrop only
 ever runs at 33 ms, but ``scripts/vis_sheet.py`` can drive this at any rate and
@@ -105,11 +105,11 @@ _DEFAULT_SIZE = (912, 384)
 
 # ── The hose ───────────────────────────────────────────────────────────────
 # How long the wave takes to cross the window. Shipped at 10.0 and retuned
-# three times on request, to ~1.1 s. Everything else in here is expressed in
+# four times on request, to ~0.5 s. Everything else in here is expressed in
 # time, so each retune is this one number: the history still holds the same
 # music per second, each feature just crosses faster (and sits
 # proportionally wider on screen).
-_WINDOW_SECONDS = 1.1
+_WINDOW_SECONDS = 0.5
 # Nozzle history resolution. In bins per *second* so the buffer holds the same
 # stretch of music however often it is fed. Doubled from 20 when the crossing
 # dropped to ~1.7 s, keeping a bin (width / (crossing * rate) pixels, ~18 px
@@ -274,23 +274,26 @@ _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 # stream. The floor is the between-beats brightness, deliberately well below
 # 1 or nothing reads as a surge (beatless music simply shows the dimmer
 # resting ribbon); the peak is what a full kick stamps; the release is what
-# lets a surge fade back to the floor before the next kick at DJ tempos
-# (e^(-0.47/0.18) ~= 0.07 of the peak left at 128 BPM). Brightness
-# multiplies the shade only — the alpha belongs to the silence fade below,
-# so the silhouette never pulses.
+# lets a surge fade back to the floor well before the next kick at DJ
+# tempos — at 0.06 s a 128 BPM kick's surge is long gone (e^(-0.47/0.06) is
+# nothing), so each beat is one crisp band sweeping the ~0.5 s window.
+# Brightness multiplies the shade only — the alpha belongs to the silence
+# fade below, so the silhouette never pulses. The release was 0.18 and was
+# cut 3x with the window: at half a second of crossing a 0.18 s tail was a
+# third of the stream.
 _BEAT_FLOOR = 0.50
 _BEAT_PEAK = 1.35
-_BEAT_RELEASE_TAU = 0.18
+_BEAT_RELEASE_TAU = 0.06
 # The silence fade, the fractal's other half. Instant attack, exponential
 # release: the sheet is at full strength the frame music plays and dims to
-# nothing over ~2 s without it (e^(-2/0.5) ~= 0.02 — the fractal's
-# 0.94-per-frame at 30 fps is the same curve, written as a time). The knee
-# saturates the envelope, so any music above a low level shows the sheet at
-# full strength and the fade only speaks when the sound actually stops. It
-# multiplies the shade AND the alpha: dimming the shade alone would leave an
-# opaque near-black ribbon lying over the playlist rows.
+# nothing in ~0.7 s without it (started at the fractal's own 0.5 s tau, cut
+# 3x on request). The knee saturates the envelope, so any music above a low
+# level shows the sheet at full strength and the fade only speaks when the
+# sound actually stops. It multiplies the shade AND the alpha: dimming the
+# shade alone would leave an opaque near-black ribbon lying over the
+# playlist rows.
 _GLOW_KNEE = 0.25
-_GLOW_RELEASE_TAU = 0.5
+_GLOW_RELEASE_TAU = 0.5 / 3.0
 
 
 def build_env_ramp(size: int = _ENV_SIZE) -> np.ndarray:

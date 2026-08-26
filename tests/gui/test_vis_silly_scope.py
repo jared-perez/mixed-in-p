@@ -349,7 +349,10 @@ def test_a_kick_is_stamped_at_the_source_and_travels_with_the_stream():
         ).sum(axis=(0, 2))
         return int(np.argmax(diff))
 
-    assert surge_column(0.1) > 0.75 * width
+    # No extra delay for the first look: the kick frame and the measuring
+    # frame are already ~0.07 s of travel, which at a ~0.5 s crossing is an
+    # eighth of the window on their own.
+    assert surge_column(0.0) > 0.75 * width
     assert 0.25 * width < surge_column(0.4 * _WINDOW_SECONDS) < 0.75 * width
 
 
@@ -376,7 +379,7 @@ def test_the_fade_is_a_release_and_the_return_is_instant(scene):
     through the fade the sheet is dimmed, not gone; the first loud frame
     brings it back at full strength."""
     _run(scene, 10.0)
-    _run(scene, 0.3, heights=np.zeros(19))
+    _run(scene, 0.1, heights=np.zeros(19))
     mid = _alpha_of(scene.render(np.zeros(19), 0.0)).max()
     assert 0 < mid < 255
     _run(scene, 4.0, heights=np.zeros(19))
