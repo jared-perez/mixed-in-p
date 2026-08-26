@@ -4,7 +4,10 @@ It used to be the *popout's face* of a mode with two of them, the backdrop
 wearing a chunky 152x64 retro grid. That grid is gone: the backdrop's scope
 slot draws ``stream`` now (a separate mode id — see
 ``test_vis_stream.py``), so this mode has one picture again and the tests
-that pinned the split pin the retirement instead.
+that pinned the split pin the retirement instead. And having one picture is
+what let it be offered in *both* halves of the menu: ``backdrop_oscilloscope``
+draws this same scene behind the playlist rows, under the smaller of the two
+area caps.
 
 Assertions are on the scene's arrays and on image *sizes*, never on a pixel
 being a particular colour at a particular place. The suite runs styleless and
@@ -153,6 +156,20 @@ def test_the_mode_id_and_the_config_set_did_not_move():
     assert _BACKDROP_VIS_MAP["backdrop_scope"] == "stream"
 
 
+def test_the_backdrop_row_is_its_own_id_and_names_the_mode_it_draws():
+    """"Backdrop oscilloscope" is a *new* menu id, not the reuse of an old one.
+
+    ``backdrop_scope`` is spoken for — it is the stream's row — so the CRT's
+    backdrop needed a name of its own, and it gets the plain one because there
+    is no longer a second picture for it to be ambiguous about.
+    """
+    assert "backdrop_oscilloscope" in _VALID_VIS_MODES
+    assert _BACKDROP_VIS_MAP["backdrop_oscilloscope"] == "oscilloscope"
+    # Both halves reach the same render mode; neither id displaced the other.
+    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "stream"
+    assert "backdrop_oscilloscope" not in RENDER_MODES  # a menu id, not a mode
+
+
 # ── Size and the frame budget ──────────────────────────────────────────────
 
 
@@ -171,7 +188,7 @@ def test_a_host_under_the_cap_renders_native(scene):
 
 
 def test_the_backdrops_cap_is_the_smaller_one(scene):
-    """It never reaches this scene today; the split is stated, not implied."""
+    """What "Backdrop oscilloscope" renders under: the host is the budget."""
     scene.set_target_size(2800, 1600, popout=False)
     height, width = scene._buf.shape
     assert width * height <= _BACKDROP_CAP_PX

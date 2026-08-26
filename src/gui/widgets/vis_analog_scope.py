@@ -1,10 +1,18 @@
 """Analog oscilloscope: a green phosphor beam with glow and persistence.
 
-The **popout** face of the ``oscilloscope`` mode. The backdrop keeps the chunky
-152x64 retro grid that :class:`~.vis_canvas.VisRenderer._render_scope` draws;
-this is the same mode id wearing a different picture in the other host, the
-mirror image of what fire does (one mode, backdrop only). Nothing about the
-menu, the mode id or the config set changes for it.
+The whole of the ``oscilloscope`` mode, in **either** host. It began as the
+popout face alone, opposite a chunky 152x64 retro grid in the playlist
+backdrop; that grid is gone, and both menu halves now reach this scene —
+``backdrop_oscilloscope`` behind the playlist rows and ``oscilloscope`` in the
+popout window. So the ``popout`` flag that arrives with
+:meth:`AnalogScopeScene.set_target_size` no longer picks a *picture*: it picks
+an area cap, because the two hosts have different budgets (see
+:data:`_POPOUT_CAP_PX`).
+
+Nothing here needed changing to be hosted by the backdrop. The ramp's alpha
+already follows intensity, so the black between the traces is transparent and
+the glow composites over the playlist grey exactly as it composites over the
+popout's black fill.
 
 It is not a polyline. The whole look — bright slow segments, a dim thread on
 the steep slopes, a soft halo, decaying ghosts of the last few frames — falls
@@ -63,10 +71,11 @@ from PySide6.QtGui import QColor, QImage
 # theirs grow. The area is capped rather than a width and a height because cost
 # follows pixels, not shape.
 #
-# The backdrop never reaches this scene today (VisRenderer routes here only
-# when the host asked as the popout), but it gets a cap anyway so the split is
-# stated rather than implied: its budget is the *host* — repainting the
-# playlist rows behind the frame is ~11 ms on its own.
+# The backdrop's cap is the smaller one because its budget is the *host*:
+# repainting the playlist rows behind the frame is ~11 ms on its own, and the
+# backdrop is advanced at FRAME_MS (30 fps) whatever the mode. This cap was
+# written before anything reached it — the backdrop's scope slot drew the
+# stream — and "Backdrop oscilloscope" is what finally uses it.
 _POPOUT_CAP_PX = 900_000
 _BACKDROP_CAP_PX = 620_000
 _MIN_W, _MIN_H = 64, 32

@@ -3,13 +3,15 @@
 Retro visuals rendered into an internal QImage and upscaled by the host with
 fast (non-smooth) transformation for a chunky pixel look:
 
-- ``oscilloscope`` — a green phosphor CRT: host-resolution, 60 fps, glow and
-  persistence (see :mod:`.vis_analog_scope`). It used to be the one mode with
-  **two faces**, wearing a chunky 152x64 retro trace in the playlist backdrop
-  and the CRT in the popout, chosen by the ``popout`` flag
-  ``set_target_size`` carries. The retro face is gone: the backdrop's scope
-  slot now draws ``stream`` instead, so this is popout-only in practice
-  and renders the CRT to whichever host asks.
+- ``oscilloscope`` — a green phosphor CRT: host-resolution, glow and
+  persistence, 60 fps in the popout (see :mod:`.vis_analog_scope`). It used to
+  be the one mode with **two faces**, wearing a chunky 152x64 retro trace in
+  the playlist backdrop and the CRT in the popout, chosen by the ``popout``
+  flag ``set_target_size`` carries. The retro face is gone and the CRT is now
+  offered in *both* halves of the menu — ``backdrop_oscilloscope`` behind the
+  playlist rows, ``oscilloscope`` in the popout — which is one picture drawn
+  to whichever host asks, not two faces returning. The ``popout`` flag still
+  travels, but it now only picks an area cap and a frame rate.
 - ``stream`` — a sheet of liquid gold wiggled at its source like a garden
   hose (see :mod:`.vis_stream`). Backdrop only, which is fire's shape from
   the other end, and the reason it is a *separate mode id* rather than a third

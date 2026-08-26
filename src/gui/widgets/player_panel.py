@@ -111,8 +111,14 @@ from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, Visualize
 # existing user with it selected gets the new visual, which is the point. The
 # row was labelled "Silly Scope" when the sheet first shipped and is "stream"
 # now; the label named the look and the look is what was renamed.
+#
+# ``backdrop_oscilloscope`` is the *other* direction and needs no such note:
+# it names the mode it draws, because the CRT is one picture in either host
+# now. The scene has always carried a backdrop area cap beside its popout one;
+# what it lacked was a menu row that reached it.
 _BACKDROP_VIS_MAP = {
     "backdrop_scope": "stream",
+    "backdrop_oscilloscope": "oscilloscope",
     "backdrop_spectrum": "spectrum",
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
@@ -1885,6 +1891,7 @@ class PlayerPanel(QWidget):
         for mode, label in (
             ("backdrop_fractal", self.tr("Backdrop fractal")),
             ("backdrop_loop_tunnel", self.tr("Backdrop tunnel chase")),
+            ("backdrop_oscilloscope", self.tr("Backdrop oscilloscope")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
             ("backdrop_scope", self.tr("Backdrop stream")),

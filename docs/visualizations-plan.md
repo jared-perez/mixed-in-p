@@ -84,9 +84,10 @@ Two hosts share it:
 - **Backdrop**: the same visuals blitted dimmed (~0.40 opacity) behind
   the playlist rows via the table's image-backdrop path, driven by a
   PlayerPanel timer that runs while playing plus a ~2 s silence decay after
-  pause so bars fall and fire burns down. Modes `backdrop_scope`,
-  `backdrop_spectrum`, `backdrop_fire`, `backdrop_fractal`,
-  `backdrop_loop_tunnel`.
+  pause so bars fall and fire burns down. Modes `backdrop_scope` (which draws
+  the stream, not a scope — the row kept its id when its picture changed),
+  `backdrop_oscilloscope`, `backdrop_spectrum`, `backdrop_fire`,
+  `backdrop_fractal`, `backdrop_loop_tunnel`, `backdrop_beat_tunnel`.
 
 Data path per frame (GUI-thread QTimer, `Qt.PreciseTimer`, 16 ms):
 

@@ -45,6 +45,7 @@ _VALID_VIS_MODES = {
     # Behind the playlist rows.
     "backdrop",
     "backdrop_scope",
+    "backdrop_oscilloscope",
     "backdrop_spectrum",
     "backdrop_fire",
     "backdrop_fractal",

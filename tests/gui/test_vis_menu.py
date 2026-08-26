@@ -214,6 +214,21 @@ class TestPickingAVisualStartsIt:
         assert player._backdrop_renderer._mode == "loop_tunnel"
         assert load_config().visualization_mode == "backdrop_loop_tunnel"
 
+    def test_the_scope_can_be_chosen_in_either_half(self, player):
+        """Both menu ids reach the same render mode, from different hosts.
+
+        The popout row is unchanged; the backdrop row is the new one, and the
+        renderer it builds is the panel's own — the popout window's is a
+        separate instance, which is what lets the CRT be selected as either.
+        """
+        player._select_vis_mode("backdrop_oscilloscope")
+        assert player._backdrop_renderer is not None
+        assert player._backdrop_renderer._mode == "oscilloscope"
+        assert player._backdrop_renderer._popout is False
+        assert load_config().visualization_mode == "backdrop_oscilloscope"
+        assert player._vis_actions["backdrop_oscilloscope"].isChecked()
+        player._select_vis_mode("off")
+
     def test_choosing_off_stops_it(self, player):
         player._select_vis_mode("backdrop_fractal")
         player._select_vis_mode("off")
