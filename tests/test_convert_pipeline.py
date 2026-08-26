@@ -5,7 +5,12 @@ from __future__ import annotations
 import pytest
 
 from src.conversion.result import ConversionResult
-from src.gui.convert_pipeline import ConvertPipeline
+from src.gui.convert_pipeline import (
+    STEP_ANALYZE,
+    STEP_CONVERT,
+    STEP_RENAME,
+    ConvertPipeline,
+)
 
 
 def ok(source: str, output: str) -> ConversionResult:
@@ -145,3 +150,147 @@ def test_end_clears_the_run(pipeline):
     pipeline.end()
     assert not pipeline.active
     assert pipeline.summary() == (0, 0, 0)
+
+
+# ---------------------------------------------------------------- step routing
+
+
+def test_arming_without_steps_means_convert_then_analyze(pipeline):
+    """Every caller predating the step toggles meant exactly this pair."""
+    pipeline.arm(7, "Set", ["/a.wav"], [])
+    assert pipeline.has_step(STEP_CONVERT)
+    assert pipeline.has_step(STEP_ANALYZE)
+    assert not pipeline.has_step(STEP_RENAME)
+    assert pipeline.next_step() == STEP_CONVERT
+    assert pipeline.next_step(STEP_CONVERT) == STEP_ANALYZE
+    assert pipeline.next_step(STEP_ANALYZE) is None
+
+
+def test_next_step_skips_the_disabled_ones(pipeline):
+    pipeline.arm(7, "Set", steps={STEP_RENAME, STEP_ANALYZE})
+    assert pipeline.next_step() == STEP_RENAME
+    # Convert is off, so rename hands straight to analyze.
+    assert pipeline.next_step(STEP_RENAME) == STEP_ANALYZE
+    assert pipeline.next_step(STEP_ANALYZE) is None
+
+
+def test_next_step_is_none_when_only_the_start_step_runs(pipeline):
+    """Rename-only: nothing follows it but the playlist add."""
+    pipeline.arm(7, "Set", steps={STEP_RENAME}, to_rename=["/a.wav"])
+    assert pipeline.next_step(STEP_RENAME) is None
+
+
+def test_an_inactive_pipeline_routes_nowhere(pipeline):
+    assert pipeline.next_step() is None
+    assert not pipeline.has_step(STEP_CONVERT)
+
+
+# ------------------------------------------------------------------- rename leg
+
+
+def test_a_run_awaiting_rename_is_not_finished(pipeline):
+    pipeline.arm(7, "Set", steps={STEP_RENAME}, to_rename=["/a.wav"])
+    assert not pipeline.finished()
+
+
+def test_rename_done_carries_moved_and_untouched_rows_in_armed_order(pipeline):
+    pipeline.arm(7, "Set", steps={STEP_RENAME}, to_rename=["/a.wav", "/b.wav", "/c.wav"])
+    paths = pipeline.rename_done({"/b.wav": "/128 - b.wav"})
+    assert paths == ["/a.wav", "/128 - b.wav", "/c.wav"]
+    assert pipeline.finished()
+
+
+def test_rename_done_drains_once(pipeline):
+    pipeline.arm(7, "Set", steps={STEP_RENAME}, to_rename=["/a.wav"])
+    assert pipeline.rename_done({}) == ["/a.wav"]
+    assert pipeline.rename_done({}) == []
+
+
+def test_rename_done_on_an_inactive_pipeline_forwards_nothing(pipeline):
+    assert pipeline.rename_done({"/a.wav": "/b.wav"}) == []
+
+
+def test_an_aborted_rename_forwards_nothing(pipeline):
+    pipeline.arm(7, "Set", steps={STEP_RENAME}, to_rename=["/a.wav"])
+    pipeline.abort()
+    assert not pipeline.active
+    assert pipeline.rename_done({}) == []
+
+
+# --------------------------------------------------------------- direct add leg
+
+
+def test_direct_add_retires_like_analysis_does(pipeline):
+    pipeline.arm(7, "Set", steps={STEP_CONVERT})
+    assert pipeline.await_direct_add(["/a.flac", "/b.flac"]) == ["/a.flac", "/b.flac"]
+    assert not pipeline.finished()
+    assert pipeline.direct_add_done("/a.flac")
+    pipeline.record_added("/a.flac")
+    assert not pipeline.finished()
+    assert pipeline.direct_add_done("/b.flac")
+    pipeline.record_skipped()
+    assert pipeline.finished()
+    assert pipeline.summary() == (1, 1, 0)
+
+
+def test_a_direct_add_run_with_nothing_else_finishes(pipeline):
+    """Rename off, convert off, analyze off — just files into a playlist."""
+    pipeline.arm(7, "Set")
+    pipeline.await_direct_add(["/a.flac"])
+    pipeline.direct_add_done("/a.flac")
+    pipeline.record_added("/a.flac")
+    assert pipeline.finished()
+
+
+def test_a_direct_add_path_retires_exactly_once(pipeline):
+    pipeline.arm(7, "Set")
+    pipeline.await_direct_add(["/a.flac"])
+    assert pipeline.direct_add_done("/a.flac")
+    assert not pipeline.direct_add_done("/a.flac")
+
+
+def test_a_foreign_direct_add_is_refused(pipeline):
+    pipeline.arm(7, "Set")
+    pipeline.await_direct_add(["/a.flac"])
+    assert not pipeline.direct_add_done("/somebody-elses.flac")
+    assert not pipeline.finished()
+
+
+def test_await_direct_add_registers_each_file_once(pipeline):
+    """The caller adds what it is handed back, so a repeat must not come back."""
+    pipeline.arm(7, "Set")
+    assert pipeline.await_direct_add(["/a.flac", "/a.flac"]) == ["/a.flac"]
+    assert pipeline.await_direct_add(["/a.flac"]) == []
+    assert pipeline.direct_add_done("/a.flac")
+    assert pipeline.finished()
+
+
+def test_await_direct_add_on_an_inactive_pipeline_registers_nothing(pipeline):
+    assert pipeline.await_direct_add(["/a.flac"]) == []
+    assert not pipeline.direct_add_done("/a.flac")
+
+
+def test_a_full_three_step_run_finishes_only_at_the_end(pipeline):
+    """rename -> convert -> analyze -> playlist, one file, one step at a time."""
+    pipeline.arm(
+        7,
+        "Set",
+        steps={STEP_RENAME, STEP_CONVERT, STEP_ANALYZE},
+        to_rename=["/a.wav"],
+    )
+    assert not pipeline.finished()
+    renamed = pipeline.rename_done({"/a.wav": "/128 - a.wav"})
+
+    # Between draining one step and arming the next the run holds nothing and
+    # would read as finished — which is why the handoff is synchronous and
+    # nothing asks in between.
+    run = pipeline.run
+    run.awaiting_convert = set(renamed)
+    assert pipeline.conversion_done([ok("/128 - a.wav", "/128 - a.flac")]) == ["/128 - a.flac"]
+
+    pipeline.await_analysis({"/private/128 - a.flac": "/128 - a.flac"})
+    assert not pipeline.finished()
+    assert pipeline.track_analysed("/private/128 - a.flac", None) == "/128 - a.flac"
+    pipeline.record_added("/128 - a.flac")
+    assert pipeline.finished()
+    assert pipeline.summary() == (1, 0, 0)
