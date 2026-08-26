@@ -50,9 +50,9 @@ STEP_TOOLTIPS = {
 class PipelineToggle(QAbstractButton):
     """Checkable triangle marking one step as part of the pipeline."""
 
-    #: Panel-size, matching the 28px box the Convert panel's `|` toggle wore.
+    # Panel-size, matching the 28px box the Convert panel's `|` toggle wore.
     SIZE_PANEL = 28
-    #: Header-size, small enough for three of them beside the Add button.
+    # Header-size, small enough for three of them beside the Add button.
     SIZE_MINI = 18
 
     def __init__(self, size: int = SIZE_PANEL, parent=None) -> None:

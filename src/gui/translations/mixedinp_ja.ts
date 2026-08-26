@@ -105,9 +105,8 @@ Features:
         <translation>使い方ガイド</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="285"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Send To&lt;/span&gt; to move files between panels.&lt;/div&gt;</source>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;いずれかのパネルにファイルをドロップすると始められます。&lt;br&gt;サイドバーはナビゲーション用だけではありません。&lt;br&gt;ボタンに直接ファイルをドラッグして振り分けられます。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;名前変更&lt;/span&gt; — まずファイル名を整えます&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;確定前にトリミング・プレフィックス・プレビュー&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;解析&lt;/span&gt; — BPM・キー・エナジーを検出&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;タグの自動書き込みと名前変更を一括で実行&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;変換&lt;/span&gt; — フォーマットを切り替え&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y};&quot;&gt;送る&lt;/span&gt;を使ってパネル間でファイルを移動できます。&lt;/div&gt;</translation>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;いずれかのパネルにファイルをドロップすると始められます。&lt;br&gt;サイドバーはナビゲーション用だけではありません。&lt;br&gt;ボタンに直接ファイルをドラッグして振り分けられます。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;名前変更&lt;/span&gt; — まずファイル名を整えます&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;確定前にトリミング・プレフィックス・プレビュー&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;解析&lt;/span&gt; — BPM・キー・エナジーを検出&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;タグの自動書き込みと名前変更を一括で実行&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;変換&lt;/span&gt; — フォーマットを切り替え&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y};&quot;&gt;送る&lt;/span&gt;を使ってパネル間でファイルを移動できます。&lt;/div&gt;</translation>
     </message>
     <message>
         <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
@@ -151,6 +150,11 @@ Features:
         <translation>その他の機能</translation>
     </message>
     <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="285"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;いずれかのパネルにファイルをドロップすると始められます。&lt;br&gt;サイドバーはナビゲーション用だけではありません。&lt;br&gt;ボタンに直接ファイルをドラッグして振り分けられます。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;名前変更&lt;/span&gt; — まずファイル名を整えます&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;確定前にトリミング・プレフィックス・プレビュー&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;解析&lt;/span&gt; — BPM・キー・エナジーを検出&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;タグの自動書き込みと名前変更を一括で実行&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;変換&lt;/span&gt; — フォーマットを切り替え&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;パネルの&lt;span style=&quot;color: {y};&quot;&gt;パイプライン&lt;/span&gt;ステップをオンにすると、まとめて一気に処理できます。&lt;/div&gt;</translation>
+    </message>
+    <message>
         <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
@@ -164,38 +168,39 @@ Features:
 <context>
     <name>AnalysisPanel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="353"/>
-        <location filename="../widgets/analysis_panel.py" line="444"/>
+        <location filename="../widgets/analysis_panel.py" line="362"/>
+        <location filename="../widgets/analysis_panel.py" line="459"/>
+        <location filename="../widgets/analysis_panel.py" line="656"/>
         <source>Analyze</source>
         <translation>解析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="356"/>
+        <location filename="../widgets/analysis_panel.py" line="365"/>
         <source>Drop files to analyze, unless changed in settings. Results update in real-time.</source>
         <translation>設定で変更しない限り、ファイルをドロップすると解析します。結果はリアルタイムで更新されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="363"/>
+        <location filename="../widgets/analysis_panel.py" line="372"/>
         <source>Auto</source>
         <translation>自動</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="369"/>
+        <location filename="../widgets/analysis_panel.py" line="378"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>解析パネルにドロップまたは送ったときに自動的に解析</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="378"/>
+        <location filename="../widgets/analysis_panel.py" line="387"/>
         <source>Freeze</source>
         <translation>凍結</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="395"/>
+        <location filename="../widgets/analysis_panel.py" line="404"/>
         <source>Drop files here to analyze immediately</source>
         <translation>すぐに解析するにはここにファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="440"/>
+        <location filename="../widgets/analysis_panel.py" line="449"/>
         <source>Clear Results</source>
         <translation>結果をクリア</translation>
     </message>
@@ -204,58 +209,65 @@ Features:
         <translation type="vanished">選択項目を削除</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="451"/>
         <source>Send To</source>
         <translatorcomment>送る per glossary (not 送信). Plain verb. Confirmed.</translatorcomment>
-        <translation>送る</translation>
+        <translation type="vanished">送る</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="453"/>
         <source>Convert</source>
-        <translation>変換</translation>
+        <translation type="vanished">変換</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="454"/>
         <source>Player</source>
-        <translation>プレイヤー</translation>
+        <translation type="vanished">プレイヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="553"/>
+        <location filename="../widgets/analysis_panel.py" line="559"/>
         <source>{n} analyzed</source>
         <translation>{n}件解析済み</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="555"/>
+        <location filename="../widgets/analysis_panel.py" line="561"/>
         <source>{n} errors</source>
         <translation>{n}件のエラー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="557"/>
+        <location filename="../widgets/analysis_panel.py" line="563"/>
         <source>{n} pending</source>
         <translation>{n}件待機中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="559"/>
+        <location filename="../widgets/analysis_panel.py" line="565"/>
         <source>{n} in progress</source>
         <translation>{n}件処理中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="561"/>
+        <location filename="../widgets/analysis_panel.py" line="567"/>
         <source>No results yet</source>
         <translation>まだ結果はありません</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="605"/>
+        <location filename="../widgets/analysis_panel.py" line="609"/>
         <source>Let analysis write tags and rename files again</source>
         <translation>解析がタグの書き込みとファイル名の変更を再び行えるようにします</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="607"/>
+        <location filename="../widgets/analysis_panel.py" line="611"/>
         <source>Stop analysis writing tags or renaming files, until you unfreeze</source>
         <translation>解除するまで、解析がタグを書き込んだりファイル名を変更したりしないようにします</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="636"/>
+        <location filename="../widgets/analysis_panel.py" line="651"/>
+        <source>Start Pipeline</source>
+        <translation>パイプラインを開始</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="653"/>
+        <source>Send these tracks through the pipeline, starting here</source>
+        <translation>これらのトラックをここからパイプラインに流します</translation>
+    </message>
+    <message>
+        <location filename="../widgets/analysis_panel.py" line="715"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
@@ -268,7 +280,7 @@ Features:
         <translation type="vanished">プレイヤーに送る</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="638"/>
+        <location filename="../widgets/analysis_panel.py" line="717"/>
         <source>Remove</source>
         <translation>削除</translation>
     </message>
@@ -276,98 +288,98 @@ Features:
 <context>
     <name>AnalysisTableModel</name>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="58"/>
+        <location filename="../widgets/analysis_panel.py" line="60"/>
         <source>Name</source>
         <translation>名前</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="59"/>
+        <location filename="../widgets/analysis_panel.py" line="61"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="60"/>
         <location filename="../widgets/analysis_panel.py" line="62"/>
+        <location filename="../widgets/analysis_panel.py" line="64"/>
         <source>Conf</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>信頼度</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="61"/>
+        <location filename="../widgets/analysis_panel.py" line="63"/>
         <source>Key</source>
         <translatorcomment>Chose キー (katakana) over 調性/調 per glossary, since this is a DJ/producer app. Used consistently everywhere &apos;key&apos; = musical key.</translatorcomment>
         <translation>キー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="63"/>
+        <location filename="../widgets/analysis_panel.py" line="65"/>
         <source>Key Code</source>
         <translation>キーコード</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="64"/>
+        <location filename="../widgets/analysis_panel.py" line="66"/>
         <source>Alt Keys</source>
         <translation>代替キー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="65"/>
+        <location filename="../widgets/analysis_panel.py" line="67"/>
         <source>Energy</source>
         <translatorcomment>Translated as エナジー (katakana) to match DJ-app jargon and the &apos;Energy Tag&apos; tagging convention. &apos;エネルギー&apos; is the standard physics term; review which fits the UI tone.</translatorcomment>
         <translation>エナジー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="66"/>
+        <location filename="../widgets/analysis_panel.py" line="68"/>
         <source>Status</source>
         <translation>ステータス</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="139"/>
+        <location filename="../widgets/analysis_panel.py" line="141"/>
         <source>WAV files do not store metadata, but the filename can still be changed.</source>
         <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
         <translation>WAVファイルはメタデータを保存できませんが、ファイル名は変更できます。</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="153"/>
+        <location filename="../widgets/analysis_panel.py" line="155"/>
         <source>Queued</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>待機中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="154"/>
+        <location filename="../widgets/analysis_panel.py" line="156"/>
         <source>Pending</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>保留中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="155"/>
+        <location filename="../widgets/analysis_panel.py" line="157"/>
         <source>Analyzing</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>解析中</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="156"/>
+        <location filename="../widgets/analysis_panel.py" line="158"/>
         <source>Analyzed</source>
         <translatorcomment>Status column in the Analyze table; matches the stem already used for this language&apos;s Convert status column.</translatorcomment>
         <translation>解析済み</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="157"/>
+        <location filename="../widgets/analysis_panel.py" line="159"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="174"/>
+        <location filename="../widgets/analysis_panel.py" line="176"/>
         <source>WAV file</source>
         <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
         <translation>WAVファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="176"/>
+        <location filename="../widgets/analysis_panel.py" line="178"/>
         <source>Analyzed, no tags</source>
         <translatorcomment>WAV kept in English per the glossary (audio format code); the rest reuses this language&apos;s existing wording for tags/metadata.</translatorcomment>
         <translation>解析済み、タグなし</translation>
     </message>
     <message>
-        <location filename="../widgets/analysis_panel.py" line="202"/>
+        <location filename="../widgets/analysis_panel.py" line="204"/>
         <source>Other likely keys: {keys}</source>
         <translation>他の可能性のあるキー: {keys}</translation>
     </message>
@@ -520,81 +532,81 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="146"/>
-        <location filename="../widgets/conversion_panel.py" line="359"/>
-        <location filename="../widgets/conversion_panel.py" line="613"/>
+        <location filename="../widgets/conversion_panel.py" line="142"/>
+        <location filename="../widgets/conversion_panel.py" line="320"/>
+        <location filename="../widgets/conversion_panel.py" line="554"/>
         <source>Convert</source>
         <translation>変換</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="149"/>
+        <location filename="../widgets/conversion_panel.py" line="145"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>オーディオファイルをフォーマット間で変換します（WAV、FLAC、AIFF、MP3）。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="161"/>
+        <location filename="../widgets/conversion_panel.py" line="157"/>
         <source>Target Format:</source>
         <translation>変換先フォーマット:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="170"/>
+        <location filename="../widgets/conversion_panel.py" line="166"/>
         <source>Sample Rate:</source>
         <translation>サンプルレート:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="177"/>
-        <location filename="../widgets/conversion_panel.py" line="195"/>
+        <location filename="../widgets/conversion_panel.py" line="173"/>
+        <location filename="../widgets/conversion_panel.py" line="191"/>
         <source>Keep source</source>
         <translatorcomment>Combo item: keep the source file&apos;s own sample rate / bit depth (the engine leaves that axis alone).</translatorcomment>
         <translation>元のまま</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="178"/>
+        <location filename="../widgets/conversion_panel.py" line="174"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz（DVD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="179"/>
+        <location filename="../widgets/conversion_panel.py" line="175"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz（DAT）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="180"/>
+        <location filename="../widgets/conversion_panel.py" line="176"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz（CD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="181"/>
+        <location filename="../widgets/conversion_panel.py" line="177"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="191"/>
+        <location filename="../widgets/conversion_panel.py" line="187"/>
         <source>Bit Depth:</source>
         <translation>ビット深度:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="196"/>
+        <location filename="../widgets/conversion_panel.py" line="192"/>
         <source>32 bit</source>
         <translation>32 bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="197"/>
+        <location filename="../widgets/conversion_panel.py" line="193"/>
         <source>24 bit (DVD)</source>
         <translation>24 bit（DVD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="198"/>
+        <location filename="../widgets/conversion_panel.py" line="194"/>
         <source>16 bit (CD)</source>
         <translation>16 bit（CD）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="199"/>
+        <location filename="../widgets/conversion_panel.py" line="195"/>
         <source>8 bit</source>
         <translation>8 bit</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="209"/>
+        <location filename="../widgets/conversion_panel.py" line="205"/>
         <source>Bitrate:</source>
         <translation>ビットレート:</translation>
     </message>
@@ -603,81 +615,76 @@ or click “Add Artwork…”</source>
         <translation type="vanished">保存先:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="231"/>
-        <location filename="../widgets/conversion_panel.py" line="837"/>
+        <location filename="../widgets/conversion_panel.py" line="227"/>
+        <location filename="../widgets/conversion_panel.py" line="710"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>変換後のファイルの保存先フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="356"/>
         <source>Playlist name</source>
-        <translation>プレイリスト名</translation>
+        <translation type="vanished">プレイリスト名</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="602"/>
         <source>Turn off the pipeline — Convert goes back to converting only.</source>
-        <translation>パイプラインをオフ — 変換は変換のみに戻ります。</translation>
+        <translation type="vanished">パイプラインをオフ — 変換は変換のみに戻ります。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="605"/>
         <source>Turn on the pipeline: Convert → Analyze → add to the playlist named here.</source>
-        <translation>パイプラインをオン: 変換 → 解析 → ここで指定したプレイリストに追加します。</translation>
+        <translation type="vanished">パイプラインをオン: 変換 → 解析 → ここで指定したプレイリストに追加します。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="610"/>
         <source>Start</source>
-        <translation>開始</translation>
+        <translation type="vanished">開始</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="611"/>
         <source>Send the tracks through the pipeline</source>
-        <translation>トラックをパイプラインに送ります</translation>
+        <translation type="vanished">トラックをパイプラインに送ります</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="830"/>
+        <location filename="../widgets/conversion_panel.py" line="703"/>
         <source>Save converted files next to the originals</source>
         <translation>変換後のファイルを元のファイルと同じ場所に保存</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="276"/>
+        <location filename="../widgets/conversion_panel.py" line="272"/>
         <source>Files</source>
         <translation>ファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="243"/>
+        <location filename="../widgets/conversion_panel.py" line="239"/>
         <source>Source</source>
         <translation>元の場所</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="279"/>
+        <location filename="../widgets/conversion_panel.py" line="275"/>
         <source>Drop audio files here to add them</source>
         <translation>追加するにはここにオーディオファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="282"/>
+        <location filename="../widgets/conversion_panel.py" line="278"/>
         <source>Filename</source>
         <translation>ファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="283"/>
+        <location filename="../widgets/conversion_panel.py" line="279"/>
         <source>From</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>変換元</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="284"/>
+        <location filename="../widgets/conversion_panel.py" line="280"/>
         <source>To</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>変換先</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="285"/>
+        <location filename="../widgets/conversion_panel.py" line="281"/>
         <source>Status</source>
         <translation>ステータス</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="312"/>
-        <location filename="../widgets/conversion_panel.py" line="1081"/>
+        <location filename="../widgets/conversion_panel.py" line="308"/>
+        <location filename="../widgets/conversion_panel.py" line="949"/>
         <source>No files</source>
         <translation>ファイルなし</translation>
     </message>
@@ -686,35 +693,30 @@ or click “Add Artwork…”</source>
         <translation type="vanished">選択項目を削除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="366"/>
         <source>Send To</source>
         <translatorcomment>送る per glossary (not 送信). Plain verb. Confirmed.</translatorcomment>
-        <translation>送る</translation>
+        <translation type="vanished">送る</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="368"/>
         <source>Select at least one file to send.</source>
-        <translation>送るファイルを1つ以上選択してください。</translation>
+        <translation type="vanished">送るファイルを1つ以上選択してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="370"/>
         <source>Analyze</source>
-        <translation>解析</translation>
+        <translation type="vanished">解析</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="371"/>
         <source>Rename</source>
         <translatorcomment>Action label → 名前を変更 (dictionary form per Apple JP). Note &apos;Rename History&apos; uses リネーム; intentional split between action vs feature label.</translatorcomment>
-        <translation>名前を変更</translation>
+        <translation type="vanished">名前を変更</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="372"/>
         <source>Player</source>
-        <translation>プレイヤー</translation>
+        <translation type="vanished">プレイヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="383"/>
-        <location filename="../widgets/conversion_panel.py" line="512"/>
+        <location filename="../widgets/conversion_panel.py" line="334"/>
+        <location filename="../widgets/conversion_panel.py" line="456"/>
         <source>Lossy files not allowed</source>
         <translation>非可逆圧縮ファイルは使用できません</translation>
     </message>
@@ -723,27 +725,37 @@ or click “Add Artwork…”</source>
         <translation type="vanished">各ソースファイルと同じフォルダ</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="809"/>
+        <location filename="../widgets/conversion_panel.py" line="549"/>
+        <source>Start Pipeline</source>
+        <translation>パイプラインを開始</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="551"/>
+        <source>Send these tracks through the pipeline, starting here</source>
+        <translation>これらのトラックをここからパイプラインに流します</translation>
+    </message>
+    <message>
+        <location filename="../widgets/conversion_panel.py" line="682"/>
         <source>Same folder as source</source>
         <translation>元と同じフォルダ</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="828"/>
+        <location filename="../widgets/conversion_panel.py" line="701"/>
         <source>Save converted files to a folder instead</source>
         <translation>変換後のファイルをフォルダに保存</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="858"/>
+        <location filename="../widgets/conversion_panel.py" line="731"/>
         <source>Choose Output Folder</source>
         <translation>保存先フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="914"/>
+        <location filename="../widgets/conversion_panel.py" line="787"/>
         <source>Output Folder Unavailable</source>
         <translation>保存先フォルダを使用できません</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="915"/>
+        <location filename="../widgets/conversion_panel.py" line="788"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -752,79 +764,79 @@ or click “Add Artwork…”</source>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="960"/>
+        <location filename="../widgets/conversion_panel.py" line="828"/>
         <source>Open File Location</source>
         <translation>ファイルの場所を開く</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="962"/>
+        <location filename="../widgets/conversion_panel.py" line="830"/>
         <source>Remove</source>
         <translation>削除</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1037"/>
-        <location filename="../widgets/conversion_panel.py" line="1257"/>
+        <location filename="../widgets/conversion_panel.py" line="905"/>
+        <location filename="../widgets/conversion_panel.py" line="1088"/>
         <source>Done</source>
         <translation>完了</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1050"/>
+        <location filename="../widgets/conversion_panel.py" line="918"/>
         <source>Same format</source>
         <translation>同じフォーマット</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1053"/>
+        <location filename="../widgets/conversion_panel.py" line="921"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>このファイルを変換するには、より低いサンプルレートまたはビット深度を選択してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1056"/>
+        <location filename="../widgets/conversion_panel.py" line="924"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>元より高品質</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1059"/>
+        <location filename="../widgets/conversion_panel.py" line="927"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>このファイルより高くないサンプルレートとビット深度を選択してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1062"/>
-        <location filename="../widgets/conversion_panel.py" line="1249"/>
-        <location filename="../widgets/conversion_panel.py" line="1279"/>
+        <location filename="../widgets/conversion_panel.py" line="930"/>
+        <location filename="../widgets/conversion_panel.py" line="1080"/>
+        <location filename="../widgets/conversion_panel.py" line="1110"/>
         <source>Ready</source>
         <translation>準備完了</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1076"/>
+        <location filename="../widgets/conversion_panel.py" line="944"/>
         <source>{count} files</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>{count}個のファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1078"/>
+        <location filename="../widgets/conversion_panel.py" line="946"/>
         <source>{count} to convert</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>{count}件を変換</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1080"/>
+        <location filename="../widgets/conversion_panel.py" line="948"/>
         <source>({count} lossy skipped)</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>（{count}件の非可逆をスキップ）</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1221"/>
+        <location filename="../widgets/conversion_panel.py" line="1052"/>
         <source>Converting</source>
         <translation>変換中</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1242"/>
+        <location filename="../widgets/conversion_panel.py" line="1073"/>
         <source>Incomplete</source>
         <translation>未完了</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1242"/>
+        <location filename="../widgets/conversion_panel.py" line="1073"/>
         <source>Error</source>
         <translation>エラー</translation>
     </message>
@@ -880,38 +892,38 @@ or click “Add Artwork…”</source>
 <context>
     <name>HeaderBar</name>
     <message>
-        <location filename="../widgets/header_bar.py" line="68"/>
+        <location filename="../widgets/header_bar.py" line="69"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>DJ向けオーディオ解析ツールキット</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="90"/>
+        <location filename="../widgets/header_bar.py" line="91"/>
         <source>Go to the playlist the current track is playing from</source>
         <translation>再生中のトラックが入っているプレイリストへ移動します</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="104"/>
+        <location filename="../widgets/header_bar.py" line="112"/>
         <source>Add</source>
         <translation>追加</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="110"/>
+        <location filename="../widgets/header_bar.py" line="118"/>
         <source>Add files or a folder to the panel you&apos;re currently viewing</source>
         <translation>現在表示しているパネルにファイルまたはフォルダを追加します</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="114"/>
+        <location filename="../widgets/header_bar.py" line="122"/>
         <source>Files…</source>
         <translation>ファイル…</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="115"/>
+        <location filename="../widgets/header_bar.py" line="123"/>
         <source>Folder…</source>
         <translation>フォルダ…</translation>
     </message>
     <message>
-        <location filename="../widgets/header_bar.py" line="140"/>
+        <location filename="../widgets/header_bar.py" line="153"/>
         <source>Playing: {0}</source>
         <translation>再生中: {0}</translation>
     </message>
@@ -1441,74 +1453,74 @@ or click “Add Artwork…”</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="122"/>
+        <location filename="../main_window.py" line="128"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="558"/>
         <location filename="../main_window.py" line="587"/>
+        <location filename="../main_window.py" line="616"/>
         <source>Export All Playlists</source>
         <translation>すべてのプレイリストを書き出す</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="579"/>
+        <location filename="../main_window.py" line="608"/>
         <source>Export failed</source>
         <translation>書き出しに失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="580"/>
+        <location filename="../main_window.py" line="609"/>
         <source>Could not write the file:
 {0}</source>
         <translation>ファイルを書き込めませんでした:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="588"/>
+        <location filename="../main_window.py" line="617"/>
         <source>There are no playlists to export yet.</source>
         <translation>書き出せるプレイリストがまだありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="593"/>
+        <location filename="../main_window.py" line="622"/>
         <source>Export complete</source>
         <translation>書き出しが完了しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="594"/>
+        <location filename="../main_window.py" line="623"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0}件のプレイリスト（{1}トラック）を次の場所に書き出しました:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="685"/>
+        <location filename="../main_window.py" line="714"/>
         <source>Select Audio Files</source>
         <translation>オーディオファイルを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="696"/>
+        <location filename="../main_window.py" line="725"/>
         <source>Select Folder</source>
         <translation>フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="926"/>
+        <location filename="../main_window.py" line="955"/>
         <source>No Audio Files</source>
         <translation>オーディオファイルなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="927"/>
+        <location filename="../main_window.py" line="956"/>
         <source>No audio files found in:
 {0}</source>
         <translation>次の場所にオーディオファイルが見つかりません:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="932"/>
+        <location filename="../main_window.py" line="961"/>
         <source>Invalid Folder</source>
         <translation>無効なフォルダ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="933"/>
+        <location filename="../main_window.py" line="962"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>有効なディレクトリではありません:
@@ -1523,17 +1535,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">すでに解析を実行中です。完了を待つか、先にキャンセルしてください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1075"/>
+        <location filename="../main_window.py" line="1104"/>
         <source>Analyzing...</source>
         <translation>解析中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1107"/>
+        <location filename="../main_window.py" line="1136"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完了: {0}件解析済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1111"/>
+        <location filename="../main_window.py" line="1140"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完了: {0}個のファイルを解析しました</translation>
     </message>
@@ -1542,97 +1554,137 @@ or click “Add Artwork…”</source>
         <translation type="vanished">キャンセルしました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1302"/>
+        <location filename="../main_window.py" line="1331"/>
         <source>Conversion in Progress</source>
         <translation>変換を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1303"/>
+        <location filename="../main_window.py" line="1332"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>すでに変換を実行中です。お待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1317"/>
+        <location filename="../main_window.py" line="1350"/>
         <source>Pipeline in Progress</source>
         <translation>パイプラインを実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1318"/>
+        <location filename="../main_window.py" line="1351"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translation>前回のパイプラインがまだ終わっていません — 完了するまでお待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1529"/>
+        <location filename="../main_window.py" line="1368"/>
+        <source>No Target Playlist</source>
+        <translation>対象プレイリストがありません</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1369"/>
+        <location filename="../main_window.py" line="1552"/>
+        <source>Name a playlist for the run in the header bar first.</source>
+        <translation>先にヘッダーバーで実行先のプレイリストを指定してください。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1564"/>
+        <source>Cannot Start</source>
+        <translation>開始できません</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1574"/>
+        <source>No Files</source>
+        <translation>ファイルがありません</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1575"/>
+        <source>Add files to this panel before starting a pipeline run.</source>
+        <translation>パイプラインを開始する前に、このパネルにファイルを追加してください。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1585"/>
+        <source>No Rename Adjustments</source>
+        <translation>名前変更の設定がありません</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1586"/>
+        <source>No rename adjustments are set. Send the files on unchanged?</source>
+        <translation>名前変更の設定がありません。ファイルをそのまま送りますか？</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1797"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>パイプライン完了: {playlist} に {added} 件追加しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1534"/>
+        <location filename="../main_window.py" line="1802"/>
         <source>{n} skipped</source>
         <translation>{n}件スキップ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1536"/>
+        <location filename="../main_window.py" line="1804"/>
         <source>{n} errors</source>
         <translation>{n}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1575"/>
+        <location filename="../main_window.py" line="1896"/>
         <source>Converting...</source>
         <translation>変換中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1591"/>
+        <location filename="../main_window.py" line="1912"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完了: {0}件変換済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1595"/>
+        <location filename="../main_window.py" line="1916"/>
         <source>Complete: {0} files converted</source>
         <translation>完了: {0}個のファイルを変換しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1919"/>
+        <location filename="../main_window.py" line="2232"/>
         <source>Rename in Progress</source>
         <translation>名前変更を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1920"/>
+        <location filename="../main_window.py" line="2233"/>
         <source>A rename operation is already running.</source>
         <translation>すでに名前変更操作を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2016"/>
+        <location filename="../main_window.py" line="2337"/>
         <source>Rename Failed</source>
         <translation>名前の変更に失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2050"/>
+        <location filename="../main_window.py" line="2372"/>
         <source>Undo Rename</source>
         <translation>名前の変更を取り消す</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2085"/>
+        <location filename="../main_window.py" line="2407"/>
         <source>Undo Failed</source>
         <translation>取り消しに失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2131"/>
-        <source>Set pipeline settings in the Convert panel first.</source>
-        <translation>先に「変換」パネルでパイプラインを設定してください。</translation>
+        <location filename="../main_window.py" line="2463"/>
+        <source>Switch the Convert step on to run the pipeline from here.</source>
+        <translation>ここからパイプラインを実行するには「変換」ステップをオンにしてください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2133"/>
+        <source>Set pipeline settings in the Convert panel first.</source>
+        <translation type="vanished">先に「変換」パネルでパイプラインを設定してください。</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1547"/>
         <source>A conversion is already running.</source>
         <translation>すでに変換を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2135"/>
+        <location filename="../main_window.py" line="1549"/>
         <source>The last pipeline run is still finishing.</source>
         <translation>前回のパイプラインがまだ終わっていません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2162"/>
+        <location filename="../main_window.py" line="1679"/>
         <source>Lossy files stayed in Convert — the pipeline converts lossless sources only.</source>
         <translation>非可逆圧縮ファイルは変換パネルに残ります — パイプラインは可逆圧縮のソースのみを変換します。</translation>
     </message>
@@ -1645,22 +1697,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2022"/>
+        <location filename="../main_window.py" line="2344"/>
         <source>No Session</source>
         <translation>セッションなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2022"/>
+        <location filename="../main_window.py" line="2344"/>
         <source>No rename session to undo.</source>
         <translation>取り消す名前変更セッションがありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2031"/>
+        <location filename="../main_window.py" line="2353"/>
         <source>Confirm Undo</source>
         <translation>取り消しの確認</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2032"/>
+        <location filename="../main_window.py" line="2354"/>
         <source>Undo renaming of {0} files?</source>
         <translation>{0}個のファイルの名前変更を取り消しますか？</translation>
     </message>
@@ -1669,7 +1721,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">名前変更を取り消し中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2051"/>
+        <location filename="../main_window.py" line="2373"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>取り消し完了: {0}個のファイル、{1}件のエラー</translation>
     </message>
@@ -2088,6 +2140,52 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/metronome_view.py" line="337"/>
         <source>Stop</source>
         <translation>停止</translation>
+    </message>
+</context>
+<context>
+    <name>PipelineCluster</name>
+    <message>
+        <location filename="../widgets/pipeline_cluster.py" line="90"/>
+        <source>Playlist name</source>
+        <translation>プレイリスト名</translation>
+    </message>
+    <message>
+        <location filename="../widgets/pipeline_cluster.py" line="92"/>
+        <source>The playlist every pipeline run files its tracks into</source>
+        <translation>すべてのパイプライン実行がトラックを収めるプレイリスト</translation>
+    </message>
+</context>
+<context>
+    <name>PipelineToggle</name>
+    <message>
+        <location filename="../widgets/pipeline_toggle.py" line="36"/>
+        <source>Include Rename in pipeline runs</source>
+        <translation>パイプライン実行に「名前を変更」ステップを含める</translation>
+    </message>
+    <message>
+        <location filename="../widgets/pipeline_toggle.py" line="37"/>
+        <source>Leave Rename out of pipeline runs</source>
+        <translation>パイプライン実行から「名前を変更」ステップを外す</translation>
+    </message>
+    <message>
+        <location filename="../widgets/pipeline_toggle.py" line="40"/>
+        <source>Include Convert in pipeline runs</source>
+        <translation>パイプライン実行に「変換」ステップを含める</translation>
+    </message>
+    <message>
+        <location filename="../widgets/pipeline_toggle.py" line="41"/>
+        <source>Leave Convert out of pipeline runs</source>
+        <translation>パイプライン実行から「変換」ステップを外す</translation>
+    </message>
+    <message>
+        <location filename="../widgets/pipeline_toggle.py" line="44"/>
+        <source>Include Analyze in pipeline runs</source>
+        <translation>パイプライン実行に「解析」ステップを含める</translation>
+    </message>
+    <message>
+        <location filename="../widgets/pipeline_toggle.py" line="45"/>
+        <source>Leave Analyze out of pipeline runs</source>
+        <translation>パイプライン実行から「解析」ステップを外す</translation>
     </message>
 </context>
 <context>
@@ -2965,13 +3063,13 @@ or click “Add Artwork…”</source>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="130"/>
+        <location filename="../widgets/rename_panel.py" line="133"/>
         <source>Rename</source>
         <translatorcomment>Action label → 名前を変更 (dictionary form per Apple JP). Note &apos;Rename History&apos; uses リネーム; intentional split between action vs feature label.</translatorcomment>
         <translation>名前を変更</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="133"/>
+        <location filename="../widgets/rename_panel.py" line="136"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translation>下のすべてのファイル名の先頭と末尾から文字をトリミングします。すべてのファイル名の先頭（前に追加）または末尾（後ろに追加）にテキストを加えます。</translation>
     </message>
@@ -2980,195 +3078,200 @@ or click “Add Artwork…”</source>
         <translation type="vanished">操作</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="151"/>
+        <location filename="../widgets/rename_panel.py" line="154"/>
         <source>Trim Start:</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>先頭をトリミング:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="155"/>
-        <location filename="../widgets/rename_panel.py" line="167"/>
+        <location filename="../widgets/rename_panel.py" line="158"/>
+        <location filename="../widgets/rename_panel.py" line="170"/>
         <source> chars</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>文字</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="156"/>
+        <location filename="../widgets/rename_panel.py" line="159"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>ファイル名の先頭から文字を削除します</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="163"/>
+        <location filename="../widgets/rename_panel.py" line="166"/>
         <source>Trim End:</source>
         <translation>末尾をトリミング:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="168"/>
+        <location filename="../widgets/rename_panel.py" line="171"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>ファイル名の末尾（拡張子の前）から文字を削除します</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="173"/>
+        <location filename="../widgets/rename_panel.py" line="176"/>
         <source>Clear</source>
         <translation>クリア</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="188"/>
+        <location filename="../widgets/rename_panel.py" line="191"/>
         <source>Remove Underscores</source>
         <translation>アンダースコアを削除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="192"/>
+        <location filename="../widgets/rename_panel.py" line="195"/>
         <source>Space Dashes</source>
         <translation>ハイフンの前後に空白</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="198"/>
+        <location filename="../widgets/rename_panel.py" line="201"/>
         <source>Put spaces around a dash: Artist-Track → Artist - Track</source>
         <translation>ハイフンの前後に空白を入れます: Artist-Track → Artist - Track</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="223"/>
+        <location filename="../widgets/rename_panel.py" line="226"/>
         <source>Prepend Text</source>
         <translation>テキストを前に追加</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="226"/>
+        <location filename="../widgets/rename_panel.py" line="229"/>
         <source>Append Text</source>
         <translation>テキストを後ろに追加</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="255"/>
-        <location filename="../widgets/rename_panel.py" line="263"/>
+        <location filename="../widgets/rename_panel.py" line="258"/>
+        <location filename="../widgets/rename_panel.py" line="266"/>
         <source>Preview</source>
         <translation>プレビュー</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="258"/>
+        <location filename="../widgets/rename_panel.py" line="261"/>
         <source>Drop audio files here to add them</source>
         <translation>追加するにはここにオーディオファイルをドロップ</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="263"/>
+        <location filename="../widgets/rename_panel.py" line="266"/>
         <source>Original</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>元の名前</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="263"/>
+        <location filename="../widgets/rename_panel.py" line="266"/>
         <source>Status</source>
         <translation>ステータス</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="309"/>
+        <location filename="../widgets/rename_panel.py" line="312"/>
         <source>No files to rename</source>
         <translation>名前を変更するファイルがありません</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="315"/>
+        <location filename="../widgets/rename_panel.py" line="318"/>
         <source>Undo Last</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>直前を取り消す</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="320"/>
+        <location filename="../widgets/rename_panel.py" line="323"/>
         <source>Remove All</source>
         <translation>すべて削除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="325"/>
+        <location filename="../widgets/rename_panel.py" line="333"/>
+        <location filename="../widgets/rename_panel.py" line="559"/>
         <source>Apply Rename</source>
         <translation>名前変更を適用</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="332"/>
+        <location filename="../widgets/rename_panel.py" line="554"/>
+        <source>Start Pipeline</source>
+        <translation>パイプラインを開始</translation>
+    </message>
+    <message>
+        <location filename="../widgets/rename_panel.py" line="556"/>
+        <source>Send these files through the pipeline, starting here</source>
+        <translation>これらのファイルをここからパイプラインに流します</translation>
+    </message>
+    <message>
         <source>Send To</source>
         <translatorcomment>送る per glossary (not 送信). Plain verb. Confirmed.</translatorcomment>
-        <translation>送る</translation>
+        <translation type="vanished">送る</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="338"/>
         <source>Convert</source>
-        <translation>変換</translation>
+        <translation type="vanished">変換</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="339"/>
         <source>Analyze</source>
-        <translation>解析</translation>
+        <translation type="vanished">解析</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="340"/>
         <source>Auto Pipeline</source>
-        <translation>自動パイプライン</translation>
+        <translation type="vanished">自動パイプライン</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="345"/>
         <source>Set pipeline settings in the Convert panel first.</source>
-        <translation>先に「変換」パネルでパイプラインを設定してください。</translation>
+        <translation type="vanished">先に「変換」パネルでパイプラインを設定してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="410"/>
+        <location filename="../widgets/rename_panel.py" line="396"/>
         <source>Text to add at end of filename</source>
         <translation>ファイル名の末尾に追加するテキスト</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="412"/>
+        <location filename="../widgets/rename_panel.py" line="398"/>
         <source>Text to add at start of filename</source>
         <translation>ファイル名の先頭に追加するテキスト</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="453"/>
+        <location filename="../widgets/rename_panel.py" line="439"/>
         <source>No files</source>
         <translation>ファイルなし</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="497"/>
+        <location filename="../widgets/rename_panel.py" line="483"/>
         <source>Conflict</source>
         <translation>競合</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="514"/>
+        <location filename="../widgets/rename_panel.py" line="500"/>
         <source>{0} files</source>
         <translatorcomment>Reviewed (ja pass): counter usage confirmed (個 for file objects, 件 for case/action counts).</translatorcomment>
         <translation>{0}個のファイル</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="516"/>
+        <location filename="../widgets/rename_panel.py" line="502"/>
         <source>{0} to rename</source>
         <translation>{0}件を名前変更</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="518"/>
+        <location filename="../widgets/rename_panel.py" line="504"/>
         <source>{0} conflicts</source>
         <translation>{0}件の競合</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="578"/>
         <source>Convert with the Convert panel&apos;s settings, analyze, add to &quot;{name}&quot;.</source>
-        <translation>「変換」パネルの設定で変換し、解析して「{name}」に追加します。</translation>
+        <translation type="vanished">「変換」パネルの設定で変換し、解析して「{name}」に追加します。</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="681"/>
+        <location filename="../widgets/rename_panel.py" line="686"/>
         <source>Changed</source>
         <translation>変更あり</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="756"/>
+        <location filename="../widgets/rename_panel.py" line="761"/>
         <source>Copy text</source>
         <translation>テキストをコピー</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="756"/>
+        <location filename="../widgets/rename_panel.py" line="761"/>
         <source>Copy {0} names</source>
         <translation>{0}件の名前をコピー</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="762"/>
+        <location filename="../widgets/rename_panel.py" line="767"/>
         <source>Remove from list</source>
         <translation>リストから削除</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="762"/>
+        <location filename="../widgets/rename_panel.py" line="767"/>
         <source>Remove {0} from list</source>
         <translation>{0}をリストから削除</translation>
     </message>

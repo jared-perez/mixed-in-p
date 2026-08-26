@@ -27,7 +27,7 @@ STEP_RENAME = "rename"
 STEP_CONVERT = "convert"
 STEP_ANALYZE = "analyze"
 
-#: The one order steps ever run in. Toggles pick members, never the sequence.
+# The one order steps ever run in. Toggles pick members, never the sequence.
 STEP_ORDER = (STEP_RENAME, STEP_CONVERT, STEP_ANALYZE)
 
 

@@ -32,13 +32,13 @@ PIPELINE_TARGET_WIDTH = 174
 class PipelineCluster(QWidget):
     """Three mini step toggles plus the run's target playlist."""
 
-    #: (step id, on) — a request, not a fact. MainWindow decides and reflects.
+    # (step id, on) — a request, not a fact. MainWindow decides and reflects.
     step_toggled = Signal(str, bool)
-    #: The target playlist changed (picked or typed).
+    # The target playlist changed (picked or typed).
     target_changed = Signal()
-    #: The cluster got wider or narrower (the target field came or went). The
-    #: header competes for that width, so it has to be told — a visibility
-    #: change has no resize behind it to notice.
+    # The cluster got wider or narrower (the target field came or went). The
+    # header competes for that width, so it has to be told — a visibility
+    # change has no resize behind it to notice.
     shape_changed = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
