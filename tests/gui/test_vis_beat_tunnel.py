@@ -489,20 +489,28 @@ def _place_planet(scene, kind=0, rings=(), depth=12.0, radius=1.4, seed=4):
     return scene
 
 
-def test_the_three_planet_tints_are_the_old_one_plus_two(scene):
-    """Most planets are exactly the shade they were; the other two vary from it.
+def test_the_planet_tints_are_the_old_one_plus_four(scene):
+    """Most planets are exactly the shade they were; the others vary from it.
 
     The brightness of the pale one was settled by eye in the running app, so
     this pins it to the star palette's own wash rather than to a number: if that
     wash moves, the planets should move with it.
     """
-    pale, dark, tint = scene._planet_tints()
+    pale, dark, tint, red, blue = scene._planet_tints()
     assert pale == scene._palette()[1]  # unchanged, and still the same wash
     for channel in ("red", "green", "blue"):
         assert getattr(dark, channel)() < getattr(pale, channel)()
     # Less washed toward white is more of the accent's own colour, and the
     # theme colour is what the wash is pulling away from.
     assert abs(tint.blue() - scene._color.blue()) < abs(pale.blue() - scene._color.blue())
+    # The red one leans red, the blue one blue — and both are *dull*: no
+    # channel outshines the pale planet's, so they read as different rock in
+    # the same sky rather than as new bright objects.
+    assert red.red() > red.blue() and red.red() > red.green()
+    assert blue.blue() > blue.red() and blue.blue() > blue.green()
+    for colour in (red, blue):
+        for channel in ("red", "green", "blue"):
+            assert getattr(colour, channel)() < max(pale.red(), pale.green(), pale.blue())
 
 
 def test_a_planet_keeps_its_tint_and_rings_until_it_is_replaced(scene):
@@ -548,9 +556,11 @@ def test_only_a_few_planets_are_dusky_tinted_or_ringed(scene):
     finally:
         type(scene)._spawn_planet = real
     assert len(kinds) > 60  # the sample is big enough to say anything at all
-    assert 0.5 < kinds.count(0) / len(kinds)  # pale is still the rule
-    assert 0 < kinds.count(1) < len(kinds) * 0.35
-    assert 0 < kinds.count(2) < len(kinds) * 0.35
+    # Pale is still the commonest by a distance — a plurality rather than a
+    # majority now that red and blue joined the dusky and tinted exceptions.
+    assert kinds.count(0) > 2 * max(kinds.count(k) for k in (1, 2, 3, 4))
+    for kind in (1, 2, 3, 4):  # dusky, accent-tinted, dull red, dull blue
+        assert 0 < kinds.count(kind) < len(kinds) * 0.35
     assert 0 < ringed < len(kinds) * 0.4
 
 
@@ -577,12 +587,64 @@ def test_a_ring_is_drawn_around_the_planet_and_not_only_over_it(scene):
     assert beyond.mean() > 0.5
 
 
+def _chain_segments(chains):
+    """How many of the ring's segments a list of polyline chains carries."""
+    return sum(chain.size() - 1 for chain in chains)
+
+
 def test_a_ring_passes_behind_the_planet_as_well_as_in_front(scene):
     """A tilted ring is split at the planet's own depth — the Saturn silhouette."""
     _place_planet(scene, rings=(1.6,))
     behind, in_front = scene._ring_arcs(0, 1216, 512)
     assert behind and in_front
-    assert len(behind) + len(in_front) <= tc._PLANET_RING_SEGMENTS
+    assert _chain_segments(behind) + _chain_segments(in_front) <= tc._PLANET_RING_SEGMENTS
+
+
+def test_the_far_half_is_dropped_where_the_planet_covers_it(scene):
+    """The disc is translucent, so draw order cannot occlude — dropping does.
+
+    A near-edge-on ring sends its far half straight across the planet's face;
+    painted and merely overdrawn it shows through the gradient disc, which
+    reads as the ring passing in *front* — the bug the running app showed.
+    So the stretch inside the silhouette must be missing from the chains
+    entirely, and no surviving behind-point may sit deep inside the disc.
+    """
+    _place_planet(scene, rings=(1.6,))
+    scene._planet_ring_basis[0] = np.array([[1.0, 0.0, 0.0], [0.0, 0.1, 0.995]])
+    behind, in_front = scene._ring_arcs(0, 1216, 512)
+    assert _chain_segments(behind) + _chain_segments(in_front) < tc._PLANET_RING_SEGMENTS
+    depth, radius = scene._planets[0, 2], scene._planets[0, 3]
+    pr = scene._focal * radius / depth
+    for chain in behind:
+        for m in range(chain.size()):
+            point = chain.at(m)
+            assert np.hypot(point.x() - 1216 / 2, point.y() - 512 / 2) > pr * 0.8
+
+
+def test_a_ring_is_chains_not_beads(scene):
+    """One face-on ring is a single closed chain, and paints with no dots.
+
+    Drawn one line at a time, every shared endpoint of a translucent pen
+    double-paints, and the ring wears a bead of 36 dots — exactly what the
+    running app showed. A stroked polyline double-paints nothing, so no
+    pixel of the band may exceed the pen's own alpha.
+    """
+    _place_planet(scene, rings=(1.8,))
+    scene._planet_ring_basis[0] = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    behind, in_front = scene._ring_arcs(0, 1216, 512)
+    chains = behind + in_front
+    assert len(chains) == 1  # one unbroken chain...
+    assert chains[0].size() == tc._PLANET_RING_SEGMENTS + 1  # ...closed on itself
+
+    depth, radius = scene._planets[0, 2], scene._planets[0, 3]
+    alpha = _pixels(_planets_alone(scene, glow=1.0))[..., 3].astype(int)
+    ys, xs = np.indices(alpha.shape)
+    span = np.hypot(xs - 200, ys - 200) / (scene._focal * radius / depth)
+    band = alpha[(span > 1.6) & (span < 2.0)]
+    disc = QColor(scene._planet_tints()[0])
+    disc.setAlphaF(1.0)
+    pen_alpha = scene._ring_colour(disc).alphaF() * 255
+    assert band.max() <= pen_alpha + 5  # nothing double-painted anywhere
 
 
 def test_a_planet_without_rings_has_no_arcs(scene):
@@ -616,7 +678,7 @@ def test_a_ring_is_brighter_than_the_planet_it_circles(scene):
     """
     disc = QColor(scene._planet_tints()[0])
     disc.setAlphaF(0.4)  # about what the depth fade and the glow floor leave
-    assert scene._ring_colour(disc).alphaF() > disc.alphaF() * 1.5
+    assert scene._ring_colour(disc).alphaF() > disc.alphaF() * 1.25
 
     close = QColor(disc)
     close.setAlphaF(1.0)  # a rare close pass, where the disc is at full alpha
@@ -667,6 +729,192 @@ def test_the_ring_plane_is_fixed_in_the_world_not_to_the_camera(scene):
         assert np.isclose(np.linalg.norm(v), 1.0, atol=1e-6)
         assert abs(float(u @ v)) < 1e-6
     assert not np.allclose(scene._planet_ring_basis[0], first, atol=1e-3)
+
+
+# ── The sky thins out: rests, galaxies, and spiky stars ───────────────────
+
+
+def test_an_emptied_planet_slot_rests_before_it_refills(scene):
+    """"About 20% fewer planets": the stream's rate is lifetime *plus* rest.
+
+    The rest is in world units, not seconds or frames, so it scales with the
+    tempo exactly as the churn it thins does and both frame-rate hosts agree.
+    Kill a planet by hand: the next frame parks it far behind the lens with a
+    wake arc-length, it stays parked until the camera has flown the gap, and
+    it refills on its own once it has.
+    """
+    step = 128.0 / 60.0 / 60.0
+    beat = 1.0
+    scene.render(beat, 0.6, 0.0)
+    scene._planets[0, 2] = 0.1  # shove it past the near bound
+    beat += step
+    scene.render(beat, 0.6, 0.0)
+    assert scene._planets[0, 2] == tc._SKY_PARKED
+    wake = float(scene._planet_wake[0])
+    assert scene._cam_s < wake  # a real rest, not an instant refill
+    while (beat + step) * UNITS_PER_BEAT < wake:
+        beat += step
+        scene.render(beat, 0.6, 0.0)
+        assert scene._planets[0, 2] == tc._SKY_PARKED  # still resting
+    beat = wake / UNITS_PER_BEAT + step
+    scene.render(beat, 0.6, 0.0)
+    assert scene._planets[0, 2] > 0  # back in the sky, ahead of the camera
+
+
+def test_a_fresh_sky_owes_its_first_galaxy_a_full_rest(scene):
+    """Sparse is the brief, so a reset does not open on a galaxy.
+
+    It also keeps every short deterministic flight in this file galaxy-free:
+    the shortest rest is 12 units and the planet fixtures fly 10.
+    """
+    assert (scene._galaxies[:, 2] == tc._SKY_PARKED).all()
+    assert (scene._galaxy_wake >= tc._GALAXY_REST[0]).all()
+
+
+def test_galaxies_are_about_a_fifth_of_the_planet_stream(scene):
+    """Both streams counted over the same flight: a ratio, and a planet ceiling.
+
+    Two instruments because they catch different regressions, checked by
+    running this with each fix removed. The ratio fails outright with the
+    galaxy slot dead (zero) but *survives* the planet rest gap being deleted
+    (0.14 against 0.23 — both inside any honest band for a 16-galaxy sample),
+    so the ceiling on the planet count is what pins the "20% fewer": this
+    flight spawns 70 with the rest and 90 without it.
+    """
+    counts = {"planet": 0, "galaxy": 0}
+    real_planet = type(scene)._spawn_planet
+    real_galaxy = type(scene)._spawn_galaxy
+
+    def spy_planet(self, index, depth=None):
+        counts["planet"] += 1
+        real_planet(self, index, depth)
+
+    def spy_galaxy(self, index):
+        counts["galaxy"] += 1
+        real_galaxy(self, index)
+
+    type(scene)._spawn_planet = spy_planet
+    type(scene)._spawn_galaxy = spy_galaxy
+    try:
+        _fly(scene, 0.0, 200.0)
+    finally:
+        type(scene)._spawn_planet = real_planet
+        type(scene)._spawn_galaxy = real_galaxy
+    assert 40 < counts["planet"] < 80
+    assert 0.08 < counts["galaxy"] / counts["planet"] < 0.4
+
+
+def _galaxy_alone(scene, depth=20.0, radius=3.0, size=400):
+    """One face-on galaxy dead ahead, painted on its own layer."""
+    scene.reset()
+    scene._galaxies[0] = [0.0, 0.0, depth, radius]
+    scene._galaxy_basis[0] = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
+    scene._galaxy_twist[0] = 4.4  # what _spawn_galaxy would roll, pinned
+    image = QImage(size, size, QImage.Format.Format_ARGB32_Premultiplied)
+    image.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(image)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+    scene._paint_galaxies(painter, size, size, 1.0, 1.0)
+    painter.end()
+    return image
+
+
+def test_a_galaxy_is_a_translucent_disc_with_a_brighter_heart(scene):
+    """The two passes in one sample: haze that fades outward, a bulge at centre.
+
+    Translucent because it is the farthest thing in the frame and the sky is
+    depth behind the tunnel — nothing in it may reach full alpha.
+    """
+    alpha = _pixels(_galaxy_alone(scene))[..., 3].astype(int)
+    assert (alpha > 0).sum() > 500  # really there
+    assert alpha.max() < 255  # and haze, never a solid body
+    centre = alpha[200, 200]
+    reach = int(scene._focal * 3.0 / 20.0 * 0.8)
+    assert centre > alpha[200, 200 + reach]  # the bulge outshines the disc
+
+
+def test_the_disc_carries_spiral_arms_not_just_haze(scene):
+    """Sampled around a circle at half the disc's radius, sector by sector.
+
+    The haze is a radial gradient, which is *flat* around any circle centred
+    on the bulge — so all the angular contrast on that ring is the arms, and
+    a regression to the armless disc reads as near-zero range here.
+    """
+    alpha = _pixels(_galaxy_alone(scene))[..., 3].astype(int)
+    reach = scene._focal * 3.0 / 20.0  # the disc's projected radius
+    angles = np.linspace(0, 2 * np.pi, 72, endpoint=False)
+    ring = alpha[
+        (200 + 0.55 * reach * np.sin(angles)).astype(int),
+        (200 + 0.55 * reach * np.cos(angles)).astype(int),
+    ]
+    assert int(ring.max()) - int(ring.min()) > 25
+
+
+def test_an_edge_on_galaxy_is_a_sliver_not_a_wheel(scene):
+    """The disc is a circle in its *own* plane, so the tilt is free.
+
+    Its plane's two axes are projected and the unit circle mapped through
+    them — turn the plane edge-on and the picture must collapse in one
+    direction while keeping the other, with no per-case code.
+    """
+    face_on = _pixels(_galaxy_alone(scene))[..., 3] > 0
+    scene._galaxy_basis[0] = np.array([[1.0, 0.0, 0.0], [0.0, 0.06, 0.998]])
+    image = QImage(400, 400, QImage.Format.Format_ARGB32_Premultiplied)
+    image.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(image)
+    scene._paint_galaxies(painter, 400, 400, 1.0, 1.0)
+    painter.end()
+    edge_on = _pixels(image)[..., 3] > 0
+    tall = face_on.any(axis=1).sum()
+    thin = edge_on.any(axis=1).sum()
+    assert thin < tall * 0.5  # squashed vertically...
+    assert edge_on.any(axis=0).sum() > face_on.any(axis=0).sum() * 0.7  # ...not shrunk
+
+
+def test_star_crosses_vary_in_how_far_they_poke_out(scene):
+    """Spikiness is rolled per star at spawn, so the field mixes tight and long."""
+    spikes = scene._star_spike
+    assert (spikes >= tc._STAR_SPIKE[0]).all()
+    assert (spikes <= tc._STAR_SPIKE[1]).all()
+    assert np.unique(spikes.round(3)).size > 10  # a distribution, not a constant
+
+
+def test_most_stars_are_small_and_the_small_ones_are_the_compact_ones(scene):
+    """Two asks in one roll: more smaller stars, and less spiky means tighter.
+
+    The size skew is the bias exponent (a uniform roll would put the median at
+    the range's midpoint); the coupling is that spike and size ride the same
+    roll, so sorting the field by either order sorts it by both — a compact
+    star never wears the long arms.
+    """
+    sizes = scene._star_size
+    assert (sizes >= tc._STAR_SIZE[0]).all()
+    assert (sizes <= tc._STAR_SIZE[1]).all()
+    assert np.median(sizes) < (tc._STAR_SIZE[0] + tc._STAR_SIZE[1]) / 2
+    assert (np.argsort(sizes) == np.argsort(scene._star_spike)).all()
+
+
+def _lone_star_coverage(scene, spike, size=200):
+    """Pixels lit by one near star drawn at *spike*."""
+    scene._stars[:, 2] = -1.0
+    scene._stars[0] = [0.0, 0.0, 3.0]  # near enough to be a four-point star
+    scene._star_kind[0] = 0
+    scene._star_spike[0] = spike
+    scene._star_size[0] = 1.0  # pin the size roll: this test is about the arms
+    image = QImage(size, size, QImage.Format.Format_ARGB32_Premultiplied)
+    image.fill(Qt.GlobalColor.transparent)
+    painter = QPainter(image)
+    painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+    scene._paint_stars(painter, scene._palette(), size, size, 1.0, 1.0)
+    painter.end()
+    return int((_pixels(image)[..., 3] > 0).sum())
+
+
+def test_the_painter_really_draws_the_rolled_spike(scene):
+    """The same star at the two ends of the range, differenced by coverage."""
+    tight = _lone_star_coverage(scene, tc._STAR_SPIKE[0])
+    long_armed = _lone_star_coverage(scene, tc._STAR_SPIKE[1])
+    assert long_armed > tight * 1.3
 
 
 # ── Stars respond to the kick ──────────────────────────────────────────────

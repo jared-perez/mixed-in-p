@@ -73,6 +73,7 @@ from PySide6.QtGui import (
     QPen,
     QPolygonF,
     QRadialGradient,
+    QTransform,
 )
 
 from ..styles.theme import Theme
@@ -158,7 +159,46 @@ _N_PLANETS = 3
 _STAR_FLOOR = 0.15  # a star's depth alpha between kicks
 _STAR_DECAY_AT_33MS = 0.82  # the loop tunnel's release, as a time constant
 _STAR_POINT_MIN = 1.8  # below this a star is a dot rather than a 4-point star
-_PLANET_RADIUS = (0.6, 1.8)  # world units
+# How a star looks is one roll per star, skewed toward the small end: most of
+# the field is small compact dots and tight sparkles, and the occasional big
+# star wears the long arms. Spike is how far the cross pokes out, in star
+# sizes; size is a multiplier on the depth-driven base (whose old effective
+# value was a fixed 1.0 — the field reads smaller now on purpose). The two
+# ride the *same* roll deliberately: "less spiky" and "more compact" are the
+# same star, so a short-armed one never comes out as a fat plus.
+_STAR_SPIKE = (1.25, 2.6)
+_STAR_SIZE = (0.4, 1.25)
+_STAR_SIZE_BIAS = 2.0  # exponent on the roll: higher skews further toward small
+_PLANET_RADIUS = (0.45, 2.2)  # world units — wide on purpose, for variety
+
+# A sky slot that empties does not refill at once: it rests for a stretch of
+# *path* first. World units rather than seconds or frames, so the rate scales
+# with the tempo exactly as the churn it thins does, and the 16 ms and 33 ms
+# hosts agree. A planet lives ~19 units on average (spawn depth over travel,
+# minus the ones a turn swings out of the window early), so ~4.8 units of
+# rest on top is the "about 20% fewer" asked for — measured below.
+_PLANET_REST = (2.0, 7.6)  # world units a planet slot lies empty
+_SKY_PARKED = -1000.0  # where a resting body waits, far behind the lens
+
+# Galaxies: one slot, resting most of the time — the brief is *sparse*, about
+# a fifth of the planet stream. Bigger than any planet in world units and
+# drawn as translucent haze (a tilted gradient disc plus a round bulge), so
+# it reads as background rather than as an approaching object.
+_N_GALAXIES = 1
+_GALAXY_RADIUS = (2.2, 4.0)  # world units
+_GALAXY_REST = (12.0, 26.0)  # world units the slot lies empty
+_GALAXY_NEAR = 2.0  # dies here: this big, any nearer would fill the frame
+_GALAXY_MIN_PX = 5.0  # smaller than this is a smudge, not a galaxy
+# The spiral: two arms wound this many radians from bulge to rim, drawn in
+# the disc's own plane so the tilt foreshortens them with everything else.
+# An arm is a run of overlapping soft blobs, not a stroke — the stroked
+# version read as a curled wire in the running app, and cloud is clumps.
+# Handedness and the exact wind are rolled at spawn; each blob's jitter,
+# size and brightness are hashed from the wind, so a galaxy keeps its own
+# clumps for life and no two galaxies share them.
+_GALAXY_ARM_WIND = (3.6, 5.2)
+_GALAXY_ARM_BLOBS = 16  # per arm
+_GALAXY_ARM_START = 0.18  # where an arm leaves the bulge, in disc radii
 
 # Planet variety. The pale cream the whole field used to be is still most of
 # it — its brightness was judged right in the running app, so nothing below
@@ -166,16 +206,27 @@ _PLANET_RADIUS = (0.6, 1.8)  # world units
 #
 # They are chances rather than counts because there are only three planets on
 # screen at a time, and a "small percentage" is a property of the stream rather
-# than of the three. Measured over three minutes at 128 BPM: **about fifty
-# planets a minute**, of which nine are dusky, nine wear the accent's own
-# colour and ten carry rings. (Fifty is more churn than the geometry suggests —
-# a planet spawns 22 to 42 units out and travels at 5.3 units a second, so it
-# should last four to eight — because a turn swings the ones off to the side
-# out of the depth window early. Same for the stars; it is not new here.)
+# than of the three. Measured over three minutes at 128 BPM: **about
+# forty-four planets a minute** — 55 with no rest gap, so `_PLANET_REST` is
+# the asked-for "about 20% fewer" — of which roughly eight are dusky, eight
+# wear the accent's own colour, four are dull red, four dull blue, and ten
+# carry rings; the galaxy stream runs at 22% of the planets'. (More churn than
+# the geometry suggests — a planet spawns 22 to 42 units out and travels at
+# 5.3 units a second, so it should last four to eight — because a turn swings
+# the ones off to the side out of the depth window early. Same for the stars;
+# it is not new here.)
 _PLANET_DARK_CHANCE = 0.18
 _PLANET_TINT_CHANCE = 0.18
+_PLANET_RED_CHANCE = 0.10
+_PLANET_BLUE_CHANCE = 0.10
 _PLANET_DARK = 0.62  # value multiplier on the cream: a rock, not an ice ball
 _PLANET_TINT_WASH = 0.22  # how far the tinted one is washed toward white
+# Deliberately dull: desaturated and no brighter than the dusky one, so a red
+# or blue planet reads as a different rock in the same sky rather than as a
+# new bright object. Fixed constants rather than accent washes, like _GREY —
+# there is no wash of a gold accent that comes out red or blue.
+_PLANET_RED = (176, 112, 98)  # brick
+_PLANET_BLUE = (108, 128, 176)  # slate
 
 # Rings: thin, concentric, and in a plane of their own per planet. The span is
 # in planet radii, and the rings are spread across it rather than drawn at
@@ -193,13 +244,15 @@ _PLANET_RING_PEN = 1.15  # px at the 512-high reference
 # its alpha over thousands of pixels and the ring over a one-pixel line, so at
 # the alpha the disc is comfortable at — around 0.3 by the time the depth fade
 # and the between-kicks glow floor have both been applied — the ring simply is
-# not there. Rendered against a real flight, 1.0 was invisible and this reads at
-# every distance a planet is drawn at. The ceiling is what stops a close pass —
-# where the disc's own alpha is already near 1 — from putting the brightest line
-# in the frame around a planet: the tunnel is the subject, and the sky, rings
-# included, is depth behind it.
-_PLANET_RING_ALPHA = 1.8  # multiplier on the planet's own alpha
-_PLANET_RING_MAX_ALPHA = 0.85
+# not there. Rendered against a real flight, 1.0 was invisible; 1.8 read as
+# too bright in the running app once the beading was gone (the double-painted
+# segment joints were part of what it was tuned against), and this is the
+# user's judgement. The ceiling is what stops a close pass — where the disc's
+# own alpha is already near 1 — from putting the brightest line in the frame
+# around a planet: the tunnel is the subject, and the sky, rings included, is
+# depth behind it.
+_PLANET_RING_ALPHA = 1.4  # multiplier on the planet's own alpha
+_PLANET_RING_MAX_ALPHA = 0.7
 
 _HISTORY = 4.0  # world units of path kept behind the camera
 
@@ -349,6 +402,44 @@ def _hash01(value: np.ndarray, scale: float) -> np.ndarray:
     """The usual sine hash, as a fraction: deterministic, cheap, world-anchored."""
     raw = np.sin(value) * scale
     return raw - np.floor(raw)
+
+
+def _arc_chains(sx, sy, keep: np.ndarray) -> list[QPolygonF]:
+    """The kept segments of one closed ring, joined into polyline chains.
+
+    ``keep[m]`` says whether the segment from vertex *m* to *m + 1* survives.
+    Runs of consecutive kept segments become one chain each (walked from a
+    dropped segment so a run wrapping the seam stays whole); a fully kept
+    ring closes into a single chain. One chain per run is the point: a
+    stroked polyline double-paints nothing, where per-segment lines bead at
+    every shared translucent endpoint.
+    """
+    count = len(keep)
+    if not keep.any():
+        return []
+    if keep.all():
+        points = [QPointF(sx[m], sy[m]) for m in range(count)]
+        points.append(points[0])
+        return [QPolygonF(points)]
+    start = int(np.flatnonzero(~keep)[0])
+    chains: list[QPolygonF] = []
+    run: list[int] = []
+    for step in range(1, count + 1):
+        m = (start + step) % count
+        if keep[m]:
+            run.append(m)
+        elif run:
+            points = [QPointF(sx[i], sy[i]) for i in run]
+            tail = (run[-1] + 1) % count
+            points.append(QPointF(sx[tail], sy[tail]))
+            chains.append(QPolygonF(points))
+            run = []
+    if run:
+        points = [QPointF(sx[i], sy[i]) for i in run]
+        tail = (run[-1] + 1) % count
+        points.append(QPointF(sx[tail], sy[tail]))
+        chains.append(QPolygonF(points))
+    return chains
 
 
 def schedule_turns(beat_from: int, beat_to: int, rng: np.random.Generator,
@@ -546,6 +637,8 @@ class BeatTunnelScene:
         self._seg_odd = (self._seg % 2 == 1)
         self._stars = np.empty((_N_STARS, 3))
         self._star_kind = np.empty(_N_STARS, int)
+        self._star_spike = np.full(_N_STARS, _STAR_SPIKE[0])
+        self._star_size = np.full(_N_STARS, _STAR_SIZE[0])
         self._planets = np.empty((_N_PLANETS, 4))  # x, y, z, radius
         self._planet_kind = np.zeros(_N_PLANETS, int)
         # Two perpendicular directions spanning each planet's ring plane, and
@@ -553,6 +646,13 @@ class BeatTunnelScene:
         # slot this planet does not use.
         self._planet_ring_basis = np.zeros((_N_PLANETS, 2, 3))
         self._planet_ring_radii = np.zeros((_N_PLANETS, _PLANET_RING_COUNT))
+        # The camera arc-length before which an empty slot stays empty — the
+        # rest gap that thins the stream (see _PLANET_REST / _GALAXY_REST).
+        self._planet_wake = np.zeros(_N_PLANETS)
+        self._galaxies = np.empty((_N_GALAXIES, 4))  # x, y, z, radius
+        self._galaxy_basis = np.zeros((_N_GALAXIES, 2, 3))  # the disc's plane
+        self._galaxy_wake = np.zeros(_N_GALAXIES)
+        self._galaxy_twist = np.zeros(_N_GALAXIES)  # signed arm wind, per spawn
         self._prev_basis: np.ndarray | None = None
         self._prev_cam: np.ndarray | None = None
         self._star_glow = 0.0
@@ -591,11 +691,22 @@ class BeatTunnelScene:
         for i in range(_N_STARS):
             self._stars[i] = self._spawn(self._rng.uniform(1.0, self._far))
             self._star_kind[i] = self._rng.integers(0, 3)
+            self._roll_star_look(i)
+        self._planet_wake[:] = 0.0
         for i in range(_N_PLANETS):
             # Nearer than a respawn on purpose: the first seconds should have
             # planets in them rather than an empty sky waiting for the first
             # one to arrive.
             self._spawn_planet(i, self._rng.uniform(self._far * 0.5, self._far * 1.5))
+        # Galaxies start resting, not on screen: sparse is the brief, and a
+        # full rest before the first one keeps short deterministic test
+        # flights (and the first bars of every track) galaxy-free.
+        self._galaxies[:] = 0.0
+        self._galaxies[:, 2] = _SKY_PARKED
+        self._galaxy_basis[:] = 0.0
+        self._galaxy_twist[:] = 0.0
+        for i in range(_N_GALAXIES):
+            self._galaxy_wake[i] = self._rng.uniform(*_GALAXY_REST)
         self._image.fill(Qt.GlobalColor.transparent)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
@@ -684,6 +795,7 @@ class BeatTunnelScene:
 
         self._advance_stars(basis, cam)
         self._advance_planets(basis, cam)
+        self._advance_galaxies(basis, cam)
         self._prev_basis, self._prev_cam = basis, cam
         self._paint(geometry, ring_s, level, pulse)
         return self._image
@@ -752,6 +864,17 @@ class BeatTunnelScene:
             if x * x + y * y > (TUNNEL_R * margin) ** 2:
                 return np.array([x, y, depth])
 
+    def _roll_star_look(self, index: int) -> None:
+        """One prominence roll per star, driving spike and size together.
+
+        Squaring the roll (``_STAR_SIZE_BIAS``) skews the field toward small:
+        most stars land near the compact short-armed end, and the long-armed
+        ones stay the exceptions that make the sky read as varied.
+        """
+        t = self._rng.random() ** _STAR_SIZE_BIAS
+        self._star_spike[index] = _STAR_SPIKE[0] + (_STAR_SPIKE[1] - _STAR_SPIKE[0]) * t
+        self._star_size[index] = _STAR_SIZE[0] + (_STAR_SIZE[1] - _STAR_SIZE[0]) * t
+
     def _spawn_planet(self, index: int, depth: float | None = None) -> None:
         """A fresh planet: where, how big, which tint, and whether it wears rings.
 
@@ -764,27 +887,22 @@ class BeatTunnelScene:
         self._planets[index, 3] = self._rng.uniform(*_PLANET_RADIUS)
 
         roll = self._rng.random()
-        if roll < _PLANET_DARK_CHANCE:
+        edge = _PLANET_DARK_CHANCE
+        if roll < edge:
             self._planet_kind[index] = 1
-        elif roll < _PLANET_DARK_CHANCE + _PLANET_TINT_CHANCE:
+        elif roll < (edge := edge + _PLANET_TINT_CHANCE):
             self._planet_kind[index] = 2
+        elif roll < (edge := edge + _PLANET_RED_CHANCE):
+            self._planet_kind[index] = 3
+        elif roll < edge + _PLANET_BLUE_CHANCE:
+            self._planet_kind[index] = 4
         else:
             self._planet_kind[index] = 0
 
         self._planet_ring_radii[index] = 0.0
         if self._rng.random() >= _PLANET_RING_CHANCE:
             return
-        # A plane through the planet at a random attitude: take a normal off
-        # the sphere and any two perpendiculars to it. The normal is drawn from
-        # a Gaussian rather than from two uniform angles because that is
-        # uniform on the sphere — polar angles bunch the normals at the poles,
-        # which would give most ringed planets a near-edge-on band.
-        normal = self._rng.normal(size=3)
-        normal /= np.linalg.norm(normal)
-        aside = np.array([0.0, 0.0, 1.0]) if abs(normal[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
-        u = np.cross(normal, aside)
-        u /= np.linalg.norm(u)
-        self._planet_ring_basis[index] = np.stack([u, np.cross(normal, u)])
+        self._planet_ring_basis[index] = self._random_plane_basis()
 
         count = int(self._rng.integers(1, _PLANET_RING_COUNT + 1))
         inner, outer = _PLANET_RING_SPAN
@@ -792,6 +910,31 @@ class BeatTunnelScene:
             band = (outer - inner) / count
             low = inner + band * slot
             self._planet_ring_radii[index, slot] = self._rng.uniform(low, low + band * 0.65)
+
+    def _random_plane_basis(self) -> np.ndarray:
+        """Two perpendicular unit vectors spanning a plane at a random attitude.
+
+        Take a normal off the sphere and any two perpendiculars to it. The
+        normal is drawn from a Gaussian rather than from two uniform angles
+        because that is uniform on the sphere — polar angles bunch the normals
+        at the poles, which would give most ringed planets (and most galaxies)
+        a near-edge-on band.
+        """
+        normal = self._rng.normal(size=3)
+        normal /= np.linalg.norm(normal)
+        aside = np.array([0.0, 0.0, 1.0]) if abs(normal[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
+        u = np.cross(normal, aside)
+        u /= np.linalg.norm(u)
+        return np.stack([u, np.cross(normal, u)])
+
+    def _spawn_galaxy(self, index: int) -> None:
+        """A fresh galaxy: where, how big, its disc's attitude, its spiral."""
+        depth = self._rng.uniform(self._far * 0.9, self._far * 1.5)
+        self._galaxies[index, :3] = self._spawn(depth, margin=3.0)
+        self._galaxies[index, 3] = self._rng.uniform(*_GALAXY_RADIUS)
+        self._galaxy_basis[index] = self._random_plane_basis()
+        handed = -1.0 if self._rng.random() < 0.5 else 1.0
+        self._galaxy_twist[index] = handed * self._rng.uniform(*_GALAXY_ARM_WIND)
 
     def _rigid(self, basis, cam):
         """Rotation and offset carrying last frame's camera coordinates into this one's.
@@ -814,9 +957,27 @@ class BeatTunnelScene:
         z = self._stars[:, 2]
         for i in np.flatnonzero((z < _NEAR) | (z > self._far * 1.2)):
             self._stars[i] = self._spawn()
+            self._roll_star_look(i)
+
+    def _refill_slot(self, positions, wake, index, rest, spawn) -> None:
+        """One empty sky slot: park it, rest it, then let *spawn* refill it.
+
+        The first frame after a body leaves the window rolls the rest gap and
+        parks it far behind the lens; every later frame re-parks it (the rigid
+        transform moves parked points like any other) until the camera has
+        flown *rest* units, and only then does the slot refill. This is the
+        whole of "20% fewer planets": the stream's rate is lifetime plus rest.
+        """
+        if positions[index, 2] > _SKY_PARKED * 0.5:
+            wake[index] = self._cam_s + self._rng.uniform(*rest)
+            positions[index, 2] = _SKY_PARKED
+        elif self._cam_s >= wake[index]:
+            spawn(index)
+        else:
+            positions[index, 2] = _SKY_PARKED
 
     def _advance_planets(self, basis, cam) -> None:
-        """As the stars, plus the ring planes.
+        """As the stars, plus the ring planes — and a rest between planets.
 
         A ring's plane is fixed in the world like the planet it belongs to, so
         its two basis vectors take the rotation and **not** the offset: they are
@@ -831,7 +992,27 @@ class BeatTunnelScene:
             self._planet_ring_basis[:] = self._planet_ring_basis @ rotation.T
         z = self._planets[:, 2]
         for i in np.flatnonzero((z < 0.5) | (z > self._far * 1.6)):
-            self._spawn_planet(i)
+            self._refill_slot(
+                self._planets, self._planet_wake, i, _PLANET_REST, self._spawn_planet
+            )
+
+    def _advance_galaxies(self, basis, cam) -> None:
+        """As the planets: fixed in the world, resting far longer between visits.
+
+        The near bound is higher because a galaxy is huge — letting one reach
+        the lens would fill the frame with haze — and its alpha has already
+        faded to nothing by then, the same shape as a ring reaching the camera.
+        """
+        move = self._rigid(basis, cam)
+        if move is not None:
+            rotation, offset = move
+            self._galaxies[:, :3] = self._galaxies[:, :3] @ rotation.T + offset
+            self._galaxy_basis[:] = self._galaxy_basis @ rotation.T
+        z = self._galaxies[:, 2]
+        for i in np.flatnonzero((z < _GALAXY_NEAR) | (z > self._far * 1.8)):
+            self._refill_slot(
+                self._galaxies, self._galaxy_wake, i, _GALAXY_REST, self._spawn_galaxy
+            )
 
     def _wash(self, white: float) -> QColor:
         """The accent colour mixed *white* of the way toward white."""
@@ -851,15 +1032,19 @@ class BeatTunnelScene:
         return [QColor(*_GREY), self._wash(0.65), self._wash(0.4)]
 
     def _planet_tints(self) -> list[QColor]:
-        """Cream, a dusky one, and one wearing the accent's own colour.
+        """Cream, a dusky one, the accent's own colour, a dull red, a dull blue.
 
         The first is the shade every planet used to be, unchanged: its
         brightness was judged right in the running app, and the point of the
-        other two is variety at the same brightness budget rather than a
+        others is variety at the same brightness budget rather than a
         different one. The dusky planet is that cream taken down in value, so
         it stays the same hue and reads as rock beside an ice ball; the tinted
         one is barely washed at all, which is the only way the colour survives
-        being drawn at a fraction of full alpha on black.
+        being drawn at a fraction of full alpha on black. The red and blue are
+        fixed dull constants (see `_PLANET_RED`), sitting at the dusky one's
+        brightness so they read as different rock, not new bright objects —
+        and their rings inherit the colour, since a ring is the disc's colour
+        brightened.
         """
         pale = self._wash(0.65)
         dark = QColor(
@@ -867,7 +1052,10 @@ class BeatTunnelScene:
             int(pale.green() * _PLANET_DARK),
             int(pale.blue() * _PLANET_DARK),
         )
-        return [pale, dark, self._wash(_PLANET_TINT_WASH)]
+        return [
+            pale, dark, self._wash(_PLANET_TINT_WASH),
+            QColor(*_PLANET_RED), QColor(*_PLANET_BLUE),
+        ]
 
     # ── Paint ──────────────────────────────────────────────────────────────
 
@@ -880,6 +1068,7 @@ class BeatTunnelScene:
         palette = self._palette()
         glow = _STAR_FLOOR + (1.0 - _STAR_FLOOR) * self._star_glow
 
+        self._paint_galaxies(painter, width, height, glow, scale)
         self._paint_planets(painter, self._planet_tints(), width, height, glow, scale)
         self._paint_stars(painter, palette, width, height, glow, scale)
         if _NEBULA_MESH_ALPHA > 0:
@@ -888,6 +1077,115 @@ class BeatTunnelScene:
             )
         self._paint_nebula(painter, geometry, ring_s, level, pulse, scale)
         painter.end()
+
+    def _paint_galaxies(self, painter, width, height, glow, scale) -> None:
+        """Rare translucent discs, the farthest thing in the frame.
+
+        A galaxy is a circle in its own plane, so it projects to an ellipse —
+        drawn by mapping the unit circle through the projected images of its
+        two plane axes, which is what makes an edge-on one a sliver and a
+        face-on one a wheel with no per-case code. Two passes: the tilted
+        gradient disc, then a round bulge in *screen* space, because a bulge
+        is a ball and does not foreshorten with the disc it sits in.
+        """
+        for index, (x, y, z, radius) in enumerate(self._galaxies):
+            if z <= _GALAXY_NEAR:
+                continue
+            px = width / 2 + self._focal * x / z
+            py = height / 2 - self._focal * y / z
+            centre = np.array([x, y, z])
+            axes = []
+            for direction in self._galaxy_basis[index]:
+                tip = centre + direction * radius
+                if tip[2] <= 0.2:
+                    break
+                axes.append((
+                    width / 2 + self._focal * tip[0] / tip[2] - px,
+                    height / 2 - self._focal * tip[1] / tip[2] - py,
+                ))
+            if len(axes) < 2:
+                continue
+            (ux, uy), (vx, vy) = axes
+            major = max(math.hypot(ux, uy), math.hypot(vx, vy))
+            if major < _GALAXY_MIN_PX * scale or abs(ux * vy - uy * vx) < 1e-6:
+                continue
+            if not (-major <= px <= width + major and -major <= py <= height + major):
+                continue
+            # The near fade is the ring lesson again: by the time the death
+            # bound removes it, it is already drawing at nothing.
+            near = float(np.clip((z - _GALAXY_NEAR) / 6.0, 0.0, 1.0))
+            alpha = float(np.clip(1.05 - z / (self._far * 1.5), 0.12, 0.45))
+            alpha *= near * (0.35 + 0.65 * glow)
+
+            core = self._wash(0.85)
+            core.setAlphaF(min(1.0, alpha * 1.6))
+            mid = self._wash(0.5)
+            mid.setAlphaF(alpha * 0.65)  # haze under the arms, not the shape
+            edge = QColor(mid)
+            edge.setAlphaF(0.0)
+            disc = QRadialGradient(QPointF(0.0, 0.0), 1.0)
+            disc.setColorAt(0.0, core)
+            disc.setColorAt(0.35, mid)
+            disc.setColorAt(1.0, edge)
+            painter.save()
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setTransform(QTransform(ux, uy, vx, vy, px, py), True)
+            painter.setBrush(QBrush(disc))
+            painter.drawEllipse(QRectF(-1.0, -1.0, 2.0, 2.0))
+            self._paint_spiral_arms(painter, self._galaxy_twist[index], alpha)
+            painter.restore()
+
+            core_r = major * 0.16
+            bright = self._wash(0.9)
+            bright.setAlphaF(min(1.0, alpha * 1.9))
+            dim = QColor(bright)
+            dim.setAlphaF(0.0)
+            bulge = QRadialGradient(QPointF(px, py), core_r)
+            bulge.setColorAt(0.0, bright)
+            bulge.setColorAt(1.0, dim)
+            painter.setPen(Qt.PenStyle.NoPen)
+            painter.setBrush(QBrush(bulge))
+            painter.drawEllipse(QPointF(px, py), core_r, core_r)
+
+    def _paint_spiral_arms(self, painter, twist: float, alpha: float) -> None:
+        """Two arms of cloud clumps in the disc's unit circle.
+
+        Drawn while the galaxy's plane transform is on the painter, so the
+        arms foreshorten and tilt with the disc for free — an edge-on spiral
+        collapses into its sliver like everything else. Each arm is a run of
+        overlapping radial-gradient blobs, jittered off the spiral's spine
+        and varied in size and brightness by a hash of the galaxy's own wind:
+        clumps, not a stroke, which is the difference between cloud and the
+        curled wire the first cut read as. The taper power is what dissolves
+        the tip — a linear fade left it hanging past the haze as a hook.
+        """
+        ts = np.linspace(_GALAXY_ARM_START, 1.0, _GALAXY_ARM_BLOBS)
+        angles = twist * ts
+        radii = ts ** 0.9
+        arm_colour = self._wash(0.7)
+        painter.setPen(Qt.PenStyle.NoPen)
+        steps = np.arange(_GALAXY_ARM_BLOBS)
+        for arm, phase in enumerate((0.0, math.pi)):
+            seed = twist * 57.3 + arm * 19.1
+            h1 = _hash01(seed + steps * 12.9898, 43758.5453)
+            h2 = _hash01(seed + steps * 78.233, 27183.1)
+            xs = radii * np.cos(angles + phase) + (h1 - 0.5) * 0.12
+            ys = radii * np.sin(angles + phase) + (h2 - 0.5) * 0.12
+            for m in range(_GALAXY_ARM_BLOBS):
+                taper = 1.0 - float(ts[m])
+                bright = min(1.0, alpha * 1.15) * taper ** 1.1 * (0.6 + 0.4 * float(h2[m]))
+                if bright < 0.01:
+                    continue
+                blob_r = 0.10 + 0.10 * taper + 0.06 * float(h1[m])
+                centre = QColor(arm_colour)
+                centre.setAlphaF(bright)
+                edge = QColor(arm_colour)
+                edge.setAlphaF(0.0)
+                blob = QRadialGradient(QPointF(xs[m], ys[m]), blob_r)
+                blob.setColorAt(0.0, centre)
+                blob.setColorAt(1.0, edge)
+                painter.setBrush(QBrush(blob))
+                painter.drawEllipse(QPointF(xs[m], ys[m]), blob_r, blob_r)
 
     def _paint_planets(self, painter, tints, width, height, glow, scale) -> None:
         """Sparse shaded discs, behind everything. Three at a time, far out.
@@ -926,10 +1224,17 @@ class BeatTunnelScene:
     def _ring_arcs(self, index: int, width: int, height: int):
         """This planet's rings, projected and split into behind-it and in-front-of-it.
 
-        Returns two lists of :class:`QLineF`. A ring is a circle in the world,
-        so it projects to an ellipse and is drawn as segments; splitting them by
-        whether each end is nearer than the planet's centre is exactly the
-        Saturn silhouette, and costs a comparison per segment.
+        Returns two lists of :class:`QPolygonF` chains. A ring is a circle in
+        the world, so it projects to an ellipse and is walked as segments;
+        splitting them by whether each end is nearer than the planet's centre
+        is the Saturn silhouette. Two lessons the running app taught, both
+        invisible in the geometry. Consecutive segments on one side join into
+        a single polyline, because a translucent pen drawn one line at a time
+        double-paints every shared endpoint and the ring wears a bead of dots
+        (the same fix the galaxy arms needed). And the far half is *dropped*
+        where it crosses the disc's own silhouette: the disc is painted as a
+        translucent gradient, so draw order alone cannot occlude, and a ring
+        showing through the planet's face reads as passing in front of it.
         """
         radii = self._planet_ring_radii[index]
         if not radii.any():
@@ -939,8 +1244,11 @@ class BeatTunnelScene:
         theta = np.linspace(0, 2 * np.pi, _PLANET_RING_SEGMENTS, endpoint=False)
         rim = np.cos(theta)[:, None] * u + np.sin(theta)[:, None] * v
         centre = np.array([cx, cy, cz])
-        behind: list[QLineF] = []
-        in_front: list[QLineF] = []
+        px = width / 2 + self._focal * cx / cz
+        py = height / 2 - self._focal * cy / cz
+        pr = self._focal * radius / cz
+        behind: list[QPolygonF] = []
+        in_front: list[QPolygonF] = []
         for factor in radii:
             if factor <= 0.0:
                 continue
@@ -951,10 +1259,17 @@ class BeatTunnelScene:
             sx = width / 2 + self._focal * points[:, 0] / depth
             sy = height / 2 - self._focal * points[:, 1] / depth
             nearer = depth < cz
+            hidden = np.hypot(sx - px, sy - py) < pr * 0.985
+            front_seg = np.empty(_PLANET_RING_SEGMENTS, bool)
+            drop_seg = np.empty(_PLANET_RING_SEGMENTS, bool)
             for m in range(_PLANET_RING_SEGMENTS):
                 n = (m + 1) % _PLANET_RING_SEGMENTS
-                line = QLineF(sx[m], sy[m], sx[n], sy[n])
-                (in_front if nearer[m] and nearer[n] else behind).append(line)
+                front_seg[m] = nearer[m] and nearer[n]
+                drop_seg[m] = (
+                    not (nearer[m] or nearer[n]) and hidden[m] and hidden[n]
+                )
+            behind += _arc_chains(sx, sy, ~front_seg & ~drop_seg)
+            in_front += _arc_chains(sx, sy, front_seg)
         return behind, in_front
 
     def _ring_colour(self, disc: QColor) -> QColor:
@@ -963,12 +1278,20 @@ class BeatTunnelScene:
         lit.setAlphaF(min(_PLANET_RING_MAX_ALPHA, disc.alphaF() * _PLANET_RING_ALPHA))
         return lit
 
-    def _paint_ring_arcs(self, painter, lines, colour: QColor, scale: float) -> None:
-        if not lines:
+    def _paint_ring_arcs(self, painter, chains, colour: QColor, scale: float) -> None:
+        if not chains:
             return
         painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.setPen(QPen(self._ring_colour(colour), max(_PLANET_RING_PEN * scale, 0.8)))
-        painter.drawLines(lines)
+        # Flat caps: a round or square cap reaches past the endpoint, so the
+        # two chains of a split ring would double-paint where they meet at
+        # the limb — two bright dots, a small edition of the beading fixed
+        # by chaining. Round joins keep the interior corners soft.
+        painter.setPen(QPen(
+            self._ring_colour(colour), max(_PLANET_RING_PEN * scale, 0.8),
+            Qt.PenStyle.SolidLine, Qt.PenCapStyle.FlatCap, Qt.PenJoinStyle.RoundJoin,
+        ))
+        for chain in chains:
+            painter.drawPolyline(chain)
 
     def _paint_stars(self, painter, palette, width, height, glow, scale) -> None:
         """Dots far out, four-point stars with a white core near.
@@ -980,18 +1303,20 @@ class BeatTunnelScene:
         xs = width / 2 + self._focal * self._stars[:, 0] / z
         ys = height / 2 - self._focal * self._stars[:, 1] / z
         painter.setPen(Qt.PenStyle.NoPen)
-        for x, y, depth, kind in zip(xs, ys, z, self._star_kind):
+        for x, y, depth, kind, spike, prominence in zip(
+            xs, ys, z, self._star_kind, self._star_spike, self._star_size
+        ):
             if depth <= 0.2 or not (0 <= x < width and 0 <= y < height):
                 continue
             alpha = float(np.clip(1.1 - depth / self._far, 0.15, 1.0)) * glow
             colour = QColor(palette[kind])
             colour.setAlphaF(alpha)
-            size = (1.0 + 2.5 * (1.0 - depth / self._far)) * scale
+            size = (1.0 + 2.5 * (1.0 - depth / self._far)) * prominence * scale
             painter.setBrush(colour)
             if size < _STAR_POINT_MIN * scale:
                 painter.drawEllipse(QPointF(x, y), size * 0.6, size * 0.6)
                 continue
-            long_arm, waist = size * 1.8, size * 0.45
+            long_arm, waist = size * spike, size * 0.45
             painter.drawPolygon(QPolygonF([
                 QPointF(x, y - long_arm), QPointF(x + waist, y - waist),
                 QPointF(x + long_arm, y), QPointF(x + waist, y + waist),
