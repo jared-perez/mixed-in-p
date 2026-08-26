@@ -17,6 +17,7 @@ from PySide6.QtWidgets import (
 
 from ..styles.theme import Theme
 from .elided_label import LinkLabel
+from .pipeline_cluster import PipelineCluster
 
 # The header's now-playing line elides rather than pushing the Add button off
 # the bar, and floors out at roughly "Playing: <a few characters>…" — below
@@ -96,6 +97,13 @@ class HeaderBar(QFrame):
         # Spacer
         layout.addStretch()
 
+        # The pipeline's shape, left of Add: three mini step toggles and the
+        # playlist every run ends in. Here rather than in a panel because a run
+        # can start from any of three panels and belongs to none of them.
+        self._pipeline = PipelineCluster()
+        self._pipeline.shape_changed.connect(self._apply_subtitle_rule)
+        layout.addWidget(self._pipeline, alignment=Qt.AlignmentFlag.AlignVCenter)
+
         # Single "Add" menu button: click reveals Files / Folder actions, which
         # emit the same signals the two old buttons did (wiring is unchanged in
         # main_window). Collapsing two buttons into one also keeps the subtitle
@@ -123,6 +131,11 @@ class HeaderBar(QFrame):
         )
         self._about_btn.clicked.connect(self.about_clicked.emit)
         layout.addWidget(self._about_btn)
+
+    @property
+    def pipeline(self) -> PipelineCluster:
+        """The step toggles and target playlist. MainWindow owns their state."""
+        return self._pipeline
 
     def set_subtitle_visible(self, visible: bool) -> None:
         """Show or hide the 'DJ Audio Analysis Toolkit' subtitle."""
@@ -163,6 +176,12 @@ class HeaderBar(QFrame):
         total = margins.left() + margins.right()
         total += sum(w.sizeHint().width() for w in widgets)
         gaps = len(widgets) - 1
+        # As wide as the cluster is right now: the target field appears with
+        # the first step switched on, and reserving its width while it is
+        # hidden would take the subtitle away from everyone who never turns
+        # the pipeline on. shape_changed re-runs this when it moves.
+        total += self._pipeline.width_hint()
+        gaps += 1
         # The now-playing spacer is a QSpacerItem, so it holds its width whether
         # or not the label beside it is showing.
         total += _NOW_PLAYING_GAP

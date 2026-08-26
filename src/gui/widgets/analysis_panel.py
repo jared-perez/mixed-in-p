@@ -44,10 +44,12 @@ from src.metadata import stores_tags
 # under the green "Analyzed" text and costs it contrast.
 _TAGLESS_TINT_ALPHA = 36
 
+from ..convert_pipeline import STEP_ANALYZE
 from ..models import TrackState, TrackStore, TrackTableModel
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableView
+from .pipeline_toggle import PipelineToggle
 from .progress_bar import ProgressPanel
 
 
@@ -304,8 +306,15 @@ class AnalysisPanel(QWidget):
     files_dropped = Signal(list)  # List of file paths for immediate analysis
     cancel_analysis = Signal()
     send_to_player = Signal(list)  # List of track dicts for player
+    # Kept for a CLI to drive later; no control in the panel emits it now that
+    # Send To is gone (sidebar drag covers the route it offered).
     send_to_convert = Signal(list)  # List of file path strings
     start_analysis = Signal()  # Manual analyze button clicked
+    # The Analyze step toggle moved. A request: MainWindow owns the state and
+    # reflects it back here and onto the header's mini.
+    pipeline_toggled = Signal(bool)
+    # Analyze was pressed with the Analyze step on: start a run here.
+    start_pipeline = Signal()
     auto_analyze_toggled = Signal(bool)  # Auto button toggled (syncs with Settings)
     write_freeze_toggled = Signal(bool)  # Freeze button toggled (session-only)
 
@@ -441,19 +450,18 @@ class AnalysisPanel(QWidget):
         self._clear_btn.clicked.connect(self._on_clear_clicked)
         bottom_row.addWidget(self._clear_btn)
 
+        # Whether a pipeline run performs the Analyze step. Left of the button
+        # it modifies, as in the Rename and Convert panels.
+        self._pipeline_toggle = PipelineToggle.for_step(STEP_ANALYZE)
+        self._pipeline_toggle.toggled.connect(self._on_pipeline_toggled)
+        bottom_row.addWidget(self._pipeline_toggle)
+
         self._analyze_btn = QPushButton(self.tr("Analyze"))
         self._analyze_btn.setObjectName("primaryButton")
         self._analyze_btn.setMinimumWidth(160)
         self._analyze_btn.setEnabled(False)
         self._analyze_btn.clicked.connect(self._on_analyze_clicked)
         bottom_row.addWidget(self._analyze_btn)
-
-        self._send_to_btn = QPushButton(self.tr("Send To"))
-        send_to_menu = QMenu(self._send_to_btn)
-        self._send_to_convert_action = send_to_menu.addAction(self.tr("Convert"))
-        self._send_to_player_action = send_to_menu.addAction(self.tr("Player"))
-        self._send_to_btn.setMenu(send_to_menu)
-        bottom_row.addWidget(self._send_to_btn)
 
         layout.addLayout(bottom_row)
 
@@ -491,8 +499,6 @@ class AnalysisPanel(QWidget):
         self._table.files_dropped.connect(self.files_dropped.emit)
         self._store.track_updated.connect(self._update_stats)
         self._store.batch_update_finished.connect(self._update_stats)
-        self._send_to_convert_action.triggered.connect(self._on_send_to_convert)
-        self._send_to_player_action.triggered.connect(self._send_selected_to_player)
         # Drag selected (sendable) rows onto a sidebar nav button to route them.
         self._table.enable_drag_out("analysis", self._drag_data)
 
@@ -564,9 +570,7 @@ class AnalysisPanel(QWidget):
         # no batch is currently running. Disabling it during a run means files
         # dropped in while analyzing simply pile up in the queue; the button lights
         # back up when the batch stops so the user can start them when they like.
-        self._analyze_btn.setEnabled(
-            not self._auto_analyze and pending > 0 and not self._analyzing
-        )
+        self._sync_analyze_enabled(pending)
 
     def set_analyzing(self, running: bool) -> None:
         """Mark whether a batch is currently running (drives the Analyze button).
@@ -614,8 +618,83 @@ class AnalysisPanel(QWidget):
         self.write_freeze_toggled.emit(checked)
 
     def _on_analyze_clicked(self) -> None:
-        """Handle manual Analyze button click."""
-        self.start_analysis.emit()
+        """Analyse what is waiting, or start a pipeline run from here."""
+        if self._pipeline_toggle.isChecked():
+            self.start_pipeline.emit()
+        else:
+            self.start_analysis.emit()
+
+    # --------------------------------------------------------------- pipeline
+
+    def pipeline_enabled(self) -> bool:
+        return self._pipeline_toggle.isChecked()
+
+    def set_pipeline_enabled(self, enabled: bool) -> None:
+        """Reflect the step toggle without re-entering the handler that asks.
+
+        MainWindow owns the state; this is the reflect half. Blocked, or the
+        panel's triangle and its header mini would echo each other.
+        """
+        if self._pipeline_toggle.isChecked() != enabled:
+            self._pipeline_toggle.blockSignals(True)
+            self._pipeline_toggle.setChecked(enabled)
+            self._pipeline_toggle.blockSignals(False)
+        self._sync_pipeline_controls()
+
+    def _on_pipeline_toggled(self, checked: bool) -> None:
+        self._sync_pipeline_controls()
+        self.pipeline_toggled.emit(checked)
+
+    def _sync_pipeline_controls(self) -> None:
+        """Reflect the step toggle in the button's label, tooltip and enablement."""
+        if self._pipeline_toggle.isChecked():
+            self._analyze_btn.setText(self.tr("Start Pipeline"))
+            self._analyze_btn.setToolTip(
+                self.tr("Send these tracks through the pipeline, starting here")
+            )
+        else:
+            self._analyze_btn.setText(self.tr("Analyze"))
+            self._analyze_btn.setToolTip("")
+        self._update_stats()
+
+    def _sync_analyze_enabled(self, pending: int) -> None:
+        """Analyze needs something unanalysed; Start Pipeline needs any row.
+
+        Analyze is disabled in auto mode because files analyse as they arrive,
+        so the button would have nothing left to do. Start Pipeline is not: in
+        auto mode every row is ANALYSED by the time the user reaches for it,
+        and refusing them would make the feature unusable in exactly the mode
+        most people leave switched on. What the two share is the run in
+        progress — neither starts a second batch on top of one.
+        """
+        if self._pipeline_toggle.isChecked():
+            to_analyse, done = self.pipeline_rows()
+            self._analyze_btn.setEnabled(bool(to_analyse or done) and not self._analyzing)
+        else:
+            self._analyze_btn.setEnabled(
+                not self._auto_analyze and pending > 0 and not self._analyzing
+            )
+
+    def pipeline_rows(self) -> tuple[list[str], list[str]]:
+        """(to analyse, already analysed) for a Start Pipeline press.
+
+        The same shape ConversionPanel.pipeline_rows has, and for the same
+        reason: a run takes every row it can act on, and the ones the step has
+        nothing left to do to travel straight to the playlist rather than being
+        dropped. Re-analysing an ANALYSED track costs six seconds a file and
+        finds what it already found.
+
+        The set is _SENDABLE_STATES — what this panel already treats as a row
+        you can do something with. An ERROR or mid-flight row is neither.
+        """
+        to_analyse: list[str] = []
+        done: list[str] = []
+        for track in self._store.get_all():
+            if track.state == TrackState.PENDING:
+                to_analyse.append(track.file_path)
+            elif track.state == TrackState.ANALYSED:
+                done.append(track.file_path)
+        return to_analyse, done
 
     def _on_remove_selected(self) -> None:
         """Remove selected tracks from the store."""
@@ -669,14 +748,6 @@ class AnalysisPanel(QWidget):
         QDesktopServices.openUrl(QUrl.fromLocalFile(str(folder)))
 
     _SENDABLE_STATES = {TrackState.ANALYSED, TrackState.PENDING}
-
-    def _on_send_to_convert(self) -> None:
-        """Gather selected tracks and emit send_to_convert signal."""
-        file_paths, track_ids = self._selected_sendable_paths()
-        if file_paths:
-            self.send_to_convert.emit(file_paths)
-            for tid in track_ids:
-                self._store.remove(tid)
 
     def _send_selected_to_player(self) -> None:
         """Gather selected tracks and emit send_to_player signal."""

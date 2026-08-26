@@ -1,14 +1,12 @@
-"""Auto Pipeline: the Rename panel's third Send To action.
+"""Starting a pipeline run from a panel's own button.
 
-It adds the queued rows to Convert and presses the same Start the user would,
-so what is worth testing is the seam, not the pipeline behind it: the action's
-readiness is *pulled* on every menu open, the gesture degrades to a plain Send
-To when readiness has moved since the menu was drawn, and the run goes through
-press_convert rather than a second arming path.
-
-Never open the menu. QMenu.exec is unpatchable from Python (PySide6 resolves it
-through C++), so a test that shows one hangs the suite with no output —
-aboutToShow is emitted by hand and actions are triggered as objects.
+A run starts wherever the user presses Start Pipeline and flows through the
+*later* enabled steps only, always ending in the target playlist. What is worth
+testing is the routing and the guards, not the pipeline behind them: a rename
+that changes nothing must not go through _start_rename (it returns silently at
+zero renames and the run would wait for a thread that never started), a run
+reaching its Convert step must get past the re-arm guard that exists to refuse
+a *second* run, and a run with Analyze off must still file its tracks.
 
 Structure, never pixels: the suite runs with no application stylesheet.
 """
@@ -18,15 +16,10 @@ from __future__ import annotations
 import pytest
 from PySide6.QtWidgets import QMessageBox
 
+from src.gui.convert_pipeline import STEP_ANALYZE, STEP_CONVERT, STEP_RENAME
 from src.gui.main_window import MainWindow
 from src.gui.models.state import TrackState
-from src.gui.models.track_model import TrackStore
-from src.gui.widgets.rename_panel import RenamePanel
 from src.utils.config import AppConfig, save_config
-
-NOT_SET_UP = "Set pipeline settings in the Convert panel first."
-CONVERTING = "A conversion is already running."
-TAIL = "The last pipeline run is still finishing."
 
 
 def _wav(path, samplerate: int = 44100, subtype: str = "PCM_16") -> str:
@@ -38,69 +31,6 @@ def _wav(path, samplerate: int = 44100, subtype: str = "PCM_16") -> str:
     sf.write(str(path), (0.2 * np.sin(2 * np.pi * 440 * t)).astype("float32"),
              samplerate, subtype=subtype)
     return str(path)
-
-
-# --------------------------------------------------------------- the panel
-
-
-@pytest.fixture
-def panel(qtbot):
-    widget = RenamePanel(TrackStore())
-    qtbot.addWidget(widget)
-    return widget
-
-
-def test_the_action_sits_after_analyze_in_the_send_to_menu(panel):
-    labels = [a.text() for a in panel._send_to_menu.actions()]
-    assert labels == ["Convert", "Analyze", "Auto Pipeline"]
-
-
-def test_the_menu_shows_action_tooltips(panel):
-    """Off by default in Qt, which would leave the greyed action mute."""
-    assert panel._send_to_menu.toolTipsVisible()
-
-
-def test_the_action_starts_disabled_and_says_why(panel):
-    """Nobody has answered the query yet — a panel with no MainWindow behind
-    it must not offer a run it cannot start."""
-    assert not panel._send_to_pipeline_action.isEnabled()
-    assert panel._send_to_pipeline_action.toolTip() == NOT_SET_UP
-
-
-def test_the_setter_greys_the_action_and_shows_the_reason(panel):
-    panel.set_auto_pipeline_ready(False, CONVERTING)
-    assert not panel._send_to_pipeline_action.isEnabled()
-    assert panel._send_to_pipeline_action.toolTip() == CONVERTING
-
-
-def test_the_setter_enables_and_names_the_target(panel):
-    panel.set_auto_pipeline_ready(True, "Friday set")
-    action = panel._send_to_pipeline_action
-    assert action.isEnabled()
-    assert '"Friday set"' in action.toolTip()
-
-
-def test_opening_the_menu_asks_for_the_state(panel, qtbot):
-    with qtbot.waitSignal(panel.auto_pipeline_state_query, timeout=100):
-        panel._send_to_menu.aboutToShow.emit()
-
-
-def test_the_action_sends_every_queued_row_and_empties_the_store(panel, tmp_path, qtbot):
-    store = panel._store
-    paths = [str(tmp_path / f"{n}.wav") for n in ("a", "b")]
-    for p in paths:
-        store.add_from_path(p)
-    # An analysed row belongs to the Analyze panel, not to this queue.
-    other = store.add_from_path(str(tmp_path / "c.wav"))
-    store.update(other.id, state=TrackState.ANALYSED)
-
-    panel.set_auto_pipeline_ready(True, "Friday set")
-    with qtbot.waitSignal(panel.send_to_auto_pipeline, timeout=100) as blocker:
-        panel._send_to_pipeline_action.trigger()
-
-    assert sorted(blocker.args[0]) == sorted(paths)
-    assert store.get_by_state(TrackState.QUEUED) == []
-    assert store.get_by_path(str(tmp_path / "c.wav")) is not None
 
 
 # ---------------------------------------------------------- the whole window
@@ -131,53 +61,65 @@ def window(qtbot):
         win._player_panel.shutdown_workers()
 
 
+@pytest.fixture
+def popups(monkeypatch):
+    """Catch the guard popups. An unclicked modal hangs the whole suite."""
+    seen: list[tuple[str, str]] = []
+    monkeypatch.setattr(
+        MainWindow, "_warn_pipeline",
+        lambda self, title, body: seen.append((title, body)),
+    )
+    return seen
+
+
 def _queue(win, paths):
+    """Put files in the Rename panel — QUEUED is that panel's working set."""
     for p in paths:
         win._store.add_from_path(p)
+    win._rename_panel.refresh()
 
 
-def _ask(win):
-    """Drive the pull the way opening the menu does."""
-    win._rename_panel._send_to_menu.aboutToShow.emit()
-    return win._rename_panel._send_to_pipeline_action
+def _playlist(win, name):
+    return next(n for n in win._library.get_children(None) if n.name == name)
 
 
-def test_the_query_greys_the_action_when_the_pipeline_is_off(window):
-    win = window(pipeline_convert_enabled=False,
-                 pipeline_playlist="Friday set")
-    action = _ask(win)
-    assert not action.isEnabled()
-    assert action.toolTip() == NOT_SET_UP
+# --------------------------------------------------------------- the guards
 
 
-def test_the_query_greys_the_action_when_the_target_is_blank(window):
-    win = window(pipeline_convert_enabled=True, pipeline_playlist="")
-    action = _ask(win)
-    assert not action.isEnabled()
-    assert action.toolTip() == NOT_SET_UP
+def test_a_start_with_no_files_says_so(window, popups):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    win._start_pipeline_from(STEP_RENAME)
+    assert popups and popups[0][0] == "No Files"
+    assert not win._pipeline.active
 
 
-def test_the_query_enables_the_action_when_the_pipeline_is_set_up(window):
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
-    action = _ask(win)
-    assert action.isEnabled()
-    assert '"Friday set"' in action.toolTip()
+def test_a_start_with_no_target_says_so(window, popups, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    win._start_pipeline_from(STEP_RENAME)
+    assert popups and "playlist" in popups[0][1]
+    assert not win._pipeline.active
 
 
-def test_the_query_reports_an_analysis_tail(window):
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
-    win._pipeline.arm(1, "Friday set", ["/x.wav"], [])
-    assert win._pipeline.active
-    action = _ask(win)
-    assert not action.isEnabled()
-    assert action.toolTip() == TAIL
+def test_a_start_during_the_analysis_tail_says_so(window, popups, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    win._pipeline.arm(1, "Elsewhere", passthrough=["/x.wav"])
+    win._pipeline.await_analysis({"/x.wav": "/x.wav"})
+    before = dict(win._pipeline.run.awaiting_analysis)
+
+    win._start_pipeline_from(STEP_RENAME)
+
+    assert popups and "still finishing" in popups[0][1]
+    # The bug this guards is the orphaning: an unguarded second start replaces
+    # ConvertPipeline.run wholesale and the first run's tracks never land.
+    assert win._pipeline.run.awaiting_analysis == before
+    assert win._pipeline.run.playlist_name == "Elsewhere"
 
 
-def test_a_conversion_in_flight_greys_the_action(window, monkeypatch):
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
+def test_a_conversion_in_flight_blocks_a_start(window, popups, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
 
     class _Running:
         def isRunning(self):
@@ -185,116 +127,224 @@ def test_a_conversion_in_flight_greys_the_action(window, monkeypatch):
 
     win._conversion_thread = _Running()
     try:
-        action = _ask(win)
-        assert not action.isEnabled()
-        assert action.toolTip() == CONVERTING
+        win._start_pipeline_from(STEP_RENAME)
+        assert popups and "conversion is already running" in popups[0][1]
+        assert not win._pipeline.active
     finally:
         win._conversion_thread = None
 
 
-def test_the_gesture_converts_analyses_and_files_the_tracks(window, qtbot, tmp_path):
-    """End to end on an all-passthrough batch: WAVs into a WAV pipeline, so
-    there is no conversion thread and the run goes straight to analysis."""
-    win = window(pipeline_convert_enabled=True,
+# ------------------------------------------------ the no-adjustments question
+
+
+def test_a_rename_with_nothing_to_change_asks_first(window, monkeypatch, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    asked = []
+    monkeypatch.setattr(
+        QMessageBox, "question",
+        lambda *a, **k: asked.append(a[2]) or QMessageBox.StandardButton.No,
+    )
+    win._start_pipeline_from(STEP_RENAME)
+    assert asked and "unchanged" in asked[0]
+    assert not win._pipeline.active  # No means no
+
+
+def test_saying_yes_sends_the_files_on_unrenamed(window, monkeypatch, tmp_path):
+    """And never through _start_rename, which returns silently at zero renames
+    — the run would then wait for a thread that never started."""
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    started = []
+    monkeypatch.setattr(MainWindow, "_start_rename",
+                        lambda self, p, o: started.append(True))
+    forwarded = []
+    monkeypatch.setattr(MainWindow, "_pipeline_advance",
+                        lambda self, step, paths: forwarded.append((step, paths)))
+
+    win._start_pipeline_from(STEP_RENAME)
+
+    assert started == []
+    assert forwarded and forwarded[0][0] == STEP_RENAME
+    assert forwarded[0][1] == [str(tmp_path / "a.wav")]
+
+
+def test_a_configured_rename_is_not_questioned(window, monkeypatch, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    win._rename_panel._prepend_edit.setText("128 - ")
+    asked = []
+    monkeypatch.setattr(QMessageBox, "question", lambda *a, **k: asked.append(1))
+    monkeypatch.setattr(MainWindow, "_start_rename", lambda self, p, o: None)
+    win._start_pipeline_from(STEP_RENAME)
+    assert asked == []
+
+
+# ------------------------------------------------------------- step routing
+
+
+def test_the_run_records_only_the_enabled_steps(window, monkeypatch, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_analyze_enabled=True,
                  pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(MainWindow, "_pipeline_advance", lambda self, s, p: None)
+
+    win._start_pipeline_from(STEP_RENAME)
+
+    assert win._pipeline.run.steps == {STEP_RENAME, STEP_ANALYZE}
+    # Convert is off, so rename hands straight to analyze.
+    assert win._pipeline.next_step(STEP_RENAME) == STEP_ANALYZE
+
+
+def test_a_toggle_flipped_mid_run_does_not_reroute_it(window, monkeypatch, tmp_path):
+    """The steps are a snapshot taken at arming."""
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(MainWindow, "_pipeline_advance", lambda self, s, p: None)
+    win._start_pipeline_from(STEP_RENAME)
+
+    win._on_pipeline_step_toggled(STEP_CONVERT, True)
+    assert win._pipeline.run.steps == {STEP_RENAME}
+    assert win._pipeline.next_step(STEP_RENAME) is None
+
+
+# -------------------------------------------------------- rename -> playlist
+
+
+def test_rename_only_files_the_tracks_un_analysed(window, monkeypatch, qtbot, tmp_path):
+    """No convert, no analyze: the direct-add leg, which is the whole reason
+    the playlist is not itself a step."""
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
     paths = [_wav(tmp_path / f"{n}.wav") for n in ("a", "b")]
     _queue(win, paths)
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
 
-    action = _ask(win)
-    assert action.isEnabled()
-    action.trigger()
+    win._start_pipeline_from(STEP_RENAME)
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=10000)
 
-    # The Rename panel has handed its rows on — a Send To is a panel move.
-    assert win._store.get_by_state(TrackState.QUEUED) == []
-    assert win._pipeline.active
-
-    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=60000)
-
-    node = next(n for n in win._library.get_children(None) if n.name == "Friday set")
-    members = win._library.get_items(node.id)
-    assert len(members) == 2
+    members = win._library.get_items(_playlist(win, "Friday set").id)
+    assert sorted(m.path for m in members) == sorted(paths)
 
 
-def test_a_run_that_is_no_longer_ready_falls_back_to_send_to_convert(window, tmp_path):
-    """State can move between the menu opening and the click. The files land
-    in Convert either way, and the panel says why nothing started."""
-    win = window(pipeline_convert_enabled=True,
+def test_a_real_rename_forwards_the_new_names(window, monkeypatch, qtbot, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    win._rename_panel._prepend_edit.setText("128 - ")
+    assert win._rename_panel.has_rename_changes()
+
+    win._start_pipeline_from(STEP_RENAME)
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=10000)
+
+    members = win._library.get_items(_playlist(win, "Friday set").id)
+    assert [p.name for p in map(__import__("pathlib").Path,
+                                (m.path for m in members))] == ["128 - a.wav"]
+
+
+# ------------------------------------------------------- rename -> convert
+
+
+def test_the_convert_leg_gets_past_the_re_arm_guard(window, monkeypatch, tmp_path):
+    """A continuation presses the panel's own button, so it arrives at
+    _start_conversion looking exactly like a second Start."""
+    win = window(pipeline_rename_enabled=True, pipeline_convert_enabled=True,
                  pipeline_playlist="Friday set")
-    paths = [str(tmp_path / "a.wav")]
-    win._pipeline.arm(1, "Elsewhere", ["/x.wav"], [])
-
-    # A disabled QAction swallows trigger(), so drive the slot the signal
-    # would have reached.
-    win._send_rename_to_auto_pipeline(paths)
-
-    assert win._conversion_panel._file_paths == paths
-    assert win._current_page == "convert"
-    assert win._pipeline.run is not None
-    assert win._pipeline.run.playlist_name == "Elsewhere"  # untouched
-    assert win._conversion_panel._lossy_notice.text() == TAIL
-
-
-def test_lossy_files_get_a_word_because_the_pipeline_will_not_take_them(
-    window, tmp_path, monkeypatch
-):
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
-    pressed = []
-    monkeypatch.setattr(type(win._conversion_panel), "press_convert",
-                        lambda self: pressed.append(True))
-    paths = [_wav(tmp_path / "a.wav"), str(tmp_path / "b.mp3")]
-
-    win._send_rename_to_auto_pipeline(paths)
-
-    assert pressed == [True]
-    assert "Lossy files stayed in Convert" in win._conversion_panel._lossy_notice.text()
-
-
-def test_a_lossless_only_batch_gets_no_notice(window, tmp_path, monkeypatch):
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
-    monkeypatch.setattr(type(win._conversion_panel), "press_convert",
-                        lambda self: None)
-    win._send_rename_to_auto_pipeline([_wav(tmp_path / "a.wav")])
-    assert win._conversion_panel._lossy_notice.isHidden()
-
-
-def test_the_gesture_presses_the_panels_own_button(window, tmp_path, monkeypatch):
-    """Never a second arming path: everything the pipeline guarantees lives
-    behind _on_convert_clicked."""
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
-    seen = []
-    monkeypatch.setattr(type(win._conversion_panel), "_on_convert_clicked",
-                        lambda self: seen.append(True))
-    win._send_rename_to_auto_pipeline([_wav(tmp_path / "a.wav")])
-    assert seen == [True]
-
-
-# ------------------------------------------------- W4: the re-arm guard
-
-
-def test_starting_again_during_the_analysis_tail_leaves_the_first_run_intact(
-    window, tmp_path, monkeypatch
-):
-    """Conversion done, analyses still landing: Start is enabled again, and
-    arming a second run would replace ConvertPipeline.run wholesale — the
-    first run's tracks would finish analysing and never reach the playlist."""
-    win = window(pipeline_convert_enabled=True,
-                 pipeline_playlist="Friday set")
-    win._pipeline.arm(1, "Friday set", [], ["/a.wav"])
-    win._pipeline.await_analysis({"/a.wav": "/a.wav"})
-    before = dict(win._pipeline.run.awaiting_analysis)
-    assert before
-
+    paths = [_wav(tmp_path / "a.wav")]
+    _queue(win, paths)
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
     warned = []
     monkeypatch.setattr(QMessageBox, "warning",
                         lambda *a, **k: warned.append(a[2] if len(a) > 2 else ""))
 
-    win._start_conversion([str(tmp_path / "b.wav")], "WAV")
+    win._start_pipeline_from(STEP_RENAME)
 
-    # The bug this guards is the orphaning, so assert that first: an
-    # unguarded second Start replaces ConvertPipeline.run wholesale.
-    assert win._pipeline.run.awaiting_analysis == before
-    assert win._pipeline.run.playlist_name == "Friday set"
-    assert warned and "still finishing" in warned[0]
+    assert warned == []  # not refused for being its own run
+    assert win._current_page == "convert"
+    assert win._conversion_panel._file_paths == []  # forwarded onward already
+
+
+def test_the_convert_leg_says_so_when_lossy_files_cannot_travel(
+    window, monkeypatch, tmp_path
+):
+    win = window(pipeline_rename_enabled=True, pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav"), str(tmp_path / "b.mp3")])
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(type(win._conversion_panel), "press_convert",
+                        lambda self: None)
+
+    win._start_pipeline_from(STEP_RENAME)
+
+    assert "Lossy files stayed in Convert" in win._conversion_panel._lossy_notice.text()
+
+
+def test_a_lossless_only_batch_gets_no_notice(window, monkeypatch, tmp_path):
+    win = window(pipeline_rename_enabled=True, pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    monkeypatch.setattr(type(win._conversion_panel), "press_convert",
+                        lambda self: None)
+    win._start_pipeline_from(STEP_RENAME)
+    assert win._conversion_panel._lossy_notice.isHidden()
+
+
+def test_the_convert_leg_presses_the_panels_own_button(window, monkeypatch, tmp_path):
+    """Never a second arming path: everything the pipeline guarantees lives
+    behind _on_convert_clicked."""
+    win = window(pipeline_rename_enabled=True, pipeline_convert_enabled=True,
+                 pipeline_playlist="Friday set")
+    _queue(win, [_wav(tmp_path / "a.wav")])
+    monkeypatch.setattr(QMessageBox, "question",
+                        lambda *a, **k: QMessageBox.StandardButton.Yes)
+    seen = []
+    monkeypatch.setattr(type(win._conversion_panel), "_on_convert_clicked",
+                        lambda self: seen.append(True))
+    win._start_pipeline_from(STEP_RENAME)
+    assert seen == [True]
+
+
+# ------------------------------------------------------------- start at Analyze
+
+
+def test_an_analyze_start_analyses_and_files(window, qtbot, tmp_path):
+    win = window(pipeline_analyze_enabled=True, pipeline_playlist="Friday set")
+    paths = [_wav(tmp_path / f"{n}.wav") for n in ("a", "b")]
+    for p in paths:
+        track = win._store.add_from_path(p)
+        win._store.update(track.id, state=TrackState.PENDING)
+
+    win._start_pipeline_from(STEP_ANALYZE)
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=60000)
+
+    members = win._library.get_items(_playlist(win, "Friday set").id)
+    assert len(members) == 2
+
+
+def test_an_already_analysed_row_is_filed_without_re_analysing(
+    window, monkeypatch, qtbot, tmp_path
+):
+    """Six seconds a file to find what it already found."""
+    win = window(pipeline_analyze_enabled=True, pipeline_playlist="Friday set")
+    path = _wav(tmp_path / "a.wav")
+    track = win._store.add_from_path(path)
+    win._store.update(track.id, state=TrackState.ANALYSED)
+    analysed = []
+    monkeypatch.setattr(MainWindow, "_start_analysis",
+                        lambda self, ids: analysed.append(list(ids)))
+
+    win._start_pipeline_from(STEP_ANALYZE)
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=10000)
+
+    assert analysed == []
+    members = win._library.get_items(_playlist(win, "Friday set").id)
+    assert [m.path for m in members] == [path]

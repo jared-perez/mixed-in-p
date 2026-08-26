@@ -35,19 +35,13 @@ from src.conversion.result import (
 from src.utils.config import load_config, save_config
 from src.utils.paths import normalize_track_path
 
+from ..convert_pipeline import STEP_CONVERT
 from ..models import TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableWidget
+from .pipeline_toggle import PipelineToggle
 from .progress_bar import ProgressPanel
-
-
-# The pipeline's playlist field. Stated rather than measured: it holds user
-# data of no fixed length, so there is no width that fits every name, and a
-# box that resized itself as playlists were renamed read as a glitch. Wide
-# enough for the "Playlist name" placeholder in all eleven languages —
-# rendered and looked at, not calculated.
-_PIPELINE_TARGET_WIDTH = 174
 
 
 class ConversionPanel(QWidget):
@@ -63,7 +57,9 @@ class ConversionPanel(QWidget):
     send_to_analyze = Signal(list)  # list of file path strings
     send_to_rename = Signal(list)  # list of file path strings
     send_to_player = Signal(list)  # list of track dicts for player
-    pipeline_toggled = Signal(bool)  # the `|` toggle; MainWindow owns the coupling
+    # The Convert step toggle moved. A request: MainWindow owns the state and
+    # reflects it back here and onto the header's mini.
+    pipeline_toggled = Signal(bool)
 
     def __init__(
         self,
@@ -315,46 +311,11 @@ class ConversionPanel(QWidget):
 
         bottom_row.addStretch()
 
-        # The pipeline: Convert -> Analyze -> into a playlist, in one press.
-        # `|` is a glyph, not a word — deliberately not tr()'d — and the
-        # tooltip carries the meaning, saying what the NEXT click does.
-        self._pipeline_toggle = QPushButton("|")
-        self._pipeline_toggle.setObjectName("pipelineToggle")
-        self._pipeline_toggle.setCheckable(True)
+        # Whether a pipeline run performs the Convert step. The target
+        # playlist is not here: it belongs to the run, not to this step, and
+        # lives in the header where every panel can see it.
+        self._pipeline_toggle = PipelineToggle.for_step(STEP_CONVERT)
         bottom_row.addWidget(self._pipeline_toggle)
-
-        # Editable: picking an item targets that playlist, typing a name
-        # creates one. The default completer would silently turn a typed name
-        # into a pick, and the two have to stay distinguishable, so it is off.
-        self._pipeline_target = FittedComboBox()
-        self._pipeline_target.setEditable(True)
-        self._pipeline_target.setInsertPolicy(QComboBox.InsertPolicy.NoInsert)
-        self._pipeline_target.setCompleter(None)
-        # A stated width, and the items are stopped from driving it. An
-        # editable combo sizes itself to its WIDEST ITEM by default, so the
-        # box grew with whoever had the longest playlist name — 232px for one
-        # called "Warmup / Long folder name" — and changed size whenever a
-        # playlist was renamed. A field you type into wants to stay put; the
-        # popup is where the full names are read, and FittedComboBox floors
-        # that at the box's own width.
-        # AdjustToContents, not the default AdjustToContentsOnFirstShow: the
-        # hint is what the popup is floored at below, and "on first show" locks
-        # it at whatever the list held when the panel was first shown — which
-        # is nothing, because MainWindow feeds the playlists in afterwards.
-        # It does not affect the box, whose width is stated on the next line.
-        self._pipeline_target.setSizeAdjustPolicy(
-            QComboBox.SizeAdjustPolicy.AdjustToContents
-        )
-        self._pipeline_target.setFixedWidth(_PIPELINE_TARGET_WIDTH)
-        # The box is capped; the LIST must not be. FittedComboBox floors the
-        # popup at the box's own width, which was right while the box sized
-        # itself to its widest item — capped, it left the popup rendering
-        # "Gigs / Satur…ing set 2026". Fitting the popup to the contents asks
-        # the combo for the width it *would* have had, which is the same
-        # arithmetic as before and needs no chrome constant of its own.
-        self._pipeline_target.set_popup_fits_contents(True)
-        self._pipeline_target.lineEdit().setPlaceholderText(self.tr("Playlist name"))
-        bottom_row.addWidget(self._pipeline_target)
 
         self._convert_btn = QPushButton(self.tr("Convert"))
         self._convert_btn.setObjectName("primaryButton")
@@ -362,16 +323,6 @@ class ConversionPanel(QWidget):
         self._convert_btn.setEnabled(False)
         self._convert_btn.clicked.connect(self._on_convert_clicked)
         bottom_row.addWidget(self._convert_btn)
-
-        self._send_to_btn = QPushButton(self.tr("Send To"))
-        self._send_to_btn.setEnabled(False)
-        self._send_to_btn.setToolTip(self.tr("Select at least one file to send."))
-        send_to_menu = QMenu(self._send_to_btn)
-        self._send_to_analyze_action = send_to_menu.addAction(self.tr("Analyze"))
-        self._send_to_rename_action = send_to_menu.addAction(self.tr("Rename"))
-        self._send_to_player_action = send_to_menu.addAction(self.tr("Player"))
-        self._send_to_btn.setMenu(send_to_menu)
-        bottom_row.addWidget(self._send_to_btn)
 
         bottom_row.setSpacing(Theme.SPACING)  # or spacing() reads back -1
         layout.addLayout(bottom_row)
@@ -402,7 +353,6 @@ class ConversionPanel(QWidget):
         # Restore the pipeline's toggle and target. _loading_settings is still
         # on here, so neither write straight back to disk.
         self._pipeline_toggle.setChecked(self._config.pipeline_convert_enabled)
-        self.restore_pipeline_target(self._config.pipeline_playlist)
         self._sync_pipeline_controls()
 
     def _connect_signals(self) -> None:
@@ -417,15 +367,9 @@ class ConversionPanel(QWidget):
         self._bitdepth_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitrate_combo.currentTextChanged.connect(self._save_convert_settings)
         self._pipeline_toggle.toggled.connect(self._on_pipeline_toggled)
-        self._pipeline_target.currentIndexChanged.connect(self._on_pipeline_target_changed)
-        self._pipeline_target.editTextChanged.connect(self._on_pipeline_target_changed)
         self._dest_choose_btn.clicked.connect(self._on_choose_output_dir)
         self._dest_source_toggle.toggled.connect(self._on_source_toggled)
         self._file_table.files_dropped.connect(self.add_files)
-        self._file_table.itemSelectionChanged.connect(self._on_selection_changed)
-        self._send_to_analyze_action.triggered.connect(self._on_send_to_analyze)
-        self._send_to_rename_action.triggered.connect(self._on_send_to_rename)
-        self._send_to_player_action.triggered.connect(self._on_send_to_player)
         # Drag selected rows onto a sidebar nav button to route them (mirrors Send To).
         self._file_table.enable_drag_out("convert", self._drag_data)
 
@@ -587,41 +531,42 @@ class ConversionPanel(QWidget):
         cfg.convert_bit_depth = None if bd is None else int(bd)
         cfg.convert_output_dir = self._output_dir
         cfg.convert_use_source_dir = self._use_source_dir
-        cfg.pipeline_convert_enabled = self._pipeline_toggle.isChecked()
-        cfg.pipeline_playlist = self._pipeline_target.currentText().strip()
+        # The step toggle is NOT written here: a step appears in this panel and
+        # again in the header, so MainWindow owns all four pipeline fields and
+        # two writers would only drift.
         save_config(cfg)
         self._config = cfg
 
     # --------------------------------------------------------------- pipeline
 
     def _sync_pipeline_controls(self) -> None:
-        """Reflect the toggle in the Convert button's label, tooltip and
-        enablement, and in whether the target field is offered at all."""
-        on = self._pipeline_toggle.isChecked()
-        self._pipeline_toggle.setToolTip(
-            self.tr("Turn off the pipeline — Convert goes back to converting only.")
-            if on
-            else self.tr(
-                "Turn on the pipeline: Convert → Analyze → add to the playlist named here."
+        """Reflect the step toggle in the button's label, tooltip and enablement.
+
+        The toggle keeps its own tooltip — it says what the next click does,
+        in the same words as its mini in the header.
+        """
+        if self._pipeline_toggle.isChecked():
+            self._convert_btn.setText(self.tr("Start Pipeline"))
+            self._convert_btn.setToolTip(
+                self.tr("Send these tracks through the pipeline, starting here")
             )
-        )
-        self._pipeline_target.setEnabled(on)
-        if on:
-            self._convert_btn.setText(self.tr("Start"))
-            self._convert_btn.setToolTip(self.tr("Send the tracks through the pipeline"))
         else:
             self._convert_btn.setText(self.tr("Convert"))
             self._convert_btn.setToolTip("")
         self._sync_convert_enabled()
 
     def _sync_convert_enabled(self) -> None:
-        """Convert needs a convertible row; Start needs a forwardable one and
-        somewhere to put it."""
+        """Convert needs a convertible row; Start Pipeline needs a forwardable one.
+
+        Start Pipeline deliberately does NOT also require a target playlist,
+        though a run cannot happen without one. The target lives in the header
+        now, so a button greyed out for the want of it is greyed out for a
+        reason that is nowhere near it — and a press that explains itself beats
+        a control that cannot.
+        """
         if self._pipeline_toggle.isChecked():
             to_convert, passthrough = self.pipeline_rows()
-            enabled = bool(to_convert or passthrough) and bool(
-                self._pipeline_target.currentText().strip()
-            )
+            enabled = bool(to_convert or passthrough)
         else:
             enabled = self._convertible_count > 0
         self._convert_btn.setEnabled(enabled)
@@ -631,39 +576,15 @@ class ConversionPanel(QWidget):
         self._save_convert_settings()
         self.pipeline_toggled.emit(checked)
 
-    def _on_pipeline_target_changed(self, *_args) -> None:
-        self._sync_convert_enabled()
-        self._save_convert_settings()
-
-    def restore_pipeline_target(self, name: str) -> None:
-        """Point the field at a remembered playlist.
-
-        Called twice: once in __init__ (when the list is still empty, so the
-        name can only be typed back) and again by MainWindow once it has fed
-        the real playlists in, which is the pass that can resolve it.
-
-        A name that still matches a playlist is *selected*, so the next Start
-        reuses it. Only a name that matches nothing is set as edit text, which
-        reads as "create". Setting the text alone would make a new numbered
-        playlist on every launch.
-        """
-        if not name:
-            return
-        index = self._pipeline_target.findText(name, Qt.MatchFlag.MatchExactly)
-        if index >= 0:
-            self._pipeline_target.setCurrentIndex(index)
-        else:
-            self._pipeline_target.setCurrentIndex(-1)
-            self._pipeline_target.setEditText(name)
-
     def pipeline_enabled(self) -> bool:
         return self._pipeline_toggle.isChecked()
 
     def set_pipeline_enabled(self, enabled: bool) -> None:
-        """Reflect the toggle without re-entering the handler that saves.
+        """Reflect the step toggle without re-entering the handler that saves.
 
-        MainWindow calls this when auto-analyze goes off, which switches the
-        pipeline off with it — a reflect, never an act.
+        MainWindow calls this when the header's mini for this step is clicked —
+        a reflect, never an act. Without the block the two mirrors would echo
+        each other and write config back and forth.
         """
         if self._pipeline_toggle.isChecked() == enabled:
             return
@@ -672,51 +593,6 @@ class ConversionPanel(QWidget):
         self._pipeline_toggle.blockSignals(False)
         self._sync_pipeline_controls()
         self._save_convert_settings()
-
-    def pipeline_target(self) -> tuple[int | None, str]:
-        """(node id, text) for the target. The id is set only when an existing
-        playlist was picked from the list — typed text that happens to equal a
-        listed name still reads as "create", which is why the completer is off.
-        """
-        text = self._pipeline_target.currentText().strip()
-        index = self._pipeline_target.currentIndex()
-        if index >= 0 and self._pipeline_target.itemText(index) == text:
-            node_id = self._pipeline_target.itemData(index)
-            if node_id is not None:
-                return int(node_id), text
-        return None, text
-
-    def set_playlists(self, rows: list[tuple[int, str]]) -> None:
-        """Fill the target list with (node_id, label) in tree order.
-
-        The panel never opens the library itself; MainWindow feeds it at
-        startup and on every nodes_changed. A refill keeps whatever the user
-        had — the same playlist if it survived, the same typed text if not.
-        """
-        picked_id, text = self.pipeline_target()
-        blocked = self._pipeline_target.blockSignals(True)
-        self._pipeline_target.clear()
-        for node_id, label in rows:
-            self._pipeline_target.addItem(label, node_id)
-        if picked_id is not None and self.select_node(picked_id):
-            pass
-        else:
-            self._pipeline_target.setCurrentIndex(-1)
-            self._pipeline_target.setEditText(text)
-        self._pipeline_target.blockSignals(blocked)
-        self._sync_convert_enabled()
-
-    def select_node(self, node_id: int) -> bool:
-        """Point the field at a playlist by id. True when it was in the list.
-
-        Called after the pipeline creates a playlist, so the next Start reuses
-        it instead of making a second one with the same name.
-        """
-        for i in range(self._pipeline_target.count()):
-            if self._pipeline_target.itemData(i) == node_id:
-                self._pipeline_target.setCurrentIndex(i)
-                return True
-        return False
 
     def pipeline_rows(self) -> tuple[list[str], list[str]]:
         """(to convert, forwarded as-is) for a Start press.
@@ -747,10 +623,9 @@ class ConversionPanel(QWidget):
         self._remove_sources(sources)
 
     def set_pipeline_controls_enabled(self, enabled: bool) -> None:
-        """Lock the two controls while a conversion runs — the batch in flight
+        """Lock the step toggle while a conversion runs — the batch in flight
         is already armed one way or the other."""
         self._pipeline_toggle.setEnabled(enabled)
-        self._pipeline_target.setEnabled(enabled and self._pipeline_toggle.isChecked())
 
     def bottom_row_min_width(self) -> int:
         """Panel width the bottom row needs, including the panel's padding.
@@ -764,9 +639,7 @@ class ConversionPanel(QWidget):
         """
         widgets = (
             self._pipeline_toggle,
-            self._pipeline_target,
             self._convert_btn,
-            self._send_to_btn,
         )
         margins = self._bottom_row.contentsMargins()
         return (
@@ -917,11 +790,6 @@ class ConversionPanel(QWidget):
                 ),
             )
             return False
-
-    def _on_selection_changed(self) -> None:
-        """Enable/disable Send To based on table selection."""
-        has_selection = len(self._file_table.selectedItems()) > 0
-        self._send_to_btn.setEnabled(has_selection)
 
     def _selected_source_paths(self) -> list[str]:
         """Return source paths for currently selected rows, in display order."""
@@ -1085,10 +953,6 @@ class ConversionPanel(QWidget):
         # so the count is remembered rather than applied here.
         self._convertible_count = convertible_count
         self._sync_convert_enabled()
-        # Send To enablement is driven by selection via _on_selection_changed.
-        if not self._file_table.selectedItems():
-            self._send_to_btn.setEnabled(False)
-
     def press_convert(self) -> None:
         """Press Start from outside the panel (the Rename panel's Auto Pipeline).
 
@@ -1131,39 +995,6 @@ class ConversionPanel(QWidget):
                 self._bitdepth_combo.currentData(),
                 self.output_dir(),
             )
-
-    def _on_send_to_analyze(self) -> None:
-        """Send selected rows to Analyze using the converted output path when available."""
-        sources = self._selected_source_paths()
-        if not sources:
-            return
-        effective = [self._effective_path(s) for s in sources]
-        self.send_to_analyze.emit(effective)
-        self._remove_sources(sources)
-
-    def _on_send_to_rename(self) -> None:
-        """Send selected rows to Rename using the converted output path when available."""
-        sources = self._selected_source_paths()
-        if not sources:
-            return
-        effective = [self._effective_path(s) for s in sources]
-        self.send_to_rename.emit(effective)
-        self._remove_sources(sources)
-
-    def _on_send_to_player(self) -> None:
-        """Send selected rows to Player using the converted output path when available."""
-        sources = self._selected_source_paths()
-        if not sources:
-            return
-        tracks = [
-            {
-                "file_path": self._effective_path(s),
-                "display_name": Path(self._effective_path(s)).stem,
-            }
-            for s in sources
-        ]
-        self.send_to_player.emit(tracks)
-        self._remove_sources(sources)
 
     def refresh(self) -> None:
         """Refresh the table (called when panel becomes visible)."""

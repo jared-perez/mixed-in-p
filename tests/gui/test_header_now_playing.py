@@ -109,7 +109,10 @@ class TestTheHeaderWidget:
         """The line joins the row the subtitle is competing for, so the
         threshold moves the moment a track starts — and no resize follows a
         track change to apply it."""
-        header.setFixedWidth(500)
+        # Derived, not a constant: the bar has gained widgets before now (the
+        # pipeline cluster last), and each time a hardcoded width here turned
+        # into a test about a header the app no longer has.
+        header.setFixedWidth(header._subtitle_fits() + 20)
         qtbot.wait(10)
         assert header._subtitle.isVisible()  # room enough with no track
 

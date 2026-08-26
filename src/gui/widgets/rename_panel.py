@@ -37,10 +37,12 @@ from src.renamer import (
     preview_rename,
 )
 
+from ..convert_pipeline import STEP_RENAME
 from ..models import TrackState, TrackStore
 from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableWidget
+from .pipeline_toggle import PipelineToggle
 
 
 class _SelectableTextDelegate(QStyledItemDelegate):
@@ -89,14 +91,15 @@ class RenamePanel(QWidget):
     undo_last = Signal()
     files_dropped = Signal(list)             # str paths → _add_files
     analyze_and_rename = Signal(list, list)  # (track_ids, operations) → full pipeline
+    # Kept for a CLI to drive later; no control in the panel emits them now
+    # that Send To is gone (sidebar drag covers every route it offered).
     send_to_convert = Signal(list)           # list of file path strings
     send_to_auto_pipeline = Signal(list)     # list of file path strings
-    # Asked on every Send To menu open; MainWindow answers synchronously with
-    # set_auto_pipeline_ready. A pull, not a push — the readiness depends on
-    # six things today (toggle, target, conversion thread start/finish/cancel/
-    # error, pipeline end) and more tomorrow, and one cheap query per menu
-    # open is always fresh where a web of change-signals rots.
-    auto_pipeline_state_query = Signal()
+    # The Rename step toggle moved. A request: MainWindow owns the state and
+    # reflects it back here and onto the header's mini.
+    pipeline_toggled = Signal(bool)
+    # Apply Rename was pressed with the Rename step on: start a run here.
+    start_pipeline = Signal()
 
     def __init__(
         self,
@@ -322,31 +325,17 @@ class RenamePanel(QWidget):
         self._remove_btn.clicked.connect(self._on_remove_all)
         bottom_row.addWidget(self._remove_btn)
 
+        # Whether a pipeline run performs the Rename step. Left of Apply so
+        # the toggle reads as a modifier on the button beside it.
+        self._pipeline_toggle = PipelineToggle.for_step(STEP_RENAME)
+        bottom_row.addWidget(self._pipeline_toggle)
+
         self._apply_btn = QPushButton(self.tr("Apply Rename"))
         self._apply_btn.setObjectName("primaryButton")
         self._apply_btn.setMinimumWidth(160)
         self._apply_btn.clicked.connect(self._on_apply_clicked)
         self._apply_btn.setEnabled(False)
         bottom_row.addWidget(self._apply_btn)
-
-        self._send_to_btn = QPushButton(self.tr("Send To"))
-        self._send_to_btn.setEnabled(False)
-        send_to_menu = QMenu(self._send_to_btn)
-        # QMenu hides action tooltips by default, which would leave Auto
-        # Pipeline greyed out with no way to learn why.
-        send_to_menu.setToolTipsVisible(True)
-        self._send_to_convert_action = send_to_menu.addAction(self.tr("Convert"))
-        self._send_to_analyze_action = send_to_menu.addAction(self.tr("Analyze"))
-        self._send_to_pipeline_action = send_to_menu.addAction(self.tr("Auto Pipeline"))
-        # Disabled until MainWindow answers the aboutToShow query, so a panel
-        # with nobody listening never offers a run it cannot start.
-        self._send_to_pipeline_action.setEnabled(False)
-        self._send_to_pipeline_action.setToolTip(
-            self.tr("Set pipeline settings in the Convert panel first.")
-        )
-        self._send_to_menu = send_to_menu
-        self._send_to_btn.setMenu(send_to_menu)
-        bottom_row.addWidget(self._send_to_btn)
 
         layout.addLayout(bottom_row)
 
@@ -363,10 +352,7 @@ class RenamePanel(QWidget):
         self._store.track_added.connect(self._on_track_added)
         self._preview_table.files_dropped.connect(self.files_dropped.emit)
         self._preview_table.customContextMenuRequested.connect(self._on_context_menu)
-        self._send_to_convert_action.triggered.connect(self._on_send_to_convert)
-        self._send_to_analyze_action.triggered.connect(self._on_analyze_clicked)
-        self._send_to_pipeline_action.triggered.connect(self._on_send_to_auto_pipeline)
-        self._send_to_menu.aboutToShow.connect(self.auto_pipeline_state_query)
+        self._pipeline_toggle.toggled.connect(self._on_pipeline_toggled)
         self._clear_ops_btn.clicked.connect(self._clear_operations)
         self._remove_underscores_btn.clicked.connect(self._on_remove_underscores)
         self._space_dashes_btn.clicked.connect(self._on_space_dashes)
@@ -451,8 +437,8 @@ class RenamePanel(QWidget):
         if not all_tracks:
             self._preview_table.setRowCount(0)
             self._stats_label.setText(self.tr("No files"))
+            self._previews = []
             self._apply_btn.setEnabled(False)
-            self._send_to_btn.setEnabled(False)
             self._last_queued_paths = set()
             return
 
@@ -519,13 +505,8 @@ class RenamePanel(QWidget):
 
         self._stats_label.setText(" | ".join(parts))
 
-        # Enable apply button only if there are changes and no conflicts
-        can_apply = changes_count > 0 and conflicts_count == 0
-        self._apply_btn.setEnabled(can_apply)
-
-        # Enable send-to button when there are queued tracks
-        queued_count = len(self._store.get_by_state(TrackState.QUEUED))
-        self._send_to_btn.setEnabled(queued_count > 0)
+        # Apply needs a change to make; Start Pipeline only needs files.
+        self._sync_apply_enabled()
 
         # Snapshot current QUEUED paths for change detection on next batch.
         self._last_queued_paths = {t.file_path for t in all_tracks}
@@ -546,43 +527,67 @@ class RenamePanel(QWidget):
         if track_ids:
             self.analyze_and_rename.emit(track_ids, [])
 
-    def _on_send_to_convert(self) -> None:
-        """Send all queued files to the Convert panel."""
-        queued = self._store.get_by_state(TrackState.QUEUED)
-        file_paths = [t.file_path for t in queued]
-        if file_paths:
-            self.send_to_convert.emit(file_paths)
-            for track in queued:
-                self._store.remove(track.id)
+    # --------------------------------------------------------------- pipeline
 
-    def _on_send_to_auto_pipeline(self) -> None:
-        """Send all queued files to Convert and start the pipeline there."""
-        queued = self._store.get_by_state(TrackState.QUEUED)
-        file_paths = [t.file_path for t in queued]
-        if file_paths:
-            self.send_to_auto_pipeline.emit(file_paths)
-            for track in queued:
-                self._store.remove(track.id)
+    def pipeline_enabled(self) -> bool:
+        return self._pipeline_toggle.isChecked()
 
-    def set_auto_pipeline_ready(self, ready: bool, reason: str) -> None:
-        """Answer the aboutToShow query: enable the action and say what it does.
+    def set_pipeline_enabled(self, enabled: bool) -> None:
+        """Reflect the step toggle without re-entering the handler that asks.
 
-        ``reason`` is the target playlist's name when ready, and the
-        greyed-out explanation when not.
+        MainWindow owns the state; this is the reflect half. Blocked, or the
+        panel's triangle and its header mini would echo each other.
         """
-        self._send_to_pipeline_action.setEnabled(ready)
-        if ready:
-            # One literal, not adjacent-concatenated: lupdate harvests the
-            # source text it can see, and a split string is not it.
-            self._send_to_pipeline_action.setToolTip(
-                self.tr('Convert with the Convert panel\'s settings, analyze, add to "{name}".').format(name=reason)
+        if self._pipeline_toggle.isChecked() != enabled:
+            self._pipeline_toggle.blockSignals(True)
+            self._pipeline_toggle.setChecked(enabled)
+            self._pipeline_toggle.blockSignals(False)
+        self._sync_pipeline_controls()
+
+    def _on_pipeline_toggled(self, checked: bool) -> None:
+        self._sync_pipeline_controls()
+        self.pipeline_toggled.emit(checked)
+
+    def _sync_pipeline_controls(self) -> None:
+        """Reflect the step toggle in Apply's label, tooltip and enablement."""
+        if self._pipeline_toggle.isChecked():
+            self._apply_btn.setText(self.tr("Start Pipeline"))
+            self._apply_btn.setToolTip(
+                self.tr("Send these files through the pipeline, starting here")
             )
         else:
-            self._send_to_pipeline_action.setToolTip(reason)
+            self._apply_btn.setText(self.tr("Apply Rename"))
+            self._apply_btn.setToolTip("")
+        self._sync_apply_enabled()
+
+    def _sync_apply_enabled(self) -> None:
+        """Apply needs a change to make; Start Pipeline only needs files.
+
+        The difference is deliberate: a run whose rename adjusts nothing is a
+        perfectly reasonable thing to want (the later steps are the point), so
+        the "no adjustments" case is a question at the press rather than a
+        button that will not move — see MainWindow's prompt. Conflicts still
+        disable both: they are the one state neither can act on.
+        """
+        if self._pipeline_toggle.isChecked():
+            can = bool(self._previews) and not has_conflicts(self._previews)
+        else:
+            can = has_changes(self._previews) and not has_conflicts(self._previews)
+        self._apply_btn.setEnabled(can)
+
+    def has_rename_changes(self) -> bool:
+        """True when the configured operations actually rename something."""
+        return has_changes(self._previews)
+
+    def queued_paths(self) -> list[str]:
+        """Every file the panel holds, in table order — a run's starting set."""
+        return [p.original_path for p in self._previews]
 
     def _on_apply_clicked(self) -> None:
-        """Handle apply button click."""
-        if self._previews and self._operations:
+        """Apply the rename, or start a pipeline run from here."""
+        if self._pipeline_toggle.isChecked():
+            self.start_pipeline.emit()
+        elif self._previews and self._operations:
             self.apply_rename.emit(self._previews, self._operations)
 
     def set_undo_enabled(self, enabled: bool) -> None:

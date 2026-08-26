@@ -17,11 +17,34 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QPointF, QSize, Qt
+from PySide6.QtCore import QT_TRANSLATE_NOOP, QCoreApplication, QPointF, QSize, Qt
 from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPolygonF
 from PySide6.QtWidgets import QAbstractButton
 
+from ..convert_pipeline import STEP_ANALYZE, STEP_CONVERT, STEP_RENAME
 from ..styles.theme import Theme
+
+# What each toggle says the next click will do, off state first. Marked here
+# and translated at the display site so the panel triangle and its header mini
+# share one pair of strings rather than six pairs of the same sentence — they
+# mean the same thing, and a translator should only have to say it once.
+#
+# QT_TRANSLATE_NOOP rather than a bare literal because the display site passes
+# a variable, which lupdate cannot read; this is what puts them in the .ts.
+STEP_TOOLTIPS = {
+    STEP_RENAME: (
+        QT_TRANSLATE_NOOP("PipelineToggle", "Include Rename in pipeline runs"),
+        QT_TRANSLATE_NOOP("PipelineToggle", "Leave Rename out of pipeline runs"),
+    ),
+    STEP_CONVERT: (
+        QT_TRANSLATE_NOOP("PipelineToggle", "Include Convert in pipeline runs"),
+        QT_TRANSLATE_NOOP("PipelineToggle", "Leave Convert out of pipeline runs"),
+    ),
+    STEP_ANALYZE: (
+        QT_TRANSLATE_NOOP("PipelineToggle", "Include Analyze in pipeline runs"),
+        QT_TRANSLATE_NOOP("PipelineToggle", "Leave Analyze out of pipeline runs"),
+    ),
+}
 
 
 class PipelineToggle(QAbstractButton):
@@ -42,6 +65,19 @@ class PipelineToggle(QAbstractButton):
         self._tip_on = ""
         self._tip_off = ""
         self.toggled.connect(lambda _checked: self._sync_tooltip())
+
+    @classmethod
+    def for_step(cls, step: str, size: int = SIZE_PANEL, parent=None) -> "PipelineToggle":
+        """A toggle for one pipeline step, already carrying its tooltips."""
+        toggle = cls(size, parent)
+        off, on = STEP_TOOLTIPS[step]
+        toggle.set_step_tooltips(
+            # The context is spelled out at every call: a module constant here
+            # extracts nothing and falls back to English in eleven languages.
+            QCoreApplication.translate("PipelineToggle", off),
+            QCoreApplication.translate("PipelineToggle", on),
+        )
+        return toggle
 
     # ------------------------------------------------------------- tooltips
 

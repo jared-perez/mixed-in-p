@@ -1,13 +1,10 @@
-"""The Convert panel's pipeline controls: the `|` toggle and the target field.
+"""The Convert panel's Convert-step toggle and what it does to the button.
 
 Structure, never pixels — the suite runs with no application stylesheet, so a
 width measured here is a width of a different app (CLAUDE.md).
 
-The two things worth guarding are the ones a reasonable implementation gets
-wrong. A typed name that happens to equal a listed playlist must still read as
-"create", or the completer's inline match would silently retarget the run at
-somebody else's playlist. And a remembered name must be *selected* rather than
-typed back in, or every launch makes one more numbered playlist.
+The target playlist used to live here and now lives in the header; its tests
+moved with it, to test_pipeline_cluster.py.
 """
 
 from __future__ import annotations
@@ -51,15 +48,13 @@ def panel(qtbot):
 def test_off_by_default(panel):
     assert not panel.pipeline_enabled()
     assert panel._convert_btn.text() == "Convert"
-    assert not panel._pipeline_target.isEnabled()
 
 
-def test_toggling_on_renames_the_button_and_opens_the_field(panel):
+def test_toggling_on_renames_the_button(panel):
     panel._pipeline_toggle.setChecked(True)
     assert panel.pipeline_enabled()
-    assert panel._convert_btn.text() == "Start"
-    assert panel._convert_btn.toolTip() == "Send the tracks through the pipeline"
-    assert panel._pipeline_target.isEnabled()
+    assert panel._convert_btn.text() == "Start Pipeline"
+    assert panel._convert_btn.toolTip()
 
 
 def test_the_toggle_tooltip_says_what_the_next_click_does(panel):
@@ -67,18 +62,18 @@ def test_the_toggle_tooltip_says_what_the_next_click_does(panel):
     panel._pipeline_toggle.setChecked(True)
     on = panel._pipeline_toggle.toolTip()
     assert off != on
-    assert "Turn on" in off and "Turn off" in on
+    assert "Include" in off and "Leave" in on
 
 
-def test_toggling_emits_for_the_coupling(panel, qtbot):
+def test_toggling_emits_for_the_mirror(panel, qtbot):
     with qtbot.waitSignal(panel.pipeline_toggled) as caught:
         panel._pipeline_toggle.setChecked(True)
     assert caught.args == [True]
 
 
 def test_set_pipeline_enabled_is_a_reflect_not_an_act(panel):
-    """MainWindow calls this when auto-analyze goes off; it must not come back
-    round as a toggle the user made."""
+    """MainWindow calls this when the header's mini is clicked; it must not
+    come back round as a toggle the user made here."""
     seen = []
     panel.pipeline_toggled.connect(seen.append)
     panel._pipeline_toggle.setChecked(True)
@@ -87,29 +82,26 @@ def test_set_pipeline_enabled_is_a_reflect_not_an_act(panel):
     assert seen == [True]  # no echo
     assert not panel.pipeline_enabled()
     assert panel._convert_btn.text() == "Convert"
-    assert load_config().pipeline_convert_enabled is False
 
 
 # ---------------------------------------------------------------- enablement
 
 
-def test_start_needs_both_rows_and_a_name(qtbot, tmp_path):
+def test_start_pipeline_needs_forwardable_rows(qtbot, tmp_path):
+    panel = _panel(qtbot)
+    panel._pipeline_toggle.setChecked(True)
+    assert not panel._convert_btn.isEnabled()
+    panel.add_files([_write(tmp_path / "a.wav")])
+    assert panel._convert_btn.isEnabled()
+
+
+def test_start_pipeline_does_not_wait_for_a_target(qtbot, tmp_path):
+    """The target is in the header now. A button greyed for the want of it is
+    greyed for a reason nowhere near it, so the press explains itself instead."""
     panel = _panel(qtbot)
     panel.add_files([_write(tmp_path / "a.wav")])
     panel._pipeline_toggle.setChecked(True)
-    assert panel._pipeline_target.currentText() == ""
-    assert not panel._convert_btn.isEnabled()
-    panel._pipeline_target.setEditText("Pipeline test")
     assert panel._convert_btn.isEnabled()
-    panel._pipeline_target.setEditText("   ")
-    assert not panel._convert_btn.isEnabled()
-
-
-def test_a_name_alone_is_not_enough(qtbot):
-    panel = _panel(qtbot)
-    panel._pipeline_toggle.setChecked(True)
-    panel._pipeline_target.setEditText("Pipeline test")
-    assert not panel._convert_btn.isEnabled()
 
 
 def test_start_is_enabled_for_a_batch_with_nothing_to_convert(qtbot, tmp_path):
@@ -118,7 +110,6 @@ def test_start_is_enabled_for_a_batch_with_nothing_to_convert(qtbot, tmp_path):
     panel.add_files([_write(tmp_path / "a.wav")])
     assert not panel._convert_btn.isEnabled()  # Same format
     panel._pipeline_toggle.setChecked(True)
-    panel._pipeline_target.setEditText("Pipeline test")
     assert panel._convert_btn.isEnabled()
 
 
@@ -155,88 +146,22 @@ def test_an_already_converted_row_is_forwarded_by_its_output(qtbot, tmp_path):
     assert panel._effective_path(src) == str(tmp_path / "a.flac")
 
 
-# --------------------------------------------------------------- the target
-
-
-def test_pipeline_target_reports_a_pick(panel):
-    panel.set_playlists([(4, "Set"), (9, "Warmup")])
-    panel.select_node(9)
-    assert panel.pipeline_target() == (9, "Warmup")
-
-
-def test_typed_text_equal_to_a_listed_name_still_reads_as_create(panel):
-    """The completer is off precisely so these two stay distinguishable."""
-    panel.set_playlists([(4, "Set")])
-    panel._pipeline_target.setCurrentIndex(-1)
-    panel._pipeline_target.setEditText("Set")
-    assert panel.pipeline_target() == (None, "Set")
-
-
-def test_the_completer_is_off(panel):
-    assert panel._pipeline_target.completer() is None
-
-
-def test_the_target_is_a_fitted_combo(panel):
-    from src.gui.widgets.fitted_combo import FittedComboBox
-
-    assert isinstance(panel._pipeline_target, FittedComboBox)
-
-
-def test_select_node_reports_a_miss(panel):
-    panel.set_playlists([(4, "Set")])
-    assert panel.select_node(4)
-    assert not panel.select_node(99)
-
-
-def test_refilling_keeps_a_pick(panel):
-    panel.set_playlists([(4, "Set"), (9, "Warmup")])
-    panel.select_node(9)
-    panel.set_playlists([(4, "Set"), (9, "Warmup"), (11, "New")])
-    assert panel.pipeline_target() == (9, "Warmup")
-
-
-def test_refilling_keeps_typed_text(panel):
-    panel._pipeline_target.setEditText("Not yet made")
-    panel.set_playlists([(4, "Set")])
-    assert panel.pipeline_target() == (None, "Not yet made")
-
-
-def test_refilling_after_the_picked_playlist_is_deleted_keeps_the_name(panel):
-    panel.set_playlists([(4, "Set"), (9, "Warmup")])
-    panel.select_node(9)
-    panel.set_playlists([(4, "Set")])
-    assert panel.pipeline_target() == (None, "Warmup")
-
-
 # -------------------------------------------------------------- persistence
 
 
-def test_the_toggle_and_the_name_are_saved(qtbot, tmp_path):
+def test_the_stored_step_is_shown_on_the_way_in(qtbot):
+    panel = _panel(qtbot, pipeline_convert_enabled=True)
+    assert panel.pipeline_enabled()
+    assert panel._convert_btn.text() == "Start Pipeline"
+
+
+def test_the_panel_never_writes_the_step_itself(qtbot):
+    """A step appears here and again in the header, so MainWindow owns all
+    four pipeline fields — two writers would only drift."""
     panel = _panel(qtbot)
     panel._pipeline_toggle.setChecked(True)
-    panel._pipeline_target.setEditText("Pipeline test")
-    disk = load_config()
-    assert disk.pipeline_convert_enabled is True
-    assert disk.pipeline_playlist == "Pipeline test"
-
-
-def test_a_remembered_name_that_matches_nothing_is_typed_back(qtbot):
-    panel = _panel(qtbot, pipeline_convert_enabled=True,
-                   pipeline_playlist="Gone")
-    assert panel.pipeline_enabled()
-    assert panel.pipeline_target() == (None, "Gone")
-
-
-def test_a_remembered_name_resolves_to_the_same_playlist(qtbot):
-    """The whole point of storing a name: it must be *picked* on the way back,
-    or every launch creates one more numbered playlist."""
-    panel = _panel(qtbot, pipeline_convert_enabled=True,
-                   pipeline_playlist="Set")
-    panel.set_playlists([(4, "Set"), (9, "Warmup")])
-    # set_playlists cannot re-pick what was never picked, so restore again the
-    # way MainWindow does once the list has arrived.
-    panel.restore_pipeline_target("Set")
-    assert panel.pipeline_target() == (4, "Set")
+    panel._format_combo.setCurrentText("WAV")  # forces a settings write
+    assert load_config().pipeline_convert_enabled is False
 
 
 def test_the_toggle_survives_auto_analyze_being_off(qtbot):
@@ -272,56 +197,16 @@ def test_the_bottom_row_reports_a_real_minimum(panel):
     assert panel.bottom_row_min_width() > panel._convert_btn.sizeHint().width()
 
 
-def test_the_target_box_does_not_grow_with_its_playlists(panel):
-    """An editable combo sizes itself to its widest item by default, so the
-    box grew with whoever had the longest playlist name and changed size when
-    one was renamed. A field you type into has to stay put."""
-    before = panel._pipeline_target.width()
-    panel.set_playlists([(1, "Set")])
-    assert panel._pipeline_target.width() == before
-    panel.set_playlists([(1, "Gigs / Saturday closing set 2026 extended mix")])
-    assert panel._pipeline_target.width() == before
-    assert panel._pipeline_target.minimumWidth() == panel._pipeline_target.maximumWidth()
-
-
-def test_the_list_is_not_capped_with_the_box(panel, qtbot):
-    """The popup is floored at the box's width, which was right while the box
-    sized itself to its items — capped, it opened the list elided."""
-    panel.set_playlists([(1, "Set"), (2, "Gigs / Saturday closing set 2026")])
-    panel.show()
-    qtbot.waitExposed(panel)
-    combo = panel._pipeline_target
-    combo.showPopup()
-    try:
-        assert combo.view().width() > combo.width()
-        assert combo.view().width() >= combo.view().sizeHintForColumn(0)
-    finally:
-        combo.hidePopup()
-
-
-def test_the_target_sizes_from_contents_not_first_show(panel):
-    """MainWindow feeds the playlists in after the panel exists, so the
-    default AdjustToContentsOnFirstShow would lock the hint at an empty list
-    and the popup floor would read that stale number for ever."""
-    from PySide6.QtWidgets import QComboBox
-
-    assert (panel._pipeline_target.sizeAdjustPolicy()
-            == QComboBox.SizeAdjustPolicy.AdjustToContents)
-
-
-def test_the_pipeline_controls_sit_beside_the_convert_button(panel):
-    """Ordered [stats][stretch][toggle][playlist][Convert][Send To]: the two
-    pipeline controls are adjacent to the button they arm, not adrift in the
-    middle of the row."""
+def test_the_pipeline_toggle_sits_beside_the_convert_button(panel):
+    """Ordered [stats][stretch][triangle][Convert]: the step toggle is next to
+    the button it re-labels, not adrift in the middle of the row."""
     row = panel._bottom_row
     order = [row.itemAt(i).widget() for i in range(row.count())]
     widgets = [w for w in order if w is not None]
     assert widgets == [
         panel._stats_label,
         panel._pipeline_toggle,
-        panel._pipeline_target,
         panel._convert_btn,
-        panel._send_to_btn,
     ]
     # ...and the only stretch is the one before the toggle.
     stretches = [i for i in range(row.count()) if row.itemAt(i).widget() is None]
@@ -329,6 +214,16 @@ def test_the_pipeline_controls_sit_beside_the_convert_button(panel):
     assert stretches[0] == order.index(panel._pipeline_toggle) - 1
 
 
-def test_the_toggle_glyph_is_not_translated(panel):
-    assert panel._pipeline_toggle.text() == "|"
-    assert panel._pipeline_toggle.objectName() == "pipelineToggle"
+def test_the_toggle_is_a_step_triangle(panel):
+    from src.gui.widgets.pipeline_toggle import PipelineToggle
+
+    assert isinstance(panel._pipeline_toggle, PipelineToggle)
+    assert panel._pipeline_toggle.isCheckable()
+
+
+def test_send_to_is_gone(panel):
+    """Sidebar drag covers every route it offered; the signals stay for a CLI."""
+    assert not hasattr(panel, "_send_to_btn")
+    assert hasattr(panel, "send_to_analyze")
+    assert hasattr(panel, "send_to_rename")
+    assert hasattr(panel, "send_to_player")

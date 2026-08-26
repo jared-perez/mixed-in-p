@@ -347,6 +347,13 @@ PipelineToggle {
     padding: 0;
 }
 
+/* ...and the header cluster that holds three of them plus the target
+   playlist. A bare QWidget used as a layout container is opaque: the global
+   QWidget rule fills it BG_DARK, over the header bar it sits on. */
+QWidget#pipelineHeaderCluster {
+    background-color: transparent;
+}
+
 /* "Freeze" toggle beside it — analysis stops writing to disk for the session.
    Same chrome outline when off, but fills WARNING rather than the accent when
    on: "frozen" must not read as one more thing switched on. */

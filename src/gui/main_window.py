@@ -58,7 +58,13 @@ from .window_sizer import CurrentPageStack, WindowSizer
 from src.conversion.result import LOSSY_EXTENSIONS, ConversionResult
 
 from .widgets.analysis_panel import AnalysisPanel
-from .convert_pipeline import ConvertPipeline
+from .convert_pipeline import (
+    STEP_ANALYZE,
+    STEP_CONVERT,
+    STEP_ORDER,
+    STEP_RENAME,
+    ConvertPipeline,
+)
 from .widgets.conversion_panel import ConversionPanel
 from .widgets.dialogs import duplicate_policy
 from .widgets.dialogs.about_dialog import AboutDialog
@@ -188,6 +194,12 @@ class MainWindow(QMainWindow):
         # One run of Convert -> Analyze -> playlist at a time. Qt-free; every
         # event it needs already arrives at a handler on this window.
         self._pipeline = ConvertPipeline()
+        # A run reaching its Convert step presses the panel's own button, so it
+        # arrives at _start_conversion looking exactly like a second Start.
+        # This is how that one press is told apart from a real one.
+        self._pipeline_entering_convert = False
+        # A rename thread started by a run, not by Apply Rename.
+        self._pending_pipeline_rename = False
         self._playlists_panel.set_library(self._library)
         self._player_panel.set_library(self._library)
         # Read/update only — the Metadata panel never adds a row. It uses the
@@ -208,10 +220,14 @@ class MainWindow(QMainWindow):
         # panel so it lands before the undo stack is live — otherwise the
         # clear would be undoable and yesterday's Scratch could come back.
         apply_scratch_policy(self._library, self._config.persist_scratch)
-        # The Convert panel never opens the library itself; it is fed the
-        # playlists from here, at startup and on every nodes_changed.
+        # The header cluster never opens the library itself; it is fed the
+        # playlists from here, at startup and on every nodes_changed. The
+        # remembered target is restored twice: once by the cluster itself with
+        # an empty list (where the name can only be typed back) and again here,
+        # which is the pass that can resolve it to a pick.
         self._refresh_pipeline_playlists()
-        self._conversion_panel.restore_pipeline_target(self._config.pipeline_playlist)
+        self._header.pipeline.restore_pipeline_target(self._config.pipeline_playlist)
+        self._sync_pipeline_steps()
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._load_last_session()
 
@@ -327,6 +343,8 @@ class MainWindow(QMainWindow):
         self._header.add_folder_clicked.connect(self._on_add_folder)
         self._header.about_clicked.connect(self._on_about)
         self._header.now_playing_clicked.connect(self._on_header_now_playing_clicked)
+        self._header.pipeline.step_toggled.connect(self._on_pipeline_step_toggled)
+        self._header.pipeline.target_changed.connect(self._on_pipeline_target_changed)
 
         # Sidebar signals
         self._sidebar.page_changed.connect(self._on_page_changed)
@@ -374,7 +392,9 @@ class MainWindow(QMainWindow):
         self._conversion_panel.send_to_analyze.connect(self._send_convert_to_analyze)
         self._conversion_panel.send_to_rename.connect(self._send_convert_to_rename)
         self._conversion_panel.send_to_player.connect(self._on_send_to_player)
-        self._conversion_panel.pipeline_toggled.connect(self._on_pipeline_toggled)
+        self._conversion_panel.pipeline_toggled.connect(
+            lambda on: self._on_pipeline_step_toggled(STEP_CONVERT, on)
+        )
 
         # Analysis panel signals
         self._analysis_panel.files_dropped.connect(self._add_and_analyze_files)
@@ -382,6 +402,12 @@ class MainWindow(QMainWindow):
         self._analysis_panel.send_to_player.connect(self._on_send_to_player)
         self._analysis_panel.send_to_convert.connect(self._send_analyze_to_convert)
         self._analysis_panel.start_analysis.connect(self._on_manual_analyze)
+        self._analysis_panel.pipeline_toggled.connect(
+            lambda on: self._on_pipeline_step_toggled(STEP_ANALYZE, on)
+        )
+        self._analysis_panel.start_pipeline.connect(
+            lambda: self._start_pipeline_from(STEP_ANALYZE)
+        )
         self._analysis_panel.auto_analyze_toggled.connect(self._on_auto_analyze_toggled)
         self._analysis_panel.write_freeze_toggled.connect(self._on_write_freeze_toggled)
 
@@ -390,7 +416,12 @@ class MainWindow(QMainWindow):
         self._rename_panel.undo_last.connect(self._undo_last_rename)
         self._rename_panel.send_to_convert.connect(self._send_rename_to_convert)
         self._rename_panel.send_to_auto_pipeline.connect(self._send_rename_to_auto_pipeline)
-        self._rename_panel.auto_pipeline_state_query.connect(self._answer_auto_pipeline_state)
+        self._rename_panel.pipeline_toggled.connect(
+            lambda on: self._on_pipeline_step_toggled(STEP_RENAME, on)
+        )
+        self._rename_panel.start_pipeline.connect(
+            lambda: self._start_pipeline_from(STEP_RENAME)
+        )
 
         # History panel signals
         self._history_panel.undo_session.connect(self._undo_session_from_history)
@@ -1309,7 +1340,11 @@ class MainWindow(QMainWindow):
         # finish analysing and never reach the playlist. A plain conversion is
         # blocked too: _on_conversion_finished would forward *its* results
         # into the older run.
-        if self._pipeline.active:
+        # ...unless this *is* that run, arriving at its Convert step from
+        # Rename. A continuation presses the panel's own button, so it comes
+        # through here like any other Start and would otherwise be refused for
+        # being the very run it belongs to.
+        if self._pipeline.active and not self._pipeline_entering_convert:
             QMessageBox.warning(
                 self,
                 self.tr("Pipeline in Progress"),
@@ -1319,18 +1354,28 @@ class MainWindow(QMainWindow):
 
         # Armed only here, after the busy check: a run armed for a conversion
         # that never started would wait for results that are not coming.
-        pipeline = self._conversion_panel.pipeline_enabled()
+        pipeline = self._conversion_panel.pipeline_enabled() or self._pipeline_entering_convert
         if pipeline:
-            file_paths = self._arm_pipeline(file_paths)
-            if not self._pipeline.active:
-                return  # no target resolved (blank name) — nothing to run
+            if self._pipeline_entering_convert:
+                file_paths = self._load_convert_leg(file_paths)
+            else:
+                file_paths = self._arm_pipeline(file_paths)
+                if not self._pipeline.active:
+                    # A blank target is the one thing the button cannot check:
+                    # the field is in the header, so a greyed-out Start would
+                    # be greyed for a reason nowhere near it.
+                    self._warn_pipeline(
+                        self.tr("No Target Playlist"),
+                        self.tr("Name a playlist for the run in the header bar first."),
+                    )
+                    return
 
         if not file_paths:
             # A pipeline run with nothing to convert skips the thread entirely
             # (a zero-file worker emits an error and no `finished`) and goes
-            # straight to analysis.
+            # straight to whatever comes after this step.
             if pipeline:
-                self._pipeline_analyse(self._pipeline.take_passthrough())
+                self._pipeline_advance(STEP_CONVERT, self._pipeline.take_passthrough())
             return
 
         # Start progress
@@ -1355,17 +1400,17 @@ class MainWindow(QMainWindow):
         self._conversion_thread.conversion_error.connect(self._on_conversion_error)
         self._conversion_thread.conversion_cancelled.connect(self._on_conversion_cancelled)
         self._conversion_thread.start()
-        self._conversion_panel.set_pipeline_controls_enabled(False)
+        self._set_pipeline_controls_enabled(False)
         self._sidebar.set_page_busy("convert", True)
 
     # ------------------------------------------------- Convert -> Analyze -> playlist
 
     def _refresh_pipeline_playlists(self) -> None:
-        """Feed the Convert panel every playlist in the library, in tree order.
+        """Feed the header cluster every playlist in the library, in tree order.
 
-        Walked here rather than in the panel: the tree's nodes_changed never
-        fires before its first load, so the panel would open with an empty list
-        and a remembered name it could not resolve.
+        Walked here rather than in the widget: the tree's nodes_changed never
+        fires before its first load, so the cluster would open with an empty
+        list and a remembered name it could not resolve.
         """
         rows: list[tuple[int, str]] = []
 
@@ -1378,7 +1423,7 @@ class MainWindow(QMainWindow):
                     rows.append((node.id, label))
 
         walk(None, "")
-        self._conversion_panel.set_playlists(rows)
+        self._header.pipeline.set_playlists(rows)
 
     def _unique_playlist_name(self, name: str) -> str:
         """`name`, or the first free `name (N)`.
@@ -1411,7 +1456,7 @@ class MainWindow(QMainWindow):
         combo is then pointed at it, so a second Start with the same text
         reuses it instead of making `Test (2)`, `Test (3)` and so on for ever.
         """
-        node_id, text = self._conversion_panel.pipeline_target()
+        node_id, text = self._header.pipeline.pipeline_target()
         if node_id is not None:
             return node_id, text
         if not text:
@@ -1420,11 +1465,29 @@ class MainWindow(QMainWindow):
         new_id = self._library.create_playlist(name)
         self._playlists_panel.ensure_loaded()
         self._playlists_panel.tree.refresh()
-        self._conversion_panel.select_node(new_id)
+        self._header.pipeline.select_node(new_id)
         return new_id, name
 
+    def _set_pipeline_controls_enabled(self, enabled: bool) -> None:
+        """Lock or free every pipeline control while a conversion runs.
+
+        The Convert panel's triangle and its mini in the header are two views
+        of one toggle, so they grey together — one of them staying live would
+        read as the two disagreeing.
+        """
+        self._conversion_panel.set_pipeline_controls_enabled(enabled)
+        self._header.pipeline.set_controls_enabled(enabled)
+
+    def _enabled_steps(self) -> set[str]:
+        """Which steps a run armed right now would perform.
+
+        Read once, at arming: the run keeps the set, so a toggle flipped while
+        a batch is in flight cannot re-route it half way through.
+        """
+        return {step for step in STEP_ORDER if self._step_enabled(step)}
+
     def _arm_pipeline(self, file_paths: list[str]) -> list[str]:
-        """Arm a run for a Start press. Returns the files to convert.
+        """Arm a run for a Start press in Convert. Returns the files to convert.
 
         Called from _start_conversion, after its busy check — arming for a
         conversion that never started would leave the run waiting for results
@@ -1434,6 +1497,15 @@ class MainWindow(QMainWindow):
         if target is None:
             return file_paths
         node_id, name = target
+        self._pipeline.arm(node_id, name, steps=self._enabled_steps())
+        return self._load_convert_leg(file_paths)
+
+    def _load_convert_leg(self, file_paths: list[str]) -> list[str]:
+        """Hand the Convert panel's rows to the run in flight.
+
+        Split from _arm_pipeline because a run that started at Rename reaches
+        Convert already armed: it needs the rows loaded and nothing else.
+        """
         _to_convert, passthrough = self._conversion_panel.pipeline_rows()
         # Rows already converted in an earlier batch travel by their output.
         forwarded = [self._conversion_panel._effective_path(p) for p in passthrough]
@@ -1450,10 +1522,202 @@ class MainWindow(QMainWindow):
                 pass
             break
 
-        self._pipeline.arm(node_id, name, file_paths, forwarded)
-        # They are Analyze's rows now, exactly as Send To hands them over.
+        run = self._pipeline.run
+        if run is not None:
+            run.awaiting_convert = set(file_paths)
+            run.passthrough = list(forwarded)
+        # They are the next step's rows now, exactly as Send To handed them over.
         self._conversion_panel.forget_rows(passthrough)
         return file_paths
+
+    # ------------------------------------------------------- starting a run
+
+    def _warn_pipeline(self, title: str, body: str) -> None:
+        """Say why a Start press did nothing. Fired from a button click, so it
+        needs no QTimer hop — that rule is for drop and drag handlers."""
+        QMessageBox.information(self, title, body)
+
+    def _pipeline_blocker(self) -> str | None:
+        """Why a run cannot start right now, or None.
+
+        The literal reading of "as if the user had pressed Start": a target,
+        no conversion in flight, no run still finishing.
+        """
+        if self._conversion_thread is not None and self._conversion_thread.isRunning():
+            return self.tr("A conversion is already running.")
+        if self._pipeline.active:
+            return self.tr("The last pipeline run is still finishing.")
+        _node_id, target_name = self._header.pipeline.pipeline_target()
+        if not target_name:
+            return self.tr("Name a playlist for the run in the header bar first.")
+        return None
+
+    def _start_pipeline_from(self, start_step: str) -> None:
+        """A Start Pipeline press in the Rename or Analyze panel.
+
+        Convert's press keeps its own route (the button emits start_conversion
+        with the format settings on it), so every pipeline invariant still
+        lives behind _on_convert_clicked exactly once.
+        """
+        blocker = self._pipeline_blocker()
+        if blocker:
+            self._warn_pipeline(self.tr("Cannot Start"), blocker)
+            return
+
+        if start_step == STEP_RENAME:
+            files = self._rename_panel.queued_paths()
+        else:
+            to_analyse, done = self._analysis_panel.pipeline_rows()
+            files = to_analyse + done
+        if not files:
+            self._warn_pipeline(
+                self.tr("No Files"),
+                self.tr("Add files to this panel before starting a pipeline run."),
+            )
+            return
+
+        # A rename with nothing to change is a reasonable thing to ask for —
+        # the later steps are the point — but it is also what an unconfigured
+        # panel looks like, so it is worth one question.
+        if start_step == STEP_RENAME and not self._rename_panel.has_rename_changes():
+            answer = QMessageBox.question(
+                self,
+                self.tr("No Rename Adjustments"),
+                self.tr("No rename adjustments are set. Send the files on unchanged?"),
+            )
+            if answer != QMessageBox.StandardButton.Yes:
+                return
+
+        target = self._resolve_pipeline_target()
+        if target is None:
+            return  # blank name; _pipeline_blocker already said so
+        node_id, name = target
+        steps = self._enabled_steps()
+
+        if start_step == STEP_RENAME:
+            self._pipeline.arm(node_id, name, steps=steps, to_rename=files)
+            self._pipeline_run_rename()
+        else:
+            self._pipeline.arm(node_id, name, steps=steps)
+            self._pipeline_run_analyze()
+
+    def _pipeline_run_rename(self) -> None:
+        """The Rename step of a run that starts here.
+
+        A no-op rename must NOT go through _start_rename: that returns silently
+        when nothing would move, and the run would sit waiting for a thread
+        that never started. It is retired straight from the engine instead.
+        """
+        panel = self._rename_panel
+        if not panel.has_rename_changes():
+            self._pipeline_advance(STEP_RENAME, self._pipeline.rename_done({}))
+            return
+        self._pending_pipeline_rename = True
+        self._start_rename(panel._previews, panel._operations)
+        if self._rename_thread is None:
+            # Refused (a rename already running) — nothing will call back.
+            self._pending_pipeline_rename = False
+            self._pipeline.abort()
+
+    def _pipeline_run_analyze(self) -> None:
+        """The Analyze step of a run that starts here.
+
+        Rows already analysed are not analysed again: it costs six seconds a
+        file and finds what it already found. They go straight to the playlist,
+        which is why the engine has a direct-add leg at all.
+
+        Both awaiting-collections are registered before a single add commits —
+        an add that lands while the analysis side is still unregistered would
+        read as the end of the run.
+        """
+        to_analyse, done = self._analysis_panel.pipeline_rows()
+        pending = self._pipeline.await_direct_add(
+            [normalize_track_path(p) for p in done]
+        )
+        self._pipeline_analyse([normalize_track_path(p) for p in to_analyse])
+        for path in pending:
+            self._pipeline_direct_add(path)
+
+    def _pipeline_advance(self, after_step: str, paths: list[str]) -> None:
+        """Hand `paths` to whatever the run does next — or to the playlist.
+
+        The playlist is not a step and has no toggle: it is where every run
+        ends, so "nothing enabled after this" means file them, un-analysed.
+        """
+        if not self._pipeline.active:
+            return
+        nxt = self._pipeline.next_step(after_step)
+        if nxt == STEP_CONVERT:
+            self._pipeline_enter_convert(paths)
+        elif nxt == STEP_ANALYZE:
+            self._pipeline_analyse([normalize_track_path(p) for p in paths])
+        else:
+            pending = self._pipeline.await_direct_add(
+                [normalize_track_path(p) for p in paths]
+            )
+            if not pending:
+                self._finish_pipeline_if_done()
+            for path in pending:
+                self._pipeline_direct_add(path)
+
+    def _pipeline_enter_convert(self, paths: list[str]) -> None:
+        """Move the run into the Convert panel and press its own button.
+
+        Through the button the user would press, never a second arming path:
+        every invariant the pipeline holds (which rows forward as-is, the
+        zero-file thread skip, the two path spellings, the warm-import guard)
+        lives behind it.
+        """
+        self._conversion_panel.add_files(paths)
+        self._sidebar.set_current_page("convert")
+        self._on_page_changed("convert")
+        # pipeline_rows() walks lossless paths only, so a lossy file sent here
+        # sits in the table and is never converted, analysed or added. Say so
+        # rather than hand back an emptier playlist than the user expects.
+        if any(Path(p).suffix.lower() in LOSSY_EXTENSIONS for p in paths):
+            self._conversion_panel.show_notice(
+                self.tr("Lossy files stayed in Convert — the pipeline converts lossless sources only.")
+            )
+        self._pipeline_entering_convert = True
+        try:
+            self._conversion_panel.press_convert()
+        finally:
+            self._pipeline_entering_convert = False
+
+    def _pipeline_direct_add(self, path: str) -> None:
+        """File one un-analysed track into the run's playlist.
+
+        The Analyze-off leg. Deliberately not routed through
+        _update_track_from_result, which is the analysis leg's hook and has no
+        result to be handed here. Duplicates are read the same way: ASK is not
+        a question this can ask, so it is read as SKIP and counted.
+        """
+        run = self._pipeline.run
+        if run is None:
+            return
+        tree = self._playlists_panel.tree
+        self._playlists_panel.ensure_loaded()
+
+        def committed(resolved: list[str]) -> None:
+            if not self._pipeline.direct_add_done(path):
+                return
+            if resolved:
+                self._pipeline.record_added(path)
+            else:
+                self._pipeline.record_skipped()
+            self._finish_pipeline_if_done()
+
+        policy = duplicate_policy.current_policy()
+        started = tree._add_paths_to_node(
+            run.node_id,
+            [path],
+            policy=duplicate_policy.SKIP if policy == duplicate_policy.ASK else policy,
+            on_committed=committed,
+        )
+        if not started and self._pipeline.direct_add_done(path):
+            # No library, or the playlist was deleted mid-run.
+            self._pipeline.record_skipped()
+            self._finish_pipeline_if_done()
 
     def _pipeline_analyse(self, paths: list[str]) -> None:
         """Add pipeline outputs to the store and start analysing them.
@@ -1488,6 +1752,12 @@ class MainWindow(QMainWindow):
             self._on_page_changed("analysis")
             self._pending_rename_operations = []  # enable auto-rename gate
             self._start_analysis(track_ids)
+
+    def _on_pipeline_rename_error(self) -> None:
+        """A failed rename ends the run: nothing is forwarded half-renamed."""
+        if self._pending_pipeline_rename:
+            self._pending_pipeline_rename = False
+            self._pipeline.abort()
 
     def _pipeline_analysis_idle(self) -> None:
         """Carry a run past the end of a batch.
@@ -1535,18 +1805,66 @@ class MainWindow(QMainWindow):
         self._conversion_panel.progress_panel.complete(", ".join(parts))
         self._pipeline.end()
 
-    def _on_pipeline_toggled(self, enabled: bool) -> None:
-        """A step toggle moved.
+    # A step's toggle appears twice — in its panel and as a mini in the header
+    # — and the two mirror each other. This is the one owner: both ask here,
+    # both are reflected from here, and the reflect setters block signals so a
+    # reflection never comes back round as a fresh request.
+    _STEP_FIELDS = {
+        STEP_RENAME: "pipeline_rename_enabled",
+        STEP_CONVERT: "pipeline_convert_enabled",
+        STEP_ANALYZE: "pipeline_analyze_enabled",
+    }
 
-        Nothing to couple: auto-analyze says what happens to files that merely
-        *arrive*, while a pipeline run drives its own analysis outright
-        (_pipeline_analyse calls _start_analysis whatever the setting says, and
-        _pipeline_analysis_idle carries the batch on where auto mode would
-        have). The two used to drag each other about, from a time when the
-        pipeline was a Convert-panel feature that could only end in an
-        analysis; test_a_whole_run_completes_with_auto_analyze_off is the
-        measurement that retired it.
+    def _step_enabled(self, step: str) -> bool:
+        return bool(getattr(self._config, self._STEP_FIELDS[step]))
+
+    def _panel_for_step(self, step: str):
+        """The panel whose triangle shows `step`, or None if it has none yet."""
+        return {
+            STEP_RENAME: self._rename_panel,
+            STEP_CONVERT: self._conversion_panel,
+            STEP_ANALYZE: self._analysis_panel,
+        }.get(step)
+
+    def _sync_pipeline_steps(self) -> None:
+        """Push the stored steps into both mirrors, at startup."""
+        for step in STEP_ORDER:
+            on = self._step_enabled(step)
+            self._header.pipeline.set_step_enabled(step, on)
+            panel = self._panel_for_step(step)
+            if panel is not None:
+                panel.set_pipeline_enabled(on)
+
+    def _on_pipeline_step_toggled(self, step: str, enabled: bool) -> None:
+        """One of a step's two toggles was clicked: record it and mirror it.
+
+        Auto-analyze is not consulted, and no longer moves with any of this:
+        it says what happens to files that merely *arrive*, while a pipeline
+        run drives its own analysis outright (_pipeline_analyse calls
+        _start_analysis whatever the setting says, and _pipeline_analysis_idle
+        carries the batch on where auto mode would have). The two used to drag
+        each other about, from when the pipeline was a Convert-panel feature
+        that could only end in an analysis;
+        test_a_whole_run_completes_with_auto_analyze_off retired it.
         """
+        if self._step_enabled(step) == enabled:
+            return
+        setattr(self._config, self._STEP_FIELDS[step], enabled)
+        self._persist_config()
+        self._header.pipeline.set_step_enabled(step, enabled)
+        panel = self._panel_for_step(step)
+        if panel is not None:
+            panel.set_pipeline_enabled(enabled)
+
+    def _on_pipeline_target_changed(self) -> None:
+        """Remember the target playlist by NAME — an id means nothing once the
+        playlist it named has been deleted."""
+        _node_id, text = self._header.pipeline.pipeline_target()
+        if text == self._config.pipeline_playlist:
+            return
+        self._config.pipeline_playlist = text
+        self._persist_config()
+
 
     def _cancel_conversion(self) -> None:
         """Cancel the current conversion.
@@ -1566,7 +1884,7 @@ class MainWindow(QMainWindow):
         # rows still marked Converting revert to Ready.
         self._conversion_panel.mark_converted([])
         self._conversion_thread = None
-        self._conversion_panel.set_pipeline_controls_enabled(True)
+        self._set_pipeline_controls_enabled(True)
         self._sidebar.set_page_busy("convert", False)
         # A cancel is "stop". Half-forwarding a batch the user just stopped is
         # exactly the half-applied result to avoid — the rows that finished
@@ -1600,20 +1918,20 @@ class MainWindow(QMainWindow):
 
         self._conversion_panel.mark_converted(results)
         self._conversion_thread = None
-        self._conversion_panel.set_pipeline_controls_enabled(True)
+        self._set_pipeline_controls_enabled(True)
         self._sidebar.set_page_busy("convert", False)
 
         if self._pipeline.active:
             sources = [r.source_path for r in results if not r.error and not r.skipped]
-            paths = [normalize_track_path(p) for p in self._pipeline.conversion_done(results)]
+            paths = self._pipeline.conversion_done(results)
             self._conversion_panel.forget_rows(sources)
-            self._pipeline_analyse(paths)
+            self._pipeline_advance(STEP_CONVERT, paths)
 
     def _on_conversion_error(self, error: str) -> None:
         """Handle conversion error."""
         self._conversion_panel.progress_panel.set_error(error)
         self._conversion_thread = None
-        self._conversion_panel.set_pipeline_controls_enabled(True)
+        self._set_pipeline_controls_enabled(True)
         self._sidebar.set_page_busy("convert", False)
         # The batch never produced results, so there is nothing to forward.
         self._pipeline.conversion_cancelled()
@@ -1970,6 +2288,14 @@ class MainWindow(QMainWindow):
         self._rename_panel._clear_operations()
         self._rename_thread = None
 
+        # A run that started at Rename carries on from here, under the names
+        # the files now wear. Everything above still ran: a pipeline rename is
+        # a rename, and undo, history and the playlists all want to know.
+        if self._pending_pipeline_rename:
+            self._pending_pipeline_rename = False
+            moved = {r.original_path: r.new_path for r in session.records}
+            self._pipeline_advance(STEP_RENAME, self._pipeline.rename_done(moved))
+
     def _reload_player_for_renamed(self, old_paths: list[str]) -> None:
         """Re-read the Player's list when a rename moved a file it is showing.
 
@@ -2010,6 +2336,7 @@ class MainWindow(QMainWindow):
         """Handle rename error."""
         QMessageBox.critical(self, self.tr("Rename Failed"), error)
         self._rename_thread = None
+        self._on_pipeline_rename_error()
 
     def _undo_last_rename(self) -> None:
         """Undo the last rename operation."""
@@ -2113,53 +2440,35 @@ class MainWindow(QMainWindow):
         self._sidebar.set_current_page("convert")
         self._on_page_changed("convert")
 
-    def _auto_pipeline_readiness(self) -> tuple[bool, str]:
-        """(can Auto Pipeline run now, why not / the target playlist's name).
-
-        The gate is the pipeline toggle ON *and* a target — the literal
-        reading of "as if the user had pressed Start", and the reason the
-        Rename gesture never flips the toggle itself: _on_pipeline_toggled
-        drags auto-analyze on with it and both persist to config.
-        """
-        _node_id, target_name = self._conversion_panel.pipeline_target()
-        if not self._conversion_panel.pipeline_enabled() or not target_name:
-            return False, self.tr("Set pipeline settings in the Convert panel first.")
-        if self._conversion_thread is not None and self._conversion_thread.isRunning():
-            return False, self.tr("A conversion is already running.")
-        if self._pipeline.active:
-            return False, self.tr("The last pipeline run is still finishing.")
-        return True, target_name
-
-    def _answer_auto_pipeline_state(self) -> None:
-        """Answer the Rename panel's aboutToShow query, before the menu paints."""
-        self._rename_panel.set_auto_pipeline_ready(*self._auto_pipeline_readiness())
-
     def _send_rename_to_auto_pipeline(self, file_paths: list[str]) -> None:
-        """Send Rename's queue to Convert and press Start for the user.
+        """Send a set of files to Convert and run the pipeline from there.
 
-        Re-checks readiness because state moves between the menu opening and
-        the click (a conversion started from a drop, a run that has just
-        ended). When it has moved, this degrades to exactly Send To Convert
-        plus a line saying why nothing started — the files are never lost.
+        No control emits this any more — the Rename panel's own Start Pipeline
+        button arms the run properly, rename step included. It is kept as
+        plumbing for a CLI, and degrades to a plain Send To Convert plus a line
+        saying why nothing started, so the files are never lost.
         """
-        ready, reason = self._auto_pipeline_readiness()
+        blocker = self._pipeline_blocker()
         self._conversion_panel.add_files(file_paths)
         self._sidebar.set_current_page("convert")
         self._on_page_changed("convert")
-        if not ready:
-            self._conversion_panel.show_notice(reason)
+        if blocker:
+            self._conversion_panel.show_notice(blocker)
             return
-        # pipeline_rows() walks lossless paths only, so a lossy file sent here
-        # sits in the table and is never converted, analysed or added. Say so
-        # rather than hand back an emptier playlist than the user expects.
-        if any(Path(p).suffix.lower() in LOSSY_EXTENSIONS for p in file_paths):
+        steps = self._enabled_steps()
+        if STEP_CONVERT not in steps:
+            # This entry point starts the run *at* Convert, so it is the one
+            # step it cannot skip. The files are in the panel either way.
             self._conversion_panel.show_notice(
-                self.tr("Lossy files stayed in Convert — the pipeline converts lossless sources only.")
+                self.tr("Switch the Convert step on to run the pipeline from here.")
             )
-        # Through the same button the user would press: every invariant the
-        # pipeline holds (passthrough rows, the zero-file thread skip, the two
-        # path spellings, the warm-import guard) lives behind it.
-        self._conversion_panel.press_convert()
+            return
+        target = self._resolve_pipeline_target()
+        if target is None:
+            return
+        node_id, name = target
+        self._pipeline.arm(node_id, name, steps=steps)
+        self._pipeline_enter_convert(file_paths)
 
     def _on_send_to_player(self, tracks: list[dict]) -> None:
         """Send tracks from analysis to the player panel."""
@@ -2230,15 +2539,11 @@ class MainWindow(QMainWindow):
         # destination — or silently drops the folder the user meant to keep.
         self._config.convert_output_dir = disk.convert_output_dir
         self._config.convert_use_source_dir = disk.convert_use_source_dir
-        # The pipeline's step toggles and target are written by the panels the
-        # same way, so they belong on this list too — left off, closing the
-        # window would revert whatever the user set this session. All four,
-        # every time: a new field beside one already here and not added to it
-        # is the same bug, one field narrower.
-        self._config.pipeline_rename_enabled = disk.pipeline_rename_enabled
-        self._config.pipeline_convert_enabled = disk.pipeline_convert_enabled
-        self._config.pipeline_analyze_enabled = disk.pipeline_analyze_enabled
-        self._config.pipeline_playlist = disk.pipeline_playlist
+        # The four pipeline fields are deliberately NOT on this list. They used
+        # to be, when the Convert panel wrote them itself; a step now appears in
+        # two places at once, so this window owns all four and no panel writes
+        # any of them. Re-reading them from disk here would undo the toggle the
+        # user just clicked, since that is what calls this.
         self._config.player_edit_locked = disk.player_edit_locked
         # These three are one value in three fields and must always be copied
         # together: the count says how many sections the state describes (a

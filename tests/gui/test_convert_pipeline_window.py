@@ -21,7 +21,7 @@ import pytest
 from PySide6.QtCore import QObject
 
 from src.conversion.result import ConversionResult
-from src.gui.convert_pipeline import ConvertPipeline
+from src.gui.convert_pipeline import STEP_CONVERT, ConvertPipeline
 from src.gui.main_window import MainWindow
 from src.gui.models.state import TrackState
 from src.gui.models.track_model import TrackStore
@@ -52,17 +52,50 @@ class _ProgressStub:
         pass
 
 
+class _ClusterStub:
+    """The header's pipeline cluster: the run's target, and which steps run."""
+
+    def __init__(self, target=(None, "Pipeline test"), enabled=True):
+        self._target = target
+        self._enabled = enabled
+        self.controls_enabled = True
+        self.selected = []
+        self.playlists = []
+
+    def pipeline_target(self):
+        return self._target
+
+    def select_node(self, node_id):
+        self.selected.append(node_id)
+        self._target = (node_id, self._target[1])
+        return True
+
+    def set_playlists(self, rows):
+        self.playlists = list(rows)
+
+    def any_step_enabled(self):
+        return self._enabled
+
+    def set_step_enabled(self, step, on):
+        self._enabled = on
+
+    def set_controls_enabled(self, on):
+        self.controls_enabled = on
+
+
+class _HeaderStub:
+    def __init__(self, cluster):
+        self.pipeline = cluster
+
+
 class _PanelStub:
     """The Convert panel, reduced to what the window asks of it."""
 
-    def __init__(self, enabled=True, target=(None, "Pipeline test"),
-                 rows=((), ())):
+    def __init__(self, enabled=True, rows=((), ())):
         self.progress_panel = _ProgressStub()
         self._enabled = enabled
-        self._target = target
         self._rows = rows
         self.forgotten = []
-        self.selected = []
         self.controls_enabled = True
         self.converting = []
         self.marked = []
@@ -70,19 +103,11 @@ class _PanelStub:
     def pipeline_enabled(self):
         return self._enabled
 
-    def pipeline_target(self):
-        return self._target
-
     def pipeline_rows(self):
         return [list(self._rows[0]), list(self._rows[1])]
 
     def forget_rows(self, paths):
         self.forgotten.append(list(paths))
-
-    def select_node(self, node_id):
-        self.selected.append(node_id)
-        self._target = (node_id, self._target[1])
-        return True
 
     def set_pipeline_controls_enabled(self, on):
         self.controls_enabled = on
@@ -189,6 +214,12 @@ class WindowStub(QObject):
     _on_conversion_cancelled = MainWindow._on_conversion_cancelled
     _on_conversion_error = MainWindow._on_conversion_error
     _arm_pipeline = MainWindow._arm_pipeline
+    _load_convert_leg = MainWindow._load_convert_leg
+    _enabled_steps = MainWindow._enabled_steps
+    _pipeline_blocker = MainWindow._pipeline_blocker
+    _pipeline_advance = MainWindow._pipeline_advance
+    _pipeline_direct_add = MainWindow._pipeline_direct_add
+    _set_pipeline_controls_enabled = MainWindow._set_pipeline_controls_enabled
     _pipeline_analyse = MainWindow._pipeline_analyse
     _pipeline_analysis_idle = MainWindow._pipeline_analysis_idle
     _finish_pipeline_if_done = MainWindow._finish_pipeline_if_done
@@ -196,23 +227,36 @@ class WindowStub(QObject):
     _resolve_pipeline_target = MainWindow._resolve_pipeline_target
     _unique_playlist_name = MainWindow._unique_playlist_name
     _refresh_pipeline_playlists = MainWindow._refresh_pipeline_playlists
-    _on_pipeline_toggled = MainWindow._on_pipeline_toggled
+    _on_pipeline_step_toggled = MainWindow._on_pipeline_step_toggled
+    _step_enabled = MainWindow._step_enabled
+    _panel_for_step = MainWindow._panel_for_step
+    _STEP_FIELDS = MainWindow._STEP_FIELDS
     _on_auto_analyze_toggled = MainWindow._on_auto_analyze_toggled
 
-    def __init__(self, store, library, panel):
+    def __init__(self, store, library, panel, cluster=None):
         super().__init__()
         self._store = store
         self._library = library
-        self._config = AppConfig()
+        # These tests predate the step toggles and mean the old single flag:
+        # convert, then analyse, then file it. The panel stub is the switch.
+        self._config = AppConfig(
+            pipeline_convert_enabled=panel.pipeline_enabled(),
+            pipeline_analyze_enabled=panel.pipeline_enabled(),
+        )
         self._pipeline = ConvertPipeline()
         self._conversion_panel = panel
+        self._header = _HeaderStub(cluster or _ClusterStub())
         self._conversion_thread = None
         self._analysis_thread = None
+        self._pipeline_entering_convert = False
+        self._pending_pipeline_rename = False
+        self.warnings = []
         self._analyzing_track_ids = []
         self._pending_rename_operations = None
         self._sidebar = _SidebarStub()
         self._analysis_panel = _AnalysisPanelStub()
         self._settings_panel = _SettingsPanelStub()
+        self._rename_panel = None  # no triangle of its own in these tests
         self._playlists_panel = _PlaylistsPanelStub()
         self.analysed = []
         self.page_changes = []
@@ -236,6 +280,11 @@ class WindowStub(QObject):
     def _persist_config(self):
         pass
 
+    def _warn_pipeline(self, title, body):
+        # A real QMessageBox.information would be a modal with nobody to click
+        # it, which is a hung suite rather than a failing test.
+        self.warnings.append((title, body))
+
 
 @pytest.fixture
 def library():
@@ -244,9 +293,9 @@ def library():
     lib.close()
 
 
-def _window(library, panel=None, **panel_kw):
+def _window(library, panel=None, target=(None, "Pipeline test"), **panel_kw):
     panel = panel or _PanelStub(**panel_kw)
-    return WindowStub(TrackStore(), library, panel), panel
+    return WindowStub(TrackStore(), library, panel, _ClusterStub(target)), panel
 
 
 def _fake_threads(monkeypatch):
@@ -298,18 +347,18 @@ def test_scratch_never_counts(library):
 
 def test_a_pick_is_used_as_is(library):
     node_id = library.create_playlist("Set")
-    win, panel = _window(library, target=(node_id, "Set"))
+    win, _ = _window(library, target=(node_id, "Set"))
     assert win._resolve_pipeline_target() == (node_id, "Set")
-    assert panel.selected == []  # nothing created
+    assert win._header.pipeline.selected == []  # nothing created
 
 
 def test_typed_text_creates_once_then_the_combo_picks_it(library):
-    win, panel = _window(library, target=(None, "Pipeline test"))
+    win, _ = _window(library, target=(None, "Pipeline test"))
     first = win._resolve_pipeline_target()
     assert first is not None
     node_id, name = first
     assert name == "Pipeline test"
-    assert panel.selected == [node_id]
+    assert win._header.pipeline.selected == [node_id]
     assert win._playlists_panel.tree.refreshed == 1
     # The panel now reports a pick, so a second Start reuses the playlist.
     assert win._resolve_pipeline_target() == (node_id, "Pipeline test")
@@ -325,20 +374,18 @@ def test_blank_text_resolves_to_nothing(library):
 
 
 def test_the_combo_is_fed_every_playlist_with_folders_spelled_out(library, qtbot):
-    from src.gui.models.track_model import TrackStore as _TS
-    from src.gui.widgets.conversion_panel import ConversionPanel
+    from src.gui.widgets.pipeline_cluster import PipelineCluster
 
-    panel = ConversionPanel(_TS())
-    qtbot.addWidget(panel)
-    win = WindowStub(TrackStore(), library, panel)
+    cluster = PipelineCluster()
+    qtbot.addWidget(cluster)
+    win = WindowStub(TrackStore(), library, _PanelStub(), cluster)
     folder = library.create_folder("Gigs")
     nested = library.create_playlist("Friday", parent_id=folder)
     flat = library.create_playlist("Set")
     win._refresh_pipeline_playlists()
-    labels = [panel._pipeline_target.itemText(i)
-              for i in range(panel._pipeline_target.count())]
-    ids = [panel._pipeline_target.itemData(i)
-           for i in range(panel._pipeline_target.count())]
+    combo = cluster._target
+    labels = [combo.itemText(i) for i in range(combo.count())]
+    ids = [combo.itemData(i) for i in range(combo.count())]
     assert "Gigs / Friday" in labels and "Set" in labels
     assert set(ids) == {nested, flat}
 
@@ -399,6 +446,7 @@ def test_a_blank_target_starts_nothing(library, monkeypatch, tmp_path):
     src = _touch(tmp_path, "a.wav")
     win, _ = _window(library, target=(None, ""), rows=([src], []))
     win._start_conversion([src], "FLAC")
+    assert win.warnings and "playlist" in win.warnings[0][1]
     assert threads == []
     assert not win._pipeline.active
 
@@ -526,7 +574,7 @@ def test_the_idle_hook_only_takes_this_run_s_files(library, monkeypatch, tmp_pat
 def test_a_step_toggle_leaves_auto_analyze_alone(library):
     win, _ = _window(library)
     win._config.auto_analyze = False
-    win._on_pipeline_toggled(True)
+    win._on_pipeline_step_toggled(STEP_CONVERT, True)
     assert win._config.auto_analyze is False
     assert win._analysis_panel.auto is None  # never told
 
@@ -759,7 +807,7 @@ def test_a_whole_run_completes_with_auto_analyze_off(adding, tmp_path, monkeypat
     _fake_threads(monkeypatch)
     path = _flac(tmp_path / "a.flac")
     adding._config.auto_analyze = False
-    adding._conversion_panel._target = (None, "Manual mode")
+    adding._header.pipeline._target = (None, "Manual mode")
     adding._conversion_panel._rows = ([], [path])
 
     adding._start_conversion([], "FLAC")
