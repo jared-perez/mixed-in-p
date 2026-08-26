@@ -8,10 +8,10 @@ fast (non-smooth) transformation for a chunky pixel look:
   **two faces**, wearing a chunky 152x64 retro trace in the playlist backdrop
   and the CRT in the popout, chosen by the ``popout`` flag
   ``set_target_size`` carries. The retro face is gone: the backdrop's scope
-  slot now draws ``silly_scope`` instead, so this is popout-only in practice
+  slot now draws ``stream`` instead, so this is popout-only in practice
   and renders the CRT to whichever host asks.
-- ``silly_scope`` — a sheet of liquid gold wiggled at its source like a garden
-  hose (see :mod:`.vis_silly_scope`). Backdrop only, which is fire's shape from
+- ``stream`` — a sheet of liquid gold wiggled at its source like a garden
+  hose (see :mod:`.vis_stream`). Backdrop only, which is fire's shape from
   the other end, and the reason it is a *separate mode id* rather than a third
   face: two faces of one id was the arrangement that just ended, and the menu
   row that selects it (``backdrop_scope``) keeps its own id and needs no
@@ -60,7 +60,7 @@ from .beat_clock import BeatClock
 from .vis_analog_scope import AnalogScopeScene
 from .vis_beat_tunnel import BeatTunnelScene
 from .vis_loop_tunnel import LoopTunnelScene
-from .vis_silly_scope import SillyScopeScene
+from .vis_stream import StreamScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
@@ -108,15 +108,15 @@ _PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 
 RENDER_MODES = (
     "oscilloscope", "spectrum", "fire", "fractal", "loop_tunnel", "beat_tunnel",
-    "silly_scope",
+    "stream",
 )
 # What the popout window offers, which is no longer everything the renderer can
 # draw: fire was retired from the menu's popout half and kept as a backdrop,
-# where it reads as lit rows rather than as the whole window, and the silly
-# scope was only ever a backdrop. So a mode may render and not be offered —
+# where it reads as lit rows rather than as the whole window, and the stream
+# was only ever a backdrop. So a mode may render and not be offered —
 # never the other way round, which is derived here rather than written out so a
 # new render mode cannot be silently unreachable.
-_BACKDROP_ONLY = {"fire", "silly_scope"}
+_BACKDROP_ONLY = {"fire", "stream"}
 POPOUT_MODES = tuple(m for m in RENDER_MODES if m not in _BACKDROP_ONLY)
 
 
@@ -193,15 +193,15 @@ class VisRenderer:
         self._popout = False
         # The backdrop's scope slot. Its own image again, and cheap to build:
         # the LUTs and the bead sprites, nothing per-frame.
-        self._silly_scope = SillyScopeScene()
+        self._stream = StreamScene()
 
     # ── Public API ─────────────────────────────────────────────────────────
 
     def image(self) -> QImage:
         if self._mode == "oscilloscope":
             return self._analog_scope.image()
-        if self._mode == "silly_scope":
-            return self._silly_scope.image()
+        if self._mode == "stream":
+            return self._stream.image()
         if self._mode == "loop_tunnel":
             return self._loop_tunnel.image()
         if self._mode == "beat_tunnel":
@@ -230,13 +230,13 @@ class VisRenderer:
         a full-frame upscale, i.e. free.
 
         The oscilloscope's glow field would staircase once the area cap bites,
-        and the silly scope is a soft liquid field rendered near the host's own
+        and the stream is a soft liquid field rendered near the host's own
         size — nearest-neighbour on either would undo the thing they render
         large for. This used to answer for the oscilloscope's *host* rather
         than for the mode, because the backdrop's face was the chunky grid;
         that face is gone, so the question is a per-mode one again.
         """
-        return self._mode in ("beat_tunnel", "loop_tunnel", "oscilloscope", "silly_scope")
+        return self._mode in ("beat_tunnel", "loop_tunnel", "oscilloscope", "stream")
 
     def set_frame_interval(self, frame_ms: float) -> None:
         """Tell the renderer how often it is being advanced.
@@ -254,7 +254,7 @@ class VisRenderer:
         self._clock.set_frame_interval(frame_ms / 1000.0)
         self._beat_tunnel.set_frame_interval(frame_ms)
         self._analog_scope.set_frame_interval(frame_ms)
-        self._silly_scope.set_frame_interval(frame_ms)
+        self._stream.set_frame_interval(frame_ms)
 
     def set_track_tempo(self, bpm: float | None) -> None:
         """The playing track's tag BPM — the beat clock's period.
@@ -301,8 +301,8 @@ class VisRenderer:
         self._flux_peaks[:] = 0.0
         if mode == "oscilloscope":
             self._analog_scope.reset()
-        elif mode == "silly_scope":
-            self._silly_scope.reset()
+        elif mode == "stream":
+            self._stream.reset()
             self._clock.reset()
         elif mode == "loop_tunnel":
             self._loop_tunnel.reset()
@@ -316,7 +316,7 @@ class VisRenderer:
         self._loop_tunnel.set_color(self._color)
         self._beat_tunnel.set_color(self._color)
         self._analog_scope.set_color(self._color)
-        self._silly_scope.set_color(self._color)
+        self._stream.set_color(self._color)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
@@ -338,7 +338,7 @@ class VisRenderer:
         self._loop_tunnel.set_target_size(width, height, popout)
         self._beat_tunnel.set_target_size(width, height, popout)
         self._analog_scope.set_target_size(width, height, popout)
-        self._silly_scope.set_target_size(width, height, popout)
+        self._stream.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -352,7 +352,7 @@ class VisRenderer:
             return self._analog_scope.render(samples, sr)
         else:
             heights = self._band_heights(samples, sr)
-            if self._mode == "silly_scope":
+            if self._mode == "stream":
                 # Down here rather than beside the oscilloscope on purpose: the
                 # scene wants band heights and the kick pulse, not raw samples,
                 # so it goes through _band_heights like fire and the fractal.
@@ -361,7 +361,7 @@ class VisRenderer:
                 # plumbing as the beat tunnel (tag BPM via set_track_tempo,
                 # evidence dropped on seek), the scene just reads the phase.
                 self._clock.tick(self._kick_flux)
-                return self._silly_scope.render(heights, self._pulse, self._clock.phase)
+                return self._stream.render(heights, self._pulse, self._clock.phase)
             if self._mode == "loop_tunnel":
                 # Returned directly, never assigned to self._image: the
                 # scope/spectrum renderers paint into that at _W x _H, and
@@ -402,10 +402,10 @@ class VisRenderer:
         # Hann coherent gain is 0.5 → a full-scale sine peaks its bin at N/4.
         spectrum /= FFT_SIZE / 4.0
         self._update_pulse(spectrum)
-        if self._mode in ("beat_tunnel", "silly_scope"):
+        if self._mode in ("beat_tunnel", "stream"):
             # Only the modes with a beat clock: a log1p over 1025 bins is
             # 30 µs, which is nothing, but it is 30 µs of tax on modes that
-            # have no use for it. The silly scope joined when its source
+            # have no use for it. The stream joined when its source
             # started dancing on the beat grid.
             self._update_kick_flux(spectrum)
         db = 20.0 * np.log10(spectrum + 1e-9)

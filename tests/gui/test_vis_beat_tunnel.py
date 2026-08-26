@@ -1109,7 +1109,7 @@ def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
         assert renderer.smooth_upscale() is False
     renderer.set_mode("oscilloscope")
     assert renderer.smooth_upscale() is True
-    renderer.set_mode("silly_scope")
+    renderer.set_mode("stream")
     assert renderer.frame_ms() == FRAME_MS
     assert renderer.smooth_upscale() is True
 

@@ -1,7 +1,7 @@
-"""The Silly Scope — the backdrop's liquid-gold sheet, and the hose that moves it.
+"""The stream — the backdrop's liquid-gold sheet, and the hose that moves it.
 
 What is worth pinning here is the *mechanism*, not the picture. The look is
-judged by rendering stills (``scripts/vis_sheet.py --mode silly_scope``), as it
+judged by rendering stills (``scripts/vis_sheet.py --mode stream``), as it
 is for every visual: the suite runs offscreen and styleless and cannot tell
 liquid gold from mustard, and both pixel-diff traps in CLAUDE.md apply. So the
 assertions are on state — where the wave is, how wide the sheet is, what the
@@ -18,13 +18,13 @@ import numpy as np
 import pytest
 from PySide6.QtGui import QColor
 
-from src.gui.widgets import vis_silly_scope
-from src.gui.widgets.vis_silly_scope import (
+from src.gui.widgets import vis_stream
+from src.gui.widgets.vis_stream import (
     _BACKDROP_CAP_PX,
     _POPOUT_CAP_PX,
     _WINDOW_SECONDS,
     _GOLD_BASE_HSV,
-    SillyScopeScene,
+    StreamScene,
     build_color_lut,
     build_env_ramp,
 )
@@ -42,7 +42,7 @@ FRAMES_PER_SECOND = 1000.0 / FRAME_MS
 
 @pytest.fixture
 def scene():
-    made = SillyScopeScene()
+    made = StreamScene()
     made.set_frame_interval(FRAME_MS)
     made.set_target_size(912, 384)
     return made
@@ -161,7 +161,7 @@ def test_the_same_second_of_audio_looks_the_same_at_either_rate():
     """
     states = []
     for frame_ms in (16.0, FRAME_MS):
-        scene = SillyScopeScene()
+        scene = StreamScene()
         scene.set_frame_interval(frame_ms)
         scene.set_target_size(912, 384)
         scene.reset()
@@ -293,7 +293,7 @@ def _twin_scenes_final_frames(pulse_pair):
     """
     frames = []
     for pulse in pulse_pair:
-        scene = SillyScopeScene()
+        scene = StreamScene()
         scene.set_frame_interval(FRAME_MS)
         scene.set_target_size(912, 384)
         _run(scene, 4.0)
@@ -320,7 +320,7 @@ def test_between_beats_the_stream_rests_dim_and_a_kick_lights_it():
     one, which is what makes a surge readable at all."""
     frames = []
     for pulse in (0.0, 1.0):
-        made = SillyScopeScene()
+        made = StreamScene()
         made.set_frame_interval(FRAME_MS)
         made.set_target_size(912, 384)
         _run(made, 4.0, pulse=pulse)
@@ -336,7 +336,7 @@ def test_a_kick_is_stamped_at_the_source_and_travels_with_the_stream():
     it: the per-column difference between them is exactly the surge."""
     scenes = []
     for _ in range(2):
-        made = SillyScopeScene()
+        made = StreamScene()
         made.set_frame_interval(FRAME_MS)
         made.set_target_size(912, 384)
         _run(made, 4.0)
@@ -398,8 +398,8 @@ def test_the_fade_is_a_release_and_the_return_is_instant(scene):
 def test_the_droplets_are_gone():
     """Nothing left behind that a later edit could route back to."""
     for name in ("_DROP_MAX", "_DROP_PULSE", "_DROP_RADIUS_FRAC"):
-        assert not hasattr(vis_silly_scope, name)
-    scene = SillyScopeScene()
+        assert not hasattr(vis_stream, name)
+    scene = StreamScene()
     assert not hasattr(scene, "_drops")
     assert not hasattr(scene, "_stamp_drops")
 
@@ -531,16 +531,16 @@ def test_the_colour_setting_recolours_the_stream(scene):
 
 def test_it_renders_and_is_not_offered_in_the_popout():
     """Fire's shape from the other end: a mode may render and not be offered."""
-    assert "silly_scope" in RENDER_MODES
-    assert "silly_scope" not in POPOUT_MODES
-    assert "silly_scope" not in _VALID_VIS_MODES  # it is not a menu id
-    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "silly_scope"
+    assert "stream" in RENDER_MODES
+    assert "stream" not in POPOUT_MODES
+    assert "stream" not in _VALID_VIS_MODES  # it is not a menu id
+    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "stream"
 
 
 def test_the_renderer_returns_the_scenes_image_and_never_keeps_it(qapp):
     """The corner-drawing trap: the shared 152x64 image must stay 152x64."""
     renderer = VisRenderer()
-    renderer.set_mode("silly_scope")
+    renderer.set_mode("stream")
     renderer.set_target_size(1216, 512)
     rng = np.random.default_rng(0)
     image = renderer.render(rng.normal(0, 0.2, 2048).astype(np.float32), 44100)
@@ -552,11 +552,11 @@ def test_the_renderer_returns_the_scenes_image_and_never_keeps_it(qapp):
 
 
 def test_the_renderer_ticks_the_beat_clock_for_this_mode(qapp):
-    """The dance's clock: silly_scope joined beat_tunnel as a mode that
+    """The dance's clock: stream joined beat_tunnel as a mode that
     counts beats, so rendering must advance the clock's phase and feed the
     kick flux it locks from."""
     renderer = VisRenderer()
-    renderer.set_mode("silly_scope")
+    renderer.set_mode("stream")
     renderer.set_target_size(912, 384)
     renderer.set_track_tempo(128.0)
     rng = np.random.default_rng(3)
@@ -568,27 +568,27 @@ def test_the_renderer_ticks_the_beat_clock_for_this_mode(qapp):
 
 def test_the_renderer_smooths_it_and_keeps_the_backdrops_own_rate(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("silly_scope")
+    renderer.set_mode("stream")
     assert renderer.smooth_upscale() is True
     assert renderer.frame_ms() == FRAME_MS
 
 
 def test_switching_to_it_clears_whatever_the_last_run_left(qapp):
     renderer = VisRenderer()
-    renderer.set_mode("silly_scope")
+    renderer.set_mode("stream")
     renderer.set_target_size(912, 384)
     rng = np.random.default_rng(1)
     for _ in range(120):
         renderer.render(rng.normal(0, 0.5, 2048).astype(np.float32), 44100)
-    assert np.any(renderer._silly_scope._history != 0.0)
-    renderer.set_mode("silly_scope")
-    assert np.all(renderer._silly_scope._history == 0.0)
+    assert np.any(renderer._stream._history != 0.0)
+    renderer.set_mode("stream")
+    assert np.all(renderer._stream._history == 0.0)
 
 
 def test_silence_is_a_frame_it_can_render(qapp):
     """What the backdrop feeds after a pause, for _VIS_DECAY_MS."""
     renderer = VisRenderer()
-    renderer.set_mode("silly_scope")
+    renderer.set_mode("stream")
     renderer.set_target_size(912, 384)
     image = renderer.render(None, 44100)
     assert image.width() > 0
@@ -597,7 +597,7 @@ def test_silence_is_a_frame_it_can_render(qapp):
 def test_the_retro_backdrop_face_is_gone(qapp):
     """Nothing left behind that a later edit could route back to."""
     assert not hasattr(VisRenderer, "_render_scope")
-    assert not hasattr(vis_silly_scope, "_SCOPE_LEVELS")
+    assert not hasattr(vis_stream, "_SCOPE_LEVELS")
     from src.gui.widgets import vis_canvas
 
     assert not hasattr(vis_canvas, "_SCOPE_SAMPLES")

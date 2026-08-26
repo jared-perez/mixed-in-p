@@ -2,8 +2,8 @@
 
 It used to be the *popout's face* of a mode with two of them, the backdrop
 wearing a chunky 152x64 retro grid. That grid is gone: the backdrop's scope
-slot draws ``silly_scope`` now (a separate mode id — see
-``test_vis_silly_scope.py``), so this mode has one picture again and the tests
+slot draws ``stream`` now (a separate mode id — see
+``test_vis_stream.py``), so this mode has one picture again and the tests
 that pinned the split pin the retirement instead.
 
 Assertions are on the scene's arrays and on image *sizes*, never on a pixel
@@ -77,7 +77,7 @@ def test_a_host_that_never_said_popout_gets_the_scene_too(qapp):
     """The retro face is retired: there is one picture, at the backdrop's cap.
 
     Nothing routes here without ``popout=True`` today — the backdrop's scope
-    slot draws the silly scope — but the scene has always carried a backdrop
+    slot draws the stream — but the scene has always carried a backdrop
     cap for the host it never meets, and ``vis_sheet --mode oscilloscope``
     without ``--popout`` drives exactly this path.
     """
@@ -143,14 +143,14 @@ def test_the_mode_id_and_the_config_set_did_not_move():
     """The scope keeps its own id and its popout row; only the backdrop left.
 
     ``backdrop_scope`` still names a valid setting and still selects — it just
-    draws the silly scope now, which is why there is no migration on either
+    draws the stream now, which is why there is no migration on either
     side of this change.
     """
     assert "oscilloscope" in RENDER_MODES
     assert "oscilloscope" in POPOUT_MODES
     assert "oscilloscope" in _VALID_VIS_MODES
     assert "backdrop_scope" in _VALID_VIS_MODES
-    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "silly_scope"
+    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "stream"
 
 
 # ── Size and the frame budget ──────────────────────────────────────────────

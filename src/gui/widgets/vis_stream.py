@@ -1,4 +1,4 @@
-"""Silly Scope: a sheet of liquid gold, wiggled at its source like a garden hose.
+"""Stream: a sheet of liquid gold, wiggled at its source like a garden hose.
 
 The **backdrop** face of the ``backdrop_scope`` menu row, and the mode that
 retired the chunky 152x64 retro trace that used to draw it. Backdrop-only, the
@@ -73,7 +73,7 @@ Every constant is expressed in **seconds**, never per frame. The backdrop only
 ever runs at 33 ms, but ``scripts/vis_sheet.py`` can drive this at any rate and
 a decay written per frame is a duration only at one of them.
 
-No audio analysis lives here: :meth:`SillyScopeScene.render` takes the band
+No audio analysis lives here: :meth:`StreamScene.render` takes the band
 heights, the kick pulse and the beat-clock phase
 :class:`~.vis_canvas.VisRenderer` already computes — the mid-high melody
 slice is a reading of those same bands, not new DSP.
@@ -465,7 +465,7 @@ def _smooth1d(values: np.ndarray, sigma: float) -> np.ndarray:
     return out
 
 
-class SillyScopeScene:
+class StreamScene:
     """The hose's history, the sheet it carries, and the image they paint."""
 
     def __init__(self) -> None:

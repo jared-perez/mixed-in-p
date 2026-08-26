@@ -103,15 +103,16 @@ from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, Visualize
 
 # Backdrop visualizer modes → the VisRenderer mode that draws them.
 #
-# ``backdrop_scope`` reads across to ``silly_scope`` and that is not a slip:
+# ``backdrop_scope`` reads across to ``stream`` and that is not a slip:
 # the menu row keeps its own id and its own slot and changed its *picture* by
 # design, so there is nothing to migrate. The persisted-enum trap is a
 # look-named id whose look moves to a different mode, or two such names
-# trading places; here the id still names "the scope-slot backdrop", "Silly
-# Scope" still contains scope, and every existing user with it selected gets
-# the new visual, which is the point.
+# trading places; here the id still names "the scope-slot backdrop" and every
+# existing user with it selected gets the new visual, which is the point. The
+# row was labelled "Silly Scope" when the sheet first shipped and is "stream"
+# now; the label named the look and the look is what was renamed.
 _BACKDROP_VIS_MAP = {
-    "backdrop_scope": "silly_scope",
+    "backdrop_scope": "stream",
     "backdrop_spectrum": "spectrum",
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
@@ -1886,7 +1887,7 @@ class PlayerPanel(QWidget):
             ("backdrop_loop_tunnel", self.tr("Backdrop tunnel chase")),
             ("backdrop_spectrum", self.tr("Backdrop spectrum")),
             ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
-            ("backdrop_scope", self.tr("Backdrop Silly Scope")),
+            ("backdrop_scope", self.tr("Backdrop stream")),
             ("backdrop", self.tr("Backdrop waveform")),
             ("backdrop_fire", self.tr("Backdrop fire")),
             ("fractal", self.tr("Popout fractal")),
