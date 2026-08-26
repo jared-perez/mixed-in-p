@@ -336,6 +336,17 @@ QPushButton#pipelineToggle:checked:hover {
     border-color: @ACCENT_HOVER@;
 }
 
+/* The step toggles. PipelineToggle paints its own triangle from Theme tokens,
+   so the one thing QSS must do is keep out of the way: no padding (the global
+   button padding inside a box this small deletes the glyph — the
+   #discogsApplyButton law) and no background, or the global QWidget rule fills
+   BG_DARK into the corners the triangle deliberately leaves empty. */
+PipelineToggle {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+}
+
 /* "Freeze" toggle beside it — analysis stops writing to disk for the session.
    Same chrome outline when off, but fills WARNING rather than the accent when
    on: "frozen" must not read as one more thing switched on. */
