@@ -169,7 +169,9 @@ def test_the_same_second_of_audio_looks_the_same_at_either_rate():
             # rates would otherwise be fed different music and the test would
             # be measuring that instead.
             level = 0.5 + 0.4 * np.sin(elapsed * 2.0)
-            scene.render(_loud(level=level), 0.0)
+            # The dance is driven in beat space, so it must agree too: hand
+            # both rates the same beats-per-elapsed-time.
+            scene.render(_loud(level=level), 0.0, beat=elapsed * 2.133)
             elapsed += frame_ms / 1000.0
         width, height = scene._size
         states.append((
@@ -178,6 +180,8 @@ def test_the_same_second_of_audio_looks_the_same_at_either_rate():
             scene._twist_phase,
             scene._presence,
             scene._glow,
+            scene._dance_pos,
+            scene._melody_fast,
         ))
 
     fast, slow = states
@@ -186,6 +190,8 @@ def test_the_same_second_of_audio_looks_the_same_at_either_rate():
     assert fast[2] == pytest.approx(slow[2], rel=0.01)
     assert fast[3] == pytest.approx(slow[3], abs=0.02)
     assert fast[4] == pytest.approx(slow[4], abs=0.02)
+    assert fast[5] == pytest.approx(slow[5], abs=0.02)
+    assert fast[6] == pytest.approx(slow[6], abs=0.02)
 
 
 def test_setting_the_rate_is_not_undone_by_a_reset(scene):
@@ -396,6 +402,76 @@ def test_the_droplets_are_gone():
     assert not hasattr(scene, "_stamp_drops")
 
 
+# ── The dance ──────────────────────────────────────────────────────────────
+
+
+def _beat_feed(scene, seconds, bpm=128.0, start_beat=0.0, heights=None):
+    """Run the scene with a synthetic beat clock advancing at *bpm*."""
+    frames = int(round(seconds * FRAMES_PER_SECOND))
+    beat = start_beat
+    per_frame = bpm / 60.0 * (FRAME_MS / 1000.0)
+    for _ in range(frames):
+        scene.render(_loud() if heights is None else heights, 0.0, beat)
+        beat += per_frame
+    return beat
+
+
+def test_the_source_turns_on_the_four_beat_grid(scene):
+    beat = _beat_feed(scene, 2.0)  # ~4.3 beats at 128: crosses beat 4
+    assert scene._last_turn == 4
+    target = scene._dance_target
+    assert target != 0.0
+    _beat_feed(scene, 1.0, start_beat=beat)  # to ~6.4: inside the phrase
+    assert scene._last_turn == 4  # no turning point between the boundaries
+    assert scene._dance_target == target
+
+
+def test_turns_alternate_and_phrase_edges_move_further_and_quicker(scene):
+    _beat_feed(scene, 2.0)  # crosses 4
+    span_4 = scene._dance_span
+    sign_4 = np.sign(scene._dance_target)
+    amp_4 = abs(scene._dance_target)
+    _beat_feed(scene, 2.0, start_beat=4.3)  # crosses 8
+    assert scene._last_turn == 8
+    assert np.sign(scene._dance_target) == -sign_4  # back and forth
+    _beat_feed(scene, 4.0, start_beat=8.5)  # crosses 12 and then 16
+    assert scene._last_turn == 16
+    assert abs(scene._dance_target) > amp_4  # a phrase edge swings further
+    assert scene._dance_span < span_4  # and arrives quicker
+
+
+def test_the_dance_reaches_the_painted_source(scene):
+    """The choreography is not private state: after a couple of phrases the
+    newest columns sit away from mid-height, on steady music whose loudness
+    wiggle alone would leave the source centred."""
+    width, height = scene._size
+    _beat_feed(scene, 4.0)
+    centre = scene._centerline(width, height)
+    assert abs(centre[-1] - 0.5 * height) > 0.05 * height
+
+
+def test_no_clock_means_no_dance(scene):
+    _run(scene, 4.0)
+    assert scene._dance_pos == 0.0
+    assert scene._last_turn == 0
+
+
+def test_the_melody_follower_reads_the_mid_highs_not_the_bass(scene):
+    """Bass-heavy music must not drive the melody term — that is the whole
+    request. Two bursts of equal overall shape, one in band 2 (~100 Hz) and
+    one in band 12 (~1.6 kHz): only the second reaches the melody follower."""
+    bass = np.zeros(19, dtype=np.float32)
+    bass[2] = 0.9
+    _run(scene, 2.0, heights=bass)
+    from_bass = scene._melody_fast
+    scene.reset()
+    mids = np.zeros(19, dtype=np.float32)
+    mids[12] = 0.9
+    _run(scene, 2.0, heights=mids)
+    assert from_bass == 0.0
+    assert scene._melody_fast > 0.3
+
+
 # ── The tables ─────────────────────────────────────────────────────────────
 
 
@@ -455,6 +531,21 @@ def test_the_renderer_returns_the_scenes_image_and_never_keeps_it(qapp):
     renderer.set_mode("spectrum")
     after = renderer.render(rng.normal(0, 0.2, 2048).astype(np.float32), 44100)
     assert (after.width(), after.height()) == (152, 64)
+
+
+def test_the_renderer_ticks_the_beat_clock_for_this_mode(qapp):
+    """The dance's clock: silly_scope joined beat_tunnel as a mode that
+    counts beats, so rendering must advance the clock's phase and feed the
+    kick flux it locks from."""
+    renderer = VisRenderer()
+    renderer.set_mode("silly_scope")
+    renderer.set_target_size(912, 384)
+    renderer.set_track_tempo(128.0)
+    rng = np.random.default_rng(3)
+    for _ in range(30):
+        renderer.render(rng.normal(0, 0.4, 2048).astype(np.float32), 44100)
+    assert renderer._clock.phase > 0.5
+    assert renderer._prev_log is not None  # kick flux really computed
 
 
 def test_the_renderer_smooths_it_and_keeps_the_backdrops_own_rate(qapp):

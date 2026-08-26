@@ -5,11 +5,23 @@ retired the chunky 152x64 retro trace that used to draw it. Backdrop-only, the
 way fire is — the popout's ``oscilloscope`` keeps its green CRT
 (:mod:`.vis_analog_scope`) and is a separate mode id.
 
-**The model, in one line**: the stream is a garden hose. The *source*'s vertical
-position wiggles with the averaged volume, that displacement travels along the
-stream at a fixed flow speed, and what the wave carries is a **flat sheet**
-shaded by its orientation — not a tube. The source sits at the right edge (the
-newest audio) and the wave rolls left, taking ~:data:`_WINDOW_SECONDS` to cross.
+**The model, in one line**: the stream is a garden hose. The *source*'s
+vertical position moves, that displacement travels along the stream at a fixed
+flow speed, and what the wave carries is a **flat sheet** shaded by its
+orientation — not a tube. The source sits at the right edge (the newest audio)
+and the wave rolls left, taking ~:data:`_WINDOW_SECONDS` to cross.
+
+What moves the source is a mix of three drivers, weighted by the ``_*_FRAC``
+trio: the **dance** — a choreography on the beat grid (the renderer's
+:class:`~.beat_clock.BeatClock` supplies fractional beats): every 4th beat is
+a turning point, and the bigger the boundary (8, 16, 32) the further and the
+*quicker* the source swings, so the motion is lazy half-time inside a phrase
+and snaps at phrase edges; a **melody wobble** — the band-passed dynamics of
+the mid-high bands (~570 Hz-7 kHz, weighted toward the highs), so the line
+follows where the melody moves rather than the kick; and the original
+full-band loudness **wiggle**, kept as texture. The first cut drove the
+source from overall loudness alone, which on bass-heavy music meant the bass
+dictated everything and a steady-loud track pinned the source to mid-height.
 
 That one decision is what buys the look cheaply. The silhouette is smooth *by
 construction*, because it is the history of a smooth signal advected: there is
@@ -60,7 +72,9 @@ ever runs at 33 ms, but ``scripts/vis_sheet.py`` can drive this at any rate and
 a decay written per frame is a duration only at one of them.
 
 No audio analysis lives here: :meth:`SillyScopeScene.render` takes the band
-heights and the kick pulse :class:`~.vis_canvas.VisRenderer` already computes.
+heights, the kick pulse and the beat-clock phase
+:class:`~.vis_canvas.VisRenderer` already computes — the mid-high melody
+slice is a reading of those same bands, not new DSP.
 """
 
 from __future__ import annotations
@@ -298,6 +312,38 @@ _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 _BEAT_FLOOR = 0.50
 _BEAT_PEAK = 1.35
 _BEAT_RELEASE_TAU = 0.06
+
+# ── The dance ──────────────────────────────────────────────────────────────
+# The source's choreography, in **beat space** (the renderer ticks its beat
+# clock for this mode and hands the scene fractional beats), so it is
+# rate-independent by construction and locked to the music's grid rather
+# than to seconds. Every _TURN_EVERY beats is a turning point; the *rank* of
+# the boundary (the largest of 4/8/16/32 dividing it) decides how far the
+# swing goes and how many beats it takes to arrive — phrase interiors move
+# lazily (a 4-boundary eases over four beats, the half-time feel) and phrase
+# edges snap (a 16 or 32 arrives in about a beat). Direction alternates, so
+# the source goes back and forth rather than random-walking, and the swing
+# opens up with the melody's presence. No RNG anywhere: the choreography is
+# deterministic, which is also what makes it testable.
+_TURN_EVERY = 4
+_TURN_AMP = {4: 0.35, 8: 0.50, 16: 0.70, 32: 0.85}
+_TURN_BEATS = {4: 4.0, 8: 2.0, 16: 1.0, 32: 0.75}
+# The melody follower: the mid-high slice of the renderer's 19 log bands
+# (50 Hz-16 kHz), bands 8..15 ~= 570 Hz-7 kHz, weighted toward the highs —
+# where the melody lives, per the request — through the same fast/slow
+# follower pair as the hose, a touch quicker so runs and stabs read.
+_MELODY_BANDS = slice(8, 16)
+_MELODY_HIGH_WEIGHT = (0.7, 1.3)  # linear weights across the slice, low->high
+_MELODY_FAST_TAU = 0.25
+_MELODY_SLOW_TAU = 2.0
+_MELODY_GAIN = 7.0
+_MELODY_KNEE = 0.35  # melody level at which the dance swings full-width
+# How the three drivers share the source's travel. They can sum past 1 on a
+# loud phrase edge; the centerline then brushes the frame and is clipped,
+# which the doubled swing already allows on purpose.
+_DANCE_FRAC = 0.60
+_MELODY_FRAC = 0.25
+_WIGGLE_FRAC = 0.25
 # The silence fade, the fractal's other half. Instant attack, exponential
 # release: the sheet is at full strength the frame music plays and dims to
 # nothing in ~0.7 s without it (started at the fractal's own 0.5 s tau, cut
@@ -410,6 +456,15 @@ class SillyScopeScene:
         self._level_fast = 0.0
         self._level_slow = 0.0
         self._presence = 0.0
+        self._melody_fast = 0.0
+        self._melody_slow = 0.0
+        self._dance_pos = 0.0
+        self._dance_from = 0.0
+        self._dance_target = 0.0
+        self._dance_start = 0.0
+        self._dance_span = 0.0
+        self._dance_dir = 1.0
+        self._last_turn = 0
         self.set_frame_interval(33.0)
         bins = int(round(_WINDOW_SECONDS * _HISTORY_BINS_PER_S)) + 2
         self._history = np.zeros(bins, dtype=np.float32)
@@ -456,6 +511,8 @@ class SillyScopeScene:
         self._presence_alpha = float(np.exp(-self._dt / _PRESENCE_TAU))
         self._glow_release = float(np.exp(-self._dt / _GLOW_RELEASE_TAU))
         self._beat_release = float(np.exp(-self._dt / _BEAT_RELEASE_TAU))
+        self._melody_fast_alpha = float(np.exp(-self._dt / _MELODY_FAST_TAU))
+        self._melody_slow_alpha = float(np.exp(-self._dt / _MELODY_SLOW_TAU))
 
     def reset(self) -> None:
         """Forget the stream: the wave in flight and the phases."""
@@ -472,6 +529,15 @@ class SillyScopeScene:
         self._level_fast = 0.0
         self._level_slow = 0.0
         self._presence = 0.0
+        self._melody_fast = 0.0
+        self._melody_slow = 0.0
+        self._dance_pos = 0.0
+        self._dance_from = 0.0
+        self._dance_target = 0.0
+        self._dance_start = 0.0
+        self._dance_span = 0.0
+        self._dance_dir = 1.0
+        self._last_turn = 0
         self._pulse = 0.0
         self._glow = 0.0
         width, height = self._size
@@ -498,34 +564,59 @@ class SillyScopeScene:
         self._image = QImage(target_w, target_h, QImage.Format.Format_ARGB32)
         self._image.fill(0)
 
-    def render(self, heights: np.ndarray | None, pulse: float = 0.0) -> QImage:
+    def render(
+        self,
+        heights: np.ndarray | None,
+        pulse: float = 0.0,
+        beat: float | None = None,
+    ) -> QImage:
         """Advance the stream one frame and paint it.
 
         *heights* is the renderer's log-band array (``None`` or empty is
         silence, which is what the backdrop feeds after a pause: the envelope
         releases, the sheet thins toward a resting thread and the host's timer
         stops on a still frame — liquid settling, for free). *pulse* is the
-        same kick accent the other modes read.
+        same kick accent the other modes read. *beat* is the renderer's beat
+        clock in fractional beats; ``None`` (a caller with no clock) leaves
+        the dance at rest and everything else working.
         """
         if heights is None or len(heights) == 0:
             level = 0.0
+            melody = 0.0
         else:
             # The fire/fractal blend: mean alone leaves a lone bass line nearly
             # invisible, max alone never breathes.
             level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
+            band = np.asarray(heights[_MELODY_BANDS], dtype=np.float32)
+            if band.size:
+                weights = np.linspace(*_MELODY_HIGH_WEIGHT, band.size)
+                melody = float(np.clip(
+                    0.55 * float((band * weights).mean()) + 0.55 * float(band.max()),
+                    0.0, 1.0,
+                ))
+            else:
+                melody = 0.0
         self._pulse = float(np.clip(pulse, 0.0, 1.0))
-        self._advance(level)
+        self._advance(level, melody, beat)
         self._paint()
         return self._image
 
     # ── State ──────────────────────────────────────────────────────────────
 
-    def _advance(self, level: float) -> None:
-        """One frame of hose, twist and drift."""
+    def _advance(self, level: float, melody: float, beat: float | None) -> None:
+        """One frame of hose, melody, dance, twist and drift."""
         dt = self._dt
         self._level_fast = self._fast_alpha * self._level_fast + (1.0 - self._fast_alpha) * level
         self._level_slow = self._slow_alpha * self._level_slow + (1.0 - self._slow_alpha) * level
         self._presence = self._presence_alpha * self._presence + (1.0 - self._presence_alpha) * level
+        self._melody_fast = (
+            self._melody_fast_alpha * self._melody_fast
+            + (1.0 - self._melody_fast_alpha) * melody
+        )
+        self._melody_slow = (
+            self._melody_slow_alpha * self._melody_slow
+            + (1.0 - self._melody_slow_alpha) * melody
+        )
         gate = float(np.clip(self._presence / _PRESENCE_KNEE, 0.0, 1.0))
         # The silence fade's envelope: attack is the max, release the decay,
         # snapped to zero once it is below what an alpha byte can show.
@@ -539,7 +630,14 @@ class SillyScopeScene:
         # to reach the floor again before the next one (see _BEAT_RELEASE_TAU).
         self._beat_glow = max(self._pulse, self._beat_glow * self._beat_release)
         bright = _BEAT_FLOOR + (_BEAT_PEAK - _BEAT_FLOOR) * self._beat_glow
-        nozzle = float(np.tanh(_HOSE_GAIN * (self._level_fast - self._level_slow)) * gate)
+        self._advance_dance(beat)
+        wiggle = float(np.tanh(_HOSE_GAIN * (self._level_fast - self._level_slow)))
+        melody_wiggle = float(np.tanh(_MELODY_GAIN * (self._melody_fast - self._melody_slow)))
+        nozzle = gate * (
+            _DANCE_FRAC * self._dance_pos
+            + _MELODY_FRAC * melody_wiggle
+            + _WIGGLE_FRAC * wiggle
+        )
 
         # Push the nozzle into the history at a fixed rate in *time*, so the
         # buffer holds the same stretch of music however often it is fed — and
@@ -570,6 +668,40 @@ class SillyScopeScene:
         self._und_phase[1] += _UND_DRIFT2 * dt
         self._marble_phase[0] += _MARBLE_DRIFT_X * dt
         self._marble_phase[1] += _MARBLE_DRIFT_S * dt
+
+    def _advance_dance(self, beat: float | None) -> None:
+        """Step the source's choreography along the beat grid.
+
+        A turning point fires once per crossed _TURN_EVERY boundary (guarded
+        by ``_last_turn``, so the clock's occasional small phase corrections
+        cannot re-fire one), the boundary's rank picks how far and how fast,
+        the direction alternates, and the melody's presence opens the swing
+        up. Between turning points the position eases with a smoothstep in
+        beat space, so the motion itself is beat-locked.
+        """
+        if beat is None:
+            return
+        boundary = int(np.floor(beat / _TURN_EVERY)) * _TURN_EVERY
+        if boundary > self._last_turn:
+            self._last_turn = boundary
+            if boundary % 32 == 0:
+                rank = 32
+            elif boundary % 16 == 0:
+                rank = 16
+            elif boundary % 8 == 0:
+                rank = 8
+            else:
+                rank = 4
+            self._dance_dir = -self._dance_dir
+            openness = float(np.clip(self._melody_fast / _MELODY_KNEE, 0.0, 1.0))
+            self._dance_from = self._dance_pos
+            self._dance_target = self._dance_dir * _TURN_AMP[rank] * (0.55 + 0.45 * openness)
+            self._dance_start = float(beat)
+            self._dance_span = _TURN_BEATS[rank]
+        if self._dance_span > 0.0:
+            t = float(np.clip((beat - self._dance_start) / self._dance_span, 0.0, 1.0))
+            eased = t * t * (3.0 - 2.0 * t)
+            self._dance_pos = self._dance_from + (self._dance_target - self._dance_from) * eased
 
     def _sample_history(self, values: np.ndarray, width: int) -> np.ndarray:
         """A history -> one value per column, advected.

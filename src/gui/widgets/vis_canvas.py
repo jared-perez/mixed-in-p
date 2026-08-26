@@ -303,6 +303,7 @@ class VisRenderer:
             self._analog_scope.reset()
         elif mode == "silly_scope":
             self._silly_scope.reset()
+            self._clock.reset()
         elif mode == "loop_tunnel":
             self._loop_tunnel.reset()
         elif mode == "beat_tunnel":
@@ -355,8 +356,12 @@ class VisRenderer:
                 # Down here rather than beside the oscilloscope on purpose: the
                 # scene wants band heights and the kick pulse, not raw samples,
                 # so it goes through _band_heights like fire and the fractal.
-                # Returned, never assigned, like the tunnels.
-                return self._silly_scope.render(heights, self._pulse)
+                # Returned, never assigned, like the tunnels. The clock tick is
+                # what makes the source's dance beat-locked — same tempo
+                # plumbing as the beat tunnel (tag BPM via set_track_tempo,
+                # evidence dropped on seek), the scene just reads the phase.
+                self._clock.tick(self._kick_flux)
+                return self._silly_scope.render(heights, self._pulse, self._clock.phase)
             if self._mode == "loop_tunnel":
                 # Returned directly, never assigned to self._image: the
                 # scope/spectrum renderers paint into that at _W x _H, and
@@ -397,9 +402,11 @@ class VisRenderer:
         # Hann coherent gain is 0.5 → a full-scale sine peaks its bin at N/4.
         spectrum /= FFT_SIZE / 4.0
         self._update_pulse(spectrum)
-        if self._mode == "beat_tunnel":
-            # Only here: a log1p over 1025 bins is 30 µs, which is nothing,
-            # but it is 30 µs of tax on five modes that have no use for it.
+        if self._mode in ("beat_tunnel", "silly_scope"):
+            # Only the modes with a beat clock: a log1p over 1025 bins is
+            # 30 µs, which is nothing, but it is 30 µs of tax on modes that
+            # have no use for it. The silly scope joined when its source
+            # started dancing on the beat grid.
             self._update_kick_flux(spectrum)
         db = 20.0 * np.log10(spectrum + 1e-9)
         heights = np.array([db[s].max() for s in self._band_slices])
