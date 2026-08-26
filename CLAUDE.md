@@ -301,6 +301,24 @@ UI conventions for each language.
   pt_BR, …); use native script for Cyrillic/non-Latin (ru: слайсер/сэмпл) so a
   Cyrillic UI stays consistent. (NB: "Sample Rate"/"Sample rate" is the DSP term
   and IS translated normally — it is not the producer "sample".)
+- **`pipeline`**: the loanword in every Latin-script language (es/fr/it/pt_BR),
+  `пайплайн` in ru, `流水线` in zh_CN, `potok` in pl. It shipped as
+  "chain" in six languages (es *cadena*, fr *chaîne*, it *catena*, pt_BR
+  *cadeia*, ru *цепочка*, pl *łańcuch*) and that was **wrong in three separate
+  ways**, which is why it must not be "corrected" back. A chain is rigid links,
+  so it loses the liquid-through-a-pipe image the feature is named for; *cadena*
+  and *catena* read first as **assembly line** (*cadena de montaje*), which is
+  the factory connotation rather than the flow one; and pt_BR *cadeia*
+  colloquially means **jail**. All four languages' own tech communities use
+  "pipeline" untranslated anyway. The decisive one is the **surf** reading —
+  Banzai Pipeline keeps its English name in every one of these languages, and
+  the step toggle is literally the tsunami hazard sign, so translating the word
+  is what breaks the symbol. Two deliberate exceptions: **pl `potok`**, which
+  beats the loanword because it is simultaneously the established Polish CS
+  term *and* literally a stream of water; and **zh_CN `流水线`**, kept because
+  its characters already read "flowing-water line". ru's button is the noun
+  `Запуск пайплайна`, not the infinitive the rule above asks for, because
+  `Запустить пайплайн` measures 164px against the button's 160px minimum.
 - **`Send To`**: retired from the UI (the step toggles replaced it); the rule
   it illustrated stands for any such phrase — localize in ALL languages
   (es "Enviar a", fr "Envoyer vers", ru "Отправить в") rather than leaving a

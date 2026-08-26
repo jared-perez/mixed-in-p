@@ -9,7 +9,10 @@ looking (see the W2 note in the handoff).
 from __future__ import annotations
 
 from PySide6.QtCore import QPoint, Qt
+from PySide6.QtGui import QColor, QImage
+from PySide6.QtWidgets import QWidget
 
+from src.gui.styles.theme import Theme
 from src.gui.widgets.pipeline_toggle import PipelineToggle
 
 
@@ -151,3 +154,91 @@ def test_disabling_a_checked_toggle_dims_it(qtbot):
     lit = _fill_color(toggle)
     toggle.setEnabled(False)
     assert _fill_color(toggle) != lit
+
+
+# The panel behind the toggle, as a colour the widget never paints, so any
+# pixel still wearing it is one the toggle deliberately left alone.
+_BEHIND = "#ff00ff"
+
+
+def _on_a_panel(toggle: PipelineToggle) -> QImage:
+    """The toggle drawn over `_BEHIND`, the way it sits on a real panel.
+
+    `DrawChildren` alone on purpose: the default flags paint the palette's
+    window colour first, which would fill the negative space with something
+    and make the test below pass against a toggle that fills it too.
+    """
+    image = QImage(toggle.size(), QImage.Format.Format_ARGB32)
+    image.fill(QColor(_BEHIND))
+    toggle.render(image, QPoint(), toggle.rect(), QWidget.RenderFlag.DrawChildren)
+    return image
+
+
+def test_an_unchecked_toggle_leaves_its_field_transparent(qtbot):
+    """Unchecked is a line drawing: rim and wave only, panel showing through.
+
+    Sampled above the crest and inside the rim, which is field in both states.
+    """
+    toggle = PipelineToggle(PipelineToggle.SIZE_PANEL)
+    qtbot.addWidget(toggle)
+    assert _on_a_panel(toggle).pixelColor(14, 8).name() == _BEHIND
+    toggle.setChecked(True)
+    assert _on_a_panel(toggle).pixelColor(14, 8) == QColor(Theme.NEON_YELLOW)
+
+
+def _field_regions(image: QImage) -> int:
+    """How many separate patches the lit field breaks into.
+
+    A pixel counts as field where it leans nearer the accent than the ink,
+    which is the call the eye makes — insisting on a fully saturated pixel
+    would fail on the antialiased channel that legitimately carries the two
+    halves together at this size.
+    """
+    accent, ink = QColor(Theme.NEON_YELLOW), QColor(Theme.BG_DARK)
+
+    def gap(colour: QColor, other: QColor) -> int:
+        return (
+            (colour.red() - other.red()) ** 2
+            + (colour.green() - other.green()) ** 2
+            + (colour.blue() - other.blue()) ** 2
+        )
+
+    def is_field(x: int, y: int) -> bool:
+        colour = image.pixelColor(x, y)
+        return gap(colour, accent) < gap(colour, ink)
+
+    width, height = image.width(), image.height()
+    seen: set[tuple[int, int]] = set()
+    regions = 0
+    for y in range(height):
+        for x in range(width):
+            if (x, y) in seen or not is_field(x, y):
+                continue
+            regions += 1
+            stack = [(x, y)]
+            seen.add((x, y))
+            while stack:
+                cx, cy = stack.pop()
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if 0 <= nx < width and 0 <= ny < height and (nx, ny) not in seen:
+                        if is_field(nx, ny):
+                            seen.add((nx, ny))
+                            stack.append((nx, ny))
+    return regions
+
+
+def test_the_lit_field_is_one_shape_at_both_sizes(qtbot):
+    """The barrel has to stay open, and at 18px that is not free.
+
+    The field is connected only through the channel between the wave's lip
+    and the right-hand rim. Drawn at the artwork's own proportions that
+    channel is about 1.4px on the header mini, so a checked toggle came out
+    as two unrelated blobs; `_WAVE_SQUEEZE` is what reopens it, and 0.88 is
+    the least distortion that does (measured at 18/20/22/28px). Without it
+    this reports 3 regions at 18px and 2 at 20px.
+    """
+    for size in (PipelineToggle.SIZE_MINI, PipelineToggle.SIZE_PANEL):
+        toggle = PipelineToggle(size)
+        qtbot.addWidget(toggle)
+        toggle.setChecked(True)
+        assert _field_regions(_on_a_panel(toggle)) == 1, f"broken up at {size}px"

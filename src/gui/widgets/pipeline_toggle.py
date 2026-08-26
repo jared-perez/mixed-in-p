@@ -2,9 +2,18 @@
 
 One of these sits in the Rename, Convert and Analyze panels, and three minis
 mirror them in the header. Checked means "this step runs"; unchecked means a
-run passes the step by entirely. The shape is a hazard sign with a wave
-through it — symbol only, no label, so the tooltip carries the meaning and
-nothing has to be re-measured in eleven languages.
+run passes the step by entirely. The shape is the tsunami hazard sign — a
+barrelling wave in a rounded triangle, which is the pipeline's other reading
+(the surf break, not the plumbing) and the one thing about the word that
+survives into all eleven languages. Symbol only, no label, so the tooltip
+carries the meaning and nothing has to be re-measured per language.
+
+The sign is drawn as *ink and negative space* rather than as a fill with a
+glyph on top: the ink is the rim plus the wave, and everything the reference
+artwork paints yellow is left alone. Unchecked that negative space is the
+panel behind, so the toggle reads as a line drawing; checked it fills with the
+accent and the sign lights up whole. One path drives both states, so the two
+cannot drift apart.
 
 Self-painted from a ``QAbstractButton`` rather than styled from QSS: the shape
 is not a box, and the global button padding inside a box this small leaves no
@@ -18,7 +27,13 @@ from __future__ import annotations
 import math
 
 from PySide6.QtCore import QT_TRANSLATE_NOOP, QCoreApplication, QPointF, QSize, Qt
-from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen, QPolygonF
+from PySide6.QtGui import (
+    QColor,
+    QPainter,
+    QPainterPath,
+    QPainterPathStroker,
+    QPolygonF,
+)
 from PySide6.QtWidgets import QAbstractButton
 
 from ..convert_pipeline import STEP_ANALYZE, STEP_CONVERT, STEP_RENAME
@@ -45,6 +60,55 @@ STEP_TOOLTIPS = {
         QT_TRANSLATE_NOOP("PipelineToggle", "Leave Analyze out of pipeline runs"),
     ),
 }
+
+# Where the wave meets the sign's field, traced from the artwork in
+# spitball/mip-pip/evidence/wave-hazard.png rather than eyeballed: these are
+# the boundary between that sign's yellow region and its black wave, run
+# through Douglas-Peucker at 0.26% of the sign's width, in coordinates
+# normalized to the sign's bounding box (x and y both 0..1, y downward).
+#
+# It reads right to left: it starts on the right-hand edge, sweeps left along
+# the underside of the barrel, spirals in to the lip's tip at the middle pair,
+# then comes back out over the crest to the left-hand edge. Both ends are
+# extrapolated past the sign in `_wave_region`, so the rim can be any
+# thickness without the curve needing to be re-traced to meet it.
+_WAVE_EDGE = (
+    (0.864, 0.833),
+    (0.767, 0.850),
+    (0.681, 0.847),
+    (0.600, 0.825),
+    (0.562, 0.805),
+    (0.537, 0.784),
+    (0.518, 0.759),
+    (0.508, 0.737),
+    (0.501, 0.698),
+    (0.508, 0.653),
+    (0.531, 0.620),
+    (0.558, 0.603),
+    (0.592, 0.597),
+    (0.636, 0.608),
+    (0.674, 0.635),
+    (0.683, 0.628),
+    (0.650, 0.565),
+    (0.613, 0.527),
+    (0.575, 0.503),
+    (0.513, 0.486),
+    (0.436, 0.490),
+    (0.358, 0.514),
+    (0.273, 0.557),
+)
+
+# The one place this deviates from the artwork, and it is a legibility fix
+# rather than a taste one. The field is a single connected region only through
+# the channel between the wave's lip and the right-hand rim, which the artwork
+# draws at ~8% of the width — 1.4px on the 18px header mini, i.e. gone once
+# antialiasing has had it. The checked toggle then reads as two unrelated
+# yellow blobs instead of a barrel. Squeezing the wave horizontally toward the
+# point where it meets the left edge widens that channel and leaves everything
+# else where it was; measured across 18/22/28px, 0.88 is where the mini holds
+# together without the panel-size triangle looking cramped.
+_WAVE_SQUEEZE = 0.88
+_WAVE_PIVOT = 0.30
 
 
 class PipelineToggle(QAbstractButton):
@@ -134,8 +198,75 @@ class PipelineToggle(QAbstractButton):
 
     def hitButton(self, pos) -> bool:
         # Only the triangle answers to the mouse — the corners it leaves empty
-        # belong to whatever is behind it, not to this button.
+        # belong to whatever is behind it, not to this button. Note this is the
+        # whole triangle, not the ink: the field inside the rim is part of the
+        # button even when nothing is painted there.
         return self.triangle().containsPoint(QPointF(pos), Qt.FillRule.OddEvenFill)
+
+    def _rim(self) -> float:
+        """How thick the sign's border is.
+
+        6% of the width in the reference artwork, floored so that the mini in
+        the header does not come out at a single hairline pixel.
+        """
+        return max(1.1, self._size * 0.065)
+
+    def _sign(self) -> QPainterPath:
+        return self._rounded(list(self.triangle()), radius=self._size * 0.16)
+
+    def _wave_region(self) -> QPainterPath:
+        """The wave, closed into a region that reaches well past the sign.
+
+        `_WAVE_EDGE` only describes where the wave meets the field; the rest of
+        this shape is deliberately oversized so the caller can clip it against
+        whatever the current rim leaves. Both ends carry on along their last
+        segment rather than stopping on the edge they were traced against —
+        a thicker rim then simply eats more of the curve, instead of leaving a
+        sliver of field between the wave and the border.
+        """
+        inset = 1.0
+        w = float(self.width())
+        h = float(self.height())
+        span_x, span_y = w - 2.0 * inset, h - 2.0 * inset
+        points = [
+            QPointF(
+                inset + (_WAVE_PIVOT + (nx - _WAVE_PIVOT) * _WAVE_SQUEEZE) * span_x,
+                inset + ny * span_y,
+            )
+            for nx, ny in _WAVE_EDGE
+        ]
+
+        reach = max(w, h)
+
+        def onward(origin: QPointF, tip: QPointF) -> QPointF:
+            """`reach` px past `tip`, heading away from `origin`."""
+            dx, dy = tip.x() - origin.x(), tip.y() - origin.y()
+            length = math.hypot(dx, dy) or 1.0
+            return QPointF(tip.x() + dx / length * reach, tip.y() + dy / length * reach)
+
+        polygon = QPolygonF([
+            onward(points[1], points[0]),
+            *points,
+            onward(points[-2], points[-1]),
+            QPointF(-reach, h + reach),
+            QPointF(w + reach, h + reach),
+        ])
+        path = QPainterPath()
+        path.addPolygon(polygon)
+        path.closeSubpath()
+        return path
+
+    def _field(self) -> QPainterPath:
+        """The sign's negative space: inside the rim, above the wave."""
+        sign = self._sign()
+        stroker = QPainterPathStroker()
+        stroker.setWidth(self._rim() * 2.0)
+        stroker.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
+        # A band centred on the outline, subtracted, insets every edge evenly —
+        # scaling the triangle about its centroid would not, since its three
+        # edges sit at different distances from it.
+        inner = sign.subtracted(stroker.createStroke(sign))
+        return inner.subtracted(self._wave_region())
 
     # --------------------------------------------------------------- painting
 
@@ -162,21 +293,6 @@ class PipelineToggle(QAbstractButton):
         path.closeSubpath()
         return path
 
-    def _wave(self) -> QPainterPath:
-        """One period of a sine, sitting where the triangle is widest."""
-        w = float(self.width())
-        h = float(self.height())
-        span = w * 0.44
-        amp = h * 0.10
-        cx, cy = w / 2.0, h * 0.66
-        path = QPainterPath()
-        steps = 16
-        for i in range(steps + 1):
-            t = i / steps
-            point = QPointF(cx - span / 2.0 + span * t, cy - amp * math.sin(2 * math.pi * t))
-            path.moveTo(point) if i == 0 else path.lineTo(point)
-        return path
-
     @staticmethod
     def _dim(color: QColor, amount: float = 0.55) -> QColor:
         """`color` faded toward the panel behind it."""
@@ -187,53 +303,49 @@ class PipelineToggle(QAbstractButton):
             int(color.blue() + (back.blue() - color.blue()) * amount),
         )
 
-    def _colors(self) -> tuple[QColor, QColor, QColor]:
-        """(fill, border, glyph) for the current state."""
+    def _colors(self) -> tuple[QColor | None, QColor]:
+        """(field, ink) for the current state.
+
+        A `None` field means "leave the negative space alone", which is what
+        makes an unchecked toggle a line drawing on the panel rather than a
+        second box sitting on it.
+        """
         if not self.isEnabled():
             # A disabled toggle still has to say which way it is set: these are
             # greyed out for the length of a run, and an ON step that reads as
             # OFF the whole time it is running is worse than no toggle at all.
             if self.isChecked():
-                fill = self._dim(QColor(Theme.NEON_YELLOW))
-                return fill, fill, self._dim(QColor(Theme.BG_DARK), 0.35)
-            return (
-                QColor(Theme.BG_MEDIUM),
-                QColor(Theme.CHROME_DARK),
-                QColor(Theme.TEXT_DISABLED),
-            )
+                return (
+                    self._dim(QColor(Theme.NEON_YELLOW)),
+                    self._dim(QColor(Theme.BG_DARK), 0.35),
+                )
+            return None, QColor(Theme.TEXT_DISABLED)
         hovered = self.underMouse()
         if self.isChecked():
             if self.isDown():
-                fill = QColor(Theme.ACCENT_PRESSED)
+                field = QColor(Theme.ACCENT_PRESSED)
             elif hovered:
-                fill = QColor(Theme.ACCENT_HOVER)
+                field = QColor(Theme.ACCENT_HOVER)
             else:
-                fill = QColor(Theme.NEON_YELLOW)
-            return fill, fill, QColor(Theme.BG_DARK)
-        return (
-            QColor(Theme.BG_MEDIUM),
-            QColor(Theme.CHROME if hovered else Theme.CHROME_DARK),
-            QColor(Theme.TEXT_PRIMARY if hovered else Theme.TEXT_SECONDARY),
+                field = QColor(Theme.NEON_YELLOW)
+            return field, QColor(Theme.BG_DARK)
+        return None, QColor(
+            Theme.TEXT_PRIMARY if (hovered or self.isDown()) else Theme.TEXT_SECONDARY
         )
 
     def paintEvent(self, event) -> None:  # noqa: ARG002
-        fill, border, glyph = self._colors()
-        stroke = max(1.4, self._size / 16.0)
+        field_color, ink = self._colors()
+        sign = self._sign()
+        field = self._field()
         painter = QPainter(self)
         try:
             painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-
-            shape = self._rounded(list(self.triangle()), radius=self._size * 0.16)
-            painter.setBrush(fill)
-            painter.setPen(QPen(border, 1.0))
-            painter.drawPath(shape)
-
-            pen = QPen(glyph, stroke)
-            pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-            pen.setJoinStyle(Qt.PenJoinStyle.RoundJoin)
-            painter.setPen(pen)
-            painter.setBrush(Qt.BrushStyle.NoBrush)
-            painter.drawPath(self._wave())
+            painter.setPen(Qt.PenStyle.NoPen)
+            if field_color is not None:
+                painter.fillPath(field, field_color)
+            # The ink is whatever the field does not claim, so the rim and the
+            # wave are one shape and cannot come out at different weights.
+            painter.fillPath(sign.subtracted(field), ink)
         finally:
             painter.end()
 
