@@ -169,10 +169,15 @@ _CENTER_SMOOTH_SECONDS = 0.06
 _BASE_HALF_FRAC = 0.17
 # The twist: the sheet turns edge-on and back, which is the reference's
 # pinch-and-flare. Waves across the window, plus a slow drift of its own so the
-# pattern never repeats exactly against the flow.
-_TWIST_WAVES = 1.35
+# pattern never repeats exactly against the flow. |cos| pinches TWICE per
+# wave, so the on-screen pinch count is 2x this number — at the original
+# 1.35 that was ~2.7 evenly spaced pinches, which read fine crossing in 10 s
+# and read as beads on a string at 0.5 s. Fewer and shallower: about one
+# pinch on screen, and the sheet keeps most of its width through it, so the
+# silhouette is a long gently curved protrusion rather than a bulb.
+_TWIST_WAVES = 0.45
 _TWIST_DRIFT = 0.16  # radians per second
-_TWIST_NARROW = 0.55  # half-width multiplier where the sheet is fully edge-on
+_TWIST_NARROW = 0.75  # half-width multiplier where the sheet is fully edge-on
 # How flat silence leaves it: the multiplier on the half-width with no music.
 _QUIET_WIDTH = 0.42
 
@@ -187,8 +192,11 @@ _ROLL_START = 0.70
 _ROLL_HEIGHT = 0.30
 
 _TILT = 0.44  # how far the twist tips the sheet across its width
-_UND1 = (1.7, 0.42, 0.105)  # (waves across the window, waves across s, weight)
-_UND2 = (2.9, -0.70, 0.072)
+# Stretched along the flow with the twist (they were 1.7 and 2.9): pools much
+# shorter than the window slide past as repeating blobs at this speed, which
+# is the same bead-reading the flare had.
+_UND1 = (0.9, 0.42, 0.105)  # (waves across the window, waves across s, weight)
+_UND2 = (1.6, -0.70, 0.072)
 _UND_DRIFT1 = 0.055  # window-widths per second, on top of the flow
 _UND_DRIFT2 = -0.038
 _PITCH = 0.22  # how far the centerline's own slope tips the sheet
