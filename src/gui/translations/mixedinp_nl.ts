@@ -2181,68 +2181,67 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1778"/>
+        <location filename="../widgets/player_panel.py" line="1786"/>
         <source>Player</source>
         <translation>Speler</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1810"/>
-        <location filename="../widgets/player_panel.py" line="3136"/>
+        <location filename="../widgets/player_panel.py" line="1818"/>
+        <location filename="../widgets/player_panel.py" line="3144"/>
         <source>Search all playlists…</source>
         <translation>In alle playlists zoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1829"/>
+        <location filename="../widgets/player_panel.py" line="1837"/>
         <source>This playlist</source>
         <translation>Deze playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1830"/>
+        <location filename="../widgets/player_panel.py" line="1838"/>
         <source>All playlists</source>
         <translation>Alle playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1855"/>
+        <location filename="../widgets/player_panel.py" line="1863"/>
         <source>Choose a visualization</source>
         <translation>Kies een visualisatie</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1889"/>
+        <location filename="../widgets/player_panel.py" line="1897"/>
         <source>Visuals off</source>
         <translation>Geen visualisatie</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1882"/>
+        <location filename="../widgets/player_panel.py" line="1890"/>
         <source>Backdrop waveform</source>
         <translation>Achtergrond: golfvorm</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1881"/>
         <source>Backdrop oscilloscope</source>
-        <translation>Achtergrond: oscilloscoop</translation>
+        <translation type="vanished">Achtergrond: oscilloscoop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1879"/>
+        <location filename="../widgets/player_panel.py" line="1887"/>
         <source>Backdrop spectrum</source>
         <translation>Achtergrond: spectrum</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1883"/>
+        <location filename="../widgets/player_panel.py" line="1891"/>
         <source>Backdrop fire</source>
         <translation>Achtergrond: vuur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1877"/>
+        <location filename="../widgets/player_panel.py" line="1885"/>
         <source>Backdrop fractal</source>
         <translation>Achtergrond: fractal</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1886"/>
+        <location filename="../widgets/player_panel.py" line="1894"/>
         <source>Popout oscilloscope</source>
         <translation>Venster: oscilloscoop</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1887"/>
+        <location filename="../widgets/player_panel.py" line="1895"/>
         <source>Popout spectrum bars</source>
         <translation>Venster: spectrumbalken</translation>
     </message>
@@ -2251,174 +2250,180 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Venster: vuur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1884"/>
+        <location filename="../widgets/player_panel.py" line="1892"/>
         <source>Popout fractal</source>
         <translation>Venster: fractal</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1922"/>
+        <location filename="../widgets/player_panel.py" line="1930"/>
         <source>Edit Lock</source>
         <translation>Bewerkingsvergrendeling</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1926"/>
+        <location filename="../widgets/player_panel.py" line="1934"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Metadata bewerken in de afspeellijst vergrendelen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1384"/>
-        <location filename="../widgets/player_panel.py" line="3253"/>
+        <location filename="../widgets/player_panel.py" line="1392"/>
+        <location filename="../widgets/player_panel.py" line="3261"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1385"/>
+        <location filename="../widgets/player_panel.py" line="1393"/>
         <source>Filename</source>
         <translation>Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1386"/>
+        <location filename="../widgets/player_panel.py" line="1394"/>
         <source>Artist</source>
         <translation>Artiest</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1387"/>
+        <location filename="../widgets/player_panel.py" line="1395"/>
         <source>Title</source>
         <translation>Titel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1388"/>
+        <location filename="../widgets/player_panel.py" line="1396"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1389"/>
+        <location filename="../widgets/player_panel.py" line="1397"/>
         <source>Key</source>
         <translatorcomment>Translated as &apos;Toonsoort&apos; (musical key), per glossary — not &apos;sleutel&apos;/&apos;toets&apos;.</translatorcomment>
         <translation>Toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1390"/>
+        <location filename="../widgets/player_panel.py" line="1398"/>
         <source>Comment</source>
         <translation>Opmerking</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1391"/>
+        <location filename="../widgets/player_panel.py" line="1399"/>
         <source>Duration</source>
         <translation>Duur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1392"/>
+        <location filename="../widgets/player_panel.py" line="1400"/>
         <source>Year</source>
         <translation>Jaar</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1393"/>
+        <location filename="../widgets/player_panel.py" line="1401"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1394"/>
+        <location filename="../widgets/player_panel.py" line="1402"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1395"/>
+        <location filename="../widgets/player_panel.py" line="1403"/>
         <source>Track #</source>
         <translation>Track #</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1396"/>
+        <location filename="../widgets/player_panel.py" line="1404"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1397"/>
+        <location filename="../widgets/player_panel.py" line="1405"/>
         <source>Bitrate</source>
         <translation>Bitrate</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1398"/>
+        <location filename="../widgets/player_panel.py" line="1406"/>
         <source>Energy</source>
         <translation>Energie</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1399"/>
+        <location filename="../widgets/player_panel.py" line="1407"/>
         <source>Art</source>
         <translation>Artwork</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1400"/>
+        <location filename="../widgets/player_panel.py" line="1408"/>
         <source>Date Added</source>
         <translation>Toegevoegd op</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1401"/>
+        <location filename="../widgets/player_panel.py" line="1409"/>
         <source>Date Created</source>
         <translation>Aanmaakdatum</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1795"/>
+        <location filename="../widgets/player_panel.py" line="1803"/>
         <source>Show this cover in the sidebar</source>
         <translation>Deze hoes in de zijbalk tonen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1880"/>
+        <location filename="../widgets/player_panel.py" line="1888"/>
         <source>Backdrop wormhole</source>
         <translation>Achtergrond: wormgat</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1878"/>
+        <location filename="../widgets/player_panel.py" line="1886"/>
         <source>Backdrop tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Achtergrond: tunneljacht</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1888"/>
+        <location filename="../widgets/player_panel.py" line="1896"/>
         <source>Popout wormhole</source>
         <translation>Venster: wormgat</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1885"/>
+        <location filename="../widgets/player_panel.py" line="1893"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Venster: tunneljacht</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2014"/>
-        <location filename="../widgets/player_panel.py" line="3250"/>
+        <location filename="../widgets/player_panel.py" line="1889"/>
+        <source>Backdrop Silly Scope</source>
+        <translatorcomment>Glossary ruling: “Silly Scope” stays in English in every language. It is a proper name and a pun on “oscilloscope”, the same class as the product name “Mixed in P”, and translating it loses the joke without gaining a word anyone searches for. The “Backdrop” half is translated exactly as its six sibling entries already do.</translatorcomment>
+        <translation>Achtergrond: Silly Scope</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="2022"/>
+        <location filename="../widgets/player_panel.py" line="3258"/>
         <source>Playlists</source>
         <translation>Playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2121"/>
+        <location filename="../widgets/player_panel.py" line="2129"/>
         <source>Previous</source>
         <translation>Vorige</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2132"/>
+        <location filename="../widgets/player_panel.py" line="2140"/>
         <source>Play / Pause  (Space)</source>
         <translation>Afspelen / Pauze  (Spatie)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2139"/>
+        <location filename="../widgets/player_panel.py" line="2147"/>
         <source>Stop</source>
         <translation>Stoppen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2146"/>
+        <location filename="../widgets/player_panel.py" line="2154"/>
         <source>Next</source>
         <translation>Volgende</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2164"/>
-        <location filename="../widgets/player_panel.py" line="3093"/>
-        <location filename="../widgets/player_panel.py" line="3098"/>
+        <location filename="../widgets/player_panel.py" line="2172"/>
+        <location filename="../widgets/player_panel.py" line="3101"/>
+        <location filename="../widgets/player_panel.py" line="3106"/>
         <source>Save Playlist</source>
         <translation>Playlist opslaan</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2102"/>
+        <location filename="../widgets/player_panel.py" line="2110"/>
         <source>Vol</source>
         <translatorcomment>Kept &apos;Vol&apos; (volume abbreviation); identical short form works in NL.</translatorcomment>
         <translation>Vol</translation>
@@ -2428,121 +2433,121 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Selectie verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2169"/>
+        <location filename="../widgets/player_panel.py" line="2177"/>
         <source>Clear Playlist</source>
         <translation>Playlist wissen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2209"/>
+        <location filename="../widgets/player_panel.py" line="2217"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>Sleep dit naar een playlist om de spelende track toe te voegen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2228"/>
+        <location filename="../widgets/player_panel.py" line="2236"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>De playlist openen waaruit de huidige track speelt</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2467"/>
-        <location filename="../widgets/player_panel.py" line="3015"/>
-        <location filename="../widgets/player_panel.py" line="3080"/>
+        <location filename="../widgets/player_panel.py" line="2475"/>
+        <location filename="../widgets/player_panel.py" line="3023"/>
+        <location filename="../widgets/player_panel.py" line="3088"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2975"/>
+        <location filename="../widgets/player_panel.py" line="2983"/>
         <source>Playing: {0}</source>
         <translation>Speelt: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3025"/>
+        <location filename="../widgets/player_panel.py" line="3033"/>
         <source>In Playlist: {0}</source>
         <translation>In playlist: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3077"/>
+        <location filename="../widgets/player_panel.py" line="3085"/>
         <source>Search: {0}</source>
         <translation>Zoeken: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3094"/>
+        <location filename="../widgets/player_panel.py" line="3102"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>De playlist is leeg: voeg eerst tracks toe.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3098"/>
+        <location filename="../widgets/player_panel.py" line="3106"/>
         <source>Playlist name:</source>
         <translation>Naam van playlist:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3133"/>
+        <location filename="../widgets/player_panel.py" line="3141"/>
         <source>Search scope: {0}</source>
         <translation>Zoekbereik: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3138"/>
+        <location filename="../widgets/player_panel.py" line="3146"/>
         <source>Search this playlist…</source>
         <translation>In deze playlist zoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3161"/>
+        <location filename="../widgets/player_panel.py" line="3169"/>
         <source>No matching tracks</source>
         <translation>Geen overeenkomende tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3629"/>
+        <location filename="../widgets/player_panel.py" line="3637"/>
         <source>File not found:
 {0}</source>
         <translation>Bestand niet gevonden:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3804"/>
+        <location filename="../widgets/player_panel.py" line="3812"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Tracks verbergen die passen bij de spelende track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3806"/>
+        <location filename="../widgets/player_panel.py" line="3814"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Tracks tonen die passen bij de spelende track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4128"/>
+        <location filename="../widgets/player_panel.py" line="4136"/>
         <source>{0}+ results</source>
         <translation>{0}+ resultaten</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4131"/>
+        <location filename="../widgets/player_panel.py" line="4139"/>
         <source>{0} result</source>
         <translation>{0} resultaat</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4133"/>
+        <location filename="../widgets/player_panel.py" line="4141"/>
         <source>{0} results</source>
         <translation>{0} resultaten</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4137"/>
+        <location filename="../widgets/player_panel.py" line="4145"/>
         <source>{0} track</source>
         <translation>{0} track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4139"/>
+        <location filename="../widgets/player_panel.py" line="4147"/>
         <source>{0} tracks</source>
         <translation>{0} tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4724"/>
+        <location filename="../widgets/player_panel.py" line="4732"/>
         <source>Reset Columns</source>
         <translation>Kolommen herstellen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5439"/>
+        <location filename="../widgets/player_panel.py" line="5447"/>
         <source>“{0}” has moved.</source>
         <translation>‘{0}’ is verplaatst.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5441"/>
+        <location filename="../widgets/player_panel.py" line="5449"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n van de geselecteerde bestanden is verplaatst.</numerusform>
@@ -2550,87 +2555,87 @@ of klik op “Artwork toevoegen…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5444"/>
+        <location filename="../widgets/player_panel.py" line="5452"/>
         <source>File Has Moved</source>
         <translation>Bestand is verplaatst</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5448"/>
+        <location filename="../widgets/player_panel.py" line="5456"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Het staat niet meer op de opgeslagen locatie en kan dus niet aan een playlist worden toegevoegd of eruit worden gesleept. Een track die al speelt, blijft spelen: die is in het geheugen geladen voordat het bestand werd verplaatst.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5453"/>
+        <location filename="../widgets/player_panel.py" line="5461"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Klik met de rechtermuisknop op de track en kies ‘Ontbrekend bestand zoeken…’</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5600"/>
+        <location filename="../widgets/player_panel.py" line="5608"/>
         <source>Locate Missing File…</source>
         <translation>Ontbrekend bestand zoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5602"/>
+        <location filename="../widgets/player_panel.py" line="5610"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5603"/>
+        <location filename="../widgets/player_panel.py" line="5611"/>
         <source>Open in Metadata Panel</source>
         <translatorcomment>Reviewed (nl pass): no article surfaces here; &apos;paneel&apos; is het - confirmed.</translatorcomment>
         <translation>Openen in Metadata-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5604"/>
+        <location filename="../widgets/player_panel.py" line="5612"/>
         <source>Reload Metadata from File</source>
         <translation>Metadata opnieuw laden uit bestand</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5608"/>
+        <location filename="../widgets/player_panel.py" line="5616"/>
         <source>Look Up Online…</source>
         <translation>Online opzoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5610"/>
+        <location filename="../widgets/player_panel.py" line="5618"/>
         <source>Remove from Playlist</source>
         <translation>Uit playlist verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5666"/>
-        <location filename="../widgets/player_panel.py" line="5694"/>
-        <location filename="../widgets/player_panel.py" line="5794"/>
-        <location filename="../widgets/player_panel.py" line="5867"/>
-        <location filename="../widgets/player_panel.py" line="5897"/>
+        <location filename="../widgets/player_panel.py" line="5674"/>
+        <location filename="../widgets/player_panel.py" line="5702"/>
+        <location filename="../widgets/player_panel.py" line="5802"/>
+        <location filename="../widgets/player_panel.py" line="5875"/>
+        <location filename="../widgets/player_panel.py" line="5905"/>
         <source>Look Up Online</source>
         <translation>Online opzoeken</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5668"/>
+        <location filename="../widgets/player_panel.py" line="5676"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>Geen van de geselecteerde nummers heeft een artiest of titel om mee te zoeken, en de bestandsnamen geven er ook geen.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5688"/>
+        <location filename="../widgets/player_panel.py" line="5696"/>
         <source>Looking up track details…</source>
         <translation>Bezig met opzoeken van nummergegevens…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5689"/>
+        <location filename="../widgets/player_panel.py" line="5697"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5719"/>
+        <location filename="../widgets/player_panel.py" line="5727"/>
         <source>Looking up {0} of {1}…</source>
         <translation>Bezig met {0} van {1}…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5727"/>
+        <location filename="../widgets/player_panel.py" line="5735"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Wachten op de aanvraaglimiet van Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5890"/>
+        <location filename="../widgets/player_panel.py" line="5898"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n nummer had geen overeenkomst.</numerusform>
@@ -2638,7 +2643,7 @@ of klik op “Artwork toevoegen…”</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5893"/>
+        <location filename="../widgets/player_panel.py" line="5901"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n nummer bijgewerkt.</numerusform>
@@ -3069,12 +3074,12 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>RenamePanel</name>
     <message>
-        <location filename="../widgets/rename_panel.py" line="133"/>
+        <location filename="../widgets/rename_panel.py" line="145"/>
         <source>Rename</source>
         <translation>Hernoemen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="136"/>
+        <location filename="../widgets/rename_panel.py" line="148"/>
         <source>Trim characters from beginning and end of ALL filenames below. Add text to the start (Prepend) or end (Append) of ALL the filenames.</source>
         <translatorcomment>Translated Prepend-&gt;Prefix and Append-&gt;Suffix for clarity, matching the more natural NL UI terms used elsewhere.</translatorcomment>
         <translation>Kort tekens in aan het begin en einde van ALLE bestandsnamen hieronder. Voeg tekst toe aan het begin (Prefix) of einde (Suffix) van ALLE bestandsnamen.</translation>
@@ -3084,112 +3089,112 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Bewerkingen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="154"/>
+        <location filename="../widgets/rename_panel.py" line="166"/>
         <source>Trim Start:</source>
         <translation>Begin inkorten:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="158"/>
         <location filename="../widgets/rename_panel.py" line="170"/>
+        <location filename="../widgets/rename_panel.py" line="182"/>
         <source> chars</source>
         <translation> tekens</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="159"/>
+        <location filename="../widgets/rename_panel.py" line="171"/>
         <source>Remove characters from the beginning of the filename</source>
         <translation>Verwijder tekens aan het begin van de bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="166"/>
+        <location filename="../widgets/rename_panel.py" line="178"/>
         <source>Trim End:</source>
         <translation>Einde inkorten:</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="171"/>
+        <location filename="../widgets/rename_panel.py" line="183"/>
         <source>Remove characters from the end of the filename (before extension)</source>
         <translation>Verwijder tekens aan het einde van de bestandsnaam (vóór de extensie)</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="176"/>
+        <location filename="../widgets/rename_panel.py" line="188"/>
         <source>Clear</source>
         <translation>Wissen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="191"/>
+        <location filename="../widgets/rename_panel.py" line="203"/>
         <source>Remove Underscores</source>
         <translation>Underscores verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="195"/>
+        <location filename="../widgets/rename_panel.py" line="207"/>
         <source>Space Dashes</source>
         <translation>Streepjes spatiëren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="201"/>
+        <location filename="../widgets/rename_panel.py" line="213"/>
         <source>Put spaces around a dash: Artist-Track → Artist - Track</source>
         <translation>Zet spaties rond een streepje: Artist-Track → Artist - Track</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="226"/>
+        <location filename="../widgets/rename_panel.py" line="239"/>
         <source>Prepend Text</source>
         <translatorcomment>&apos;Prepend&apos;-&gt;&apos;Tekst vooraan toevoegen&apos; for clarity; no concise NL verb for prepend.</translatorcomment>
         <translation>Tekst vooraan toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="229"/>
+        <location filename="../widgets/rename_panel.py" line="242"/>
         <source>Append Text</source>
         <translatorcomment>&apos;Append&apos;-&gt;&apos;Tekst achteraan toevoegen&apos; for clarity; no concise NL verb for append.</translatorcomment>
         <translation>Tekst achteraan toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="258"/>
-        <location filename="../widgets/rename_panel.py" line="266"/>
+        <location filename="../widgets/rename_panel.py" line="288"/>
+        <location filename="../widgets/rename_panel.py" line="296"/>
         <source>Preview</source>
         <translation>Voorbeeld</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="261"/>
+        <location filename="../widgets/rename_panel.py" line="291"/>
         <source>Drop audio files here to add them</source>
         <translation>Sleep audiobestanden hierheen om ze toe te voegen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="266"/>
+        <location filename="../widgets/rename_panel.py" line="296"/>
         <source>Original</source>
         <translation>Origineel</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="266"/>
+        <location filename="../widgets/rename_panel.py" line="296"/>
         <source>Status</source>
         <translation>Status</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="312"/>
+        <location filename="../widgets/rename_panel.py" line="342"/>
         <source>No files to rename</source>
         <translation>Geen bestanden om te hernoemen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="318"/>
+        <location filename="../widgets/rename_panel.py" line="348"/>
         <source>Undo Last</source>
         <translation>Laatste herstellen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="323"/>
+        <location filename="../widgets/rename_panel.py" line="353"/>
         <source>Remove All</source>
         <translation>Alles verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="333"/>
-        <location filename="../widgets/rename_panel.py" line="559"/>
+        <location filename="../widgets/rename_panel.py" line="363"/>
+        <location filename="../widgets/rename_panel.py" line="606"/>
         <source>Apply Rename</source>
         <translation>Hernoemen toepassen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="554"/>
+        <location filename="../widgets/rename_panel.py" line="601"/>
         <source>Start Pipeline</source>
         <translation>Pipeline starten</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="556"/>
+        <location filename="../widgets/rename_panel.py" line="603"/>
         <source>Send these files through the pipeline, starting here</source>
         <translation>Deze bestanden vanaf hier door de pipeline sturen</translation>
     </message>
@@ -3214,37 +3219,37 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Stel de pipeline eerst in in het paneel Converteren.</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="396"/>
+        <location filename="../widgets/rename_panel.py" line="258"/>
         <source>Text to add at end of filename</source>
         <translation>Tekst om achteraan de bestandsnaam toe te voegen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="398"/>
+        <location filename="../widgets/rename_panel.py" line="255"/>
         <source>Text to add at start of filename</source>
         <translation>Tekst om vooraan de bestandsnaam toe te voegen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="439"/>
+        <location filename="../widgets/rename_panel.py" line="486"/>
         <source>No files</source>
         <translation>Geen bestanden</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="483"/>
+        <location filename="../widgets/rename_panel.py" line="530"/>
         <source>Conflict</source>
         <translation>Conflict</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="500"/>
+        <location filename="../widgets/rename_panel.py" line="547"/>
         <source>{0} files</source>
         <translation>{0} bestanden</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="502"/>
+        <location filename="../widgets/rename_panel.py" line="549"/>
         <source>{0} to rename</source>
         <translation>{0} te hernoemen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="504"/>
+        <location filename="../widgets/rename_panel.py" line="551"/>
         <source>{0} conflicts</source>
         <translation>{0} conflicten</translation>
     </message>
@@ -3253,27 +3258,27 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Converteren met de instellingen van het paneel Converteren, analyseren en toevoegen aan “{name}”.</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="686"/>
+        <location filename="../widgets/rename_panel.py" line="749"/>
         <source>Changed</source>
         <translation>Gewijzigd</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="761"/>
+        <location filename="../widgets/rename_panel.py" line="824"/>
         <source>Copy text</source>
         <translation>Tekst kopiëren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="761"/>
+        <location filename="../widgets/rename_panel.py" line="824"/>
         <source>Copy {0} names</source>
         <translation>{0} namen kopiëren</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="767"/>
+        <location filename="../widgets/rename_panel.py" line="830"/>
         <source>Remove from list</source>
         <translation>Uit lijst verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/rename_panel.py" line="767"/>
+        <location filename="../widgets/rename_panel.py" line="830"/>
         <source>Remove {0} from list</source>
         <translation>{0} uit lijst verwijderen</translation>
     </message>
@@ -3281,7 +3286,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="711"/>
+        <location filename="../widgets/player_panel.py" line="719"/>
         <source>Drop audio files here</source>
         <translation>Sleep audiobestanden hierheen</translation>
     </message>
@@ -3300,7 +3305,7 @@ of klik op “Artwork toevoegen…”</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="107"/>
-        <location filename="../widgets/settings_panel.py" line="788"/>
+        <location filename="../widgets/settings_panel.py" line="791"/>
         <source>Default Audio Player</source>
         <translation>Standaard audiospeler</translation>
     </message>
@@ -3443,43 +3448,43 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Laagste BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="338"/>
+        <location filename="../widgets/settings_panel.py" line="341"/>
         <source>Highest BPM</source>
         <translation>Hoogste BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="353"/>
+        <location filename="../widgets/settings_panel.py" line="356"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translation>Toonsoort/BPM toevoegen aan bestandsnaam na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="361"/>
+        <location filename="../widgets/settings_panel.py" line="364"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translatorcomment>Reviewed (nl pass): confirmed.</translatorcomment>
         <translation>Automatisch analyseren bij slepen naar of sturen naar het Analyseren-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="366"/>
+        <location filename="../widgets/settings_panel.py" line="369"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>BPM automatisch naar tags schrijven na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="370"/>
+        <location filename="../widgets/settings_panel.py" line="373"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM wordt afgerond op het dichtstbijzijnde hele getal bij het schrijven naar de metadata.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="375"/>
+        <location filename="../widgets/settings_panel.py" line="378"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translation>Toonsoort automatisch naar tags schrijven na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="379"/>
+        <location filename="../widgets/settings_panel.py" line="382"/>
         <source>Automatically rename files after analysis</source>
         <translation>Bestanden automatisch hernoemen na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="386"/>
+        <location filename="../widgets/settings_panel.py" line="389"/>
         <source>Write key to comment</source>
         <translation>Toonsoort naar opmerking schrijven</translation>
     </message>
@@ -3492,297 +3497,297 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Als zowel dit als de Energietag-opmerking worden geschreven, zet dan energie eerst en toonsoort daarna.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="392"/>
+        <location filename="../widgets/settings_panel.py" line="395"/>
         <source>Naming format:</source>
         <translation>Naamgevingsformaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="401"/>
+        <location filename="../widgets/settings_panel.py" line="404"/>
         <source>128 8A - Original_File_Name</source>
         <translation>128 8A - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="401"/>
+        <location filename="../widgets/settings_panel.py" line="404"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + toonsoort prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="402"/>
+        <location filename="../widgets/settings_panel.py" line="405"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="402"/>
+        <location filename="../widgets/settings_panel.py" line="405"/>
         <source>Key + BPM prefix</source>
         <translation>Toonsoort + BPM prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="403"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="403"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>Key prefix only</source>
         <translation>Alleen toonsoort prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>Originele_Bestandsnaam - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>suffix: Key + BPM</source>
         <translation>suffix: toonsoort + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>Original_File_Name - 8A</source>
         <translation>Originele_Bestandsnaam - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>suffix: Key only</source>
         <translation>suffix: alleen toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="428"/>
+        <location filename="../widgets/settings_panel.py" line="431"/>
         <source>Notation</source>
         <translation>Notatie</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="438"/>
+        <location filename="../widgets/settings_panel.py" line="441"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translatorcomment>Reviewed (nl pass): confirmed.</translatorcomment>
         <translation>Er kan slechts één notatie tegelijk actief zijn. Geldt voor de toonsoort die tijdens analyse naar tags/bestandsnamen wordt geschreven en voor de toonsoortlabels van het Toetsenbord-paneel.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="450"/>
+        <location filename="../widgets/settings_panel.py" line="453"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>Kept &apos;Key codes&apos; English per glossary; key-code tokens (8A etc.) preserved.</translatorcomment>
         <translation>👑 Key codes  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="451"/>
+        <location filename="../widgets/settings_panel.py" line="454"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>Traditionele toonsoortnotatie  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="452"/>
+        <location filename="../widgets/settings_panel.py" line="455"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="468"/>
+        <location filename="../widgets/settings_panel.py" line="471"/>
         <source>Energy Tag</source>
         <translatorcomment>&apos;Tag&apos;-&gt;compound &apos;Energietag&apos;; &apos;tag&apos; kept English (standard for metadata tags in NL).</translatorcomment>
         <translation>Energietag</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="476"/>
+        <location filename="../widgets/settings_panel.py" line="479"/>
         <source>Write energy level to Comment tag</source>
         <translation>Energieniveau naar Opmerking-tag schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="484"/>
+        <location filename="../widgets/settings_panel.py" line="487"/>
         <source>Energy level written first</source>
         <translation>Energieniveau eerst schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="488"/>
+        <location filename="../widgets/settings_panel.py" line="491"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>Als zowel energie als toonsoort naar de opmerking wordt geschreven, komt de energie eerst en de toonsoort daarna.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="494"/>
+        <location filename="../widgets/settings_panel.py" line="497"/>
         <source>Format:</source>
         <translation>Formaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="502"/>
+        <location filename="../widgets/settings_panel.py" line="505"/>
         <source>Number only  (7)</source>
         <translation>Alleen getal  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="503"/>
+        <location filename="../widgets/settings_panel.py" line="506"/>
         <source>With label  (Energy 7)</source>
         <translatorcomment>Kept the literal example label &apos;Energy 7&apos; as-is since it represents the actual text written to the tag.</translatorcomment>
         <translation>Met label  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="512"/>
+        <location filename="../widgets/settings_panel.py" line="515"/>
         <source>Write mode:</source>
         <translation>Schrijfmodus:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="520"/>
+        <location filename="../widgets/settings_panel.py" line="523"/>
         <source>Prepend to existing comment</source>
         <translation>Vooraan bestaande opmerking toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="521"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>Append to existing comment</source>
         <translation>Achteraan bestaande opmerking toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="522"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>Replace existing comment</source>
         <translation>Bestaande opmerking vervangen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="542"/>
+        <location filename="../widgets/settings_panel.py" line="545"/>
         <source>Write energy level to its own tag field</source>
         <translation>Energieniveau naar een eigen tagveld schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="545"/>
+        <location filename="../widgets/settings_panel.py" line="548"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>Bewaart de energie op een plek waar die exact terug te lezen is, in plaats van uit de opmerking te worden gehaald.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="624"/>
+        <location filename="../widgets/settings_panel.py" line="627"/>
         <source>Playlists</source>
         <translation>Playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="633"/>
+        <location filename="../widgets/settings_panel.py" line="636"/>
         <source>Duplicate tracks:</source>
         <translation>Dubbele tracks:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="636"/>
+        <location filename="../widgets/settings_panel.py" line="639"/>
         <source>Ask each time</source>
         <translation>Elke keer vragen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="637"/>
+        <location filename="../widgets/settings_panel.py" line="640"/>
         <source>Always add duplicates</source>
         <translation>Dubbele altijd toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="638"/>
+        <location filename="../widgets/settings_panel.py" line="641"/>
         <source>Always skip duplicates</source>
         <translation>Dubbele altijd overslaan</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="650"/>
+        <location filename="../widgets/settings_panel.py" line="653"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>Wat er gebeurt als je een track toevoegt die de playlist al bevat. Een set kan een track met opzet herhalen, dus wordt het aan jou gevraagd in plaats van voor je beslist: kies een van de andere opties om niet meer gevraagd te worden.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="660"/>
+        <location filename="../widgets/settings_panel.py" line="663"/>
         <source>Keep Scratch between sessions</source>
         <translation>Scratch tussen sessies bewaren</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="667"/>
+        <location filename="../widgets/settings_panel.py" line="670"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch is de werklijst waarmee de speler opent, en die is bij elke start leeg. Zet dit aan om hem weer te openen met wat erin zat — hoe dan ook bewaart ‘Playlist opslaan’ een kopie.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="677"/>
+        <location filename="../widgets/settings_panel.py" line="680"/>
         <source>Always use full paths in exported playlists</source>
         <translation>Altijd volledige paden gebruiken in geëxporteerde playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="685"/>
+        <location filename="../widgets/settings_panel.py" line="688"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>Geëxporteerde playlists gebruiken paden relatief aan het playlistbestand wanneer de tracks ernaast staan, zodat een map die je zipt en verstuurt ook werkt op de computer van iemand anders. Zet dit aan om altijd het volledige pad te schrijven.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="695"/>
+        <location filename="../widgets/settings_panel.py" line="698"/>
         <source>Export All Playlists…</source>
         <translation>Alle playlists exporteren…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="704"/>
+        <location filename="../widgets/settings_panel.py" line="707"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>Schrijft één map met playlistbestanden die je structuur weerspiegelt: een back-up die elke andere app kan lezen.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="553"/>
+        <location filename="../widgets/settings_panel.py" line="556"/>
         <source>Online Metadata</source>
         <translation>Online metagegevens</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="562"/>
+        <location filename="../widgets/settings_panel.py" line="565"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Nummergegevens online opzoeken (Discogs)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="570"/>
+        <location filename="../widgets/settings_panel.py" line="573"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>Standaard uit; de app doet geen netwerkverzoeken totdat je dit aanzet. Een zoekopdracht stuurt de artiest en titel van het gekozen nummer — nooit je audio en nooit je bibliotheek. BPM, toonsoort en energie komen altijd uit de analyse van deze app.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="581"/>
+        <location filename="../widgets/settings_panel.py" line="584"/>
         <source>Discogs token:</source>
         <translation>Discogs-token:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="587"/>
+        <location filename="../widgets/settings_panel.py" line="590"/>
         <source>Paste your token</source>
         <translation>Plak je token</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="590"/>
+        <location filename="../widgets/settings_panel.py" line="593"/>
         <source>Get a Token…</source>
         <translation>Token ophalen…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="597"/>
+        <location filename="../widgets/settings_panel.py" line="600"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs heeft een gratis persoonlijk token nodig om hoezen mee te sturen en op volle snelheid te antwoorden. Het is alleen-lezen en je kunt het altijd intrekken op je Discogs-account.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="606"/>
+        <location filename="../widgets/settings_panel.py" line="609"/>
         <source>Fetch cover art with lookups</source>
         <translation>Hoes ophalen bij het opzoeken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="613"/>
+        <location filename="../widgets/settings_panel.py" line="616"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>Toont de hoes van de uitgave naast die van je bestand, zodat je ze kunt vergelijken. Er wordt niets geschreven totdat je akkoord gaat.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="793"/>
+        <location filename="../widgets/settings_panel.py" line="796"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>Je audiobestanden worden nu geopend met Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="804"/>
+        <location filename="../widgets/settings_panel.py" line="807"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P is niet geregistreerd bij Windows. Opnieuw installeren registreert het.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="809"/>
+        <location filename="../widgets/settings_panel.py" line="812"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>Windows-instellingen kon niet worden geopend. Je kunt dit daar zelf instellen bij ‘Apps → Standaard-apps’.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="815"/>
+        <location filename="../widgets/settings_panel.py" line="818"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Selecteer een audiobestand in de Finder, druk op Command-I, kies Mixed in P bij ‘Open met’ en klik op ‘Wijzig alle’.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="963"/>
+        <location filename="../widgets/settings_panel.py" line="970"/>
         <source>Waveform color</source>
         <translation>Golfvormkleur</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="995"/>
-        <location filename="../widgets/settings_panel.py" line="1008"/>
+        <location filename="../widgets/settings_panel.py" line="1002"/>
+        <location filename="../widgets/settings_panel.py" line="1015"/>
         <source>Restart required</source>
         <translation>Opnieuw opstarten vereist</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="997"/>
+        <location filename="../widgets/settings_panel.py" line="1004"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>De taalwijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1010"/>
+        <location filename="../widgets/settings_panel.py" line="1017"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>De themawijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>
@@ -4128,7 +4133,7 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>VisualizerWindow</name>
     <message>
-        <location filename="../widgets/vis_canvas.py" line="632"/>
+        <location filename="../widgets/vis_canvas.py" line="641"/>
         <source>Visualizer</source>
         <translation>Visualizer</translation>
     </message>
@@ -4136,12 +4141,12 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>run_app</name>
     <message>
-        <location filename="../app.py" line="186"/>
+        <location filename="../app.py" line="219"/>
         <source>Mixed in P is already running</source>
         <translation>Mixed in P is al geopend</translation>
     </message>
     <message>
-        <location filename="../app.py" line="187"/>
+        <location filename="../app.py" line="220"/>
         <source>The running copy didn&apos;t respond, so those files weren&apos;t opened. Bring it to the front and add them there.</source>
         <translation>De actieve kopie reageerde niet, dus die bestanden zijn niet geopend. Breng deze naar de voorgrond en voeg ze daar toe.</translation>
     </message>

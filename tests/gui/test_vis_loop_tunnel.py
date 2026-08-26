@@ -285,7 +285,7 @@ def test_switching_away_leaves_the_other_modes_at_their_own_size(qapp):
     renderer.set_mode("spectrum")
     image = renderer.render(_noise(np.random.default_rng(1)), 44100)
     assert (image.width(), image.height()) == (152, 64)
-    renderer.set_mode("oscilloscope")
+    renderer.set_mode("spectrum")
     image = renderer.render(_noise(np.random.default_rng(2)), 44100)
     assert (image.width(), image.height()) == (152, 64)
 

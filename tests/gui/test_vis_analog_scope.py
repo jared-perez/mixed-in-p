@@ -1,9 +1,10 @@
-"""The analog scope — the popout's face of the ``oscilloscope`` mode.
+"""The analog scope — what the ``oscilloscope`` mode draws, in either host.
 
-The mode now draws two different pictures depending on which host asked, so
-most of what matters here is the *split*: the backdrop's renderer must keep the
-152x64 retro grid it has always drawn, and only a renderer that has been told
-``popout=True`` gets the phosphor scene.
+It used to be the *popout's face* of a mode with two of them, the backdrop
+wearing a chunky 152x64 retro grid. That grid is gone: the backdrop's scope
+slot draws ``silly_scope`` now (a separate mode id — see
+``test_vis_silly_scope.py``), so this mode has one picture again and the tests
+that pinned the split pin the retirement instead.
 
 Assertions are on the scene's arrays and on image *sizes*, never on a pixel
 being a particular colour at a particular place. The suite runs styleless and
@@ -72,13 +73,23 @@ def scene(qapp):
 # ── The host split ─────────────────────────────────────────────────────────
 
 
-def test_the_backdrop_still_gets_the_retro_grid(qapp):
-    """A renderer nobody called popout on draws the 152x64 trace it always did."""
+def test_a_host_that_never_said_popout_gets_the_scene_too(qapp):
+    """The retro face is retired: there is one picture, at the backdrop's cap.
+
+    Nothing routes here without ``popout=True`` today — the backdrop's scope
+    slot draws the silly scope — but the scene has always carried a backdrop
+    cap for the host it never meets, and ``vis_sheet --mode oscilloscope``
+    without ``--popout`` drives exactly this path.
+    """
     renderer = VisRenderer()
     renderer.set_mode("oscilloscope")
-    renderer.set_target_size(2400, 1200)  # the backdrop's call: popout defaults False
+    renderer.set_target_size(2400, 1200)  # popout defaults False
     image = renderer.render(tone()[:FFT_SIZE], SR)
-    assert (image.width(), image.height()) == (152, 64)
+    # The cap is on the area, but each dimension is rounded to a whole pixel
+    # afterwards, so the product can land a few hundred pixels over it. That
+    # slack is the rounding, not a leak.
+    assert image.width() * image.height() <= _BACKDROP_CAP_PX * 1.01
+    assert (image.width(), image.height()) != (152, 64)
     assert renderer.image() is image
 
 
@@ -107,19 +118,18 @@ def test_the_scenes_image_is_never_left_in_the_shared_one(qapp):
     assert (image.width(), image.height()) == (152, 64)
 
 
-def test_the_smoothing_follows_the_host_and_the_rate_follows_the_mode(qapp):
-    """Two answers with different shapes, and the asymmetry is deliberate.
+def test_the_smoothing_is_a_question_about_the_mode_again(qapp):
+    """It used to split per host, and the reason for that split is gone.
 
-    The upscale is a question about the picture, so it splits per host: the
-    popout's glow field would staircase once the area cap bites, the backdrop's
-    grid is meant to be chunky. The frame rate is asked only of the mode
-    because only the popout ever reads it — the backdrop's tick timer stays at
-    FRAME_MS whatever is playing, since its cost is repainting the rows.
+    While the backdrop wore the chunky grid, "should the host interpolate?" had
+    two answers for one mode id. Now the glow field is the only picture this
+    mode draws, so both hosts get the same answer — and it is True, because a
+    glow field would staircase once the area cap bites.
     """
     backdrop = VisRenderer()
     backdrop.set_mode("oscilloscope")
     backdrop.set_target_size(1216, 512)
-    assert backdrop.smooth_upscale() is False
+    assert backdrop.smooth_upscale() is True
 
     popout = VisRenderer()
     popout.set_mode("oscilloscope")
@@ -129,13 +139,18 @@ def test_the_smoothing_follows_the_host_and_the_rate_follows_the_mode(qapp):
     assert backdrop.frame_ms() == popout.frame_ms() == FAST_FRAME_MS
 
 
-def test_nothing_about_the_menu_or_the_config_moved():
-    """Same mode id in every list — no migration, no orphaned translations."""
+def test_the_mode_id_and_the_config_set_did_not_move():
+    """The scope keeps its own id and its popout row; only the backdrop left.
+
+    ``backdrop_scope`` still names a valid setting and still selects — it just
+    draws the silly scope now, which is why there is no migration on either
+    side of this change.
+    """
     assert "oscilloscope" in RENDER_MODES
     assert "oscilloscope" in POPOUT_MODES
     assert "oscilloscope" in _VALID_VIS_MODES
     assert "backdrop_scope" in _VALID_VIS_MODES
-    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "oscilloscope"
+    assert _BACKDROP_VIS_MAP["backdrop_scope"] == "silly_scope"
 
 
 # ── Size and the frame budget ──────────────────────────────────────────────

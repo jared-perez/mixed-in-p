@@ -3,14 +3,19 @@
 Retro visuals rendered into an internal QImage and upscaled by the host with
 fast (non-smooth) transformation for a chunky pixel look:
 
-- ``oscilloscope`` — the one mode with **two faces**, chosen by which host is
-  asking. In the playlist backdrop it is the retro original: a time-domain
-  trace of the last ~576 samples, vertically quantized to a small number of
-  levels. In the popout, where it fills a window rather than sitting dimmed
-  behind text, it is a green phosphor CRT — host-resolution, 60 fps, glow and
-  persistence (see :mod:`.vis_analog_scope`). Same mode id, same menu label,
-  no migration: fire is the same idea from the other end (one mode, backdrop
-  only), and what decides is the ``popout`` flag ``set_target_size`` carries.
+- ``oscilloscope`` — a green phosphor CRT: host-resolution, 60 fps, glow and
+  persistence (see :mod:`.vis_analog_scope`). It used to be the one mode with
+  **two faces**, wearing a chunky 152x64 retro trace in the playlist backdrop
+  and the CRT in the popout, chosen by the ``popout`` flag
+  ``set_target_size`` carries. The retro face is gone: the backdrop's scope
+  slot now draws ``silly_scope`` instead, so this is popout-only in practice
+  and renders the CRT to whichever host asks.
+- ``silly_scope`` — a sheet of liquid gold wiggled at its source like a garden
+  hose (see :mod:`.vis_silly_scope`). Backdrop only, which is fire's shape from
+  the other end, and the reason it is a *separate mode id* rather than a third
+  face: two faces of one id was the arrangement that just ended, and the menu
+  row that selects it (``backdrop_scope``) keeps its own id and needs no
+  migration either way.
 - ``spectrum`` — log-banded FFT bars with instant attack, linear falloff and
   peak-hold caps that drop with accelerating speed.
 - ``fire`` — the classic heat-propagation fire effect, stoked from the bottom
@@ -47,7 +52,7 @@ from __future__ import annotations
 
 import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter, QPen
+from PySide6.QtGui import QColor, QImage, QLinearGradient, QPainter
 from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from ..styles.theme import Theme
@@ -55,6 +60,7 @@ from .beat_clock import BeatClock
 from .vis_analog_scope import AnalogScopeScene
 from .vis_beat_tunnel import BeatTunnelScene
 from .vis_loop_tunnel import LoopTunnelScene
+from .vis_silly_scope import SillyScopeScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
@@ -76,8 +82,6 @@ _DB_FLOOR = -65.0
 _BAR_FALL = 0.22
 _PEAK_START = 0.05
 _PEAK_ACCEL = 1.1
-_SCOPE_SAMPLES = 576
-_SCOPE_LEVELS = 16
 _FIRE_STOKE_GAIN = 1.25
 # Fractal (Julia set) tuning. The constant moves on the classic morphing-Julia
 # circle |c| = 0.7885, but swings back and forth through the arc around angle π
@@ -104,13 +108,16 @@ _PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 
 RENDER_MODES = (
     "oscilloscope", "spectrum", "fire", "fractal", "loop_tunnel", "beat_tunnel",
+    "silly_scope",
 )
 # What the popout window offers, which is no longer everything the renderer can
 # draw: fire was retired from the menu's popout half and kept as a backdrop,
-# where it reads as lit rows rather than as the whole window. So a mode may
-# render and not be offered — never the other way round, which is derived here
-# rather than written out so a new render mode cannot be silently unreachable.
-POPOUT_MODES = tuple(m for m in RENDER_MODES if m != "fire")
+# where it reads as lit rows rather than as the whole window, and the silly
+# scope was only ever a backdrop. So a mode may render and not be offered —
+# never the other way round, which is derived here rather than written out so a
+# new render mode cannot be silently unreachable.
+_BACKDROP_ONLY = {"fire", "silly_scope"}
+POPOUT_MODES = tuple(m for m in RENDER_MODES if m not in _BACKDROP_ONLY)
 
 
 def _fire_palette(color: QColor) -> np.ndarray:
@@ -184,12 +191,17 @@ class VisRenderer:
         # every render, and the backdrop's own VisRenderer instance never does.
         self._analog_scope = AnalogScopeScene()
         self._popout = False
+        # The backdrop's scope slot. Its own image again, and cheap to build:
+        # the LUTs and the bead sprites, nothing per-frame.
+        self._silly_scope = SillyScopeScene()
 
     # ── Public API ─────────────────────────────────────────────────────────
 
     def image(self) -> QImage:
-        if self._mode == "oscilloscope" and self._popout:
+        if self._mode == "oscilloscope":
             return self._analog_scope.image()
+        if self._mode == "silly_scope":
+            return self._silly_scope.image()
         if self._mode == "loop_tunnel":
             return self._loop_tunnel.image()
         if self._mode == "beat_tunnel":
@@ -217,13 +229,14 @@ class VisRenderer:
         it is what made the loop tunnel read as a staircase. Measured at 0.4 ms for
         a full-frame upscale, i.e. free.
 
-        The oscilloscope answers for whichever face this instance is drawing:
-        the popout's glow field would staircase once the area cap bites, and
-        the backdrop's 152x64 grid is meant to be chunky.
+        The oscilloscope's glow field would staircase once the area cap bites,
+        and the silly scope is a soft liquid field rendered near the host's own
+        size — nearest-neighbour on either would undo the thing they render
+        large for. This used to answer for the oscilloscope's *host* rather
+        than for the mode, because the backdrop's face was the chunky grid;
+        that face is gone, so the question is a per-mode one again.
         """
-        if self._mode == "oscilloscope":
-            return self._popout
-        return self._mode in ("beat_tunnel", "loop_tunnel")
+        return self._mode in ("beat_tunnel", "loop_tunnel", "oscilloscope", "silly_scope")
 
     def set_frame_interval(self, frame_ms: float) -> None:
         """Tell the renderer how often it is being advanced.
@@ -241,6 +254,7 @@ class VisRenderer:
         self._clock.set_frame_interval(frame_ms / 1000.0)
         self._beat_tunnel.set_frame_interval(frame_ms)
         self._analog_scope.set_frame_interval(frame_ms)
+        self._silly_scope.set_frame_interval(frame_ms)
 
     def set_track_tempo(self, bpm: float | None) -> None:
         """The playing track's tag BPM — the beat clock's period.
@@ -287,6 +301,8 @@ class VisRenderer:
         self._flux_peaks[:] = 0.0
         if mode == "oscilloscope":
             self._analog_scope.reset()
+        elif mode == "silly_scope":
+            self._silly_scope.reset()
         elif mode == "loop_tunnel":
             self._loop_tunnel.reset()
         elif mode == "beat_tunnel":
@@ -299,6 +315,7 @@ class VisRenderer:
         self._loop_tunnel.set_color(self._color)
         self._beat_tunnel.set_color(self._color)
         self._analog_scope.set_color(self._color)
+        self._silly_scope.set_color(self._color)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
@@ -320,6 +337,7 @@ class VisRenderer:
         self._loop_tunnel.set_target_size(width, height, popout)
         self._beat_tunnel.set_target_size(width, height, popout)
         self._analog_scope.set_target_size(width, height, popout)
+        self._silly_scope.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -328,13 +346,17 @@ class VisRenderer:
         else:
             samples = samples[-FFT_SIZE:]
         if self._mode == "oscilloscope":
-            if self._popout:
-                # Returned, never assigned to self._image — same trap as the
-                # tunnels below.
-                return self._analog_scope.render(samples, sr)
-            self._render_scope(samples)
+            # Returned, never assigned to self._image — same trap as the
+            # tunnels below.
+            return self._analog_scope.render(samples, sr)
         else:
             heights = self._band_heights(samples, sr)
+            if self._mode == "silly_scope":
+                # Down here rather than beside the oscilloscope on purpose: the
+                # scene wants band heights and the kick pulse, not raw samples,
+                # so it goes through _band_heights like fire and the fractal.
+                # Returned, never assigned, like the tunnels.
+                return self._silly_scope.render(heights, self._pulse)
             if self._mode == "loop_tunnel":
                 # Returned directly, never assigned to self._image: the
                 # scope/spectrum renderers paint into that at _W x _H, and
@@ -439,19 +461,6 @@ class VisRenderer:
         self._peaks = np.clip(self._peaks, 0.0, 1.0)
 
     # ── Renderers (into the internal low-res image) ────────────────────────
-
-    def _render_scope(self, samples: np.ndarray) -> None:
-        self._image.fill(Qt.GlobalColor.transparent)
-        trace = samples[-_SCOPE_SAMPLES:]
-        cols = np.linspace(0, len(trace) - 1, _W).astype(int)
-        # Quantize to a few vertical levels for the chunky retro trace.
-        levels = np.round(np.clip(trace[cols], -1.0, 1.0) * (_SCOPE_LEVELS / 2))
-        ys = (_H / 2 - levels * (_H / _SCOPE_LEVELS)).astype(int).clip(1, _H - 2)
-        painter = QPainter(self._image)
-        painter.setPen(QPen(self._color, 1))
-        for x in range(1, _W):
-            painter.drawLine(x - 1, int(ys[x - 1]), x, int(ys[x]))
-        painter.end()
 
     def _spectrum_gradient(self) -> QLinearGradient:
         gradient = QLinearGradient(0, _H, 0, 0)

@@ -1092,9 +1092,9 @@ def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
     own size, where a nearest-neighbour blow-up undoes the resolution, against
     the retro modes, which are meant to look like big pixels.
 
-    The oscilloscope's own split lives in test_vis_analog_scope.py; what is
-    pinned here is that this renderer — which never claimed to be a popout —
-    keeps the chunky blow-up for it.
+    The oscilloscope's own answer lives in test_vis_analog_scope.py: it used to
+    split per host and no longer does, because the chunky face it split for is
+    retired.
     """
     renderer = VisRenderer()
     renderer.set_mode("beat_tunnel")
@@ -1108,7 +1108,10 @@ def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
         assert renderer.frame_ms() == FRAME_MS
         assert renderer.smooth_upscale() is False
     renderer.set_mode("oscilloscope")
-    assert renderer.smooth_upscale() is False
+    assert renderer.smooth_upscale() is True
+    renderer.set_mode("silly_scope")
+    assert renderer.frame_ms() == FRAME_MS
+    assert renderer.smooth_upscale() is True
 
 
 def test_the_bass_average_keeps_its_time_constant_at_either_rate(qapp):
