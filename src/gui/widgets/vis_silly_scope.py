@@ -44,10 +44,12 @@ surface curvature has no metallic banding; a real 2-D fluid sim is O(pixels x
 iterations) and art-directs badly. The reference renders are about *shading*,
 not turbulence.
 
-Droplets are **stamped sprites**, not part of the sheet field, and that is a
-rule rather than an optimisation: on a bead the curvature is enormous (a tiny
-radius) and the sheet's curvature term shreds it into speckle and rings. They
-are built once per size like the LUTs.
+Beat response is the house flicker, the accent the fire and the fractal
+already wear: one multiplicative lift of the whole shade field on the kick
+pulse, applied just before the gold LUT, so every pool flashes toward white
+at once and a pulse of zero renders the frame it always did. (Droplet sprites
+popping off the crest were tried here first and retired — next to the sheet
+they read as clutter, not as beat.)
 
 Every constant is expressed in **seconds**, never per frame. The backdrop only
 ever runs at 33 ms, but ``scripts/vis_sheet.py`` can drive this at any rate and
@@ -98,10 +100,12 @@ _MIN_W, _MIN_H = 96, 48
 _DEFAULT_SIZE = (912, 384)
 
 # ── The hose ───────────────────────────────────────────────────────────────
-# How long the wave takes to cross the window. This is "50% slower" made
-# concrete: the old face replaced its whole picture every 33 ms, so there was
-# no motion to halve — here there is one flow speed and this is it.
-_WINDOW_SECONDS = 10.0
+# How long the wave takes to cross the window. Shipped at 10.0 and retuned to
+# a third of that on request — the pour read as far too slow. Everything else
+# in here is expressed in time, so the change is this one number: the history
+# still holds the same music per second, each feature just crosses three times
+# as fast (and therefore sits three times wider on screen).
+_WINDOW_SECONDS = 10.0 / 3.0
 # Nozzle history resolution. In bins per *second* so the buffer holds the same
 # stretch of music however often it is fed.
 _HISTORY_BINS_PER_S = 20.0
@@ -122,22 +126,25 @@ _PRESENCE_TAU = 1.2
 _PRESENCE_KNEE = 0.34  # level at which the gate is fully open
 # Vertical swing of the centerline, as a fraction of the image height. Tuned
 # as a *pair* with _BASE_HALF_FRAC below, and against decoded audio rather than
-# synthetic band heights — see the note there.
-_SWING_FRAC = 0.24
+# synthetic band heights — see the note there. Doubled from the shipped 0.24
+# on request: the ribbon keeps its thickness, the wave just travels further,
+# and a full-scale crest now brushes the frame edge — the row crop clips it,
+# exactly as the stream running off the sides already does.
+_SWING_FRAC = 0.48
 # Smoothing over the nozzle history, in bins, and then over the sampled
 # centerline, in pixels. Both are about the same thing: the pitch term
 # amplifies any kink in the centerline into a vertical crease down the whole
 # sheet, so the centerline has to be smooth before anything differentiates it.
 _HISTORY_BLURS = 3
 # The pixel-space smoother, as a fraction of the image width so the look does
-# not change with the render size. It has to be this wide: the history runs at
-# 20 bins a second and the wave crosses in 10 s, so one bin is ~6 px, and the
-# centerline's *real* curvature over that distance — not noise, the signal
-# genuinely turning — reaches 0.4 px per px squared. The x-gradient is scaled
-# by 0.2 * width to keep the side glints, which multiplies exactly that
-# curvature by ~240 and paints it as fine vertical corduroy over the whole
-# sheet. Measured: this takes the second difference from 0.126 rms to what a
-# smooth wave of this wavelength actually has.
+# not change with the render size. It has to be this wide: the centerline's
+# *real* curvature — not noise, the signal genuinely turning — is what the
+# x-gradient (scaled by 0.2 * width to keep the side glints) multiplies by
+# ~240 and paints as fine vertical corduroy over the whole sheet. Measured at
+# the original 10 s crossing, where one bin was ~6 px: it took the second
+# difference from 0.126 rms to what a smooth wave of that wavelength really
+# has. The faster flow stretches every feature 3x in px, so the curvature
+# under this kernel only fell.
 _CENTER_SMOOTH = 0.018
 
 # ── The sheet ──────────────────────────────────────────────────────────────
@@ -222,8 +229,9 @@ _MARBLE_DRIFT_S = 0.21
 
 # Curvature: the second difference of the vertical normal, darkening concave
 # folds and lighting convex ridges — the thin contour that traces every pool
-# boundary in the reference. **Sheet only**: on a bead the radius is tiny, the
-# curvature enormous, and this shreds it into speckle.
+# boundary in the reference. It wants a broad radius: anything bead-sized put
+# through it is shredded into speckle, which is why the retired droplets were
+# sprites and why no small feature should ever share this shader.
 _FOLD_GAIN = 0.55
 _GLINT = 0.16  # cubed side glint from the horizontal normal
 _RIM_START = 0.88
@@ -247,18 +255,13 @@ _GOLD_STOPS = (
 )
 _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 
-# ── Droplets ───────────────────────────────────────────────────────────────
-_DROP_MAX = 8
-_DROP_PULSE = 0.55  # kick strength that flicks beads off a crest
-_DROP_COOLDOWN = 0.20  # seconds, so a busy kick does not spray
-_DROP_RADIUS_FRAC = (0.012, 0.030)  # of the image height
-_DROP_SPRITE_BUCKETS = 6
-_DROP_VY = (-0.55, -0.22)  # image heights per second, upward
-_DROP_GRAVITY = 1.15  # image heights per second squared
-_DROP_BASE = 0.42  # body gold, before the light
-_DROP_LIT = 0.34  # how much brighter the up-facing half is
-_DROP_LIMB = 0.30  # how far the edge falls away, which is what rounds it
-_DROP_SPECULAR = 0.30  # the little highlight that makes a bead read as metal
+# ── The beat flicker ───────────────────────────────────────────────────────
+# The house kick accent, worn the way the fire wears its stoke gain
+# (1 + 0.8 * pulse) and the fractal its brightness (0.8 + 0.5 * pulse): the
+# whole shade field is lifted multiplicatively just before the gold LUT, so a
+# kick flashes every pool toward white at once and a pulse of zero renders
+# the frame it always did. This replaced the droplet sprites as the beat.
+_FLICKER_GAIN = 0.35
 
 
 def build_env_ramp(size: int = _ENV_SIZE) -> np.ndarray:
@@ -357,7 +360,6 @@ class SillyScopeScene:
         # (256,) uint32 view gathers one word for a byte-identical result, and
         # is what took the analog scope's paint from 5.0 ms to 0.8.
         self._lut32 = self._lut.view(np.uint32).reshape(256)
-        self._rng = np.random.default_rng(20260826)
         self._dt = 33.0 / 1000.0
         self._level_fast = 0.0
         self._level_slow = 0.0
@@ -371,15 +373,11 @@ class SillyScopeScene:
         self._twist_phase = 0.0
         self._und_phase = [0.0, 0.0]
         self._marble_phase = [0.0, 0.0]
-        self._drop_wait = 0.0
-        # (x px, y px, vy px/s, radius px, sprite bucket)
-        self._drops: list[list[float]] = []
-        self._sprites: list[tuple[np.ndarray, np.ndarray]] = []
+        self._pulse = 0.0
         width, height = _DEFAULT_SIZE
         self._size = (width, height)
         self._image = QImage(width, height, QImage.Format.Format_ARGB32)
         self._image.fill(0)
-        self._build_sprites()
 
     # ── Public API ─────────────────────────────────────────────────────────
 
@@ -408,7 +406,7 @@ class SillyScopeScene:
         self._presence_alpha = float(np.exp(-self._dt / _PRESENCE_TAU))
 
     def reset(self) -> None:
-        """Forget the stream: the wave in flight, the phases and the beads."""
+        """Forget the stream: the wave in flight and the phases."""
         self._history[:] = 0.0
         self._bin_accum = 0.0
         self._prev_nozzle = 0.0
@@ -419,8 +417,7 @@ class SillyScopeScene:
         self._level_fast = 0.0
         self._level_slow = 0.0
         self._presence = 0.0
-        self._drop_wait = 0.0
-        self._drops.clear()
+        self._pulse = 0.0
         width, height = self._size
         self._image = QImage(width, height, QImage.Format.Format_ARGB32)
         self._image.fill(0)
@@ -444,9 +441,6 @@ class SillyScopeScene:
         self._size = (target_w, target_h)
         self._image = QImage(target_w, target_h, QImage.Format.Format_ARGB32)
         self._image.fill(0)
-        # Beads are positioned in pixels, so they belong to the old size.
-        self._drops.clear()
-        self._build_sprites()
 
     def render(self, heights: np.ndarray | None, pulse: float = 0.0) -> QImage:
         """Advance the stream one frame and paint it.
@@ -463,14 +457,15 @@ class SillyScopeScene:
             # The fire/fractal blend: mean alone leaves a lone bass line nearly
             # invisible, max alone never breathes.
             level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
-        self._advance(level, float(pulse))
+        self._pulse = float(np.clip(pulse, 0.0, 1.0))
+        self._advance(level)
         self._paint()
         return self._image
 
     # ── State ──────────────────────────────────────────────────────────────
 
-    def _advance(self, level: float, pulse: float) -> None:
-        """One frame of hose, twist, drift and ballistics."""
+    def _advance(self, level: float) -> None:
+        """One frame of hose, twist and drift."""
         dt = self._dt
         self._level_fast = self._fast_alpha * self._level_fast + (1.0 - self._fast_alpha) * level
         self._level_slow = self._slow_alpha * self._level_slow + (1.0 - self._slow_alpha) * level
@@ -502,43 +497,6 @@ class SillyScopeScene:
         self._und_phase[1] += _UND_DRIFT2 * dt
         self._marble_phase[0] += _MARBLE_DRIFT_X * dt
         self._marble_phase[1] += _MARBLE_DRIFT_S * dt
-        self._advance_drops(pulse)
-
-    def _advance_drops(self, pulse: float) -> None:
-        width, height = self._size
-        dt = self._dt
-        flow = -width / _WINDOW_SECONDS  # beads travel with the stream
-        gravity = _DROP_GRAVITY * height
-        alive = []
-        for drop in self._drops:
-            drop[2] += gravity * dt
-            drop[1] += drop[2] * dt
-            drop[0] += flow * dt
-            if drop[0] > -2.0 * drop[3] and -3.0 * height < drop[1] < height + 2.0 * drop[3]:
-                alive.append(drop)
-        self._drops = alive
-
-        self._drop_wait = max(0.0, self._drop_wait - dt)
-        if pulse < _DROP_PULSE or self._drop_wait > 0.0 or len(self._drops) >= _DROP_MAX:
-            return
-        self._drop_wait = _DROP_COOLDOWN
-        # Off the current crest: the highest point the sheet reaches on screen.
-        centre = self._centerline(width, height)
-        column = int(np.argmin(centre))
-        for _ in range(int(self._rng.integers(1, 3))):
-            if len(self._drops) >= _DROP_MAX:
-                break
-            radius = float(
-                self._rng.uniform(*_DROP_RADIUS_FRAC) * height
-            )
-            bucket = self._sprite_bucket(radius)
-            self._drops.append([
-                float(column + self._rng.uniform(-0.04, 0.04) * width),
-                float(centre[column] - self._rng.uniform(0.0, 0.03) * height),
-                float(self._rng.uniform(*_DROP_VY) * height),
-                radius,
-                float(bucket),
-            ])
 
     def _centerline(self, width: int, height: int) -> np.ndarray:
         """Where the sheet's middle sits in each column: the nozzle's history.
@@ -597,7 +555,6 @@ class SillyScopeScene:
         if high > low:
             rows = np.arange(low, high, dtype=np.float32)
             self._paint_sheet(bgra[low:high], rows, centre, half, u, sin_twist)
-        self._stamp_drops(bgra)
         self._image = QImage(
             bgra.tobytes(), width, height, width * 4, QImage.Format.Format_ARGB32
         ).copy()
@@ -652,7 +609,7 @@ class SillyScopeScene:
         shade = self._env[(index * (_ENV_SIZE - 1)).astype(np.int32)]
 
         # Curvature: dark concave folds, bright convex ridges — the contour
-        # that traces every pool boundary. Sheet only, never a bead.
+        # that traces every pool boundary.
         shade = shade + _FOLD_GAIN * self._curvature(ny)
         # A side glint, cubed so it is a glint and not a wash.
         shade += _GLINT * (nx ** 3)
@@ -661,6 +618,10 @@ class SillyScopeScene:
         # turning in depth rather than as a flat band changing width.
         rim = np.clip((absr - _RIM_START) / (1.0 - _RIM_START), 0.0, 1.0) ** 2
         shade += _RIM_GAIN * rim * (1.0 + _RIM_LEAN * sin_twist[None, :] * np.sign(s))
+        # The beat: everything above shapes the liquid, this one line is the
+        # flicker. See _FLICKER_GAIN.
+        if self._pulse > 0.0:
+            shade *= 1.0 + _FLICKER_GAIN * self._pulse
         np.clip(shade, 0.0, 1.0, out=shade)
         shade = _blur121(shade, _SHADE_BLURS)
 
@@ -704,72 +665,3 @@ class SillyScopeScene:
             curv[1:-1, :] += ny[:-2, :] + ny[2:, :] - 2.0 * ny[1:-1, :]
         return curv
 
-    # ── Droplets ───────────────────────────────────────────────────────────
-
-    def _build_sprites(self) -> None:
-        """Shaded gold beads, one patch per size bucket, built like the LUTs.
-
-        A bead is *not* run through the sheet shader: its radius is tiny, so
-        its curvature is enormous and the fold term shreds it into rings and
-        spokes. It gets the same environment ramp and the same gold, applied to
-        a sphere, once.
-        """
-        height = self._size[1]
-        self._sprites = []
-        radii = np.linspace(
-            _DROP_RADIUS_FRAC[0] * height, _DROP_RADIUS_FRAC[1] * height,
-            _DROP_SPRITE_BUCKETS,
-        )
-        for radius in radii:
-            r = max(2, int(round(radius)))
-            span = np.arange(-r, r + 1, dtype=np.float32)
-            dx = span[None, :] / r
-            dy = span[:, None] / r
-            q2 = dx * dx + dy * dy
-            inside = q2 <= 1.0
-            nz = np.sqrt(np.maximum(1.0 - q2, 0.0))
-            # Deliberately *not* the sheet's environment ramp. A sphere maps
-            # the whole ramp across its face, so every chrome band lands on a
-            # 12 px bead as a hard horizontal stripe — which at this size reads
-            # as damage rather than as reflection, exactly as the sheet's
-            # curvature term reads as speckle on one. A bead gets a plain
-            # up-facing gradient, a limb that darkens, and one specular.
-            shade = _DROP_BASE + _DROP_LIT * np.clip(-dy, 0.0, 1.0)
-            spec = np.clip(-0.70 * dx - 0.70 * dy + 0.55 * nz - 0.80, 0.0, 1.0)
-            shade = np.clip(
-                shade + _DROP_SPECULAR * spec * 4.0 - _DROP_LIMB * (1.0 - nz), 0.0, 1.0
-            )
-            rgb = self._lut[(shade * 255.0).astype(np.uint8)][..., :3]
-            alpha = np.clip((1.0 - np.sqrt(q2)) * r / 1.2, 0.0, 1.0) * inside
-            patch = np.zeros((2 * r + 1, 2 * r + 1, 4), dtype=np.uint8)
-            patch[..., :3] = rgb
-            patch[..., 3] = (alpha * 255.0).astype(np.uint8)
-            self._sprites.append((patch, alpha.astype(np.float32)))
-
-    def _sprite_bucket(self, radius: float) -> int:
-        height = self._size[1]
-        lo, hi = _DROP_RADIUS_FRAC[0] * height, _DROP_RADIUS_FRAC[1] * height
-        if hi <= lo:
-            return 0
-        t = (radius - lo) / (hi - lo)
-        return int(np.clip(round(t * (_DROP_SPRITE_BUCKETS - 1)), 0, _DROP_SPRITE_BUCKETS - 1))
-
-    def _stamp_drops(self, bgra: np.ndarray) -> None:
-        height, width = bgra.shape[:2]
-        for drop in self._drops:
-            patch, alpha = self._sprites[int(drop[4])]
-            size = patch.shape[0]
-            r = size // 2
-            x0 = int(round(drop[0])) - r
-            y0 = int(round(drop[1])) - r
-            sx0, sy0 = max(0, -x0), max(0, -y0)
-            dx0, dy0 = max(0, x0), max(0, y0)
-            span_x = min(size - sx0, width - dx0)
-            span_y = min(size - sy0, height - dy0)
-            if span_x <= 0 or span_y <= 0:
-                continue
-            src = patch[sy0:sy0 + span_y, sx0:sx0 + span_x]
-            a = alpha[sy0:sy0 + span_y, sx0:sx0 + span_x][..., None]
-            dst = bgra[dy0:dy0 + span_y, dx0:dx0 + span_x]
-            dst[..., :3] = (src[..., :3] * a + dst[..., :3] * (1.0 - a)).astype(np.uint8)
-            np.maximum(dst[..., 3], src[..., 3], out=dst[..., 3])

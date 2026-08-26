@@ -20,7 +20,6 @@ import pytest
 from src.gui.widgets import vis_silly_scope
 from src.gui.widgets.vis_silly_scope import (
     _BACKDROP_CAP_PX,
-    _DROP_MAX,
     _POPOUT_CAP_PX,
     _WINDOW_SECONDS,
     SillyScopeScene,
@@ -81,8 +80,11 @@ def test_a_spike_enters_at_the_source_and_travels_to_the_far_end(scene):
     quiet = scene._centerline(width, height)
     assert np.ptp(quiet) < 0.02 * height  # nothing in flight yet
 
-    _run(scene, 0.6, heights=np.full(19, 1.0))  # the burst
-    _run(scene, 0.4, heights=np.full(19, 0.2))
+    # The probe times ride the window: they were 0.6 s and 0.4 s at the
+    # original 10 s crossing, and a fixed wait against a 3x faster flow would
+    # find the burst a third of the way across before the first look.
+    _run(scene, 0.06 * _WINDOW_SECONDS, heights=np.full(19, 1.0))  # the burst
+    _run(scene, 0.04 * _WINDOW_SECONDS, heights=np.full(19, 0.2))
     entering = scene._centerline(width, height)
     moved = np.abs(entering - height / 2.0)
     assert moved[-1] > moved[0]  # it is at the source, not at the far end
@@ -228,8 +230,14 @@ def test_a_host_that_is_not_on_screen_yet_keeps_the_previous_size(scene):
 def test_the_frame_is_transparent_where_the_stream_is_not(scene):
     """The backdrop composites over the playlist grey: an opaque frame would
     paint the rows out entirely.
+
+    Checked on the *settled* sheet: at the doubled swing a full-scale onset
+    crest legitimately brushes the frame edge at the source (and is clipped
+    there, like the stream running off the sides), so the corners are only
+    guaranteed clear once the followers have converged and the onset has
+    left the window.
     """
-    _run(scene, 3.0)
+    _run(scene, 20.0)
     image = scene.render(_loud(), 0.0)
     alpha = _alpha_of(image)
     assert alpha[0, 0] == 0
@@ -254,45 +262,61 @@ def test_the_image_is_its_own_copy_not_a_view_of_a_numpy_buffer(scene):
 
 def test_reset_forgets_the_stream(scene):
     _run(scene, 6.0, pulse=1.0)
-    assert scene._drops
     scene.reset()
-    assert not scene._drops
     assert np.all(scene._history == 0.0)
     assert scene._scroll == 0.0
     assert np.ptp(scene._centerline(*scene._size)) == 0.0
 
 
-# ── Droplets ───────────────────────────────────────────────────────────────
+# ── The beat flicker ───────────────────────────────────────────────────────
 
 
-def test_beads_are_flicked_on_kicks_and_are_bounded(scene):
-    _run(scene, 8.0, pulse=1.0)
-    assert 0 < len(scene._drops) <= _DROP_MAX
+def _twin_scenes_final_frames(pulse_pair):
+    """Two scenes fed identical music; only the final frame's pulse differs.
+
+    The scene is deterministic (no rng anywhere since the droplets left), so
+    any difference between the frames is the pulse's doing alone.
+    """
+    frames = []
+    for pulse in pulse_pair:
+        scene = SillyScopeScene()
+        scene.set_frame_interval(FRAME_MS)
+        scene.set_target_size(912, 384)
+        _run(scene, 4.0)
+        frames.append(scene.render(_loud(), pulse))
+    return frames
 
 
-def test_no_kick_no_beads(scene):
-    _run(scene, 8.0, pulse=0.0)
-    assert scene._drops == []
+def _lit_mean_rgb(image):
+    """Mean RGB over the pixels the stream actually covers."""
+    width, height = image.width(), image.height()
+    buffer = np.frombuffer(image.constBits(), dtype=np.uint8)
+    bgra = buffer.reshape(height, image.bytesPerLine() // 4, 4)[:, :width]
+    return float(bgra[..., :3][bgra[..., 3] > 0].mean())
 
 
-def test_beads_belong_to_the_size_they_were_flicked_at(scene):
-    """They are positioned in pixels, so a resize is not something to rescale."""
-    _run(scene, 6.0, pulse=1.0)
-    assert scene._drops
-    scene.set_target_size(1200, 500)
-    assert scene._drops == []
+def test_a_kick_flashes_the_whole_sheet_brighter():
+    """The house accent, fire/fractal style: a multiplicative lift on the
+    shade, so the same state renders strictly brighter under a pulse."""
+    calm, kicked = _twin_scenes_final_frames((0.0, 1.0))
+    assert _lit_mean_rgb(kicked) > _lit_mean_rgb(calm) * 1.05
 
 
-def test_a_bead_falls_back_down(scene):
-    _run(scene, 1.0, pulse=1.0)
-    assert scene._drops
-    drop = scene._drops[0]
-    top = drop[1]
-    for _ in range(60):
-        scene.render(_loud(), 0.0)
-        if drop not in scene._drops:
-            break
-    assert drop[1] > top or drop not in scene._drops
+def test_the_flicker_is_brightness_only_and_never_moves_the_silhouette():
+    """Alpha comes from the sheet coordinate, so a kick must not fatten,
+    shrink or displace the stream — and a pulse of zero must render the
+    exact frame the scene always did."""
+    calm, kicked = _twin_scenes_final_frames((0.0, 1.0))
+    assert np.array_equal(_alpha_of(calm), _alpha_of(kicked))
+
+
+def test_the_droplets_are_gone():
+    """Nothing left behind that a later edit could route back to."""
+    for name in ("_DROP_MAX", "_DROP_PULSE", "_DROP_RADIUS_FRAC"):
+        assert not hasattr(vis_silly_scope, name)
+    scene = SillyScopeScene()
+    assert not hasattr(scene, "_drops")
+    assert not hasattr(scene, "_stamp_drops")
 
 
 # ── The tables ─────────────────────────────────────────────────────────────
