@@ -265,13 +265,19 @@ _SHADE_BLURS = 1
 # one visual whose whole subject is the logo's liquid gold, so set_color exists
 # and is deliberately ignored, exactly as the analog scope ignores it for green
 # phosphor.
+# Retinted toward yellow on request (the first cut read as orange): green
+# sits closer under red through the body — G/R ~0.78 in the mids against the
+# original ~0.70 — which is the yellow-gold axis, while the R >= G >= B
+# ordering that keeps the ramp *gold* rather than grey still holds at every
+# stop (and therefore everywhere, since the channels interpolate linearly
+# between the same abscissae).
 _GOLD_STOPS = (
-    (0.00, (28, 15, 2)),
-    (0.20, (116, 68, 9)),
-    (0.42, (198, 138, 27)),
-    (0.66, (240, 194, 70)),
-    (0.85, (255, 234, 148)),
-    (1.00, (255, 253, 240)),
+    (0.00, (28, 17, 2)),
+    (0.20, (118, 80, 8)),
+    (0.42, (202, 156, 24)),
+    (0.66, (243, 208, 62)),
+    (0.85, (255, 240, 138)),
+    (1.00, (255, 254, 238)),
 )
 _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 
