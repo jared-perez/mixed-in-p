@@ -86,6 +86,25 @@ def test_tooltips_set_while_checked_land_the_right_way_round(qtbot):
     assert toggle.toolTip() == "Skip this step"
 
 
+def test_the_tooltip_follows_a_reflected_state_with_signals_blocked(qtbot):
+    """The case this widget exists in: a step shows twice and each mirror
+    reflects the other inside blockSignals, so a tooltip hung off `toggled`
+    changes the picture and keeps the other state's sentence."""
+    toggle = PipelineToggle()
+    qtbot.addWidget(toggle)
+    toggle.set_step_tooltips("Include this step", "Skip this step")
+
+    blocked = toggle.blockSignals(True)
+    toggle.setChecked(True)
+    toggle.blockSignals(blocked)
+    assert toggle.toolTip() == "Skip this step"
+
+    blocked = toggle.blockSignals(True)
+    toggle.setChecked(False)
+    toggle.blockSignals(blocked)
+    assert toggle.toolTip() == "Include this step"
+
+
 def test_it_paints_in_every_state_without_a_stylesheet(qtbot):
     """A self-painted button still has to survive being drawn."""
     toggle = PipelineToggle()

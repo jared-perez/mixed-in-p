@@ -64,7 +64,6 @@ class PipelineToggle(QAbstractButton):
         self.setFocusPolicy(Qt.FocusPolicy.TabFocus)
         self._tip_on = ""
         self._tip_off = ""
-        self.toggled.connect(lambda _checked: self._sync_tooltip())
 
     @classmethod
     def for_step(cls, step: str, size: int = SIZE_PANEL, parent=None) -> "PipelineToggle":
@@ -90,6 +89,25 @@ class PipelineToggle(QAbstractButton):
         """
         self._tip_off = when_off
         self._tip_on = when_on
+        self._sync_tooltip()
+
+    def checkStateSet(self) -> None:
+        """Qt's hook for "the checked state was set", however it was set.
+
+        The tooltip hung off `toggled` until 2026-08-25, which is wrong for
+        exactly the case this widget exists in: a step appears twice — panel
+        triangle and header mini — and each reflects the other inside
+        `blockSignals(True)`, so the *reflected* one changed its picture and
+        kept the other state's sentence. Clicking a header mini left its panel
+        triangle saying "Include Rename…" over a step that was now on.
+
+        Nothing about that is visible to a test of `toggled`, and the panel
+        that read its own state from config at startup (Convert, unblocked)
+        looked right while the two that only ever learn theirs through the
+        mirror did not — which is what made it read as three panels
+        disagreeing rather than as one missing call.
+        """
+        super().checkStateSet()
         self._sync_tooltip()
 
     def _sync_tooltip(self) -> None:
