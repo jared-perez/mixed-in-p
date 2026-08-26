@@ -98,8 +98,12 @@ def test_a_spike_enters_at_the_source_and_travels_to_the_far_end(scene):
 
 def test_the_wave_takes_the_crossing_time_to_leave(scene):
     width, height = scene._size
-    _run(scene, 1.0, heights=np.full(19, 1.0))
-    _run(scene, 0.5, heights=np.full(19, 0.2))
+    # Settled followers first, and a burst that rides the window: a fixed
+    # 1 s burst no longer fits inside a ~1.1 s crossing, so the "entry"
+    # measurement would see nothing but the burst's own plateau.
+    _run(scene, 30.0, heights=np.full(19, 0.2))
+    _run(scene, 0.06 * _WINDOW_SECONDS, heights=np.full(19, 1.0))
+    _run(scene, 0.04 * _WINDOW_SECONDS, heights=np.full(19, 0.2))
     swing_at_entry = np.ptp(scene._centerline(width, height))
     _run(scene, _WINDOW_SECONDS + 1.0, heights=np.full(19, 0.2))
     assert np.ptp(scene._centerline(width, height)) < 0.25 * swing_at_entry
@@ -270,7 +274,7 @@ def test_reset_forgets_the_stream(scene):
     assert np.ptp(scene._centerline(*scene._size)) == 0.0
 
 
-# ── The beat flicker ───────────────────────────────────────────────────────
+# ── The beat, stamped at the source ────────────────────────────────────────
 
 
 def _twin_scenes_final_frames(pulse_pair):
@@ -297,17 +301,62 @@ def _lit_mean_rgb(image):
     return float(bgra[..., :3][bgra[..., 3] > 0].mean())
 
 
-def test_a_kick_flashes_the_whole_sheet_brighter():
-    """The house accent, fire/fractal style: a multiplicative lift on the
-    shade, so the same state renders strictly brighter under a pulse."""
-    calm, kicked = _twin_scenes_final_frames((0.0, 1.0))
-    assert _lit_mean_rgb(kicked) > _lit_mean_rgb(calm) * 1.05
+def _bgra_of(image):
+    width, height = image.width(), image.height()
+    buffer = np.frombuffer(image.constBits(), dtype=np.uint8).copy()
+    return buffer.reshape(height, image.bytesPerLine() // 4, 4)[:, :width]
 
 
-def test_the_flicker_is_brightness_only_and_never_moves_the_silhouette():
-    """Alpha comes from the sheet coordinate, so a kick must not fatten,
-    shrink or displace the stream — and a pulse of zero must render the
-    exact frame the scene always did."""
+def test_between_beats_the_stream_rests_dim_and_a_kick_lights_it():
+    """The floor/peak pair: a pulse-free stream sits well below a kicked
+    one, which is what makes a surge readable at all."""
+    frames = []
+    for pulse in (0.0, 1.0):
+        made = SillyScopeScene()
+        made.set_frame_interval(FRAME_MS)
+        made.set_target_size(912, 384)
+        _run(made, 4.0, pulse=pulse)
+        frames.append(made.render(_loud(), pulse))
+    calm, hot = frames
+    assert _lit_mean_rgb(hot) > _lit_mean_rgb(calm) * 1.3
+
+
+def test_a_kick_is_stamped_at_the_source_and_travels_with_the_stream():
+    """The beat is *in the stream*: one kick brightens what is leaving the
+    nozzle, and that bright surge is found further along later — the hose
+    property, again, for brightness. Twin scenes fed identical music isolate
+    it: the per-column difference between them is exactly the surge."""
+    scenes = []
+    for _ in range(2):
+        made = SillyScopeScene()
+        made.set_frame_interval(FRAME_MS)
+        made.set_target_size(912, 384)
+        _run(made, 4.0)
+        scenes.append(made)
+    with_kick, without = scenes
+    with_kick.render(_loud(), 1.0)
+    without.render(_loud(), 0.0)
+    width = with_kick._size[0]
+
+    def surge_column(delay_seconds):
+        for _ in range(int(round(delay_seconds * FRAMES_PER_SECOND))):
+            with_kick.render(_loud(), 0.0)
+            without.render(_loud(), 0.0)
+        kicked = _bgra_of(with_kick.render(_loud(), 0.0))
+        plain = _bgra_of(without.render(_loud(), 0.0))
+        diff = np.abs(
+            kicked[..., :3].astype(int) - plain[..., :3].astype(int)
+        ).sum(axis=(0, 2))
+        return int(np.argmax(diff))
+
+    assert surge_column(0.1) > 0.75 * width
+    assert 0.25 * width < surge_column(0.4 * _WINDOW_SECONDS) < 0.75 * width
+
+
+def test_the_beat_is_brightness_only_and_never_moves_the_silhouette():
+    """Alpha comes from the sheet coordinate and the silence fade, never
+    from the beat, so a kick must not fatten, shrink or displace the
+    stream."""
     calm, kicked = _twin_scenes_final_frames((0.0, 1.0))
     assert np.array_equal(_alpha_of(calm), _alpha_of(kicked))
 

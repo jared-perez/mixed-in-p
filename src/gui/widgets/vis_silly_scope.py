@@ -44,15 +44,16 @@ surface curvature has no metallic banding; a real 2-D fluid sim is O(pixels x
 iterations) and art-directs badly. The reference renders are about *shading*,
 not turbulence.
 
-Beat response is the house flicker, the accent the fire and the fractal
-already wear: one multiplicative lift of the whole shade field on the kick
-pulse, applied just before the gold LUT, so every pool flashes toward white
-at once and a pulse of zero renders the frame it always did. (Droplet sprites
-popping off the crest were tried here first and retired — next to the sheet
-they read as clutter, not as beat.) Its other half is the fractal's silence
-fade: a saturating glow envelope — instant attack, exponential release —
-multiplies the shade *and* the alpha, so the whole sheet dims to nothing over
-~2 s without sound and snaps back the frame the music returns.
+Beat response is stamped at the source: the kick brightens what is leaving
+the nozzle, that brightness rides the flow in a second history beside the
+displacement's, and between beats the stream rests dimmer — so beats read as
+bright surges travelling down a faded ribbon rather than as a strobe. (Two
+earlier beat answers are retired: droplet sprites read as clutter next to
+the sheet, and a whole-frame flicker blinked the picture without ever making
+the stream *carry* the beat.) Under it sits the fractal's silence fade: a
+saturating glow envelope — instant attack, exponential release — multiplies
+the shade *and* the alpha, so the whole sheet dims to nothing over ~2 s
+without sound and snaps back the frame the music returns.
 
 Every constant is expressed in **seconds**, never per frame. The backdrop only
 ever runs at 33 ms, but ``scripts/vis_sheet.py`` can drive this at any rate and
@@ -104,11 +105,11 @@ _DEFAULT_SIZE = (912, 384)
 
 # ── The hose ───────────────────────────────────────────────────────────────
 # How long the wave takes to cross the window. Shipped at 10.0 and retuned
-# twice on request — to a third, then half of that again — so the crossing is
-# now ~1.7 s. Everything else in here is expressed in time, so each retune is
-# this one number: the history still holds the same music per second, each
-# feature just crosses faster (and sits proportionally wider on screen).
-_WINDOW_SECONDS = 10.0 / 6.0
+# three times on request, to ~1.1 s. Everything else in here is expressed in
+# time, so each retune is this one number: the history still holds the same
+# music per second, each feature just crosses faster (and sits
+# proportionally wider on screen).
+_WINDOW_SECONDS = 1.1
 # Nozzle history resolution. In bins per *second* so the buffer holds the same
 # stretch of music however often it is fed. Doubled from 20 when the crossing
 # dropped to ~1.7 s, keeping a bin (width / (crossing * rate) pixels, ~18 px
@@ -266,13 +267,20 @@ _GOLD_STOPS = (
 )
 _EDGE_AA_PX = 1.6  # how many pixels the silhouette fades out over
 
-# ── The beat flicker ───────────────────────────────────────────────────────
-# The house kick accent, worn the way the fire wears its stoke gain
-# (1 + 0.8 * pulse) and the fractal its brightness (0.8 + 0.5 * pulse): the
-# whole shade field is lifted multiplicatively just before the gold LUT, so a
-# kick flashes every pool toward white at once and a pulse of zero renders
-# the frame it always did. This replaced the droplet sprites as the beat.
-_FLICKER_GAIN = 0.35
+# ── The beat, stamped at the source ────────────────────────────────────────
+# The kick brightens what is *leaving the nozzle*, and that brightness rides
+# the flow exactly as the displacement does — a second history, sampled per
+# column by the same math — so a beat is a bright surge travelling down the
+# stream. The floor is the between-beats brightness, deliberately well below
+# 1 or nothing reads as a surge (beatless music simply shows the dimmer
+# resting ribbon); the peak is what a full kick stamps; the release is what
+# lets a surge fade back to the floor before the next kick at DJ tempos
+# (e^(-0.47/0.18) ~= 0.07 of the peak left at 128 BPM). Brightness
+# multiplies the shade only — the alpha belongs to the silence fade below,
+# so the silhouette never pulses.
+_BEAT_FLOOR = 0.50
+_BEAT_PEAK = 1.35
+_BEAT_RELEASE_TAU = 0.18
 # The silence fade, the fractal's other half. Instant attack, exponential
 # release: the sheet is at full strength the frame music plays and dims to
 # nothing over ~2 s without it (e^(-2/0.5) ~= 0.02 — the fractal's
@@ -388,8 +396,11 @@ class SillyScopeScene:
         self.set_frame_interval(33.0)
         bins = int(round(_WINDOW_SECONDS * _HISTORY_BINS_PER_S)) + 2
         self._history = np.zeros(bins, dtype=np.float32)
+        self._bright_history = np.full(bins, _BEAT_FLOOR, dtype=np.float32)
         self._bin_accum = 0.0
         self._prev_nozzle = 0.0
+        self._prev_bright = _BEAT_FLOOR
+        self._beat_glow = 0.0
         self._scroll = 0.0
         self._twist_phase = 0.0
         self._und_phase = [0.0, 0.0]
@@ -427,12 +438,16 @@ class SillyScopeScene:
         self._slow_alpha = float(np.exp(-self._dt / _LEVEL_SLOW_TAU))
         self._presence_alpha = float(np.exp(-self._dt / _PRESENCE_TAU))
         self._glow_release = float(np.exp(-self._dt / _GLOW_RELEASE_TAU))
+        self._beat_release = float(np.exp(-self._dt / _BEAT_RELEASE_TAU))
 
     def reset(self) -> None:
         """Forget the stream: the wave in flight and the phases."""
         self._history[:] = 0.0
+        self._bright_history[:] = _BEAT_FLOOR
         self._bin_accum = 0.0
         self._prev_nozzle = 0.0
+        self._prev_bright = _BEAT_FLOOR
+        self._beat_glow = 0.0
         self._scroll = 0.0
         self._twist_phase = 0.0
         self._und_phase = [0.0, 0.0]
@@ -503,6 +518,10 @@ class SillyScopeScene:
         )
         if self._glow < 1.0 / 512.0:
             self._glow = 0.0
+        # The beat envelope: instant attack on the kick, released fast enough
+        # to reach the floor again before the next one (see _BEAT_RELEASE_TAU).
+        self._beat_glow = max(self._pulse, self._beat_glow * self._beat_release)
+        bright = _BEAT_FLOOR + (_BEAT_PEAK - _BEAT_FLOOR) * self._beat_glow
         nozzle = float(np.tanh(_HOSE_GAIN * (self._level_fast - self._level_slow)) * gate)
 
         # Push the nozzle into the history at a fixed rate in *time*, so the
@@ -521,7 +540,12 @@ class SillyScopeScene:
             across = 1.0 - min(self._bin_accum / dt, 1.0) if dt > 0.0 else 1.0
             self._history[:-1] = self._history[1:]
             self._history[-1] = self._prev_nozzle + (nozzle - self._prev_nozzle) * across
+            self._bright_history[:-1] = self._bright_history[1:]
+            self._bright_history[-1] = (
+                self._prev_bright + (bright - self._prev_bright) * across
+            )
         self._prev_nozzle = nozzle
+        self._prev_bright = bright
 
         self._scroll += dt / _WINDOW_SECONDS
         self._twist_phase += _TWIST_DRIFT * dt
@@ -530,15 +554,16 @@ class SillyScopeScene:
         self._marble_phase[0] += _MARBLE_DRIFT_X * dt
         self._marble_phase[1] += _MARBLE_DRIFT_S * dt
 
-    def _centerline(self, width: int, height: int) -> np.ndarray:
-        """Where the sheet's middle sits in each column: the nozzle's history.
+    def _sample_history(self, values: np.ndarray, width: int) -> np.ndarray:
+        """A history -> one value per column, advected.
 
-        ``c(x) = history(t - (W - x) / v)`` — the source is the right edge,
-        where the newest audio is, and the wave rolls left. The sub-bin phase
-        is folded in so the wave slides smoothly rather than stepping at
-        :data:`_HISTORY_BINS_PER_S`.
+        ``v(x) = history(t - (W - x) / v)`` — the source is the right edge,
+        where the newest audio is, and what it holds rolls left. The sub-bin
+        phase is folded in so a feature slides smoothly rather than stepping
+        at :data:`_HISTORY_BINS_PER_S`. Shared by the centerline and the
+        beat's brightness, which is what keeps the two in exact phase.
         """
-        bins = len(self._history)
+        bins = len(values)
         columns = np.arange(width, dtype=np.float32)
         age = (width - 1 - columns) / max(width - 1, 1) * _WINDOW_SECONDS
         index = (bins - 1) - (age - self._bin_accum) * _HISTORY_BINS_PER_S
@@ -546,7 +571,7 @@ class SillyScopeScene:
         # Smoothed in *bins* — i.e. in time — rather than in pixels: a pixel
         # blur wide enough to matter would have to span several bins, and the
         # thing being smoothed is the signal, not the picture.
-        history = _blur1d(self._history, _HISTORY_BLURS)
+        history = _blur1d(values, _HISTORY_BLURS)
         # Interpolated with a smoothstep rather than linearly. That is not a
         # refinement: linear interpolation leaves a C1 kink at every bin
         # boundary, the pitch term turns each one into a vertical crease, and
@@ -557,12 +582,20 @@ class SillyScopeScene:
         np.clip(base, 0, bins - 2, out=base)
         frac = (index - base).astype(np.float32)
         frac = frac * frac * (3.0 - 2.0 * frac)
-        offsets = history[base] * (1.0 - frac) + history[base + 1] * frac
-        offsets = _smooth1d(
-            offsets.astype(np.float32),
+        sampled = history[base] * (1.0 - frac) + history[base + 1] * frac
+        return _smooth1d(
+            sampled.astype(np.float32),
             _CENTER_SMOOTH_SECONDS / _WINDOW_SECONDS * width,
         )
+
+    def _centerline(self, width: int, height: int) -> np.ndarray:
+        """Where the sheet's middle sits in each column: the nozzle's history."""
+        offsets = self._sample_history(self._history, width)
         return (0.5 * height + offsets * _SWING_FRAC * height).astype(np.float32)
+
+    def _brightline(self, width: int) -> np.ndarray:
+        """The brightness each column's material left the nozzle with."""
+        return self._sample_history(self._bright_history, width)
 
     # ── Paint ──────────────────────────────────────────────────────────────
 
@@ -589,7 +622,10 @@ class SillyScopeScene:
         bgra = np.zeros((height, width, 4), dtype=np.uint8)
         if high > low and self._glow > 0.0:
             rows = np.arange(low, high, dtype=np.float32)
-            self._paint_sheet(bgra[low:high], rows, centre, half, u, sin_twist)
+            self._paint_sheet(
+                bgra[low:high], rows, centre, half, u, sin_twist,
+                self._brightline(width),
+            )
         self._image = QImage(
             bgra.tobytes(), width, height, width * 4, QImage.Format.Format_ARGB32
         ).copy()
@@ -602,6 +638,7 @@ class SillyScopeScene:
         half: np.ndarray,
         u: np.ndarray,
         sin_twist: np.ndarray,
+        bright: np.ndarray,
     ) -> None:
         width = len(centre)
         s = (rows[:, None] - centre[None, :]) / half[None, :]
@@ -653,11 +690,10 @@ class SillyScopeScene:
         # turning in depth rather than as a flat band changing width.
         rim = np.clip((absr - _RIM_START) / (1.0 - _RIM_START), 0.0, 1.0) ** 2
         shade += _RIM_GAIN * rim * (1.0 + _RIM_LEAN * sin_twist[None, :] * np.sign(s))
-        # The beat and the silence share one brightness: the kick lifts it,
-        # no sound releases it. See _FLICKER_GAIN / _GLOW_RELEASE_TAU.
-        bright = self._glow * (1.0 + _FLICKER_GAIN * self._pulse)
-        if bright != 1.0:
-            shade *= bright
+        # The beat rides the stream: each column wears the brightness its
+        # material left the nozzle with, times the silence fade. Shade only —
+        # the alpha keeps the silhouette (see _BEAT_FLOOR).
+        shade *= (self._glow * bright)[None, :]
         np.clip(shade, 0.0, 1.0, out=shade)
         shade = _blur121(shade, _SHADE_BLURS)
 
