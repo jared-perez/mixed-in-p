@@ -3424,7 +3424,7 @@ or click “Add Artwork…”</source>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="107"/>
-        <location filename="../widgets/settings_panel.py" line="791"/>
+        <location filename="../widgets/settings_panel.py" line="792"/>
         <source>Default Audio Player</source>
         <translation>默认音频播放器</translation>
     </message>
@@ -3454,12 +3454,12 @@ or click “Add Artwork…”</source>
         <translation>暗夜</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="160"/>
+        <location filename="../widgets/settings_panel.py" line="161"/>
         <source>Daylight</source>
         <translation>日光</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="171"/>
+        <location filename="../widgets/settings_panel.py" line="172"/>
         <source>Restart to apply theme changes.</source>
         <translation>重启以应用主题更改。</translation>
     </message>
@@ -3469,72 +3469,72 @@ or click “Add Artwork…”</source>
         <translation type="vanished">波形</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="187"/>
+        <location filename="../widgets/settings_panel.py" line="188"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>播放器中完整波形的颜色。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="206"/>
+        <location filename="../widgets/settings_panel.py" line="207"/>
         <source>Default</source>
         <translation>默认</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="208"/>
+        <location filename="../widgets/settings_panel.py" line="209"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>使用主题的默认波形颜色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="216"/>
+        <location filename="../widgets/settings_panel.py" line="217"/>
         <source>Custom…</source>
         <translation>自定义…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="227"/>
+        <location filename="../widgets/settings_panel.py" line="228"/>
         <source>Playlist Text Size</source>
         <translation>播放列表文字大小</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="236"/>
+        <location filename="../widgets/settings_panel.py" line="237"/>
         <source>Size of the track rows in the player. Applies straight away.</source>
         <translation>播放器中曲目行的大小。立即生效。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="248"/>
+        <location filename="../widgets/settings_panel.py" line="249"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="249"/>
+        <location filename="../widgets/settings_panel.py" line="250"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="250"/>
+        <location filename="../widgets/settings_panel.py" line="251"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="270"/>
         <source>Playlist Artwork</source>
         <translation>播放列表封面</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="279"/>
+        <location filename="../widgets/settings_panel.py" line="280"/>
         <source>Part of the cover art shown in the player&apos;s Art column. Full makes each row tall enough for the whole sleeve.</source>
         <translation>在播放器封面列中显示的部分。选择“完整”会加高每一行，以显示整张封面。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="293"/>
+        <location filename="../widgets/settings_panel.py" line="294"/>
         <source>Top</source>
         <translation>顶部</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="294"/>
+        <location filename="../widgets/settings_panel.py" line="295"/>
         <source>Middle</source>
         <translation>中部</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="295"/>
+        <location filename="../widgets/settings_panel.py" line="296"/>
         <source>Full</source>
         <translation>完整</translation>
     </message>
@@ -3551,60 +3551,60 @@ or click “Add Artwork…”</source>
         <translation type="vanished">在播放器中添加视觉效果选择器，并在分析或转换时显示动态波形。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="310"/>
+        <location filename="../widgets/settings_panel.py" line="311"/>
         <source>Tempo Range</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>速度范围</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="318"/>
+        <location filename="../widgets/settings_panel.py" line="319"/>
         <source>Min 50, Max 250.</source>
         <translation>最小 50，最大 250。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="324"/>
+        <location filename="../widgets/settings_panel.py" line="325"/>
         <source>Lowest BPM</source>
         <translation>最低 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="341"/>
+        <location filename="../widgets/settings_panel.py" line="342"/>
         <source>Highest BPM</source>
         <translation>最高 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="356"/>
+        <location filename="../widgets/settings_panel.py" line="357"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>分析后将调性/BPM 添加到文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="364"/>
+        <location filename="../widgets/settings_panel.py" line="365"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>拖入或发送到分析面板时自动分析</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="369"/>
+        <location filename="../widgets/settings_panel.py" line="370"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>分析后自动将 BPM 写入标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="373"/>
+        <location filename="../widgets/settings_panel.py" line="374"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>写入元数据时，BPM 会四舍五入为最接近的整数。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="378"/>
+        <location filename="../widgets/settings_panel.py" line="379"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translatorcomment>key → 调性 (full label form).</translatorcomment>
         <translation>分析后自动将调性写入标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="382"/>
+        <location filename="../widgets/settings_panel.py" line="383"/>
         <source>Automatically rename files after analysis</source>
         <translation>分析后自动重命名文件</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="389"/>
+        <location filename="../widgets/settings_panel.py" line="390"/>
         <source>Write key to comment</source>
         <translatorcomment>key → 调性.</translatorcomment>
         <translation>将调性写入注释</translation>
@@ -3619,308 +3619,313 @@ or click “Add Artwork…”</source>
         <translation type="vanished">当同时写入此项和能量标签注释时，能量在前，调性在后。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="395"/>
+        <location filename="../widgets/settings_panel.py" line="396"/>
         <source>Naming format:</source>
         <translation>命名格式：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="405"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>128 8A - 原始文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="405"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + 调性前缀</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>8A 128 - Original_File_Name</source>
         <translatorcomment>Same example convention → 原始文件名.</translatorcomment>
         <translation>8A 128 - 原始文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>Key + BPM prefix</source>
         <translation>调性 + BPM 前缀</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="406"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>8A - Original_File_Name</source>
         <translatorcomment>Same convention → 原始文件名.</translatorcomment>
         <translation>8A - 原始文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="406"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>Key prefix only</source>
         <translation>仅调性前缀</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="407"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>Original_File_Name - 8A 128</source>
         <translatorcomment>Same convention → 原始文件名.</translatorcomment>
         <translation>原始文件名 - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="407"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>suffix: Key + BPM</source>
         <translation>后缀：调性 + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="408"/>
+        <location filename="../widgets/settings_panel.py" line="409"/>
         <source>Original_File_Name - 8A</source>
         <translatorcomment>Same convention → 原始文件名.</translatorcomment>
         <translation>原始文件名 - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="408"/>
+        <location filename="../widgets/settings_panel.py" line="409"/>
         <source>suffix: Key only</source>
         <translation>后缀：仅调性</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="431"/>
+        <location filename="../widgets/settings_panel.py" line="432"/>
         <source>Notation</source>
         <translatorcomment>Rendered 记号 (notation system for key). Could be 表示法/记谱法; verify native term for key-notation toggle.</translatorcomment>
         <translation>记号</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="441"/>
+        <location filename="../widgets/settings_panel.py" line="442"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translation>同一时间只能启用一种记号。适用于分析期间写入标签/文件名的调性，以及键盘面板的琴键标签。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="453"/>
+        <location filename="../widgets/settings_panel.py" line="454"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>key codes → 键码; emoji and Latin codes preserved.</translatorcomment>
         <translation>👑 键码  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="454"/>
+        <location filename="../widgets/settings_panel.py" line="455"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translatorcomment>key → 调性; note names Am/Ebm/F# kept Latin.</translatorcomment>
         <translation>传统调性记号  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="455"/>
+        <location filename="../widgets/settings_panel.py" line="456"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="471"/>
+        <location filename="../widgets/settings_panel.py" line="472"/>
         <source>Energy Tag</source>
         <translation>能量标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="479"/>
+        <location filename="../widgets/settings_panel.py" line="480"/>
         <source>Write energy level to Comment tag</source>
         <translation>将能量级别写入注释标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="487"/>
+        <location filename="../widgets/settings_panel.py" line="488"/>
         <source>Energy level written first</source>
         <translation>先写入能量级别</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="491"/>
+        <location filename="../widgets/settings_panel.py" line="492"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>当能量和调性同时写入注释时，先写入能量，再写入调性。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="497"/>
+        <location filename="../widgets/settings_panel.py" line="498"/>
         <source>Format:</source>
         <translation>格式：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="505"/>
+        <location filename="../widgets/settings_panel.py" line="506"/>
         <source>Number only  (7)</source>
         <translation>仅数字  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="506"/>
+        <location filename="../widgets/settings_panel.py" line="507"/>
         <source>With label  (Energy 7)</source>
         <translation>带标签  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="515"/>
+        <location filename="../widgets/settings_panel.py" line="516"/>
         <source>Write mode:</source>
         <translation>写入模式：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="523"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>Prepend to existing comment</source>
         <translation>添加到现有注释之前</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="524"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>Append to existing comment</source>
         <translation>追加到现有注释之后</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="525"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>Replace existing comment</source>
         <translation>替换现有注释</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="545"/>
+        <location filename="../widgets/settings_panel.py" line="546"/>
         <source>Write energy level to its own tag field</source>
         <translation>将能量级别写入专用标签字段</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="548"/>
+        <location filename="../widgets/settings_panel.py" line="549"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>将能量存储在可以精确读回的位置，而不是从注释中解析。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="627"/>
+        <location filename="../widgets/settings_panel.py" line="628"/>
         <source>Playlists</source>
         <translation>播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="636"/>
+        <location filename="../widgets/settings_panel.py" line="637"/>
         <source>Duplicate tracks:</source>
         <translation>重复曲目：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="639"/>
+        <location filename="../widgets/settings_panel.py" line="640"/>
         <source>Ask each time</source>
         <translation>每次询问</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="640"/>
+        <location filename="../widgets/settings_panel.py" line="641"/>
         <source>Always add duplicates</source>
         <translation>始终添加重复曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="641"/>
+        <location filename="../widgets/settings_panel.py" line="642"/>
         <source>Always skip duplicates</source>
         <translation>始终跳过重复曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="653"/>
+        <location filename="../widgets/settings_panel.py" line="654"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>当你添加播放列表中已有的曲目时如何处理。歌单可能会有意重复某首曲目，因此这里会询问你，而不是替你决定。选择其他选项即可不再询问。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="663"/>
+        <location filename="../widgets/settings_panel.py" line="664"/>
         <source>Keep Scratch between sessions</source>
         <translation>在会话之间保留 Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="670"/>
+        <location filename="../widgets/settings_panel.py" line="671"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch 是播放器打开时使用的工作列表，每次启动都是空的。开启此项可让它按上次的内容重新打开；无论哪种方式，“存储播放列表”都会保留一份副本。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="680"/>
+        <location filename="../widgets/settings_panel.py" line="681"/>
         <source>Always use full paths in exported playlists</source>
         <translation>在导出的播放列表中始终使用完整路径</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="688"/>
+        <location filename="../widgets/settings_panel.py" line="689"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>当曲目与播放列表文件位于同一位置时，导出的播放列表会使用相对于该文件的路径，因此你打包发送的文件夹在别人的电脑上依然可用。开启此项则始终写入完整路径。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="698"/>
+        <location filename="../widgets/settings_panel.py" line="699"/>
         <source>Export All Playlists…</source>
         <translation>导出所有播放列表…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="707"/>
+        <location filename="../widgets/settings_panel.py" line="708"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>写入一个与你的目录结构对应的播放列表文件夹，是任何其他应用都能读取的备份。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="556"/>
+        <location filename="../widgets/settings_panel.py" line="557"/>
         <source>Online Metadata</source>
         <translation>在线元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
+        <location filename="../widgets/settings_panel.py" line="160"/>
+        <source>Dark Mode</source>
+        <translation>深色模式</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="180"/>
         <source>Waveform / Visuals</source>
         <translatorcomment>沿用已有的“波形”“视觉效果”，分隔符用全角斜杠。</translatorcomment>
         <translation>波形／视觉效果</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="565"/>
+        <location filename="../widgets/settings_panel.py" line="566"/>
         <source>Look up track details online (Discogs)</source>
         <translation>在线查找曲目信息（Discogs）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="573"/>
+        <location filename="../widgets/settings_panel.py" line="574"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>默认关闭，开启前应用不会发起任何网络请求。查找时只发送所选曲目的艺人和标题，绝不发送你的音频或曲库。BPM、调性和能量始终来自本应用自己的分析。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="584"/>
+        <location filename="../widgets/settings_panel.py" line="585"/>
         <source>Discogs token:</source>
         <translation>Discogs 令牌：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="590"/>
+        <location filename="../widgets/settings_panel.py" line="591"/>
         <source>Paste your token</source>
         <translation>粘贴你的令牌</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="593"/>
+        <location filename="../widgets/settings_panel.py" line="594"/>
         <source>Get a Token…</source>
         <translation>获取令牌…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="600"/>
+        <location filename="../widgets/settings_panel.py" line="601"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs 需要一个免费的个人令牌，才能返回封面图片并以完整速度响应。它是只读的，你可以随时在 Discogs 账户页面撤销。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="609"/>
+        <location filename="../widgets/settings_panel.py" line="610"/>
         <source>Fetch cover art with lookups</source>
         <translation>查找时一并获取封面</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="616"/>
+        <location filename="../widgets/settings_panel.py" line="617"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>将该版本的封面与你文件的封面并排显示，便于比较。在你确认之前不会写入任何内容。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="796"/>
+        <location filename="../widgets/settings_panel.py" line="797"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>音频文件现在会用 Mixed in P 打开。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="807"/>
+        <location filename="../widgets/settings_panel.py" line="808"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P 未在 Windows 中注册。重新安装即可注册。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="812"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>无法打开 Windows 设置。你可以在「应用 → 默认应用」中自行设置。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="818"/>
+        <location filename="../widgets/settings_panel.py" line="819"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>在访达中选择一个音频文件，按 Command-I，在「打开方式」中选择 Mixed in P，然后点按「全部更改」。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="970"/>
+        <location filename="../widgets/settings_panel.py" line="971"/>
         <source>Waveform color</source>
         <translation>波形颜色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1002"/>
-        <location filename="../widgets/settings_panel.py" line="1015"/>
+        <location filename="../widgets/settings_panel.py" line="1003"/>
+        <location filename="../widgets/settings_panel.py" line="1016"/>
         <source>Restart required</source>
         <translation>需要重启</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1004"/>
+        <location filename="../widgets/settings_panel.py" line="1005"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>语言更改将在下次重启 Mixed in P 时生效。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1017"/>
+        <location filename="../widgets/settings_panel.py" line="1018"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>主题更改将在下次重启 Mixed in P 时生效。</translation>
     </message>

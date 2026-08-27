@@ -3452,7 +3452,7 @@ o tocca “Aggiungi copertina…”</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="107"/>
-        <location filename="../widgets/settings_panel.py" line="791"/>
+        <location filename="../widgets/settings_panel.py" line="792"/>
         <source>Default Audio Player</source>
         <translation>Lettore audio predefinito</translation>
     </message>
@@ -3482,12 +3482,12 @@ o tocca “Aggiungi copertina…”</translation>
         <translation>Notte scura</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="160"/>
+        <location filename="../widgets/settings_panel.py" line="161"/>
         <source>Daylight</source>
         <translation>Luce diurna</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="171"/>
+        <location filename="../widgets/settings_panel.py" line="172"/>
         <source>Restart to apply theme changes.</source>
         <translation>Riavvia per applicare le modifiche del tema.</translation>
     </message>
@@ -3497,72 +3497,72 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Forma d&apos;onda</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="187"/>
+        <location filename="../widgets/settings_panel.py" line="188"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>Colore della forma d&apos;onda completa nel lettore.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="206"/>
+        <location filename="../widgets/settings_panel.py" line="207"/>
         <source>Default</source>
         <translation>Predefinito</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="208"/>
+        <location filename="../widgets/settings_panel.py" line="209"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>Usa il colore della forma d&apos;onda predefinito del tema</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="216"/>
+        <location filename="../widgets/settings_panel.py" line="217"/>
         <source>Custom…</source>
         <translation>Personalizzato…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="227"/>
+        <location filename="../widgets/settings_panel.py" line="228"/>
         <source>Playlist Text Size</source>
         <translation>Dimensione del testo delle playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="236"/>
+        <location filename="../widgets/settings_panel.py" line="237"/>
         <source>Size of the track rows in the player. Applies straight away.</source>
         <translation>Dimensione delle righe delle tracce nel player. Si applica subito.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="248"/>
+        <location filename="../widgets/settings_panel.py" line="249"/>
         <source>Small</source>
         <translation>Piccolo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="249"/>
+        <location filename="../widgets/settings_panel.py" line="250"/>
         <source>Medium</source>
         <translation>Medio</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="250"/>
+        <location filename="../widgets/settings_panel.py" line="251"/>
         <source>Large</source>
         <translation>Grande</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="270"/>
         <source>Playlist Artwork</source>
         <translation>Copertina delle playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="279"/>
+        <location filename="../widgets/settings_panel.py" line="280"/>
         <source>Part of the cover art shown in the player&apos;s Art column. Full makes each row tall enough for the whole sleeve.</source>
         <translation>Parte della copertina mostrata nella colonna Copertina del player. Intera rende ogni riga alta abbastanza per l&apos;intera copertina.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="293"/>
+        <location filename="../widgets/settings_panel.py" line="294"/>
         <source>Top</source>
         <translation>Alto</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="294"/>
+        <location filename="../widgets/settings_panel.py" line="295"/>
         <source>Middle</source>
         <translation>Centro</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="295"/>
+        <location filename="../widgets/settings_panel.py" line="296"/>
         <source>Full</source>
         <translation>Intera</translation>
     </message>
@@ -3579,58 +3579,58 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Aggiunge al player un selettore di visualizzazioni e mostra una forma d&apos;onda animata durante l&apos;analisi o la conversione.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="310"/>
+        <location filename="../widgets/settings_panel.py" line="311"/>
         <source>Tempo Range</source>
         <translatorcomment>&apos;Range&apos; -&gt; &apos;Intervallo&apos;; &apos;Tempo&apos; here means musical tempo, rendered &apos;Intervallo di tempo&apos;.</translatorcomment>
         <translation>Intervallo di tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="318"/>
+        <location filename="../widgets/settings_panel.py" line="319"/>
         <source>Min 50, Max 250.</source>
         <translation>Min 50, Max 250.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="324"/>
+        <location filename="../widgets/settings_panel.py" line="325"/>
         <source>Lowest BPM</source>
         <translation>BPM minimo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="341"/>
+        <location filename="../widgets/settings_panel.py" line="342"/>
         <source>Highest BPM</source>
         <translation>BPM massimo</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="356"/>
+        <location filename="../widgets/settings_panel.py" line="357"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translation>Aggiunta di tonalità/BPM al nome del file dopo l&apos;analisi</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="364"/>
+        <location filename="../widgets/settings_panel.py" line="365"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>Analizza automaticamente quando trascini o invii al pannello Analizza</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="369"/>
+        <location filename="../widgets/settings_panel.py" line="370"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>Scrivi automaticamente i BPM nei tag dopo l&apos;analisi</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="373"/>
+        <location filename="../widgets/settings_panel.py" line="374"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>Il BPM viene arrotondato al numero intero più vicino quando viene scritto nei metadati.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="378"/>
+        <location filename="../widgets/settings_panel.py" line="379"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translation>Scrivi automaticamente la tonalità nei tag dopo l&apos;analisi</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="382"/>
+        <location filename="../widgets/settings_panel.py" line="383"/>
         <source>Automatically rename files after analysis</source>
         <translation>Rinomina automaticamente i file dopo l&apos;analisi</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="389"/>
+        <location filename="../widgets/settings_panel.py" line="390"/>
         <source>Write key to comment</source>
         <translation>Scrivi la tonalità nel commento</translation>
     </message>
@@ -3645,303 +3645,308 @@ o tocca “Aggiungi copertina…”</translation>
         <translation type="vanished">Quando vengono scritti sia questo che il commento dell&apos;Energy Tag, metti prima l&apos;energia e poi la tonalità.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="395"/>
+        <location filename="../widgets/settings_panel.py" line="396"/>
         <source>Naming format:</source>
         <translatorcomment>&apos;Formato del nome&apos; chosen over &apos;Formato di denominazione&apos; for UI brevity.</translatorcomment>
         <translation>Formato del nome:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="405"/>
         <source>128 8A - Original_File_Name</source>
         <translation>128 8A - Nome_File_Originale</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="404"/>
+        <location filename="../widgets/settings_panel.py" line="405"/>
         <source>BPM + Key prefix</source>
         <translation>Prefisso BPM + Tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - Nome_File_Originale</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="405"/>
+        <location filename="../widgets/settings_panel.py" line="406"/>
         <source>Key + BPM prefix</source>
         <translation>Prefisso Tonalità + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="406"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - Nome_File_Originale</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="406"/>
+        <location filename="../widgets/settings_panel.py" line="407"/>
         <source>Key prefix only</source>
         <translation>Solo prefisso Tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="407"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>Nome_File_Originale - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="407"/>
+        <location filename="../widgets/settings_panel.py" line="408"/>
         <source>suffix: Key + BPM</source>
         <translation>suffisso: Tonalità + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="408"/>
+        <location filename="../widgets/settings_panel.py" line="409"/>
         <source>Original_File_Name - 8A</source>
         <translation>Nome_File_Originale - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="408"/>
+        <location filename="../widgets/settings_panel.py" line="409"/>
         <source>suffix: Key only</source>
         <translation>suffisso: solo Tonalità</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="431"/>
+        <location filename="../widgets/settings_panel.py" line="432"/>
         <source>Notation</source>
         <translation>Notazione</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="441"/>
+        <location filename="../widgets/settings_panel.py" line="442"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translation>Può essere attiva una sola notazione alla volta. Si applica alla tonalità scritta nei tag/nomi di file durante l&apos;analisi e alle etichette dei tasti del pannello Tastiera.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="453"/>
+        <location filename="../widgets/settings_panel.py" line="454"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>&apos;Key Code&apos; kept English (domain term); emoji and key codes preserved; double space kept.</translatorcomment>
         <translation>👑 Key Code  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="454"/>
+        <location filename="../widgets/settings_panel.py" line="455"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>Notazione tradizionale  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="455"/>
+        <location filename="../widgets/settings_panel.py" line="456"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="471"/>
+        <location filename="../widgets/settings_panel.py" line="472"/>
         <source>Energy Tag</source>
         <translatorcomment>Kept English as it is a named UI feature/setting.</translatorcomment>
         <translation>Energy Tag</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="479"/>
+        <location filename="../widgets/settings_panel.py" line="480"/>
         <source>Write energy level to Comment tag</source>
         <translatorcomment>&apos;Comment tag&apos; -&gt; &apos;tag Commento&apos; to match metadata &apos;Commento&apos;.</translatorcomment>
         <translation>Scrivi il livello di energia nel tag Commento</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="487"/>
+        <location filename="../widgets/settings_panel.py" line="488"/>
         <source>Energy level written first</source>
         <translation>Scrivi prima il livello di energia</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="491"/>
+        <location filename="../widgets/settings_panel.py" line="492"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>Quando nel commento vengono scritte sia l&apos;energia sia la tonalità, l&apos;energia viene prima e la tonalità dopo.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="497"/>
+        <location filename="../widgets/settings_panel.py" line="498"/>
         <source>Format:</source>
         <translation>Formato:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="505"/>
+        <location filename="../widgets/settings_panel.py" line="506"/>
         <source>Number only  (7)</source>
         <translation>Solo numero  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="506"/>
+        <location filename="../widgets/settings_panel.py" line="507"/>
         <source>With label  (Energy 7)</source>
         <translation>Con etichetta  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="515"/>
+        <location filename="../widgets/settings_panel.py" line="516"/>
         <source>Write mode:</source>
         <translation>Modalità di scrittura:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="523"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>Prepend to existing comment</source>
         <translation>Anteponi al commento esistente</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="524"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>Append to existing comment</source>
         <translation>Accoda al commento esistente</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="525"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>Replace existing comment</source>
         <translation>Sostituisci il commento esistente</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="545"/>
+        <location filename="../widgets/settings_panel.py" line="546"/>
         <source>Write energy level to its own tag field</source>
         <translation>Scrivi il livello di energia in un campo tag dedicato</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="548"/>
+        <location filename="../widgets/settings_panel.py" line="549"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>Salva l’energia dove può essere riletta esattamente, invece di estrarla dal commento.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="627"/>
+        <location filename="../widgets/settings_panel.py" line="628"/>
         <source>Playlists</source>
         <translation>Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="636"/>
+        <location filename="../widgets/settings_panel.py" line="637"/>
         <source>Duplicate tracks:</source>
         <translation>Tracce duplicate:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="639"/>
+        <location filename="../widgets/settings_panel.py" line="640"/>
         <source>Ask each time</source>
         <translation>Chiedi ogni volta</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="640"/>
+        <location filename="../widgets/settings_panel.py" line="641"/>
         <source>Always add duplicates</source>
         <translation>Aggiungi sempre i duplicati</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="641"/>
+        <location filename="../widgets/settings_panel.py" line="642"/>
         <source>Always skip duplicates</source>
         <translation>Salta sempre i duplicati</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="653"/>
+        <location filename="../widgets/settings_panel.py" line="654"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>Cosa succede quando aggiungi una traccia che la playlist contiene già. Un set può ripetere una traccia di proposito, quindi la scelta viene chiesta a te invece di essere decisa al posto tuo: scegli una delle altre opzioni per non essere più interpellato.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="663"/>
+        <location filename="../widgets/settings_panel.py" line="664"/>
         <source>Keep Scratch between sessions</source>
         <translation>Mantieni Scratch tra una sessione e l’altra</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="670"/>
+        <location filename="../widgets/settings_panel.py" line="671"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch è la lista di lavoro con cui si apre il player e a ogni avvio è vuota. Attiva questa opzione perché si riapra con quello che conteneva: in ogni caso «Salva playlist» ne conserva una copia.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="680"/>
+        <location filename="../widgets/settings_panel.py" line="681"/>
         <source>Always use full paths in exported playlists</source>
         <translation>Usa sempre percorsi completi nelle playlist esportate</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="688"/>
+        <location filename="../widgets/settings_panel.py" line="689"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>Le playlist esportate usano percorsi relativi al file della playlist quando le tracce si trovano accanto a esso, così una cartella che comprimi e invii funziona anche sul computer di un’altra persona. Attiva questa opzione per scrivere sempre il percorso completo.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="698"/>
+        <location filename="../widgets/settings_panel.py" line="699"/>
         <source>Export All Playlists…</source>
         <translation>Esporta tutte le playlist…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="707"/>
+        <location filename="../widgets/settings_panel.py" line="708"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>Scrive una cartella di file di playlist che rispecchia il tuo albero: un backup leggibile da qualsiasi altra app.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="556"/>
+        <location filename="../widgets/settings_panel.py" line="557"/>
         <source>Online Metadata</source>
         <translation>Metadati online</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
+        <location filename="../widgets/settings_panel.py" line="160"/>
+        <source>Dark Mode</source>
+        <translation>Modalità scura</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="180"/>
         <source>Waveform / Visuals</source>
         <translatorcomment>Entrambe le metà riusano le stringhe esistenti «Forma d&apos;onda» e «Visualizzazioni».</translatorcomment>
         <translation>Forma d&apos;onda / Visualizzazioni</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="565"/>
+        <location filename="../widgets/settings_panel.py" line="566"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Cerca online i dati delle tracce (Discogs)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="573"/>
+        <location filename="../widgets/settings_panel.py" line="574"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>Disattivato per impostazione predefinita: l’app non effettua richieste di rete finché non lo attivi. Una ricerca invia artista e titolo della traccia scelta, mai il tuo audio né la tua libreria. BPM, tonalità ed energia provengono sempre dall’analisi di questa app.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="584"/>
+        <location filename="../widgets/settings_panel.py" line="585"/>
         <source>Discogs token:</source>
         <translation>Token Discogs:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="590"/>
+        <location filename="../widgets/settings_panel.py" line="591"/>
         <source>Paste your token</source>
         <translation>Incolla il tuo token</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="593"/>
+        <location filename="../widgets/settings_panel.py" line="594"/>
         <source>Get a Token…</source>
         <translation>Ottieni un token…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="600"/>
+        <location filename="../widgets/settings_panel.py" line="601"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs richiede un token personale gratuito per restituire le copertine e rispondere alla massima velocità. È di sola lettura e puoi revocarlo quando vuoi dal tuo account Discogs.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="609"/>
+        <location filename="../widgets/settings_panel.py" line="610"/>
         <source>Fetch cover art with lookups</source>
         <translation>Scarica la copertina durante le ricerche</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="616"/>
+        <location filename="../widgets/settings_panel.py" line="617"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>Mostra la copertina della pubblicazione accanto a quella del tuo file, così puoi confrontarle. Non viene scritto nulla finché non approvi.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="796"/>
+        <location filename="../widgets/settings_panel.py" line="797"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>I tuoi file audio ora si aprono con Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="807"/>
+        <location filename="../widgets/settings_panel.py" line="808"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P non è registrato in Windows. Reinstallarlo lo registrerà.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="812"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>Non è stato possibile aprire le Impostazioni di Windows. Puoi farlo tu stesso in «App → App predefinite».</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="818"/>
+        <location filename="../widgets/settings_panel.py" line="819"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Seleziona un file audio nel Finder, premi Comando-I, scegli Mixed in P in «Apri con» e fai clic su «Modifica tutti».</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="970"/>
+        <location filename="../widgets/settings_panel.py" line="971"/>
         <source>Waveform color</source>
         <translation>Colore della forma d&apos;onda</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1002"/>
-        <location filename="../widgets/settings_panel.py" line="1015"/>
+        <location filename="../widgets/settings_panel.py" line="1003"/>
+        <location filename="../widgets/settings_panel.py" line="1016"/>
         <source>Restart required</source>
         <translation>Riavvio necessario</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1004"/>
+        <location filename="../widgets/settings_panel.py" line="1005"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>La modifica della lingua avrà effetto al prossimo riavvio di Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1017"/>
+        <location filename="../widgets/settings_panel.py" line="1018"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>La modifica del tema avrà effetto al prossimo riavvio di Mixed in P.</translation>
     </message>

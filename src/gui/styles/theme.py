@@ -351,9 +351,47 @@ NUEVO_LEON = Palette(
     ACCENT_TEXT="#ebff00",  # accent reads fine as text on dark navy
 )
 
+# ── Theme E: Dark Mode ──────────────────────────────────────────────────────
+# Ported from the docs page's own palette (docs/index.html): true-black canvas,
+# graphite panels, and the neon accents on top. The playlist zebra alternates
+# the grey panel row with a *near-black* ROW_ALT (same darker-than-panel trick
+# as Nuevo Leon) — the docs table look the theme is named for.
+DARK_MODE = Palette(
+    name="dark_mode",
+    label="Dark Mode",
+    BG_DARK="#0a0a0c",  # window canvas (docs --bg)
+    BG_MEDIUM="#141418",  # panels/inputs, base table row (docs --panel)
+    BG_LIGHT="#1e1e24",  # hover / selected fill
+    BG_LIGHTER="#26262e",  # active (docs --line)
+    NEON_YELLOW="#f0ff00",  # primary accent (docs --neon)
+    NEON_GREEN="#00ff66",  # secondary accent / success (docs --green)
+    PLAYHEAD="#ffffff",  # white for max contrast over the waveform
+    CHROME="#9a9aa2",  # stronger lines / table headers (docs --muted)
+    CHROME_DARK="#2c2c36",  # hairline borders, a step above --line
+    TEXT_PRIMARY="#eaeaea",  # docs --ink
+    TEXT_SECONDARY="#9a9aa2",  # docs --muted
+    TEXT_DISABLED="#55555e",
+    ERROR="#ff5470",  # docs --red
+    WARNING="#ffb020",
+    INFO="#5c9dff",
+    PENDING="#7a7a84",
+    ACCENT_HOVER="#d4e300",
+    ACCENT_PRESSED="#b8c700",
+    ACCENT2_HOVER="#00dd58",
+    ERROR_HOVER="#e64663",
+    ROW_ALT="#0e0e11",  # near-black zebra row (docs alternation)
+    ROW_HOVER="#1c1c22",
+    SEARCH_HIT="#00ff66",
+    SEARCH_HIT_WASH="#0a2e1c",
+    TRAY_BG="#050507",  # recessed tray, darker than the black canvas
+    WAVE_AXIS="#1c1c22",
+    WAVEFORM_DEFAULT="#f0ff00",  # neon yellow on the near-black bed
+    ACCENT_TEXT="#f0ff00",  # accent reads fine as text on true black
+)
+
 # Registry keyed by the id persisted in config. Order = picker order.
 THEMES: dict[str, Palette] = {
-    p.name: p for p in (NEON_DARK, NIGHT_DARK, NUEVO_LEON, DAYLIGHT)
+    p.name: p for p in (NEON_DARK, NIGHT_DARK, NUEVO_LEON, DARK_MODE, DAYLIGHT)
 }
 DEFAULT_THEME = NUEVO_LEON.name
 

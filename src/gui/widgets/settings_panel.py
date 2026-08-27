@@ -157,6 +157,7 @@ class SettingsPanel(QWidget):
             "neon_dark": "Neon Dark",
             "night_dark": self.tr("Night Dark"),
             "nuevo_leon": "Nuevo Leon",
+            "dark_mode": self.tr("Dark Mode"),
             "daylight": self.tr("Daylight"),
         }
         self._theme_combo = FittedComboBox()
