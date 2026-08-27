@@ -20,11 +20,14 @@ from PySide6.QtGui import QMouseEvent
 from src.utils.config import load_config, save_config
 from src.gui.widgets.metronome_engine import MAX_BPM, MIN_BPM, SHARP, SOFT
 from src.gui.widgets.metronome_view import (
-    DEFAULT_CLICK_VOLUME,
+    CLICK_LEVELS,
+    DEFAULT_CLICK_LEVEL,
     SILENT,
     BpmScrubBox,
     MetronomeView,
 )
+
+DEFAULT_GAIN = CLICK_LEVELS[DEFAULT_CLICK_LEVEL]
 
 
 class FakeStream:
@@ -229,6 +232,30 @@ class TestTheTransport:
         view._start_btn.setChecked(True)
         assert view._start_btn.text() == "Stop"
 
+    def test_the_view_does_not_lay_the_start_button_out(self, view):
+        """The host puts it on its own header row — see start_button(). It is
+        still parented here, so a view with no host never leaves a stray
+        top-level window behind."""
+        assert view.start_button() is view._start_btn
+        assert view._start_btn.parent() is view
+        assert view.layout().indexOf(view._start_btn) == -1
+
+    def test_it_is_wide_enough_for_the_wider_of_its_two_labels(self, view):
+        """Measured, not written down: every label here is translated, and a
+        QPushButton centres rather than elides, so a width short by a few
+        pixels cuts the word at both ends with nothing to show for it."""
+        from PySide6.QtGui import QFontMetrics
+
+        fm = QFontMetrics(view._start_btn.font())
+        widest = max(fm.horizontalAdvance("Start"), fm.horizontalAdvance("Stop"))
+
+        assert view._start_btn.width() >= widest
+        # And it does not resize under the label change, which would shove the
+        # header row about every time the click starts.
+        before = view._start_btn.width()
+        view._start_btn.setChecked(True)
+        assert view._start_btn.width() == before
+
     def test_hiding_the_view_stops_it(self, opened, qtbot):
         """Switching to another view in the switcher, or off the panel.
 
@@ -294,20 +321,78 @@ class TestTap:
         assert view._bpm_box.value() == 120.0
 
 
+class TestTheVolumeButtonCyclesThreeLevels:
+    """Where Start used to stand. Three loudnesses, none of them silence —
+    that answer belongs to the click-choice row beside it."""
+
+    def test_it_starts_in_the_middle(self, view):
+        assert view.click_level == DEFAULT_CLICK_LEVEL
+        assert view.volume == pytest.approx(DEFAULT_GAIN)
+
+    def test_clicking_walks_up_and_wraps(self, view):
+        seen = [view.click_level]
+        for _ in range(len(CLICK_LEVELS)):
+            view._volume_btn.click()
+            seen.append(view.click_level)
+
+        assert seen == [1, 2, 0, 1]
+
+    def test_the_level_reaches_the_engine(self, view):
+        view.set_click_level(0)
+        assert view._engine._gain == pytest.approx(CLICK_LEVELS[0])
+
+        view.set_click_level(2)
+        assert view._engine._gain == pytest.approx(CLICK_LEVELS[2])
+
+    def test_the_levels_only_ever_go_up(self, view):
+        """A cycle that is not monotonic would make the bars a lie."""
+        assert list(CLICK_LEVELS) == sorted(CLICK_LEVELS)
+        assert CLICK_LEVELS[0] > 0.0
+
+    def test_silence_still_wins_over_the_level(self, view):
+        """The two rows answer different questions, and Silent answers the
+        first one — so the loudest level is still no sound."""
+        view.set_click_level(2)
+        view.set_click_choice(SILENT)
+
+        assert view.volume == 0.0
+        assert view._engine._gain == 0.0
+
+    def test_changing_the_level_while_silent_stays_silent(self, view):
+        view.set_click_choice(SILENT)
+        view.set_click_level(2)
+
+        assert view._engine._gain == 0.0
+
+    def test_coming_off_silence_takes_the_level_that_was_set(self, view):
+        view.set_click_choice(SILENT)
+        view.set_click_level(0)
+
+        view.set_click_choice(SOFT)
+
+        assert view._engine._gain == pytest.approx(CLICK_LEVELS[0])
+
+    def test_the_ends_do_not_run_off_the_scale(self, view):
+        view.set_click_level(-5)
+        assert view.click_level == 0
+        view.set_click_level(99)
+        assert view.click_level == len(CLICK_LEVELS) - 1
+
+
 class TestTheClickRowPicksWhichClick:
-    """Three exclusive toggles where the volume slider was: silent, soft,
-    sharp. The level is a constant now — it is which click that varies."""
+    """Three exclusive toggles for which click sounds: silent, soft, sharp.
+    How loud is the button beside them; this row is which."""
 
     def test_it_starts_on_the_soft_click_at_the_old_level(self, view):
         assert view.click_choice == SOFT
         assert view._engine.voice == SOFT
-        assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
+        assert view._engine._gain == pytest.approx(DEFAULT_GAIN)
 
     def test_the_sharp_choice_reaches_the_engine(self, view):
         view.set_click_choice(SHARP)
 
         assert view._engine.voice == SHARP
-        assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
+        assert view._engine._gain == pytest.approx(DEFAULT_GAIN)
 
     def test_silence_is_a_gain_of_zero(self, view):
         view.set_click_choice(SILENT)
@@ -321,7 +406,7 @@ class TestTheClickRowPicksWhichClick:
 
         assert view._engine.voice == SHARP
         view.set_click_choice(SHARP)
-        assert view._engine._gain == pytest.approx(DEFAULT_CLICK_VOLUME / 100.0)
+        assert view._engine._gain == pytest.approx(DEFAULT_GAIN)
 
     def test_only_one_is_ever_on(self, view):
         for choice in (SILENT, SOFT, SHARP):
@@ -496,3 +581,28 @@ class TestTheSmallButtonsSurviveTheStylesheet:
         text = pathlib.Path("src/gui/styles/app.qss.template").read_text()
         assert "QPushButton#metroClickButton:checked {" in text
         assert "QPushButton#metroGlobalButton:checked" in text
+
+    def test_the_volume_button_keeps_its_background_on_hover(self):
+        """Its content is three accent-filled bars painted on top of the box.
+        The NEON_YELLOW hover its 24px neighbours wear would swallow them."""
+        text = pathlib.Path("src/gui/styles/app.qss.template").read_text()
+        start = text.index("QPushButton#metroVolumeButton:hover {")
+        assert "NEON_YELLOW" not in text[start : text.index("}", start)]
+
+    def test_the_start_button_states_its_height_and_not_its_width(self):
+        """40 is written in two places and this is what keeps them equal.
+
+        It has to be: the global QPushButton rule's `min-height: 20px` reaches
+        this button, and a stylesheet minimum REPLACES the one setFixedHeight
+        set — so 140x40 rendered as 140x22 until the height was stated in the
+        QSS too. The width must NOT join it, because a width written in the
+        stylesheet is an English width while a height is the same in every
+        language. Neither half is visible to this suite, which runs with no
+        application stylesheet at all.
+        """
+        from src.gui.widgets.metronome_view import _START_HEIGHT
+
+        rule = self.rule_for("metroStartButton")
+        assert f"min-height: {_START_HEIGHT}px;" in rule
+        assert f"max-height: {_START_HEIGHT}px;" in rule
+        assert "min-width" not in rule and "max-width" not in rule

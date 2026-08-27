@@ -452,7 +452,7 @@ QWidget#playlistTreePanel {
     border: none;
 }
 
-/* ===== Metronome (Keyboard panel, third view) ===== */
+/* ===== Metronome (a collapsible section in the Player panel) ===== */
 
 /* The +/- and bend buttons are 24px square, under the global QPushButton
    padding of 8px/16px — which would leave no contents rect at all and draw
@@ -514,17 +514,60 @@ QPushButton#metroClickButton:checked {
 }
 
 QPushButton#metroTapButton,
-QPushButton#metroGlobalButton,
-QPushButton#metroStartButton {
+QPushButton#metroGlobalButton {
     padding: 4px 14px;
     min-height: 0;
     font-weight: bold;
 }
 
-QPushButton#metroGlobalButton:checked,
+QPushButton#metroGlobalButton:checked {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+}
+
+/* Start/Stop, up on the section's header row beside the word "Metronome" and
+   deliberately the biggest control in here. Its font-size is set in Python
+   rather than stated here, because the width is measured from font metrics
+   and a stylesheet font-size never reaches widget.font(). The size itself is
+   fixed from the same measurement in Python.
+   The HEIGHT has to be stated here and the width must not be, which looks
+   inconsistent and is not. A stylesheet minimum REPLACES the one setFixedSize
+   set, so the global QPushButton rule's `min-height: 20px` reaches this button
+   and setFixedHeight(40) does not survive it — 140x40 rendered as 140x22. The
+   width escapes only because no rule in this file states a min-width for a
+   plain QPushButton, and it must stay that way: a width written here would be
+   an English width, while a height is the same in every language. So 40 is
+   stated twice, and a test compares the two rather than trusting them to be
+   kept in step. */
+QPushButton#metroStartButton {
+    padding: 0px 18px;
+    min-height: 40px;
+    max-height: 40px;
+    border-radius: 6px;
+}
+
 QPushButton#metroStartButton:checked {
     background-color: @NEON_YELLOW@;
     color: @BG_DARK@;
+}
+
+/* How loud the click is: three bars that ClickVolumeButton paints on top of
+   this box. No :hover fill, unlike its 24px neighbours — a NEON_YELLOW
+   background would swallow the accent-filled bars that are the whole content
+   of the button, so the hover lifts the box a shade instead. Same stated
+   footprint law as #metroStepButton: the global 8px/16px padding would leave
+   no contents rect, and `min-width: 0` alone would collapse the width. */
+QPushButton#metroVolumeButton {
+    padding: 0;
+    min-height: 24px;
+    max-height: 24px;
+    background-color: @BG_LIGHT@;
+    border: none;
+    border-radius: 4px;
+}
+
+QPushButton#metroVolumeButton:hover {
+    background-color: @BG_LIGHTER@;
 }
 
 /* The tempo, in a monospaced-ish weight so the two decimals do not jitter

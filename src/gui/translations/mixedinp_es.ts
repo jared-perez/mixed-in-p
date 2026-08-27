@@ -421,9 +421,18 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>BpmScrubBox</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="112"/>
+        <location filename="../widgets/metronome_view.py" line="140"/>
         <source>Drag up or down to change the tempo</source>
         <translation>Arrastra hacia arriba o abajo para cambiar el tempo</translation>
+    </message>
+</context>
+<context>
+    <name>ClickVolumeButton</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="301"/>
+        <source>Click volume — press to cycle quiet / medium / loud</source>
+        <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. Three loudness levels on one cycling button; the label names all three because the button&apos;s bars show which is on.</translatorcomment>
+        <translation>Volumen del clic — pulsa para alternar bajo / medio / alto</translation>
     </message>
 </context>
 <context>
@@ -2098,18 +2107,18 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>MetronomeSection</name>
     <message>
-        <location filename="../widgets/metronome_section.py" line="62"/>
+        <location filename="../widgets/metronome_section.py" line="78"/>
         <source>Metronome</source>
         <translation>Metrónomo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_section.py" line="93"/>
+        <location filename="../widgets/metronome_section.py" line="131"/>
         <source>Hide the metronome</source>
         <translatorcomment>Disclosure header for the Player panel&apos;s metronome section. Same register as the Waveform / Loop Slicer headers beside it; the tooltip states what the next click will do.</translatorcomment>
         <translation>Ocultar el metrónomo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_section.py" line="95"/>
+        <location filename="../widgets/metronome_section.py" line="133"/>
         <source>Show the metronome — tap a tempo and click along</source>
         <translatorcomment>Disclosure header for the Player panel&apos;s metronome section. Same register as the Waveform / Loop Slicer headers beside it; the tooltip states what the next click will do.</translatorcomment>
         <translation>Mostrar el metrónomo: marca un tempo y sigue el clic</translation>
@@ -2118,73 +2127,74 @@ o haz clic en “Añadir carátula…”</translation>
 <context>
     <name>MetronomeView</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="259"/>
+        <location filename="../widgets/metronome_view.py" line="378"/>
         <source>One BPM slower</source>
         <translation>1 BPM más lento</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="268"/>
+        <location filename="../widgets/metronome_view.py" line="387"/>
         <source>One BPM faster</source>
         <translation>1 BPM más rápido</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="277"/>
+        <location filename="../widgets/metronome_view.py" line="396"/>
         <source>Tap</source>
         <translation>Marcar</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="280"/>
+        <location filename="../widgets/metronome_view.py" line="399"/>
         <source>Tap along to set the tempo</source>
         <translation>Marca el ritmo para fijar el tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="288"/>
+        <location filename="../widgets/metronome_view.py" line="407"/>
         <source>Global Click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clic global</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="309"/>
+        <location filename="../widgets/metronome_view.py" line="428"/>
         <source>Hold to lean the beat back</source>
         <translation>Mantén pulsado para atrasar el beat</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="312"/>
+        <location filename="../widgets/metronome_view.py" line="431"/>
         <source>Hold to push the beat forward</source>
         <translation>Mantén pulsado para adelantar el beat</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="322"/>
-        <location filename="../widgets/metronome_view.py" line="391"/>
+        <location filename="../widgets/metronome_view.py" line="495"/>
+        <location filename="../widgets/metronome_view.py" line="512"/>
+        <location filename="../widgets/metronome_view.py" line="552"/>
         <source>Start</source>
         <translation>Iniciar</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="340"/>
+        <location filename="../widgets/metronome_view.py" line="460"/>
         <source>Silent — the light keeps time</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Silencio: la luz sigue marcando el tiempo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="341"/>
+        <location filename="../widgets/metronome_view.py" line="461"/>
         <source>Standard click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clic estándar</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="342"/>
+        <location filename="../widgets/metronome_view.py" line="462"/>
         <source>Higher-pitched click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clic más agudo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="424"/>
+        <location filename="../widgets/metronome_view.py" line="585"/>
         <source>Stop the click when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Detén el clic al salir de esta vista</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="426"/>
+        <location filename="../widgets/metronome_view.py" line="587"/>
         <source>Keep the click going when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Mantén el clic sonando al salir de esta vista</translation>
@@ -2194,7 +2204,8 @@ o haz clic en “Añadir carátula…”</translation>
         <translation type="vanished">Volumen del clic</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="391"/>
+        <location filename="../widgets/metronome_view.py" line="512"/>
+        <location filename="../widgets/metronome_view.py" line="552"/>
         <source>Stop</source>
         <translation>Detener</translation>
     </message>

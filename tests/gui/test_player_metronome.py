@@ -18,6 +18,7 @@ import pytest
 
 from src.gui.widgets import section_header
 from src.gui.widgets.keyboard_panel import KeyboardPanel
+from src.gui.styles.theme import Theme
 from src.gui.widgets.metronome_section import MetronomeSection
 from src.gui.widgets.player_panel import PlayerPanel
 
@@ -105,6 +106,59 @@ class TestTheDisclosure:
         from PySide6.QtCore import Qt
 
         assert section.view._bpm_box.focusPolicy() != Qt.FocusPolicy.NoFocus
+
+
+class TestStartSitsOnTheHeaderRow:
+    """The one control the section lays out that it does not own. The view
+    builds and drives it; being up here is what makes it the biggest target
+    in the metronome."""
+
+    def test_the_section_adopted_it(self, section):
+        button = section.view.start_button()
+
+        assert button.parent() is section
+        assert section._start_btn is button
+
+    def test_it_shares_the_header_row_with_the_word(self, section):
+        row = section.layout().itemAt(0).layout()
+        widgets = [
+            row.itemAt(i).widget() for i in range(row.count())
+        ]
+
+        assert section._header_btn in widgets
+        assert section._start_btn in widgets
+
+    def test_it_is_the_taller_of_the_two(self, section):
+        """Drawn that way on purpose — it is not a second word of the label."""
+        assert section._start_size().height() > section._header_btn.height()
+
+    def test_a_collapsed_section_shows_only_its_word(self, section, qtbot):
+        """The same shape as the two sections beside it. It also closes the
+        second door into a running click: Start reachable over a hidden body
+        would open the stream against a view the Global Click rule has
+        already had its say about."""
+        section.show()
+        qtbot.waitExposed(section)
+
+        assert section._start_btn.isHidden()
+
+        section.set_expanded(True)
+        assert not section._start_btn.isHidden()
+
+        section.set_expanded(False)
+        assert section._start_btn.isHidden()
+
+    def test_the_window_minimum_covers_the_header_row(self, section):
+        """row_min_width measures both rows now — the header one can be the
+        wider of the two once a translated Start joins it."""
+        header_row = (
+            section._header_btn.width()
+            + Theme.SPACING
+            + 12
+            + section._start_size().width()
+        )
+
+        assert section.row_min_width() >= header_row
 
 
 class TestCollapsingSilencesIt:

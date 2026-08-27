@@ -2,8 +2,18 @@
 
 Hosted by :class:`~src.gui.widgets.metronome_section.MetronomeSection`, a
 collapsible section in the Player panel. It was the Keyboard panel's third
-view until 2026-08-26 and nothing in this file changed in the move — the host
-supplies a place to sit and the two lifecycle calls at the bottom.
+view until 2026-08-26; the host supplies a place to sit, the two lifecycle
+calls at the bottom, and — since the layout pass that followed the move — a
+home on its own header row for the one control here that is hit mid-set. So
+:meth:`MetronomeView._build_start_button` builds Start and everything about
+what it *does* stays here, while :meth:`MetronomeView.start_button` hands it
+to the host to place. Nothing else in this file is laid out by anyone else.
+
+Where Start stood, the click's level does: three loudnesses, cycled by one
+:class:`ClickVolumeButton`. It is a button rather than the slider it replaced
+because three answers do not need a hundred, and it paints its own bars
+because a label is one colour and this one has to show which of its symbols
+are lit.
 
 The sound is the clock. :class:`MetronomeEngine` schedules every click by
 sample count inside the audio callback, which is the only way to hold a tempo
@@ -35,7 +45,7 @@ import time
 
 import numpy as np
 from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QPainter
+from PySide6.QtGui import QColor, QFontMetrics, QPainter
 from PySide6.QtWidgets import (
     QButtonGroup,
     QHBoxLayout,
@@ -75,10 +85,29 @@ _BEND = 0.04
 # nothing about the sound depends on when this fires.
 _VIS_INTERVAL_MS = 33
 
-# The level both audible choices sound at, in percent. It was a slider once,
-# and this is the 50 that slider started at — so a click is exactly as loud
-# as it has always been, and the choice on the row is now *which* click.
-DEFAULT_CLICK_VOLUME = 50
+# The three levels the click sounds at, quiet to loud, as engine gains. Even
+# 6 dB steps, and the middle one is the 50 the volume slider started at — so
+# the default click is exactly as loud as it has always been and what changed
+# is that there is now a way off it.
+#
+# Silence is deliberately NOT a fourth level. It is one of the three *click
+# choices* on the row beside this, because "which click" and "how loud" are
+# different questions and the answer "none" belongs to the first one: the beat
+# light keeps time either way, so a silent metronome is a state of the click
+# rather than the bottom of a scale.
+CLICK_LEVELS = (0.25, 0.5, 1.0)
+DEFAULT_CLICK_LEVEL = 1
+
+# The Start button's own size. It sits up on the section's header row rather
+# than in with the small controls, so it is deliberately the biggest thing in
+# the metronome — this is the one button anyone reaches for mid-set.
+# The height is restated in app.qss.template; see _build_start_button.
+_START_HEIGHT = 40
+_START_MIN_WIDTH = 140
+# What the stylesheet's own padding costs, plus room to breathe. A width
+# written as a constant is an English width, so the floor above is only a
+# floor: "Start"/"Stop" are measured and the wider of the two wins.
+_START_PADDING = 44
 
 # The three settings the click row offers, left to right. Silence is one of
 # them rather than a level, because that is the only thing the level was ever
@@ -228,6 +257,95 @@ class BeatLight(QWidget):
         painter.end()
 
 
+class ClickVolumeButton(QPushButton):
+    """How loud the click is: three bars, filled with the accent up to the level.
+
+    A cycling button rather than a slider because there are only three answers
+    and none of them is a number anyone would want to name. Clicking walks
+    quiet → medium → loud → quiet, so the whole control is one target the
+    width of two glyphs, which is what let it fit where the Start button used
+    to stand.
+
+    The bars are painted rather than written for the reason a QSS-styled
+    ``::down-arrow`` had to be: a ``QPushButton``'s label is one colour, so a
+    *text* label could show three symbols but never show which of them are
+    lit. Painting also keeps the accent following the palette for free — both
+    colours are read at paint time, exactly as :class:`BeatLight` reads its own.
+    """
+
+    level_changed = Signal(int)
+
+    _BAR_W = 8
+    _BAR_GAP = 5
+    _PAD_X = 6
+    _BOTTOM = 2
+    # Ascending, so the level reads at a glance from the silhouette and not
+    # only from the colour — which is the half of it that survives a palette
+    # whose accent is a muted gold.
+    _BAR_HEIGHTS = (8, 14, 20)
+
+    def __init__(
+        self, level: int = DEFAULT_CLICK_LEVEL, parent: QWidget | None = None
+    ) -> None:
+        super().__init__(parent)
+        self.setObjectName("metroVolumeButton")
+        self._level = max(0, min(len(CLICK_LEVELS) - 1, int(level)))
+        width = (
+            len(self._BAR_HEIGHTS) * self._BAR_W
+            + (len(self._BAR_HEIGHTS) - 1) * self._BAR_GAP
+            + 2 * self._PAD_X
+        )
+        self.setFixedSize(width, 24)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+        # One line and one string: the bars already say which level is on, so
+        # the hover only has to say that the thing cycles.
+        self.setToolTip(self.tr("Click volume — press to cycle quiet / medium / loud"))
+        self.clicked.connect(self._cycle)
+
+    # ── level ───────────────────────────────────────────────────────
+
+    def level(self) -> int:
+        """Index into :data:`CLICK_LEVELS`, 0 (quiet) to 2 (loud)."""
+        return self._level
+
+    def set_level(self, level: int) -> None:
+        new = max(0, min(len(CLICK_LEVELS) - 1, int(level)))
+        if new == self._level:
+            return
+        self._level = new
+        self.update()
+        self.level_changed.emit(new)
+
+    def gain(self) -> float:
+        return CLICK_LEVELS[self._level]
+
+    def _cycle(self) -> None:
+        self.set_level((self._level + 1) % len(CLICK_LEVELS))
+
+    # ── paint ───────────────────────────────────────────────────────
+
+    def paintEvent(self, event) -> None:
+        # The stylesheet still owns the box — background, radius, hover — and
+        # only the bars are ours, so this draws on top of it rather than
+        # instead of it.
+        super().paintEvent(event)
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setPen(Qt.PenStyle.NoPen)
+        lit = QColor(Theme.NEON_YELLOW)
+        # Unlit is the secondary text colour half-faded rather than a token of
+        # its own: it has to sit between the button's fill and the accent in
+        # every one of the four palettes, and no single named colour does.
+        dim = QColor(Theme.TEXT_SECONDARY)
+        dim.setAlphaF(0.45)
+        base = self.height() - self._BOTTOM
+        for i, bar_h in enumerate(self._BAR_HEIGHTS):
+            x = self._PAD_X + i * (self._BAR_W + self._BAR_GAP)
+            painter.setBrush(lit if i <= self._level else dim)
+            painter.drawRoundedRect(x, base - bar_h, self._BAR_W, bar_h, 2, 2)
+        painter.end()
+
+
 class MetronomeView(QWidget):
     """The whole view: tempo controls, transport, and the beat light."""
 
@@ -250,6 +368,8 @@ class MetronomeView(QWidget):
     # ── layout ──────────────────────────────────────────────────────
 
     def _setup_ui(self) -> None:
+        self._start_btn = self._build_start_button()
+
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(Theme.SPACING)
@@ -319,12 +439,13 @@ class MetronomeView(QWidget):
         bend_row.addWidget(self._faster_btn)
         bend_row.addSpacing(12)
 
-        self._start_btn = QPushButton(self.tr("Start"))
-        self._start_btn.setObjectName("metroStartButton")
-        self._start_btn.setCheckable(True)
-        self._start_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        self._start_btn.toggled.connect(self._on_toggled)
-        bend_row.addWidget(self._start_btn)
+        # How loud, where the transport used to stand. The two swapped places
+        # on purpose: Start is the thing you hit mid-set and now sits big on
+        # the section's own header row, while the level is set once and then
+        # left, so it belongs down here with the other set-and-forget controls.
+        self._volume_btn = ClickVolumeButton(DEFAULT_CLICK_LEVEL)
+        self._volume_btn.level_changed.connect(lambda _: self._apply_click_choice())
+        bend_row.addWidget(self._volume_btn)
         bend_row.addSpacing(12)
 
         # Which click, in the slider's old place. A level was never what
@@ -358,6 +479,52 @@ class MetronomeView(QWidget):
         self._light = BeatLight()
         outer.addWidget(self._light, alignment=Qt.AlignmentFlag.AlignLeft)
         outer.addStretch(1)
+
+    def _build_start_button(self) -> QPushButton:
+        """Start/Stop — built here, laid out by the host.
+
+        The only control in this view that the view does not place. It lives
+        on :class:`~src.gui.widgets.metronome_section.MetronomeSection`'s
+        header row, beside the word that opens the section, because that is
+        where the hand goes for it; everything that decides what it *does*
+        (the toggle handler, and the ``stop()`` that has to un-check it when
+        the click ends by any other route) still lives with the transport it
+        drives. So the button is parented to the view — never a stray
+        top-level window if nobody adopts it — and ``start_button()`` is how
+        the host takes it.
+        """
+        button = QPushButton(self.tr("Start"), self)
+        button.setObjectName("metroStartButton")
+        button.setCheckable(True)
+        button.setCursor(Qt.CursorShape.PointingHandCursor)
+        # Set in Python, not QSS: a stylesheet font-size never reaches
+        # widget.font(), and the width below is only honest if it measures
+        # what actually paints.
+        font = button.font()
+        font.setBold(True)
+        font.setPointSize(font.pointSize() + 2)
+        button.setFont(font)
+        fm = QFontMetrics(font)
+        # Both labels, because the wider one decides the width — a button that
+        # resized between Start and Stop would shove the header row about, and
+        # a QPushButton centres rather than elides, so a width short by a few
+        # pixels cuts the label at both ends with nothing to show for it.
+        widest = max(
+            fm.horizontalAdvance(self.tr("Start")), fm.horizontalAdvance(self.tr("Stop"))
+        )
+        # The height is stated in app.qss.template as well, and has to be: a
+        # stylesheet minimum REPLACES the one setFixedSize set, so the global
+        # QPushButton rule's min-height reaches this call and 40 renders as 22
+        # without the matching rule. This line is what the suite sees, which
+        # runs with no stylesheet at all; a test keeps the two numbers equal.
+        button.setFixedHeight(_START_HEIGHT)
+        button.setFixedWidth(max(_START_MIN_WIDTH, widest + _START_PADDING))
+        button.toggled.connect(self._on_toggled)
+        return button
+
+    def start_button(self) -> QPushButton:
+        """The transport, for the host to put on its header row."""
+        return self._start_btn
 
     def _step_button(self, glyph: str, tip: str) -> QPushButton:
         button = QPushButton(glyph)
@@ -470,10 +637,13 @@ class MetronomeView(QWidget):
         self._apply_click_choice()
 
     def _apply_click_choice(self) -> None:
+        """Push both halves of the answer — which click, and how loud — at the
+        engine. One method for the two rows because a gain is only meaningful
+        alongside a voice, and either control changing has to re-state both."""
         choice = self.click_choice
         # Silence is a gain of zero rather than a stopped stream: the grid
         # has to keep running, because the beat light is reading it.
-        self._engine.set_gain(0.0 if choice == SILENT else DEFAULT_CLICK_VOLUME / 100.0)
+        self._engine.set_gain(0.0 if choice == SILENT else self._volume_btn.gain())
         if choice != SILENT:
             self._engine.set_voice(choice)
 
@@ -491,9 +661,18 @@ class MetronomeView(QWidget):
 
     @property
     def volume(self) -> float:
-        """The click's level, 0.0-1.0. Two values now, not a hundred: the row
-        chose which click, and silence is the only level anyone wanted."""
-        return 0.0 if self.click_choice == SILENT else DEFAULT_CLICK_VOLUME / 100.0
+        """The click's level, 0.0-1.0 — three values now, not a hundred, and
+        zero when the click choice is Silent."""
+        return 0.0 if self.click_choice == SILENT else self._volume_btn.gain()
+
+    @property
+    def click_level(self) -> int:
+        """Index into :data:`CLICK_LEVELS` — session-only, like the click
+        choice beside it and the Player's own volume."""
+        return self._volume_btn.level()
+
+    def set_click_level(self, level: int) -> None:
+        self._volume_btn.set_level(level)
 
     # ── the ear and the eye ─────────────────────────────────────────
 

@@ -420,9 +420,18 @@ or click “Add Artwork…”</source>
 <context>
     <name>BpmScrubBox</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="112"/>
+        <location filename="../widgets/metronome_view.py" line="140"/>
         <source>Drag up or down to change the tempo</source>
         <translation>上下にドラッグしてテンポを変更</translation>
+    </message>
+</context>
+<context>
+    <name>ClickVolumeButton</name>
+    <message>
+        <location filename="../widgets/metronome_view.py" line="301"/>
+        <source>Click volume — press to cycle quiet / medium / loud</source>
+        <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. Three loudness levels on one cycling button; the label names all three because the button&apos;s bars show which is on.</translatorcomment>
+        <translation>クリック音量 — 押して 小 / 中 / 大 を切り替え</translation>
     </message>
 </context>
 <context>
@@ -2095,18 +2104,18 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetronomeSection</name>
     <message>
-        <location filename="../widgets/metronome_section.py" line="62"/>
+        <location filename="../widgets/metronome_section.py" line="78"/>
         <source>Metronome</source>
         <translation>メトロノーム</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_section.py" line="93"/>
+        <location filename="../widgets/metronome_section.py" line="131"/>
         <source>Hide the metronome</source>
         <translatorcomment>Disclosure header for the Player panel&apos;s metronome section. Same register as the Waveform / Loop Slicer headers beside it; the tooltip states what the next click will do.</translatorcomment>
         <translation>メトロノームを非表示</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_section.py" line="95"/>
+        <location filename="../widgets/metronome_section.py" line="133"/>
         <source>Show the metronome — tap a tempo and click along</source>
         <translatorcomment>Disclosure header for the Player panel&apos;s metronome section. Same register as the Waveform / Loop Slicer headers beside it; the tooltip states what the next click will do.</translatorcomment>
         <translation>メトロノームを表示 — テンポをタップしてクリック音に合わせる</translation>
@@ -2115,73 +2124,74 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetronomeView</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="259"/>
+        <location filename="../widgets/metronome_view.py" line="378"/>
         <source>One BPM slower</source>
         <translation>1 BPM 遅く</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="268"/>
+        <location filename="../widgets/metronome_view.py" line="387"/>
         <source>One BPM faster</source>
         <translation>1 BPM 速く</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="277"/>
+        <location filename="../widgets/metronome_view.py" line="396"/>
         <source>Tap</source>
         <translation>タップ</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="280"/>
+        <location filename="../widgets/metronome_view.py" line="399"/>
         <source>Tap along to set the tempo</source>
         <translation>タップしてテンポを設定</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="288"/>
+        <location filename="../widgets/metronome_view.py" line="407"/>
         <source>Global Click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>常時クリック音</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="309"/>
+        <location filename="../widgets/metronome_view.py" line="428"/>
         <source>Hold to lean the beat back</source>
         <translation>長押しでビートを後ろに</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="312"/>
+        <location filename="../widgets/metronome_view.py" line="431"/>
         <source>Hold to push the beat forward</source>
         <translation>長押しでビートを前に</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="322"/>
-        <location filename="../widgets/metronome_view.py" line="391"/>
+        <location filename="../widgets/metronome_view.py" line="495"/>
+        <location filename="../widgets/metronome_view.py" line="512"/>
+        <location filename="../widgets/metronome_view.py" line="552"/>
         <source>Start</source>
         <translation>開始</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="340"/>
+        <location filename="../widgets/metronome_view.py" line="460"/>
         <source>Silent — the light keeps time</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>無音 — ライトは拍を刻み続けます</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="341"/>
+        <location filename="../widgets/metronome_view.py" line="461"/>
         <source>Standard click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>標準のクリック音</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="342"/>
+        <location filename="../widgets/metronome_view.py" line="462"/>
         <source>Higher-pitched click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>高いクリック音</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="424"/>
+        <location filename="../widgets/metronome_view.py" line="585"/>
         <source>Stop the click when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>この表示を離れたらクリック音を止める</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="426"/>
+        <location filename="../widgets/metronome_view.py" line="587"/>
         <source>Keep the click going when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>この表示を離れてもクリック音を鳴らし続ける</translation>
@@ -2191,7 +2201,8 @@ or click “Add Artwork…”</source>
         <translation type="vanished">クリック音の音量</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="391"/>
+        <location filename="../widgets/metronome_view.py" line="512"/>
+        <location filename="../widgets/metronome_view.py" line="552"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
