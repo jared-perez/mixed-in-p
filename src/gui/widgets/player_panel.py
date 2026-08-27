@@ -1278,6 +1278,24 @@ class NoElideDelegate(QStyledItemDelegate):
 _NOW_PLAYING_MIN_WIDTH = 80
 _NOW_PLAYING_MAX_SHARE = 0.55
 
+# "Jump to what's playing", defined here rather than beside the QShortcut in
+# MainWindow because the "In Playlist" link's tooltip advertises it — one
+# source, so the key and the label it is announced by cannot drift apart. Same
+# arrangement as PLAYLISTS_SHORTCUT in sidebar.py.
+#
+# One sequence, not two: Qt renders "Ctrl" as the Command symbol on macOS and
+# as "Ctrl" on Windows, so this is Cmd+L and Ctrl+L from a single string with
+# nothing to keep in step by hand. L rather than W, which was the first
+# request: W means *close* on both platforms (Cmd+W is Close Window in every
+# Mac app, Ctrl+W is close-tab on Windows), and this app has two things a user
+# would reasonably press it on — the artwork lightbox and the visualization
+# popout, both of which close on Escape and would instead have jumped to a
+# playlist. Nothing here would have stopped it: there is no menu bar, so Qt
+# reserves neither key and the binding would simply have taken. L is free in
+# this app and is what Apple Music/iTunes uses for "Go to Current Song", which
+# is this act exactly.
+PLAYING_PLAYLIST_SHORTCUT = QKeySequence("Ctrl+L")
+
 
 class NowPlayingLabel(HuggingElidedLabel):
     """The "Playing: …" line, draggable as the file it names.
@@ -2243,8 +2261,18 @@ class PlayerPanel(QWidget):
         self._playing_playlist_link.setStyleSheet(
             f"color: {Theme.ACCENT_TEXT}; font-size: 13px;"
         )
+        # The shortcut is appended *outside* the translated string rather than
+        # written into it: editing an existing tr() source breaks its key and
+        # drops that line to English in all eleven languages (CLAUDE.md).
+        # NativeText so macOS reads the symbols it expects and Windows reads
+        # "Ctrl+L". Same handling as the Playlists button's tooltip.
         self._playing_playlist_link.setToolTip(
             self.tr("Open the playlist the current track is playing from")
+            + "  ("
+            + PLAYING_PLAYLIST_SHORTCUT.toString(
+                QKeySequence.SequenceFormat.NativeText
+            )
+            + ")"
         )
         self._playing_playlist_link.clicked.connect(self._on_playing_playlist_clicked)
         self._playing_playlist_link.hide()
@@ -2759,8 +2787,19 @@ class PlayerPanel(QWidget):
     def closeEvent(self, event) -> None:
         self.shutdown_workers()
         self.shutdown_metronome()
-        self._flush_column_save()
+        self.flush_pending_saves()
         super().closeEvent(event)
+
+    def flush_pending_saves(self) -> None:
+        """Write anything this panel still owes to config, now.
+
+        Public because the panel's own closeEvent is NOT the path the app
+        closes by: Qt sends a QCloseEvent to the widget being closed and does
+        not propagate it to children, so closing the main window never reaches
+        here — MainWindow has to ask. It is the sibling of shutdown_workers()
+        and shutdown_metronome(), which are public for exactly that reason.
+        """
+        self._flush_column_save()
 
     def _flush_column_save(self) -> None:
         """Write a debounced column save now, rather than leaving it pending.
@@ -3092,6 +3131,40 @@ class PlayerPanel(QWidget):
     def playing_track_name(self) -> str:
         """Filename of the loaded track, or "" when nothing is loaded."""
         return Path(self._playing_path).name if self._playing_path else ""
+
+    def scroll_to_playing_row(self) -> None:
+        """Centre the playing track's row in the table, if this list has it.
+
+        A no-op when it doesn't. That is the right answer for the Cmd/Ctrl+L
+        path, which has just loaded the very playlist the track plays from: a
+        miss there means the row genuinely is not here (removed from the list
+        while it plays on), and scrolling anywhere else would be a guess.
+
+        _current_index is the row number directly — the table's rows are the
+        entries of _playlist in order, which is what _highlight_current_row
+        relies on too — and load_node has already re-linked it.
+        """
+        row = self._current_index
+        if not (0 <= row < self._table.rowCount()):
+            return
+        # Column 0 ('#') specifically, because a hidden column's visualRect is
+        # empty and scrollToItem cannot aim at one. Safe: only _OPTIONAL_COLUMNS
+        # can be hidden and those start at 9, so 0-8 are always on — the search
+        # narrows '#' rather than hiding it, and reset_columns_to_defaults
+        # un-hides every non-optional column explicitly.
+        item = self._table.item(row, 0)
+        if item is None:
+            return
+        # scrollToItem moves BOTH axes, and this panel's rows are deliberately
+        # allowed to be wider than the viewport (_sync_title_row_width), so a
+        # vertical request would otherwise yank a scrolled-across list back to
+        # the left as a side effect. Put the horizontal bar back.
+        bar = self._table.horizontalScrollBar()
+        across = bar.value()
+        self._table.scrollToItem(
+            item, QAbstractItemView.ScrollHint.PositionAtCenter
+        )
+        bar.setValue(across)
 
     def is_showing_node(self, node_id: int) -> bool:
         """True when *node_id*'s own contents are what the table is showing.

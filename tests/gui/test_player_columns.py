@@ -302,6 +302,44 @@ class TestUpgradingFromNineColumns:
         )
 
 
+class TestClosingTheWindowFlushesThePendingSave:
+    """Quitting inside the 600 ms debounce must not lose the change.
+
+    `PlayerPanel.closeEvent` flushes for exactly that — and it was dead on the
+    only path the app closes by. Qt delivers a QCloseEvent to the widget being
+    closed and does NOT propagate it to children, so closing the main window
+    never reached the panel's closeEvent: a column dragged and then quit on
+    came back at its shipped default next launch (measured: 321px -> 180px).
+    The flush had been written, and tested at the panel, where it does run.
+
+    The suite half is the documented one: a pending save resolves its app-data
+    directory when it *fires*, so one left armed by a MainWindow test lands in
+    the next test's isolated config. That is how this was found — new tests
+    that build a MainWindow poisoned an unrelated search test after them.
+    """
+
+    def test_closing_the_window_writes_a_pending_column_change(self, qtbot):
+        from src.gui.main_window import MainWindow
+
+        win = MainWindow()
+        qtbot.addWidget(win)
+        player = win._player_panel
+        player._table.setColumnWidth(2, 321)
+        assert player._col_save_timer.isActive(), (
+            "nothing was pending, so this would pass against the bug"
+        )
+
+        win.close()
+
+        # The invariant, not a race with the timer: nothing is still owed.
+        assert not player._col_save_timer.isActive()
+        player.shutdown_workers()
+
+        next_launch = make_player(qtbot)
+        assert next_launch._table.columnWidth(2) == 321
+        next_launch.shutdown_workers()
+
+
 class TestTheWindowDoesNotClobberIt:
     """`MainWindow._persist_config` re-reads the fields panels own before it
     writes its own startup snapshot back. The column state was on that list;

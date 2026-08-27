@@ -41,6 +41,12 @@ def press_hotkey(target) -> None:
     sends Shift + Key_Tab is testing a key press that never happens.
     """
     QTest.keyClick(target, Qt.Key.Key_Backtab, Qt.KeyboardModifier.ShiftModifier)
+    # And let Shift back up. keyClick presses a modifier without releasing it,
+    # and QGuiApplication.keyboardModifiers() is application state that outlives
+    # the test — a later test's programmatic selectRow() reads it and extends
+    # its selection instead of replacing it. See the no_latched_modifiers guard
+    # in conftest, which is what caught this.
+    QTest.keyRelease(target, Qt.Key.Key_Shift)
 
 
 def test_the_hotkey_shows_and_hides_the_tree(window, qtbot):

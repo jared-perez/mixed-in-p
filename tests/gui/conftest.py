@@ -108,3 +108,58 @@ def duplicate_prompt_guard(monkeypatch):
         + ". Patch duplicate_policy._prompt (or pin current_policy) in a test "
         "that means to reach it."
     )
+
+
+@pytest.fixture(autouse=True)
+def no_latched_modifiers():
+    """Fail the test that leaves a keyboard modifier held down.
+
+    ``QTest.keyClick(w, key, SomeModifier)`` presses the modifier and never
+    releases it, and ``QGuiApplication.keyboardModifiers()`` is *application*
+    state — it outlives the widget, the test and every fixture, for the whole
+    session.
+
+    The damage lands somewhere else entirely, which is what makes it worth a
+    guard rather than a convention. ``QAbstractItemView.selectRow`` does not
+    simply select: it asks ``selectionCommand()``, which reads those
+    modifiers. So a latched Control turns a *programmatic* ``selectRow(1)`` in
+    some later, unrelated test into a Ctrl-click that adds row 1 to the
+    selection instead of replacing it — and that test then asserts against the
+    union of two rows, with nothing in its own code to explain why. Measured:
+    the Cmd/Ctrl+L tests silently broke a search-highlight test three files
+    away, and only ever when the two ran in that order.
+
+    Release the modifier in the helper that pressed it (see ``press_hotkey``
+    in test_playing_playlist_hotkey.py). This only says so out loud.
+    """
+    from PySide6.QtCore import Qt
+    from PySide6.QtGui import QGuiApplication
+    from PySide6.QtTest import QTest
+
+    yield
+    stuck = QGuiApplication.keyboardModifiers()
+    if stuck != Qt.KeyboardModifier.NoModifier:
+        # Don't leave it latched for the rest of the session as well. The
+        # release needs somewhere to go: QTest.keyRelease(None, ...) takes a
+        # null QWidget* and crashes the interpreter, so give it a scratch
+        # widget rather than the test's own, which teardown has already closed.
+        from PySide6.QtWidgets import QWidget
+
+        sink = QWidget()
+        for modifier, key in (
+            (Qt.KeyboardModifier.ControlModifier, Qt.Key.Key_Control),
+            (Qt.KeyboardModifier.ShiftModifier, Qt.Key.Key_Shift),
+            (Qt.KeyboardModifier.AltModifier, Qt.Key.Key_Alt),
+            (Qt.KeyboardModifier.MetaModifier, Qt.Key.Key_Meta),
+        ):
+            if stuck & modifier:
+                QTest.keyRelease(sink, key)
+        sink.deleteLater()
+        pytest.fail(
+            f"This test left {stuck!r} held down. QTest.keyClick presses a "
+            "modifier without releasing it, and keyboardModifiers() is "
+            "application-global — a later test's selectRow() reads it and "
+            "silently extends its selection. Follow the keyClick with "
+            "QTest.keyRelease(widget, Qt.Key.Key_Control) (or the matching "
+            "key)."
+        )

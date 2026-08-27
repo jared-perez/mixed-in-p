@@ -72,7 +72,7 @@ from .widgets.header_bar import HeaderBar
 from .widgets.history_panel import HistoryPanel
 from .widgets.metadata_panel import MetadataPanel
 from .widgets.keyboard_panel import KeyboardPanel
-from .widgets.player_panel import PlayerPanel
+from .widgets.player_panel import PLAYING_PLAYLIST_SHORTCUT, PlayerPanel
 from .widgets.playlist_tree import PlaylistTreePanel
 from .widgets.rename_panel import RenamePanel
 from .widgets.settings_panel import SettingsPanel
@@ -376,6 +376,12 @@ class MainWindow(QMainWindow):
         self._player_panel.playing_playlist_clicked.connect(
             self._on_playing_playlist_clicked
         )
+        # Cmd/Ctrl+L jumps to the list the playing track came from, from
+        # wherever you are. Same scope as the two shortcuts above: it belongs
+        # to the main window. See PLAYING_PLAYLIST_SHORTCUT for why it is L.
+        playing_sc = QShortcut(PLAYING_PLAYLIST_SHORTCUT, self)
+        playing_sc.setContext(Qt.ShortcutContext.WindowShortcut)
+        playing_sc.activated.connect(self._on_show_playing_playlist)
         self._player_panel.now_playing_changed.connect(self._sync_header_now_playing)
         # The Player's header art is clickable; the sidebar owns the big box.
         # Neither knows about the other, so the window joins them.
@@ -569,6 +575,39 @@ class MainWindow(QMainWindow):
         if not self._player_panel.is_showing_node(node_id):
             self._player_panel.load_node(node_id)
         self._playlists_panel.tree.select_node(node_id)
+
+    def _on_show_playing_playlist(self) -> None:
+        """Cmd/Ctrl+L: go to the playing track's list, wherever you are.
+
+        The keyboard sibling of the "In Playlist" link, and it has to answer
+        two questions the link never did, because the link only exists on the
+        Player page and this fires from anywhere:
+
+        It **does** switch to the Player page — pressed on Convert or Settings
+        it would otherwise do all its work off screen and read as a dead key.
+        It **does not** put the sidebar into playlists mode: that is Shift+Tab's
+        job and doing it here would make one key do two jobs. The tree is still
+        told to select the node, so it is already on the right row whenever the
+        user does flip to it.
+
+        Nothing playing, or the track came out of a search (no playlist to
+        return to), or the playlist has since been deleted — all of them leave
+        playing_node_id as None and this does nothing at all, silently. There
+        is no sensible list to jump to and inventing one would be worse than
+        the key appearing not to work.
+        """
+        node_id = self._player_panel.playing_node_id
+        if node_id is None:
+            return
+        self._sidebar.set_current_page("player")
+        self._on_page_changed("player")
+        if not self._player_panel.is_showing_node(node_id):
+            self._player_panel.load_node(node_id)
+        self._playlists_panel.tree.select_node(node_id)
+        # Last, and after the load rather than inside it: load_node ends by
+        # restoring that node's remembered scroll position, which is a
+        # different place from the playing row and would win if this ran first.
+        self._player_panel.scroll_to_playing_row()
 
     def _on_tracks_added(self, node_id: int) -> None:
         """Tracks were dropped into a playlist in the tree.
@@ -2573,6 +2612,17 @@ class MainWindow(QMainWindow):
 
     def closeEvent(self, event) -> None:
         """Handle window close event."""
+        # Before _persist_config, because the column state is on its merge
+        # list: that re-reads the field from disk, so the flush has to have
+        # put the pending value there first.
+        #
+        # And it has to be asked for explicitly. Qt delivers a QCloseEvent to
+        # the widget being closed and does NOT propagate it to children, so
+        # PlayerPanel.closeEvent never runs on the path the app actually
+        # closes by — which silently defeated the debounce flush it was
+        # written for: a column dragged in the last 600 ms before quitting was
+        # lost (measured: 321px back to the 180px default on the next launch).
+        self._player_panel.flush_pending_saves()
         # Persist the window geometry (non-keyboard) for next launch.
         self._sizer.save_geometry()
         self._persist_config()
