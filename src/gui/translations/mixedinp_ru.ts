@@ -67,7 +67,6 @@ Features:
         <translation>Проверить обновления</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -80,7 +79,7 @@ Features:
   - Key detection using Chroma analysis
   - Spectrum analyzer</source>
         <translatorcomment>Recovered prior translation; added Spectrum analyzer feature bullet.</translatorcomment>
-        <translation>Анализ аудиофайлов для определения BPM и музыкальной тональности.
+        <translation type="vanished">Анализ аудиофайлов для определения BPM и музыкальной тональности.
 Результаты отображаются в виде гармонических кодов тональности для удобного гармоничного микширования.
 
 Возможности:
@@ -93,12 +92,12 @@ Features:
   - Анализатор спектра</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="242"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="243"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Поддерживаемые форматы: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="272"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="262"/>
         <source>Find Your Way Around</source>
         <translation>Освойтесь</translation>
     </message>
@@ -108,55 +107,93 @@ Features:
         <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Перетащите файлы на панели или на боковую панель.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ПЕРЕИМЕНОВАНИЕ&lt;/span&gt; — Сначала приведите имена файлов в порядок&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;обрезка, префикс, предпросмотр перед применением&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;АНАЛИЗ&lt;/span&gt; — Определяет BPM, тональность и энергию&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;автоматически записывает теги и переименовывает за один раз&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КОНВЕРТАЦИЯ&lt;/span&gt; — Смена форматов&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Используйте &lt;span style=&quot;color: {y};&quot;&gt;Отправить в&lt;/span&gt;, чтобы перемещать файлы между панелями.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="275"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
+        <translatorcomment>Reordered only, to match the pipeline&apos;s real order (RENAME &gt; CONVERT &gt; ANALYZE); the CONVERT and ANALYZE blocks are the previous translation moved verbatim, with no wording change.</translatorcomment>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Перетащите файлы на панели или на боковую панель.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ПЕРЕИМЕНОВАНИЕ&lt;/span&gt; — Сначала приведите имена файлов в порядок&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;обрезка, префикс, предпросмотр перед применением&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КОНВЕРТАЦИЯ&lt;/span&gt; — Смена форматов&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;АНАЛИЗ&lt;/span&gt; — Определяет BPM, тональность и энергию&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;автоматически записывает теги и переименовывает за один раз&lt;/span&gt;&lt;br&gt;&lt;br&gt;Включите шаг &lt;span style=&quot;color: {y};&quot;&gt;пайплайна&lt;/span&gt; в любой панели, чтобы прогнать пакет целиком.&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="340"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
+        <translatorcomment>Slide 3&apos;s SLICE blurb was replaced by the Discogs one; the rest of this string is the old translation, spliced back verbatim. DISCOGS stays in Latin script in every language (brand name), and {credit} is the untranslated attribution constant — leave the placeholder alone.</translatorcomment>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Заполните то, чего не хватает файлу.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Найдите его релиз на панели Метаданных и&lt;br&gt;получите исполнителя, альбом, лейбл, год и обложку.&lt;br&gt;Проверьте каждое поле до записи.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;МЕТАДАННЫЕ&lt;/span&gt; — Перетащите файл, редактируйте его теги.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Автосохранение при переходе дальше.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КЛАВИАТУРА&lt;/span&gt; — Играйте ноты в любой тональности.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Гармоническая полоса тональностей прямо здесь для справки.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СПЕКТР&lt;/span&gt; — Анализатор акустического спектра.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Визуальное представление качества звука.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;НАСТРОЙКИ&lt;/span&gt; — Диапазон BPM, формат тональности,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;правила автопереименования.&lt;/span&gt;&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="387"/>
         <source>click for more</source>
         <translation>нажмите, чтобы узнать больше</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="407"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="408"/>
         <source>Checking…</source>
         <translation>Проверка…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="431"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="432"/>
         <source>You&apos;re on the latest version</source>
         <translation>У вас последняя версия</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="435"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
         <source>Download</source>
         <translation>Загрузить</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="437"/>
         <source>Update available: {0}</source>
         <translation>Доступно обновление: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="444"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
         <source>see all releases</source>
         <translation>все версии</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="446"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>Не удалось проверить обновления</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="331"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="321"/>
         <source>The Rest of the Kit</source>
         <translation>Остальные инструменты</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="285"/>
-        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Перетащите файлы на панели или на боковую панель.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ПЕРЕИМЕНОВАНИЕ&lt;/span&gt; — Сначала приведите имена файлов в порядок&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;обрезка, префикс, предпросмотр перед применением&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;АНАЛИЗ&lt;/span&gt; — Определяет BPM, тональность и энергию&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;автоматически записывает теги и переименовывает за один раз&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КОНВЕРТАЦИЯ&lt;/span&gt; — Смена форматов&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Включите шаг &lt;span style=&quot;color: {y};&quot;&gt;пайплайна&lt;/span&gt; в любой панели, чтобы прогнать пакет целиком.&lt;/div&gt;</translation>
+        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
+        <source>Analyze audio files to detect BPM and musical key.
+Results displayed as harmonic key codes for easy harmonic mixing.
+
+Features:
+  - Batch file renaming with Undo
+  - Metadata editing
+  - Audio file conversion
+  - Player with built-in slicer for sample lifting
+  - Harmonic keyboard
+  - BPM detection using beat tracking
+  - Key detection using Chroma analysis
+  - Spectrum analyzer</source>
+        <translatorcomment>Only one bullet was added (audio file conversion); the rest of this string is the old translation, spliced back verbatim.</translatorcomment>
+        <translation>Анализ аудиофайлов для определения BPM и музыкальной тональности.
+Результаты отображаются в виде гармонических кодов тональности для удобного гармоничного микширования.
+
+Возможности:
+  - Пакетное переименование файлов с отменой
+  - Редактирование метаданных
+  - Конвертация аудиофайлов
+  - Плеер со встроенным слайсером для извлечения сэмплов
+  - Гармоническая клавиатура
+  - Определение BPM с помощью beat tracking
+  - Определение тональности с помощью Chroma-анализа
+  - Анализатор спектра</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Перетащите файлы на панели или на боковую панель.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ПЕРЕИМЕНОВАНИЕ&lt;/span&gt; — Сначала приведите имена файлов в порядок&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;обрезка, префикс, предпросмотр перед применением&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;АНАЛИЗ&lt;/span&gt; — Определяет BPM, тональность и энергию&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;автоматически записывает теги и переименовывает за один раз&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КОНВЕРТАЦИЯ&lt;/span&gt; — Смена форматов&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Включите шаг &lt;span style=&quot;color: {y};&quot;&gt;пайплайна&lt;/span&gt; в любой панели, чтобы прогнать пакет целиком.&lt;/div&gt;</translation>
+    </message>
+    <message>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СЛАЙСЕР&lt;/span&gt; — Возьмите фрагмент из любого трека.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Открывается из окна Плеера.&lt;br&gt;Задайте начало/конец ползунком диапазона или отметьте&lt;br&gt;границы во время воспроизведения. Сдвиг ±10 мс.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;МЕТАДАННЫЕ&lt;/span&gt; — Перетащите файл, редактируйте его теги.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Автосохранение при переходе дальше.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КЛАВИАТУРА&lt;/span&gt; — Играйте ноты в любой тональности.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Гармоническая полоса тональностей прямо здесь для справки.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СПЕКТР&lt;/span&gt; — Анализатор акустического спектра.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Визуальное представление качества звука.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;НАСТРОЙКИ&lt;/span&gt; — Диапазон BPM, формат тональности,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;правила автопереименования.&lt;/span&gt;&lt;/div&gt;</translation>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СЛАЙСЕР&lt;/span&gt; — Возьмите фрагмент из любого трека.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Открывается из окна Плеера.&lt;br&gt;Задайте начало/конец ползунком диапазона или отметьте&lt;br&gt;границы во время воспроизведения. Сдвиг ±10 мс.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;МЕТАДАННЫЕ&lt;/span&gt; — Перетащите файл, редактируйте его теги.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Автосохранение при переходе дальше.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;КЛАВИАТУРА&lt;/span&gt; — Играйте ноты в любой тональности.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Гармоническая полоса тональностей прямо здесь для справки.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;СПЕКТР&lt;/span&gt; — Анализатор акустического спектра.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Визуальное представление качества звука.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;НАСТРОЙКИ&lt;/span&gt; — Диапазон BPM, формат тональности,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;правила автопереименования.&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;PLAYER&lt;/span&gt; — Built-in playback with playlist.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Drag to reorder. Right-click tracks&lt;br&gt;in Analyze to send them over.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>

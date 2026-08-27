@@ -67,7 +67,6 @@ Fonctionnalités :
         <translation>Rechercher les mises à jour</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -80,7 +79,7 @@ Features:
   - Key detection using Chroma analysis
   - Spectrum analyzer</source>
         <translatorcomment>Recovered prior translation; added Spectrum analyzer feature bullet.</translatorcomment>
-        <translation>Analysez des fichiers audio pour détecter le BPM et la tonalité musicale.
+        <translation type="vanished">Analysez des fichiers audio pour détecter le BPM et la tonalité musicale.
 Les résultats s&apos;affichent sous forme de codes de tonalité harmonique pour un mixage harmonique simplifié.
 
 Fonctionnalités :
@@ -93,12 +92,12 @@ Fonctionnalités :
   - Analyseur de spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="242"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="243"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Formats pris en charge : MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="272"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="262"/>
         <source>Find Your Way Around</source>
         <translation>Trouvez vos repères</translation>
     </message>
@@ -107,55 +106,93 @@ Fonctionnalités :
         <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Déposez vos fichiers sur n&apos;importe quel panneau pour commencer.&lt;br&gt;La barre latérale ne sert pas qu&apos;à la navigation — vous pouvez&lt;br&gt;glisser des fichiers directement sur les boutons pour les router.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMMER&lt;/span&gt; — Nettoyez d&apos;abord les noms de fichiers&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;rognez, préfixez, prévisualisez avant de valider&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSER&lt;/span&gt; — Détecte le BPM, la tonalité &amp;amp; l&apos;énergie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;écrit les tags + renomme en une seule fois&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTIR&lt;/span&gt; — Changez de format&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Utilisez &lt;span style=&quot;color: {y};&quot;&gt;Envoyer vers&lt;/span&gt; pour déplacer les fichiers entre les panneaux.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="386"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="275"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
+        <translatorcomment>Reordered only, to match the pipeline&apos;s real order (RENAME &gt; CONVERT &gt; ANALYZE); the CONVERT and ANALYZE blocks are the previous translation moved verbatim, with no wording change.</translatorcomment>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Déposez vos fichiers sur n&apos;importe quel panneau pour commencer.&lt;br&gt;La barre latérale ne sert pas qu&apos;à la navigation — vous pouvez&lt;br&gt;glisser des fichiers directement sur les boutons pour les router.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMMER&lt;/span&gt; — Nettoyez d&apos;abord les noms de fichiers&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;rognez, préfixez, prévisualisez avant de valider&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTIR&lt;/span&gt; — Changez de format&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSER&lt;/span&gt; — Détecte le BPM, la tonalité &amp;amp; l&apos;énergie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;écrit les tags + renomme en une seule fois&lt;/span&gt;&lt;br&gt;&lt;br&gt;Activez l&apos;étape de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; d&apos;un panneau pour traiter un lot d&apos;un bout à l&apos;autre.&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="340"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
+        <translatorcomment>Slide 3&apos;s SLICE blurb was replaced by the Discogs one; the rest of this string is the old translation, spliced back verbatim. DISCOGS stays in Latin script in every language (brand name), and {credit} is the untranslated attribution constant — leave the placeholder alone.</translatorcomment>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Complétez ce qui manque à un fichier.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Recherchez sa sortie depuis le panneau Métadonnées et&lt;br&gt;récupérez artiste, album, label, année et pochette.&lt;br&gt;Vérifiez chaque champ avant toute écriture.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;MÉTADONNÉES&lt;/span&gt; — Déposez un fichier, modifiez ses tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Sauvegarde automatique quand vous passez à autre chose.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CLAVIER&lt;/span&gt; — Jouez des notes dans n&apos;importe quelle tonalité.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;La bande de tonalités harmoniques juste là pour référence.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRE&lt;/span&gt; — Analyseur de spectre acoustique.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Représentation visuelle de la qualité audio.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RÉGLAGES&lt;/span&gt; — Plage de BPM, format de tonalité,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;règles de renommage automatique.&lt;/span&gt;&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="387"/>
         <source>click for more</source>
         <translation>cliquez pour en savoir plus</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="407"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="408"/>
         <source>Checking…</source>
         <translation>Vérification…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="431"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="432"/>
         <source>You&apos;re on the latest version</source>
         <translation>Vous avez la dernière version</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="435"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
         <source>Download</source>
         <translation>Télécharger</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="437"/>
         <source>Update available: {0}</source>
         <translation>Mise à jour disponible : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="444"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
         <source>see all releases</source>
         <translation>voir toutes les versions</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="446"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>Impossible de vérifier les mises à jour</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="331"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="321"/>
         <source>The Rest of the Kit</source>
         <translation>Le reste de la boîte à outils</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="285"/>
-        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Déposez vos fichiers sur n&apos;importe quel panneau pour commencer.&lt;br&gt;La barre latérale ne sert pas qu&apos;à la navigation — vous pouvez&lt;br&gt;glisser des fichiers directement sur les boutons pour les router.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMMER&lt;/span&gt; — Nettoyez d&apos;abord les noms de fichiers&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;rognez, préfixez, prévisualisez avant de valider&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSER&lt;/span&gt; — Détecte le BPM, la tonalité &amp;amp; l&apos;énergie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;écrit les tags + renomme en une seule fois&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTIR&lt;/span&gt; — Changez de format&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Activez l&apos;étape de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; d&apos;un panneau pour traiter un lot d&apos;un bout à l&apos;autre.&lt;/div&gt;</translation>
+        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
+        <source>Analyze audio files to detect BPM and musical key.
+Results displayed as harmonic key codes for easy harmonic mixing.
+
+Features:
+  - Batch file renaming with Undo
+  - Metadata editing
+  - Audio file conversion
+  - Player with built-in slicer for sample lifting
+  - Harmonic keyboard
+  - BPM detection using beat tracking
+  - Key detection using Chroma analysis
+  - Spectrum analyzer</source>
+        <translatorcomment>Only one bullet was added (audio file conversion); the rest of this string is the old translation, spliced back verbatim.</translatorcomment>
+        <translation>Analysez des fichiers audio pour détecter le BPM et la tonalité musicale.
+Les résultats s&apos;affichent sous forme de codes de tonalité harmonique pour un mixage harmonique simplifié.
+
+Fonctionnalités :
+  - Renommage de fichiers par lots avec annulation
+  - Édition des métadonnées
+  - Conversion de fichiers audio
+  - Lecteur avec slicer intégré pour le prélèvement de samples
+  - Clavier harmonique
+  - Détection du BPM par beat tracking
+  - Détection de la tonalité par analyse Chroma
+  - Analyseur de spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Déposez vos fichiers sur n&apos;importe quel panneau pour commencer.&lt;br&gt;La barre latérale ne sert pas qu&apos;à la navigation — vous pouvez&lt;br&gt;glisser des fichiers directement sur les boutons pour les router.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMMER&lt;/span&gt; — Nettoyez d&apos;abord les noms de fichiers&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;rognez, préfixez, prévisualisez avant de valider&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSER&lt;/span&gt; — Détecte le BPM, la tonalité &amp;amp; l&apos;énergie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;écrit les tags + renomme en une seule fois&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTIR&lt;/span&gt; — Changez de format&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Activez l&apos;étape de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; d&apos;un panneau pour traiter un lot d&apos;un bout à l&apos;autre.&lt;/div&gt;</translation>
+    </message>
+    <message>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Open from inside Player window.&lt;br&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Recovered prior translation; dropped PLAYER, added SLICE open-from-Player line and SPECTRUM section.</translatorcomment>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DÉCOUPER&lt;/span&gt; — Prélevez une section de n&apos;importe quel morceau.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;S&apos;ouvre depuis la fenêtre Lecteur.&lt;br&gt;Définissez le début/la fin avec le curseur de plage ou marquez&lt;br&gt;les limites pendant la lecture. Ajustez de ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;MÉTADONNÉES&lt;/span&gt; — Déposez un fichier, modifiez ses tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Sauvegarde automatique quand vous passez à autre chose.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CLAVIER&lt;/span&gt; — Jouez des notes dans n&apos;importe quelle tonalité.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;La bande de tonalités harmoniques juste là pour référence.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRE&lt;/span&gt; — Analyseur de spectre acoustique.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Représentation visuelle de la qualité audio.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RÉGLAGES&lt;/span&gt; — Plage de BPM, format de tonalité,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;règles de renommage automatique.&lt;/span&gt;&lt;/div&gt;</translation>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DÉCOUPER&lt;/span&gt; — Prélevez une section de n&apos;importe quel morceau.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;S&apos;ouvre depuis la fenêtre Lecteur.&lt;br&gt;Définissez le début/la fin avec le curseur de plage ou marquez&lt;br&gt;les limites pendant la lecture. Ajustez de ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;MÉTADONNÉES&lt;/span&gt; — Déposez un fichier, modifiez ses tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Sauvegarde automatique quand vous passez à autre chose.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CLAVIER&lt;/span&gt; — Jouez des notes dans n&apos;importe quelle tonalité.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;La bande de tonalités harmoniques juste là pour référence.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRE&lt;/span&gt; — Analyseur de spectre acoustique.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Représentation visuelle de la qualité audio.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RÉGLAGES&lt;/span&gt; — Plage de BPM, format de tonalité,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;règles de renommage automatique.&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SLICE&lt;/span&gt; — Grab a section from any track.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Set start/end with the range slider or mark&lt;br&gt;boundaries from playback. Nudge ±10ms.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;PLAYER&lt;/span&gt; — Built-in playback with playlist.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Drag to reorder. Right-click tracks&lt;br&gt;in Analyze to send them over.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>

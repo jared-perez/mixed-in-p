@@ -417,10 +417,13 @@ def test_both_surfaces_credit_discogs_with_the_same_words(qtbot):
         for w in dialog.findChildren(type(dialog._warning))
     )
 
+    # In About it rides inside the "The Rest of the Kit" slide's rich text,
+    # directly under the Discogs blurb, so it is a substring rather than the
+    # whole label — but still the same constant, which is the point here.
     about = AboutDialog()
     qtbot.addWidget(about)
     assert any(
-        w.text() == discogs.ATTRIBUTION
+        discogs.ATTRIBUTION in w.text()
         for w in about.findChildren(type(dialog._warning))
     )
 

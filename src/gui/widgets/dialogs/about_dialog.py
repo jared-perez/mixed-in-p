@@ -223,6 +223,7 @@ class AboutDialog(QDialog):
                 "Features:\n"
                 "  - Batch file renaming with Undo\n"
                 "  - Metadata editing\n"
+                "  - Audio file conversion\n"
                 "  - Player with built-in slicer for sample lifting\n"
                 "  - Harmonic keyboard\n"
                 "  - BPM detection using beat tracking\n"
@@ -245,17 +246,6 @@ class AboutDialog(QDialog):
 
         formats.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 13px;")
         info_layout.addWidget(formats)
-
-        # Credit for the online-lookup data, which the Discogs API terms ask to
-        # be shown wherever it appears. Deliberately NOT translated and read
-        # from one constant, so this line and the one in the review dialog can
-        # never drift apart or be localised into something the terms don't
-        # recognise. Always shown, whether or not the feature is switched on:
-        # a file tagged from Discogs keeps that data after the switch goes off.
-        credit = QLabel(discogs.ATTRIBUTION)
-        credit.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        credit.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-size: 12px;")
-        info_layout.addWidget(credit)
 
         info_layout.addStretch()
         self._stack.addWidget(info_page)
@@ -294,16 +284,16 @@ class AboutDialog(QDialog):
                 'trim, prefix, preview before you commit</span>'
                 '<br>'
                 '<span style="color: {s};">↓</span><br>'
-                '<span style="color: {y}; font-weight: bold;">ANALYZE</span>'
-                ' — Detects BPM, key &amp; energy<br>'
-                '<span style="color: {s};">'
-                'auto-writes tags + renames in one shot</span>'
-                '<br>'
-                '<span style="color: {s};">↓</span><br>'
                 '<span style="color: {y}; font-weight: bold;">CONVERT</span>'
                 ' — Flip formats<br>'
                 '<span style="color: {s};">'
                 'WAV ↔ FLAC ↔ AIFF ↔ MP3</span>'
+                '<br>'
+                '<span style="color: {s};">↓</span><br>'
+                '<span style="color: {y}; font-weight: bold;">ANALYZE</span>'
+                ' — Detects BPM, key &amp; energy<br>'
+                '<span style="color: {s};">'
+                'auto-writes tags + renames in one shot</span>'
                 '<br><br>'
                 'Switch on a panel\'s <span style="color: {y};">pipeline</span>'
                 ' step to run a batch straight through.'
@@ -336,16 +326,27 @@ class AboutDialog(QDialog):
         )
         h2_layout.addWidget(h2_title)
 
+        # {credit} is the Discogs attribution, which the API terms ask to be
+        # shown wherever their data appears — so it rides directly under the
+        # blurb that explains the feature rather than sitting alone on the info
+        # slide as it used to. It is substituted from one constant and is
+        # deliberately NOT translated, so this line and the ones in the review
+        # dialog and the Metadata panel can never drift apart or be localised
+        # into something the terms don't recognise. Always shown, whether or
+        # not the feature is switched on: a file tagged from Discogs keeps that
+        # data after the switch goes off.
         h2_body = QLabel(
             self.tr(
                 '<div style="color: {p}; font-size: 13px; line-height: 1.7;'
                 ' text-align: center;">'
-                '<span style="color: {y}; font-weight: bold;">SLICE</span>'
-                ' — Grab a section from any track.<br>'
+                '<span style="color: {y}; font-weight: bold;">DISCOGS</span>'
+                ' — Fill in what a file is missing.<br>'
                 '<span style="color: {s};">'
-                'Open from inside Player window.<br>'
-                'Set start/end with the range slider or mark<br>'
-                'boundaries from playback. Nudge ±10ms.</span>'
+                'Look up its release from the Metadata panel and<br>'
+                'pull in artist, album, label, year and cover art.<br>'
+                'Review every field before anything is written.</span>'
+                '<br>'
+                '<span style="color: {s}; font-size: 11px;">{credit}</span>'
                 '<br><br>'
                 '<span style="color: {y}; font-weight: bold;">METADATA</span>'
                 ' — Drop a file in, edit its tags.<br>'
@@ -367,7 +368,7 @@ class AboutDialog(QDialog):
                 '<span style="color: {s};">'
                 'auto-rename rules.</span>'
                 '</div>'
-            ).format(p=p, y=y, s=s)
+            ).format(p=p, y=y, s=s, credit=discogs.ATTRIBUTION)
         )
         h2_body.setAlignment(Qt.AlignmentFlag.AlignCenter)
         h2_body.setTextFormat(Qt.TextFormat.RichText)
