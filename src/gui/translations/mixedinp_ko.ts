@@ -387,7 +387,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>BpmScrubBox</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="140"/>
+        <location filename="../widgets/metronome_view.py" line="141"/>
         <source>Drag up or down to change the tempo</source>
         <translation>위아래로 드래그하여 템포 변경</translation>
     </message>
@@ -395,7 +395,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>ClickVolumeButton</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="301"/>
+        <location filename="../widgets/metronome_view.py" line="302"/>
         <source>Click volume — press to cycle quiet / medium / loud</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. Three loudness levels on one cycling button; the label names all three because the button&apos;s bars show which is on.</translatorcomment>
         <translation>클릭 볼륨 — 눌러서 작게 / 보통 / 크게 전환</translation>
@@ -1440,69 +1440,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="597"/>
-        <location filename="../main_window.py" line="626"/>
+        <location filename="../main_window.py" line="636"/>
+        <location filename="../main_window.py" line="665"/>
         <source>Export All Playlists</source>
         <translation>모든 재생목록 내보내기</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="618"/>
+        <location filename="../main_window.py" line="657"/>
         <source>Export failed</source>
         <translation>내보내기 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="619"/>
+        <location filename="../main_window.py" line="658"/>
         <source>Could not write the file:
 {0}</source>
         <translation>파일을 쓸 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="627"/>
+        <location filename="../main_window.py" line="666"/>
         <source>There are no playlists to export yet.</source>
         <translation>아직 내보낼 재생목록이 없습니다.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="632"/>
+        <location filename="../main_window.py" line="671"/>
         <source>Export complete</source>
         <translation>내보내기 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="633"/>
+        <location filename="../main_window.py" line="672"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>재생목록 {0}개({1}곡)를 다음 위치로 내보냈습니다:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="724"/>
+        <location filename="../main_window.py" line="763"/>
         <source>Select Audio Files</source>
         <translation>오디오 파일 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="735"/>
+        <location filename="../main_window.py" line="774"/>
         <source>Select Folder</source>
         <translation>폴더 선택</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="965"/>
+        <location filename="../main_window.py" line="1004"/>
         <source>No Audio Files</source>
         <translation>오디오 파일 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="966"/>
+        <location filename="../main_window.py" line="1005"/>
         <source>No audio files found in:
 {0}</source>
         <translation>다음 위치에서 오디오 파일을 찾을 수 없어요:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="971"/>
+        <location filename="../main_window.py" line="1010"/>
         <source>Invalid Folder</source>
         <translation>잘못된 폴더</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="972"/>
+        <location filename="../main_window.py" line="1011"/>
         <source>Not a valid directory:
 {0}</source>
         <translatorcomment>directory → 디렉터리 (Apple Korean spelling). Flag for native review.</translatorcomment>
@@ -1518,17 +1518,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이미 분석이 실행 중이에요. 잠시 기다리거나 먼저 취소하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1114"/>
+        <location filename="../main_window.py" line="1153"/>
         <source>Analyzing...</source>
         <translation>분석 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1146"/>
+        <location filename="../main_window.py" line="1185"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>완료: {0}개 분석, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1150"/>
+        <location filename="../main_window.py" line="1189"/>
         <source>Complete: {0} files analyzed</source>
         <translation>완료: 파일 {0}개 분석</translation>
     </message>
@@ -1537,118 +1537,118 @@ or click “Add Artwork…”</source>
         <translation type="vanished">취소됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1341"/>
+        <location filename="../main_window.py" line="1380"/>
         <source>Conversion in Progress</source>
         <translation>변환 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1342"/>
+        <location filename="../main_window.py" line="1381"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>이미 변환이 실행 중이에요. 잠시 기다리세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1360"/>
+        <location filename="../main_window.py" line="1399"/>
         <source>Pipeline in Progress</source>
         <translation>파이프라인 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1361"/>
+        <location filename="../main_window.py" line="1400"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translation>마지막 파이프라인 실행이 아직 끝나지 않았어요 — 완료될 때까지 기다리세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1378"/>
+        <location filename="../main_window.py" line="1417"/>
         <source>No Target Playlist</source>
         <translation>대상 재생목록 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1379"/>
-        <location filename="../main_window.py" line="1562"/>
+        <location filename="../main_window.py" line="1418"/>
+        <location filename="../main_window.py" line="1601"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>먼저 상단 바에서 실행할 재생목록을 지정하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1574"/>
+        <location filename="../main_window.py" line="1613"/>
         <source>Cannot Start</source>
         <translation>시작할 수 없어요</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1584"/>
+        <location filename="../main_window.py" line="1623"/>
         <source>No Files</source>
         <translation>파일 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1585"/>
+        <location filename="../main_window.py" line="1624"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translation>파이프라인을 실행하기 전에 이 패널에 파일을 추가하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1595"/>
+        <location filename="../main_window.py" line="1634"/>
         <source>No Rename Adjustments</source>
         <translation>이름 변경 설정 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1596"/>
+        <location filename="../main_window.py" line="1635"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>설정된 이름 변경이 없어요. 파일을 그대로 보낼까요?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1807"/>
+        <location filename="../main_window.py" line="1846"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>파이프라인 완료: {playlist}에 {added}개 추가됨</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1812"/>
+        <location filename="../main_window.py" line="1851"/>
         <source>{n} skipped</source>
         <translation>{n}개 건너뜀</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1814"/>
+        <location filename="../main_window.py" line="1853"/>
         <source>{n} errors</source>
         <translation>오류 {n}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1906"/>
+        <location filename="../main_window.py" line="1945"/>
         <source>Converting...</source>
         <translation>변환 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1922"/>
+        <location filename="../main_window.py" line="1961"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>완료: {0}개 변환, 오류 {1}개</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1926"/>
+        <location filename="../main_window.py" line="1965"/>
         <source>Complete: {0} files converted</source>
         <translation>완료: 파일 {0}개 변환</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2242"/>
+        <location filename="../main_window.py" line="2281"/>
         <source>Rename in Progress</source>
         <translation>이름 변경 진행 중</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2243"/>
+        <location filename="../main_window.py" line="2282"/>
         <source>A rename operation is already running.</source>
         <translation>이미 이름 변경 작업이 실행 중이에요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2347"/>
+        <location filename="../main_window.py" line="2386"/>
         <source>Rename Failed</source>
         <translation>이름 변경 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2382"/>
+        <location filename="../main_window.py" line="2421"/>
         <source>Undo Rename</source>
         <translation>이름 변경 취소</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2417"/>
+        <location filename="../main_window.py" line="2456"/>
         <source>Undo Failed</source>
         <translation>실행 취소 실패</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2473"/>
+        <location filename="../main_window.py" line="2512"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translation>여기서 파이프라인을 실행하려면 &apos;변환&apos; 단계를 켜세요.</translation>
     </message>
@@ -1657,17 +1657,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">먼저 변환 패널에서 파이프라인을 설정하세요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1557"/>
+        <location filename="../main_window.py" line="1596"/>
         <source>A conversion is already running.</source>
         <translation>이미 변환이 실행 중이에요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1559"/>
+        <location filename="../main_window.py" line="1598"/>
         <source>The last pipeline run is still finishing.</source>
         <translation>마지막 파이프라인 실행이 아직 끝나지 않았어요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1689"/>
+        <location filename="../main_window.py" line="1728"/>
         <source>Lossy files stayed in Convert — the pipeline converts lossless sources only.</source>
         <translation>손실 파일은 변환에 남아요 — 파이프라인은 무손실 소스만 변환해요.</translation>
     </message>
@@ -1680,22 +1680,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">파일 {0}개 이름 변경 완료</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2354"/>
+        <location filename="../main_window.py" line="2393"/>
         <source>No Session</source>
         <translation>세션 없음</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2354"/>
+        <location filename="../main_window.py" line="2393"/>
         <source>No rename session to undo.</source>
         <translation>실행 취소할 이름 변경 세션이 없어요.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2363"/>
+        <location filename="../main_window.py" line="2402"/>
         <source>Confirm Undo</source>
         <translation>실행 취소 확인</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2364"/>
+        <location filename="../main_window.py" line="2403"/>
         <source>Undo renaming of {0} files?</source>
         <translatorcomment>Object particle avoided via 의 + 을 on 이름 변경. Counter 개. Flag for native review.</translatorcomment>
         <translation>파일 {0}개의 이름 변경을 실행 취소할까요?</translation>
@@ -1705,7 +1705,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이름 변경 실행 취소 중...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2383"/>
+        <location filename="../main_window.py" line="2422"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>실행 취소: 파일 {0}개, 오류 {1}개</translation>
     </message>
@@ -2101,74 +2101,74 @@ or click “Add Artwork…”</source>
 <context>
     <name>MetronomeView</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="378"/>
+        <location filename="../widgets/metronome_view.py" line="379"/>
         <source>One BPM slower</source>
         <translation>1 BPM 느리게</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="387"/>
+        <location filename="../widgets/metronome_view.py" line="388"/>
         <source>One BPM faster</source>
         <translation>1 BPM 빠르게</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="396"/>
+        <location filename="../widgets/metronome_view.py" line="397"/>
         <source>Tap</source>
         <translation>탭</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="399"/>
+        <location filename="../widgets/metronome_view.py" line="400"/>
         <source>Tap along to set the tempo</source>
         <translation>탭하여 템포 설정</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="407"/>
+        <location filename="../widgets/metronome_view.py" line="408"/>
         <source>Global Click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>전역 클릭음</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="428"/>
+        <location filename="../widgets/metronome_view.py" line="429"/>
         <source>Hold to lean the beat back</source>
         <translation>길게 눌러 비트를 뒤로</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="431"/>
+        <location filename="../widgets/metronome_view.py" line="432"/>
         <source>Hold to push the beat forward</source>
         <translation>길게 눌러 비트를 앞으로</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="495"/>
-        <location filename="../widgets/metronome_view.py" line="512"/>
-        <location filename="../widgets/metronome_view.py" line="552"/>
+        <location filename="../widgets/metronome_view.py" line="496"/>
+        <location filename="../widgets/metronome_view.py" line="513"/>
+        <location filename="../widgets/metronome_view.py" line="558"/>
         <source>Start</source>
         <translation>시작</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="460"/>
+        <location filename="../widgets/metronome_view.py" line="461"/>
         <source>Silent — the light keeps time</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>무음 — 표시등은 계속 박자를 셉니다</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="461"/>
+        <location filename="../widgets/metronome_view.py" line="462"/>
         <source>Standard click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>기본 클릭음</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="462"/>
+        <location filename="../widgets/metronome_view.py" line="463"/>
         <source>Higher-pitched click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>높은 클릭음</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="585"/>
+        <location filename="../widgets/metronome_view.py" line="591"/>
         <source>Stop the click when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>이 보기를 벗어나면 클릭음 중지</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="587"/>
+        <location filename="../widgets/metronome_view.py" line="593"/>
         <source>Keep the click going when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>이 보기를 벗어나도 클릭음 유지</translation>
@@ -2178,8 +2178,8 @@ or click “Add Artwork…”</source>
         <translation type="vanished">메트로놈 음량</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="512"/>
-        <location filename="../widgets/metronome_view.py" line="552"/>
+        <location filename="../widgets/metronome_view.py" line="513"/>
+        <location filename="../widgets/metronome_view.py" line="558"/>
         <source>Stop</source>
         <translation>정지</translation>
     </message>
@@ -2233,68 +2233,68 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1796"/>
+        <location filename="../widgets/player_panel.py" line="1819"/>
         <source>Player</source>
         <translation>플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1828"/>
-        <location filename="../widgets/player_panel.py" line="3186"/>
+        <location filename="../widgets/player_panel.py" line="1851"/>
+        <location filename="../widgets/player_panel.py" line="3264"/>
         <source>Search all playlists…</source>
         <translation>모든 재생목록 검색…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1847"/>
+        <location filename="../widgets/player_panel.py" line="1870"/>
         <source>This playlist</source>
         <translation>이 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1848"/>
+        <location filename="../widgets/player_panel.py" line="1871"/>
         <source>All playlists</source>
         <translation>모든 재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1873"/>
+        <location filename="../widgets/player_panel.py" line="1896"/>
         <source>Choose a visualization</source>
         <translation>시각 효과 선택</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1908"/>
+        <location filename="../widgets/player_panel.py" line="1931"/>
         <source>Visuals off</source>
         <translation>시각 효과 끔</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1901"/>
+        <location filename="../widgets/player_panel.py" line="1924"/>
         <source>Backdrop waveform</source>
         <translation>배경: 파형</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1897"/>
+        <location filename="../widgets/player_panel.py" line="1920"/>
         <source>Backdrop oscilloscope</source>
         <translation>배경: 오실로스코프</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1898"/>
+        <location filename="../widgets/player_panel.py" line="1921"/>
         <source>Backdrop spectrum</source>
         <translation>배경: 스펙트럼</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1902"/>
+        <location filename="../widgets/player_panel.py" line="1925"/>
         <source>Backdrop fire</source>
         <translation>배경: 불꽃</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1895"/>
+        <location filename="../widgets/player_panel.py" line="1918"/>
         <source>Backdrop fractal</source>
         <translation>배경: 프랙털</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1905"/>
+        <location filename="../widgets/player_panel.py" line="1928"/>
         <source>Popout oscilloscope</source>
         <translation>별도 창: 오실로스코프</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1906"/>
+        <location filename="../widgets/player_panel.py" line="1929"/>
         <source>Popout spectrum bars</source>
         <translation>별도 창: 스펙트럼 막대</translation>
     </message>
@@ -2303,176 +2303,176 @@ or click “Add Artwork…”</source>
         <translation type="vanished">별도 창: 불꽃</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1903"/>
+        <location filename="../widgets/player_panel.py" line="1926"/>
         <source>Popout fractal</source>
         <translation>별도 창: 프랙털</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1941"/>
+        <location filename="../widgets/player_panel.py" line="1964"/>
         <source>Edit Lock</source>
         <translation>편집 잠금</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1945"/>
+        <location filename="../widgets/player_panel.py" line="1968"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>재생목록의 메타데이터 편집 잠금</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1402"/>
-        <location filename="../widgets/player_panel.py" line="3303"/>
+        <location filename="../widgets/player_panel.py" line="1420"/>
+        <location filename="../widgets/player_panel.py" line="3381"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1403"/>
+        <location filename="../widgets/player_panel.py" line="1421"/>
         <source>Filename</source>
         <translation>파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1404"/>
+        <location filename="../widgets/player_panel.py" line="1422"/>
         <source>Artist</source>
         <translation>아티스트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1405"/>
+        <location filename="../widgets/player_panel.py" line="1423"/>
         <source>Title</source>
         <translation>제목</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1406"/>
+        <location filename="../widgets/player_panel.py" line="1424"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1407"/>
+        <location filename="../widgets/player_panel.py" line="1425"/>
         <source>Key</source>
         <translatorcomment>Playlist column for the musical key → 조성. Flag for native review.</translatorcomment>
         <translation>조성</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1408"/>
+        <location filename="../widgets/player_panel.py" line="1426"/>
         <source>Comment</source>
         <translation>코멘트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1409"/>
+        <location filename="../widgets/player_panel.py" line="1427"/>
         <source>Duration</source>
         <translatorcomment>Duration → 재생 시간 (playback length).</translatorcomment>
         <translation>재생 시간</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1410"/>
+        <location filename="../widgets/player_panel.py" line="1428"/>
         <source>Year</source>
         <translation>연도</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1900"/>
+        <location filename="../widgets/player_panel.py" line="1923"/>
         <source>Backdrop stream</source>
         <translatorcomment>The visual was named &quot;Silly Scope&quot; when it shipped and is now &quot;stream&quot;, so the glossary ruling that kept it in English is retired with the pun: this is an ordinary noun for the look — a flowing ribbon of liquid — and it is translated exactly as its six sibling backdrop entries are.</translatorcomment>
         <translation>배경: 흐름</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2033"/>
-        <location filename="../widgets/player_panel.py" line="3300"/>
+        <location filename="../widgets/player_panel.py" line="2056"/>
+        <location filename="../widgets/player_panel.py" line="3378"/>
         <source>Playlists</source>
         <translation>재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2140"/>
+        <location filename="../widgets/player_panel.py" line="2163"/>
         <source>Previous</source>
         <translation>이전</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2151"/>
+        <location filename="../widgets/player_panel.py" line="2174"/>
         <source>Play / Pause  (Space)</source>
         <translatorcomment>Playback → 재생; Pause → 일시정지. Key name &quot;Space&quot; kept Latin.</translatorcomment>
         <translation>재생 / 일시정지  (Space)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2158"/>
+        <location filename="../widgets/player_panel.py" line="2181"/>
         <source>Stop</source>
         <translation>정지</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2165"/>
+        <location filename="../widgets/player_panel.py" line="2188"/>
         <source>Next</source>
         <translation>다음</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2121"/>
+        <location filename="../widgets/player_panel.py" line="2144"/>
         <source>Vol</source>
         <translatorcomment>Volume abbreviation → 볼륨. Flag for native review (vs 음량).</translatorcomment>
         <translation>볼륨</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1411"/>
+        <location filename="../widgets/player_panel.py" line="1429"/>
         <source>Album</source>
         <translation>앨범</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1412"/>
+        <location filename="../widgets/player_panel.py" line="1430"/>
         <source>Genre</source>
         <translation>장르</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1413"/>
+        <location filename="../widgets/player_panel.py" line="1431"/>
         <source>Track #</source>
         <translation>트랙 번호</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1414"/>
+        <location filename="../widgets/player_panel.py" line="1432"/>
         <source>Label</source>
         <translation>레이블</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1415"/>
+        <location filename="../widgets/player_panel.py" line="1433"/>
         <source>Bitrate</source>
         <translation>비트레이트</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1416"/>
+        <location filename="../widgets/player_panel.py" line="1434"/>
         <source>Energy</source>
         <translation>에너지</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1417"/>
+        <location filename="../widgets/player_panel.py" line="1435"/>
         <source>Art</source>
         <translation>아트워크</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1813"/>
+        <location filename="../widgets/player_panel.py" line="1836"/>
         <source>Show this cover in the sidebar</source>
         <translation>이 커버를 사이드바에 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1899"/>
+        <location filename="../widgets/player_panel.py" line="1922"/>
         <source>Backdrop wormhole</source>
         <translation>배경: 웜홀</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1896"/>
+        <location filename="../widgets/player_panel.py" line="1919"/>
         <source>Backdrop tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>배경: 터널 추격</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1907"/>
+        <location filename="../widgets/player_panel.py" line="1930"/>
         <source>Popout wormhole</source>
         <translation>별도 창: 웜홀</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1904"/>
+        <location filename="../widgets/player_panel.py" line="1927"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>별도 창: 터널 추격</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1418"/>
+        <location filename="../widgets/player_panel.py" line="1436"/>
         <source>Date Added</source>
         <translation>추가된 날짜</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1419"/>
+        <location filename="../widgets/player_panel.py" line="1437"/>
         <source>Date Created</source>
         <translation>생성 날짜</translation>
     </message>
@@ -2482,224 +2482,229 @@ or click “Add Artwork…”</source>
         <translation type="vanished">배경: Silly Scope</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2183"/>
-        <location filename="../widgets/player_panel.py" line="3143"/>
-        <location filename="../widgets/player_panel.py" line="3148"/>
+        <location filename="../widgets/player_panel.py" line="2206"/>
+        <location filename="../widgets/player_panel.py" line="3221"/>
+        <location filename="../widgets/player_panel.py" line="3226"/>
         <source>Save Playlist</source>
         <translation>재생목록 저장</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2188"/>
+        <location filename="../widgets/player_panel.py" line="2211"/>
         <source>Clear Playlist</source>
         <translatorcomment>playlist → 재생목록; action button → -기 (비우기).</translatorcomment>
         <translation>재생목록 비우기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2228"/>
+        <location filename="../widgets/player_panel.py" line="2251"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>이것을 재생목록으로 끌어다 놓으면 재생 중인 곡이 추가돼요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2247"/>
+        <location filename="../widgets/player_panel.py" line="2275"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>현재 곡이 재생되고 있는 재생목록을 열어요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2495"/>
-        <location filename="../widgets/player_panel.py" line="3065"/>
-        <location filename="../widgets/player_panel.py" line="3130"/>
+        <location filename="../widgets/player_panel.py" line="2528"/>
+        <location filename="../widgets/player_panel.py" line="3109"/>
+        <location filename="../widgets/player_panel.py" line="3208"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3025"/>
+        <location filename="../widgets/player_panel.py" line="3069"/>
         <source>Playing: {0}</source>
         <translation>재생 중: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3075"/>
+        <location filename="../widgets/player_panel.py" line="3119"/>
         <source>In Playlist: {0}</source>
         <translation>재생목록: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3127"/>
+        <location filename="../widgets/player_panel.py" line="3205"/>
         <source>Search: {0}</source>
         <translation>검색: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3144"/>
+        <location filename="../widgets/player_panel.py" line="3222"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>재생목록이 비어 있어요. 먼저 곡을 추가하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3148"/>
+        <location filename="../widgets/player_panel.py" line="3226"/>
         <source>Playlist name:</source>
         <translation>재생목록 이름:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3183"/>
+        <location filename="../widgets/player_panel.py" line="3261"/>
         <source>Search scope: {0}</source>
         <translation>검색 범위: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3188"/>
+        <location filename="../widgets/player_panel.py" line="3266"/>
         <source>Search this playlist…</source>
         <translation>이 재생목록 검색…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3211"/>
+        <location filename="../widgets/player_panel.py" line="3289"/>
         <source>No matching tracks</source>
         <translation>일치하는 곡이 없음</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3679"/>
+        <location filename="../widgets/player_panel.py" line="3757"/>
         <source>File not found:
 {0}</source>
         <translation>파일을 찾을 수 없습니다:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3854"/>
+        <location filename="../widgets/player_panel.py" line="3932"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>재생 중인 트랙과 어울리는 곡 숨기기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3856"/>
+        <location filename="../widgets/player_panel.py" line="3934"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>재생 중인 트랙과 어울리는 곡 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4178"/>
+        <location filename="../widgets/player_panel.py" line="4256"/>
         <source>{0}+ results</source>
         <translation>{0}+개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4181"/>
+        <location filename="../widgets/player_panel.py" line="4259"/>
         <source>{0} result</source>
         <translation>{0}개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4183"/>
+        <location filename="../widgets/player_panel.py" line="4261"/>
         <source>{0} results</source>
         <translation>{0}개 결과</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4187"/>
+        <location filename="../widgets/player_panel.py" line="4265"/>
         <source>{0} track</source>
         <translatorcomment>Counter for tracks/songs → 곡 per glossary. Korean has no plural; {0} track and {0} tracks render identically. Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4189"/>
+        <location filename="../widgets/player_panel.py" line="4267"/>
         <source>{0} tracks</source>
         <translatorcomment>Counter 곡. Same form as the singular (no Korean plural). Flag for native review.</translatorcomment>
         <translation>{0}곡</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4774"/>
+        <location filename="../widgets/player_panel.py" line="4859"/>
         <source>Reset Columns</source>
         <translation>열 초기화</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5519"/>
+        <location filename="../widgets/player_panel.py" line="4865"/>
+        <source>Fit {0} to Longest</source>
+        <translation>{0} 열을 가장 긴 값에 맞추기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="5649"/>
         <source>“{0}” has moved.</source>
         <translation>‘{0}’이(가) 이동되었습니다.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5521"/>
+        <location filename="../widgets/player_panel.py" line="5651"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>선택한 파일 중 %n개가 이동되었습니다.</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5524"/>
+        <location filename="../widgets/player_panel.py" line="5654"/>
         <source>File Has Moved</source>
         <translation>파일이 이동됨</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5528"/>
+        <location filename="../widgets/player_panel.py" line="5658"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>저장된 위치에 더 이상 없으므로 재생목록에 추가하거나 밖으로 끌어낼 수 없습니다. 이미 재생 중인 곡은 계속 재생됩니다. 파일이 이동되기 전에 메모리로 불러왔기 때문입니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5533"/>
+        <location filename="../widgets/player_panel.py" line="5663"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>곡을 마우스 오른쪽 버튼으로 클릭하고 ‘누락된 파일 찾기…’를 선택하세요</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5680"/>
+        <location filename="../widgets/player_panel.py" line="5810"/>
         <source>Locate Missing File…</source>
         <translation>누락된 파일 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5682"/>
+        <location filename="../widgets/player_panel.py" line="5812"/>
         <source>Open File Location</source>
         <translation>파일 위치 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5683"/>
+        <location filename="../widgets/player_panel.py" line="5813"/>
         <source>Open in Metadata Panel</source>
         <translation>메타데이터 패널에서 열기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5684"/>
+        <location filename="../widgets/player_panel.py" line="5814"/>
         <source>Reload Metadata from File</source>
         <translation>파일에서 메타데이터 다시 불러오기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5688"/>
+        <location filename="../widgets/player_panel.py" line="5818"/>
         <source>Look Up Online…</source>
         <translation>온라인에서 찾기…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5690"/>
+        <location filename="../widgets/player_panel.py" line="5820"/>
         <source>Remove from Playlist</source>
         <translation>재생목록에서 제거</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5746"/>
-        <location filename="../widgets/player_panel.py" line="5774"/>
-        <location filename="../widgets/player_panel.py" line="5874"/>
-        <location filename="../widgets/player_panel.py" line="5947"/>
-        <location filename="../widgets/player_panel.py" line="5977"/>
+        <location filename="../widgets/player_panel.py" line="5876"/>
+        <location filename="../widgets/player_panel.py" line="5904"/>
+        <location filename="../widgets/player_panel.py" line="6004"/>
+        <location filename="../widgets/player_panel.py" line="6077"/>
+        <location filename="../widgets/player_panel.py" line="6107"/>
         <source>Look Up Online</source>
         <translation>온라인에서 찾기</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5748"/>
+        <location filename="../widgets/player_panel.py" line="5878"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>선택한 트랙에는 검색에 쓸 아티스트나 제목이 없고, 파일 이름에서도 알 수 없어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5768"/>
+        <location filename="../widgets/player_panel.py" line="5898"/>
         <source>Looking up track details…</source>
         <translation>트랙 정보를 찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5769"/>
+        <location filename="../widgets/player_panel.py" line="5899"/>
         <source>Cancel</source>
         <translation>취소</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5799"/>
+        <location filename="../widgets/player_panel.py" line="5929"/>
         <source>Looking up {0} of {1}…</source>
         <translation>{1}개 중 {0}번째 찾는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5807"/>
+        <location filename="../widgets/player_panel.py" line="5937"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Discogs 요청 제한이 풀리기를 기다리는 중…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5970"/>
+        <location filename="../widgets/player_panel.py" line="6100"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n개 트랙은 일치하는 항목이 없어요.</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5973"/>
+        <location filename="../widgets/player_panel.py" line="6103"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n개 트랙을 업데이트했어요.</numerusform>

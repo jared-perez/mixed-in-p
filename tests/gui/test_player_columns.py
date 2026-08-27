@@ -578,3 +578,118 @@ class TestTranslatedHeadersFit:
         player._apply_header_fit_floor()
 
         assert player._table.columnWidth(11) >= player._header_fit_width(11)
+
+
+class TestFitToLongest:
+    """One column, sized to the longest value it *currently* holds.
+
+    Deliberately one shot. A width that kept tracking the contents would move
+    under the user every time a playlist grew, and the header is Interactive
+    precisely so the width is theirs — so a longer track added afterwards
+    clips until they ask again.
+    """
+
+    def add(self, player, name: str) -> None:
+        player.add_tracks(
+            [{"file_path": f"/tmp/{name}", "display_name": name}],
+            allow_duplicates=True,
+        )
+
+    def fit_action(self, player, qtbot, col: int):
+        menu = player._build_column_menu(col)
+        qtbot.addWidget(menu)
+        return next(
+            (a for a in menu.actions() if a.text().startswith("Fit ")), None
+        )
+
+    def test_the_menu_offers_it_for_the_column_it_was_opened_on(self, player, qtbot):
+        action = self.fit_action(player, qtbot, 1)
+
+        assert action is not None
+        # Named, because everything else in this menu is about all the columns
+        # at once and this one is not.
+        assert action.text() == "Fit Filename to Longest"
+
+    def test_a_right_click_past_the_last_section_offers_nothing_to_fit(
+        self, player, qtbot
+    ):
+        """`logicalIndexAt` answers -1 there, which must not become column 0
+        or a crash."""
+        assert self.fit_action(player, qtbot, -1) is None
+
+    @pytest.mark.parametrize("col", sorted(PlayerPanel._UNFITTABLE_COLUMNS))
+    def test_the_two_columns_it_cannot_measure_are_not_offered(
+        self, player, qtbot, col
+    ):
+        """'#' is the one Fixed section (and the count column during an
+        All-playlists search); Art's band follows the row height, so there is
+        nothing in its cells to measure."""
+        assert self.fit_action(player, qtbot, col) is None
+
+    def test_it_widens_a_column_to_show_its_longest_value(self, player, qtbot):
+        self.add(player, "short.mp3")
+        self.add(player, "a considerably longer filename than the column.mp3")
+        player._table.setColumnWidth(1, 60)
+
+        self.fit_action(player, qtbot, 1).trigger()
+
+        # Asked of the style, through the path that paints the cell — a
+        # hand-written `font metrics + a pad` is right on at most one platform.
+        assert player._table.columnWidth(1) >= player._table.sizeHintForColumn(1)
+
+    def test_it_narrows_one_that_is_wider_than_it_needs(self, player, qtbot):
+        self.add(player, "a.mp3")
+        player._table.setColumnWidth(1, 900)
+
+        player._fit_column_to_contents(1)
+
+        assert player._table.columnWidth(1) < 900
+
+    def test_it_never_narrows_past_the_header_word(self, player, qtbot):
+        """Measured the way *this* header paints its label. Qt's own
+        `resizeColumnToContents` floors with `sectionSizeHint`, which is the
+        style's idea of it, and `SeparatorHeaderView` blanks that and draws its
+        own at `_TEXT_PAD`."""
+        self.add(player, "a.mp3")
+
+        player._fit_column_to_contents(1)
+
+        assert player._table.columnWidth(1) >= player._header_fit_width(1)
+
+    def test_an_empty_playlist_fits_to_the_header_word(self, player):
+        player._table.setColumnWidth(1, 900)
+
+        player._fit_column_to_contents(1)
+
+        assert player._table.columnWidth(1) == player._header_fit_width(1)
+
+    def test_it_is_one_shot_and_does_not_follow_later_additions(self, player):
+        self.add(player, "a.mp3")
+        player._fit_column_to_contents(1)
+        fitted = player._table.columnWidth(1)
+
+        self.add(player, "a very much longer filename indeed.mp3")
+
+        assert player._table.columnWidth(1) == fitted
+
+    def test_a_hidden_column_is_left_alone(self, player):
+        """Nothing can right-click one, but the handler is public enough to be
+        called: a hidden section reports width 0 and would be "fitted" to the
+        header word, i.e. silently un-zeroed behind `_set_column_visible`'s
+        back."""
+        assert player._table.isColumnHidden(9)
+
+        player._fit_column_to_contents(9)
+
+        assert player._table.columnWidth(9) == 0
+
+    def test_the_new_width_is_persisted(self, player):
+        """`setColumnWidth` emits `sectionResized`, which is already wired to
+        the debounced save — so this needs no save of its own, and this is the
+        assertion that says so."""
+        self.add(player, "a considerably longer filename than the column.mp3")
+        player._col_save_timer.stop()
+
+        player._fit_column_to_contents(1)
+
+        assert player._col_save_timer.isActive()

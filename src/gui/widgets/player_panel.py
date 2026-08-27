@@ -1529,6 +1529,11 @@ class PlayerPanel(QWidget):
     # (_set_count_column) — hiding either would leave a table you cannot read
     # or a swap fighting a visibility flag.
     _LOCKED_COLUMNS = frozenset({0, 1})
+    # Never offered "Fit to Longest" either. '#' is the one Fixed section and
+    # doubles as the membership count during an All-playlists search, and Art
+    # holds a thumbnail whose band width follows the row height rather than
+    # anything measurable in the cells.
+    _UNFITTABLE_COLUMNS = frozenset({0, _ARTWORK_COLUMN})
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -4822,7 +4827,7 @@ class PlayerPanel(QWidget):
             if header.visualIndex(col) != visual:
                 header.moveSection(header.visualIndex(col), visual)
 
-    def _build_column_menu(self) -> QMenu:
+    def _build_column_menu(self, col: int = -1) -> QMenu:
         """The header's show/hide menu, built but not shown.
 
         Separate from showing it so it can be inspected without opening a
@@ -4830,23 +4835,74 @@ class PlayerPanel(QWidget):
 
         Column labels come from the header itself so they are already
         translated; '#' and Filename are never offered.
+
+        ``col`` is the section the menu was opened on, and the only part of
+        this menu that is about one column rather than all of them: it earns
+        the "Fit to Longest" entry at the bottom. -1 (a right-click past the
+        last section) simply leaves that entry off.
         """
         menu = QMenu(self)
-        for col in range(self._table.columnCount()):
-            if col in self._LOCKED_COLUMNS:
+        # `other` rather than `col`: the loop must not shadow the section the
+        # menu was opened on, which the fit entry below still needs.
+        for other in range(self._table.columnCount()):
+            if other in self._LOCKED_COLUMNS:
                 continue
-            item = self._table.horizontalHeaderItem(col)
-            action = menu.addAction(item.text() if item else str(col))
+            item = self._table.horizontalHeaderItem(other)
+            action = menu.addAction(item.text() if item else str(other))
             action.setCheckable(True)
-            action.setChecked(not self._table.isColumnHidden(col))
-            action.setData(col)
+            action.setChecked(not self._table.isColumnHidden(other))
+            action.setData(other)
             action.toggled.connect(
-                lambda shown, c=col: self._set_column_visible(c, shown)
+                lambda shown, c=other: self._set_column_visible(c, shown)
             )
         menu.addSeparator()
         reset = menu.addAction(self.tr("Reset Columns"))
         reset.triggered.connect(self.reset_columns_to_defaults)
+        if 0 <= col < self._table.columnCount() and col not in self._UNFITTABLE_COLUMNS:
+            item = self._table.horizontalHeaderItem(col)
+            menu.addSeparator()
+            fit = menu.addAction(
+                self.tr("Fit {0} to Longest").format(
+                    item.text() if item else str(col)
+                )
+            )
+            fit.triggered.connect(
+                lambda _checked=False, c=col: self._fit_column_to_contents(c)
+            )
         return menu
+
+    def _fit_column_to_contents(self, col: int) -> None:
+        """Widen — or narrow — one column to the longest value it now holds.
+
+        One shot on purpose: it answers "show me all of this column *now*",
+        not "keep tracking it". A track added afterwards with a longer value
+        clips until the user asks again, which keeps the width theirs rather
+        than something that moves under them as a playlist fills.
+
+        The measurement is `sizeHintForColumn`, not font metrics plus a pad:
+        the QSS ``::item`` padding and the style's own per-cell margin are both
+        invisible to `QFontMetrics`, and the second differs per platform
+        (`PM_FocusFrameHMargin` is 2 on Fusion and 4 on macOS) — the same
+        reason `_measure_stamp_width` goes through it. It scans every row, not
+        just the ones on screen: Qt starts at the viewport and keeps going out
+        to the row count.
+
+        Floored by the header word rather than by Qt's own
+        `resizeColumnToContents`, which floors with `sectionSizeHint` — the
+        *style's* idea of the label, while `SeparatorHeaderView` blanks that
+        and paints its own at `_TEXT_PAD`. An empty playlist therefore fits to
+        the header word, which is the narrowest honest answer.
+
+        No need to save the width here: `setColumnWidth` emits
+        `sectionResized`, which is already wired to the debounced save.
+        """
+        if col in self._UNFITTABLE_COLUMNS or self._table.isColumnHidden(col):
+            return
+        # +4 for the reason `_measure_stamp_width` adds it: a value that
+        # reaches the section divider exactly reads as clipped even when the
+        # whole of it is there.
+        width = self._table.sizeHintForColumn(col) + 4
+        self._table.setColumnWidth(col, max(width, self._header_fit_width(col)))
 
     def reset_columns_to_defaults(self) -> None:
         """Put the playlist back to the shipped order, open set and widths.
@@ -4883,9 +4939,10 @@ class PlayerPanel(QWidget):
         self._save_column_state()
 
     def _show_column_menu(self, pos) -> None:
-        """Right-click the header: which columns to show."""
-        menu = self._build_column_menu()
-        menu.exec(self._table.horizontalHeader().mapToGlobal(pos))
+        """Right-click the header: which columns to show, and fit this one."""
+        header = self._table.horizontalHeader()
+        menu = self._build_column_menu(header.logicalIndexAt(pos))
+        menu.exec(header.mapToGlobal(pos))
 
     def _set_column_visible(self, col: int, shown: bool) -> None:
         """Show or hide one column and remember the choice."""
