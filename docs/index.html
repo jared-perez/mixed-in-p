@@ -134,12 +134,12 @@
       <tr><td>Analysis</td><td>Detect BPM, key, and energy.</td></tr>
       <tr><td>Convert</td><td>Convert between WAV, FLAC, AIFF, and MP3.</td></tr>
       <tr><td>Rename</td><td>Batch-rename with live preview.</td></tr>
-      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform + Loop Slicer).</td></tr>
+      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform + Loop Slicer + Metronome).</td></tr>
       <tr><td>Playlists</td><td>A tree of folders and saved playlists, opened from the sidebar's
         <b>Playlists</b> button rather than the nav rail.</td></tr>
       <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
       <tr><td>Spectrum</td><td>Spek-style frequency view of a track.</td></tr>
-      <tr><td>Keyboard</td><td>3-octave piano, harmonic reference grid, and a metronome.</td></tr>
+      <tr><td>Keyboard</td><td>3-octave piano and harmonic reference grid.</td></tr>
       <tr><td>History</td><td>Undo past rename batches.</td></tr>
       <tr><td>Settings</td><td>Tempo range, notation, auto-rename, language, theme, and more.</td></tr>
     </table>
@@ -158,7 +158,8 @@
         <i>Analyzed</i>, <i>Error</i> — so a long batch shows you where it has got to.</li>
       <li>Detected BPM and key can be <b>written back to the file's tags</b> (see Settings).</li>
       <li>Right-click a row to <b>Open File Location</b> or <b>Remove</b>; <b>Clear Results</b> empties the table.</li>
-      <li>Use <b>Send To</b> to push selected tracks to <b>Convert</b> or the <b>Player</b>.</li>
+      <li>Drag selected rows onto another panel's sidebar button to push them to <b>Convert</b>,
+        <b>Rename</b> or the <b>Player</b> &mdash; see <a href="#routing">Getting files in and out</a>.</li>
     </ul>
 
     <p><b>Cancelling a run.</b> The <b>Cancel</b> button appears beside the progress bar while a run is
@@ -195,7 +196,9 @@
     <p>The <b>Rename</b> panel rewrites many filenames at once, with a live before/after preview.</p>
     <ul>
       <li><b>Trim</b> characters from the start and/or end of every name.</li>
-      <li><b>Prepend</b> or <b>Append</b> custom text (one or the other). Add text to the beginning or end of ALL the filenames being renamed.</li>
+      <li><b>Prepend</b> and/or <b>Append</b> custom text &mdash; two independent toggles over two
+        boxes, so one pass can do both. Typing in a box arms its own toggle. The text is added to the
+        beginning and/or end of ALL the filenames being renamed.</li>
       <li><b>Remove underscores</b> replaces <code>_</code> with spaces.</li>
       <li><b>Space Dashes</b> puts a space on each side of a bare dash:
         <code>Artist-Track</code> becomes <code>Artist - Track</code>. Some DJ software searches
@@ -236,11 +239,44 @@
         one click and not another trip through the file dialog. Both survive a restart. A folder
         deleted in the meantime is forgotten rather than failing a batch, and nothing is ever
         overwritten: a name already taken gets a <code>(1)</code>, <code>(2)</code> and so on.</li>
-      <li><b>Send To</b> moves output to Analyze, Rename, or the Player.</li>
+      <li>Drag the converted rows onto another panel's sidebar button to move them to
+        <b>Analyze</b>, <b>Rename</b> or the <b>Player</b>.</li>
       <li><b>Cancel</b> appears beside the progress bar while a batch is converting. Files already
         written are kept; the one in progress is discarded.</li>
     </ul>
     <img class="shot-img" src="../assets/convert.webp" alt="Convert panel">
+
+    <h3 id="pipeline">Run the pipeline</h3>
+    <p>Renaming a folder, converting it, analyzing it and filing it into a playlist is four trips
+      through three panels. The <b>pipeline</b> is those trips as one press.</p>
+    <p><b>The step toggles.</b> Rename, Convert and Analyze each carry a small hazard-wave triangle.
+      Switch one on and that step is part of a pipeline run; that panel's action button changes from
+      <b>Apply Rename</b> / <b>Convert</b> / <b>Analyze</b> to <b>Start Pipeline</b> to say so. The
+      order is fixed &mdash; <b>rename &rarr; convert &rarr; analyze &rarr; playlist</b> &mdash; and
+      the toggles only choose which steps take part, never the sequence.</p>
+    <p><b>The header cluster.</b> The same three triangles appear in miniature in the app header,
+      beside a <b>playlist</b> field. Either set of toggles drives the other, so you can see and
+      change the shape of a run from anywhere in the app. The field appears as soon as any step is on
+      and folds away when they are all off. Pick an existing playlist from the list, or type a name
+      and one gets made when the run finishes &mdash; typing is what tells it to create, so a name
+      that matches one you already have still makes a new playlist unless you pick it from the
+      list.</p>
+    <p><b>Starting a run.</b> Press <b>Start Pipeline</b> in whichever enabled panel holds the files
+      you mean. The run takes that panel's files and flows through the <i>later</i> enabled steps
+      only &mdash; so a batch started in Convert with all three on is converted and analyzed, and
+      Rename is not applied to it retrospectively. Every run ends in the target playlist whatever
+      else is switched on: with Analyze off, tracks land there un-analyzed, which is exactly what you
+      want for a folder you have already been through.</p>
+    <ul>
+      <li>Each track is filed into the playlist <b>as its own analysis finishes</b>, so a long batch
+        fills the playlist while it runs rather than all at once at the end.</li>
+      <li>Turning a step off is a real skip, not a no-op: an Analyze-off run never starts the
+        analyzer, and a rename that would change no filenames asks once and then moves on.</li>
+      <li>Flipping a toggle <b>mid-run does not re-route a batch already in flight</b> &mdash; the
+        run remembers the shape it started with.</li>
+      <li><b>Auto-analyze</b> (Settings) is independent of all this. It analyzes files as they are
+        dropped; the pipeline drives its own analysis whether or not that is on.</li>
+    </ul>
 
     <h3>Edit metadata &amp; artwork</h3>
     <p>Drop a single file onto the <b>Metadata</b> panel to edit Title, Artist, Album, Label, Genre,
@@ -252,7 +288,19 @@
       <b>full path</b> it came from, shortened with an ellipsis if it is too long for the panel (hover
       it to read the whole thing).
       <b>Open File Location</b> beside it opens that folder in Finder or Explorer with the file
-      selected — useful when two tracks share a name and you need to know which one you have open.</p>
+      selected — useful when two tracks share a name and you need to know which one you have open.
+      <b>Right-click the path</b> for the same thing plus <b>Play in Player</b>, which loads the file
+      into the Player without leaving the panel, and <b>Copy File Path</b>.</p>
+    <p>Beside the filename the header reads out what the audio actually is: <b>Sample Rate</b> and
+      <b>Bit Depth</b> for a file whose stream has them, and <b>Bitrate</b> instead for one that does
+      not — an MP3, M4A or OGG, where the bitrate is the meaningful number. It is a quick way to see
+      that the "lossless" file you were sent is 44.1 kHz / 16-bit and not what its extension
+      claims.</p>
+    <p><b>The cover</b> sits in a column of its own beside the fields. <b>Click it to see it full
+      size</b> in a lightbox, which is the only way to tell a crisp 1400px scan from a 300px thumbnail
+      somebody embedded years ago. <b>Right-click it</b> for <b>Remove Artwork</b> — it lives on the
+      cover's own menu now rather than as a button in the row, so a destructive action is on the
+      thing it destroys.</p>
     <img class="shot-img" src="../assets/metadata.webp" alt="Metadata editor with tags and artwork">
 
     <h3>Fill in tags from Discogs</h3>
@@ -272,13 +320,46 @@
       filled in <b>starts unticked</b> — the lookup will not overwrite your own work unless you say
       so — and an empty field starts ticked; <b>Select All</b> is one click when you are deliberately
       re-tagging. Fields that already match are not listed at all. If the best match is a weak one,
-      the window says so instead of pre-filling confidently, and the <b>Release</b> dropdown at the
-      top switches to any of the other pressings the search found.</p>
+      the window says so instead of pre-filling confidently, and the <b>Select release</b> dropdown
+      at the top switches to any of the other pressings the search found. A second dropdown,
+      <b>Select track</b>, says which track of that release this file is &mdash; useful on an album or
+      a compilation, where the release is right and only the position is in doubt.</p>
     <p>What can be filled in: <b>Title, Artist, Album, Label, Genre, Year, Track #</b> and
       <b>cover art</b>. Genre comes from Discogs <i>styles</i> ("Techno", "Deep House"), not its
       coarse genre field. The year prefers the original release over the repress you happened to
       match. Cover art is previewed next to your file's own so you can compare them, and is written
       only if you tick it — turn the fetch off entirely in Settings if you would rather not.</p>
+    <p><b>The app remembers which release a file was tagged from.</b> Once you have applied a
+      lookup, the Metadata panel says <b>Applied from Discogs</b> beside the button, with a
+      <b>View release</b> link that opens that release's page in your browser. A second look at the
+      same file opens on the release you approved rather than searching from scratch &mdash; so a
+      track you tagged months ago is still tied to the right pressing, and a file you have already
+      been through does not have to be identified twice. The memory follows the <i>file</i>, so it
+      survives a rename, and it works on a file the Metadata panel has never imported into your
+      library.</p>
+
+    <p><b>The Discogs tab.</b> With a release remembered, the Metadata panel grows a second tab
+      beside <b>Tags</b>, named <b>Discogs</b>. It holds the release as Discogs describes it &mdash; kept on your machine, so
+      it reads with no network at all:</p>
+    <ul>
+      <li><b>Release</b> — label, catalogue number, year, styles and genres.</li>
+      <li><b>Pressing</b> — format, country, and the date it was released.</li>
+      <li><b>Tracklist</b> and <b>Credits</b> — the full listing, selectable so you can copy from
+        it.</li>
+      <li>An <b>apply arrow</b> beside a row writes just that value into the file's tags &mdash; one
+        field at a time, without running the whole review again. A row already matching your tags
+        says so instead of offering the arrow.</li>
+      <li><b>Refresh from Discogs</b> reads the release again, for a listing that has been corrected
+        or filled in since you last looked.</li>
+    </ul>
+    <p><b>Find Cover Online…</b>, on that same tab, is the lookup reviewing the sleeve alone: search
+      Discogs, compare covers, and take one without touching any other tag. Useful when the tags are
+      already right and the artwork is all that is missing.</p>
+    <p>A file with <b>no tags at all</b> is not a dead end either &mdash; the empty panel offers
+      <i>"No tags on this file — look it up on Discogs?"</i> and starts the search from there.
+      And in <b>Settings → Online Metadata</b>, pasting a token <b>switches the lookup on by
+      itself</b>: having supplied one is the only reason to paste it.</p>
+
     <p><b>BPM, key and energy are never fetched.</b> Discogs does not hold them, and they stay the
       product of this app's own analysis of your actual file. A <b>WAV</b> can be looked up — reading
       the values is still useful — but the window will remind you that WAV files hold no tags, so
@@ -310,8 +391,27 @@
         to set a slice.</li>
       <li><b>Loop Slicer:</b> the zoomed waveform and the slice controls — set start/end markers,
         nudge them, toggle an <b>A–B loop</b>, pick a format, and <b>export</b> the slice, ideal for
-        lifting loops and samples by ear. The two buttons are independent: open either on its own, or
-        both together for the full working slicer.</li>
+        lifting loops and samples by ear. The buttons are independent: open any on its own, or
+        together for the full working slicer.</li>
+      <li><b>Metronome:</b> the third of the collapsible sections, for tapping out a tempo and
+        working over it. The tempo box reads to two decimals — drag it up or down to scrub, hold
+        <b>Shift</b> while dragging for hundredths, or use the small <b>+</b>/<b>&minus;</b> buttons
+        for whole beats. <b>Tap</b> sets the tempo from your own timing, and the two hold-to-bend
+        buttons lean the beat back or push it forward while held. <b>Start</b> sits on the section's
+        own header row.
+        <ul>
+          <li><b>Pick the click:</b> three exclusive buttons — <b>&#8856;</b> silent (the beat light
+            still keeps time), <b>)</b> the standard tick, and <b>))</b> a sharper, longer beep that
+            carries over a track you're playing underneath it.</li>
+          <li><b>How loud</b> is the bars button beside them: press to cycle quiet / medium / loud.
+            Silent stays on the click row, because <i>which</i> click and <i>how loud</i> are
+            different questions.</li>
+          <li><b>Global Click</b>, on by default, keeps the click going when you leave the Player, so
+            a tempo you set once carries while you work in Rename or Convert. Turn it off and leaving
+            silences it. Collapsing the section silences it either way.</li>
+        </ul>
+        The click is scheduled sample by sample in the audio callback, so it holds a tempo
+        indefinitely without drifting.</li>
       <li>The waveform's color is configurable in <b>Settings</b>.</li>
     </ul>
     <img class="shot-img" src="../assets/player.webp" alt="Player with playlist and transport">
@@ -355,7 +455,7 @@
     <h3>Playlist columns, artwork &amp; text size</h3>
     <p><b>Right-click the playlist's column header</b> for the full list of columns. Tick one to show
       it, untick it to hide it again — the entries are toggles, so clicking a column that is already
-      showing switches it off. Seven columns are available beyond the ones you start with:</p>
+      showing switches it off. Nine columns are available beyond the ones you start with:</p>
     <table>
       <tr><th>Column</th><th>Shows</th></tr>
       <tr><td>Art</td><td>The track's cover art. <b>On by default</b>, second in the row.</td></tr>
@@ -367,12 +467,25 @@
         1411, not the compressed figure — so a real lossless file never looks worse than a 320 MP3
         beside it.</td></tr>
       <tr><td>Energy</td><td>The 1–10 energy level from analysis.</td></tr>
+      <tr><td>Date Added</td><td>When the track was added to your library, as
+        <code>YYYY-MM-DD</code> — so it sorts chronologically rather than alphabetically. Sort on it
+        to find what came in this week.</td></tr>
+      <tr><td>Date Created</td><td>The file's own creation date, in the same format. Not the same
+        thing as Date Added: a track ripped years ago and imported yesterday differs on the two.</td></tr>
     </table>
     <p>These columns are read-only and drawn from the tags already loaded, so switching one on is
       instant. <b>#</b> and <b>Filename</b> are always present and aren't in the menu.</p>
 
-    <div class="callout"><b>Lost track of your layout?</b> <b>Reset Columns</b> — at the bottom of that
-      same right-click menu, under a separator — puts the playlist back to the columns, order, and
+    <p><b>Fit a column to what's in it.</b> The last entry on that same right-click menu names the
+      column you clicked on — <b>Fit Album to Longest</b> — and sizes it to the longest value the
+      playlist currently holds, header word included. It is one shot on purpose: a track added
+      afterwards with a longer value will clip until you ask again, because a width that kept
+      tracking the contents would move under your hand every time a playlist grew. <b>#</b> and
+      <b>Art</b> aren't offered it — one is a fixed counter, the other follows the row height — and
+      right-clicking past the last column leaves the entry off.</p>
+
+    <div class="callout"><b>Lost track of your layout?</b> <b>Reset Columns</b> — on that same
+      right-click menu, under a separator below the column list — puts the playlist back to the columns, order, and
       widths it ships with, in one click. It's the way back if you've hidden something and can't
       remember what.</div>
 
@@ -481,13 +594,6 @@
       with <b>Minor</b>/<b>Major</b> chord modes. A <b>linear key strip</b> and <b>hex grid</b> light up
       to show a key's harmonic neighbors — click any segment to hear that key. Key notation displayed in
       the top-right corner changes with your choice in <b>Settings</b>.</p>
-    <p>The view switcher beside the grid also holds a <b>metronome</b>. The tempo box reads to two
-      decimals — drag it up or down to scrub, hold <b>Shift</b> while dragging for hundredths, or use
-      the small <b>+</b>/<b>&minus;</b> buttons for whole beats. <b>Tap</b> sets the tempo from your own
-      timing, and the two hold-to-bend buttons lean the beat back or push it forward while held. The
-      slider on that row is the click's own volume, separate from the piano's. The
-      click is scheduled sample by sample in the audio callback, so it holds a tempo indefinitely
-      without drifting.</p>
     <img class="shot-img" src="../assets/keyboard.webp" alt="Keyboard panel — piano and harmonic key strip">
 
     <h3>Spectrum view</h3>
@@ -500,8 +606,6 @@
 
     <h3>Between panels</h3>
     <ul>
-      <li><b>Send To menus</b> — Rename → Analyze / Convert; Convert → Analyze / Rename / Player;
-        Analysis → Convert / Player.</li>
       <li><b>Sidebar drag</b> — select rows and drop them on another panel's sidebar button. Routes
         either <b>move</b> (remove from source) or <b>copy</b> the files; the button highlights when
         it's a valid target. Dragging out of the <b>Player</b> is always a copy — a playlist keeps
@@ -622,11 +726,18 @@
       what starts it, and the menu's own <b>Visuals off</b> is how you stop it. Nothing is running
       until you choose, and your choice is remembered.</p>
     <ul>
-      <li><b>Backdrop</b> modes (fractal, wormhole, tunnel chase, waveform, oscilloscope, spectrum,
-        fire) render softly behind the playlist while a track plays.</li>
-      <li><b>Popout</b> modes (fractal, wormhole, tunnel chase, oscilloscope, spectrum bars, fire)
+      <li><b>Backdrop</b> modes (fractal, tunnel chase, oscilloscope, spectrum, wormhole, stream,
+        waveform, fire) render softly behind the playlist while a track plays.</li>
+      <li><b>Popout</b> modes (fractal, tunnel chase, oscilloscope, spectrum bars, wormhole)
         open in their own floating window you can move and resize. A popout doesn't reopen on the
-        next launch.</li>
+        next launch. <b>Fire</b> and the <b>stream</b> are backdrop-only &mdash; both read as lit rows
+        behind a playlist rather than as a whole window.</li>
+      <li><b>Stream</b> pours a sheet of liquid metal across the playlist in your <b>Waveform
+        color</b>. Its source dances on the beat grid, led by the melody, and every kick brightens
+        what is leaving the nozzle &mdash; so a beat travels down the ribbon as a surge rather than
+        flashing the whole picture. It fades to nothing through a silence.</li>
+      <li><b>Oscilloscope</b> is a green-phosphor CRT with a graticule etched on its faceplate, in
+        the popout window or behind the playlist.</li>
       <li><b>Wormhole</b> is the one that listens to the beat: it flies a tunnel of translucent
         nebula cloud &mdash; blue, violet, magenta, teal and green, with the stars showing through it
         &mdash; that turns on the first beat of every bar, and twice in every fourth bar, so the picture moves
@@ -687,6 +798,7 @@
     <table>
       <tr><th>Keys</th><th>Action</th><th>Where</th></tr>
       <tr><td>Shift+Tab</td><td>Show / hide your playlists in the sidebar</td><td>Anywhere in the window</td></tr>
+      <tr><td>Ctrl+L / Cmd+L</td><td>Jump to the playlist the current track is playing from</td><td>Anywhere in the window</td></tr>
       <tr><td>Space</td><td>Play / Pause</td><td>Player (when focused)</td></tr>
       <tr><td>Ctrl+Z / Cmd+Z</td><td>Undo the last playlist edit (this session)</td><td>Player, Playlists</td></tr>
       <tr><td>Delete / Backspace</td><td>Remove selected rows</td><td>Player, Rename, Analysis</td></tr>
@@ -700,6 +812,11 @@
       One trade worth knowing: Shift+Tab is normally the key that steps <i>backward</i> through
       form fields, so it no longer does that here. Plain <b>Tab</b> still moves forward through
       fields everywhere, and typing is unaffected.</p>
+    <p><b>Ctrl+L / Cmd+L</b> is the keyboard version of the <b>In Playlist</b> link: it switches to
+      the Player, opens the playlist the running track came from, and centres that track's row. It
+      leaves the sidebar alone &mdash; showing the tree is Shift+Tab's job. With nothing playing, or
+      when the track was played out of a search or its playlist has since been deleted, it does
+      nothing at all.</p>
 
     <h2 id="formats"><span class="num">09</span>Supported formats</h2><hr>
     <table>
