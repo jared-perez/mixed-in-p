@@ -29,7 +29,7 @@ import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import QObject, QTimer, Signal
 
-from .loop_player import _BLOCK, _POS_TIMER_MS, output_stream_kwargs
+from .loop_player import _BLOCK, _POS_TIMER_MS, UnderrunLog, output_stream_kwargs
 
 logger = logging.getLogger(__name__)
 
@@ -65,6 +65,7 @@ class PlayerEngine(QObject):
         self._loop_enabled: bool = False
         self._loop_start: int = 0
         self._loop_end: int = 0
+        self._underruns = UnderrunLog("Player stream")
 
         self._pos_timer = QTimer(self)
         self._pos_timer.setInterval(_POS_TIMER_MS)
@@ -315,6 +316,7 @@ class PlayerEngine(QObject):
     # -------------------------------------------------------------- audio thread
 
     def _callback(self, outdata, frames, time_info, status) -> None:  # noqa: ARG002
+        self._underruns.count(status)
         with self._lock:
             playing = self._playing
             pcm = self._pcm
@@ -369,6 +371,7 @@ class PlayerEngine(QObject):
     # ---------------------------------------------------------------- GUI thread
 
     def _tick(self) -> None:
+        self._underruns.report()
         with self._lock:
             reached = self._reached_end
         if reached:

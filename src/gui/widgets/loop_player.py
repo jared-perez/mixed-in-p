@@ -2,16 +2,21 @@
 
 Originally the home of the slicer's gapless ``LoopPlayer``; that A-B looping now
 lives in :class:`PlayerEngine` (which grew optional loop bounds) so the player
-runs a single engine. What remains here are the stream constants and the
-low-latency device-selection helper, imported by ``player_engine`` and
-``keyboard_panel`` for their own ``sounddevice`` streams.
+runs a single engine. What remains here are the stream constants, the
+low-latency device-selection helper, and the shared :class:`UnderrunLog`,
+imported by ``player_engine``, ``metronome_view`` and ``keyboard_panel`` for
+their own ``sounddevice`` streams.
 """
 
 from __future__ import annotations
 
+import logging
 import sys
+import time
 
 import sounddevice as sd
+
+logger = logging.getLogger(__name__)
 
 # Audio thread block size. 2048 frames @ 44.1 kHz ≈ 46 ms — a deliberately
 # roomy buffer so the Python output callback (which must take the GIL each
@@ -23,6 +28,51 @@ import sounddevice as sd
 _BLOCK = 2048
 # Position UI refresh interval (ms). ~30 fps for smooth playhead motion.
 _POS_TIMER_MS = 33
+
+
+class UnderrunLog:
+    """Counts a stream's callback ``status`` flags; a GUI timer logs them.
+
+    An underrun (the callback missing its deadline, typically because the GUI
+    thread held the GIL too long) plays as a short burst of static, and
+    PortAudio reports it only via the ``status`` argument — which every
+    callback here used to ignore, so glitches left no trace. The two halves
+    live on opposite threads on purpose: :meth:`count` runs on the audio
+    thread and is a bare int increment (no lock, no allocation, no I/O —
+    logging from the callback could itself cause the underrun it reports);
+    :meth:`report` runs from the owner's existing GUI-side timer and logs at
+    most once per :data:`LOG_EVERY_S`.
+    """
+
+    LOG_EVERY_S = 2.0
+
+    def __init__(self, name: str) -> None:
+        self._name = name
+        self.total = 0
+        self._reported = 0
+        self._logged_at = 0.0
+
+    def count(self, status) -> None:
+        """Audio thread: tally a block whose ``status`` reports any flag."""
+        if status:
+            self.total += 1
+
+    def report(self) -> None:
+        """GUI thread: log the running total when it has grown, throttled."""
+        n = self.total
+        if n == self._reported:
+            return
+        now = time.monotonic()
+        if now - self._logged_at < self.LOG_EVERY_S:
+            return
+        logger.warning(
+            "%s: %d audio underruns since launch "
+            "(the output callback missed its deadline)",
+            self._name,
+            n,
+        )
+        self._reported = n
+        self._logged_at = now
 
 
 def output_stream_kwargs() -> list[dict]:

@@ -58,7 +58,7 @@ from PySide6.QtWidgets import (
 
 from ...utils.config import load_config, save_config
 from ..styles.theme import Theme
-from .loop_player import output_stream_kwargs
+from .loop_player import _BLOCK, UnderrunLog, output_stream_kwargs
 from .metronome_engine import (
     BEATS_PER_BAR,
     SHARP,
@@ -69,7 +69,16 @@ from .metronome_engine import (
 )
 
 SAMPLE_RATE = 44100
-BLOCK_SIZE = 512
+# The Player's roomy block (2048 ≈ 46 ms), NOT the keyboard's 512. The click
+# moved here from the Keyboard panel wearing that panel's block size, whose
+# 11.6 ms deadline exists for live key-press latency — a budget the waveform
+# repaints alone can exceed while a track plays, and a Python callback that
+# can't take the GIL in time underruns as a burst of static. A metronome
+# doesn't need low latency: output latency is a constant offset on a
+# free-running click (nothing syncs it to the track, tap tempo measures
+# input timing, and the light polls the engine's own sample clock), so the
+# headroom is free.
+BLOCK_SIZE = _BLOCK
 
 # How far a vertical drag moves the tempo. 4px per BPM was the spike's
 # proposal and is about right by hand: a full box-height drag covers ~7 BPM.
@@ -356,6 +365,7 @@ class MetronomeView(QWidget):
         self.setObjectName("metronomeView")
         self._engine = MetronomeEngine(120.0, sr=SAMPLE_RATE)
         self._tap = TapTempo()
+        self._underruns = UnderrunLog("Metronome click stream")
         self._stream = None
         self._stream_lock = threading.Lock()
         # Injected in tests so nothing here ever opens a real device.
@@ -702,11 +712,16 @@ class MetronomeView(QWidget):
                 continue
         return None
 
-    def _callback(self, outdata, frames, time_info, status) -> None:
+    def _callback(self, outdata, frames, time_info, status) -> None:  # noqa: ARG002
+        self._underruns.count(status)
         mono = outdata[:, 0]
         self._engine.render(mono)
 
     def _tick(self) -> None:
+        # The vis timer keeps running through a Global Click leave (leave()
+        # returns before stop()), so this reports for as long as the click
+        # sounds, whichever panel is showing.
+        self._underruns.report()
         if self._stream is None:
             # No device: advance the grid from the wall clock so the light
             # still keeps time. Only ever reached in the degraded case.
