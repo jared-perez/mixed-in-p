@@ -25,6 +25,7 @@ from PySide6.QtCore import (
     QMimeData,
     QPoint,
     QPointF,
+    QRect,
     QRectF,
     QSize,
     Qt,
@@ -326,6 +327,12 @@ class PlaylistTree(QTreeView):
         # Tracks land IN a playlist, never between two, so this replaces Qt's
         # between-rows indicator for the duration of a file drag.
         self._track_drop_index = None
+        # Where a node drag would land, as ("line" | "into", rect). Qt paints
+        # nothing for these drags: its own indicator is only drawn when the
+        # model accepts the mime type, and QStandardItemModel refuses
+        # NODE_MIME — so the move had no visual feedback at all until the
+        # button came up. paintEvent draws this instead.
+        self._node_drop_marker: tuple[str, QRect] | None = None
         # True while _rebuild replays the stored expansion — those setExpanded
         # calls are us restoring the database's state, not the user opening
         # anything, and must not be written back.
@@ -1240,7 +1247,10 @@ class PlaylistTree(QTreeView):
         drag.setPixmap(blank_drag_pixmap())
         drag.exec(Qt.DropAction.MoveAction | Qt.DropAction.CopyAction)
         # No cleanup here: an internal move already rewrote the database in
-        # dropEvent; an external drop is a copy and removes nothing.
+        # dropEvent; an external drop is a copy and removes nothing. The
+        # indicator is cleared, though: a drag cancelled with Esc over our own
+        # viewport leaves the last marker painted otherwise.
+        self._clear_node_drop_marker()
 
     # ------------------------------------------------------------ drop (moves)
 
@@ -1274,6 +1284,105 @@ class PlaylistTree(QTreeView):
             return None  # a folder holds nodes, not tracks
         return index.data(NODE_ID_ROLE)
 
+    def _last_visible_index(self):
+        """The bottom-most row on screen, walking into open folders.
+
+        The "append at the root's end" drop has no row to hang a line off,
+        so it borrows this one's bottom edge. Hidden rows (the name filter)
+        are skipped: the line has to sit under what the user can see.
+        """
+        model = self._model
+
+        def last_child(parent):
+            for row in range(model.rowCount(parent) - 1, -1, -1):
+                if not self.isRowHidden(row, parent):
+                    return model.index(row, 0, parent)
+            return None
+
+        index = last_child(self.rootIndex())
+        while index is not None and self.isExpanded(index):
+            child = last_child(index)
+            if child is None:
+                break
+            index = child
+        return index
+
+    def _root_indent(self) -> int:
+        """Where a top-level row's icon starts, for the root-append line."""
+        for row in range(self._model.rowCount(self.rootIndex())):
+            if self.isRowHidden(row, self.rootIndex()):
+                continue
+            rect = self.visualRect(self._model.index(row, 0, self.rootIndex()))
+            if not rect.isNull():
+                return rect.left()
+        return 0
+
+    def _node_drop_plan(self, pos, node_id: int):
+        """Where a node drag at *pos* lands, and what to paint for it.
+
+        One function for both the feedback and the drop, so the line the
+        user sees is the move they get. It reads Qt's own
+        ``dropIndicatorPosition``, which the base ``dragMoveEvent`` keeps
+        current for our drags even though it never *paints* an indicator
+        for them (see ``_node_drop_marker``).
+
+        Returns ``(parent_id, row, marker)``, or None for a drop that would
+        be refused — a node into a playlist, or a folder into its own
+        subtree. Refusing here rather than at the drop is what makes the
+        absence of a line honest.
+        """
+        if self._library is None:
+            return None
+        index = self.indexAt(pos)
+        drop_pos = self.dropIndicatorPosition()
+        dip = QAbstractItemView.DropIndicatorPosition
+        right = self.viewport().width()
+
+        if not index.isValid() or drop_pos == dip.OnViewport:
+            parent_id = None
+            row = len(self._library.get_children(None))  # append at root
+            # The y comes from the bottom-most row on screen, which may be a
+            # nested one — but the x must be the ROOT indent, or a line drawn
+            # under a folder's last child claims the drop is going into that
+            # folder when it is going to the end of the root.
+            last = self._last_visible_index()
+            rect = self.visualRect(last) if last is not None else None
+            y = rect.bottom() + 1 if rect is not None and not rect.isNull() else 0
+            left = self._root_indent()
+            marker = ("line", QRect(left, y, max(0, right - left), 0))
+        elif drop_pos == dip.OnItem:
+            # Playlists are setDropEnabled(False), so Qt turns OnItem over one
+            # into Above/Below before we ever see it; this stays as the guard.
+            if index.data(KIND_ROLE) != "folder":
+                return None
+            parent_id = index.data(NODE_ID_ROLE)
+            row = len(self._library.get_children(parent_id))  # append inside
+            marker = ("into", self.visualRect(index))
+        else:  # AboveItem / BelowItem — sibling insert relative to the target
+            parent_index = index.parent()
+            parent_id = parent_index.data(NODE_ID_ROLE) if parent_index.isValid() else None
+            row = index.row() + (1 if drop_pos == dip.BelowItem else 0)
+            if parent_id is None:
+                row = max(0, row - 1)  # Scratch occupies model row 0 at the root
+            rect = self.visualRect(index)
+            y = rect.bottom() + 1 if drop_pos == dip.BelowItem else rect.top()
+            marker = ("line", QRect(rect.left(), y, max(0, right - rect.left()), 0))
+
+        if parent_id is not None and (
+            parent_id == node_id or node_id in self._library.ancestor_ids(parent_id)
+        ):
+            return None  # into itself or its own descendant
+        return parent_id, row, marker
+
+    def _set_node_drop_marker(self, marker) -> None:
+        if marker == self._node_drop_marker:
+            return
+        self._node_drop_marker = marker
+        self.viewport().update()
+
+    def _clear_node_drop_marker(self) -> None:
+        self._set_node_drop_marker(None)
+
     def dragEnterEvent(self, event) -> None:  # noqa: N802 (Qt override)
         # Nothing floating over the rows while a drag is picking one out.
         self._hide_row_add_button()
@@ -1291,7 +1400,13 @@ class PlaylistTree(QTreeView):
         # then force our own verdict (the default model would reject NODE_MIME).
         super().dragMoveEvent(event)
         if event.mimeData().hasFormat(NODE_MIME):
-            event.acceptProposedAction()
+            node_id = int(bytes(event.mimeData().data(NODE_MIME)))
+            plan = self._node_drop_plan(event.position().toPoint(), node_id)
+            self._set_node_drop_marker(None if plan is None else plan[2])
+            if plan is None:
+                event.ignore()
+            else:
+                event.acceptProposedAction()
             return
         if self._is_track_drag(event.mimeData()):
             pos = event.position().toPoint()
@@ -1306,6 +1421,7 @@ class PlaylistTree(QTreeView):
 
     def dragLeaveEvent(self, event) -> None:  # noqa: N802 (Qt override)
         self._clear_track_drop_row()
+        self._clear_node_drop_marker()
         super().dragLeaveEvent(event)
 
     def dropEvent(self, event) -> None:  # noqa: N802 (Qt override)
@@ -1313,30 +1429,17 @@ class PlaylistTree(QTreeView):
             self._drop_tracks(event)
             return
         self._clear_track_drop_row()
+        self._clear_node_drop_marker()
         if not event.mimeData().hasFormat(NODE_MIME):
             event.ignore()
             return
         node_id = int(bytes(event.mimeData().data(NODE_MIME)))
 
-        index = self.indexAt(event.position().toPoint())
-        drop_pos = self.dropIndicatorPosition()
-        dip = QAbstractItemView.DropIndicatorPosition
-
-        if not index.isValid() or drop_pos == dip.OnViewport:
-            parent_id = None
-            row = len(self._library.get_children(None))  # append at root
-        elif drop_pos == dip.OnItem:
-            if index.data(KIND_ROLE) != "folder":
-                event.ignore()
-                return
-            parent_id = index.data(NODE_ID_ROLE)
-            row = len(self._library.get_children(parent_id))  # append inside
-        else:  # AboveItem / BelowItem — sibling insert relative to the target
-            parent_index = index.parent()
-            parent_id = parent_index.data(NODE_ID_ROLE) if parent_index.isValid() else None
-            row = index.row() + (1 if drop_pos == dip.BelowItem else 0)
-            if parent_id is None:
-                row = max(0, row - 1)  # Scratch occupies model row 0 at the root
+        plan = self._node_drop_plan(event.position().toPoint(), node_id)
+        if plan is None:
+            event.ignore()
+            return
+        parent_id, row, _marker = plan
 
         if not self._apply_move(node_id, parent_id, row):
             event.ignore()
@@ -1366,19 +1469,37 @@ class PlaylistTree(QTreeView):
 
     def paintEvent(self, event) -> None:  # noqa: N802 (Qt override)
         super().paintEvent(event)
-        if self._track_drop_index is None:
+        # A drag carries either a node or files, never both, so at most one of
+        # these two is live at a time.
+        outline = line = None
+        if self._track_drop_index is not None:
+            outline = self.visualRect(self._track_drop_index)
+        elif self._node_drop_marker is not None:
+            kind, rect = self._node_drop_marker
+            outline, line = (rect, None) if kind == "into" else (None, rect)
+        if outline is not None and outline.isNull():
+            outline = None
+        if outline is None and line is None:
             return
-        rect = self.visualRect(self._track_drop_index)
-        if rect.isNull():
-            return
-        # Outline rather than a fill: the row underneath keeps its own text
-        # colours (including a lit search-trail row), and an outline reads as
-        # "into this one" where a wash reads as selection.
+
         painter = QPainter(self.viewport())
         pen = QPen(QColor(Theme.NEON_YELLOW))
         pen.setWidth(2)
         painter.setPen(pen)
-        painter.drawRect(rect.adjusted(1, 1, -2, -2))
+        if outline is not None:
+            # Outline rather than a fill: the row underneath keeps its own text
+            # colours (including a lit search-trail row), and an outline reads as
+            # "into this one" where a wash reads as selection.
+            painter.drawRect(outline.adjusted(1, 1, -2, -2))
+        if line is not None:
+            # An insertion caret: the line says which gap, the dot at its left
+            # end says which indent level — the two differ for a drop between a
+            # folder's last child and the next root row, where the line alone is
+            # ambiguous.
+            y = min(max(line.y(), 1), self.viewport().height() - 2)
+            painter.drawLine(line.left() + 6, y, line.right(), y)
+            painter.setBrush(QColor(Theme.NEON_YELLOW))
+            painter.drawEllipse(QPoint(line.left() + 3, y), 3, 3)
         painter.end()
 
     def _drop_tracks(self, event) -> None:
