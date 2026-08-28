@@ -153,12 +153,14 @@ class SettingsPanel(QWidget):
         # (product-flavor name) and "Nuevo Leon" (proper noun) are deliberately
         # NOT tr()-wrapped — they stay English in every language; the other
         # names are descriptive and translate normally.
+        # (``night_dark`` is labelled "Slate" — the id is what config stores,
+        # so it kept its shipped spelling; see the palette's own comment.)
         theme_labels = {
-            "neon_dark": "Neon Dark",
-            "night_dark": self.tr("Night Dark"),
             "nuevo_leon": "Nuevo Leon",
             "dark_mode": self.tr("Dark Mode"),
             "daylight": self.tr("Daylight"),
+            "night_dark": self.tr("Slate"),
+            "neon_dark": "Neon Dark",
         }
         self._theme_combo = FittedComboBox()
         for code, palette in THEMES.items():

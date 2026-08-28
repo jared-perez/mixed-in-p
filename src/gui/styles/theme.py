@@ -239,12 +239,17 @@ NEON_DARK = Palette(
     ACCENT_TEXT="#f0ff00",
 )
 
-# ── Theme B: Night Dark ─────────────────────────────────────────────────────
+# ── Theme B: Slate ──────────────────────────────────────────────────────────
 # Low-strain dark theme for extended late-night use: no pure black/white,
-# desaturated low-blue accents. NOT user-selectable until the picker lands.
+# desaturated low-blue accents. Shipped as "Night Dark"; the *label* is Slate
+# now (it describes the blue-grey surfaces, which is what the eye actually
+# sees), while the id stays ``night_dark`` because that string is persisted in
+# every existing config — a renamed id would need a migration to buy nothing.
+# So the label crosses the id here on purpose, the same way the two tunnel
+# visuals do; see the persisted-enum entry in CLAUDE.md.
 NIGHT_DARK = Palette(
     name="night_dark",
-    label="Night Dark",
+    label="Slate",
     BG_DARK="#16181d",
     BG_MEDIUM="#1e2127",
     BG_LIGHT="#2a2e36",
@@ -395,9 +400,10 @@ DARK_MODE = Palette(
     ACCENT_TEXT="#f0ff00",  # accent reads fine as text on true black
 )
 
-# Registry keyed by the id persisted in config. Order = picker order.
+# Registry keyed by the id persisted in config. Order = picker order: the
+# default first, then the rest roughly light-to-dark, with the loudest last.
 THEMES: dict[str, Palette] = {
-    p.name: p for p in (NEON_DARK, NIGHT_DARK, NUEVO_LEON, DARK_MODE, DAYLIGHT)
+    p.name: p for p in (NUEVO_LEON, DARK_MODE, DAYLIGHT, NIGHT_DARK, NEON_DARK)
 }
 DEFAULT_THEME = NUEVO_LEON.name
 
