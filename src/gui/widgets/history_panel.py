@@ -128,6 +128,11 @@ class HistoryPanel(QWidget):
     """Panel for viewing rename history and recent key analysis results."""
 
     undo_session = Signal(RenameSession)
+    # The footer's two view toggles carry a count that changes at runtime, and
+    # _fit widens them to suit — so the row's minimum width is not fixed at
+    # construction and the window minimum has to be re-asked. See
+    # footer_row_min_width.
+    footer_row_resized = Signal()
     # Emitted when the user picks a new row count, for the window to persist.
     history_limit_changed = Signal(int)
 
@@ -257,6 +262,13 @@ class HistoryPanel(QWidget):
 
         # Bottom buttons
         button_layout = QHBoxLayout()
+        # Explicit, because footer_row_min_width measures this layout: a nested
+        # layout inherits the parent's spacing when it is laid out, but
+        # QLayout.spacing() still reads back -1 when it was never set, and a
+        # width summed with a -1 gap *subtracts* where it means to add. Same
+        # value the parent already uses, so nothing moves on screen.
+        button_layout.setSpacing(Theme.SPACING)
+        self._footer_row = button_layout
 
         # View toggles (styled like the Analyze panel's Auto toggle: the
         # active view's button fills neon yellow)
@@ -515,6 +527,7 @@ class HistoryPanel(QWidget):
         # display limit below the number actually retained on disk).
         self._keys_btn.setText(self.tr("{0} Song Keys").format(len(visible)))
         _fit(self._keys_btn)
+        self.footer_row_resized.emit()
 
     def _refresh_sessions(self) -> None:
         """Refresh the sessions list from disk."""
@@ -572,7 +585,45 @@ class HistoryPanel(QWidget):
             self.tr("{0} Rename Sessions").format(len(self._sessions))
         )
         _fit(self._sessions_btn)
+        self.footer_row_resized.emit()
         self._update_buttons()
+
+    def footer_row_min_width(self) -> int:
+        """Panel width the bottom button row needs, including the panel's padding.
+
+        The window minimum for History was the constant 600, i.e. an English
+        width — so a translation that widened these buttons pushed the row past
+        the window instead of growing it. German clipped the final 'n' of
+        '0 Umbenennungssitzungen' and cut 'Auswahl widerrufen' at *both* ends
+        (a QPushButton centres its label rather than eliding it), and Russian
+        was worse: 'Тональности треков' overlapped 'Показать' and 'Отменить
+        выбранное' ran off the edge. Found by visual_pass and confirmed by
+        rendering the three pages and looking at them — the same defect class
+        as the player's slice-header row, which overran the same constant.
+
+        Asked of the layout rather than summed by hand, which is safe here and
+        is not everywhere: nothing in this row is ever hidden, and a hidden
+        widget contributes nothing to a layout's own hint (the trap that makes
+        ConversionPanel.format_row_min_width enumerate its widgets instead).
+        minimumSize() is the right question because _fit puts the true width on
+        each button's *minimum* — above its size hint, which the stylesheet's
+        padding is invisible to.
+
+        The invalidate() is load-bearing and not defensive tidying: a layout
+        caches its minimum, and setMinimumWidth on a child does not clear that
+        cache synchronously. Without it this returns the width from *before*
+        the count changed — measured, 714 where the row now needs 1003 — which
+        is precisely the call footer_row_resized exists to make, so the stale
+        answer would arrive in the one case the signal was added for. Caught by
+        its own regression test, not by inspection.
+        """
+        self._footer_row.invalidate()
+        margins = self.layout().contentsMargins()
+        return (
+            self._footer_row.minimumSize().width()
+            + margins.left()
+            + margins.right()
+        )
 
     def _on_selection_changed(self) -> None:
         """Handle table selection change."""

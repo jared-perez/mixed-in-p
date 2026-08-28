@@ -182,6 +182,17 @@ class WindowSizer:
                 + max(panel.format_row_min_width(), panel.bottom_row_min_width())
                 + _SLACK,
             )
+        elif page_id == "history":
+            # Measured for the same reason as the three above: every button in
+            # the footer is translated and two of them also carry a runtime
+            # count, so the constant was an English width. It clipped in de and
+            # ru — see HistoryPanel.footer_row_min_width.
+            base = max(
+                _PANEL_MIN_WIDTH["history"],
+                self.window._sidebar.width()
+                + self.window._history_panel.footer_row_min_width()
+                + _SLACK,
+            )
         else:
             base = _PANEL_MIN_WIDTH.get(page_id, 600)
         return max(base, self.window._header.minimumSizeHint().width())
@@ -236,6 +247,19 @@ class WindowSizer:
         # Only matters while the player is the active page.
         if self.window._current_page == "player":
             self._apply_page_min("player")
+            self._grow_to_min()
+
+    # ----------------------------------------------------------------- history
+
+    def on_history_footer_resized(self) -> None:
+        """The footer's counts changed, so _fit may have widened its buttons.
+
+        Same shape as _resync_player_min: the row's width is not fixed at
+        construction, so a minimum measured once at page-show goes stale the
+        first time a refresh puts a wider number on a toggle.
+        """
+        if self.window._current_page == "history":
+            self._apply_page_min("history")
             self._grow_to_min()
 
     # ------------------------------------------------- compatible tracks

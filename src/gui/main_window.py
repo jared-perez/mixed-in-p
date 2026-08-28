@@ -444,6 +444,9 @@ class MainWindow(QMainWindow):
             self._sizer.on_metronome_expanded
         )
         self._player_panel.compat_panel_toggled.connect(self._sizer.on_compat_panel_toggled)
+        self._history_panel.footer_row_resized.connect(
+            self._sizer.on_history_footer_resized
+        )
 
         # Spectrum panel signals
         self._spectrum_panel.files_dropped.connect(self._add_files)
