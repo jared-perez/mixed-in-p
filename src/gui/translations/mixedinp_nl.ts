@@ -2289,7 +2289,7 @@ of klik op “Artwork toevoegen…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1851"/>
-        <location filename="../widgets/player_panel.py" line="3264"/>
+        <location filename="../widgets/player_panel.py" line="3265"/>
         <source>Search all playlists…</source>
         <translation>In alle playlists zoeken…</translation>
     </message>
@@ -2375,7 +2375,7 @@ of klik op “Artwork toevoegen…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1420"/>
-        <location filename="../widgets/player_panel.py" line="3381"/>
+        <location filename="../widgets/player_panel.py" line="3382"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -2499,7 +2499,7 @@ of klik op “Artwork toevoegen…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="2056"/>
-        <location filename="../widgets/player_panel.py" line="3378"/>
+        <location filename="../widgets/player_panel.py" line="3379"/>
         <source>Playlists</source>
         <translation>Playlists</translation>
     </message>
@@ -2525,8 +2525,8 @@ of klik op “Artwork toevoegen…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="2206"/>
-        <location filename="../widgets/player_panel.py" line="3221"/>
-        <location filename="../widgets/player_panel.py" line="3226"/>
+        <location filename="../widgets/player_panel.py" line="3222"/>
+        <location filename="../widgets/player_panel.py" line="3227"/>
         <source>Save Playlist</source>
         <translation>Playlist opslaan</translation>
     </message>
@@ -2556,111 +2556,111 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>De playlist openen waaruit de huidige track speelt</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2528"/>
-        <location filename="../widgets/player_panel.py" line="3109"/>
-        <location filename="../widgets/player_panel.py" line="3208"/>
+        <location filename="../widgets/player_panel.py" line="2529"/>
+        <location filename="../widgets/player_panel.py" line="3110"/>
+        <location filename="../widgets/player_panel.py" line="3209"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3069"/>
+        <location filename="../widgets/player_panel.py" line="3070"/>
         <source>Playing: {0}</source>
         <translation>Speelt: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3119"/>
+        <location filename="../widgets/player_panel.py" line="3120"/>
         <source>In Playlist: {0}</source>
         <translation>In playlist: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3205"/>
+        <location filename="../widgets/player_panel.py" line="3206"/>
         <source>Search: {0}</source>
         <translation>Zoeken: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3222"/>
+        <location filename="../widgets/player_panel.py" line="3223"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>De playlist is leeg: voeg eerst tracks toe.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3226"/>
+        <location filename="../widgets/player_panel.py" line="3227"/>
         <source>Playlist name:</source>
         <translation>Naam van playlist:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3261"/>
+        <location filename="../widgets/player_panel.py" line="3262"/>
         <source>Search scope: {0}</source>
         <translation>Zoekbereik: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3266"/>
+        <location filename="../widgets/player_panel.py" line="3267"/>
         <source>Search this playlist…</source>
         <translation>In deze playlist zoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3289"/>
+        <location filename="../widgets/player_panel.py" line="3290"/>
         <source>No matching tracks</source>
         <translation>Geen overeenkomende tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3757"/>
+        <location filename="../widgets/player_panel.py" line="3758"/>
         <source>File not found:
 {0}</source>
         <translation>Bestand niet gevonden:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3932"/>
+        <location filename="../widgets/player_panel.py" line="3933"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Tracks verbergen die passen bij de spelende track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3934"/>
+        <location filename="../widgets/player_panel.py" line="3935"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Tracks tonen die passen bij de spelende track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4256"/>
+        <location filename="../widgets/player_panel.py" line="4257"/>
         <source>{0}+ results</source>
         <translation>{0}+ resultaten</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4259"/>
+        <location filename="../widgets/player_panel.py" line="4260"/>
         <source>{0} result</source>
         <translation>{0} resultaat</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4261"/>
+        <location filename="../widgets/player_panel.py" line="4262"/>
         <source>{0} results</source>
         <translation>{0} resultaten</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4265"/>
+        <location filename="../widgets/player_panel.py" line="4266"/>
         <source>{0} track</source>
         <translation>{0} track</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4267"/>
+        <location filename="../widgets/player_panel.py" line="4268"/>
         <source>{0} tracks</source>
         <translation>{0} tracks</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4859"/>
+        <location filename="../widgets/player_panel.py" line="4860"/>
         <source>Reset Columns</source>
         <translation>Kolommen herstellen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4865"/>
+        <location filename="../widgets/player_panel.py" line="4866"/>
         <source>Fit {0} to Longest</source>
         <translation>{0} aanpassen aan langste waarde</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5649"/>
+        <location filename="../widgets/player_panel.py" line="5654"/>
         <source>“{0}” has moved.</source>
         <translation>‘{0}’ is verplaatst.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="5651"/>
+        <location filename="../widgets/player_panel.py" line="5656"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n van de geselecteerde bestanden is verplaatst.</numerusform>
@@ -2668,87 +2668,87 @@ of klik op “Artwork toevoegen…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5654"/>
+        <location filename="../widgets/player_panel.py" line="5659"/>
         <source>File Has Moved</source>
         <translation>Bestand is verplaatst</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5658"/>
+        <location filename="../widgets/player_panel.py" line="5663"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Het staat niet meer op de opgeslagen locatie en kan dus niet aan een playlist worden toegevoegd of eruit worden gesleept. Een track die al speelt, blijft spelen: die is in het geheugen geladen voordat het bestand werd verplaatst.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5663"/>
+        <location filename="../widgets/player_panel.py" line="5668"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Klik met de rechtermuisknop op de track en kies ‘Ontbrekend bestand zoeken…’</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5810"/>
+        <location filename="../widgets/player_panel.py" line="5815"/>
         <source>Locate Missing File…</source>
         <translation>Ontbrekend bestand zoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5812"/>
+        <location filename="../widgets/player_panel.py" line="5817"/>
         <source>Open File Location</source>
         <translation>Bestandslocatie openen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5813"/>
+        <location filename="../widgets/player_panel.py" line="5818"/>
         <source>Open in Metadata Panel</source>
         <translatorcomment>Reviewed (nl pass): no article surfaces here; &apos;paneel&apos; is het - confirmed.</translatorcomment>
         <translation>Openen in Metadata-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5814"/>
+        <location filename="../widgets/player_panel.py" line="5819"/>
         <source>Reload Metadata from File</source>
         <translation>Metadata opnieuw laden uit bestand</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5818"/>
+        <location filename="../widgets/player_panel.py" line="5823"/>
         <source>Look Up Online…</source>
         <translation>Online opzoeken…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5820"/>
+        <location filename="../widgets/player_panel.py" line="5825"/>
         <source>Remove from Playlist</source>
         <translation>Uit playlist verwijderen</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5876"/>
-        <location filename="../widgets/player_panel.py" line="5904"/>
-        <location filename="../widgets/player_panel.py" line="6004"/>
-        <location filename="../widgets/player_panel.py" line="6077"/>
-        <location filename="../widgets/player_panel.py" line="6107"/>
+        <location filename="../widgets/player_panel.py" line="5881"/>
+        <location filename="../widgets/player_panel.py" line="5909"/>
+        <location filename="../widgets/player_panel.py" line="6009"/>
+        <location filename="../widgets/player_panel.py" line="6082"/>
+        <location filename="../widgets/player_panel.py" line="6112"/>
         <source>Look Up Online</source>
         <translation>Online opzoeken</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5878"/>
+        <location filename="../widgets/player_panel.py" line="5883"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>Geen van de geselecteerde nummers heeft een artiest of titel om mee te zoeken, en de bestandsnamen geven er ook geen.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5898"/>
+        <location filename="../widgets/player_panel.py" line="5903"/>
         <source>Looking up track details…</source>
         <translation>Bezig met opzoeken van nummergegevens…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5899"/>
+        <location filename="../widgets/player_panel.py" line="5904"/>
         <source>Cancel</source>
         <translation>Annuleren</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5929"/>
+        <location filename="../widgets/player_panel.py" line="5934"/>
         <source>Looking up {0} of {1}…</source>
         <translation>Bezig met {0} van {1}…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5937"/>
+        <location filename="../widgets/player_panel.py" line="5942"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Wachten op de aanvraaglimiet van Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6100"/>
+        <location filename="../widgets/player_panel.py" line="6105"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n nummer had geen overeenkomst.</numerusform>
@@ -2756,7 +2756,7 @@ of klik op “Artwork toevoegen…”</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6103"/>
+        <location filename="../widgets/player_panel.py" line="6108"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n nummer bijgewerkt.</numerusform>
@@ -4014,119 +4014,147 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">▸  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="112"/>
+        <location filename="../widgets/slice_section.py" line="130"/>
         <source>Waveform</source>
         <translation>Golfvorm</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="114"/>
+        <location filename="../widgets/slice_section.py" line="132"/>
+        <source>Zoomed Wave</source>
+        <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
+        <translation>Ingezoomde golf</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="134"/>
         <source>Loop Slicer</source>
         <translatorcomment>Producer tool name — kept English here, as the old &apos;Waveform Loop Slicer&apos; header was.</translatorcomment>
         <translation>Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="169"/>
+        <location filename="../widgets/slice_section.py" line="200"/>
         <source>Slice start time (m:ss:mmm) — type to set</source>
         <translation>Begintijd van de slice (m:ss:mmm) — typ om in te stellen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="178"/>
+        <location filename="../widgets/slice_section.py" line="209"/>
         <source>Slice end time (m:ss:mmm) — type to set</source>
         <translation>Eindtijd van de slice (m:ss:mmm) — typ om in te stellen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="180"/>
-        <location filename="../widgets/slice_section.py" line="187"/>
+        <location filename="../widgets/slice_section.py" line="211"/>
+        <location filename="../widgets/slice_section.py" line="218"/>
         <source>Mark</source>
         <translation>Markeren</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="181"/>
+        <location filename="../widgets/slice_section.py" line="212"/>
         <source>Mark start at playhead (Q)</source>
         <translation>Begin markeren bij afspeelkop (Q)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="188"/>
+        <location filename="../widgets/slice_section.py" line="219"/>
         <source>Mark end at playhead (E)</source>
         <translation>Einde markeren bij afspeelkop (E)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="203"/>
+        <location filename="../widgets/slice_section.py" line="234"/>
         <source>Nudge start marker back 10 ms</source>
         <translation>Beginmarkering 10 ms terug verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="205"/>
+        <location filename="../widgets/slice_section.py" line="236"/>
         <source>Nudge start marker forward 10 ms</source>
         <translation>Beginmarkering 10 ms vooruit verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="207"/>
+        <location filename="../widgets/slice_section.py" line="238"/>
         <source>Nudge end marker back 10 ms</source>
         <translation>Eindmarkering 10 ms terug verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="209"/>
+        <location filename="../widgets/slice_section.py" line="240"/>
         <source>Nudge end marker forward 10 ms</source>
         <translation>Eindmarkering 10 ms vooruit verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="237"/>
+        <location filename="../widgets/slice_section.py" line="268"/>
         <source>Length</source>
         <translation>Lengte</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="241"/>
+        <location filename="../widgets/slice_section.py" line="272"/>
         <source>Shorten slice by 10 ms</source>
         <translation>Slice 10 ms inkorten</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="245"/>
+        <location filename="../widgets/slice_section.py" line="276"/>
         <source>Slice length (m:ss:mmm) — type to set; moves the end marker</source>
         <translation>Lengte van de slice (m:ss:mmm) — typ om in te stellen; verplaatst de eindmarkering</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="247"/>
+        <location filename="../widgets/slice_section.py" line="278"/>
         <source>Lengthen slice by 10 ms</source>
         <translation>Slice 10 ms verlengen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="262"/>
+        <location filename="../widgets/slice_section.py" line="293"/>
         <source>&lt; Start</source>
         <translation>&lt; Begin</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="360"/>
+        <location filename="../widgets/slice_section.py" line="396"/>
         <source>Hide the full-track waveform</source>
         <translation>Golfvorm van het hele nummer verbergen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="362"/>
+        <location filename="../widgets/slice_section.py" line="398"/>
         <source>Show the full-track waveform — click it to move playback</source>
         <translation>Golfvorm van het hele nummer tonen — klik erin om het afspelen te verplaatsen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="369"/>
-        <source>Hide the zoomed waveform and slice controls</source>
-        <translation>Ingezoomde golfvorm en slice-regelaars verbergen</translation>
+        <location filename="../widgets/slice_section.py" line="407"/>
+        <source>Hide the zoomed waveform</source>
+        <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
+        <translation>Ingezoomde golfvorm verbergen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="371"/>
+        <location filename="../widgets/slice_section.py" line="409"/>
+        <source>Show the zoomed waveform around the playhead</source>
+        <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
+        <translation>Ingezoomde golfvorm rond de afspeelkop tonen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="418"/>
+        <source>Hide the slice controls</source>
+        <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
+        <translation>Slice-regelaars verbergen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="420"/>
+        <source>Show the slice controls — markers, length, loop and export</source>
+        <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
+        <translation>Slice-regelaars tonen — markeringen, lengte, loop en export</translation>
+    </message>
+    <message>
+        <source>Hide the zoomed waveform and slice controls</source>
+        <translation type="vanished">Ingezoomde golfvorm en slice-regelaars verbergen</translation>
+    </message>
+    <message>
         <source>Show the zoomed waveform and slice controls</source>
-        <translation>Ingezoomde golfvorm en slice-regelaars tonen</translation>
+        <translation type="vanished">Ingezoomde golfvorm en slice-regelaars tonen</translation>
     </message>
     <message>
         <source>Jump playhead to start marker</source>
         <translation type="vanished">Afspeelkop naar beginmarkering springen</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="267"/>
+        <location filename="../widgets/slice_section.py" line="298"/>
         <source>Loop</source>
         <translatorcomment>Kept &apos;Loop&apos; English (standard producer term in NL).</translatorcomment>
         <translation>Loop</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="272"/>
+        <location filename="../widgets/slice_section.py" line="303"/>
         <source>Loop playback between the start and end markers (L)</source>
         <translatorcomment>Added (L) hotkey hint to the existing loop tooltip translation.</translatorcomment>
         <translation>Loop het afspelen tussen de begin- en eindmarkering (L)</translation>
@@ -4136,28 +4164,28 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Loop het afspelen tussen de begin- en eindmarkering</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="265"/>
+        <location filename="../widgets/slice_section.py" line="296"/>
         <source>Jump playhead to start marker (S)</source>
         <translation>Afspeelkop naar beginmarkering springen (S)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="279"/>
+        <location filename="../widgets/slice_section.py" line="310"/>
         <source>Save Slice As:</source>
         <translatorcomment>Kept &apos;Slice&apos; English (slicer/producer term per glossary).</translatorcomment>
         <translation>Slice opslaan als:</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="284"/>
+        <location filename="../widgets/slice_section.py" line="315"/>
         <source>output filename</source>
         <translation>uitvoerbestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="293"/>
+        <location filename="../widgets/slice_section.py" line="324"/>
         <source>Choose save folder</source>
         <translation>Kies opslagmap</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="300"/>
+        <location filename="../widgets/slice_section.py" line="331"/>
         <source>Slice</source>
         <translatorcomment>Kept &apos;Slice&apos; English (slicer-derived term per glossary).</translatorcomment>
         <translation>Slice</translation>
@@ -4168,17 +4196,17 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">▾  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="642"/>
+        <location filename="../widgets/slice_section.py" line="731"/>
         <source>Choose Save Folder</source>
         <translation>Kies opslagmap</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="661"/>
+        <location filename="../widgets/slice_section.py" line="750"/>
         <source>Saved: {0}</source>
         <translation>Opgeslagen: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="666"/>
+        <location filename="../widgets/slice_section.py" line="755"/>
         <source>Error: {0}</source>
         <translation>Fout: {0}</translation>
     </message>

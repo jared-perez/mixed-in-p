@@ -11,7 +11,7 @@ Mixed in P is a desktop application for DJs that:
 - Converts between audio formats (WAV, FLAC, AIFF lossless; MP3 encoding via lameenc)
 - Slices audio files with visual range selection, nudge controls, and playback preview
 - Edits metadata tags (title, artist, album, genre, BPM, key, year, track, comment) with auto-save
-- Built-in audio player with playlist, transport controls, drag-to-reorder, and three collapsible sections below it: Waveform, Loop Slicer and a metronome (tap tempo, time-bend, a three-way click choice — silent / standard tick / sharp beep — and a Global Click toggle, on by default and persisted, that keeps it sounding on other panels)
+- Built-in audio player with playlist, transport controls, drag-to-reorder, and four collapsible sections below it: Waveform, Zoomed Wave, Loop Slicer and a metronome (tap tempo, time-bend, a three-way click choice — silent / standard tick / sharp beep — and a Global Click toggle, on by default and persisted, that keeps it sounding on other panels)
 - Interactive keyboard panel with 3-octave piano, harmonic key strip reference, and chord playback (two views: hex grid and circle of fifths)
 - Sidebar drag-and-drop: drop files onto nav buttons to route them to any panel
 - Pipeline: per-panel triangle toggles pick which of rename → convert → analyze a run performs, mirrored by three minis in the header beside the target playlist. Start Pipeline in any enabled panel runs that panel's files through the later enabled steps and files each track into a chosen (or newly created) playlist

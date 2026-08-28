@@ -2457,10 +2457,11 @@ class PlayerPanel(QWidget):
 
         # Slice section: swap the seek control when the waveform is up, supply
         # the waveform lazily, and forward its playhead seeks to the engine.
-        # Both toggles land on one slot, which recomputes from both states.
+        # All three toggles land on one slot, which recomputes from every state.
         self._slice.expanded_changed.connect(self._on_slice_view_changed)
         self._metronome_section.expanded_changed.connect(self._on_metronome_toggled)
         self._slice.waveform_shown_changed.connect(self._on_slice_view_changed)
+        self._slice.zoom_shown_changed.connect(self._on_slice_view_changed)
         self._slice.request_waveform.connect(self._build_waveform_for_current)
         self._slice.seek_requested.connect(self._on_seek)
 
@@ -5415,16 +5416,21 @@ class PlayerPanel(QWidget):
         """Min width the slicer's time-info + Mark-buttons row needs to fit."""
         return self._slice.time_row_min_width()
 
+    def slice_header_row_min_width(self) -> int:
+        """Min width the three slice disclosure toggles need, always showing."""
+        return self._slice.header_row_min_width()
+
     def _on_slice_view_changed(self, _checked: bool = False) -> None:
         """Swap the seek control and reflow for whichever slice views are open.
 
-        The two toggles are independent, so this recomputes from both rather
-        than from the one that fired. The full waveform *is* the seek control
-        while it's up, so the plain slider hides only then — with the Loop
-        Slicer alone there'd otherwise be nothing left to scrub with. Either
-        view open pins the playlist to a fixed visible height so it can't be
+        The three toggles are independent, so this recomputes from all of them
+        rather than from the one that fired. The full waveform *is* the seek
+        control while it's up, so the plain slider hides only then — the zoomed
+        wave scrubs ±0.5 s and the Loop Slicer draws nothing, so with either of
+        those alone there'd be nothing left to scrub the track with. Any view
+        open pins the playlist to a fixed visible height so it can't be
         squished, and the panel grows past the viewport so the outer scrollbar
-        reveals what's below. Both closed: stretchy playlist, plain slider.
+        reveals what's below. All closed: stretchy playlist, plain slider.
         """
         expanded = self._slice.is_expanded()
         self._seek_row_widget.setVisible(not self._slice.is_waveform_shown())
@@ -5575,7 +5581,7 @@ class PlayerPanel(QWidget):
     @Slot(object, object, int, object, object, float)
     def _on_waveform_fallback_ready(self, cmin, cmax, _dur, dmin, dmax, bps) -> None:
         # Only render if a view is still open on the same track.
-        if self._wf_path == self._current_path() and self._slice.is_open():
+        if self._wf_path == self._current_path() and self._slice.needs_waveform():
             self._slice.set_waveform(cmin, cmax, dmin, dmax, bps)
 
     @Slot()

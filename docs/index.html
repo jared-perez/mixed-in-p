@@ -134,7 +134,7 @@
       <tr><td>Analysis</td><td>Detect BPM, key, and energy.</td></tr>
       <tr><td>Convert</td><td>Convert between WAV, FLAC, AIFF, and MP3.</td></tr>
       <tr><td>Rename</td><td>Batch-rename with live preview.</td></tr>
-      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform + Loop Slicer + Metronome).</td></tr>
+      <tr><td>Player</td><td>Play, audition, and slice tracks (Waveform + Zoomed Wave + Loop Slicer + Metronome).</td></tr>
       <tr><td>Playlists</td><td>A tree of folders and saved playlists, opened from the sidebar's
         <b>Playlists</b> button rather than the nav rail.</td></tr>
       <tr><td>Metadata</td><td>Edit tags and cover artwork.</td></tr>
@@ -389,11 +389,13 @@
       <li><b>Waveform:</b> the full-track waveform for the loaded track. Click or drag anywhere on it
         to move playback — it replaces the seek bar while it's open — and drag the green/red markers
         to set a slice.</li>
-      <li><b>Loop Slicer:</b> the zoomed waveform and the slice controls — set start/end markers,
-        nudge them, toggle an <b>A–B loop</b>, pick a format, and <b>export</b> the slice, ideal for
-        lifting loops and samples by ear. The buttons are independent: open any on its own, or
-        together for the full working slicer.</li>
-      <li><b>Metronome:</b> the third of the collapsible sections, for tapping out a tempo and
+      <li><b>Zoomed Wave:</b> a &plusmn;0.5&nbsp;s window around the playhead, for reading the beat
+        under the cursor. Open on its own it leaves room for the metronome below without scrolling.</li>
+      <li><b>Loop Slicer:</b> the slice controls — set start/end markers, nudge them, toggle an
+        <b>A&ndash;B loop</b>, pick a format, and <b>export</b> the slice, ideal for lifting loops and
+        samples by ear. The buttons are independent: open any on its own, or all three together for
+        the full working slicer.</li>
+      <li><b>Metronome:</b> the last of the collapsible sections, for tapping out a tempo and
         working over it. The tempo box reads to two decimals — drag it up or down to scrub, hold
         <b>Shift</b> while dragging for hundredths, or use the small <b>+</b>/<b>&minus;</b> buttons
         for whole beats. <b>Tap</b> sets the tempo from your own timing, and the two hold-to-bend

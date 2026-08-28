@@ -127,6 +127,17 @@ class WindowSizer:
         if page_id == "player":
             base = _PANEL_MIN_WIDTH["player"]
             player = self.window._player_panel
+            # The Waveform / Zoomed Wave / Loop Slicer toggles are on screen
+            # whatever is expanded, so their row floors the minimum
+            # unconditionally. Measured for the reason the two below are: three
+            # translated labels overrun the 600px constant in fr and ru, where
+            # the two the row used to carry had ~130px to spare.
+            base = max(
+                base,
+                self.window._sidebar.width()
+                + player.slice_header_row_min_width()
+                + _SLACK,
+            )
             if self._slice_expanded:
                 row = player.slice_time_row_min_width()
                 # Actual width, not Theme.SIDEBAR_WIDTH: in playlists mode the

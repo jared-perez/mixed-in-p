@@ -1,8 +1,9 @@
 """The Player panel's disclosure header — one look, two owners.
 
-The panel stacks independent collapsible sections (Waveform and Loop Slicer in
-:mod:`slice_section`, the metronome in :mod:`metronome_section`), and they have
-to read as one family: same arrow, same accent word, same bar height. Sizing a
+The panel stacks independent collapsible sections (Waveform, Zoomed Wave and
+Loop Slicer in :mod:`slice_section`, the metronome in :mod:`metronome_section`),
+and they have to read as one family: same arrow, same accent word, same bar
+height. Sizing a
 disclosure header is also fiddly enough to be worth writing once — a
 ``QPushButton`` *centres* rather than elides, so a width short by a few pixels
 cuts the label at both ends with nothing to show it happened, and the native

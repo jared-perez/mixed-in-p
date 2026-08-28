@@ -1,17 +1,23 @@
 """Collapsible slice section for the Player panel.
 
-Two lazily-built, collapsed-by-default views behind a pair of header toggles:
+Three lazily-built, collapsed-by-default views behind a row of header toggles:
 
 - **Waveform** — the full-track waveform, which doubles as the seek control
   while it is shown (click or drag anywhere on it to move playback) and carries
   the draggable start/end markers.
-- **Loop Slicer** — the zoomed ±0.5 s scrubber and every slice control: typed
-  and nudged marker times, Mark-at-playhead, length, the A-B loop toggle, and
-  slice export.
+- **Zoomed Wave** — the ±0.5 s scrubber around the playhead.
+- **Loop Slicer** — every slice *control*: typed and nudged marker times,
+  Mark-at-playhead, length, the A-B loop toggle, and slice export.
 
-They are independent: either alone, both together (the full working slicer), or
-neither. Marker *dragging* lives on the full waveform, so the Slicer on its own
-sets markers by Mark/nudge/typing.
+All three are independent: any one alone, any pair, all three (the full working
+slicer), or none. Marker *dragging* lives on the full waveform, so the Slicer on
+its own sets markers by Mark/nudge/typing. The zoomed canvas and the controls
+share one dark tray — it is showing whenever either half is, so opening both
+still reads as a single work area rather than two stacked boxes.
+
+The zoomed wave was split out of the Loop Slicer because it is the half people
+want while they are *listening*: with the controls closed, the zoomed view and
+the metronome below it both fit on screen without scrolling.
 
 It owns no audio device — it drives the player's single :class:`PlayerEngine`
 (loop bounds, seek, mark-from-position). Nothing is decoded or shown until the
@@ -52,17 +58,23 @@ from .waveform_canvas import WaveformCanvas, ZoomedWaveformCanvas
 
 logger = logging.getLogger(__name__)
 
+# Gap between the header toggles. Wider than Theme.SPACING on purpose: accent
+# words a normal gap apart read as one phrase rather than as separate buttons.
+_HEADER_GAP = 24
+
 
 class SliceSection(QWidget):
     """Collapsible slicer that operates on the player's currently-loaded track."""
 
-    # Slice tray opened/closed — drives the window sizer's minimum width and the
-    # panel's S/Q/E/L key routing.
+    # Slice controls opened/closed — drives the window sizer's minimum width
+    # (the time row is what needs it) and the panel's S/Q/E/L key routing.
     expanded_changed = Signal(bool)
     # Full-track waveform shown/hidden — the panel hides its own seek slider
     # while it is up, since the waveform is then the seek control.
     waveform_shown_changed = Signal(bool)
-    # Either view opened without a waveform in hand — panel supplies one.
+    # Zoomed scrubber shown/hidden — the panel reflows around it like the others.
+    zoom_shown_changed = Signal(bool)
+    # A canvas opened without a waveform in hand — panel supplies one.
     request_waveform = Signal()
     # User moved the playhead on the waveform — panel forwards to engine.seek_ms.
     seek_requested = Signal(int)
@@ -76,6 +88,7 @@ class SliceSection(QWidget):
         self._custom_save_dir: str | None = None
         self._expanded: bool = False
         self._waveform_shown: bool = False
+        self._zoom_shown: bool = False
         self._waveform_loaded: bool = False
 
         self._setup_ui()
@@ -86,9 +99,10 @@ class SliceSection(QWidget):
             btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
 
         self._set_waveform_visible(False)
+        self._set_zoom_visible(False)
         self._set_body_visible(False)
-        self._waveform_btn.setEnabled(False)
-        self._slicer_btn.setEnabled(False)
+        for btn in self._header_buttons():
+            btn.setEnabled(False)
 
     # ------------------------------------------------------------------ UI
 
@@ -106,21 +120,25 @@ class SliceSection(QWidget):
             "#sliceSection { background: transparent; }"
             f"#sliceTray {{ background-color: {Theme.TRAY_BG}; border-radius: 6px; }}"
             "#sliceTray QLabel { background-color: transparent; }"
+            # The controls container is a bare QWidget, and the global
+            # QWidget rule in app.qss.template would otherwise paint BG_DARK
+            # over the tray it sits in.
+            "#sliceControls { background: transparent; }"
         )
 
-        # Header toggles — two independent views, side by side.
+        # Header toggles — three independent views, side by side.
         self._waveform_btn = self._header_button(self.tr("Waveform"))
         self._waveform_btn.toggled.connect(self._on_waveform_toggle)
+        self._zoom_btn = self._header_button(self.tr("Zoomed Wave"))
+        self._zoom_btn.toggled.connect(self._on_zoom_toggle)
         self._slicer_btn = self._header_button(self.tr("Loop Slicer"))
         self._slicer_btn.toggled.connect(self._on_toggle)
 
         header_row = QHBoxLayout()
         header_row.setContentsMargins(0, 0, 0, 0)
-        # Wider than Theme.SPACING on purpose: two accent-coloured bold words a
-        # normal gap apart read as one phrase rather than as two buttons.
-        header_row.setSpacing(24)
-        header_row.addWidget(self._waveform_btn)
-        header_row.addWidget(self._slicer_btn)
+        header_row.setSpacing(_HEADER_GAP)
+        for btn in self._header_buttons():
+            header_row.addWidget(btn)
         header_row.addStretch(1)
         layout.addLayout(header_row)
 
@@ -132,7 +150,9 @@ class SliceSection(QWidget):
         self._range_slider = self._waveform
         self._seek_slider = self._waveform
 
-        # Collapsible dark tray: zoomed detail + all slice controls.
+        # The dark tray, shared by the two views that live in it. It is showing
+        # whenever either half is (see _sync_tray_visible), so the pair reads as
+        # one work area instead of two boxes with a gap between them.
         self._body = QWidget()
         self._body.setObjectName("sliceTray")
         body = QVBoxLayout(self._body)
@@ -142,6 +162,17 @@ class SliceSection(QWidget):
         # Zoomed scrubber — ±0.5 s detail, scrubbable while paused only.
         self._zoom_waveform = ZoomedWaveformCanvas()
         body.addWidget(self._zoom_waveform)
+
+        # Everything the Loop Slicer toggle owns, in its own container so it can
+        # hide independently of the zoomed canvas above it.
+        self._controls = QWidget()
+        self._controls.setObjectName("sliceControls")
+        controls_layout = QVBoxLayout(self._controls)
+        controls_layout.setContentsMargins(0, 0, 0, 0)
+        # Explicit: these rows used to be children of the tray's layout and
+        # inherited its spacing; a layout handed to a widget falls back to the
+        # Qt style default (6px) instead.
+        controls_layout.setSpacing(Theme.SPACING)
 
         section_label_style = (
             f"font-size: 24px; color: {Theme.TEXT_SECONDARY}; font-weight: bold;"
@@ -228,7 +259,7 @@ class SliceSection(QWidget):
         # sizer to set the player's minimum width while the slicer is open.
         self._time_row_widget = QWidget()
         self._time_row_widget.setLayout(time_row)
-        body.addWidget(self._time_row_widget)
+        controls_layout.addWidget(self._time_row_widget)
 
         # Length row
         length_row = QHBoxLayout()
@@ -252,7 +283,7 @@ class SliceSection(QWidget):
         length_row.addWidget(self._length_inc_btn)
         length_row.addStretch(1)
         length_row.addSpacing(_SECTION_LABEL_WIDTH)
-        body.addLayout(length_row)
+        controls_layout.addLayout(length_row)
 
         # Controls row: "< Start" jump + Loop checkbox. Play/Stop come from the
         # player's own transport — looping just changes how the engine plays.
@@ -272,7 +303,7 @@ class SliceSection(QWidget):
         self._loop_checkbox.setToolTip(self.tr("Loop playback between the start and end markers (L)"))
         controls_row.addWidget(self._loop_checkbox)
         controls_row.addStretch()
-        body.addLayout(controls_row)
+        controls_layout.addLayout(controls_row)
 
         # Save row
         save_row = QHBoxLayout()
@@ -301,14 +332,15 @@ class SliceSection(QWidget):
         self._slice_btn.setObjectName("primaryButton")
         self._slice_btn.setMinimumWidth(80)
         save_row.addWidget(self._slice_btn)
-        body.addLayout(save_row)
+        controls_layout.addLayout(save_row)
 
         # Status
         self._status_label = QLabel("")
         self._status_label.setStyleSheet(f"color: {Theme.NEON_GREEN};")
         self._status_label.setVisible(False)
-        body.addWidget(self._status_label)
+        controls_layout.addWidget(self._status_label)
 
+        body.addWidget(self._controls)
         layout.addWidget(self._body)
 
         # Wiring
@@ -343,6 +375,10 @@ class SliceSection(QWidget):
     _header_button = staticmethod(section_header.header_button)
     _sync_header_arrow = staticmethod(section_header.sync_header_arrow)
 
+    def _header_buttons(self) -> tuple[QPushButton, QPushButton, QPushButton]:
+        """The three toggles, in the left-to-right order they are laid out."""
+        return (self._waveform_btn, self._zoom_btn, self._slicer_btn)
+
     @staticmethod
     def _nudge_button(style: str, text: str) -> QPushButton:
         btn = QPushButton(text)
@@ -362,47 +398,94 @@ class SliceSection(QWidget):
             else self.tr("Show the full-track waveform — click it to move playback")
         )
 
+    def _set_zoom_visible(self, visible: bool) -> None:
+        """Show/hide the zoomed scrubber (the tray's upper half)."""
+        self._zoom_waveform.setVisible(visible)
+        self._sync_tray_visible()
+        self._sync_header_arrow(self._zoom_btn, visible)
+        self._zoom_btn.setToolTip(
+            self.tr("Hide the zoomed waveform")
+            if visible
+            else self.tr("Show the zoomed waveform around the playhead")
+        )
+
     def _set_body_visible(self, visible: bool) -> None:
-        self._body.setVisible(visible)
+        """Show/hide the slice controls (the tray's lower half)."""
+        self._controls.setVisible(visible)
+        self._sync_tray_visible()
         self._sync_header_arrow(self._slicer_btn, visible)
         self._slicer_btn.setToolTip(
-            self.tr("Hide the zoomed waveform and slice controls")
+            self.tr("Hide the slice controls")
             if visible
-            else self.tr("Show the zoomed waveform and slice controls")
+            else self.tr("Show the slice controls — markers, length, loop and export")
         )
+
+    def _sync_tray_visible(self) -> None:
+        """The tray carries whichever of its two halves are open, and hides
+        with the last of them — an empty rounded box is not a view."""
+        self._body.setVisible(self._zoom_shown or self._expanded)
 
     # ------------------------------------------------------------ public API
 
     def is_expanded(self) -> bool:
-        """True while the slice tray (zoomed waveform + controls) is open."""
+        """True while the slice controls are open — the S/Q/E/L keys' owner."""
         return self._expanded
 
     def is_waveform_shown(self) -> bool:
         """True while the full-track waveform is up — it is then the seek control."""
         return self._waveform_shown
 
+    def is_zoom_shown(self) -> bool:
+        """True while the zoomed scrubber is up."""
+        return self._zoom_shown
+
     def is_open(self) -> bool:
-        """True while either view is up, i.e. while a waveform is worth building."""
-        return self._expanded or self._waveform_shown
+        """True while any of the three views is up, i.e. the section wants room."""
+        return self._expanded or self._waveform_shown or self._zoom_shown
+
+    def needs_waveform(self) -> bool:
+        """True while a view that *draws* the waveform is up.
+
+        Narrower than :meth:`is_open` on purpose: the slice controls set their
+        markers by Mark/nudge/typing, so opening them alone paints no samples
+        and must not pay for a decode.
+        """
+        return self._waveform_shown or self._zoom_shown
 
     def first_screen_height(self) -> int:
         """Height that has to be on screen for an opened view to look opened.
 
-        The header row plus the top of whichever view is showing — the full
-        waveform if it is up, else the tray's zoomed canvas. Everything below
-        that (the marker rows, Save Slice As) is allowed to want scrolling; the
-        canvas is not, because a view you have to go looking for reads as a
-        button that did nothing. The player reserves this out of its viewport
-        before deciding how tall the playlist may be.
+        The header row plus the top of the topmost view that is showing — the
+        full waveform, else the tray's zoomed canvas, else the controls' time
+        row. Everything below that (the length row, Save Slice As) is allowed to
+        want scrolling; the first canvas is not, because a view you have to go
+        looking for reads as a button that did nothing. The player reserves this
+        out of its viewport before deciding how tall the playlist may be.
         """
         h = self._waveform_btn.height()
         if self._waveform_shown:
             h += Theme.SPACING + self._waveform.minimumHeight()
-        elif self._expanded:
+        elif self._zoom_shown:
             # The zoomed canvas sits inside the tray, below its top margin.
             h += Theme.SPACING + self._body.layout().contentsMargins().top()
             h += self._zoom_waveform.minimumHeight()
+        elif self._expanded:
+            # Controls alone: the time row is what the tray opens with.
+            h += Theme.SPACING + self._body.layout().contentsMargins().top()
+            h += self._time_row_widget.sizeHint().height()
         return h
+
+    def header_row_min_width(self) -> int:
+        """Width the three disclosure toggles need side by side.
+
+        Always showing, so the window sizer floors the Player's minimum with it
+        whatever is expanded. Measured, never a constant: the labels are
+        translated, and three of them are enough to overrun the 600px window
+        minimum in French and Russian where two never came close. Each button is
+        fixed-width from its own font metrics, so this is exact rather than a
+        layout hint.
+        """
+        return sum(b.width() for b in self._header_buttons()) + 2 * _HEADER_GAP
 
     def time_row_min_width(self) -> int:
         """Width needed to show the time-info + Mark-buttons row pushed together.
@@ -415,21 +498,19 @@ class SliceSection(QWidget):
     def set_track(self, file_path: str | None, duration_ms: int) -> None:
         """Point the section at the player's current track (or clear it)."""
         if file_path is None:
-            # Track unloaded — collapse both views, free, disable.
-            if self._expanded:
-                self._slicer_btn.setChecked(False)  # triggers _on_toggle(False)
-            if self._waveform_shown:
-                self._waveform_btn.setChecked(False)  # -> _on_waveform_toggle(False)
+            # Track unloaded — collapse every view, free, disable.
+            for btn in self._header_buttons():
+                btn.setChecked(False)  # each fires its own toggle handler
             self._file_path = None
             self._duration_ms = 0
             self._waveform_loaded = False
-            self._waveform_btn.setEnabled(False)
-            self._slicer_btn.setEnabled(False)
+            for btn in self._header_buttons():
+                btn.setEnabled(False)
             self.free_waveform()
             return
 
-        self._waveform_btn.setEnabled(True)
-        self._slicer_btn.setEnabled(True)
+        for btn in self._header_buttons():
+            btn.setEnabled(True)
         new_track = file_path != self._file_path
         self._file_path = file_path
         self._duration_ms = max(0, duration_ms)
@@ -463,9 +544,9 @@ class SliceSection(QWidget):
             self._format_combo.setCurrentIndex(idx)
         self._location_label.setText("")
 
-        # If a view is open on a new track, build its waveform now; if both are
-        # closed, it builds on the next expand.
-        if new_track and self.is_open():
+        # If a canvas is open on a new track, build its waveform now; otherwise
+        # it builds on the next expand of one that draws samples.
+        if new_track and self.needs_waveform():
             self.request_waveform.emit()
 
     def set_waveform(self, coarse_min, coarse_max, detail_min, detail_max, bins_per_sec) -> None:
@@ -546,19 +627,27 @@ class SliceSection(QWidget):
         if checked:
             self._request_waveform_if_needed()
 
+    def _on_zoom_toggle(self, checked: bool) -> None:
+        self._zoom_shown = checked
+        self._set_zoom_visible(checked)
+        self.zoom_shown_changed.emit(checked)
+        if checked:
+            self._request_waveform_if_needed()
+
     def _request_waveform_if_needed(self) -> None:
         """Build only if we don't already hold this track's waveform. Kept
         across collapse/expand so reopening is instant, and shared by both
-        views — one build feeds the full canvas and the zoomed one alike."""
+        canvases — one build feeds the full waveform and the zoomed one alike."""
         if not self._waveform_loaded and self._file_path is not None:
             self.request_waveform.emit()
 
     def _on_toggle(self, checked: bool) -> None:
+        # No waveform request here: the controls draw no samples of their own
+        # (see needs_waveform), so opening them alone must not force a decode.
         self._expanded = checked
         self._set_body_visible(checked)
         if checked:
             self.expanded_changed.emit(True)
-            self._request_waveform_if_needed()
         else:
             # Stop looping on collapse, but KEEP the waveform — it's dumped only
             # when the track changes (see set_track), not when the user hides it.
