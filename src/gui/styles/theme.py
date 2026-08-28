@@ -353,9 +353,15 @@ NUEVO_LEON = Palette(
 
 # ── Theme E: Dark Mode ──────────────────────────────────────────────────────
 # Ported from the docs page's own palette (docs/index.html): true-black canvas,
-# graphite panels, and the neon accents on top. The playlist zebra alternates
-# the grey panel row with a *near-black* ROW_ALT (same darker-than-panel trick
-# as Nuevo Leon) — the docs table look the theme is named for.
+# graphite panels, and the neon accents on top. ROW_ALT is *near-black* (a step
+# below the panel, the same darker-than-panel trick as Nuevo Leon), which is the
+# docs-table alternation the theme is named for — but note where it does and
+# does not land. The Player's playlist is deliberately NOT striped: it sets
+# setAlternatingRowColors(False) and paints on a transparent background so the
+# backdrop visual shows through, which is the flat all-black surface the theme
+# was signed off on. The zebra reaches the Analyze / Convert / Rename / History
+# / Queue tables only. Don't "restore" the stripe to the playlist from this
+# comment — turning it on there covers the backdrop.
 DARK_MODE = Palette(
     name="dark_mode",
     label="Dark Mode",
