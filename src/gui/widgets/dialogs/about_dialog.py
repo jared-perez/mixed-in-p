@@ -170,7 +170,7 @@ class AboutDialog(QDialog):
 
         # Keep the version number OUT of the translatable string so bumping it
         # never orphans the translations — translators handle only "Version {0}".
-        version = QLabel(self.tr("Version {0}").format("1.4.0"))
+        version = QLabel(self.tr("Version {0}").format("1.5.0"))
         version.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         version.setStyleSheet(f"color: {Theme.CHROME};")
