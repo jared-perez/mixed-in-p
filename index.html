@@ -11,8 +11,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Space+Grotesk:wght@400;500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#070a12;              /* blue-black — cool base so neon yellow reads as an accent, not a brown cousin */
-    --bg-lift:#101728;         /* midnight the page eases into below the hero */
+    --bg:#0a1228;              /* deep blue — the top of the page; cool enough that neon yellow reads as an accent */
+    --bg-lift:#2d3f66;         /* lifted slate blue the page reaches halfway down */
     --dl-card-bg:#172033;      /* download card background — tweak to recolor just the cards */
     --panel:#121a2c;
     --panel-2:#172132;
@@ -32,13 +32,15 @@
     overflow-x:hidden;
     overflow-x:clip;
     background-color:var(--bg-lift);
-    /* black through the hero (first viewport), then ease into warm charcoal.
+    /* One continuous ease from deep blue at the very top to the lifted blue
+       halfway down, held from there to the foot — no seam at the fold.
+       The 50% resolves against <html>'s box, which is the full document
+       height, so the fade tracks the page rather than the viewport.
        Set on <html> so the root background paints the full canvas edge-to-edge
        (body's overflow-x:hidden would block background propagation). */
     background-image:linear-gradient(to bottom,
       var(--bg) 0,
-      var(--bg) 100svh,
-      var(--bg-lift) calc(100svh + 360px));
+      var(--bg-lift) 50%);
     background-repeat:no-repeat;
   }
   body{
@@ -68,7 +70,7 @@
     position:absolute;
     inset:-60px -90px;
     z-index:-1;
-    background:radial-gradient(ellipse at center, rgba(7,10,18,.88) 0%, rgba(7,10,18,.55) 55%, rgba(7,10,18,0) 75%);
+    background:radial-gradient(ellipse at center, rgba(10,18,40,.88) 0%, rgba(10,18,40,.55) 55%, rgba(10,18,40,0) 75%);
     pointer-events:none;
   }
   .p-mark{
@@ -84,7 +86,7 @@
     letter-spacing:.12em;
     color:var(--yellow);
     border:1px solid var(--line);
-    background:rgba(7,10,18,.7);
+    background:rgba(10,18,40,.7);
     padding:8px 16px;
     border-radius:4px;
     margin-bottom:24px;
@@ -96,7 +98,7 @@
     font-size:clamp(34px,7vw,72px);
     line-height:1.04;
     letter-spacing:-.01em;
-    text-shadow:0 2px 40px rgba(7,10,18,.9);
+    text-shadow:0 2px 40px rgba(10,18,40,.9);
   }
   h1 .yel{color:var(--yellow)}
   .sub{
@@ -112,7 +114,7 @@
     max-width:560px;
     font-size:clamp(16px,2.2vw,19px);
     color:#bcc4d4;
-    text-shadow:0 1px 20px rgba(7,10,18,.95);
+    text-shadow:0 1px 20px rgba(10,18,40,.95);
   }
   .tagline strong{color:#eef1f7;font-weight:500}
   .dl-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
@@ -131,7 +133,7 @@
   .btn:focus-visible{outline:3px solid var(--yellow);outline-offset:3px}
   .btn-primary{background:var(--yellow);color:#0a0e16}
   .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(235,255,0,.25)}
-  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(7,10,18,.6)}
+  .btn-ghost{border:1px solid var(--line);color:var(--text);background:rgba(10,18,40,.6)}
   .btn-ghost:hover{border-color:var(--yellow-dim);transform:translateY(-2px)}
   .hero-note{
     margin-top:18px;
@@ -332,7 +334,7 @@
     border:1px solid var(--line);
     border-left:3px solid var(--yellow);
     border-radius:8px;
-    background:rgba(7,10,18,.35);
+    background:rgba(10,18,40,.35);
     color:var(--muted);
     font-size:15px;
     line-height:1.55;
@@ -390,7 +392,7 @@
     display:none;
     align-items:center;
     justify-content:center;
-    background:rgba(7,10,18,.8);
+    background:rgba(10,18,40,.8);
     padding:24px;
   }
   .modal-backdrop.open{display:flex}
@@ -503,8 +505,8 @@
     <div class="grid">
       <div class="cell">
         <span class="tag">PIPELINE</span>
-        <h3>Rename, convert, analyze — one press</h3>
-        <p>Mark any of Rename, Convert and Analyze with its step toggle and a single press runs a batch through the marked steps in order, filing each track into a playlist as its analysis lands. Skip the steps you don't need — the toggles only choose which run, never the order. Start it from whichever panel you're already in, and aim it at an existing playlist or type a name and one gets made.</p>
+        <h3>Auto Mode</h3>
+        <p>Mark any of Rename, Convert and Analyze with its Pipeline toggle and a single click runs the batch through the steps in order, filing each track into a playlist at the end. Skip the steps you don't need. Start it from whichever panel you're already in, and aim it at an existing playlist or a newly named list.<br>Auto mode also available for Analysis only.</p>
       </div>
       <div class="cell">
         <span class="tag">CONVERT</span>
@@ -517,34 +519,29 @@
         <p>Edit title, artist, key, BPM, label, and more — and embed cover art. Changes save straight to the file, and the panel always shows which file that is, with a jump to it in Finder or Explorer.</p>
       </div>
       <div class="cell">
-        <span class="tag">ONLINE</span>
+        <span class="tag">DISCOGS SEARCH</span>
         <h3>Fill the gaps from Discogs</h3>
-        <p>Opt in, and a track with half its tags missing can pull title, artist, album, label, genre, year and cover art from Discogs — one file or a whole selection. You see every value beside your own before a single one is written, and pick the right pressing and the right track when there's more than one. The app remembers which release a file was tagged from, so a second look opens on the one you approved rather than searching again — and keeps that release on its own tab, offline, to read or apply a field at a time. Off by default, and BPM, key and energy always come from your own analysis.</p>
+        <p>Use your Discogs account to pull release info about your tracks. You see every value beside your own before a single one is written. Pick the right pressing and the right track when there's more than one. A track with tags missing can pull title, artist, album, label, genre, year and cover art from Discogs.<br>Off by default. BPM, key and energy always come from your own analysis.</p>
       </div>
       <div class="cell">
-        <span class="tag">KEYBOARD</span>
-        <h3>Key comparison</h3>
-        <p>A 3-octave piano and key-code tools for working out compatible keys and chords by ear.</p>
+        <span class="tag">PRIVATE &amp; SECURE</span>
+        <h3>Your library stays yours</h3>
+        <p>No personal information is sent out. All analysis is done on your machine, and nothing phones home — the app only touches the network when you ask it to. You can opt in to search Discogs for track info, but it's a search, not a data dump.</p>
       </div>
       <div class="cell">
         <span class="tag">PLAYLISTS</span>
-        <h3>Build and keep your sets</h3>
-        <p>Save playlists, sort them into folders, and search across every one at once — or filter the tree by name to find the one you mean. Export to <code>.m3u8</code> for any other app, or copy the tracks alongside it for a USB stick.</p>
+        <h3>Build your set lists</h3>
+        <p>Save playlists, sort them into folders, and search across every one at once, or filter the tree by name to find the one you mean. Use the Player to listen to tracks in playlists. You can edit the metadata fields within the playlist window. Export playlists to <code>.m3u8</code> for any other app use.</p>
       </div>
       <div class="cell">
-        <span class="tag">COMPATIBLE</span>
+        <span class="tag">COMPATIBLE WITH</span>
         <h3>What mixes out of this?</h3>
         <p>Open the panel beside the playlist and every track in your library that works with the one playing is listed, best first — same key, then relative major/minor, then a step around the wheel, with tempo and energy breaking the ties. Click a row's play icon to preview it for as long as you hold the pointer there.</p>
       </div>
       <div class="cell">
-        <span class="tag">PLAYER</span>
-        <h3>Audition your set order</h3>
-        <p>Cover art, BPM, key, and year in view as you play. Reorder by dragging, fix a tag inline, and add the columns you want — album, genre, label, bitrate, energy, date added — from a right-click on the header, which will also fit any column to its longest value.</p>
-      </div>
-      <div class="cell">
         <span class="tag">VISUALS</span>
         <h3>Watch the track you're playing</h3>
-        <p>Seven visualizations, behind the playlist or in a window of their own: a wormhole of nebula cloud that turns on the first beat of every bar, a stream of liquid metal that carries each kick down its length, a tunnel chase, a fractal, a green-phosphor oscilloscope, spectrum bars and fire. They take their color from your waveform setting, and nothing runs until you pick one.</p>
+        <p>Several visualizations, behind the playlist or in a window of their own: a wormhole of nebula cloud that turns on the first beat of every bar, a stream of liquid metal that carries each kick down its length, a tunnel chase, a fractal, a green-phosphor oscilloscope, spectrum bars and fire. They take their color from your waveform setting, and nothing runs until you pick one.</p>
       </div>
       <div class="cell">
         <span class="tag">METRONOME</span>
@@ -562,14 +559,9 @@
         <p>Every batch operation is logged. Renamed 500 files and changed your mind? Roll it back in one click.</p>
       </div>
       <div class="cell">
-        <span class="tag">AUTO</span>
-        <h3>Hands-off mode</h3>
-        <p>Turn on Auto and dropped files are analyzed the moment they land — results update in real time.</p>
-      </div>
-      <div class="cell">
-        <span class="tag">FREEZE</span>
-        <h3>Look without touching</h3>
-        <p>Flip Freeze on and analysis still reads every track — BPM, key, energy on screen — but writes nothing to your files. For a borrowed drive, or anything you haven't decided about yet.</p>
+        <span class="tag">KEYBOARD</span>
+        <h3>Key comparison</h3>
+        <p>A 3-octave piano and key-code tools for working out compatible keys and chords by ear. The key reference comes two ways — a hex grid or a circle of fifths — whichever you read faster.</p>
       </div>
     </div>
   </div>
@@ -667,6 +659,29 @@
   let W, H, bars = [], raf = null, running = false;
   const BAR_W = 3, GAP = 2;
 
+  /* The hero scrim has to be the colour the PAGE is at that height, not a
+     fixed one: the background keeps lightening past the fold, so a scrim
+     mixed from the top colour alone would leave a dark band at exactly
+     100vh — the seam this gradient exists to avoid. Read the two ends off
+     the custom properties and lerp, so changing --bg / --bg-lift moves the
+     scrim with them. */
+  const css = getComputedStyle(document.documentElement);
+  const hexToRgb = h => {
+    h = h.trim().replace('#','');
+    return [0,2,4].map(i => parseInt(h.slice(i, i+2), 16));
+  };
+  const BG_TOP = hexToRgb(css.getPropertyValue('--bg') || '#0a1228');
+  const BG_MID = hexToRgb(css.getPropertyValue('--bg-lift') || '#2d3f66');
+
+  /* `y` is a document offset in CSS px; the gradient reaches BG_MID at half
+     the document height and holds it from there. */
+  function pageColorAt(y, alpha){
+    const half = Math.max(1, document.documentElement.scrollHeight * 0.5);
+    const t = Math.min(1, Math.max(0, y / half));
+    const c = BG_TOP.map((v, i) => Math.round(v + (BG_MID[i] - v) * t));
+    return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + alpha + ')';
+  }
+
   function buildBars(){
     bars = [];
     const count = Math.ceil(W / (BAR_W + GAP));
@@ -719,10 +734,10 @@
     }
 
     const fade = ctx.createLinearGradient(0, 0, 0, H);
-    fade.addColorStop(0, 'rgba(7,10,18,0.85)');
-    fade.addColorStop(0.35, 'rgba(7,10,18,0.55)');
-    fade.addColorStop(0.6, 'rgba(7,10,18,0.35)');
-    fade.addColorStop(1, 'rgba(7,10,18,0.92)');
+    fade.addColorStop(0, pageColorAt(0, 0.85));
+    fade.addColorStop(0.35, pageColorAt(H * 0.35, 0.55));
+    fade.addColorStop(0.6, pageColorAt(H * 0.6, 0.35));
+    fade.addColorStop(1, pageColorAt(H, 0.92));
     ctx.fillStyle = fade;
     ctx.fillRect(0, 0, W, H);
   }
