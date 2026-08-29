@@ -15,6 +15,7 @@ from PySide6.QtWidgets import (
 
 from src.online import discogs
 
+from ..pipeline_toggle import PipelineToggle
 from ...styles.theme import Theme
 from ...workers.update_worker import (
     RELEASES_PAGE_URL,
@@ -294,9 +295,6 @@ class AboutDialog(QDialog):
                 ' — Detects BPM, key &amp; energy<br>'
                 '<span style="color: {s};">'
                 'auto-writes tags + renames in one shot</span>'
-                '<br><br>'
-                'Switch on a panel\'s <span style="color: {y};">pipeline</span>'
-                ' step to run a batch straight through.'
                 '</div>'
             ).format(p=p, y=y, s=s)
         )
@@ -304,6 +302,53 @@ class AboutDialog(QDialog):
         h1_body.setTextFormat(Qt.TextFormat.RichText)
         h1_body.setWordWrap(True)
         h1_layout.addWidget(h1_body)
+
+        # The step toggle itself, at the size the three panels wear it, so the
+        # sentence under it has something to point at — a reader who has never
+        # noticed the triangle cannot be told to "switch it on".
+        #
+        # Shown lit, which is the state the sentence is asking for. That only
+        # became legible here when `PipelineToggle` gained its grey border:
+        # the checked sign's silhouette used to be BG_DARK ink alone, and this
+        # slide *is* BG_DARK, so it came out as a yellow squiggle with no
+        # triangle round it at all. Anything that puts the sign back on a
+        # BG_DARK surface — another slide, a dark palette — depends on that
+        # border, so don't take it away.
+        #
+        # It is an illustration, not a control. WA_TransparentForMouseEvents
+        # lets a click fall through to the dialog and cycle the slide like
+        # every other pixel here, and it keeps the hover colours out of
+        # `_colors()` for free: `underMouse()` is driven by enter/leave events,
+        # which a mouse-transparent widget never receives.
+        h1_layout.addSpacing(20)
+        pipeline_icon = PipelineToggle(PipelineToggle.SIZE_PANEL)
+        pipeline_icon.setChecked(True)
+        pipeline_icon.setAttribute(
+            Qt.WidgetAttribute.WA_TransparentForMouseEvents, True
+        )
+        pipeline_icon.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+        h1_layout.addWidget(
+            pipeline_icon, 0, Qt.AlignmentFlag.AlignHCenter
+        )
+        h1_layout.addSpacing(12)
+
+        # Split from the block above only so the toggle can sit between them;
+        # the wording is untouched. Its own <div> repeats the block's styling
+        # because a QLabel is a document of its own — the two are one paragraph
+        # to the reader and two documents to Qt.
+        h1_pipeline = QLabel(
+            self.tr(
+                '<div style="color: {p}; font-size: 13px; line-height: 1.6;'
+                ' text-align: center;">'
+                'Switch on a panel\'s <span style="color: {y};">pipeline</span>'
+                ' step to run a batch straight through.'
+                '</div>'
+            ).format(p=p, y=y)
+        )
+        h1_pipeline.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        h1_pipeline.setTextFormat(Qt.TextFormat.RichText)
+        h1_pipeline.setWordWrap(True)
+        h1_layout.addWidget(h1_pipeline)
 
         h1_layout.addStretch()
 

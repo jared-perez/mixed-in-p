@@ -8,8 +8,8 @@ looking (see the W2 note in the handoff).
 
 from __future__ import annotations
 
-from PySide6.QtCore import QPoint, Qt
-from PySide6.QtGui import QColor, QImage
+from PySide6.QtCore import QPoint, QPointF, Qt
+from PySide6.QtGui import QColor, QImage, QPainterPathStroker
 from PySide6.QtWidgets import QWidget
 
 from src.gui.styles.theme import Theme
@@ -186,26 +186,44 @@ def test_an_unchecked_toggle_leaves_its_field_transparent(qtbot):
     assert _on_a_panel(toggle).pixelColor(14, 8) == QColor(Theme.NEON_YELLOW)
 
 
-def _field_regions(image: QImage) -> int:
+def _gap(colour: QColor, other: QColor) -> int:
+    """Squared distance between two colours, as the eye roughly ranks them."""
+    return (
+        (colour.red() - other.red()) ** 2
+        + (colour.green() - other.green()) ** 2
+        + (colour.blue() - other.blue()) ** 2
+    )
+
+
+def _field_regions(toggle: PipelineToggle, image: QImage) -> int:
     """How many separate patches the lit field breaks into.
 
     A pixel counts as field where it leans nearer the accent than the ink,
     which is the call the eye makes — insisting on a fully saturated pixel
     would fail on the antialiased channel that legitimately carries the two
     halves together at this size.
+
+    The checked state also strokes a TEXT_SECONDARY hairline round the sign,
+    and a light grey does lean nearer the accent than BG_DARK — so the border
+    would be counted as a second patch of field. It is excluded by *geometry*,
+    from the widget's own `_sign()` and `_outline()`, rather than by adding it
+    as a third colour to compare against: the accent-to-ink gradient across an
+    antialiased edge passes straight through mid-grey, so a nearest-of-three
+    test hands the middle of the barrel's own channel to the border colour and
+    reports a break where the picture has none.
     """
     accent, ink = QColor(Theme.NEON_YELLOW), QColor(Theme.BG_DARK)
-
-    def gap(colour: QColor, other: QColor) -> int:
-        return (
-            (colour.red() - other.red()) ** 2
-            + (colour.green() - other.green()) ** 2
-            + (colour.blue() - other.blue()) ** 2
-        )
+    band = QPainterPathStroker()
+    # A pixel of slack either side, so the hairline's own antialiasing is
+    # excluded with it rather than left behind as a dotted ring.
+    band.setWidth(toggle._outline() + 2.0)
+    border = band.createStroke(toggle._sign())
 
     def is_field(x: int, y: int) -> bool:
+        if border.contains(QPointF(x + 0.5, y + 0.5)):
+            return False
         colour = image.pixelColor(x, y)
-        return gap(colour, accent) < gap(colour, ink)
+        return _gap(colour, accent) < _gap(colour, ink)
 
     width, height = image.width(), image.height()
     seen: set[tuple[int, int]] = set()
@@ -226,7 +244,6 @@ def _field_regions(image: QImage) -> int:
                             stack.append((nx, ny))
     return regions
 
-
 def test_the_lit_field_is_one_shape_at_both_sizes(qtbot):
     """The barrel has to stay open, and at 18px that is not free.
 
@@ -241,4 +258,49 @@ def test_the_lit_field_is_one_shape_at_both_sizes(qtbot):
         toggle = PipelineToggle(size)
         qtbot.addWidget(toggle)
         toggle.setChecked(True)
-        assert _field_regions(_on_a_panel(toggle)) == 1, f"broken up at {size}px"
+        assert _field_regions(toggle, _on_a_panel(toggle)) == 1, f"broken up at {size}px"
+
+
+def test_a_checked_toggle_draws_a_border_that_reads_on_a_dark_surface(qtbot):
+    """The lit sign's silhouette must not be BG_DARK ink alone.
+
+    Unchecked the rim *is* the silhouette and is drawn in TEXT_SECONDARY, so
+    there is nothing to prove. Checked, the rim turns to BG_DARK ink and the
+    edge is a dark line — invisible on a dark panel, and gone altogether on a
+    surface that is itself BG_DARK, which the About dialog's slides are. So
+    the checked state strokes a grey hairline on the outline.
+
+    Rendered over BG_DARK on purpose: that is the surface the border exists
+    for, and against a contrasting backdrop this passes either way.
+    """
+    toggle = PipelineToggle(PipelineToggle.SIZE_PANEL)
+    qtbot.addWidget(toggle)
+    toggle.setChecked(True)
+    image = QImage(toggle.size(), QImage.Format.Format_ARGB32)
+    image.fill(QColor(Theme.BG_DARK))
+    toggle.render(image, QPoint(), toggle.rect(), QWidget.RenderFlag.DrawChildren)
+
+    # Down the left-hand edge, between the base and the rounded apex: any row
+    # there crosses the border, and it is far from the wave and from both
+    # corners' radii.
+    outline, behind = QColor(Theme.TEXT_SECONDARY), QColor(Theme.BG_DARK)
+    rows = range(14, PipelineToggle.SIZE_PANEL - 4)
+    lit = [
+        y
+        for y in rows
+        if any(
+            _gap(image.pixelColor(x, y), outline) < _gap(image.pixelColor(x, y), behind)
+            for x in range(0, PipelineToggle.SIZE_PANEL // 2)
+        )
+    ]
+    assert len(lit) == len(rows), f"no border on rows {sorted(set(rows) - set(lit))}"
+
+
+def test_an_unchecked_toggle_does_not_double_its_rim_with_a_border(qtbot):
+    """The off state's rim is already TEXT_SECONDARY — a hairline on top of it
+    would only thicken the drawing, so `_colors` reports no outline there."""
+    toggle = PipelineToggle(PipelineToggle.SIZE_PANEL)
+    qtbot.addWidget(toggle)
+    assert toggle._colors()[2] is None
+    toggle.setChecked(True)
+    assert toggle._colors()[2] is not None

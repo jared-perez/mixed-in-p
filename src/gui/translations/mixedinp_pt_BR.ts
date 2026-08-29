@@ -4,24 +4,24 @@
 <context>
     <name>AboutDialog</name>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="111"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="150"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="151"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="120"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
         <source>docs</source>
         <translatorcomment>Kept in English: ubiquitous software borrowing in a Latin-script UI (cf. sample/slicer rule).</translatorcomment>
         <translation>docs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="145"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="146"/>
         <source>Jared P presents</source>
         <translation>Jared P apresenta</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="160"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translation>Kit de Análise de Áudio para DJ</translation>
     </message>
@@ -57,12 +57,12 @@ Recursos:
         <translation type="vanished">Versão 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="173"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="174"/>
         <source>Version {0}</source>
         <translation>Versão {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="182"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="183"/>
         <source>Check for updates</source>
         <translation>Buscar atualizações</translation>
     </message>
@@ -92,12 +92,12 @@ Recursos:
   - Analisador de espectro</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="243"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="244"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Formatos compatíveis: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="262"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="263"/>
         <source>Find Your Way Around</source>
         <translatorcomment>Reviewed (pt_BR pass): idiomatic onboarding title - confirmed.</translatorcomment>
         <translation>Encontre seu caminho</translation>
@@ -108,59 +108,70 @@ Recursos:
         <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Solte seus arquivos em qualquer painel para começar.&lt;br&gt;A barra lateral não serve só para navegação — você pode&lt;br&gt;arrastar arquivos direto para os botões e roteá-los.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMEAR&lt;/span&gt; — Primeiro, organize os nomes dos arquivos&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;apare, prefixe e visualize antes de aplicar&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALISAR&lt;/span&gt; — Detecta BPM, tonalidade &amp;amp; energia&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;grava tags + renomeia automaticamente de uma vez&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTER&lt;/span&gt; — Troque de formato&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;br&gt;Use &lt;span style=&quot;color: {y};&quot;&gt;Enviar para&lt;/span&gt; para mover arquivos entre painéis.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="275"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;br&gt;&lt;br&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
         <translatorcomment>Reordered only, to match the pipeline&apos;s real order (RENAME &gt; CONVERT &gt; ANALYZE); the CONVERT and ANALYZE blocks are the previous translation moved verbatim, with no wording change.</translatorcomment>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Solte seus arquivos em qualquer painel para começar.&lt;br&gt;A barra lateral não serve só para navegação — você pode&lt;br&gt;arrastar arquivos direto para os botões e roteá-los.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMEAR&lt;/span&gt; — Primeiro, organize os nomes dos arquivos&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;apare, prefixe e visualize antes de aplicar&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTER&lt;/span&gt; — Troque de formato&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALISAR&lt;/span&gt; — Detecta BPM, tonalidade &amp;amp; energia&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;grava tags + renomeia automaticamente de uma vez&lt;/span&gt;&lt;br&gt;&lt;br&gt;Ative a etapa de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; de um painel para processar um lote de ponta a ponta.&lt;/div&gt;</translation>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Solte seus arquivos em qualquer painel para começar.&lt;br&gt;A barra lateral não serve só para navegação — você pode&lt;br&gt;arrastar arquivos direto para os botões e roteá-los.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMEAR&lt;/span&gt; — Primeiro, organize os nomes dos arquivos&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;apare, prefixe e visualize antes de aplicar&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTER&lt;/span&gt; — Troque de formato&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALISAR&lt;/span&gt; — Detecta BPM, tonalidade &amp;amp; energia&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;grava tags + renomeia automaticamente de uma vez&lt;/span&gt;&lt;br&gt;&lt;br&gt;Ative a etapa de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; de um painel para processar um lote de ponta a ponta.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="340"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="276"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;/div&gt;</source>
+        <translatorcomment>Split from its final sentence only so the pipeline step&apos;s hazard-triangle icon can be drawn between the two; no wording changed. This translation is the previous one with that sentence moved to the string below.</translatorcomment>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Solte seus arquivos em qualquer painel para começar.&lt;br&gt;A barra lateral não serve só para navegação — você pode&lt;br&gt;arrastar arquivos direto para os botões e roteá-los.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENOMEAR&lt;/span&gt; — Primeiro, organize os nomes dos arquivos&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;apare, prefixe e visualize antes de aplicar&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTER&lt;/span&gt; — Troque de formato&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALISAR&lt;/span&gt; — Detecta BPM, tonalidade &amp;amp; energia&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;grava tags + renomeia automaticamente de uma vez&lt;/span&gt;&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
+        <translatorcomment>The closing sentence of slide 2, moved into its own string so the step toggle&apos;s triangle can sit above it. Wording unchanged — spliced verbatim from the previous translation.</translatorcomment>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Ative a etapa de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; de um painel para processar um lote de ponta a ponta.&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="385"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Slide 3&apos;s SLICE blurb was replaced by the Discogs one; the rest of this string is the old translation, spliced back verbatim. DISCOGS stays in Latin script in every language (brand name), and {credit} is the untranslated attribution constant — leave the placeholder alone.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Preencha o que falta em um arquivo.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Busque o lançamento pelo painel de Metadados e&lt;br&gt;traga artista, álbum, selo, ano e capa.&lt;br&gt;Revise cada campo antes de gravar qualquer coisa.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADADOS&lt;/span&gt; — Solte um arquivo e edite suas tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Salva automaticamente quando você avança.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;TECLADO&lt;/span&gt; — Toque notas em qualquer tonalidade.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;A régua de tonalidades harmônicas fica ali para referência.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ESPECTRO&lt;/span&gt; — Analisador de espectro acústico.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Representação visual da qualidade de áudio.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;AJUSTES&lt;/span&gt; — Faixa de BPM, formato de tonalidade,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;regras de renomeação automática.&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="387"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="432"/>
         <source>click for more</source>
         <translation>clique para mais</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="408"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="453"/>
         <source>Checking…</source>
         <translation>Verificando…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="432"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="477"/>
         <source>You&apos;re on the latest version</source>
         <translation>Você está na versão mais recente</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="436"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="481"/>
         <source>Download</source>
         <translation>Baixar</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="437"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="482"/>
         <source>Update available: {0}</source>
         <translation>Atualização disponível: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="445"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="490"/>
         <source>see all releases</source>
         <translation>ver todas as versões</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="446"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="491"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>Não foi possível buscar atualizações</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="321"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="366"/>
         <source>The Rest of the Kit</source>
         <translation>O resto do kit</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="221"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="222"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -996,148 +1007,148 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>HistoryPanel</name>
     <message>
-        <location filename="../widgets/history_panel.py" line="159"/>
-        <location filename="../widgets/history_panel.py" line="385"/>
+        <location filename="../widgets/history_panel.py" line="164"/>
+        <location filename="../widgets/history_panel.py" line="397"/>
         <source>Rename History</source>
         <translation>Histórico de renomeação</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="163"/>
-        <location filename="../widgets/history_panel.py" line="387"/>
+        <location filename="../widgets/history_panel.py" line="168"/>
+        <location filename="../widgets/history_panel.py" line="399"/>
         <source>View recent rename operations. Select a session to undo it.</source>
         <translation>Veja as operações de renomeação recentes. Selecione uma sessão para desfazê-la.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="177"/>
+        <location filename="../widgets/history_panel.py" line="182"/>
         <source>Session ID</source>
         <translation>ID da sessão</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="177"/>
-        <location filename="../widgets/history_panel.py" line="215"/>
+        <location filename="../widgets/history_panel.py" line="182"/>
+        <location filename="../widgets/history_panel.py" line="220"/>
         <source>Date/Time</source>
         <translation>Data/Hora</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="177"/>
+        <location filename="../widgets/history_panel.py" line="182"/>
         <source>Files</source>
         <translation>Arquivos</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="177"/>
+        <location filename="../widgets/history_panel.py" line="182"/>
         <source>Description</source>
         <translation>Descrição</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="207"/>
+        <location filename="../widgets/history_panel.py" line="212"/>
         <source>Name</source>
         <translation>Nome</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="208"/>
+        <location filename="../widgets/history_panel.py" line="213"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="209"/>
-        <location filename="../widgets/history_panel.py" line="211"/>
+        <location filename="../widgets/history_panel.py" line="214"/>
+        <location filename="../widgets/history_panel.py" line="216"/>
         <source>Conf</source>
         <translation>Conf</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="210"/>
+        <location filename="../widgets/history_panel.py" line="215"/>
         <source>Key</source>
         <translation>Tonalidade</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="212"/>
+        <location filename="../widgets/history_panel.py" line="217"/>
         <source>Key Code</source>
         <translation>Key Code</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="213"/>
+        <location filename="../widgets/history_panel.py" line="218"/>
         <source>Alt Keys</source>
         <translation>Tonalidades alt.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="214"/>
+        <location filename="../widgets/history_panel.py" line="219"/>
         <source>Energy</source>
         <translation>Energia</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="263"/>
-        <location filename="../widgets/history_panel.py" line="572"/>
+        <location filename="../widgets/history_panel.py" line="275"/>
+        <location filename="../widgets/history_panel.py" line="585"/>
         <source>{0} Rename Sessions</source>
         <translation>{0} sessões de renomeação</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="271"/>
-        <location filename="../widgets/history_panel.py" line="516"/>
+        <location filename="../widgets/history_panel.py" line="283"/>
+        <location filename="../widgets/history_panel.py" line="528"/>
         <source>{0} Song Keys</source>
         <translation>{0} tonalidades</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="290"/>
+        <location filename="../widgets/history_panel.py" line="302"/>
         <source>Show</source>
         <translation>Mostrar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="312"/>
-        <location filename="../widgets/history_panel.py" line="733"/>
-        <location filename="../widgets/history_panel.py" line="746"/>
+        <location filename="../widgets/history_panel.py" line="324"/>
+        <location filename="../widgets/history_panel.py" line="784"/>
+        <location filename="../widgets/history_panel.py" line="797"/>
         <source>Export CSV</source>
         <translation>Exportar CSV</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="314"/>
+        <location filename="../widgets/history_panel.py" line="326"/>
         <source>Export the table below to a spreadsheet-friendly CSV file.</source>
         <translation>Exporta a tabela abaixo para um arquivo CSV compatível com planilhas.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="430"/>
+        <location filename="../widgets/history_panel.py" line="442"/>
         <source>Low confidence — this key is worth double-checking.</source>
         <translation>Confiança baixa: vale a pena verificar esta tonalidade.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="433"/>
+        <location filename="../widgets/history_panel.py" line="445"/>
         <source>Low confidence — the tempo may be half or double time.</source>
         <translation>Confiança baixa: o tempo pode estar na metade ou no dobro.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="630"/>
-        <location filename="../widgets/history_panel.py" line="645"/>
+        <location filename="../widgets/history_panel.py" line="681"/>
+        <location filename="../widgets/history_panel.py" line="696"/>
         <source>Open File Location</source>
         <translation>Abrir local do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="647"/>
+        <location filename="../widgets/history_panel.py" line="698"/>
         <source>This file can&apos;t be found — it may have been moved, renamed, or deleted.</source>
         <translation>Não foi possível encontrar este arquivo — ele pode ter sido movido, renomeado ou excluído.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="734"/>
+        <location filename="../widgets/history_panel.py" line="785"/>
         <source>There is nothing to export yet.</source>
         <translation>Ainda não há nada para exportar.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="756"/>
+        <location filename="../widgets/history_panel.py" line="807"/>
         <source>Export failed</source>
         <translation>Falha na exportação</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="757"/>
+        <location filename="../widgets/history_panel.py" line="808"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Não foi possível gravar o arquivo:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="763"/>
+        <location filename="../widgets/history_panel.py" line="814"/>
         <source>Export complete</source>
         <translation>Exportação concluída</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="764"/>
+        <location filename="../widgets/history_panel.py" line="815"/>
         <source>Exported {0} rows to:
 {1}</source>
         <translation>{0} linhas exportadas para:
@@ -1152,27 +1163,27 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Atualizar</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="323"/>
+        <location filename="../widgets/history_panel.py" line="335"/>
         <source>Delete</source>
         <translation>Excluir</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="329"/>
+        <location filename="../widgets/history_panel.py" line="341"/>
         <source>Undo Selected</source>
         <translation>Desfazer selecionados</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="380"/>
+        <location filename="../widgets/history_panel.py" line="392"/>
         <source>Key History</source>
         <translation>Histórico de tonalidades</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="382"/>
+        <location filename="../widgets/history_panel.py" line="394"/>
         <source>Recently analyzed tracks and their detected keys.</source>
         <translation>Faixas analisadas recentemente e suas tonalidades detectadas.</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="562"/>
+        <location filename="../widgets/history_panel.py" line="575"/>
         <source>Renamed {0} files: {1}</source>
         <translation>{0} arquivos renomeados: {1}</translation>
     </message>
@@ -1181,7 +1192,7 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">{0} arquivos renomeados</translation>
     </message>
     <message>
-        <location filename="../widgets/history_panel.py" line="566"/>
+        <location filename="../widgets/history_panel.py" line="579"/>
         <source>No description</source>
         <translation>Sem descrição</translation>
     </message>
@@ -1504,69 +1515,69 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="636"/>
-        <location filename="../main_window.py" line="665"/>
+        <location filename="../main_window.py" line="639"/>
+        <location filename="../main_window.py" line="668"/>
         <source>Export All Playlists</source>
         <translation>Exportar todas as playlists</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="657"/>
+        <location filename="../main_window.py" line="660"/>
         <source>Export failed</source>
         <translation>Falha na exportação</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="658"/>
+        <location filename="../main_window.py" line="661"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Não foi possível gravar o arquivo:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="666"/>
+        <location filename="../main_window.py" line="669"/>
         <source>There are no playlists to export yet.</source>
         <translation>Ainda não há playlists para exportar.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="671"/>
+        <location filename="../main_window.py" line="674"/>
         <source>Export complete</source>
         <translation>Exportação concluída</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="672"/>
+        <location filename="../main_window.py" line="675"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} playlists ({1} faixas) exportadas para:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="763"/>
+        <location filename="../main_window.py" line="766"/>
         <source>Select Audio Files</source>
         <translation>Selecionar arquivos de áudio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="774"/>
+        <location filename="../main_window.py" line="777"/>
         <source>Select Folder</source>
         <translation>Selecionar pasta</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1004"/>
+        <location filename="../main_window.py" line="1007"/>
         <source>No Audio Files</source>
         <translation>Nenhum arquivo de áudio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1005"/>
+        <location filename="../main_window.py" line="1008"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Nenhum arquivo de áudio encontrado em:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1010"/>
+        <location filename="../main_window.py" line="1013"/>
         <source>Invalid Folder</source>
         <translation>Pasta inválida</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1011"/>
+        <location filename="../main_window.py" line="1014"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Não é um diretório válido:
@@ -1581,17 +1592,17 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Uma análise já está em execução. Aguarde ou cancele-a primeiro.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1153"/>
+        <location filename="../main_window.py" line="1156"/>
         <source>Analyzing...</source>
         <translation>Analisando...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1185"/>
+        <location filename="../main_window.py" line="1188"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Concluído: {0} analisados, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1189"/>
+        <location filename="../main_window.py" line="1192"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Concluído: {0} arquivos analisados</translation>
     </message>
@@ -1600,122 +1611,122 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Cancelado</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1380"/>
+        <location filename="../main_window.py" line="1383"/>
         <source>Conversion in Progress</source>
         <translation>Conversão em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1381"/>
+        <location filename="../main_window.py" line="1384"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Uma conversão já está em execução. Aguarde.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1399"/>
+        <location filename="../main_window.py" line="1402"/>
         <source>Pipeline in Progress</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Pipeline em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1400"/>
+        <location filename="../main_window.py" line="1403"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>A última execução do pipeline ainda está terminando — aguarde a conclusão.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1417"/>
+        <location filename="../main_window.py" line="1420"/>
         <source>No Target Playlist</source>
         <translation>Nenhuma playlist de destino</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1418"/>
-        <location filename="../main_window.py" line="1601"/>
+        <location filename="../main_window.py" line="1421"/>
+        <location filename="../main_window.py" line="1604"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>Informe primeiro uma playlist para a execução na barra superior.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1613"/>
+        <location filename="../main_window.py" line="1616"/>
         <source>Cannot Start</source>
         <translation>Não é possível iniciar</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1623"/>
+        <location filename="../main_window.py" line="1626"/>
         <source>No Files</source>
         <translation>Nenhum arquivo</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1624"/>
+        <location filename="../main_window.py" line="1627"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Adicione arquivos a este painel antes de iniciar uma execução do pipeline.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1634"/>
+        <location filename="../main_window.py" line="1637"/>
         <source>No Rename Adjustments</source>
         <translation>Nenhum ajuste de renomeação</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1635"/>
+        <location filename="../main_window.py" line="1638"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>Nenhum ajuste de renomeação foi definido. Enviar os arquivos sem alterações?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1846"/>
+        <location filename="../main_window.py" line="1849"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Pipeline concluído: {added} adicionadas a {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1851"/>
+        <location filename="../main_window.py" line="1854"/>
         <source>{n} skipped</source>
         <translation>{n} ignoradas</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1853"/>
+        <location filename="../main_window.py" line="1856"/>
         <source>{n} errors</source>
         <translation>{n} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1945"/>
+        <location filename="../main_window.py" line="1948"/>
         <source>Converting...</source>
         <translation>Convertendo...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1961"/>
+        <location filename="../main_window.py" line="1964"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Concluído: {0} convertidos, {1} erros</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1965"/>
+        <location filename="../main_window.py" line="1968"/>
         <source>Complete: {0} files converted</source>
         <translation>Concluído: {0} arquivos convertidos</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2281"/>
+        <location filename="../main_window.py" line="2284"/>
         <source>Rename in Progress</source>
         <translation>Renomeação em andamento</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2282"/>
+        <location filename="../main_window.py" line="2285"/>
         <source>A rename operation is already running.</source>
         <translation>Uma operação de renomeação já está em execução.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2386"/>
+        <location filename="../main_window.py" line="2389"/>
         <source>Rename Failed</source>
         <translation>Falha ao renomear</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2421"/>
+        <location filename="../main_window.py" line="2424"/>
         <source>Undo Rename</source>
         <translation>Desfazer renomeação</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2456"/>
+        <location filename="../main_window.py" line="2459"/>
         <source>Undo Failed</source>
         <translation>Falha ao desfazer</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2512"/>
+        <location filename="../main_window.py" line="2515"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Ative a etapa Converter para executar o pipeline a partir daqui.</translation>
@@ -1725,18 +1736,18 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Configure a cadeia no painel Converter primeiro.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1596"/>
+        <location filename="../main_window.py" line="1599"/>
         <source>A conversion is already running.</source>
         <translation>Uma conversão já está em execução.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1598"/>
+        <location filename="../main_window.py" line="1601"/>
         <source>The last pipeline run is still finishing.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>A última execução do pipeline ainda está terminando.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1728"/>
+        <location filename="../main_window.py" line="1731"/>
         <source>Lossy files stayed in Convert — the pipeline converts lossless sources only.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Arquivos com perdas ficam em Converter — o pipeline converte apenas fontes sem perdas.</translation>
@@ -1750,22 +1761,22 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">{0} arquivos renomeados</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2393"/>
+        <location filename="../main_window.py" line="2396"/>
         <source>No Session</source>
         <translation>Nenhuma sessão</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2393"/>
+        <location filename="../main_window.py" line="2396"/>
         <source>No rename session to undo.</source>
         <translation>Nenhuma sessão de renomeação para desfazer.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2402"/>
+        <location filename="../main_window.py" line="2405"/>
         <source>Confirm Undo</source>
         <translation>Confirmar Desfazer</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2403"/>
+        <location filename="../main_window.py" line="2406"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Desfazer a renomeação de {0} arquivos?</translation>
     </message>
@@ -1774,7 +1785,7 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Desfazendo renomeação...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2422"/>
+        <location filename="../main_window.py" line="2425"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Desfeito: {0} arquivos, {1} erros</translation>
     </message>
@@ -2269,37 +2280,37 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>PipelineToggle</name>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="51"/>
+        <location filename="../widgets/pipeline_toggle.py" line="61"/>
         <source>Include Rename in pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Incluir a etapa Renomear nas execuções do pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="52"/>
+        <location filename="../widgets/pipeline_toggle.py" line="62"/>
         <source>Leave Rename out of pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Deixar a etapa Renomear fora das execuções do pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="55"/>
+        <location filename="../widgets/pipeline_toggle.py" line="65"/>
         <source>Include Convert in pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Incluir a etapa Converter nas execuções do pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="56"/>
+        <location filename="../widgets/pipeline_toggle.py" line="66"/>
         <source>Leave Convert out of pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Deixar a etapa Converter fora das execuções do pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="59"/>
+        <location filename="../widgets/pipeline_toggle.py" line="69"/>
         <source>Include Analyze in pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Incluir a etapa Analisar nas execuções do pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="60"/>
+        <location filename="../widgets/pipeline_toggle.py" line="70"/>
         <source>Leave Analyze out of pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Deixar a etapa Analisar fora das execuções do pipeline</translation>
@@ -2792,7 +2803,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>PlaylistTree</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="478"/>
+        <location filename="../widgets/playlist_tree.py" line="485"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
@@ -2801,141 +2812,141 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Nova pasta dentro desta pasta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="771"/>
+        <location filename="../widgets/playlist_tree.py" line="778"/>
         <source>New playlist inside this folder</source>
         <translation>Nova playlist dentro desta pasta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="773"/>
+        <location filename="../widgets/playlist_tree.py" line="780"/>
         <source>New playlist below this one</source>
         <translation>Nova playlist abaixo desta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="859"/>
-        <location filename="../widgets/playlist_tree.py" line="953"/>
-        <location filename="../widgets/playlist_tree.py" line="973"/>
+        <location filename="../widgets/playlist_tree.py" line="866"/>
+        <location filename="../widgets/playlist_tree.py" line="960"/>
+        <location filename="../widgets/playlist_tree.py" line="980"/>
         <source>New Playlist</source>
         <translation>Nova playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="859"/>
-        <location filename="../widgets/playlist_tree.py" line="954"/>
-        <location filename="../widgets/playlist_tree.py" line="974"/>
+        <location filename="../widgets/playlist_tree.py" line="866"/>
+        <location filename="../widgets/playlist_tree.py" line="961"/>
+        <location filename="../widgets/playlist_tree.py" line="981"/>
         <source>New Folder</source>
         <translation>Nova pasta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="918"/>
+        <location filename="../widgets/playlist_tree.py" line="925"/>
         <source>Delete folder &quot;{0}&quot; and everything inside it?</source>
         <translation>Excluir a pasta “{0}” e todo o seu conteúdo?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="920"/>
+        <location filename="../widgets/playlist_tree.py" line="927"/>
         <source>Delete playlist &quot;{0}&quot;?</source>
         <translation>Excluir a playlist “{0}”?</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="923"/>
+        <location filename="../widgets/playlist_tree.py" line="930"/>
         <source>Delete</source>
         <translation>Excluir</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="956"/>
-        <location filename="../widgets/playlist_tree.py" line="962"/>
+        <location filename="../widgets/playlist_tree.py" line="963"/>
+        <location filename="../widgets/playlist_tree.py" line="969"/>
         <source>Rename</source>
         <translation>Renomear</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="957"/>
-        <location filename="../widgets/playlist_tree.py" line="963"/>
+        <location filename="../widgets/playlist_tree.py" line="964"/>
+        <location filename="../widgets/playlist_tree.py" line="970"/>
         <source>Delete…</source>
         <translation>Excluir…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="959"/>
+        <location filename="../widgets/playlist_tree.py" line="966"/>
         <source>Export Folder…</source>
         <translation>Exportar pasta…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="967"/>
+        <location filename="../widgets/playlist_tree.py" line="974"/>
         <source>Export…</source>
         <translation>Exportar…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="969"/>
+        <location filename="../widgets/playlist_tree.py" line="976"/>
         <source>Export and Copy Tracks…</source>
         <translation>Exportar e copiar as faixas…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="988"/>
         <location filename="../widgets/playlist_tree.py" line="995"/>
+        <location filename="../widgets/playlist_tree.py" line="1002"/>
         <source>Export Playlist</source>
         <translation>Exportar playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="989"/>
-        <location filename="../widgets/playlist_tree.py" line="1058"/>
+        <location filename="../widgets/playlist_tree.py" line="996"/>
+        <location filename="../widgets/playlist_tree.py" line="1065"/>
         <source>This playlist is empty — there is nothing to export.</source>
         <translation>Esta playlist está vazia: não há nada para exportar.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1010"/>
-        <location filename="../widgets/playlist_tree.py" line="1118"/>
+        <location filename="../widgets/playlist_tree.py" line="1017"/>
+        <location filename="../widgets/playlist_tree.py" line="1125"/>
         <source>Exported {0} tracks to:
 {1}</source>
         <translation>{0} faixas exportadas para:
 {1}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1020"/>
+        <location filename="../widgets/playlist_tree.py" line="1027"/>
         <source>Export Folder</source>
         <translation>Exportar pasta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1038"/>
+        <location filename="../widgets/playlist_tree.py" line="1045"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} playlists ({1} faixas) exportadas para:
 {2}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1057"/>
-        <location filename="../widgets/playlist_tree.py" line="1084"/>
+        <location filename="../widgets/playlist_tree.py" line="1064"/>
+        <location filename="../widgets/playlist_tree.py" line="1091"/>
         <source>Export and Copy Tracks</source>
         <translation>Exportar e copiar as faixas</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1064"/>
+        <location filename="../widgets/playlist_tree.py" line="1071"/>
         <source>Export in Progress</source>
         <translation>Exportação em andamento</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1065"/>
+        <location filename="../widgets/playlist_tree.py" line="1072"/>
         <source>An export is already running. Please wait.</source>
         <translation>Já há uma exportação em andamento. Aguarde.</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1069"/>
+        <location filename="../widgets/playlist_tree.py" line="1076"/>
         <source>Choose Where to Create the Folder</source>
         <translation>Escolha onde criar a pasta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1082"/>
+        <location filename="../widgets/playlist_tree.py" line="1089"/>
         <source>Copying tracks…</source>
         <translation>Copiando faixas…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1082"/>
+        <location filename="../widgets/playlist_tree.py" line="1089"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1109"/>
+        <location filename="../widgets/playlist_tree.py" line="1116"/>
         <source>Copying {0}</source>
         <translation>Copiando {0}</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/playlist_tree.py" line="1125"/>
+        <location filename="../widgets/playlist_tree.py" line="1132"/>
         <source>%n track(s) could not be found and were skipped.</source>
         <translation>
             <numerusform>%n faixa não foi encontrada e foi ignorada.</numerusform>
@@ -2943,41 +2954,41 @@ ou clique em “Adicionar capa…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1133"/>
-        <location filename="../widgets/playlist_tree.py" line="1191"/>
+        <location filename="../widgets/playlist_tree.py" line="1140"/>
+        <location filename="../widgets/playlist_tree.py" line="1198"/>
         <source>Export failed</source>
         <translation>Falha na exportação</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1134"/>
-        <location filename="../widgets/playlist_tree.py" line="1192"/>
+        <location filename="../widgets/playlist_tree.py" line="1141"/>
+        <location filename="../widgets/playlist_tree.py" line="1199"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Não foi possível gravar o arquivo:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1165"/>
+        <location filename="../widgets/playlist_tree.py" line="1172"/>
         <source>Serato — drag the file onto the crate panel</source>
         <translation>Serato: arraste o arquivo até o painel de crates</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1166"/>
+        <location filename="../widgets/playlist_tree.py" line="1173"/>
         <source>Rekordbox — File → Import Playlist</source>
         <translation>Rekordbox: File → Import Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1167"/>
+        <location filename="../widgets/playlist_tree.py" line="1174"/>
         <source>Traktor — File → Import</source>
         <translation>Traktor: File → Import</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1180"/>
+        <location filename="../widgets/playlist_tree.py" line="1187"/>
         <source>Export complete</source>
         <translation>Exportação concluída</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1183"/>
+        <location filename="../widgets/playlist_tree.py" line="1190"/>
         <source>To import it:</source>
         <translation>Para importá-la:</translation>
     </message>
@@ -2985,27 +2996,27 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>PlaylistTreePanel</name>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1573"/>
+        <location filename="../widgets/playlist_tree.py" line="1694"/>
         <source>+ Playlist</source>
         <translation>+ Playlist</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1574"/>
+        <location filename="../widgets/playlist_tree.py" line="1695"/>
         <source>+ Folder</source>
         <translation>+ Pasta</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1597"/>
+        <location filename="../widgets/playlist_tree.py" line="1718"/>
         <source>Playlist name…</source>
         <translation>Nome da playlist…</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1644"/>
+        <location filename="../widgets/playlist_tree.py" line="1765"/>
         <source>Close the playlist filter</source>
         <translation>Fechar o filtro de playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/playlist_tree.py" line="1646"/>
+        <location filename="../widgets/playlist_tree.py" line="1767"/>
         <source>Filter playlists by name</source>
         <translation>Filtrar playlists por nome</translation>
     </message>

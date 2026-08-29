@@ -15,6 +15,15 @@ panel behind, so the toggle reads as a line drawing; checked it fills with the
 accent and the sign lights up whole. One path drives both states, so the two
 cannot drift apart.
 
+Checked, the sign also wears a grey hairline on its outer edge. Without it the
+silhouette is drawn only by the rim, which is BG_DARK ink — a dark line on a
+dark panel, so the lit sign reads as a yellow blob with no border, and on a
+surface that *is* BG_DARK (the About dialog's slides) the edge disappears
+completely. The hairline is TEXT_SECONDARY, the same colour the unchecked rim
+is drawn in, so the outer edge is one colour in both states and only the fill
+changes. Unchecked wants none of it: the rim is already that grey and a second
+line would just double it.
+
 Self-painted from a ``QAbstractButton`` rather than styled from QSS: the shape
 is not a box, and the global button padding inside a box this small leaves no
 contents rect at all and would silently draw nothing (the #discogsApplyButton
@@ -32,6 +41,7 @@ from PySide6.QtGui import (
     QPainter,
     QPainterPath,
     QPainterPathStroker,
+    QPen,
     QPolygonF,
 )
 from PySide6.QtWidgets import QAbstractButton
@@ -211,6 +221,17 @@ class PipelineToggle(QAbstractButton):
         """
         return max(1.1, self._size * 0.065)
 
+    def _outline(self) -> float:
+        """How thick the checked state's hairline is.
+
+        Thinner than `_rim()` on purpose — it is a border on the sign, not a
+        second rim — and stroked *centred* on the outline rather than outside
+        it, so it costs no room: the triangle already sits 1px in from the
+        widget's edge, and an outward-only band that wide would put the apex
+        on the boundary at the header size.
+        """
+        return max(0.9, self._size * 0.045)
+
     def _sign(self) -> QPainterPath:
         return self._rounded(list(self.triangle()), radius=self._size * 0.16)
 
@@ -303,12 +324,13 @@ class PipelineToggle(QAbstractButton):
             int(color.blue() + (back.blue() - color.blue()) * amount),
         )
 
-    def _colors(self) -> tuple[QColor | None, QColor]:
-        """(field, ink) for the current state.
+    def _colors(self) -> tuple[QColor | None, QColor, QColor | None]:
+        """(field, ink, outline) for the current state.
 
         A `None` field means "leave the negative space alone", which is what
         makes an unchecked toggle a line drawing on the panel rather than a
-        second box sitting on it.
+        second box sitting on it. A `None` outline means the ink already draws
+        the silhouette, which is exactly the unchecked case.
         """
         if not self.isEnabled():
             # A disabled toggle still has to say which way it is set: these are
@@ -318,8 +340,12 @@ class PipelineToggle(QAbstractButton):
                 return (
                     self._dim(QColor(Theme.NEON_YELLOW)),
                     self._dim(QColor(Theme.BG_DARK), 0.35),
+                    # Dimmed with the rest of it: a full-strength border around
+                    # a faded sign reads as enabled from across the room, which
+                    # is the one thing the disabled state must not do.
+                    self._dim(QColor(Theme.TEXT_SECONDARY)),
                 )
-            return None, QColor(Theme.TEXT_DISABLED)
+            return None, QColor(Theme.TEXT_DISABLED), None
         hovered = self.underMouse()
         if self.isChecked():
             if self.isDown():
@@ -328,13 +354,22 @@ class PipelineToggle(QAbstractButton):
                 field = QColor(Theme.ACCENT_HOVER)
             else:
                 field = QColor(Theme.NEON_YELLOW)
-            return field, QColor(Theme.BG_DARK)
-        return None, QColor(
-            Theme.TEXT_PRIMARY if (hovered or self.isDown()) else Theme.TEXT_SECONDARY
+            # The border stays put through hover and press — the field already
+            # answers the mouse, and a silhouette that moves with it would read
+            # as the whole widget changing size.
+            return field, QColor(Theme.BG_DARK), QColor(Theme.TEXT_SECONDARY)
+        return (
+            None,
+            QColor(
+                Theme.TEXT_PRIMARY
+                if (hovered or self.isDown())
+                else Theme.TEXT_SECONDARY
+            ),
+            None,
         )
 
     def paintEvent(self, event) -> None:  # noqa: ARG002
-        field_color, ink = self._colors()
+        field_color, ink, outline = self._colors()
         sign = self._sign()
         field = self._field()
         painter = QPainter(self)
@@ -346,6 +381,13 @@ class PipelineToggle(QAbstractButton):
             # The ink is whatever the field does not claim, so the rim and the
             # wave are one shape and cannot come out at different weights.
             painter.fillPath(sign.subtracted(field), ink)
+            if outline is not None:
+                # Last, and over the ink: the inner half of a centred stroke
+                # lands on the rim, which is what keeps the sign the same size
+                # lit as unlit.
+                painter.setBrush(Qt.BrushStyle.NoBrush)
+                painter.setPen(QPen(outline, self._outline()))
+                painter.drawPath(sign)
         finally:
             painter.end()
 
