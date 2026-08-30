@@ -74,9 +74,15 @@ stylized animated waveform that reads as "working":
 
 ### C. Player: classic visuals (popout AND backdrop)
 
-Rendering lives in `VisRenderer` (no widget): each frame drawn into a small
-transparent-background `QImage`, upscaled without smoothing for the chunky
-retro-pixel look. QPainter + QTimer at ~30 fps is plenty (no OpenGL for v1).
+Rendering lives in `VisRenderer` (no widget): each frame drawn into a
+transparent-background `QImage`. The **retro** modes (spectrum, fire, fractal)
+draw into a small 152×64 one and are upscaled without smoothing, which is the
+chunky pixel look and is the point of them. The rest — both tunnels, the scope
+and the stream — **own their image**, size it from *device* pixels under a cap
+of their own, and ask the host to upscale smoothly
+(`VisRenderer.smooth_upscale()`); see each entry for why and for what it cost.
+QPainter + QTimer at ~30 fps is plenty for the retro modes (no OpenGL), but the
+beat tunnel runs at 60 for a correctness reason — see its entry.
 Two hosts share it:
 
 - **Popout**: `VisualizerWindow` (own QTimer) hosting `VisCanvas`, which fills
@@ -101,15 +107,44 @@ Modes (all reimplemented from scratch; constants informed by Webamp's MIT
 reimplementation — never copy from the 2024 Winamp source dump, its license
 is radioactive):
 
-1. **Oscilloscope** — last ~576 samples, one column per x-pixel; dot / line /
-   solid draw styles; vertical quantization for the retro look.
+1. **Oscilloscope** — an **analog CRT**: a green phosphor beam with glow and
+   persistence, in *both* hosts. It shipped as the popout face only, opposite a
+   chunky 152×64 retro grid in the backdrop (last ~576 samples, one column per
+   x-pixel, vertically quantized); **that retro face is gone**, and
+   `backdrop_oscilloscope` now reaches this same scene — which is why adding
+   the backdrop row cost almost no code: the mode stopped having two faces.
+   The `popout` flag on `set_target_size` therefore no longer picks a
+   *picture*, only an area cap (`_POPOUT_CAP_PX` 900k, `_BACKDROP_CAP_PX`
+   620k), because the two hosts have different budgets.
+
+   It is **not a polyline**. Bright slow segments, a dim thread on the steep
+   slopes, a soft halo and decaying ghosts all fall out of one float32
+   *phosphor buffer* the size of the host: decay it (that is the persistence),
+   stamp the beam path in additively, blur once for softness plus a
+   4×-decimated blurred copy back for the halo, lay the graticule over the top
+   *after* the blurs so it stays crisp and never blooms, then look the result
+   up in a black → green → white ramp. Beam brightness needs no code of its
+   own — the path is sampled at a fixed number of points per frame, so a point
+   *is* a fixed slice of time and the scatter puts more of them per pixel where
+   the beam moves slowly, which is the analog behaviour for free. The obvious
+   alternative (the polyline drawn three or four times with wide antialiased
+   round-cap pens under `CompositionMode_Plus`) was measured dead on arrival:
+   25.8 ms at 1216×512 and 246 ms at 2400×1200, against a 16 ms frame — the
+   wide AA pens are the cost, not the persistence.
+   `src/gui/widgets/vis_analog_scope.py`.
 2. **Spectrum bars** — hybrid lin/log band mapping (~0.9 blend toward log,
    the classic look), dB floor ≈ -65, instant attack + linear falloff
    (~12 units/frame default), grey peak-hold caps with accelerating fall
    (counter 3.0, ×1.1/frame). Thin (75 bars) and wide (~19 bars) variants.
-3. **Fire bars** — same bars, palette ramp black→red→orange→yellow→white over
-   bar height; optional "flames" = previous-frame upshift + color decay
-   (small feedback QImage).
+3. **Fire bars** — same bars, palette ramp black→colour→white over bar height
+   (derived from the waveform colour, so the classic red/orange is that ramp
+   for pure red rather than a hardcoded palette); optional "flames" =
+   previous-frame upshift + colour decay (small feedback QImage).
+   **Backdrop-only**: retired from the menu's popout half, where it read as the
+   whole window, and kept as a backdrop, where it reads as lit rows. So a mode
+   may render and not be offered — never the other way round, which
+   `POPOUT_MODES` derives from `_BACKDROP_ONLY` rather than writing out, so a
+   new render mode cannot be silently unreachable.
 4. **Fractal** — a spinning escape-time Julia set whose constant swings
    through the rich arc of the classic |c| = 0.7885 orbit; level drives
    spin/morph speed and brightness, the kick pulse punches the zoom.
@@ -202,27 +237,61 @@ is radioactive):
 
    Stars are dots far out and four-point stars
    with a white core near, in three shades (grey and two washes of the
-   accent colour toward white), with three shaded planets drifting past.
+   accent colour toward white). How spiky and how big a star is comes off
+   **one roll skewed toward the small end** (`_STAR_SIZE_BIAS`), and the two
+   ride that same roll deliberately — "less spiky" and "more compact" are the
+   same star, so a short-armed one never comes out as a fat plus. Past them
+   drift three shaded planets and, far more rarely, a single galaxy.
    Measured **3.4 ms/frame at 1216×512** and 4.5 at popout size.
 
    A planet's tint and its rings are rolled **once, at spawn** — so it cannot
    change while it is on screen — and they are chances rather than counts,
    because with only three planets at a time a "small percentage" is a property
-   of the stream: measured, about thirty planets a minute at 128 BPM (the
-   unthinned stream was fifty-five, and two passes on `_PLANET_REST` have taken
-   it down since), of which five are dusky, five wear the accent's own colour
-   instead of the pale wash, and seven carry one to three thin rings in a plane
-   of their own. The
-   rings cost 0.02 ms a frame, and they are drawn in three passes — the arc
+   of the stream. Measured over three minutes at 128 BPM, averaged across three
+   seeds: **about thirty planets a minute**, of which roughly five are dusky,
+   five wear the accent's own colour instead of the pale wash, three are a dull
+   red and three a dull blue (fixed constants, not accent washes — there is no
+   wash of a gold accent that comes out red), and seven carry one to three thin
+   rings in a plane of their own.
+
+   **That rate is a tuned setting, and it is the rest gap that sets it.** An
+   emptied sky slot does not refill at once; it lies parked for a stretch of
+   *path* first (`_PLANET_REST`, in world units so the 16 ms and 33 ms hosts
+   agree and the rate scales with the tempo). The unthinned stream was
+   fifty-five a minute, and two passes have taken it to thirty. The knob is
+   **not linear** — the rate is lifetime plus rest, and the ~19 units of
+   lifetime sit in the denominator and do not move, so the second pass's "25%
+   fewer" needed the mean rest to go 4.8 → 12.7 rather than a 25% nudge — and
+   it is **noisy**: three seeds of one build measured 30.3 / 30.3 / 28.3 a
+   minute while a neighbouring setting measured 36.3 / 30.0 / 35.0, so a lone
+   three-minute figure carries about ±3/min, which is most of the distance
+   between two settings anyone would argue about. Quote a per-seed spread.
+
+   The rings cost 0.02 ms a frame, and they are drawn in three passes — the arc
    behind the planet, the disc, then the arc in front — which is the Saturn
    silhouette for the price of a depth comparison per segment. They are drawn
-   **brighter than the disc they circle** (1.8×, ceiling 0.85) and have to be:
+   **brighter than the disc they circle** (1.4×, ceiling 0.7) and have to be:
    the disc spreads its alpha over thousands of pixels and the ring over a
    one-pixel line, so at the disc's own alpha the first cut of them was
    invisible in the app while passing every structural test. That was found by
    rendering a real flight — `planet_sheet.py --flight` in the evidence
    directory, which grabs the ringed planets as they actually pass rather than
-   placing one by hand at an alpha nothing produces.
+   placing one by hand at an alpha nothing produces. The multiplier has since
+   come *down* from 1.8: the double-painted segment joints were part of what
+   1.8 was tuned against, and once that beading was gone it read as too bright
+   in the running app. Both numbers are the user's judgement from the app, so
+   treat them as settled rather than as headroom.
+
+   **Galaxies are the sparse one**: a single slot, resting far longer than a
+   planet's between visits (`_GALAXY_REST`), measured at about nine a minute —
+   roughly 30% of the planet stream's rate, though that ratio was 22% before
+   the second thinning pass and has drifted up as the planets thinned rather
+   than being chosen: the galaxy's own rest gap has never moved.
+   Bigger than any planet in world units and drawn as translucent haze — a
+   tilted gradient disc, a round bulge and two spiral arms — so it reads as
+   background rather than as an approaching object. An arm is a run of
+   overlapping soft blobs rather than a stroke; the stroked version read as a
+   curled wire in the running app, and cloud is clumps.
 
    Two things it does that no other mode does. It renders from **device**
    pixels and asks the host to upscale *smoothly* (`VisRenderer
@@ -278,6 +347,58 @@ is radioactive):
    off-frame — are what put the viewer *inside* a tube rather than in front of
    a cone. So spokes are **clipped at** the plane by interpolation and rings
    are **faded out near** it. `src/gui/widgets/vis_beat_tunnel.py`.
+
+7. **Stream** (`stream`) — a sheet of liquid metal wiggled at its source like
+   a **garden hose**, and the mode that retired the chunky 152×64 retro trace
+   that used to draw `backdrop_scope`. **Backdrop-only**, the way fire is: the
+   popout's `oscilloscope` keeps its green CRT and is a separate mode id, so
+   the menu row's id and its picture no longer match — deliberately, and
+   documented at the row (see the intro above).
+
+   The model in one line: the *source*'s vertical position moves, that
+   displacement travels along the stream at a fixed flow speed, and what the
+   wave carries is a **flat sheet shaded by its orientation** — not a tube.
+   The source sits at the right edge (the newest audio) and the wave rolls
+   left, crossing in `_WINDOW_SECONDS` (0.5). What moves the source is three
+   weighted drivers: a **dance** on the beat grid (every 4th beat is a turning
+   point, and the bigger the boundary — 8, 16, 32 — the further and *quicker*
+   the swing, so the motion is lazy half-time inside a phrase and snaps at
+   phrase edges), a **melody wobble** from the band-passed mid-highs
+   (~570 Hz–7 kHz), and the original full-band loudness **wiggle** as texture.
+   The first cut drove the source from overall loudness alone, which on
+   bass-heavy music let the bass dictate everything and pinned a steady-loud
+   track to mid-height.
+
+   **That one decision is what buys the look cheaply**: the silhouette is
+   smooth *by construction*, because it is the history of a smooth signal
+   advected, so there is no per-edge turbulence machinery anywhere in it — an
+   earlier round that had some produced spiky stalactites. Shade comes from a
+   precomputed 1-D **chrome environment ramp** indexed by the normal, which is
+   why layers of contrast cost nothing per frame; the beat is carried by
+   brightening what is *leaving the nozzle* and letting the same advection
+   push it down the stream, so a kick is a bright surge travelling down a
+   dimmer resting stream rather than a whole-frame flicker.
+
+   Cost **6.2 ms at the 1216×512 backdrop cap** (0.62 Mpx), a shade under the
+   ~8 ms target; it scales linearly with pixels (2.5 ms at 0.24 Mpx, 10.7 at
+   1.08). `src/gui/widgets/vis_stream.py`.
+
+   Four traps it taught, each of which shipped wrong first and was found by
+   rendering a still and *looking* at it — they generalize past this mode.
+   **A hard clamp on a signal that drives a shape is a square-wave generator**:
+   the nozzle was `clip(gain * (fast - slow), -1, 1)`, loud music sat on the
+   clamp, and every downstream term amplified the corners (`tanh` instead —
+   same limit, no corners). **A smoothing kernel written as a fraction of the
+   width is a duration only at one flow speed**, hence `_CENTER_SMOOTH_SECONDS`
+   in *seconds of signal*. **A bin rate in bins per second is not
+   rate-independent on its own** unless you interpolate to the boundary, or a
+   33 ms host and a 16 ms host disagree by more than the wiggle they are
+   recording. And **a wave's amplitude is only meaningful as a ratio to the
+   thing that carries it** — the ribbon looked motionless against a real track
+   while the state under it moved exactly as designed, because an 11% swing
+   inside a 42%-thick ribbon is not a wave; `_SWING_FRAC` and `_BASE_HALF_FRAC`
+   are tuned as a **pair**, against decoded audio, never separately against
+   synthetic band heights.
 
 ### The beat clock
 
