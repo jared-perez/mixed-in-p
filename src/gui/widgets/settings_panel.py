@@ -2,7 +2,7 @@
 
 import logging
 
-from PySide6.QtCore import Qt, QUrl, Signal
+from PySide6.QtCore import QPoint, Qt, QUrl, Signal
 from PySide6.QtGui import QColor, QDesktopServices
 from PySide6.QtWidgets import (
     QButtonGroup,
@@ -556,7 +556,13 @@ class SettingsPanel(QWidget):
         outer.addWidget(energy_frame)
 
         # ── Section: Online Metadata ────────────────────────────────────────
-        outer.addWidget(self._make_section_label(self.tr("Online Metadata")))
+        # Kept on the panel so scroll_to_online_metadata can bring it to the
+        # top of the viewport — the Metadata panel's Discogs Setup button is a
+        # deep link to this section, not to the page.
+        self._online_section_label = self._make_section_label(
+            self.tr("Online Metadata")
+        )
+        outer.addWidget(self._online_section_label)
 
         online_frame = QFrame()
         online_frame.setObjectName("settingsSection")
@@ -721,6 +727,7 @@ class SettingsPanel(QWidget):
 
         scroll.setWidget(container)
         root.addWidget(scroll)
+        self._scroll = scroll
 
         # Wire signals
         self._min_bpm_spin.valueChanged.connect(self._on_min_changed)
@@ -745,6 +752,32 @@ class SettingsPanel(QWidget):
 
         # Style the spinboxes and frame
         self.setStyleSheet(self._build_stylesheet())
+
+    def scroll_to_online_metadata(self) -> None:
+        """Bring the Online Metadata (Discogs) section to the top of the view.
+
+        The scroll position is computed from the section label's place inside
+        the scrolled container, not by slamming the bar to its maximum: only
+        the Playlists section follows, so "all the way down" happens to land
+        near here today and would stop doing so the moment a section is added
+        below. Where the remaining content is shorter than the viewport the
+        bar clamps to its maximum by itself, which is the same picture.
+
+        The container's layout is activated first because this is normally
+        called on a page the user has never opened, where every position is
+        still lazy and ``mapTo`` would answer against an unlaid-out parent.
+        """
+        container = self._scroll.widget()
+        if container is None:
+            return
+        layout = container.layout()
+        if layout is not None:
+            layout.activate()
+        target = self._online_section_label
+        top = target.mapTo(container, QPoint(0, 0)).y()
+        bar = self._scroll.verticalScrollBar()
+        # A little air above the heading so it does not sit flush on the edge.
+        bar.setValue(max(0, min(top - 12, bar.maximum())))
 
     # ── Helpers ────────────────────────────────────────────────────────────
 

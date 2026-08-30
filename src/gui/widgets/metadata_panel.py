@@ -171,6 +171,12 @@ def _format_audio_props(path: str) -> str:
         return ""
 
 
+# The app stylesheet gives every QPushButton ``padding: 8px 16px``, which the
+# native style does not know about when it computes a width. Same constant and
+# same reason as ``_fit`` in history_panel.
+_BUTTON_CHROME = 44
+
+
 class MetadataPanel(QWidget):
     """Panel for viewing and editing audio file metadata tags."""
 
@@ -179,6 +185,12 @@ class MetadataPanel(QWidget):
     # reach into the player: this panel owns a file, not the transport, and
     # MainWindow is where every other cross-panel route is already wired.
     play_requested = Signal(str)
+    # "Discogs Setup" in the panel header. The empty panel is a dead end
+    # otherwise — nothing to edit and no sign that the online lookup it offers
+    # has to be switched on somewhere else — so it routes to the one place that
+    # switch lives. A signal, not a reach into the Settings panel, for the same
+    # reason play_requested is one: MainWindow owns every cross-panel route.
+    discogs_setup_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -264,10 +276,42 @@ class MetadataPanel(QWidget):
         # and leaving it over a loaded file spends the widest row in the panel
         # telling the user to do the thing they have just done.
         self._desc_label = ElidedLabel(
-            self.tr("Drop a single audio file to view and edit its metadata tags.")
+            self.tr(
+                "Drop a single audio file to view and edit its metadata tags. "
+                "Right-click a track in a playlist \u2192 Open in Metadata Panel"
+            )
         )
         self._desc_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
-        layout.addLayout(panel_header_row(title, self._desc_label))
+        header_row = panel_header_row(title, self._desc_label)
+        # Pinned to the right of the row: the description above it carries an
+        # Ignored size policy and all the stretch, so the button keeps its own
+        # width and stays on the window's right edge at any size. Measured from
+        # its own font metrics rather than left to the native size hint, which
+        # cannot see the stylesheet's ``padding: 8px 16px`` and would draw a
+        # translated label into a contents rect narrower than the text — and a
+        # QPushButton centres rather than elides, so it clips at both ends.
+        self._discogs_setup_btn = QPushButton(self.tr("Discogs Setup"))
+        self._discogs_setup_btn.setToolTip(
+            self.tr("Open the Discogs settings, where the online lookup is switched on.")
+        )
+        self._discogs_setup_btn.setMinimumWidth(
+            self._discogs_setup_btn.fontMetrics().horizontalAdvance(
+                self._discogs_setup_btn.text().replace("&", "")
+            )
+            + _BUTTON_CHROME
+        )
+        # Fixed, because the description beside it is taken down the moment a
+        # file loads: a QPushButton's default policy lets it grow, so the
+        # button inherited the freed space and slid into the middle of the row
+        # at three times its own width.
+        self._discogs_setup_btn.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Fixed
+        )
+        self._discogs_setup_btn.clicked.connect(self.discogs_setup_requested.emit)
+        header_row.addWidget(
+            self._discogs_setup_btn, 0, Qt.AlignmentFlag.AlignBottom
+        )
+        layout.addLayout(header_row)
 
         # File header row: filename (yellow) | Sample Rate / Bit Depth (secondary)
         file_row = QHBoxLayout()

@@ -438,6 +438,9 @@ class MainWindow(QMainWindow):
         # Player panel signals
         self._player_panel.files_dropped.connect(self._add_files_to_player)
         self._metadata_panel.play_requested.connect(self._play_from_metadata)
+        self._metadata_panel.discogs_setup_requested.connect(
+            self._open_discogs_settings
+        )
         self._player_panel.open_in_metadata.connect(self._open_in_metadata_panel)
         self._player_panel.slice_expanded.connect(self._sizer.on_slicer_expanded)
         self._player_panel.metronome_expanded.connect(
@@ -2551,6 +2554,18 @@ class MainWindow(QMainWindow):
         self._metadata_panel._load_file(file_path)
         self._sidebar.set_current_page("metadata")
         self._on_page_changed("metadata")
+
+    def _open_discogs_settings(self) -> None:
+        """Metadata panel → Discogs Setup: the Settings page at that section.
+
+        The scroll runs *after* the page change, because a QScrollArea on a
+        page that has never been current has no scroll range to set a value
+        within — its own layout has not been done — so scrolling first sets a
+        position that is clamped to zero and then discarded.
+        """
+        self._sidebar.set_current_page("settings")
+        self._on_page_changed("settings")
+        self._settings_panel.scroll_to_online_metadata()
 
     def _on_about(self) -> None:
         """Show about dialog."""
