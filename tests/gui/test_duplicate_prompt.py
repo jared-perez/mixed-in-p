@@ -8,7 +8,7 @@ was purely a width-vs-text arithmetic error.
 
 import pytest
 from PySide6.QtGui import QCloseEvent
-from PySide6.QtWidgets import QMessageBox
+from PySide6.QtWidgets import QDialogButtonBox, QMessageBox
 
 from src.gui.widgets.dialogs.duplicate_policy import (
     _BUTTON_MIN,
@@ -74,12 +74,28 @@ class TestTheBoxIsNarrow:
 
     def test_it_is_narrower_than_it_was_with_cancel(self, box, qtbot):
         """Not a pixel count — a comparison against the same box wearing the
-        button that used to be there, so it survives a restyle."""
+        button that used to be there, so it survives a restyle.
+
+        Measured on the *button row* rather than on the whole box, because a
+        QMessageBox is as wide as the wider of its text and its buttons, and
+        which of the two wins is a fact about the platform's font. Under
+        Fusion on macOS the buttons win and the whole box shrank 474 -> 384;
+        on Windows the message text is 581px on its own and swallows the
+        change, leaving 581 against 586 — a five-pixel margin that any
+        restyle, translator or DPI change flips, and did, intermittently and
+        only in a full run. The button row states the same thing with the
+        text's width taken out of it: 442 against 564 here.
+        """
         wide = DuplicatePrompt(None, 1, 1, "New Playlist")
         qtbot.addWidget(wide)
         wide.addButton(QMessageBox.StandardButton.Cancel)
         _fit_buttons(wide)
-        assert box.sizeHint().width() < wide.sizeHint().width()
+
+        row = box.findChild(QDialogButtonBox)
+        wide_row = wide.findChild(QDialogButtonBox)
+        assert row.sizeHint().width() < wide_row.sizeHint().width()
+        # ...and nothing else grew to spend the width the buttons gave back.
+        assert box.sizeHint().width() <= wide.sizeHint().width()
 
 
 class TestVerdict:

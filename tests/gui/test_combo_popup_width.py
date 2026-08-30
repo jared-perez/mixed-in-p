@@ -86,7 +86,14 @@ class TestEveryComboIsFitted:
         offenders = [
             f"{path.relative_to(root)}:{number}"
             for path in sorted(root.rglob("*.py"))
-            for number, line in enumerate(path.read_text().splitlines(), 1)
+            for number, line in enumerate(
+                # encoding="utf-8" explicitly: the default is the *locale* encoding,
+                # which is cp1252 on Windows, and the source is full of em-dashes
+                # and arrows. Without it this guard dies with a UnicodeDecodeError
+                # before it checks anything — i.e. it does not run at all on the
+                # one platform, so a bare combo could land unnoticed.
+                path.read_text(encoding="utf-8").splitlines(), 1
+            )
             if "QComboBox()" in line
         ]
         assert offenders == [], (

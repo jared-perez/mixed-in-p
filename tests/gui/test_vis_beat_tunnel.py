@@ -193,10 +193,24 @@ def scene(qapp):
 
 
 def _pixels(image):
-    """``(h, w, 4)`` BGRA as numpy — the whole frame, not a sample of it."""
+    """``(h, w, 4)`` BGRA as numpy — the whole frame, not a sample of it.
+
+    The ``.copy()`` is load-bearing, and leaving it off is a use-after-free
+    rather than an inefficiency. A scene renders ``ARGB32_Premultiplied``, so
+    ``convertToFormat`` really does allocate — the converted image is a
+    *temporary* owned by nothing but this frame — and the memoryview
+    ``constBits()`` hands back keeps no reference to the ``QImage`` it points
+    into. So the view outlives its buffer: measured, a returned view read the
+    0x7F fill of whatever ``QImage`` next took that block (alpha sum 19.7M
+    against the frame's real 2.38M), and when the block went back to the OS
+    instead the first read was an access violation that took the whole run
+    down. It is load- and allocator-dependent, so the crash lands on a
+    different test each run and passes outright on macOS.
+    """
     image = image.convertToFormat(QImage.Format.Format_ARGB32)
     raw = np.frombuffer(image.constBits(), dtype=np.uint8)
-    return raw.reshape(image.height(), image.bytesPerLine() // 4, 4)[:, : image.width()]
+    frame = raw.reshape(image.height(), image.bytesPerLine() // 4, 4)
+    return frame[:, : image.width()].copy()
 
 
 def _fly(scene, from_beat=0.0, to_beat=8.0, fps=60, bpm=128.0, pulse_at=None):

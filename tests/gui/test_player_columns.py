@@ -556,11 +556,23 @@ class TestTranslatedHeadersFit:
         than keeping the widest it ever was."""
         player._table.horizontalHeaderItem(13).setText("Eine sehr lange Bezeichnung")
         player._apply_header_fit_floor()
-        assert player._default_column_widths[13] > player._BASE_COLUMN_WIDTHS[13]
+        widened = player._default_column_widths[13]
+        assert widened > player._BASE_COLUMN_WIDTHS[13]
 
         player._table.horizontalHeaderItem(13).setText("Bitrate")
         player._apply_header_fit_floor()
-        assert player._default_column_widths[13] == player._BASE_COLUMN_WIDTHS[13]
+        # Back to what a fresh measurement gives — NOT to the base, which is a
+        # floor and not the answer. Whether the English word clears it is a fact
+        # about the font the suite happens to run in, exactly as
+        # test_the_floor_never_narrows_a_base_width says: "Bitrate" fits inside
+        # the 80px base under the offscreen font on macOS and measures 104px
+        # under the one on Windows, so equality-with-base is a true statement
+        # about one platform's header only. A ratcheting implementation fails
+        # both halves below, which is what this test is here for.
+        assert player._default_column_widths[13] < widened
+        assert player._default_column_widths[13] == max(
+            player._BASE_COLUMN_WIDTHS[13], player._header_fit_width(13)
+        )
 
     def test_the_artwork_column_keeps_room_for_its_own_header(self, player):
         """Art's width comes from the band, not from a constant — so the band
