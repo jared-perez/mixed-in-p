@@ -208,9 +208,11 @@ is radioactive):
    A planet's tint and its rings are rolled **once, at spawn** — so it cannot
    change while it is on screen — and they are chances rather than counts,
    because with only three planets at a time a "small percentage" is a property
-   of the stream: measured, about fifty planets a minute at 128 BPM, of which
-   nine are dusky, nine wear the accent's own colour instead of the pale
-   wash, and ten carry one to three thin rings in a plane of their own. The
+   of the stream: measured, about thirty planets a minute at 128 BPM (the
+   unthinned stream was fifty-five, and two passes on `_PLANET_REST` have taken
+   it down since), of which five are dusky, five wear the accent's own colour
+   instead of the pale wash, and seven carry one to three thin rings in a plane
+   of their own. The
    rings cost 0.02 ms a frame, and they are drawn in three passes — the arc
    behind the planet, the disc, then the arc in front — which is the Saturn
    silhouette for the price of a depth comparison per segment. They are drawn

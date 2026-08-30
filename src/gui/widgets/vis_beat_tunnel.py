@@ -175,9 +175,13 @@ _PLANET_RADIUS = (0.45, 2.2)  # world units — wide on purpose, for variety
 # *path* first. World units rather than seconds or frames, so the rate scales
 # with the tempo exactly as the churn it thins does, and the 16 ms and 33 ms
 # hosts agree. A planet lives ~19 units on average (spawn depth over travel,
-# minus the ones a turn swings out of the window early), so ~4.8 units of
-# rest on top is the "about 20% fewer" asked for — measured below.
-_PLANET_REST = (2.0, 7.6)  # world units a planet slot lies empty
+# minus the ones a turn swings out of the window early), and the stream's rate
+# is **lifetime plus rest** — which is the whole of how this knob works, and
+# why it is not linear: the first thinning pass asked for 20% fewer and got it
+# from ~4.8 units of rest, and the second asked for another 25% off *that* and
+# needed ~12.7, because the 19 units of lifetime are in the denominator and do
+# not move. Measured, not derived — see the rates quoted below.
+_PLANET_REST = (7.0, 18.5)  # world units a planet slot lies empty
 _SKY_PARKED = -1000.0  # where a resting body waits, far behind the lens
 
 # Galaxies: one slot, resting most of the time — the brief is *sparse*, about
@@ -206,15 +210,20 @@ _GALAXY_ARM_START = 0.18  # where an arm leaves the bulge, in disc radii
 #
 # They are chances rather than counts because there are only three planets on
 # screen at a time, and a "small percentage" is a property of the stream rather
-# than of the three. Measured over three minutes at 128 BPM: **about
-# forty-four planets a minute** — 55 with no rest gap, so `_PLANET_REST` is
-# the asked-for "about 20% fewer" — of which roughly eight are dusky, eight
-# wear the accent's own colour, four are dull red, four dull blue, and ten
-# carry rings; the galaxy stream runs at 22% of the planets'. (More churn than
-# the geometry suggests — a planet spawns 22 to 42 units out and travels at
-# 5.3 units a second, so it should last four to eight — because a turn swings
-# the ones off to the side out of the depth window early. Same for the stars;
-# it is not new here.)
+# than of the three. Measured over three minutes at 128 BPM, averaged across
+# three seeds: **about thirty planets a minute** — down from ~42 before the
+# second thinning pass raised `_PLANET_REST`, i.e. the asked-for "about 25%
+# fewer" — of which roughly five are dusky, five wear the accent's own colour,
+# three are dull red, three dull blue, and seven carry rings; the galaxy
+# stream is untouched by that pass and so now runs at 29% of the planets'
+# rather than 22%. **Quote a per-seed spread, not a single run**: three seeds
+# of the same build came out 30.3 / 30.3 / 28.3, and a neighbouring setting
+# measured 36.3 / 30.0 / 35.0 — so a lone three-minute figure carries about
+# ±3 a minute of noise, which is most of the distance between two settings
+# anyone would argue about. (More churn than the geometry suggests — a planet
+# spawns 22 to 42 units out and travels at 5.3 units a second, so it should
+# last four to eight — because a turn swings the ones off to the side out of
+# the depth window early. Same for the stars; it is not new here.)
 _PLANET_DARK_CHANCE = 0.18
 _PLANET_TINT_CHANCE = 0.18
 _PLANET_RED_CHANCE = 0.10
@@ -966,7 +975,8 @@ class BeatTunnelScene:
         parks it far behind the lens; every later frame re-parks it (the rigid
         transform moves parked points like any other) until the camera has
         flown *rest* units, and only then does the slot refill. This is the
-        whole of "20% fewer planets": the stream's rate is lifetime plus rest.
+        whole of thinning the sky: the stream's rate is lifetime plus rest, so
+        `_PLANET_REST` is the only knob either thinning pass touched.
         """
         if positions[index, 2] > _SKY_PARKED * 0.5:
             wake[index] = self._cam_s + self._rng.uniform(*rest)

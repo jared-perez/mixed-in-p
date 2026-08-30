@@ -552,7 +552,12 @@ def test_only_a_few_planets_are_dusky_tinted_or_ringed(scene):
 
     type(scene)._spawn_planet = spy
     try:
-        _fly(scene, 0.0, 240.0)
+        # The flight length is what pays for the sample, and the stream has
+        # been thinned twice (`_PLANET_REST`) since this was written: 240 beats
+        # bought 59 spawns after the second pass, one short of its own guard.
+        # So a further thinning lengthens the flight — never lowers the bar,
+        # which is the whole reason the guard is here.
+        _fly(scene, 0.0, 360.0)
     finally:
         type(scene)._spawn_planet = real
     assert len(kinds) > 60  # the sample is big enough to say anything at all
