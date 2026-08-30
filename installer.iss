@@ -26,6 +26,16 @@ SolidCompression=yes
 WizardStyle=modern
 ArchitecturesAllowed=x64compatible
 ArchitecturesInstallIn64BitMode=x64compatible
+; Windows 10 2004 (build 19041) and up. Without this Inno applies its own
+; default, which still permits Windows 7 SP1 — where the bundle cannot run at
+; all, so the install completed and the app then failed at launch with a DLL
+; error. A refusal from the installer is the better failure.
+;
+; 19041 rather than 19045: 20H1 through 22H2 all share the 19041 kernel and
+; differ only by enablement package, so this admits the whole 22H2 family —
+; which is the only Windows 10 still receiving updates at its EOL, i.e. the
+; only one a real user is realistically on.
+MinVersion=10.0.19041
 DisableProgramGroupPage=yes
 WizardImageFile=resources\installer_wizard.png
 WizardSmallImageFile=resources\installer_p_logo.png
