@@ -213,12 +213,14 @@ class TestThePanelMakesRoomForIt:
         assert not player._is_table_pinned()
 
     def test_it_does_not_release_a_pin_the_slicer_still_wants(self, player):
-        player._slice._waveform_btn.setChecked(True)
+        # The zoomed wave, not the waveform: the full waveform lives in the
+        # pinned footer now and never holds the pin itself.
+        player._slice._zoom_btn.setChecked(True)
         player._metronome_section.set_expanded(True)
 
         player._metronome_section.set_expanded(False)
 
-        assert player._is_table_pinned(), "the waveform is still open"
+        assert player._is_table_pinned(), "the zoomed wave is still open"
 
     def test_an_open_section_is_reserved_out_of_the_playlists_budget(self, player):
         before = player._height_outside_playlist()

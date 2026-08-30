@@ -142,8 +142,11 @@ class SliceSection(QWidget):
         header_row.addStretch(1)
         layout.addLayout(header_row)
 
-        # Full-track waveform — on the player grey, above the dark tray. Also the
-        # seek control while shown.
+        # Full-track waveform — the seek control while shown. Parented here so
+        # a bare SliceSection stays self-contained, but in the app the Player
+        # reparents it into its pinned footer (see waveform_widget): the seek
+        # control belongs at the bottom edge with the transport, where it
+        # cannot scroll off screen.
         self._waveform = WaveformCanvas()
         layout.addWidget(self._waveform)
         # Aliases so the ported handlers read naturally.
@@ -427,6 +430,15 @@ class SliceSection(QWidget):
 
     # ------------------------------------------------------------ public API
 
+    def waveform_widget(self) -> WaveformCanvas:
+        """The full-track canvas, for the Player to seat in its pinned footer.
+
+        Hands over the *widget* only: visibility, marks, seeking and the lazy
+        waveform build stay this section's job, and all of it keeps working
+        wherever the canvas is parented.
+        """
+        return self._waveform
+
     def is_expanded(self) -> bool:
         """True while the slice controls are open — the S/Q/E/L keys' owner."""
         return self._expanded
@@ -455,17 +467,18 @@ class SliceSection(QWidget):
     def first_screen_height(self) -> int:
         """Height that has to be on screen for an opened view to look opened.
 
-        The header row plus the top of the topmost view that is showing — the
-        full waveform, else the tray's zoomed canvas, else the controls' time
-        row. Everything below that (the length row, Save Slice As) is allowed to
+        The header row plus the top of the topmost view showing *in the scroll
+        content* — the tray's zoomed canvas, else the controls' time row.
+        Everything below that (the length row, Save Slice As) is allowed to
         want scrolling; the first canvas is not, because a view you have to go
-        looking for reads as a button that did nothing. The player reserves this
-        out of its viewport before deciding how tall the playlist may be.
+        looking for reads as a button that did nothing. The full waveform is
+        not counted: it is drawn in the Player's pinned footer, which pays for
+        it out of the viewport before this budget is even computed. The player
+        reserves this out of its viewport before deciding how tall the
+        playlist may be.
         """
         h = self._waveform_btn.height()
-        if self._waveform_shown:
-            h += Theme.SPACING + self._waveform.minimumHeight()
-        elif self._zoom_shown:
+        if self._zoom_shown:
             # The zoomed canvas sits inside the tray, below its top margin.
             h += Theme.SPACING + self._body.layout().contentsMargins().top()
             h += self._zoom_waveform.minimumHeight()

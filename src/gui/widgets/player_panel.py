@@ -1738,22 +1738,54 @@ class PlayerPanel(QWidget):
     # ── UI setup ────────────────────────────────────────────────
 
     def _setup_ui(self) -> None:
-        # The whole panel scrolls: when the slice section expands below the
-        # playlist the content grows past the viewport and one vertical
-        # scrollbar lets the user scroll down to the slicer. The playlist keeps
-        # its own scrollbar and, while a slice view is open, only the height the
-        # viewport can spare once the transport and that view are reserved (see
-        # _apply_table_height) — so opening one never pushes itself off the
-        # bottom, however tall the rows are. Collapsed, everything fits and no
-        # outer scrollbar appears. The faint background overlay stays on the panel
+        # Two siblings: a scroll area holding everything that may outgrow the
+        # viewport (title, playlist, slice tray, metronome), and under it a
+        # footer that never scrolls — the seek control (waveform or slider),
+        # the transport and the now-playing line, justified to the bottom
+        # edge. Whatever the user opens or scrolls to, the transport stays
+        # reachable; only the views that want more room than the viewport has
+        # ride the scrollbar. The faint background overlay stays on the panel
         # itself, so the transparent scroll area lets it show through.
         outer = QVBoxLayout(self)
         outer.setContentsMargins(0, 0, 0, 0)
+        # The seam's whole gap is the footer's top margin — the style-default
+        # 6px here would add to it.
+        outer.setSpacing(0)
         self._scroll = QScrollArea()
         self._scroll.setWidgetResizable(True)
         self._scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        outer.addWidget(self._scroll)
+        outer.addWidget(self._scroll, 1)
+
+        # The pinned footer. A bare QWidget wears the global BG_DARK rule
+        # (bare containers are opaque — CLAUDE.md), so it paints the same
+        # BG_MEDIUM as #playerContent above it: the seam between the two must
+        # be invisible. Horizontal size policy is Ignored on purpose — inside
+        # the scroll area these rows never propagated a minimum width to the
+        # window (the viewport just clipped them at a squeeze), and moving
+        # them out must not start widening every panel's minimum through the
+        # page stack. Vertical stays Preferred so the rows' heights are real.
+        self._footer = QWidget()
+        self._footer.setObjectName("playerFooter")
+        self._footer.setSizePolicy(
+            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Preferred
+        )
+        self._footer.setStyleSheet(
+            f"#playerFooter {{ background-color: {Theme.BG_MEDIUM}; }}"
+            "#playerFooter QLabel { background-color: transparent; }"
+            "#playerFooter QSlider { background-color: transparent; }"
+            "#seekRow, #nowPlayingRow { background-color: transparent; }"
+        )
+        footer_layout = QVBoxLayout(self._footer)
+        # Bottom padding lives here now, not on the content layout; explicit
+        # spacing because a widget's own layout falls back to the 6px style
+        # default, not Theme.SPACING (CLAUDE.md).
+        footer_layout.setContentsMargins(
+            Theme.PADDING, Theme.SPACING, Theme.PADDING, Theme.PADDING
+        )
+        footer_layout.setSpacing(Theme.SPACING)
+        self._footer_layout = footer_layout
+        outer.addWidget(self._footer, 0)
 
         # Player surface is the sidebar grey (BG_MEDIUM) down through the full
         # waveform; the slice detail/controls below sit on a near-black tray.
@@ -1793,7 +1825,9 @@ class PlayerPanel(QWidget):
             "QWidget#compatiblePanel { background-color: transparent; }"
         )
         layout = QVBoxLayout(content)
-        layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, Theme.PADDING)
+        # Bottom margin 0: the footer below the scroll area carries the bottom
+        # padding, and keeping both would double the gap at the seam.
+        layout.setContentsMargins(Theme.PADDING, Theme.PADDING, Theme.PADDING, 0)
         layout.setSpacing(Theme.SPACING)
         # Kept so _height_below_playlist can measure the rows under the table.
         self._content_layout = layout
@@ -2107,10 +2141,10 @@ class PlayerPanel(QWidget):
         self._sync_compat_tooltip()
 
         # Seek bar — wrapped in a widget so it can be hidden when the slice
-        # section's waveform takes over as the seek control. It sits directly
-        # above the combined controls row so the scrub bar reads as part of the
-        # transport cluster, and vanishing while the slicer is open just tucks
-        # the controls row up under the playlist.
+        # section's waveform takes over as the seek control. It lives in the
+        # pinned footer, directly above the combined controls row, so the
+        # scrub bar reads as part of the transport cluster and neither can
+        # ever scroll off screen.
         seek_row = QHBoxLayout()
         seek_row.setContentsMargins(0, 0, 0, 0)
 
@@ -2132,7 +2166,7 @@ class PlayerPanel(QWidget):
         self._seek_row_widget = QWidget()
         self._seek_row_widget.setObjectName("seekRow")
         self._seek_row_widget.setLayout(seek_row)
-        layout.addWidget(self._seek_row_widget)
+        footer_layout.addWidget(self._seek_row_widget)
 
         # Combined controls row: volume on the left, transport buttons centered,
         # then track-count stats and Clear Playlist on the right. Folding the
@@ -2212,10 +2246,11 @@ class PlayerPanel(QWidget):
         self._clear_btn.clicked.connect(self._on_clear_playlist)
         controls_row.addWidget(self._clear_btn)
 
-        # Kept (as the layout, not a wrapper widget — wrapping would change its
-        # inherited spacing) so its height can be reserved by the slice pin.
+        # Kept as the layout, not a wrapper widget — wrapping would change its
+        # inherited spacing. It lives in the pinned footer, so the transport
+        # can never scroll off screen.
         self._controls_row = controls_row
-        layout.addLayout(controls_row)
+        footer_layout.addLayout(controls_row)
 
         # Now-playing line: names the track loaded in the engine. Playback is
         # independent of the visible list (switching playlists doesn't stop
@@ -2227,9 +2262,8 @@ class PlayerPanel(QWidget):
         # be hidden as one: a QVBoxLayout skips a hidden *widget* and the gap
         # that would sit above it, where an empty nested layout still takes its
         # spacing and would leave a stray gap under the transport with nothing
-        # playing. It needs no transparency rule the way the sidebar's
-        # containers do (the global QWidget BG_DARK it inherits is what this
-        # panel sits on — no background overlay), same as #seekRow above it.
+        # playing. The footer's stylesheet makes it transparent alongside
+        # #seekRow, so the pinned strip is one unbroken BG_MEDIUM surface.
         self._now_playing_row = QWidget()
         self._now_playing_row.setObjectName("nowPlayingRow")
         now_playing_row = QHBoxLayout(self._now_playing_row)
@@ -2287,12 +2321,17 @@ class PlayerPanel(QWidget):
         now_playing_row.addStretch(1)
 
         self._now_playing_row.hide()
-        layout.addWidget(self._now_playing_row)
+        footer_layout.addWidget(self._now_playing_row)
 
         # Collapsible slice section — shares the engine; builds its waveform
         # lazily on expand. Lets the user trim a slice from the loaded track.
         self._slice = SliceSection(self._engine, self)
         layout.addWidget(self._slice)
+        # The full-track waveform is drawn in the pinned footer, not in the
+        # section: it is the seek control while it is up, so it takes the seek
+        # slider's slot at the bottom edge. Reparenting moves the *widget*
+        # only — SliceSection still owns its visibility, marks and signals.
+        footer_layout.insertWidget(0, self._slice.waveform_widget())
         # Route S/Q/E through the panel only while the section is open.
         self._table.set_slice_keys_active(self._slice.is_expanded)
 
@@ -2303,6 +2342,15 @@ class PlayerPanel(QWidget):
         # track — it holds its own click stream.
         self._metronome_section = MetronomeSection(self)
         layout.addWidget(self._metronome_section)
+        # Any surplus the pinned playlist refuses must not be redistributed
+        # into the chrome rows: QVBoxLayout hands leftover height to every row
+        # whose size policy can grow, which is how the title and now-playing
+        # lines once inflated into ~140px black bands on a tall window. The
+        # budget in _apply_table_height spends the surplus on the playlist;
+        # this zero-stretch spacer is the backstop that collects any residue
+        # at the bottom instead. (Zero so the splitter's stretch still wins
+        # every pixel while the playlist is unpinned.)
+        layout.addStretch()
 
         self._scroll.setWidget(content)
         # Keep the header inside the visible width (see _sync_title_row_width).
@@ -2338,7 +2386,10 @@ class PlayerPanel(QWidget):
         # clipping. Past this point the header overflows like any other row.
         floor = self._title_row_widget.minimumSizeHint().width()
         self._title_row_widget.setMaximumWidth(max(visible, floor))
-        self._sync_now_playing_widths(visible)
+        # The now-playing line lives in the footer, which spans the whole
+        # panel rather than the scroll viewport — so its budget is the panel
+        # width, scrollbar or no scrollbar.
+        self._sync_now_playing_widths(self.width() - 2 * Theme.PADDING)
 
     def _sync_now_playing_widths(self, visible: int) -> None:
         """Share the now-playing line between the filename and the link.
@@ -5400,16 +5451,13 @@ class PlayerPanel(QWidget):
         visible list, which may be a different playlist entirely."""
         return self._playing_path
 
-    # Most playlist rows kept visible when the slice section is open. A *cap*,
-    # not the answer: what actually decides the height is the room left in the
-    # viewport once the transport and the opened canvas are reserved. This was
-    # the whole rule when a row was 30px tall, and it silently stopped working
-    # when Full artwork made a row 78px — 12 of those is 983px against a 793px
-    # viewport, so the playlist alone was taller than the panel and the
-    # transport, the waveform and the slice controls all opened below the fold.
-    _ROWS_VISIBLE_WHEN_SLICING = 12
-    # …and the fewest, so a short window shrinks the playlist rather than
-    # deleting it. Past this point scrolling is unavoidable and correct.
+    # The fewest playlist rows kept visible while a scrollable section is
+    # open — a short window shrinks the playlist rather than deleting it, and
+    # past this point scrolling is unavoidable and correct. There is no upper
+    # cap on purpose: the playlist absorbs the whole viewport budget, because
+    # any surplus it refuses is redistributed by the layout into the growable
+    # chrome rows (a 12-row cap is what once inflated the title and
+    # now-playing lines into ~140px black bands on a tall window).
     _MIN_ROWS_WHEN_SLICING = 3
 
     def slice_time_row_min_width(self) -> int:
@@ -5427,34 +5475,45 @@ class PlayerPanel(QWidget):
         rather than from the one that fired. The full waveform *is* the seek
         control while it's up, so the plain slider hides only then — the zoomed
         wave scrubs ±0.5 s and the Loop Slicer draws nothing, so with either of
-        those alone there'd be nothing left to scrub the track with. Any view
-        open pins the playlist to a fixed visible height so it can't be
-        squished, and the panel grows past the viewport so the outer scrollbar
-        reveals what's below. All closed: stretchy playlist, plain slider.
+        those alone there'd be nothing left to scrub the track with. Both live
+        in the pinned footer, so the swap costs the scroll content nothing.
+        The views that live in the scroll content (zoomed wave, slice
+        controls, metronome) pin the playlist to a budget so the view's first
+        screen lands on screen, and the outer scrollbar reveals the rest.
+        All closed: stretchy playlist, plain slider.
         """
         expanded = self._slice.is_expanded()
         self._seek_row_widget.setVisible(not self._slice.is_waveform_shown())
-        self._apply_table_height(self._any_section_open())
-        if not self._any_section_open():
+        self._apply_table_height(self._scroll_content_wants_room())
+        if not self._scroll_content_wants_room():
             # Return to the top so the user isn't left scrolled past the slicer.
             self._scroll.verticalScrollBar().setValue(0)
         # Only the tray's time row needs the wider window minimum.
         self.slice_expanded.emit(expanded)
 
-    def _any_section_open(self) -> bool:
-        """Whether anything below the playlist is asking for room.
+    def _scroll_content_wants_room(self) -> bool:
+        """Whether anything in the scroll content below the playlist is
+        asking for room.
 
-        The pin is about the *panel* growing past the viewport, not about the
-        slicer specifically — so the metronome counts. Keying it off the slice
-        section alone let an opened metronome be squeezed by a stretchy
-        playlist, which is the bug the pin exists to prevent.
+        The pin is about the *scroll content* growing past the viewport, so
+        only the views that live there count: the zoomed wave, the slice
+        controls and the metronome. (Keying it off the slice section alone
+        once let an opened metronome be squeezed by a stretchy playlist.) The
+        full waveform does NOT count — it is drawn in the pinned footer, which
+        takes its room out of the viewport before the budget is computed, so
+        with only the waveform open the playlist stays stretchy and fills
+        whatever the footer leaves.
         """
-        return self._slice.is_open() or self._metronome_section.is_expanded()
+        return (
+            self._slice.is_zoom_shown()
+            or self._slice.is_expanded()
+            or self._metronome_section.is_expanded()
+        )
 
     def _on_metronome_toggled(self, expanded: bool) -> None:
         """Reflow around the metronome, and tell the sizer its minimum moved."""
-        self._apply_table_height(self._any_section_open())
-        if not self._any_section_open():
+        self._apply_table_height(self._scroll_content_wants_room())
+        if not self._scroll_content_wants_room():
             self._scroll.verticalScrollBar().setValue(0)
         self.metronome_expanded.emit(expanded)
 
@@ -5478,43 +5537,41 @@ class PlayerPanel(QWidget):
         return self._table.maximumHeight() < self._UNPINNED_HEIGHT
 
     def _height_outside_playlist(self) -> int:
-        """Pixels the panel must keep on screen either side of the playlist.
+        """Pixels the scroll content must keep on screen around the playlist.
 
-        The title row above it, and below it the transport cluster and the top
-        of whichever slice view is open. Measured from the widgets, never
-        written as a constant, because every term moves: the seek row comes and
-        goes with the waveform, the now-playing line only exists while a track
-        is loaded, and the button row's height follows the text size and the
-        translated labels. Read the *hints*, not the laid-out heights — this is
-        called to decide a height, so the geometry it would read back is the
-        one it is about to replace (and a hidden widget's height is stale
-        anyway: the now-playing label reports 480px while hidden).
+        The title row above it and, below it, the top of whichever scrollable
+        view is open (the slice tray's first screen, the metronome's). The
+        transport, the seek row and the full waveform live in the pinned
+        footer — outside the viewport this budget divides — so they no longer
+        appear here. Measured from the widgets, never written as a constant,
+        because every term moves with translation and text size. Read the
+        *hints*, not the laid-out heights — this is called to decide a height,
+        so the geometry it would read back is the one it is about to replace.
         """
         rows = [self._title_row_widget.sizeHint().height()]
-        if not self._slice.is_waveform_shown():
-            rows.append(self._seek_row_widget.sizeHint().height())
-        rows.append(self._controls_row.sizeHint().height())
-        if not self._now_playing_row.isHidden():
-            rows.append(self._now_playing_row.sizeHint().height())
         rows.append(self._slice.first_screen_height())
         rows.append(self._metronome_section.first_screen_height())
         margins = self._content_layout.contentsMargins()
-        # One gap per row: the rows plus the playlist are len(rows) + 1 items.
+        # One gap per row plus one more for the trailing stretch: the rows,
+        # the playlist and the spacer are len(rows) + 2 layout items.
         return (
             sum(rows)
-            + self._content_layout.spacing() * len(rows)
+            + self._content_layout.spacing() * (len(rows) + 1)
             + margins.top()
             + margins.bottom()
         )
 
     def _apply_table_height(self, fixed: bool) -> None:
-        """Fit the playlist into what the slice section leaves it, else stretch.
+        """Fit the playlist into what the open sections leave it, else stretch.
 
         The height is a *budget*, not a row count: whatever the viewport has
-        spare once the transport and the opened canvas are reserved, capped at
-        the rows the old fixed pin gave (so a text-height row is unchanged) and
-        floored at a few (so a short window still shows a playlist). Sizing it
-        by row count alone is what put Full artwork's 78px rows below the fold.
+        spare once the title row and the opened views' first screens are
+        reserved, floored at a few rows (so a short window still shows a
+        playlist). The playlist takes the WHOLE budget — an earlier 12-row cap
+        left the surplus for the layout to redistribute into the growable
+        chrome rows, which inflated the now-playing line into a ~140px black
+        band on a tall window. Sizing by row count alone is what put Full
+        artwork's 78px rows below the fold before that.
         """
         if fixed:
             header_h = self._table.horizontalHeader().height()
@@ -5527,8 +5584,7 @@ class PlayerPanel(QWidget):
                 row_h = 28
             chrome = header_h + 2 * self._table.frameWidth() + 4
             budget = self._scroll.viewport().height() - self._height_outside_playlist()
-            h = min(chrome + self._ROWS_VISIBLE_WHEN_SLICING * row_h, budget)
-            h = max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, h)
+            h = max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, budget)
             self._table.setMinimumHeight(h)
             self._table.setMaximumHeight(h)
         else:

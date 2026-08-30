@@ -231,20 +231,31 @@ class TestPanelReflow:
 
         assert player._seek_row_widget.isHidden(), "the waveform is still the seek control"
 
-    def test_either_view_pins_the_playlist_height(self, player):
+    def test_the_waveform_alone_leaves_the_playlist_stretchy(self, player):
+        # The canvas lives in the pinned footer, which takes its room out of
+        # the viewport before the playlist is measured — nothing in the scroll
+        # content grows, so there is nothing to pin against and the playlist
+        # fills whatever the footer leaves. That IS the feature: more visible
+        # playlist, not a 12-row cap.
         stretchy = player._table.maximumHeight()
 
         player._slice._waveform_btn.setChecked(True)
+
+        assert player._table.maximumHeight() == stretchy
+
+    def test_a_scroll_content_view_pins_the_playlist_height(self, player):
+        stretchy = player._table.maximumHeight()
+
+        player._slice._slicer_btn.setChecked(True)
         pinned = player._table.maximumHeight()
-        player._slice._waveform_btn.setChecked(False)
+        player._slice._slicer_btn.setChecked(False)
 
         assert pinned < stretchy
         assert player._table.maximumHeight() == stretchy
 
     def test_closing_one_view_leaves_the_playlist_pinned(self, player):
-        # Pinned, not pinned to the same pixel: closing the waveform brings the
-        # seek row back and swaps which canvas is reserved, so the budget — and
-        # with it the height — legitimately moves a little.
+        # The waveform never held the pin (it lives in the footer), so closing
+        # it must not release the pin the still-open slice controls hold.
         player._slice._waveform_btn.setChecked(True)
         player._slice._slicer_btn.setChecked(True)
 
@@ -320,9 +331,13 @@ class TestTallRowsStayOnScreen:
 
     The playlist pin used to be a fixed *row count* (12), tuned when a row was
     the height of its text. Full artwork makes a row ~2.6x taller, so 12 of
-    them exceeded the whole viewport and the transport, the waveform and the
-    slice controls all opened out of sight — you had to scroll the panel to
-    find the thing you had just opened.
+    them exceeded the whole viewport and everything below opened out of sight.
+    The transport and the full waveform are out of the game entirely now —
+    they live in a pinned footer below the scroll area — so the pin only has
+    to land the scroll-content views (zoomed wave, slice controls, metronome)
+    on screen, and the 12-row cap itself is gone: surplus height the playlist
+    refused was redistributed by the layout into the growable chrome rows,
+    which inflated the title and now-playing lines into ~140px black bands.
 
     Asserted as a relation between two things Qt reports (does the canvas end
     above the fold), never as a pixel count: the suite runs with no stylesheet,
@@ -385,25 +400,33 @@ class TestTallRowsStayOnScreen:
         )
         return (player._table.maximumHeight() - chrome) / player._row_height()
 
-    @pytest.mark.parametrize("view", ["top", "middle", "full"])
-    def test_the_waveform_opens_on_screen_in_every_artwork_view(
-        self, player, qtbot, view
-    ):
-        player.set_artwork_view(view)
-        player._slice._waveform_btn.setChecked(True)
+    def test_the_waveform_and_transport_live_in_the_pinned_footer(self, player):
+        # They cannot open below the fold or scroll off: they are not scroll
+        # content at all. Asserted structurally — the suite wears no
+        # stylesheet, so a pixel claim would measure a different app.
+        wf = player._slice.waveform_widget()
+        for w in (wf, player._seek_row_widget, player._clear_btn,
+                  player._play_btn, player._now_playing_row):
+            assert player._footer.isAncestorOf(w), w
+            assert not player._scroll.isAncestorOf(w), w
+        assert not player._scroll.isAncestorOf(player._footer)
+
+    def test_scrolling_to_the_bottom_cannot_move_the_transport(self, player, qtbot):
+        # The user's report: scrolled down to the slicer, the transport was
+        # gone. The footer sits outside the scroll area, justified to the
+        # panel's bottom edge, so the outer scrollbar cannot touch it.
+        player.set_artwork_view("full")
+        player._slice._slicer_btn.setChecked(True)
+        player._metronome_section.set_expanded(True)
+        qtbot.wait(20)
+        before = player._footer.geometry()
+        assert before.bottom() == player.rect().bottom()
+
+        bar = player._scroll.verticalScrollBar()
+        bar.setValue(bar.maximum())
         qtbot.wait(20)
 
-        assert self.below_fold(player, player._slice._waveform) <= 0
-
-    @pytest.mark.parametrize("view", ["top", "middle", "full"])
-    def test_the_transport_opens_on_screen_in_every_artwork_view(
-        self, player, qtbot, view
-    ):
-        player.set_artwork_view(view)
-        player._slice._waveform_btn.setChecked(True)
-        qtbot.wait(20)
-
-        assert self.below_fold(player, player._clear_btn) <= 0
+        assert player._footer.geometry() == before
 
     def test_the_zoomed_canvas_opens_on_screen_with_tall_rows(self, player, qtbot):
         player.set_artwork_view("full")
@@ -424,7 +447,7 @@ class TestTallRowsStayOnScreen:
     def test_tall_rows_cost_rows_not_the_panel(self, player, qtbot):
         """The playlist gives up rows to make room — it does not overflow."""
         player.set_artwork_view("top")
-        player._slice._waveform_btn.setChecked(True)
+        player._slice._zoom_btn.setChecked(True)
         qtbot.wait(20)
         text_rows = self.visible_rows(player)
 
@@ -435,20 +458,38 @@ class TestTallRowsStayOnScreen:
         assert art_rows < text_rows, "tall rows must yield, not push the panel down"
         assert art_rows >= player._MIN_ROWS_WHEN_SLICING, "the playlist must survive"
 
-    def test_a_text_height_row_still_gets_the_full_row_count(self, player, qtbot):
-        # The budget is a cap, so the shipped behaviour at a normal row height
-        # is unchanged: still the 12 rows the old fixed pin gave.
+    def test_the_playlist_absorbs_the_whole_budget(self, player, qtbot):
+        """No surplus is left for the layout to redistribute.
+
+        The old 12-row cap left hundreds of pixels that QVBoxLayout handed to
+        every growable chrome row — the title and now-playing lines measured
+        143px against size hints of 29/16 on a tall window, which the user
+        reported as giant black bands. The playlist takes the whole budget
+        now, so those rows sit at their own heights however tall the window.
+        """
+        player.resize(1024, 1500)
         player.set_artwork_view("top")
-        player._slice._waveform_btn.setChecked(True)
+        player._slice._zoom_btn.setChecked(True)
+        qtbot.wait(20)
+        content = player._scroll.widget()
+        content.layout().activate()
         qtbot.wait(20)
 
-        assert round(self.visible_rows(player)) == player._ROWS_VISIBLE_WHEN_SLICING
+        for row in (player._title_row_widget, player._metronome_section):
+            assert row.height() <= row.sizeHint().height() + 1, (
+                f"{row.objectName() or row} inflated past its own height"
+            )
+        budget = (
+            player._scroll.viewport().height()
+            - player._height_outside_playlist()
+        )
+        assert player._table.maximumHeight() == budget
 
     def test_shrinking_the_window_re_fits_the_playlist(self, player, qtbot):
         # The budget is a share of the viewport, so a resize changes the answer
         # and the pin has to be recomputed — the old fixed row count never was.
         player.set_artwork_view("full")
-        player._slice._waveform_btn.setChecked(True)
+        player._slice._zoom_btn.setChecked(True)
         qtbot.wait(20)
         tall = player._table.maximumHeight()
         viewport = player._scroll.viewport().height()
@@ -472,7 +513,7 @@ class TestTallRowsStayOnScreen:
         otherwise demands something no implementation can deliver.
         """
         player.set_artwork_view("full")
-        player._slice._waveform_btn.setChecked(True)
+        player._slice._zoom_btn.setChecked(True)
         qtbot.wait(20)
 
         player.resize(1024, 320)
