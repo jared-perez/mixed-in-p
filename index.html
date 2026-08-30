@@ -21,7 +21,8 @@
     --yellow-bright:#f6ff66;
     --yellow-dim:#7a8500;
     --text:#e7ebf2;            /* cool white */
-    --muted:#8893a8;           /* slate gray */
+    --muted:#a2abbb;           /* slate gray — lifted from #8893a8 so it clears 4.5:1
+                                  against --bg-lift, the palest ground the page reaches */
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{
@@ -259,6 +260,11 @@
   }
   .step b{display:block;font-weight:500;margin-bottom:2px}
   .step span{color:var(--muted);font-size:15px}
+  /* Quick Start sits on the palest ground the page reaches (the gradient has
+     completed and holds --bg-lift from halfway down), where --muted body copy
+     falls to 3.4:1. These steps carry install instructions people read word
+     by word, so they take --text instead — 8.7:1 on the same ground. */
+  #quickstart .step span{color:var(--text)}
   /* macOS / Windows install notes: big OS logo in its own left column,
      sitting under the "01", with the paragraph to its right. */
   .os-row{display:flex;align-items:center;gap:16px;margin-top:18px}
@@ -356,6 +362,10 @@
     padding:48px 24px 40px;
     border-top:1px solid var(--line);
     text-align:center;
+    /* Back to the top-of-page blue: it puts --muted at 6.0:1 down here
+       instead of the 3.4:1 it gets on the lifted ground. Flat band with a
+       rule above it, the same treatment the download section uses. */
+    background:var(--bg);
   }
   footer .logo-img{width:200px;margin:0 auto 16px;opacity:.9}
   footer p{
