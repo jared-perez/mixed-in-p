@@ -2645,8 +2645,10 @@ class MainWindow(QMainWindow):
         self._sizer.save_geometry()
         self._persist_config()
 
-        # Stop media players
-        self._player_panel.stop_playback()
+        # Stop media players, and *release the device* rather than leaving it
+        # primed for a resume that is never coming — see
+        # PlayerPanel.shutdown_audio for what an open stream costs at exit.
+        self._player_panel.shutdown_audio()
         # Not leave_metronome: closing the window overrides Global Click.
         self._player_panel.shutdown_metronome()
         self._keyboard_panel.stop_audio()

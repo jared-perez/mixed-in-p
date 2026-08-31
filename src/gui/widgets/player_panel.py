@@ -1781,6 +1781,9 @@ class PlayerPanel(QWidget):
         # True while WE close the popout (mode/setting change), so the closed
         # handler only resets the dropdown when the USER dismissed the window.
         self._vis_closing: bool = False
+        # The panel is shutting down: a queued decode must not
+        # start playback (and so reopen the device) behind it.
+        self._closing: bool = False
         self._waveform_color: str = Theme.WAVEFORM_DEFAULT
 
         # One-shot waveform decode, used only when the slice section opens on a
@@ -2942,10 +2945,35 @@ class PlayerPanel(QWidget):
         self.wait_for_readers()
 
     def closeEvent(self, event) -> None:
+        # Set before anything else: a decode already in flight lands on a
+        # *queued* signal, so `_on_decoded` can run after this method has
+        # returned and open a brand-new stream on a panel that is gone. See
+        # shutdown_audio() for what that costs.
+        self._closing = True
+        self.shutdown_audio()
         self.shutdown_workers()
         self.shutdown_metronome()
         self.flush_pending_saves()
         super().closeEvent(event)
+
+    def shutdown_audio(self) -> None:
+        """Release the output device, not merely stop the sound.
+
+        `stop_playback()` is deliberately *not* this: `PlayerEngine.stop()`
+        rewinds and keeps the stream open and primed, so resuming is instant.
+        That is right while the app is running and wrong at the end of it — a
+        PortAudio stream left open outlives the **interpreter**, and its
+        CoreAudio thread then fires one more callback into torn-down Python
+        state. The result is a SIGSEGV in `ffi_closure_SYSV_inner` with no
+        Python traceback anywhere, landing after the last line of output
+        instead of at the fault, which is why it read for so long as an
+        inherent "teardown segfault" rather than as a stream nobody closed.
+
+        Public for the same reason `shutdown_workers` and `shutdown_metronome`
+        are: Qt does not propagate a close to children, so MainWindow has to
+        ask.
+        """
+        self._engine.unload()
 
     def flush_pending_saves(self) -> None:
         """Write anything this panel still owes to config, now.
@@ -5445,6 +5473,12 @@ class PlayerPanel(QWidget):
     @Slot(str, object, int)
     def _on_decoded(self, path: str, pcm, sr: int) -> None:
         # Cache every decode (even a now-stale one) so returning to it is instant.
+        if self._closing:
+            # The decode outlived the panel. Playing now would open an output
+            # device moments after shutdown_audio() released one, and nothing
+            # would ever close it — the panel is on its way out and its
+            # closeEvent has already run.
+            return
         self._cache_put(path, pcm, sr)
         if path == self._pending_play_path:
             self._pending_play_path = None

@@ -174,3 +174,50 @@ class TestPlayerPanelShutdown:
 
         assert not thread.isRunning()
         library.close()
+
+    def test_closing_the_panel_releases_the_audio_device(self, qtbot, monkeypatch):
+        """Stopping is not enough, and that is the whole bug.
+
+        `PlayerEngine.stop()` rewinds but deliberately keeps the stream open
+        and primed, so a resume is instant — right while the app runs, wrong
+        at the end of it. A PortAudio stream left open outlives the
+        interpreter and its CoreAudio thread then calls back into torn-down
+        Python state: SIGSEGV in `ffi_closure_SYSV_inner`, no traceback, and
+        it lands after the last line of output rather than at the fault.
+
+        Asserted as an invariant (the close path releases) rather than by
+        opening a real device: a test that plays needs audio hardware, and
+        what broke was the wiring rather than the closing.
+        """
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        released = []
+        monkeypatch.setattr(panel._engine, "unload", lambda: released.append(True))
+
+        panel.close()
+
+        assert released == [True]
+
+    def test_a_decode_landing_after_the_close_does_not_reopen_it(
+        self, qtbot, monkeypatch, tmp_path
+    ):
+        """The other half, and either alone leaves a stream open.
+
+        A decode in flight arrives on a *queued* signal, so `_on_decoded` can
+        run after `closeEvent` has already released the device — and it would
+        then open a fresh one that nothing will ever close. Measured: of four
+        streams the suite leaked, two were opened after their panel's close.
+        """
+        import numpy as np
+
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        played = []
+        monkeypatch.setattr(panel._engine, "play", lambda: played.append(True))
+        path = str(tmp_path / "late.wav")
+        panel._pending_play_path = path
+
+        panel.close()
+        panel._on_decoded(path, np.zeros((256, 1), dtype="float32"), 44100)
+
+        assert played == []
