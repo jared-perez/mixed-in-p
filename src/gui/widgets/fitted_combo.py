@@ -44,9 +44,17 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QComboBox
 
+from .wheel_guard import WheelGuardMixin
 
-class FittedComboBox(QComboBox):
-    """A ``QComboBox`` that widens its popup to its own width before opening."""
+
+class FittedComboBox(WheelGuardMixin, QComboBox):
+    """A ``QComboBox`` that widens its popup to its own width before opening.
+
+    It is also off the wheel (see ``wheel_guard``), which is free to state
+    here because a bare ``QComboBox`` is already banned from the GUI by
+    ``test_combo_popup_width`` -- so every combo in the app gets it and no
+    later one can be added without it.
+    """
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)

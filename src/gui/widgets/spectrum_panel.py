@@ -26,7 +26,6 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QSizePolicy,
-    QSlider,
     QVBoxLayout,
     QWidget,
 )
@@ -37,6 +36,7 @@ from ..workers.spectrum_worker import DYNAMIC_RANGE_DB, _COLORMAP, colorize, Spe
 from ..workers.thread_keeper import keep_alive, wait_for_threads
 from .elided_label import ElidedLabel
 from .drop_zone import AUDIO_EXTENSIONS
+from .wheel_guard import NoWheelSlider
 
 logger = logging.getLogger(__name__)
 
@@ -336,7 +336,7 @@ class SpectrumPanel(QWidget):
         sens_caption = QLabel(self.tr("Sensitivity:"))
         sens_caption.setStyleSheet(f"color: {Theme.TEXT_SECONDARY}; font-weight: bold;")
         sens_row.addWidget(sens_caption)
-        self._sens_slider = QSlider(Qt.Orientation.Horizontal)
+        self._sens_slider = NoWheelSlider(Qt.Orientation.Horizontal)
         self._sens_slider.setRange(0, self._SLIDER_MAX)
         self._sens_slider.setFixedWidth(220)
         self._sens_slider.setValue(self._dr_to_slider(self._dynamic_range))

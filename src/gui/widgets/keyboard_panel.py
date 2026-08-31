@@ -16,7 +16,6 @@ from PySide6.QtWidgets import (
     QLabel,
     QPushButton,
     QScrollArea,
-    QSlider,
     QVBoxLayout,
     QWidget,
 )
@@ -32,6 +31,7 @@ from .hex_key_grid import HexKeyGrid
 from .key_info_box import KeyInfoBox
 from .linear_key_strip import LinearKeyStrip
 from .loop_player import output_stream_kwargs
+from .wheel_guard import NoWheelSlider
 
 # ---------------------------------------------------------------------------
 # Audio constants
@@ -632,7 +632,7 @@ class KeyboardPanel(QWidget):
         vol_label.setStyleSheet(f"color: {Theme.TEXT_PRIMARY}; font-size: 16px;")
         ctrl_layout.addWidget(vol_label)
 
-        self._vol_slider = QSlider(Qt.Orientation.Horizontal)
+        self._vol_slider = NoWheelSlider(Qt.Orientation.Horizontal)
         self._vol_slider.setRange(0, 100)
         self._vol_slider.setValue(int(DEFAULT_VOLUME * 100))
         self._vol_slider.setFixedWidth(130)

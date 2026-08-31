@@ -141,6 +141,7 @@ from .compatible_panel import CompatibleTracksPanel
 from .player_engine import PlayerEngine
 from .metronome_section import MetronomeSection
 from .slice_section import SliceSection
+from .wheel_guard import NoWheelSlider
 
 logger = logging.getLogger(__name__)
 
@@ -2180,7 +2181,7 @@ class PlayerPanel(QWidget):
         vol_label.setMinimumWidth(25)
         controls_row.addWidget(vol_label)
 
-        self._volume_slider = QSlider(Qt.Orientation.Horizontal)
+        self._volume_slider = NoWheelSlider(Qt.Orientation.Horizontal)
         self._volume_slider.setRange(0, 100)
         self._volume_slider.setValue(70)
         self._volume_slider.setFixedWidth(120)

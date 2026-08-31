@@ -43,6 +43,7 @@ from ..styles.theme import BackgroundOverlay, Theme, panel_header_row
 from .elided_label import ElidedLabel
 from .droppable_table import DroppableTableWidget
 from .pipeline_toggle import PipelineToggle
+from .wheel_guard import NoWheelSpinBox
 
 
 def _spin_width(spin: QSpinBox, floor: int = 120) -> int:
@@ -164,7 +165,7 @@ class RenamePanel(QWidget):
 
         # Trim start
         trim_row.addWidget(QLabel(self.tr("Trim Start:")))
-        self._trim_start_spin = QSpinBox()
+        self._trim_start_spin = NoWheelSpinBox()
         self._trim_start_spin.setRange(0, 100)
         self._trim_start_spin.setValue(0)
         self._trim_start_spin.setSuffix(self.tr(" chars"))
@@ -176,7 +177,7 @@ class RenamePanel(QWidget):
 
         # Trim end
         trim_row.addWidget(QLabel(self.tr("Trim End:")))
-        self._trim_end_spin = QSpinBox()
+        self._trim_end_spin = NoWheelSpinBox()
         self._trim_end_spin.setRange(0, 100)
         self._trim_end_spin.setValue(0)
         self._trim_end_spin.setSuffix(self.tr(" chars"))

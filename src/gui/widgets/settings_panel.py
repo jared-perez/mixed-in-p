@@ -17,12 +17,12 @@ from PySide6.QtWidgets import (
     QPushButton,
     QRadioButton,
     QScrollArea,
-    QSpinBox,
     QVBoxLayout,
     QWidget,
 )
 
 from .fitted_combo import FittedComboBox
+from .wheel_guard import NoWheelSpinBox
 
 import sys
 from dataclasses import replace
@@ -326,7 +326,7 @@ class SettingsPanel(QWidget):
         low_row = self._row_layout()
         low_label = QLabel(self.tr("Lowest BPM"))
         low_label.setObjectName("settingsLabel")
-        self._min_bpm_spin = QSpinBox()
+        self._min_bpm_spin = NoWheelSpinBox()
         self._min_bpm_spin.setRange(50, 248)
         self._min_bpm_spin.setValue(99)
         # Measured, not 80: the stylesheet reserves room on the right for the
@@ -343,7 +343,7 @@ class SettingsPanel(QWidget):
         high_row = self._row_layout()
         high_label = QLabel(self.tr("Highest BPM"))
         high_label.setObjectName("settingsLabel")
-        self._max_bpm_spin = QSpinBox()
+        self._max_bpm_spin = NoWheelSpinBox()
         self._max_bpm_spin.setRange(52, 250)
         self._max_bpm_spin.setValue(199)
         self._max_bpm_spin.setFixedWidth(max(80, self._max_bpm_spin.sizeHint().width()))
