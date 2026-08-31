@@ -442,6 +442,25 @@ class PlaylistEntry:
     # file's own birth time off the disk.
     date_added: str = ""
     date_created: str = ""
+    # Bits per sample as bare digits ("24"), or "" for a lossy file, which has
+    # none. Kept unformatted for the same reason `bitrate` is: this is what
+    # sorts as a number and what the library row stores. The cell says
+    # "24 bit" — see `PlayerPanel._format_bit_depth`.
+    bit_depth: str = ""
+
+    @property
+    def file_type(self) -> str:
+        """The audio format, from the extension: "AIFF", "MP3", "FLAC"…
+
+        Derived rather than stored, so it cannot go stale: a rename, a
+        relocate or a conversion changes the path and the answer follows.
+        Nothing else about this entry can say it — the library keeps no
+        format column, and a tag read would be an open per row for something
+        the filename already states.
+
+        Not translated: these are format codes, the same class as "8A".
+        """
+        return _format_label(self.file_path)
 
 
 # Displayed date spelling for both date columns. ISO order on purpose: it is
@@ -490,6 +509,53 @@ def _widest_stamp(widget: QWidget) -> str:
     fm = QFontMetrics(widget.font())
     digit = max("0123456789", key=fm.horizontalAdvance)
     return _STAMP_SHAPE.replace("0", digit)
+
+
+# Extensions that spell one format two or three ways. Everything else is its
+# own suffix in capitals, which is already the format's name (WAV, FLAC, MP3).
+_FORMAT_ALIASES = {"aif": "AIFF", "aifc": "AIFF"}
+# Every label the Format column can hold, for measuring it: the formats this
+# app opens (see `drop_zone.AUDIO_EXTENSIONS`), collapsed through the aliases
+# above — a closed set, so the column can be sized so no value ever clips.
+_FORMAT_LABELS = ("MP3", "WAV", "FLAC", "AIFF", "M4A", "OGG")
+# The depths a file is likely to report. `soundfile` writes 8, 16, 24 and 32,
+# and those are what a test can produce — but FLAC allows anything from 4 to
+# 32 bits and 20-bit masters exist, so the column is NOT measured from this
+# list. See `_widest_depth`.
+_BIT_DEPTHS = ("8", "16", "24", "32")
+# The containers that carry a bit depth. Everything else this app opens is
+# lossy — its samples are reconstructed rather than stored, so there is no such
+# number and a blank cell is the right answer, reachable without opening the
+# file. That is what makes the "read it if we don't know it" trigger in
+# `add_tracks` bounded: it can only ever fire for a file that really has one.
+_SIZED_EXTENSIONS = {".wav", ".flac", ".aiff", ".aif", ".aifc"}
+
+
+def _has_bit_depth(path: str) -> bool:
+    """Whether *path*'s format stores a bit depth at all."""
+    return Path(path).suffix.lower() in _SIZED_EXTENSIONS
+
+
+def _widest_depth(widget: QWidget) -> str:
+    """The widest two-digit depth *this* font can draw, for measuring.
+
+    The same move `_widest_stamp` makes, and for the same reason: digits are
+    equal-width only in a font with tabular figures, which no UI font
+    promises. Two of the widest digit covers every depth a file can name (4
+    to 32 bits) rather than only the four common ones — measuring the list
+    would leave a 20-bit master to clip if "0" happened to be the wide digit.
+    """
+    fm = QFontMetrics(widget.font())
+    digit = max("0123456789", key=fm.horizontalAdvance)
+    return digit * 2
+
+
+def _format_label(path: str) -> str:
+    """Displayed audio format for *path*. "" when it has no extension."""
+    suffix = Path(path).suffix.lstrip(".").lower()
+    if not suffix:
+        return ""
+    return _FORMAT_ALIASES.get(suffix, suffix.upper())
 
 
 def _file_created_at(path: str) -> str:
@@ -1436,6 +1502,8 @@ class PlayerPanel(QWidget):
         QT_TRANSLATE_NOOP("PlayerPanel", "Art"),
         QT_TRANSLATE_NOOP("PlayerPanel", "Date Added"),
         QT_TRANSLATE_NOOP("PlayerPanel", "Date Created"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Format"),
+        QT_TRANSLATE_NOOP("PlayerPanel", "Bit Depth"),
     )
     # Optional columns: (logical index, PlaylistEntry attribute). A None
     # attribute has no text of its own — Art carries a thumbnail instead, read
@@ -1450,11 +1518,18 @@ class PlayerPanel(QWidget):
         (15, None),
         (16, "date_added"),
         (17, "date_created"),
+        (18, "file_type"),
+        (19, "bit_depth"),
     )
     _ARTWORK_COLUMN = 15
     # Named because `_fill_dates_added` patches this one cell in place.
     _DATE_ADDED_COLUMN = 16
     _DATE_CREATED_COLUMN = 17
+    # Named because both hold a closed set of values and are measured against
+    # it, and because Bit Depth is the one column whose cell text is not its
+    # entry attribute verbatim.
+    _FORMAT_COLUMN = 18
+    _BIT_DEPTH_COLUMN = 19
     # The shipped layout, as a *visual* order over those fixed logical indexes:
     # #, Art, Artist, Title, BPM, Key, Comment, Duration, Year, Filename, and
     # then the optional ones in their own order. Expressed this way because the
@@ -1462,7 +1537,7 @@ class PlayerPanel(QWidget):
     # number, and every existing user has one), so "the default order" is a
     # separate thing from "the order the columns were declared in".
     _DEFAULT_COLUMN_ORDER = (
-        0, 15, 2, 3, 4, 5, 6, 7, 8, 1, 9, 10, 11, 12, 13, 14, 16, 17,
+        0, 15, 2, 3, 4, 5, 6, 7, 8, 1, 9, 10, 11, 12, 13, 14, 16, 17, 18, 19,
     )
     # Optional columns that are nonetheless shown out of the box. Art earns it:
     # it is the one column that says what a track *is* at a glance.
@@ -1524,6 +1599,14 @@ class PlayerPanel(QWidget):
         # draw", which is the one number that means something on its own.
         16: 100,  # Date Added
         17: 100,  # Date Created
+        # Like the two above, these are floored by their contents as well as by
+        # their header word — both hold a closed set of values (six format
+        # codes, four depths), so they can be sized so nothing ever clips, and
+        # must be: `NoElideDelegate` cuts a value's tail with no ellipsis to
+        # admit it. The base is the English header word's own width, i.e. the
+        # narrowest either could honestly open at.
+        18: 70,   # Format
+        19: 80,   # Bit Depth
     }
     # Never offered in the hide menu. Filename is the row's identity, and '#'
     # doubles as the membership-count column during an All-playlists search
@@ -2075,11 +2158,12 @@ class PlayerPanel(QWidget):
             width = header_fm.horizontalAdvance(label) + 2 * SeparatorHeaderView._TEXT_PAD + 4
             self._word_fit_widths[col] = width
             self._default_column_widths[col] = width
-        # The two date columns are floored by their *contents* as well as by
-        # their header word — the only ones that can be, and the only ones that
-        # must be. Measured before the floor is applied, since it reads this.
+        # The date, Format and Bit Depth columns are floored by their
+        # *contents* as well as by their header word — the only ones that can
+        # be (their values are a closed set), and the only ones that must be.
+        # Measured before the floor is applied, since it reads this.
         self._content_fit_widths: dict[int, int] = {}
-        self._remeasure_stamp_widths()
+        self._remeasure_content_widths()
         # The rest keep their English-measured base width unless a translation
         # needs more room than it allows for.
         self._apply_header_fit_floor(header_fm)
@@ -2609,6 +2693,7 @@ class PlayerPanel(QWidget):
             track_number = t.get("track_number", "")
             label = t.get("label", "")
             bitrate = t.get("bitrate", "")
+            bit_depth = t.get("bit_depth", "")
             energy = t.get("energy", "")
             duration_sec = t.get("duration")
             # Fall back to reading these from the file's tags when a caller didn't
@@ -2619,6 +2704,15 @@ class PlayerPanel(QWidget):
             # trigger it: plenty of files have no label or track number at all,
             # so testing them here would open every such file on every add,
             # forever, to learn nothing.
+            #
+            # Bit depth is the one exception, and only because its blanks are
+            # knowable in advance: a lossy stream has no such number, so only a
+            # *lossless* file with none yet is worth opening for. That read
+            # happens once per file ever — `_store_read_props` writes what it
+            # learned onto the library row, which the next load hands straight
+            # back. Without the trigger every row added before schema v8 would
+            # show an empty cell forever, since a fully-tagged row asks for
+            # nothing else.
             if (
                 not artist
                 or not title
@@ -2627,6 +2721,7 @@ class PlayerPanel(QWidget):
                 or not comment
                 or not year
                 or duration_sec is None
+                or (not bit_depth and _has_bit_depth(t["file_path"]))
             ):
                 try:
                     from src.metadata.tags import read_metadata
@@ -2645,6 +2740,9 @@ class PlayerPanel(QWidget):
                     )
                     label = label or (meta.label or "")
                     bitrate = bitrate or (str(meta.bitrate) if meta.bitrate else "")
+                    bit_depth = bit_depth or (
+                        str(meta.bit_depth) if meta.bit_depth else ""
+                    )
                     energy = energy or (str(meta.energy) if meta.energy else "")
                     if duration_sec is None:
                         duration_sec = meta.duration
@@ -2674,6 +2772,7 @@ class PlayerPanel(QWidget):
                 date_added=_format_iso_stamp(t.get("added_at"))
                 or self._library_added_at(t["file_path"]),
                 date_created=_file_created_at(t["file_path"]),
+                bit_depth=bit_depth,
             )
             # Duplicates were already resolved by add_tracks — whatever
             # reaches here has been cleared to land.
@@ -2953,7 +3052,7 @@ class PlayerPanel(QWidget):
             # and a track whose file is missing still shows its stored tags.
             # The tag-read fallback then only fills what the DB lacks: the
             # comment for rows written before there was a column for it (see
-            # _store_read_comments), and year/track number/label/bitrate for
+            # _store_read_props), and year/track number/label/bitrate for
             # rows added before schema v5 gave them one.
             self.add_tracks(
                 [
@@ -2971,6 +3070,7 @@ class PlayerPanel(QWidget):
                         "track_number": t.track_number or "",
                         "label": t.label or "",
                         "bitrate": str(t.bitrate) if t.bitrate else "",
+                        "bit_depth": str(t.bit_depth) if t.bit_depth else "",
                         "energy": str(t.energy) if t.energy else "",
                         "duration": t.duration,
                         # Passed so the load needs no second query per row to
@@ -2984,7 +3084,7 @@ class PlayerPanel(QWidget):
             )
         finally:
             self._loading_playlist = False
-        self._store_read_comments(tracks)
+        self._store_read_props(tracks)
         # Re-link the playing track to its row if this list contains it.
         if self._playing_path is not None:
             self._relink_playing_row()
@@ -3009,27 +3109,41 @@ class PlayerPanel(QWidget):
         self._table.doItemsLayout()
         self._table.verticalScrollBar().setValue(self._node_scroll.get(node_id, 0))
 
-    def _store_read_comments(self, tracks) -> None:
-        """Keep comments the load just read from the files.
+    def _store_read_props(self, tracks) -> None:
+        """Keep what the load just read from the files but the rows lacked.
 
-        The comment column arrived after the library did, so rows written by
-        an earlier build carry none — and a field the database doesn't hold is
-        a field search can't find. A load already reads tags for whatever the
-        row lacks, so storing that one column costs nothing and makes the
-        playlist comment-searchable from the first time it is opened.
+        Two fields, both for the same reason: their column arrived after the
+        library did, so rows written by an earlier build carry none. The
+        comment matters because a field the database doesn't hold is a field
+        search can't find; the bit depth matters because nothing else would
+        ever fill it in — a fully-tagged row asks for no other read, so
+        without this the Bit Depth column would open a file per row on every
+        load, forever, and still show the same answer.
+
+        A load already reads tags for whatever the row lacks, so storing them
+        costs nothing and makes the playlist complete from the first time it
+        is opened.
 
         Deliberately not `_persist_playlist`: that is suppressed during a load
         (it would rewrite the list it is loading, and push undo). This writes
         tags only — never membership, never the undo stack. It also only ever
-        fills a comment in, so a file that failed to read can't blank one.
+        fills a value in, so a file that failed to read can't blank one.
         """
         if self._library is None:
             return
         by_path = {t.path: t for t in tracks}
         for entry in self._playlist:
             track = by_path.get(entry.file_path)
-            if track is not None and entry.comment and entry.comment != track.comment:
-                self._library.update_track_tags(track.id, comment=entry.comment)
+            if track is None:
+                continue
+            fields: dict[str, object] = {}
+            if entry.comment and entry.comment != track.comment:
+                fields["comment"] = entry.comment
+            depth = _parse_int(entry.bit_depth)
+            if depth is not None and depth != track.bit_depth:
+                fields["bit_depth"] = depth
+            if fields:
+                self._library.update_track_tags(track.id, **fields)
 
     def _persist_playlist(self) -> None:
         """Auto-save: write the visible list through to the loaded node."""
@@ -3071,6 +3185,7 @@ class PlayerPanel(QWidget):
                 track_number=e.track_number,
                 label=e.label,
                 bitrate=_parse_int(e.bitrate),
+                bit_depth=_parse_int(e.bit_depth),
                 energy=_parse_int(e.energy),
                 duration=_parse_duration(e.duration),
             )
@@ -3477,6 +3592,7 @@ class PlayerPanel(QWidget):
             track_number=track.track_number or "",
             label=track.label or "",
             bitrate=str(track.bitrate) if track.bitrate else "",
+            bit_depth=str(track.bit_depth) if track.bit_depth else "",
             energy=str(track.energy) if track.energy else "",
             date_added=_format_iso_stamp(track.added_at),
             # The one field here not off the row, because the row does not hold
@@ -3604,6 +3720,15 @@ class PlayerPanel(QWidget):
             self._rebuild_table()
             self._persist_playlist()
 
+    def _format_bit_depth(self, bits: str) -> str:
+        """"24" -> "24 bit". Blank stays blank.
+
+        The word is translated (ru "24 бит", ja "24ビット") while the entry
+        keeps the bare number, which is what sorts and what the library row
+        stores — the same split `duration` makes between "3:47" and 227.
+        """
+        return self.tr("{0} bit").format(bits) if bits else ""
+
     # ── Column sort (view only — the stored order never changes) ──────
 
     # column -> (entry attribute, key function). Absent columns cannot be
@@ -3632,6 +3757,10 @@ class PlayerPanel(QWidget):
         # carries no time), and the sort is stable, so they keep list order.
         16: ("date_added", _sort_text),
         17: ("date_created", _sort_text),
+        18: ("file_type", _sort_text),
+        # The attribute, not the cell: "24" is a number and "24 bit" is a
+        # number with a word after it in whichever language is running.
+        19: ("bit_depth", _sort_number),
     }
 
     @property
@@ -3847,9 +3976,10 @@ class PlayerPanel(QWidget):
                 # editable set above is a deliberate list, and widening it is
                 # its own conversation.
                 for col, attribute in self._OPTIONAL_COLUMNS:
-                    item = QTableWidgetItem(
-                        getattr(entry, attribute) if attribute else ""
-                    )
+                    value = getattr(entry, attribute) if attribute else ""
+                    if col == self._BIT_DEPTH_COLUMN:
+                        value = self._format_bit_depth(value)
+                    item = QTableWidgetItem(value)
                     item.setFlags(non_drop_flags)
                     if col == self._ARTWORK_COLUMN:
                         thumb = self._art_cache.get(self._art_key(entry.file_path))
@@ -4264,6 +4394,7 @@ class PlayerPanel(QWidget):
         entry.track_number = str(meta.track_number) if meta.track_number else ""
         entry.label = meta.label or ""
         entry.bitrate = str(meta.bitrate) if meta.bitrate else ""
+        entry.bit_depth = str(meta.bit_depth) if meta.bit_depth else ""
         entry.energy = str(meta.energy) if meta.energy else ""
         if meta.duration:
             entry.duration = self._format_time(int(meta.duration * 1000))
@@ -4749,19 +4880,21 @@ class PlayerPanel(QWidget):
             self._default_column_widths[col] = width
             if self._table.columnWidth(col) < width:
                 self._table.setColumnWidth(col, width)
-        # The date stamps grew with the same font the header word did, and a
-        # cell that outgrows its column loses its tail silently.
-        self._remeasure_stamp_widths()
+        # The stamps and the depth word grew with the same font the header
+        # word did, and a cell that outgrows its column loses its tail
+        # silently.
+        self._remeasure_content_widths()
         self._apply_header_fit_floor(header_fm)
 
     def _measure_stamp_width(self) -> int:
         """Width a "YYYY-MM-DD" cell needs, asked of the style.
 
-        The two date columns are the only ones here whose contents are a
-        **closed set of one width**, so unlike Album or Comment they can be
-        sized so the value never clips — and they have to be, because
-        `NoElideDelegate` means a cut stamp loses its tail with no ellipsis to
-        admit it: "2026-08-2" reads as a date rather than as damage.
+        The date columns are one of three whose contents are a **closed set**,
+        so unlike Album or Comment they can be sized so the value never clips
+        — and they have to be, because `NoElideDelegate` means a cut stamp
+        loses its tail with no ellipsis to admit it: "2026-08-2" reads as a
+        date rather than as damage. Format and Bit Depth are the other two
+        — see `_remeasure_content_widths`.
 
         A constant cannot do it. The stamp wants 74 / 85 / 100px across the
         small / medium / large text presets — the constant this started as was
@@ -4776,30 +4909,60 @@ class PlayerPanel(QWidget):
         (`PM_FocusFrameHMargin` is 2 on Fusion and 4 on macOS). So this goes
         through `sizeHintForColumn` → `sizeFromContents`, the path that paints
         the cell, and lets whichever style is running do its own arithmetic.
-
-        Measured in a throwaway row on the **real** table, because a scratch
-        widget would not carry the stylesheet rule that supplies the padding.
         """
-        col = self._DATE_ADDED_COLUMN
-        row = self._table.rowCount()
+        return self._measure_value_width(
+            self._DATE_ADDED_COLUMN, _widest_stamp(self._table)
+        )
+
+    def _measure_value_width(self, col: int, *values: str) -> int:
+        """Width *col* needs to show the widest of *values* whole.
+
+        One throwaway row on the **real** table, because a scratch widget
+        would not carry the stylesheet rule that supplies the cell padding.
+        Every value is measured in the column it will actually be drawn in:
+        `sizeHintForColumn` scans the rows, so laying them all down at once
+        and asking once is both the cheapest way and the only one that lets
+        the style compare them on its own terms.
+        """
+        first = self._table.rowCount()
         self._table.blockSignals(True)
         try:
-            self._table.insertRow(row)
-            self._table.setItem(row, col, QTableWidgetItem(_widest_stamp(self._table)))
+            for offset, value in enumerate(values):
+                self._table.insertRow(first + offset)
+                self._table.setItem(first + offset, col, QTableWidgetItem(value))
             width = self._table.sizeHintForColumn(col)
         finally:
-            self._table.removeRow(row)
+            for _ in values:
+                self._table.removeRow(first)
             self._table.blockSignals(False)
         # The same couple of pixels `_header_fit_width` adds, for the same
         # reason: the hint is the width at which the text exactly reaches the
         # section divider, which reads as clipped even when it is not.
         return width + 4
 
-    def _remeasure_stamp_widths(self) -> None:
-        """Refresh the date columns' content floor. Cheap: one throwaway row."""
+    def _remeasure_content_widths(self) -> None:
+        """Refresh the content floor of every closed-set column.
+
+        Three of them, all measured the same way and all for the same reason:
+        their values come from a known list, so "wide enough for anything this
+        column can hold" is a question with an answer. Cheap — a few throwaway
+        rows, and no file is opened.
+
+        Bit Depth is measured on the *displayed* text, which carries a
+        translated word ("24 бит"), so this is a per-language width and cannot
+        be a constant. Format holds format codes, which are the same in every
+        language — measured anyway, because the header word is not.
+        """
         width = self._measure_stamp_width()
         for col in (self._DATE_ADDED_COLUMN, self._DATE_CREATED_COLUMN):
             self._content_fit_widths[col] = width
+        self._content_fit_widths[self._FORMAT_COLUMN] = self._measure_value_width(
+            self._FORMAT_COLUMN, *_FORMAT_LABELS
+        )
+        self._content_fit_widths[self._BIT_DEPTH_COLUMN] = self._measure_value_width(
+            self._BIT_DEPTH_COLUMN,
+            self._format_bit_depth(_widest_depth(self._table)),
+        )
 
     def _header_fit_width(self, col: int, header_fm: QFontMetrics | None = None) -> int:
         """Width at which column ``col`` shows its whole header word.

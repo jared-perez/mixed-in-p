@@ -32,7 +32,7 @@ from src.library import Library
 from src.utils.config import AppConfig, load_config, save_config
 
 FIRST_OPTIONAL = 9
-TOTAL_COLUMNS = 18
+TOTAL_COLUMNS = 20
 
 
 @pytest.fixture
@@ -460,6 +460,10 @@ class TestTheDataReachesThem:
             "Label": "Science",
             "Bitrate": "706",
             "Energy": "6",
+            # Neither of these is a tag: Format is the extension, and Bit
+            # Depth comes off the stream the tag read already has open.
+            "Format": "FLAC",
+            "Bit Depth": "16 bit",
         }
         assert all(re.fullmatch(r"\d{4}-\d\d-\d\d", d) for d in dates), dates
 

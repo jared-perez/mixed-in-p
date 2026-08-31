@@ -58,6 +58,7 @@ def make_track(track_id=1, **fields) -> Track:
         track_number=None,
         label=None,
         bitrate=None,
+        bit_depth=None,
         duration=None,
         size=None,
         mtime=None,

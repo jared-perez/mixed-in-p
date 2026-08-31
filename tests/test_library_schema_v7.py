@@ -64,9 +64,14 @@ class TestTheUpgrade:
         assert {"discogs_releases", "discogs_path_releases"} <= names
 
     def test_the_version_is_stamped(self, tmp_path):
+        """Against the constant, not a literal — what this guards is that a
+        new database is stamped at all rather than left at 0. The `>= 7` is
+        the part that is about v7: it shipped, so anything below it is older.
+        Written as `== 7` at first, which turned the next schema bump into a
+        failing test about nothing."""
         with Library(tmp_path / "library.db") as lib:
             (version,) = lib._con.execute("PRAGMA user_version").fetchone()
-        assert version == _SCHEMA_VERSION == 7
+        assert version == _SCHEMA_VERSION >= 7
 
     def test_a_v6_release_id_still_answers_after_the_upgrade(self, tmp_path):
         """The column v6 shipped is still the answer where it has one."""

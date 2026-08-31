@@ -47,7 +47,7 @@ SCRATCH_NODE_ID = 1
 logger = logging.getLogger(__name__)
 
 _CONTENT_ID_BYTES = 64 * 1024
-_SCHEMA_VERSION = 7
+_SCHEMA_VERSION = 8
 
 _SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -70,6 +70,14 @@ CREATE TABLE IF NOT EXISTS tracks (
     track_number TEXT,
     label TEXT,
     bitrate INTEGER,
+    -- Bits per sample. Not a tag — a property of the stream, read off the
+    -- same handle as the bitrate — but written like one (it is in
+    -- _TAG_COLUMNS, which is really "columns a caller may set", the same
+    -- way bitrate and duration are). NULL both for a lossy file, which has
+    -- no such number, and for a row added before v8 gave it a column: the
+    -- two are indistinguishable here on purpose, because the Player draws
+    -- both as a blank cell.
+    bit_depth INTEGER,
     duration REAL,
     size INTEGER,
     mtime REAL,
@@ -153,6 +161,7 @@ _TAG_COLUMNS = (
     "track_number",
     "label",
     "bitrate",
+    "bit_depth",
     "duration",
 )
 
@@ -188,6 +197,7 @@ class Track:
     track_number: str | None
     label: str | None
     bitrate: int | None
+    bit_depth: int | None
     duration: float | None
     size: int | None
     mtime: float | None
@@ -457,6 +467,15 @@ class Library:
         # it reaches a fresh one. Only a new *column* on an existing table
         # needs an ALTER, which is what every branch above is.
 
+        # v8 — the stream's bit depth, an optional Player column. Keyed on
+        # the column being absent like the rest, and with no backfill for the
+        # same reason v5's four had none: it lives in the file, and reading
+        # thousands of them during a first launch is not a thing to do. It
+        # populates forward — a load fills it for the lossless rows that lack
+        # it and stores what it read (see `_store_read_props`).
+        if "bit_depth" not in tracks:
+            self._con.execute("ALTER TABLE tracks ADD COLUMN bit_depth INTEGER")
+
         (version,) = self._con.execute("PRAGMA user_version").fetchone()
         if version and version < 4:  # v4 — the key became a searchable field
             # Here a rebuild IS required: existing rows have a stored key that
@@ -593,6 +612,7 @@ class Library:
         track_number: str | None = None,
         label: str | None = None,
         bitrate: int | None = None,
+        bit_depth: int | None = None,
         duration: float | None = None,
     ) -> int:
         """Insert a track, or update the existing row for the same path.
@@ -615,6 +635,7 @@ class Library:
             "track_number": track_number,
             "label": label,
             "bitrate": bitrate,
+            "bit_depth": bit_depth,
             "duration": duration,
         }
         existing = self._con.execute(
@@ -637,9 +658,9 @@ class Library:
                 INSERT INTO tracks
                     (path, filename, artist, title, album, genre, comment, bpm,
                      "key", keycode, energy, year, track_number, label, bitrate,
-                     duration, size, mtime, content_id, search_blob,
+                     bit_depth, duration, size, mtime, content_id, search_blob,
                      added_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     path,
@@ -657,6 +678,7 @@ class Library:
                     tags["track_number"],
                     tags["label"],
                     tags["bitrate"],
+                    tags["bit_depth"],
                     tags["duration"],
                     size,
                     mtime,
@@ -1293,6 +1315,7 @@ class Library:
                     track_number=t.track_number,
                     label=t.label,
                     bitrate=t.bitrate,
+                    bit_depth=t.bit_depth,
                     duration=t.duration,
                 )
             )
@@ -1525,6 +1548,7 @@ def _track(row: sqlite3.Row) -> Track:
         track_number=row["track_number"],
         label=row["label"],
         bitrate=row["bitrate"],
+        bit_depth=row["bit_depth"],
         duration=row["duration"],
         size=row["size"],
         mtime=row["mtime"],

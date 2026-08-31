@@ -459,7 +459,7 @@
     <h3>Playlist columns, artwork &amp; text size</h3>
     <p><b>Right-click the playlist's column header</b> for the full list of columns. Tick one to show
       it, untick it to hide it again — the entries are toggles, so clicking a column that is already
-      showing switches it off. Nine columns are available beyond the ones you start with:</p>
+      showing switches it off. Eleven columns are available beyond the ones you start with:</p>
     <table>
       <tr><th>Column</th><th>Shows</th></tr>
       <tr><td>Art</td><td>The track's cover art. <b>On by default</b>, second in the row.</td></tr>
@@ -476,9 +476,17 @@
         to find what came in this week.</td></tr>
       <tr><td>Date Created</td><td>The file's own creation date, in the same format. Not the same
         thing as Date Added: a track ripped years ago and imported yesterday differs on the two.</td></tr>
+      <tr><td>Format</td><td>The audio format — <code>AIFF</code>, <code>WAV</code>,
+        <code>FLAC</code>, <code>MP3</code>. Sort on it to gather every MP3 in a set together
+        before a night on lossless-only decks.</td></tr>
+      <tr><td>Bit Depth</td><td><code>16 bit</code>, <code>24 bit</code>. Blank for MP3, M4A and
+        OGG, which have no bit depth at all — a lossy file rebuilds its samples rather than
+        storing them, so there is no number to show.</td></tr>
     </table>
-    <p>These columns are read-only and drawn from the tags already loaded, so switching one on is
-      instant. <b>#</b> and <b>Filename</b> are always present and aren't in the menu.</p>
+    <p>These columns are read-only, and all but one are already loaded, so switching them on is
+      instant. Bit Depth is the exception: it isn't a tag, so the first time a lossless track is
+      opened its depth is read from the file and remembered — every load after that is instant
+      too. <b>#</b> and <b>Filename</b> are always present and aren't in the menu.</p>
 
     <p><b>Fit a column to what's in it.</b> The last entry on that same right-click menu names the
       column you clicked on — <b>Fit Album to Longest</b> — and sizes it to the longest value the

@@ -33,6 +33,11 @@ class TrackMetadata:
     artwork_mime: str | None = None
     duration: float | None = None  # seconds
     bitrate: int | None = None  # kbps
+    # Bits per sample, for the formats that have one. A lossy stream has
+    # none at all (its samples are reconstructed, not stored), so None
+    # here means "this file has no such number" as often as it means
+    # "we could not read it" — see `read_bit_depth`.
+    bit_depth: int | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary."""
@@ -317,6 +322,7 @@ def read_metadata(file_path: str) -> TrackMetadata:
             if audio.info is not None:
                 metadata.duration = float(audio.info.length)
                 metadata.bitrate = read_bitrate(audio.info)
+                metadata.bit_depth = read_bit_depth(audio.info)
         except Exception:
             pass
         # Read separately because the easy interface cannot see a TXXX frame.
@@ -352,6 +358,21 @@ def read_bitrate(info: Any) -> int | None:
     if reported:
         return round(reported / 1000)
     return None
+
+
+def read_bit_depth(info: Any) -> int | None:
+    """Bits per sample from an already-open mutagen stream info, or None.
+
+    Read off the same handle as the bitrate above, for the same reason: the
+    number is free while the file is open and costs an entire second open if
+    it is asked for later.
+
+    None for a lossy stream, and that is the answer rather than a failure —
+    MP3, AAC and Vorbis reconstruct their samples instead of storing them, so
+    there is no bit depth to report. The Player shows it as a blank cell.
+    """
+    depth = getattr(info, "bits_per_sample", 0)
+    return depth if depth else None
 
 
 def _read_metadata_from(audio, file_path: str, suffix: str) -> TrackMetadata:

@@ -114,7 +114,7 @@ class TestTheShippedOrder:
 
         assert visual_order(player, visible_only=False) == EXPECTED_ORDER + [
             "Album", "Genre", "Track #", "Label", "Bitrate", "Energy",
-            "Date Added", "Date Created",
+            "Date Added", "Date Created", "Format", "Bit Depth",
         ]
 
     def test_the_logical_indexes_are_untouched(self, qtbot, lib):
