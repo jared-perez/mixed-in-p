@@ -53,7 +53,20 @@ from pathlib import Path
 REPO = str(Path(__file__).resolve().parent.parent)
 sys.path.insert(0, REPO)
 
-os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
+# Offscreen everywhere except Windows, where it is not merely different but
+# *useless*: Qt no longer ships fonts and the offscreen plugin has no system
+# database to fall back to there, so every glyph renders as an identical tofu
+# box and this tool — which measures nothing but font advances — would compare
+# character counts. The guard below refuses that run rather than reporting it,
+# but a default that walks straight into a guard is a trap with a sign on it,
+# so win32 asks for the native plugin instead. Two things that makes better,
+# not merely working: it is where the established Windows baseline of 21 comes
+# from, and the native style is the one the app actually wears, which is what
+# this tool is for. The cost is real windows appearing during the run.
+# An explicit QT_QPA_PLATFORM still wins on either platform.
+os.environ.setdefault(
+    "QT_QPA_PLATFORM", "windows" if sys.platform == "win32" else "offscreen"
+)
 
 # Redirect app data for this process *and* every child, at import — before
 # anything can call get_app_data_dir(), which derives from HOME/%APPDATA%. The
