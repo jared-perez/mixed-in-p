@@ -372,7 +372,10 @@
 
     <h3>Play, audition &amp; lift samples</h3>
     <ul>
-      <li>Player transport: Previous / Play-Pause / Stop / Next, a click-or-drag seek bar, and volume.</li>
+      <li>Player transport: Previous / Play-Pause / Stop / Next, a click-or-drag seek bar, and volume.
+        The transport is <b>pinned to the bottom edge of the panel</b> &mdash; open as many of the
+        collapsible sections below as you like and the controls stay where they are, with the playlist
+        giving up the height instead of the transport scrolling away.</li>
       <li>The playlist opens on <b>#</b>, cover art, artist, title, BPM, key, comment, duration, year,
         and filename. Double-click to play, drag to reorder, and right-click to open the file location,
         reload a track's tags from disk, or remove tracks; your column layout is remembered.</li>
@@ -392,25 +395,36 @@
         to move playback — it replaces the seek bar while it's open — and drag the green/red markers
         to set a slice.</li>
       <li><b>Zoomed Wave:</b> a &plusmn;0.5&nbsp;s window around the playhead, for reading the beat
-        under the cursor. Open on its own it leaves room for the metronome below without scrolling.</li>
+        under the cursor.</li>
       <li><b>Loop Slicer:</b> the slice controls — set start/end markers, nudge them, toggle an
         <b>A&ndash;B loop</b>, pick a format, and <b>export</b> the slice, ideal for lifting loops and
         samples by ear. The buttons are independent: open any on its own, or all three together for
         the full working slicer.</li>
       <li><b>Metronome:</b> the last of the collapsible sections, for tapping out a tempo and
-        working over it. The tempo box reads to two decimals — drag it up or down to scrub, hold
-        <b>Shift</b> while dragging for hundredths, or use the small <b>+</b>/<b>&minus;</b> buttons
-        for whole beats. <b>Tap</b> sets the tempo from your own timing, and the two hold-to-bend
-        buttons lean the beat back or push it forward while held. <b>Start</b> sits on the section's
-        own header row.
+        working over it. It sits on two rows. <b>Start</b> and the whole tempo group share the
+        section's own header row: the <b>&minus;</b>/<b>+</b> steppers, the tempo box, <b>Tap</b> and
+        <b>Track</b>. Everything about the click itself — how loud, which click, the beat lights, the
+        bend pair and <b>Global Click</b> — sits on the row below.
         <ul>
+          <li><b>Three ways to set the tempo</b>, side by side. Type or scrub the box, which reads to
+            two decimals — drag it up or down, hold <b>Shift</b> while dragging for hundredths, or use
+            the <b>+</b>/<b>&minus;</b> buttons for whole beats. <b>Tap</b> sets it from your own
+            timing. <b>Track</b> takes it from the track loaded in the player, reading that track's
+            BPM tag each time you press it — so a BPM you have just edited in the playlist is picked
+            up without reloading anything, and a <i>running</i> click changes tempo under your hand
+            rather than needing a stop. With no BPM on the loaded track the button is unavailable and
+            its tooltip says why.</li>
+          <li><b>Lean the beat</b> with the two hold-to-bend buttons beside the beat lights: hold to
+            pull the beat back or push it forward, release to return to the set tempo.</li>
           <li><b>Pick the click:</b> three exclusive buttons — <b>&#8856;</b> silent (the beat light
             still keeps time), <b>)</b> the standard tick, and <b>))</b> a sharper, longer beep that
             carries over a track you're playing underneath it.</li>
-          <li><b>How loud</b> is the bars button beside them: press to cycle quiet / medium / loud.
+          <li><b>How loud</b> is the bars button at the head of the click row: press to cycle
+            quiet / medium / loud.
             Silent stays on the click row, because <i>which</i> click and <i>how loud</i> are
             different questions.</li>
-          <li><b>Global Click</b>, on by default, keeps the click going when you leave the Player, so
+          <li><b>Global Click</b>, at the end of the click row and on by default, keeps the click
+            going when you leave the Player, so
             a tempo you set once carries while you work in Rename or Convert. Turn it off and leaving
             silences it. Collapsing the section silences it either way.</li>
         </ul>

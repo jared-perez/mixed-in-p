@@ -10,7 +10,7 @@ The full audio file preparation workflow for DJs.
 - Audio conversion (MP3/WAV/FLAC/AIFF) — quality is only ever kept or lowered, including same-format downgrades (96k/24-bit FLAC → 44.1k/16-bit FLAC), writing beside each source or into a folder of your choosing, toggled per batch
 - Pipeline — mark any of Rename, Convert and Analyze with its step toggle and one press runs a batch through the marked steps in order, filing each track into a playlist as it lands; start it from whichever marked panel you like, and pick an existing playlist or type a name and one gets made
 - Acoustic spectrum analyzer
-- Audio Player + Slicer for sample lifting, with a metronome beside them — tap tempo, time-bend, 2-decimal BPM, a choice of click (silent, tick, or a sharper beep), and a Global Click that keeps it sounding while you work on other panels
+- Audio Player + Slicer for sample lifting, with a metronome beside them — tap tempo, take the loaded track's tempo, time-bend, 2-decimal BPM, a choice of click (silent, tick, or a sharper beep), and a Global Click that keeps it sounding while you work on other panels
 - Playlist library — folders, saved playlists, a name filter for the tree, search across every playlist at once, export to `.m3u8`/`.m3u`/tracklist, and Shift+Tab to show or hide the tree from anywhere
 - Playlist view you can shape — cover art in the list (top / middle / full sleeve), optional Album, Genre, Track #, Label, Bitrate, Energy, Date Added, Date Created, Format and Bit Depth columns, a per-column Fit to Longest, and Small/Medium/Large text
 - Compatible Tracks — what else in your library mixes with the track in the player, ranked by key, tempo (half- and double-time count) and energy, with click-and-hold preview
