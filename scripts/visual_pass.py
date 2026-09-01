@@ -68,6 +68,18 @@ if not _VP_HOME:
     atexit.register(shutil.rmtree, _VP_HOME, ignore_errors=True)
 if sys.platform == "win32":
     os.environ["APPDATA"] = _VP_HOME
+    # HOME is not enough here, and setting only APPDATA is not either.
+    # ``get_app_data_dir`` reads %APPDATA%, but ``get_history_dir`` also calls
+    # ``_migrate_from_musickey``, which reads ``Path.home()`` — and on Windows
+    # that resolves through ntpath.expanduser, which consults USERPROFILE and
+    # then HOMEDRIVE+HOMEPATH and **never HOME**. So a win32 run that set only
+    # HOME rendered the developer's real ~/.musickey sessions inside a report
+    # that claims to be isolated. Set every name expanduser looks at.
+    os.environ["USERPROFILE"] = _VP_HOME
+    _drive, _tail = os.path.splitdrive(_VP_HOME)
+    os.environ["HOMEDRIVE"] = _drive
+    os.environ["HOMEPATH"] = _tail
+    os.environ["HOME"] = _VP_HOME
 else:
     os.environ["HOME"] = _VP_HOME
 
@@ -174,6 +186,50 @@ def measure(root, page: str, out: dict) -> None:
         }
 
 
+def assert_fonts_usable(app) -> None:
+    """Abort rather than measure text in a fontless environment.
+
+    Every number this script prints is a font advance, so a Qt install with no
+    usable font database does not fail — it reports confident nonsense. Seen on
+    Windows, where the offscreen plugin found no fonts and *every* glyph in
+    every language, English included, rendered as an identical tofu box: the
+    run was comparing character counts in a fixed-width fallback, so German
+    ``Einstellungen`` was "over by 103px" purely for having five more letters
+    than ``Settings``. It reported 55 regressions and took twenty minutes to
+    disbelieve, because nobody can check this tool's arithmetic by eye.
+
+    Two cheap signals, both about the *fallback* rather than about any one
+    font. An empty family list is the obvious one. The load-bearing one is that
+    a tofu fallback is fixed-width, so ``i`` and ``W`` measure the same — which
+    stays true however the substitution is spelled, and is what actually
+    distinguishes "no fonts" from "a font I did not expect".
+    """
+    from PySide6.QtGui import QFontDatabase, QFontMetrics
+
+    families = QFontDatabase.families()
+    metrics = QFontMetrics(app.font())
+    narrow = metrics.horizontalAdvance("i")
+    wide = metrics.horizontalAdvance("W")
+
+    if families and narrow != wide:
+        return
+
+    why = (
+        "no font families are available"
+        if not families
+        else f"'i' and 'W' both measure {narrow}px, i.e. a fixed-width fallback"
+    )
+    raise SystemExit(
+        f"visual_pass: refusing to run — {why}.\n"
+        f"  Every number this script prints is a font advance, so without a\n"
+        f"  usable font database it would report confident nonsense rather\n"
+        f"  than fail. QT_QPA_PLATFORM={os.environ.get('QT_QPA_PLATFORM')!r}.\n"
+        f"  On Windows the offscreen plugin often has no fonts: re-run with\n"
+        f"  QT_QPA_PLATFORM=windows. Override with VP_ALLOW_NO_FONTS=1 only if\n"
+        f"  you intend to read the output as character counts."
+    )
+
+
 def run(lang: str, shots: Path | None) -> dict:
     from src.gui.app import create_qapplication, install_translators
     from src.utils.config import AppConfig, load_config, save_config
@@ -185,6 +241,8 @@ def run(lang: str, shots: Path | None) -> dict:
     save_config(replace(load_config(), language=lang))
 
     app = create_qapplication(["mixedinp"])
+    if not os.environ.get("VP_ALLOW_NO_FONTS"):
+        assert_fonts_usable(app)
     if lang != "en":
         install_translators(app, lang)
 

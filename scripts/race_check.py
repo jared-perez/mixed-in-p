@@ -63,6 +63,17 @@ SETTLE_SECONDS = 14
 # ahead of every reader.
 if sys.platform == "win32":
     os.environ["APPDATA"] = str(DATA)
+    # APPDATA alone is not the whole redirect. get_history_dir() also calls
+    # _migrate_from_musickey, which reads Path.home() — and on Windows that
+    # resolves through ntpath.expanduser, which consults USERPROFILE and then
+    # HOMEDRIVE+HOMEPATH and **never HOME**. Found in visual_pass, which had
+    # the same two lines and rendered the developer's real ~/.musickey inside
+    # an "isolated" run. Set every name expanduser looks at.
+    os.environ["USERPROFILE"] = str(DATA)
+    _drive, _tail = os.path.splitdrive(str(DATA))
+    os.environ["HOMEDRIVE"] = _drive
+    os.environ["HOMEPATH"] = _tail
+    os.environ["HOME"] = str(DATA)
 else:
     os.environ["HOME"] = str(DATA)
 
