@@ -999,26 +999,35 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
             event.ignore()
             return
 
-        # Detach items before removing rows so we can reinsert them at the target position.
-        rows_data: list[list[QTableWidgetItem | None]] = []
-        for r in selected_rows:
-            rows_data.append([self.takeItem(r, c) for c in range(self.columnCount())])
+        # Detach items before removing rows so we can reinsert them at the target
+        # position. Signals blocked throughout: setItem emits itemChanged, which
+        # the panel commits as an inline metadata edit — against the entry that
+        # still sits at the target row, since _playlist is only resynced by the
+        # order_changed below. Unguarded, a drag dropped onto a track overwrote
+        # that track's artist/title and wrote them into its file's tags.
+        self.blockSignals(True)
+        try:
+            rows_data: list[list[QTableWidgetItem | None]] = []
+            for r in selected_rows:
+                rows_data.append([self.takeItem(r, c) for c in range(self.columnCount())])
 
-        # Remove rows bottom-up to keep earlier indices valid; shift drop target for each
-        # removal above it.
-        adjusted_drop = drop_row
-        for r in reversed(selected_rows):
-            self.removeRow(r)
-            if r < drop_row:
-                adjusted_drop -= 1
+            # Remove rows bottom-up to keep earlier indices valid; shift drop target
+            # for each removal above it.
+            adjusted_drop = drop_row
+            for r in reversed(selected_rows):
+                self.removeRow(r)
+                if r < drop_row:
+                    adjusted_drop -= 1
 
-        adjusted_drop = max(0, min(adjusted_drop, self.rowCount()))
+            adjusted_drop = max(0, min(adjusted_drop, self.rowCount()))
 
-        for i, row_items in enumerate(rows_data):
-            self.insertRow(adjusted_drop + i)
-            for c, item in enumerate(row_items):
-                if item is not None:
-                    self.setItem(adjusted_drop + i, c, item)
+            for i, row_items in enumerate(rows_data):
+                self.insertRow(adjusted_drop + i)
+                for c, item in enumerate(row_items):
+                    if item is not None:
+                        self.setItem(adjusted_drop + i, c, item)
+        finally:
+            self.blockSignals(False)
 
         self.clearSelection()
         if rows_data:
