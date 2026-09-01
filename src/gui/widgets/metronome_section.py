@@ -17,7 +17,8 @@ The header row carries the Start button and the tempo controls as well as the
 word, and neither is the section's to own: :class:`MetronomeView` builds and
 drives both, and this only places them. Being up here is the point — Start is
 what the hand goes for once the tempo is set, so it is the biggest thing in
-the section, and BPM/Tap/Global Click are what it goes for next. Putting that
+the section, and the three ways of setting a tempo — type it, tap it, take
+the loaded track's — are what it goes for next. Putting that
 row up beside it is what makes the whole metronome two rows rather than four,
 which matters in a panel where the playlist and the transport are competing
 for the same height. Both hide with the body, so a collapsed metronome reads
@@ -51,7 +52,9 @@ class MetronomeSection(QWidget):
     # and the window sizer applies its minimum width.
     expanded_changed = Signal(bool)
 
-    def __init__(self, parent: QWidget | None = None, stream_factory=None) -> None:
+    def __init__(
+        self, parent: QWidget | None = None, stream_factory=None, track_bpm=None
+    ) -> None:
         super().__init__(parent)
         self.setObjectName("metronomeSection")
         # A bare QWidget paints the global BG_DARK over the player's grey.
@@ -63,7 +66,7 @@ class MetronomeSection(QWidget):
             f"#metronomeTray {{ background-color: {Theme.TRAY_BG}; border-radius: 6px; }}"
         )
         self._expanded = False
-        self._setup_ui(stream_factory)
+        self._setup_ui(stream_factory, track_bpm)
         # Never capture focus, so Space stays play/pause and the panel's slice
         # keys are not swallowed — the same rule the slice section follows.
         # The BPM box is deliberately left out: it is a text field and typing
@@ -72,9 +75,11 @@ class MetronomeSection(QWidget):
             btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self._set_body_visible(False)
 
-    def _setup_ui(self, stream_factory) -> None:
+    def _setup_ui(self, stream_factory, track_bpm) -> None:
         # Built first: the header row below adopts its Start button.
-        self._view = MetronomeView(stream_factory=stream_factory)
+        self._view = MetronomeView(
+            stream_factory=stream_factory, track_bpm=track_bpm
+        )
 
         layout = QVBoxLayout(self)
         layout.setContentsMargins(0, 0, 0, 0)
@@ -212,6 +217,14 @@ class MetronomeSection(QWidget):
             + self._tempo_row.sizeHint().width()
         )
         return max(self._view.sizeHint().width() + 20, header_row)  # tray margins
+
+    def refresh_track_bpm(self) -> None:
+        """Re-read the loaded track's tempo, for the host to call on a change.
+
+        Forwarded rather than owned: the value belongs to the player and the
+        button belongs to the view, so this is only the door between them.
+        """
+        self._view.refresh_track_bpm()
 
     # ── audio lifecycle ─────────────────────────────────────────────
 

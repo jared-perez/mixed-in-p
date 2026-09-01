@@ -11,10 +11,17 @@ click runs. Two things are handed up there: Start
 purely because a layout cannot be reparented and a widget can. Everything
 about what either *does* stays here; only where they sit is the host's.
 
-That leaves the view itself one row — bend, level, click choice, beat light —
-so the whole metronome is two rows instead of four. The condensing was asked
-for in those terms: this sits above the transport in a panel whose playlist
-is fighting it for height, and two of the four rows were mostly air.
+That leaves the view itself one row — bend, level, click choice, beat light,
+Global Click — so the whole metronome is two rows instead of four. The
+condensing was asked for in those terms: this sits above the transport in a
+panel whose playlist is fighting it for height, and two of the four rows were
+mostly air.
+
+The tempo row holds three ways of answering "what tempo?": type or drag one,
+tap one, or take the loaded track's. The last is the Track button, and the
+only thing in this file that knows anything about the player — through a
+callable handed in at construction, asked at the moment it is wanted, so no
+copy of that tempo is kept here to go stale.
 
 Where Start stood, the click's level does: three loudnesses, cycled by one
 :class:`ClickVolumeButton`. It is a button rather than the slider it replaced
@@ -366,10 +373,18 @@ class MetronomeView(QWidget):
     """The whole view: tempo controls, transport, and the beat light."""
 
     def __init__(
-        self, parent: QWidget | None = None, stream_factory=None
+        self, parent: QWidget | None = None, stream_factory=None, track_bpm=None
     ) -> None:
         super().__init__(parent)
         self.setObjectName("metronomeView")
+        # Where the Track button's tempo comes from: a callable answering the
+        # loaded track's BPM, or None. A *source* rather than a value, so
+        # there is one record of that fact and it lives in the player — a
+        # copy kept here would go stale the moment a BPM cell was edited, and
+        # would be a second thing to keep in step with the track that is
+        # actually loaded. Absent (a bare view, or the suite) the button is
+        # simply never enabled.
+        self._track_bpm_source = track_bpm
         self._engine = MetronomeEngine(120.0, sr=SAMPLE_RATE)
         self._tap = TapTempo()
         self._underruns = UnderrunLog("Metronome click stream")
@@ -445,23 +460,20 @@ class MetronomeView(QWidget):
         # the signal like any other change.
         self._global_btn.setChecked(load_config().metronome_global_click)
         self._sync_global_tooltip(self._global_btn.isChecked())
-        tempo_row.addWidget(self._global_btn)
+
+        # Take the tempo from whatever is loaded in the player, in Global
+        # Click's old place beside Tap — the two ways of answering "what
+        # tempo?" that are not typing one belong next to each other, and this
+        # is the one you reach for while a track is up.
+        self._track_btn = QPushButton(self.tr("Track"))
+        self._track_btn.setObjectName("metroTapButton")  # Tap's twin, and styled as one
+        self._track_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._track_btn.clicked.connect(self._on_take_track_tempo)
+        tempo_row.addWidget(self._track_btn)
+        self.refresh_track_bpm()
 
         bend_row = QHBoxLayout()
         bend_row.setSpacing(6)
-        self._slower_btn = self._bend_button(
-            "‹", self.tr("Hold to lean the beat back")
-        )
-        self._faster_btn = self._bend_button(
-            "›", self.tr("Hold to push the beat forward")
-        )
-        self._slower_btn.pressed.connect(lambda: self._engine.set_bend(1 - _BEND))
-        self._faster_btn.pressed.connect(lambda: self._engine.set_bend(1 + _BEND))
-        for button in (self._slower_btn, self._faster_btn):
-            button.released.connect(self._engine.clear_bend)
-        bend_row.addWidget(self._slower_btn)
-        bend_row.addWidget(self._faster_btn)
-        bend_row.addSpacing(12)
 
         # How loud, where the transport used to stand. The two swapped places
         # on purpose: Start is the thing you hit mid-set and now sits big on
@@ -506,6 +518,32 @@ class MetronomeView(QWidget):
         # you with.
         self._light = BeatLight()
         bend_row.addWidget(self._light, alignment=Qt.AlignmentFlag.AlignVCenter)
+        bend_row.addSpacing(16)
+
+        # Lean the beat back or push it forward while held — the row's only
+        # controls that are *played* rather than set, so they sit next to the
+        # light that shows what they are doing to the beat rather than up at
+        # the head of the row where they started.
+        self._slower_btn = self._bend_button(
+            "‹", self.tr("Hold to lean the beat back")
+        )
+        self._faster_btn = self._bend_button(
+            "›", self.tr("Hold to push the beat forward")
+        )
+        self._slower_btn.pressed.connect(lambda: self._engine.set_bend(1 - _BEND))
+        self._faster_btn.pressed.connect(lambda: self._engine.set_bend(1 + _BEND))
+        for button in (self._slower_btn, self._faster_btn):
+            button.released.connect(self._engine.clear_bend)
+        bend_row.addWidget(self._slower_btn)
+        bend_row.addWidget(self._faster_btn)
+        bend_row.addSpacing(16)
+
+        # Global Click ends this row rather than sitting up on the header one.
+        # It is not a tempo control at all — it answers "does the click follow
+        # me off this panel", which is set once and left, so it belongs down
+        # here with the level and the click choice and not beside the two
+        # buttons that set a tempo.
+        bend_row.addWidget(self._global_btn)
         bend_row.addStretch(1)
         outer.addLayout(bend_row)
         outer.addStretch(1)
@@ -763,6 +801,47 @@ class MetronomeView(QWidget):
             # which no human tap resolves. The decimals are for typed and
             # dragged input.
             self._bpm_box.set_value(round(estimate, 2))
+
+    # ── the loaded track's tempo ────────────────────────────────────
+
+    def track_bpm(self) -> float | None:
+        """The loaded track's BPM, asked for fresh every time.
+
+        Never cached. The player already holds this fact, and the tag can
+        change under it — an inline edit of the BPM cell rewrites the entry
+        without reloading the track — so a copy here would be a second record
+        of one fact, which is the shape that rots.
+        """
+        if self._track_bpm_source is None:
+            return None
+        bpm = self._track_bpm_source()
+        # A tag can say 0, or something unparsable that arrived as None.
+        return bpm if bpm and bpm > 0 else None
+
+    def refresh_track_bpm(self) -> None:
+        """Re-read the source and say whether there is a tempo to take.
+
+        Cheap and idempotent, so the host may call it from as many triggers
+        as it likes: what must not be duplicated is the *record*, not the
+        refresh.
+        """
+        bpm = self.track_bpm()
+        self._track_btn.setEnabled(bpm is not None)
+        self._track_btn.setToolTip(
+            self.tr("Use the loaded track's tempo — {0} BPM").format(f"{bpm:.2f}")
+            if bpm is not None
+            else self.tr("No track with a BPM tag is loaded")
+        )
+
+    def _on_take_track_tempo(self) -> None:
+        # Read again rather than trusting the enabled state: the button's
+        # state is only as fresh as the last refresh, and the value is what
+        # actually matters here.
+        bpm = self.track_bpm()
+        if bpm is not None:
+            # Straight into the box, which drives the engine — so a running
+            # click changes tempo under the hand rather than needing a stop.
+            self._bpm_box.set_value(bpm)
 
     # ── lifecycle ───────────────────────────────────────────────────
 

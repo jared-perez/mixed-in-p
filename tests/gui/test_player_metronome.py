@@ -16,6 +16,7 @@ import pathlib
 
 import pytest
 
+from src.gui.widgets import player_panel as player_panel_mod
 from src.gui.widgets import section_header
 from src.gui.widgets.keyboard_panel import KeyboardPanel
 from src.gui.styles.theme import Theme
@@ -258,6 +259,154 @@ class TestThePanelMakesRoomForIt:
         assert player.metronome_row_min_width() >= (
             player._metronome_section.view.sizeHint().width()
         )
+
+
+class TestTheFooterMovingDoesNotStrandDeadSpace:
+    """The playlist's pin is a share of the scroll viewport, and the footer
+    can change that viewport without the panel being resized at all.
+
+    Opening Waveform swaps the seek slider for the waveform down in the
+    pinned footer. The height the panel reads one line later is the pre-swap
+    one, so the budget came out short by the slider's row and the difference
+    showed as a band of dead space under the metronome — which opening and
+    closing Zoomed Wave then repaired, because that recompute ran against a
+    settled viewport.
+    """
+
+    def settle(self, player, qtbot):
+        player.show()
+        qtbot.waitExposed(player)
+        qtbot.wait(20)
+
+    def test_the_pin_matches_the_settled_viewport(self, player, qtbot):
+        player.resize(1075, 900)
+        self.settle(player, qtbot)
+        player._metronome_section.set_expanded(True)
+        qtbot.wait(20)
+
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+
+        # The budget asked for now, against a viewport that has stopped
+        # moving — the pin must already be it.
+        assert player._table.maximumHeight() == player._pinned_table_height()
+
+    def test_opening_the_zoom_and_closing_it_changes_nothing(
+        self, player, qtbot
+    ):
+        """The round trip was the user's workaround: it recomputed against a
+        settled viewport. It must now be a no-op instead of a repair."""
+        player.resize(1075, 900)
+        self.settle(player, qtbot)
+        player._metronome_section.set_expanded(True)
+        player._slice._waveform_btn.setChecked(True)
+        qtbot.wait(20)
+        before = player._table.maximumHeight()
+
+        player._slice._zoom_btn.setChecked(True)
+        qtbot.wait(20)
+        player._slice._zoom_btn.setChecked(False)
+        qtbot.wait(20)
+
+        assert player._table.maximumHeight() == before
+
+
+BPM_COLUMN = 4
+
+
+def stock(player, tmp_path, bpms=("128", "")):
+    """Two tracks, with whatever BPM tags the test wants."""
+    tracks = []
+    for i, bpm in enumerate(bpms):
+        f = tmp_path / f"{i}.wav"
+        f.write_bytes(b"not-really-audio")
+        tracks.append(
+            {"file_path": str(f), "display_name": f.name, "artist": "A",
+             "title": f.name, "bpm": bpm}
+        )
+    player.add_tracks(tracks, allow_duplicates=True)
+    return [t["file_path"] for t in tracks]
+
+
+class TestTheTrackButtonReadsTheLoadedTrack:
+    """One record of the tempo and it lives here — the button asks
+    loaded_track_bpm() rather than being handed a copy to keep in step."""
+
+    def test_it_answers_for_the_loaded_track_not_the_selected_row(
+        self, player, tmp_path
+    ):
+        paths = stock(player, tmp_path, ("128", "90"))
+        player._playing_path = paths[1]
+        player._table.selectRow(0)
+
+        assert player.loaded_track_bpm() == pytest.approx(90.0)
+
+    def test_nothing_loaded_is_no_tempo(self, player, tmp_path):
+        stock(player, tmp_path)
+
+        assert player.loaded_track_bpm() is None
+
+    def test_a_blank_tag_is_no_tempo(self, player, tmp_path):
+        paths = stock(player, tmp_path, ("128", ""))
+        player._playing_path = paths[1]
+
+        assert player.loaded_track_bpm() is None
+
+    def test_a_track_playing_out_of_the_visible_list_is_no_tempo(
+        self, player, tmp_path
+    ):
+        """_current_index is -1 whenever the visible list is a different
+        playlist from the one playing, which is why this is derived from the
+        path — an index lookup would answer for whichever row happened to be
+        there."""
+        stock(player, tmp_path)
+        player._playing_path = str(tmp_path / "elsewhere.wav")
+
+        assert player.loaded_track_bpm() is None
+
+    def test_it_is_derived_on_every_call(self, player, tmp_path):
+        paths = stock(player, tmp_path, ("128", "90"))
+        player._playing_path = paths[0]
+        assert player.loaded_track_bpm() == pytest.approx(128.0)
+
+        player._playlist[0].bpm = "174"
+
+        assert player.loaded_track_bpm() == pytest.approx(174.0)
+
+    def test_the_button_follows_the_loaded_track(self, player, tmp_path):
+        """now_playing_changed is the panel's own "the loaded track moved" —
+        played, removed from under the player, or cleared."""
+        button = player._metronome_section.view._track_btn
+        paths = stock(player, tmp_path, ("128", ""))
+        assert not button.isEnabled()
+
+        player._playing_path = paths[0]
+        player.now_playing_changed.emit()
+
+        assert button.isEnabled()
+        button.click()
+        assert player._metronome_section.view._bpm_box.value() == pytest.approx(128.0)
+
+    def test_a_bpm_typed_into_the_loaded_row_reaches_it(
+        self, player, tmp_path, monkeypatch
+    ):
+        """The edit rewrites the entry with no reload, so the enabled state
+        has to be told the answer may have moved — the value itself is read
+        fresh either way."""
+        monkeypatch.setattr(
+            player_panel_mod, "write_metadata", lambda *a, **k: None
+        )
+        paths = stock(player, tmp_path, ("", ""))
+        player._playing_path = paths[0]
+        player.now_playing_changed.emit()
+        button = player._metronome_section.view._track_btn
+        assert not button.isEnabled()
+
+        player._table.item(0, BPM_COLUMN).setText("140")
+
+        assert button.isEnabled()
+        button.click()
+        assert player._metronome_section.view._bpm_box.value() == pytest.approx(140.0)
 
 
 class TestTheHostOwnsTheAudioLifecycle:

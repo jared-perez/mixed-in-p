@@ -459,6 +459,87 @@ class TestTheClickRowPicksWhichClick:
 
         assert applied == [SHARP]
 
+class TestTheTrackButtonTakesTheLoadedTrackTempo:
+    """It reads a *source*, never a stored copy — the player owns that fact
+    and the tag can change under it (an inline BPM edit rewrites the entry
+    with no reload), so a second record here is the shape that rots."""
+
+    @pytest.fixture
+    def wired(self, qtbot):
+        """A view whose source is a box the test can move under it."""
+        held = {"bpm": 128.0}
+        view = MetronomeView(
+            stream_factory=FakeStream, track_bpm=lambda: held["bpm"]
+        )
+        qtbot.addWidget(view)
+        return view, held
+
+    def test_it_sets_the_tempo_from_the_source(self, wired):
+        view, _ = wired
+
+        view._track_btn.click()
+
+        assert view._bpm_box.value() == pytest.approx(128.0)
+
+    def test_it_reads_again_on_every_press(self, wired):
+        """Not from the enabled state, which is only as fresh as the last
+        refresh — the value is what matters, so it is asked for at the click."""
+        view, held = wired
+        view._track_btn.click()
+
+        held["bpm"] = 174.0
+        view._track_btn.click()
+
+        assert view._bpm_box.value() == pytest.approx(174.0)
+
+    def test_a_running_click_changes_tempo_under_the_hand(self, wired):
+        view, held = wired
+        view._start_btn.setChecked(True)
+        held["bpm"] = 90.0
+
+        view._track_btn.click()
+
+        assert view._engine.bpm == pytest.approx(90.0)
+
+    def test_it_is_dead_with_nothing_loaded(self, wired):
+        view, held = wired
+        held["bpm"] = None
+        view.refresh_track_bpm()
+
+        assert not view._track_btn.isEnabled()
+
+    def test_a_zero_tag_is_not_a_tempo(self, wired):
+        """A file can carry BPM 0, which is a missing value written down."""
+        view, held = wired
+        held["bpm"] = 0.0
+        view.refresh_track_bpm()
+
+        assert not view._track_btn.isEnabled()
+        view._track_btn.click()
+        assert view._bpm_box.value() == pytest.approx(120.0)
+
+    def test_a_view_with_no_source_never_offers_it(self, view):
+        assert view.track_bpm() is None
+        assert not view._track_btn.isEnabled()
+
+    def test_the_tooltip_names_the_tempo_on_offer(self, wired):
+        view, held = wired
+        assert "128.00" in view._track_btn.toolTip()
+
+        held["bpm"] = None
+        view.refresh_track_bpm()
+        assert "128.00" not in view._track_btn.toolTip()
+
+    def test_it_stands_where_global_click_did(self, wired):
+        """Beside Tap: the two ways of answering "what tempo?" that are not
+        typing one belong next to each other."""
+        view, _ = wired
+        row = view.tempo_row().layout()
+        widgets = [row.itemAt(i).widget() for i in range(row.count())]
+
+        assert widgets.index(view._track_btn) == widgets.index(view._tap_btn) + 1
+
+
 class TestGlobalClickSurvivesLeavingTheView:
     """On by default and remembered. Off, hiding the view silences it.
 
@@ -555,12 +636,39 @@ class TestGlobalClickIsRemembered:
         merge = source[start : source.index("save_config(self._config)", start)]
         assert "metronome_global_click = disk.metronome_global_click" in merge
 
-    def test_it_sits_beside_tap(self, view):
-        # Both live on the tempo row, which is the container the host adopts
-        # onto its header — so the row IS that widget's own layout.
-        row = view.tempo_row().layout()
+    def test_it_ends_the_click_row_rather_than_the_tempo_one(self, view):
+        """It is not a tempo control — it answers "does the click follow me
+        off this panel", which is set once and left, so it belongs with the
+        level and the click choice. Track took its old place beside Tap."""
+        tempo = view.tempo_row().layout()
+        tempo_widgets = [tempo.itemAt(i).widget() for i in range(tempo.count())]
+        assert view._global_btn not in tempo_widgets
+
+        row = view.layout().itemAt(0).layout()
         widgets = [row.itemAt(i).widget() for i in range(row.count())]
-        assert widgets.index(view._global_btn) == widgets.index(view._tap_btn) + 1
+        assert widgets.index(view._global_btn) > widgets.index(view._volume_btn)
+        assert widgets.index(view._global_btn) > widgets.index(view._light)
+
+
+class TestTheRowReadsLeftToRight:
+    """Set-and-forget first, then the beat, then the two buttons you play,
+    then the one setting that is not about the click at all."""
+
+    def test_the_bend_pair_sits_between_the_light_and_global_click(self, view):
+        row = view.layout().itemAt(0).layout()
+        widgets = [row.itemAt(i).widget() for i in range(row.count())]
+
+        for button in (view._slower_btn, view._faster_btn):
+            assert widgets.index(button) > widgets.index(view._light)
+            assert widgets.index(button) < widgets.index(view._global_btn)
+
+    def test_slower_is_left_of_faster(self, view):
+        row = view.layout().itemAt(0).layout()
+        widgets = [row.itemAt(i).widget() for i in range(row.count())]
+
+        assert widgets.index(view._slower_btn) + 1 == widgets.index(
+            view._faster_btn
+        )
 
 
 class TestTheSmallButtonsSurviveTheStylesheet:

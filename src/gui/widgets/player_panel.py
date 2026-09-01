@@ -13,6 +13,7 @@ import shiboken6
 from PySide6.QtCore import (
     QT_TRANSLATE_NOOP,
     QByteArray,
+    QEvent,
     QObject,
     QPoint,
     QPointF,
@@ -1851,6 +1852,15 @@ class PlayerPanel(QWidget):
         self._scroll.setWidgetResizable(True)
         self._scroll.setFrameShape(QScrollArea.Shape.NoFrame)
         self._scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        # The playlist's pin is a share of THIS viewport, and the viewport is
+        # what the footer leaves — so it moves without the panel being
+        # resized. Opening the Waveform swaps the seek slider for the
+        # waveform down there, and the height that arrives at the panel one
+        # line later is the pre-swap one; a budget taken then is short by the
+        # slider's row and shows as a band of dead space under the metronome.
+        # Watching the viewport itself catches every cause at the one place
+        # they all pass through, and needs no caller to remember.
+        self._scroll.viewport().installEventFilter(self)
         outer.addWidget(self._scroll, 1)
 
         # The pinned footer. A bare QWidget wears the global BG_DARK rule
@@ -2435,9 +2445,13 @@ class PlayerPanel(QWidget):
         # Collapsible metronome, its own section below the slicer's. It moved
         # here from the Keyboard panel's view dropdown: a tempo you set once
         # and then work over belongs beside the transport, not three clicks
-        # deep in another panel. Nothing in it touches the engine or the
-        # track — it holds its own click stream.
-        self._metronome_section = MetronomeSection(self)
+        # deep in another panel. It holds its own click stream and still
+        # touches neither the engine nor the file — the one thing it asks of
+        # the player is the loaded track's tag BPM, and it asks by calling
+        # rather than by being told, so there is no copy of that to go stale.
+        self._metronome_section = MetronomeSection(
+            self, track_bpm=self.loaded_track_bpm
+        )
         layout.addWidget(self._metronome_section)
         # Any surplus the pinned playlist refuses must not be redistributed
         # into the chrome rows: QVBoxLayout hands leftover height to every row
@@ -2458,6 +2472,24 @@ class PlayerPanel(QWidget):
             lambda *_: self._sync_title_row_width()
         )
         self._sync_title_row_width()
+
+    def eventFilter(self, watched, event) -> bool:
+        """Re-pin the playlist when the scroll viewport settles at a new height.
+
+        Never a resize of *this* panel — that has its own handler below — but
+        of the viewport, which the footer can shrink or grow on its own. The
+        recompute is skipped unless the answer actually moved, so the
+        scrollbar appearing (which resizes the viewport again) settles in one
+        further pass instead of ringing.
+        """
+        if (
+            watched is self._scroll.viewport()
+            and event.type() == QEvent.Type.Resize
+            and self._is_table_pinned()
+            and self._pinned_table_height() != self._table.maximumHeight()
+        ):
+            self._apply_table_height(True)
+        return super().eventFilter(watched, event)
 
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
@@ -2612,6 +2644,11 @@ class PlayerPanel(QWidget):
         self._slice.zoom_shown_changed.connect(self._on_slice_view_changed)
         self._slice.request_waveform.connect(self._build_waveform_for_current)
         self._slice.seek_requested.connect(self._on_seek)
+        # The metronome's Track button follows the loaded track. This signal
+        # is the panel's own "the loaded track changed" — played, removed
+        # from under the player, or cleared — and the refresh is a re-read,
+        # not a store, so firing it on a bare playlist rename costs nothing.
+        self.now_playing_changed.connect(self._metronome_section.refresh_track_bpm)
 
     # ── Public API ──────────────────────────────────────────────
 
@@ -4362,6 +4399,12 @@ class PlayerPanel(QWidget):
             return
 
         setattr(entry, attr, new_text)
+        # A BPM typed into the loaded track's row is a tempo the metronome's
+        # Track button can now offer (or, blanked, can no longer). Nothing
+        # here is stored for it — the button reads loaded_track_bpm() when
+        # asked — so this only tells it that the answer may have moved.
+        if kind == "bpm":
+            self._metronome_section.refresh_track_bpm()
         # Reflect any normalization (e.g. BPM "128.0" -> "128") back into the cell.
         if new_text != item.text():
             self._revert_cell(row, item.column(), new_text)
@@ -5711,6 +5754,22 @@ class PlayerPanel(QWidget):
             self._scroll.verticalScrollBar().setValue(0)
         self.metronome_expanded.emit(expanded)
 
+    def loaded_track_bpm(self) -> float | None:
+        """Tag BPM of the track loaded in the engine, or None.
+
+        Derived on every call from ``_playing_path`` — never from
+        ``_current_index``, which is -1 whenever the visible list is a
+        different playlist from the one playing, and never cached, so an
+        inline edit of the BPM cell is picked up without a reload. The
+        metronome's Track button is the caller.
+        """
+        if not self._playing_path:
+            return None
+        entry = next(
+            (e for e in self._playlist if e.file_path == self._playing_path), None
+        )
+        return _parse_bpm(entry.bpm) if entry is not None else None
+
     def metronome_row_min_width(self) -> int:
         """Width the metronome's own controls need, for the window minimum."""
         return self._metronome_section.row_min_width()
@@ -5768,22 +5827,29 @@ class PlayerPanel(QWidget):
         artwork's 78px rows below the fold before that.
         """
         if fixed:
-            header_h = self._table.horizontalHeader().height()
-            row_h = (
-                self._table.rowHeight(0)
-                if self._table.rowCount() > 0
-                else self._table.verticalHeader().defaultSectionSize()
-            )
-            if row_h <= 0:
-                row_h = 28
-            chrome = header_h + 2 * self._table.frameWidth() + 4
-            budget = self._scroll.viewport().height() - self._height_outside_playlist()
-            h = max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, budget)
+            h = self._pinned_table_height()
             self._table.setMinimumHeight(h)
             self._table.setMaximumHeight(h)
         else:
             self._table.setMinimumHeight(0)
             self._table.setMaximumHeight(self._UNPINNED_HEIGHT)  # stretch freely
+
+    def _pinned_table_height(self) -> int:
+        """The budget itself, split out so it can be *asked for* without being
+        applied — which is what lets the viewport filter tell a settled
+        resize from a no-op one.
+        """
+        header_h = self._table.horizontalHeader().height()
+        row_h = (
+            self._table.rowHeight(0)
+            if self._table.rowCount() > 0
+            else self._table.verticalHeader().defaultSectionSize()
+        )
+        if row_h <= 0:
+            row_h = 28
+        chrome = header_h + 2 * self._table.frameWidth() + 4
+        budget = self._scroll.viewport().height() - self._height_outside_playlist()
+        return max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, budget)
 
     def _build_waveform_for_current(self) -> None:
         """Supply the slice section a waveform for the current track.
