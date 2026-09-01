@@ -48,6 +48,20 @@ pytest tests/test_analyzer.py -v  # Single test file
 pyinstaller mixedinp.spec
 ```
 
+**The shell here is zsh, not bash.** `${PIPESTATUS[0]}` — the usual guard
+against a pipeline reporting the *last* command's status — is a bash array and
+expands to **empty** in zsh, printing a bare `EXIT=` with no error, so the guard
+silently does nothing. zsh spells it `${pipestatus[1]}` (arrays are 1-indexed).
+This matters most for pytest, whose totals line is easy to pipe through `head`
+or `tail`: that reports **tail's** exit code, and a run with real failures has
+already looked like `exit 0` here more than once. Redirect to a file and read
+`$?` on the very next line instead:
+
+```zsh
+venv/bin/python -m pytest tests/ -q > /tmp/out.log 2>&1; echo "EXIT=$?"
+tail -3 /tmp/out.log; grep -cE "^(FAILED|ERROR)" /tmp/out.log   # 0 = clean
+```
+
 ## Architecture
 
 ```
