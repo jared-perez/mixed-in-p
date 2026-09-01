@@ -21,7 +21,7 @@ project_root = Path(SPECPATH)
 
 # Application metadata
 APP_NAME = 'MixedInP'
-APP_VERSION = '1.5.0'
+APP_VERSION = '1.5.1'
 APP_BUNDLE_ID = 'com.mixedinp.app'
 
 # Entry point (must be src/main.py, not src/gui/app.py, so package imports work)

@@ -155,7 +155,7 @@ def create_qapplication(argv: list[str] | None = None) -> QApplication:
     app = QApplication(argv)
     app.setApplicationName("Mixed in P")
     app.setOrganizationName("Mixed in P")
-    app.setApplicationVersion("1.5.0")
+    app.setApplicationVersion("1.5.1")
 
     config = load_config()
 
