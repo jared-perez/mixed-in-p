@@ -5,7 +5,7 @@ Three pieces, tested at the level each one actually decides something:
 * ``MainWindow.open_files`` — the funnel every OS entry point shares. Driven
   as an unbound method against a stub (the same trick the drag tests use),
   because what is being tested is the *order* of its steps, not a window.
-* ``PlayerPanel.play_path_if_idle`` — the idle question, and which row wins.
+* ``PlayerPanel.play_path`` — that it interrupts, and which row wins.
 * ``FileOpenRelay`` — the macOS half, whose whole job is timing.
 """
 
@@ -44,6 +44,7 @@ class PanelStub:
         self.scroll_to_end = None
         self.played = []
         self.play_result = True
+        self.scrolled_to_playing = 0
 
     def load_node(self, node_id):
         self.loaded.append(node_id)
@@ -54,9 +55,12 @@ class PanelStub:
         self.allow_duplicates = allow_duplicates
         self.scroll_to_end = scroll_to_end
 
-    def play_path_if_idle(self, path):
+    def play_path(self, path):
         self.played.append(path)
         return self.play_result
+
+    def scroll_to_playing_row(self):
+        self.scrolled_to_playing += 1
 
 
 class SidebarStub:
@@ -134,15 +138,28 @@ class TestOpenFiles:
 
         assert window._player_panel.allow_duplicates is True
 
-    def test_the_view_stays_at_the_track_that_starts_playing(self, tmp_path):
-        """An add normally scrolls to the end. Not this one: the first of
-        these files is about to play, and its row is at the top."""
+    def test_the_view_goes_to_the_track_that_starts_playing(self, tmp_path):
+        """An add normally scrolls to the end. Not this one: the row that
+        matters is the *first* of these files, the one about to play — which
+        is only at the top when Scratch was empty, so it is scrolled to by
+        name instead."""
         a, b = make_files(tmp_path, "a.mp3", "b.mp3")
         window = WindowStub()
 
         open_now(window, [a, b])
 
         assert window._player_panel.scroll_to_end is False
+        assert window._player_panel.scrolled_to_playing == 1
+
+    def test_a_row_it_could_not_find_is_not_scrolled_to(self, tmp_path):
+        """_current_index would still name whatever played before."""
+        (a,) = make_files(tmp_path, "a.mp3")
+        window = WindowStub()
+        window._player_panel.play_result = False
+
+        open_now(window, [a])
+
+        assert window._player_panel.scrolled_to_playing == 0
 
     def test_the_file_lands_normalized(self, tmp_path):
         (a,) = make_files(tmp_path, "a.mp3")
@@ -338,7 +355,7 @@ class TestOpenBatching:
         assert window._player_panel.added == []
 
 
-# ── PlayerPanel.play_path_if_idle ───────────────────────────────
+# ── PlayerPanel.play_path ───────────────────────────────────────
 
 
 @pytest.fixture
@@ -381,46 +398,63 @@ def set_engine(player, monkeypatch, *, playing=False, paused=False):
     monkeypatch.setattr(player._engine, "is_paused", lambda: paused)
 
 
-class TestPlayPathIfIdle:
-    def test_an_idle_player_plays_the_file(self, player, played, monkeypatch, tmp_path):
+class TestPlayPath:
+    """The one entry point for both callers, and unconditional for both.
+
+    A second, idle-only method used to guard the Open-with path; the states it
+    treated as "busy" are the interrupt tests below, so reintroducing it fails
+    three of them rather than passing quietly.
+    """
+
+    def test_it_plays_the_named_row(self, player, played, monkeypatch, tmp_path):
         """The cold-start case, which is the entire point of the feature."""
         a, b = make_files(tmp_path, "a.mp3", "b.mp3")
         add(player, [a, b])
         set_engine(player, monkeypatch)
 
-        assert player.play_path_if_idle(b) is True
+        assert player.play_path(b) is True
         assert played == [1]
 
-    def test_it_will_not_interrupt_playback(self, player, played, monkeypatch, tmp_path):
-        """Cutting off a track mid-set is a real-world harm in a DJ app."""
-        (a,) = make_files(tmp_path, "a.mp3")
-        add(player, [a])
-        set_engine(player, monkeypatch, playing=True)
-
-        assert player.play_path_if_idle(a) is False
-        assert played == []
-
-    def test_paused_counts_as_busy(self, player, played, monkeypatch, tmp_path):
-        """A paused track holds a position the user chose and expects back."""
-        (a,) = make_files(tmp_path, "a.mp3")
-        add(player, [a])
-        set_engine(player, monkeypatch, paused=True)
-
-        assert player.play_path_if_idle(a) is False
-        assert played == []
-
-    def test_a_pending_decode_counts_as_busy(
+    def test_it_interrupts_a_playing_track(
         self, player, played, monkeypatch, tmp_path
     ):
-        """Between _play_track and the PCM landing the engine reads as stopped,
-        but a track is milliseconds from starting."""
-        (a,) = make_files(tmp_path, "a.mp3")
-        add(player, [a])
+        """Both callers want this. The Metadata panel's "Play in Player" is an
+        explicit request, and refusing it silently because another track is
+        playing is indistinguishable, from the user's side, from the menu
+        entry being broken. Open-with is the same answer from the other side:
+        a file handed over by Finder starts, the way any default audio player
+        starts one — this app prepares files rather than performing with them.
+        """
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        add(player, [a, b])
+        set_engine(player, monkeypatch, playing=True)
+
+        assert player.play_path(b) is True
+        assert played == [1]
+
+    def test_it_interrupts_a_paused_track(self, player, played, monkeypatch, tmp_path):
+        """Paused used to count as busy, which is the state the old refusal
+        was most often hit in — nothing was audible, so nothing happened."""
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        add(player, [a, b])
+        set_engine(player, monkeypatch, paused=True)
+
+        assert player.play_path(b) is True
+        assert played == [1]
+
+    def test_it_interrupts_a_pending_decode(
+        self, player, played, monkeypatch, tmp_path
+    ):
+        """Between _play_track and the PCM landing the engine reads as
+        stopped, and a track is milliseconds from starting. It still loses to
+        the file the user just double-clicked."""
+        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
+        add(player, [a, b])
         set_engine(player, monkeypatch)
         player._pending_play_path = a
 
-        assert player.play_path_if_idle(a) is False
-        assert played == []
+        assert player.play_path(b) is True
+        assert played == [1]
 
     def test_the_newest_copy_wins(self, player, played, monkeypatch, tmp_path):
         """Additions force duplicates, so the row the user just asked for is
@@ -430,7 +464,7 @@ class TestPlayPathIfIdle:
         add(player, [a])
         set_engine(player, monkeypatch)
 
-        assert player.play_path_if_idle(a) is True
+        assert player.play_path(a) is True
         assert played == [1]
 
     def test_a_path_that_is_not_here_plays_nothing(
@@ -440,7 +474,7 @@ class TestPlayPathIfIdle:
         add(player, [a])
         set_engine(player, monkeypatch)
 
-        assert player.play_path_if_idle(b) is False
+        assert player.play_path(b) is False
         assert played == []
 
 
@@ -526,41 +560,3 @@ class TestFileOpenRelay:
         rly.eventFilter(host, QFileOpenEvent(QUrl("https://example.com/a.mp3")))
 
         assert got == []
-
-
-class TestPlayPath:
-    """The unconditional twin, for a request the user made by name."""
-
-    def test_it_plays_even_while_something_else_is_playing(
-        self, player, played, monkeypatch, tmp_path
-    ):
-        """The Metadata panel's "Play in Player" is an explicit request. Refusing
-        it silently because another track is playing is indistinguishable, from
-        the user's side, from the menu entry being broken."""
-        a, b = make_files(tmp_path, "a.mp3", "b.mp3")
-        add(player, [a, b])
-        set_engine(player, monkeypatch, playing=True)
-
-        assert player.play_path(b) is True
-        assert played == [1]
-
-    def test_a_path_that_is_not_in_the_list_plays_nothing(
-        self, player, played, monkeypatch, tmp_path
-    ):
-        (a,) = make_files(tmp_path, "a.mp3")
-        add(player, [a])
-        set_engine(player, monkeypatch)
-
-        assert player.play_path(str(tmp_path / "never-added.mp3")) is False
-        assert played == []
-
-    def test_the_last_copy_wins(self, player, played, monkeypatch, tmp_path):
-        """Additions force duplicates, so the copy that just landed is the one
-        the user asked for."""
-        (a,) = make_files(tmp_path, "a.mp3")
-        add(player, [a])
-        add(player, [a])
-        set_engine(player, monkeypatch)
-
-        assert player.play_path(a) is True
-        assert played == [1]

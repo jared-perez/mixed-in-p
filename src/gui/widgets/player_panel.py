@@ -2870,43 +2870,23 @@ class PlayerPanel(QWidget):
         if filled and self._sort_column == self._DATE_ADDED_COLUMN:
             self._apply_sort()
 
-    def play_path_if_idle(self, path: str) -> bool:
-        """Start playing *path*, but only if nothing is under way. True if it did.
-
-        This is what "Open with Mixed in P" needs and why it is public rather
-        than the caller reaching into ``_play_track``: on a cold start playing
-        the file *is* the whole point, while a file arriving mid-set must not
-        cut the DJ off. Idle is the deciding question, and it is a wider
-        question than ``is_playing``:
-
-        - **Paused counts as busy.** A paused track still holds a position the
-          user chose and expects to resume from; replacing it loses that as
-          surely as interrupting playback does.
-        - **A pending decode counts as busy.** Between ``_play_track`` and the
-          PCM arriving, the engine is genuinely stopped — acting on that would
-          hijack a track that is a few hundred milliseconds from starting.
-
-        The search runs from the end of the list because additions force
-        duplicates: if the file was already here, the copy that just landed is
-        the last one, and that is the one the user asked for.
-        """
-        if (
-            self._engine.is_playing()
-            or self._engine.is_paused()
-            or self._pending_play_path is not None
-        ):
-            return False
-        return self.play_path(path)
-
     def play_path(self, path: str) -> bool:
         """Play *path* now, whatever is under way. True if the row was found.
 
-        The unconditional twin of :meth:`play_path_if_idle`, for a caller that
-        is relaying an explicit request — the Metadata panel's "Play in Player"
-        — rather than reacting to a file the OS handed us. There the idle test
-        would be wrong in both directions: the user asked for this track, and
-        silently refusing because another is playing is indistinguishable from
-        the menu entry being broken.
+        Unconditional, and public rather than the callers reaching into
+        ``_play_track``, for both of the requests that arrive here. The
+        Metadata panel's "Play in Player" is relaying something the user asked
+        for by name, where silently refusing because another track is playing
+        is indistinguishable from the menu entry being broken. "Open with
+        Mixed in P" is the same answer reached from the other side: this app
+        *prepares* files rather than performing with them, so a double-click
+        in Finder means "let me hear this now", which is what every other
+        audio player does when it is the default handler.
+
+        There used to be an idle-only twin of this method guarding that second
+        path — it refused to interrupt, and counted a *paused* deck and a
+        pending decode as busy as well. See ``MainWindow._flush_open_batch``
+        for why it went; do not reintroduce it without reading that first.
 
         The search runs from the end of the list because additions force
         duplicates: if the file was already here, the copy that just landed is

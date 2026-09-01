@@ -889,11 +889,22 @@ class MainWindow(QMainWindow):
            that prompt is deferred off a zero-delay timer — during app launch
            it could land before the window is even mapped. A modal nobody
            asked for is worse than a repeated row in a disposable list.
-        4. **Play only if idle.** A cold start always plays, because that is
-           the point — the owner's words: "the user wants to listen to them
-           right away, which is what Open with is supposed to provide". A file
-           arriving mid-track does not, because cutting off playback in a DJ
-           app is a real-world harm.
+        4. **Always play, interrupting whatever is under way.** A
+           double-click in Finder means "let me hear this now" — the owner's
+           words: "the user wants to listen to them right away, which is what
+           Open with is supposed to provide" — and that is what every other
+           audio player does when it is the default handler. It shipped
+           refusing to interrupt, on the reasoning that cutting a DJ off
+           mid-set is a real-world harm; that is the wrong trade for a tool
+           that *prepares* files rather than performing with them, where the
+           commonest gesture then did nothing audible. A **paused** deck
+           counted as busy too, so the app most often looked broken rather
+           than careful.
+        5. **Scroll to the row that is now playing.** The add deliberately
+           does not scroll to the end, and the playing row is only at the top
+           when Scratch was empty — on a warm app it is below the fold, so
+           hearing a track with no visible row reads as the wrong file
+           starting.
         """
         paths = shell_sorted(self._open_batch)
         self._open_batch = []
@@ -903,15 +914,18 @@ class MainWindow(QMainWindow):
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
-        # No scroll to the end: the first of these files is about to start
-        # playing, and its row is at the top.
+        # No scroll to the end: the row that matters is the *first* of these
+        # files, which is about to start playing and is scrolled to below.
         self._add_files_to_player(paths, allow_duplicates=True, scroll_to_end=False)
 
         # add_tracks resolves synchronously when the policy is forced, so the
         # tracks are in the list by now and this can act on the first of them.
         # Normalized separately, and identically, to the copy _add_files_to_player
         # stored — matching on the raw string would silently never find the row.
-        self._player_panel.play_path_if_idle(normalize_track_path(paths[0]))
+        # Guarded on the return: a miss leaves _current_index naming whatever
+        # played before, and scrolling to that would point at the wrong row.
+        if self._player_panel.play_path(normalize_track_path(paths[0])):
+            self._player_panel.scroll_to_playing_row()
 
     def _raise_to_front(self) -> None:
         """Bring the window up and give it focus, from whatever state it is in.
@@ -2538,8 +2552,8 @@ class MainWindow(QMainWindow):
         the other direction. Added to the playlist first because the player
         plays *rows*, not paths, and this file need never have been there.
 
-        ``play_path`` and not ``play_path_if_idle``: the user asked for this
-        track by name, and a request that silently does nothing because
+        ``play_path`` interrupts whatever is under way: the user asked for
+        this track by name, and a request that silently does nothing because
         something else is playing is indistinguishable from a broken menu.
         Playback survives the page change — only closing the window stops it —
         so switching to the Player and switching back to keep editing works.
