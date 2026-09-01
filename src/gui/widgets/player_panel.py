@@ -5461,8 +5461,14 @@ class PlayerPanel(QWidget):
         # the prior deleteLater may still be queued (rapid track switches → SIGBUS).
         keep_alive(self._thread_keep, thread, worker)
         thread.started.connect(worker.run)
-        worker.decoded.connect(self._on_decoded)
-        worker.error.connect(self._on_decode_error)
+        # Queued explicitly, though Qt's default already resolves to queued here
+        # (the worker emits from its own thread; the panel lives on the GUI one).
+        # Saying so pins it: these two slots open the audio device and touch
+        # widgets, so they must run on the GUI thread whatever the worker's
+        # affinity later becomes. The two thread.quit connections below stay on
+        # the default on purpose — their receiver is the thread that is emitting.
+        worker.decoded.connect(self._on_decoded, Qt.ConnectionType.QueuedConnection)
+        worker.error.connect(self._on_decode_error, Qt.ConnectionType.QueuedConnection)
         worker.decoded.connect(thread.quit)
         worker.error.connect(thread.quit)
         thread.finished.connect(worker.deleteLater)
@@ -5474,10 +5480,11 @@ class PlayerPanel(QWidget):
     def _on_decoded(self, path: str, pcm, sr: int) -> None:
         # Cache every decode (even a now-stale one) so returning to it is instant.
         if self._closing:
-            # The decode outlived the panel. Playing now would open an output
-            # device moments after shutdown_audio() released one, and nothing
-            # would ever close it — the panel is on its way out and its
-            # closeEvent has already run.
+            # A decode emitted before the close, delivered after it. Playing now
+            # would open an output device moments after shutdown_audio() released
+            # one, and nothing would ever close it — the panel is on its way out
+            # and its closeEvent has already run. (Both this flag and this slot
+            # are on the GUI thread, so the check is a plain ordering test.)
             return
         self._cache_put(path, pcm, sr)
         if path == self._pending_play_path:
