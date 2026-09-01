@@ -269,8 +269,14 @@ def run(lang: str, shots: Path | None) -> dict:
     return measured
 
 
-def child(lang: str, shots: Path | None) -> dict:
-    """One language per process — Qt does not want two QApplications."""
+def child(lang: str, shots: Path | None) -> dict | None:
+    """One language per process — Qt does not want two QApplications.
+
+    ``None`` means the child *failed*, which is deliberately distinct from an
+    empty dict meaning it ran and measured nothing. Collapsing the two is what
+    let a run in which every child aborted report ``0 regression(s)`` and exit
+    0 — see ``main``.
+    """
     import json
 
     args = [sys.executable, __file__, "--one", lang]
@@ -279,7 +285,7 @@ def child(lang: str, shots: Path | None) -> dict:
     proc = subprocess.run(args, capture_output=True, text=True, cwd=REPO)
     if proc.returncode != 0:
         print(f"!! {lang} failed:\n{proc.stderr[-2000:]}")
-        return {}
+        return None
     return json.loads(proc.stdout)
 
 
@@ -297,14 +303,36 @@ def main() -> int:
 
     from src.utils.i18n import LANGUAGES
 
+    # A total is only a result if the run that produced it happened. The
+    # fontless guard above stops each *child* reporting nonsense, but the
+    # parent used to turn twelve aborted children into "0 regression(s)" and
+    # exit 0 — which reads as success, and is a worse failure than the lurid
+    # wrong number it replaced, because nothing about it invites a second
+    # look. Two guards, because they catch different things: an English
+    # baseline of nothing makes every later comparison vacuous whatever the
+    # cause, and a child that dies after the baseline is fine would otherwise
+    # be skipped in silence.
+    failed: list[str] = []
+
     baseline = child("en", shots)
-    print(f"english baseline: {len(baseline)} text widgets measured\n")
+    print(f"english baseline: {len(baseline or {})} text widgets measured\n")
+    if not baseline:
+        why = "it failed" if baseline is None else "it measured no text widgets"
+        print(
+            f"visual_pass: no result — the English baseline is empty ({why}).\n"
+            f"  Every language is reported as a diff against English, so with\n"
+            f"  no baseline there is nothing any later number could mean."
+        )
+        return 1
 
     total = 0
     for code, native in LANGUAGES:
         if code == "en":
             continue
         found = child(code, shots)
+        if found is None:
+            failed.append(code)
+            continue
         if not found:
             continue
 
@@ -327,6 +355,12 @@ def main() -> int:
                 f"(en: {base['over']:+}px)  {cur['text'][:52]!r}"
             )
     print(f"\n{total} regression(s) across all languages")
+    if failed:
+        print(
+            f"!! {len(failed)} language(s) did not run: {', '.join(failed)}.\n"
+            f"   The count above is not a result — it is missing those runs."
+        )
+        return 1
     return 0
 
 
