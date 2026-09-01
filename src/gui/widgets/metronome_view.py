@@ -4,10 +4,17 @@ Hosted by :class:`~src.gui.widgets.metronome_section.MetronomeSection`, a
 collapsible section in the Player panel. It was the Keyboard panel's third
 view until 2026-08-26; the host supplies a place to sit, the two lifecycle
 calls at the bottom, and — since the layout pass that followed the move — a
-home on its own header row for the one control here that is hit mid-set. So
-:meth:`MetronomeView._build_start_button` builds Start and everything about
-what it *does* stays here, while :meth:`MetronomeView.start_button` hands it
-to the host to place. Nothing else in this file is laid out by anyone else.
+home on its own header row for the controls that are reached for while the
+click runs. Two things are handed up there: Start
+(:meth:`MetronomeView.start_button`) and the tempo row
+(:meth:`MetronomeView.tempo_row`), the second of which is a container widget
+purely because a layout cannot be reparented and a widget can. Everything
+about what either *does* stays here; only where they sit is the host's.
+
+That leaves the view itself one row — bend, level, click choice, beat light —
+so the whole metronome is two rows instead of four. The condensing was asked
+for in those terms: this sits above the transport in a panel whose playlist
+is fighting it for height, and two of the four rows were mostly air.
 
 Where Start stood, the click's level does: three loudnesses, cycled by one
 :class:`ClickVolumeButton`. It is a button rather than the slider it replaced
@@ -384,7 +391,16 @@ class MetronomeView(QWidget):
         outer.setContentsMargins(0, 0, 0, 0)
         outer.setSpacing(Theme.SPACING)
 
-        tempo_row = QHBoxLayout()
+        # The tempo controls, in a container of their own so the host can put
+        # them on its header row beside Start — the same arrangement Start
+        # itself already has, and for the same reason: what they *do* is this
+        # view's business, where they sit is the section's. It is a widget
+        # rather than a layout because only a widget can be reparented, and
+        # reparenting is the whole of "adopt this".
+        self._tempo_row = QWidget(self)
+        self._tempo_row.setObjectName("metronomeTempoRow")
+        tempo_row = QHBoxLayout(self._tempo_row)
+        tempo_row.setContentsMargins(0, 0, 0, 0)
         tempo_row.setSpacing(6)
         self._minus_btn = self._step_button("−", self.tr("One BPM slower"))
         self._minus_btn.clicked.connect(lambda: self._bpm_box.step(-1.0))
@@ -430,8 +446,6 @@ class MetronomeView(QWidget):
         self._global_btn.setChecked(load_config().metronome_global_click)
         self._sync_global_tooltip(self._global_btn.isChecked())
         tempo_row.addWidget(self._global_btn)
-        tempo_row.addStretch(1)
-        outer.addLayout(tempo_row)
 
         bend_row = QHBoxLayout()
         bend_row.setSpacing(6)
@@ -483,20 +497,27 @@ class MetronomeView(QWidget):
             bend_row.addWidget(button)
         self._click_group.buttonToggled.connect(self._on_click_choice)
         self._click_buttons[DEFAULT_CLICK].setChecked(True)
+        bend_row.addSpacing(16)
+
+        # The beat light ends this row rather than owning one below it. It is
+        # 14px of dots against a row of 24px buttons, so a row of its own was
+        # mostly air — and it belongs beside the click controls anyway: it
+        # shows the same beat they sound, and it is what a silent click leaves
+        # you with.
+        self._light = BeatLight()
+        bend_row.addWidget(self._light, alignment=Qt.AlignmentFlag.AlignVCenter)
         bend_row.addStretch(1)
         outer.addLayout(bend_row)
-
-        self._light = BeatLight()
-        outer.addWidget(self._light, alignment=Qt.AlignmentFlag.AlignLeft)
         outer.addStretch(1)
 
     def _build_start_button(self) -> QPushButton:
         """Start/Stop — built here, laid out by the host.
 
-        The only control in this view that the view does not place. It lives
-        on :class:`~src.gui.widgets.metronome_section.MetronomeSection`'s
-        header row, beside the word that opens the section, because that is
-        where the hand goes for it; everything that decides what it *does*
+        One of the two things this view does not place (the tempo row is the
+        other). It lives on
+        :class:`~src.gui.widgets.metronome_section.MetronomeSection`'s header
+        row, beside the word that opens the section, because that is where
+        the hand goes for it; everything that decides what it *does*
         (the toggle handler, and the ``stop()`` that has to un-check it when
         the click ends by any other route) still lives with the transport it
         drives. So the button is parented to the view — never a stray
@@ -535,6 +556,10 @@ class MetronomeView(QWidget):
     def start_button(self) -> QPushButton:
         """The transport, for the host to put on its header row."""
         return self._start_btn
+
+    def tempo_row(self) -> QWidget:
+        """The tempo controls, for the host to put on its header row."""
+        return self._tempo_row
 
     def _step_button(self, glyph: str, tip: str) -> QPushButton:
         button = QPushButton(glyph)

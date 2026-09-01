@@ -13,13 +13,15 @@ then leave running while you work. Everything about the metronome itself —
 the sample-scheduled grid, the click voices, Global Click — stayed exactly
 where it was; only its host moved.
 
-The header row carries the Start button as well as the word, which is the one
-thing the section lays out that it does not own: :class:`MetronomeView` builds
-it and drives it, and this places it. Being up here is the point — Start is
-the control the hand goes for once the tempo is set, so it is the biggest
-thing in the section and the only one not buried in the tray. It hides with
-the body, so a collapsed metronome reads exactly like the two sections beside
-it.
+The header row carries the Start button and the tempo controls as well as the
+word, and neither is the section's to own: :class:`MetronomeView` builds and
+drives both, and this only places them. Being up here is the point — Start is
+what the hand goes for once the tempo is set, so it is the biggest thing in
+the section, and BPM/Tap/Global Click are what it goes for next. Putting that
+row up beside it is what makes the whole metronome two rows rather than four,
+which matters in a panel where the playlist and the transport are competing
+for the same height. Both hide with the body, so a collapsed metronome reads
+exactly like the two sections beside it.
 
 Collapsing silences it, and it does so through :meth:`MetronomeView.hideEvent`
 rather than through anything here: hiding the body IS the stop signal, and
@@ -55,6 +57,9 @@ class MetronomeSection(QWidget):
         # A bare QWidget paints the global BG_DARK over the player's grey.
         self.setStyleSheet(
             "#metronomeSection { background: transparent; }"
+            # Adopted onto the header row, where it sits over the player's
+            # grey — and a bare QWidget paints BG_DARK.
+            "#metronomeTempoRow { background: transparent; }"
             f"#metronomeTray {{ background-color: {Theme.TRAY_BG}; border-radius: 6px; }}"
         )
         self._expanded = False
@@ -97,6 +102,16 @@ class MetronomeSection(QWidget):
         # correctly 40px tall. The word beside it keeps its AlignVCenter,
         # which is what makes the pair read as one row.
         header_row.addWidget(self._start_btn)
+        header_row.addSpacing(_START_GAP)
+        # The tempo controls ride up here too, to the right of Start: BPM,
+        # Tap and Global Click are what the hand goes for once the click is
+        # running, and putting them on this row is what takes the metronome
+        # from four rows to two. Adopted exactly as Start is — built and
+        # driven by the view, placed here.
+        self._tempo_row = self._view.tempo_row()
+        header_row.addWidget(
+            self._tempo_row, alignment=Qt.AlignmentFlag.AlignVCenter
+        )
         header_row.addStretch(1)
         layout.addLayout(header_row)
 
@@ -126,6 +141,7 @@ class MetronomeSection(QWidget):
         # could open the stream against a hidden view, which is a second way
         # into a state the Global Click rule already owns.
         self._start_btn.setVisible(visible)
+        self._tempo_row.setVisible(visible)
         section_header.sync_header_arrow(self._header_btn, visible)
         self._header_btn.setToolTip(
             self.tr("Hide the metronome")
@@ -154,8 +170,13 @@ class MetronomeSection(QWidget):
         """
         h = self._header_btn.height()
         if self._expanded:
-            # The header row grows to whichever is taller once Start is on it.
-            h = max(h, self._start_size().height())
+            # The header row grows to whichever is tallest once Start and the
+            # tempo controls are on it.
+            h = max(
+                h,
+                self._start_size().height(),
+                self._tempo_row.sizeHint().height(),
+            )
             h += Theme.SPACING + self._body.sizeHint().height()
         return h
 
@@ -187,6 +208,8 @@ class MetronomeSection(QWidget):
             + Theme.SPACING
             + _START_GAP
             + self._start_size().width()
+            + _START_GAP
+            + self._tempo_row.sizeHint().width()
         )
         return max(self._view.sizeHint().width() + 20, header_row)  # tray margins
 

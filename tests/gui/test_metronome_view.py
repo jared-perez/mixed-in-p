@@ -240,6 +240,29 @@ class TestTheTransport:
         assert view._start_btn.parent() is view
         assert view.layout().indexOf(view._start_btn) == -1
 
+    def test_the_view_does_not_lay_the_tempo_row_out_either(self, view):
+        """Handed to the host the same way Start is, and parented here for
+        the same reason — a view with no host leaves no stray window."""
+        assert view.tempo_row().parent() is view
+        assert view.layout().indexOf(view.tempo_row()) == -1
+        assert view._bpm_box.parent() is view.tempo_row()
+
+    def test_the_body_is_one_row_with_the_light_on_the_end(self, view):
+        """Four rows condensed to two: the tempo controls went up to the
+        header and the beat light joined the click controls, which were 14px
+        of dots and a row of mostly air before."""
+        outer = view.layout()
+        rows = [
+            outer.itemAt(i).layout()
+            for i in range(outer.count())
+            if outer.itemAt(i).layout() is not None
+        ]
+
+        assert len(rows) == 1
+        widgets = [rows[0].itemAt(i).widget() for i in range(rows[0].count())]
+        assert view._light in widgets
+        assert view._volume_btn in widgets
+
     def test_it_is_wide_enough_for_the_wider_of_its_two_labels(self, view):
         """Measured, not written down: every label here is translated, and a
         QPushButton centres rather than elides, so a width short by a few
@@ -533,7 +556,9 @@ class TestGlobalClickIsRemembered:
         assert "metronome_global_click = disk.metronome_global_click" in merge
 
     def test_it_sits_beside_tap(self, view):
-        row = view._tap_btn.parentWidget().layout().itemAt(0).layout()
+        # Both live on the tempo row, which is the container the host adopts
+        # onto its header — so the row IS that widget's own layout.
+        row = view.tempo_row().layout()
         widgets = [row.itemAt(i).widget() for i in range(row.count())]
         assert widgets.index(view._global_btn) == widgets.index(view._tap_btn) + 1
 

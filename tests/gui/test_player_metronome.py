@@ -132,6 +132,19 @@ class TestStartSitsOnTheHeaderRow:
         """Drawn that way on purpose — it is not a second word of the label."""
         assert section._start_size().height() > section._header_btn.height()
 
+    def test_the_tempo_controls_share_that_row_too(self, section):
+        """The condensing: BPM/Tap/Global Click ride beside Start instead of
+        owning a row of their own, which is half of two-rows-not-four."""
+        row = section.layout().itemAt(0).layout()
+        widgets = [row.itemAt(i).widget() for i in range(row.count())]
+
+        assert section.view.tempo_row() in widgets
+        assert section.view.tempo_row().parent() is section
+        # Right of Start, not left of it.
+        assert widgets.index(section.view.tempo_row()) > widgets.index(
+            section._start_btn
+        )
+
     def test_a_collapsed_section_shows_only_its_word(self, section, qtbot):
         """The same shape as the two sections beside it. It also closes the
         second door into a running click: Start reachable over a hidden body
@@ -141,12 +154,15 @@ class TestStartSitsOnTheHeaderRow:
         qtbot.waitExposed(section)
 
         assert section._start_btn.isHidden()
+        assert section.view.tempo_row().isHidden()
 
         section.set_expanded(True)
         assert not section._start_btn.isHidden()
+        assert not section.view.tempo_row().isHidden()
 
         section.set_expanded(False)
         assert section._start_btn.isHidden()
+        assert section.view.tempo_row().isHidden()
 
     def test_the_window_minimum_covers_the_header_row(self, section):
         """row_min_width measures both rows now — the header one can be the
@@ -156,6 +172,8 @@ class TestStartSitsOnTheHeaderRow:
             + Theme.SPACING
             + 12
             + section._start_size().width()
+            + 12
+            + section.view.tempo_row().sizeHint().width()
         )
 
         assert section.row_min_width() >= header_row
