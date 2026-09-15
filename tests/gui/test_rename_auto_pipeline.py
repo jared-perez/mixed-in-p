@@ -13,6 +13,8 @@ Structure, never pixels: the suite runs with no application stylesheet.
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 from PySide6.QtWidgets import QMessageBox
 
@@ -30,6 +32,18 @@ def _wav(path, samplerate: int = 44100, subtype: str = "PCM_16") -> str:
     t = np.linspace(0, 0.1, int(samplerate * 0.1), endpoint=False)
     sf.write(str(path), (0.2 * np.sin(2 * np.pi * 440 * t)).astype("float32"),
              samplerate, subtype=subtype)
+    return str(path)
+
+
+def _flac(path, seconds: float = 2.0) -> str:
+    """A tone long enough for beat tracking to answer with a BPM."""
+    sf = pytest.importorskip("soundfile")
+    import numpy as np
+
+    sr = 44100
+    t = np.linspace(0, seconds, int(sr * seconds), endpoint=False)
+    sf.write(str(path), (0.2 * np.sin(2 * np.pi * 440 * t)).astype("float32"),
+             sr, subtype="PCM_16")
     return str(path)
 
 
@@ -348,3 +362,43 @@ def test_an_already_analysed_row_is_filed_without_re_analysing(
     assert analysed == []
     members = win._library.get_items(_playlist(win, "Friday set").id)
     assert [m.path for m in members] == [path]
+
+
+# ------------------------------------------------------------ start at Convert
+
+
+def test_a_convert_start_renames_the_converted_file(window, qtbot, tmp_path):
+    """The whole run, from the Convert panel's own button: FLAC -> AIFF ->
+    analysed -> the AIFF wears the BPM/key prefix and the row follows it.
+
+    Written after a Windows report of exactly this run tagging the AIFF and
+    leaving its name alone. Nothing in the suite had ever asked whether a
+    pipeline analysis ends in the auto-rename the Settings checkbox promises.
+    """
+    win = window(pipeline_rename_enabled=True, pipeline_convert_enabled=True,
+                 pipeline_analyze_enabled=True, pipeline_playlist="Friday set",
+                 convert_target_format="AIFF", convert_sample_rate=None,
+                 convert_bit_depth=None, auto_rename=True)
+    win._conversion_panel.add_files([_flac(tmp_path / "song.flac")])
+
+    win._conversion_panel._on_convert_clicked()
+
+    assert win._pipeline.active
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=120000)
+    qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=120000)
+    qtbot.waitUntil(lambda: win._rename_thread is None, timeout=30000)
+
+    aiffs = sorted(p.name for p in tmp_path.glob("*.aiff"))
+    assert len(aiffs) == 1 and aiffs[0] != "song.aiff", aiffs
+    assert aiffs[0].endswith(" - song.aiff"), aiffs
+    (row,) = [t for t in win._store.get_all() if t.state == TrackState.ANALYSED]
+    assert Path(row.file_path).name == aiffs[0]
+
+
+def test_a_closed_gate_is_named_in_the_log(window, caplog):
+    """Every gate declines in silence; the log line is the only witness."""
+    win = window(auto_rename=False)
+    win._pending_rename_operations = []
+    with caplog.at_level("INFO", logger="src.gui.main_window"):
+        assert win._auto_rename_gate_open("finished", 1) is False
+    assert "armed=True setting=False frozen=False -> skip" in caplog.text

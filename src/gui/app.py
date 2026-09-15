@@ -41,19 +41,132 @@ def _get_base_path() -> Path:
     return Path(__file__).resolve().parent.parent.parent
 
 
-def setup_logging():
-    """Configure logging for the application."""
-    logging.basicConfig(
-        level=logging.INFO,
-        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        handlers=[
-            logging.StreamHandler(sys.stdout)
-        ]
-    )
+_LOG_FORMAT = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+_LOG_FILE_NAME = "mixedinp.log"
+_LOG_FILE_BYTES = 2 * 1024 * 1024
+_LOG_FILE_BACKUPS = 3
+_file_handler: logging.Handler | None = None
+_stream_handler: logging.Handler | None = None
+
+
+def log_file_path() -> Path:
+    """Where the running app writes its log: ``<app data>/logs/mixedinp.log``.
+
+    Imported inside the function on purpose: the suite isolates app data by
+    patching ``get_app_data_dir`` on its module, and a module-level binding
+    here would silently opt out of that sandbox (see CLAUDE.md).
+    """
+    from ..utils.app_dirs import get_app_data_dir
+
+    return get_app_data_dir() / "logs" / _LOG_FILE_NAME
+
+
+def setup_logging() -> Path | None:
+    """Configure logging: stdout when there is one, and always a file.
+
+    The installed build has no console (PyInstaller's windowed mode leaves
+    ``sys.stdout`` as None), so until the file handler existed nothing the app
+    logged on a user's machine survived — a rename that was declined, a write
+    that failed, an exception swallowed inside a Qt slot. The file rotates at
+    a couple of megabytes so it can be left on forever. Returns the log path,
+    or None if the directory could not be written (stdout-only then).
+
+    Not ``basicConfig``: that is a no-op once the root logger has any handler,
+    which under pytest it always does, so the handlers are attached by hand
+    and replaced rather than stacked on a second call.
+    """
+    global _file_handler, _stream_handler
+
+    root = logging.getLogger()
+    root.setLevel(logging.INFO)
+    formatter = logging.Formatter(_LOG_FORMAT)
+
+    if _stream_handler is not None:
+        root.removeHandler(_stream_handler)
+        _stream_handler = None
+    if sys.stdout is not None:
+        _stream_handler = logging.StreamHandler(sys.stdout)
+        _stream_handler.setFormatter(formatter)
+        root.addHandler(_stream_handler)
+
+    if _file_handler is not None:
+        root.removeHandler(_file_handler)
+        _file_handler.close()
+        _file_handler = None
+    path: Path | None = None
+    try:
+        from logging.handlers import RotatingFileHandler
+
+        path = log_file_path()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        _file_handler = RotatingFileHandler(
+            path,
+            maxBytes=_LOG_FILE_BYTES,
+            backupCount=_LOG_FILE_BACKUPS,
+            encoding="utf-8",
+        )
+        _file_handler.setFormatter(formatter)
+        root.addHandler(_file_handler)
+    except OSError as exc:
+        path = None
+        logger.warning("Log file unavailable (%s); logging to stdout only", exc)
+
     # Set debug level for our modules
-    logging.getLogger('src.gui').setLevel(logging.DEBUG)
-    logging.getLogger('src.metadata').setLevel(logging.DEBUG)
-    logging.getLogger('src.renamer').setLevel(logging.DEBUG)
+    logging.getLogger("src.gui").setLevel(logging.DEBUG)
+    logging.getLogger("src.metadata").setLevel(logging.DEBUG)
+    logging.getLogger("src.renamer").setLevel(logging.DEBUG)
+
+    _install_excepthook()
+
+    from .. import __version__
+
+    logger.info(
+        "Mixed in P %s starting: python %s, %s, frozen=%s, log=%s",
+        __version__,
+        sys.version.split()[0],
+        sys.platform,
+        bool(getattr(sys, "frozen", False)),
+        path,
+    )
+    return path
+
+
+def teardown_logging() -> None:
+    """Detach the handlers setup_logging attached (tests; idempotent).
+
+    The file handler keeps its log open, and on Windows an open file blocks
+    the throwaway app-data directory from being deleted after a test.
+    """
+    global _file_handler, _stream_handler
+    root = logging.getLogger()
+    for handler in (_file_handler, _stream_handler):
+        if handler is not None:
+            root.removeHandler(handler)
+            handler.close()
+    _file_handler = _stream_handler = None
+
+
+def _install_excepthook() -> None:
+    """Route an exception that escapes a Qt slot into the log.
+
+    PySide prints such an exception and carries on — to stderr, which the
+    installed build does not have — so a handler that died halfway looked
+    exactly like one that ran and chose to do nothing. Chains to whatever
+    hook was there before so the console still sees it in development.
+    """
+    previous = sys.excepthook
+    if getattr(previous, "_mixedinp_hook", False):
+        return
+
+    def hook(exc_type, exc, tb):
+        logger.error("Unhandled exception", exc_info=(exc_type, exc, tb))
+        try:
+            previous(exc_type, exc, tb)
+        except Exception:  # noqa: BLE001 — a hook that raises loses the log
+            pass
+
+    hook._mixedinp_hook = True  # type: ignore[attr-defined]
+    sys.excepthook = hook
 
 
 def load_stylesheet() -> str:

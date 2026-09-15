@@ -1223,11 +1223,7 @@ class MainWindow(QMainWindow):
         self._sidebar.set_page_busy("analysis", False)
 
         # Auto-rename pipeline: only for tracks just analyzed in this batch
-        if (
-            self._pending_rename_operations is not None
-            and self._config.auto_rename
-            and not self._analysis_writes_frozen
-        ):
+        if self._auto_rename_gate_open("finished", len(results)):
             self._auto_rename_after_analysis(results)
         self._pending_rename_operations = None
 
@@ -1291,12 +1287,7 @@ class MainWindow(QMainWindow):
         # Same auto-rename gate as the finished path, over just what completed
         # — including the write-freeze, since a cancel's follow-through writes
         # to disk exactly like a normal finish does.
-        if (
-            completed
-            and self._pending_rename_operations is not None
-            and self._config.auto_rename
-            and not self._analysis_writes_frozen
-        ):
+        if completed and self._auto_rename_gate_open("cancelled", len(completed)):
             self._auto_rename_after_analysis(
                 [AnalysisResult(
                     file_path=t.file_path,
@@ -1315,13 +1306,40 @@ class MainWindow(QMainWindow):
         if self._pipeline.active:
             self._finish_pipeline_summary()
 
+    def _auto_rename_gate_open(self, origin: str, count: int) -> bool:
+        """The three things that must all hold for an analysis to end in a rename.
+
+        Logged as one line naming each, because every one of them declines in
+        silence: a run that analysed, tagged and never renamed reads the same
+        from the outside whichever gate closed. The log is the only witness.
+        """
+        armed = self._pending_rename_operations is not None
+        setting = bool(self._config.auto_rename)
+        frozen = self._analysis_writes_frozen
+        logger.info(
+            "Auto-rename gate (%s, %d result(s)): armed=%s setting=%s frozen=%s -> %s",
+            origin, count, armed, setting, frozen,
+            "rename" if (armed and setting and not frozen) else "skip",
+        )
+        return armed and setting and not frozen
+
     def _auto_rename_after_analysis(self, current_results: list[AnalysisResult]) -> None:
         """Build rename previews for the current analysis batch and start rename thread."""
         # Only rename tracks from this batch, not all previously-analyzed tracks
         successful_paths = {r.file_path for r in current_results if not r.error}
         all_analysed = self._store.get_by_state(TrackState.ANALYSED)
         analysed_tracks = [t for t in all_analysed if t.file_path in successful_paths]
+        logger.info(
+            "Auto-rename: %d result(s), %d without error, %d matched an analysed row",
+            len(current_results), len(successful_paths), len(analysed_tracks),
+        )
         if not analysed_tracks:
+            unmatched = successful_paths - {t.file_path for t in all_analysed}
+            logger.warning(
+                "Auto-rename skipped: no analysed row for %s; analysed rows are %s",
+                sorted(unmatched),
+                sorted(t.file_path for t in all_analysed),
+            )
             return
 
         analysis_dict = {
@@ -1346,9 +1364,22 @@ class MainWindow(QMainWindow):
             track_previews = preview_rename([track.file_path], ops, analysis_dict)
             all_previews.extend(track_previews)
 
-        if not all_previews or has_conflicts(all_previews):
+        for preview in all_previews:
+            logger.info(
+                "Auto-rename plan: %r -> %r%s",
+                preview.original_name, preview.new_name,
+                f" CONFLICT with {preview.conflict_with!r}" if preview.will_conflict else "",
+            )
+        if not all_previews:
+            logger.warning("Auto-rename skipped: nothing to preview")
+            return
+        if has_conflicts(all_previews):
+            logger.warning(
+                "Auto-rename skipped: the batch has a name conflict (see the plan above)"
+            )
             return
         if not has_changes(all_previews):
+            logger.warning("Auto-rename skipped: no name would change")
             return
 
         self._start_rename(all_previews, [])
@@ -1820,6 +1851,7 @@ class MainWindow(QMainWindow):
             self._sidebar.set_current_page("analysis")
             self._on_page_changed("analysis")
             self._pending_rename_operations = []  # enable auto-rename gate
+            logger.info("Pipeline: analysing %d file(s), auto-rename gate armed", len(track_ids))
             self._start_analysis(track_ids)
 
     def _on_pipeline_rename_error(self) -> None:
@@ -2296,6 +2328,7 @@ class MainWindow(QMainWindow):
     def _start_rename(self, previews: list[RenamePreview], operations: list[RenameOperation]) -> None:
         """Start the rename operation."""
         if self._rename_thread is not None and self._rename_thread.isRunning():
+            logger.warning("Rename refused: a rename thread is still running")
             QMessageBox.warning(
                 self,
                 self.tr("Rename in Progress"),
@@ -2306,7 +2339,9 @@ class MainWindow(QMainWindow):
         # Count actual renames
         rename_count = len([p for p in previews if p.original_name != p.new_name and not p.will_conflict])
         if rename_count == 0:
+            logger.warning("Rename skipped: %d preview(s), none would change a name", len(previews))
             return
+        logger.info("Rename starting: %d of %d preview(s) will move", rename_count, len(previews))
 
         # Rename is near-instant, so there's no progress bar: completed rows
         # are highlighted with a green tint + "Changed" pill by the panel once
@@ -2318,6 +2353,7 @@ class MainWindow(QMainWindow):
 
     def _on_rename_finished(self, session: RenameSession) -> None:
         """Handle rename finished."""
+        logger.info("Rename finished: %d file(s) moved", len(session.records))
         self._last_session = session
         self._rename_panel.set_undo_enabled(True)
 
@@ -2403,6 +2439,7 @@ class MainWindow(QMainWindow):
 
     def _on_rename_error(self, error: str) -> None:
         """Handle rename error."""
+        logger.error("Rename failed: %s", error)
         QMessageBox.critical(self, self.tr("Rename Failed"), error)
         self._rename_thread = None
         self._on_pipeline_rename_error()
