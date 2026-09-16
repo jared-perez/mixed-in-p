@@ -20,7 +20,9 @@ from PySide6.QtWidgets import QMessageBox
 
 from src.gui.convert_pipeline import STEP_ANALYZE, STEP_CONVERT, STEP_RENAME
 from src.gui.main_window import MainWindow
+from src.gui.widgets.player_panel import PlayerPanel
 from src.gui.models.state import TrackState
+from src.library import SCRATCH_NODE_ID
 from src.utils.config import AppConfig, save_config
 
 
@@ -446,3 +448,42 @@ def test_a_nested_pick_survives_a_relaunch(window, qtbot):
     # the remembered name the way a relaunch would find it on disk.
     second = window(pipeline_analyze_enabled=True, pipeline_playlist="Gigs / Friday")
     assert second._header.pipeline.pipeline_target() == (nested, "Gigs / Friday")
+
+
+# ---------------------------------------------- an Open-with landing mid-run
+
+
+def test_an_open_with_mid_run_does_not_divert_the_track(window, qtbot, tmp_path, monkeypatch):
+    """Explorer double-click while a run is converting: the opened file goes to
+    Scratch and plays, the run's track still lands in the target, renamed.
+
+    Windows 10 report, 2026-09-16: with an Open-with during the run the track
+    did not reach the playlist; without one it did. It does here — so if this
+    passes on that machine too, the log is what says what differs.
+    """
+    monkeypatch.setattr("src.gui.main_window.OPEN_BATCH_MS", 10)
+    monkeypatch.setattr(PlayerPanel, "_play_track", lambda self, i: None)  # no audio
+    win = window(pipeline_rename_enabled=True, pipeline_convert_enabled=True,
+                 pipeline_analyze_enabled=True, pipeline_playlist="Friday set",
+                 convert_target_format="AIFF", convert_sample_rate=None,
+                 convert_bit_depth=None, auto_rename=True)
+    target = win._library.create_playlist("Friday set")
+    win._refresh_pipeline_playlists()
+    assert win._header.pipeline.select_node(target)
+    win._player_panel.load_node(target)  # watching the target, as one would
+    win._conversion_panel.add_files([_flac(tmp_path / "song.flac", seconds=6.0)])
+    other = _wav(tmp_path / "other.wav")
+
+    win._conversion_panel._on_convert_clicked()
+    assert win._pipeline.active
+    win.open_files([other])  # lands while the encode runs
+
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=120000)
+    qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=120000)
+    qtbot.waitUntil(lambda: win._rename_thread is None, timeout=30000)
+
+    members = [Path(m.path).name for m in win._library.get_items(target)]
+    assert len(members) == 1 and members[0].endswith(" - song.aiff"), members
+    scratch = [Path(m.path).name for m in win._library.get_items(SCRATCH_NODE_ID)]
+    assert scratch == ["other.wav"]
+    assert win._player_panel.loaded_node_id == SCRATCH_NODE_ID
