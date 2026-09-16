@@ -1558,11 +1558,17 @@ class MainWindow(QMainWindow):
         """
         node_id, text = self._header.pipeline.pipeline_target()
         if node_id is not None:
+            logger.info("Pipeline target: picked %r (node %d)", text, node_id)
             return node_id, text
         if not text:
+            logger.warning("Pipeline target: nothing picked and nothing typed")
             return None
         name = self._unique_playlist_name(text)
         new_id = self._library.create_playlist(name)
+        logger.info(
+            "Pipeline target: created root playlist %r (node %d) from typed text %r",
+            name, new_id, text,
+        )
         self._playlists_panel.ensure_loaded()
         self._playlists_panel.tree.refresh()
         self._header.pipeline.select_node(new_id)
@@ -1597,7 +1603,10 @@ class MainWindow(QMainWindow):
         if target is None:
             return file_paths
         node_id, name = target
-        self._pipeline.arm(node_id, name, steps=self._enabled_steps())
+        steps = self._enabled_steps()
+        logger.info("Pipeline armed from Convert: steps=%s target=%r (node %d), %d file(s)",
+                    sorted(steps), name, node_id, len(file_paths))
+        self._pipeline.arm(node_id, name, steps=steps)
         return self._load_convert_leg(file_paths)
 
     def _load_convert_leg(self, file_paths: list[str]) -> list[str]:
@@ -1693,6 +1702,8 @@ class MainWindow(QMainWindow):
             return  # blank name; _pipeline_blocker already said so
         node_id, name = target
         steps = self._enabled_steps()
+        logger.info("Pipeline armed from %s: steps=%s target=%r (node %d), %d file(s)",
+                    start_step, sorted(steps), name, node_id, len(files))
 
         if start_step == STEP_RENAME:
             self._pipeline.arm(node_id, name, steps=steps, to_rename=files)
@@ -1802,8 +1813,12 @@ class MainWindow(QMainWindow):
             if not self._pipeline.direct_add_done(path):
                 return
             if resolved:
+                logger.info("Pipeline: %r filed un-analysed into %r (node %d)",
+                            Path(path).name, run.playlist_name, run.node_id)
                 self._pipeline.record_added(path)
             else:
+                logger.info("Pipeline: %r skipped as a duplicate in node %d",
+                            Path(path).name, run.node_id)
                 self._pipeline.record_skipped()
             self._finish_pipeline_if_done()
 
@@ -1816,6 +1831,8 @@ class MainWindow(QMainWindow):
         )
         if not started and self._pipeline.direct_add_done(path):
             # No library, or the playlist was deleted mid-run.
+            logger.warning("Pipeline: %r not filed — node %d is gone or there is no library",
+                           Path(path).name, run.node_id)
             self._pipeline.record_skipped()
             self._finish_pipeline_if_done()
 
@@ -1894,6 +1911,9 @@ class MainWindow(QMainWindow):
             return
         added, skipped, errors = self._pipeline.summary()
         name = self._pipeline.run.playlist_name if self._pipeline.run else ""
+        logger.info("Pipeline complete: %d added to %r (node %s), %d skipped, %d errors",
+                    added, name, self._pipeline.run.node_id if self._pipeline.run else None,
+                    skipped, errors)
         parts = [
             self.tr("Pipeline complete: {added} added to {playlist}").format(
                 added=added, playlist=name
@@ -2145,6 +2165,12 @@ class MainWindow(QMainWindow):
         library_path = self._pipeline.track_analysed(result.file_path, result.error)
         if library_path:
             self._pipeline_add_to_playlist(library_path, result)
+        elif self._pipeline.active:
+            logger.info(
+                "Pipeline: %r not filed (%s)",
+                Path(result.file_path).name,
+                "analysis error" if result.error else "not part of this run",
+            )
 
     def _pipeline_add_to_playlist(self, path: str, result: AnalysisResult) -> None:
         """Put one analysed file into the run's playlist.
@@ -2164,9 +2190,13 @@ class MainWindow(QMainWindow):
 
         def committed(resolved: list[str]) -> None:
             if not resolved:
+                logger.info("Pipeline: %r skipped as a duplicate in node %d",
+                            Path(path).name, run.node_id)
                 self._pipeline.record_skipped()
                 self._finish_pipeline_if_done()
                 return
+            logger.info("Pipeline: %r filed into %r (node %d)",
+                        Path(path).name, run.playlist_name, run.node_id)
             self._pipeline.record_added(path)
             # Patch the row with what the analysis found. The tag read inside
             # _track_id_for cannot supply it in three cases: a WAV has nowhere
@@ -2194,6 +2224,8 @@ class MainWindow(QMainWindow):
         )
         if not started:
             # No library, or the playlist was deleted mid-run.
+            logger.warning("Pipeline: %r not filed — node %d is gone or there is no library",
+                           Path(path).name, run.node_id)
             self._pipeline.record_skipped()
             self._finish_pipeline_if_done()
 

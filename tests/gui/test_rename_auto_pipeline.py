@@ -402,3 +402,47 @@ def test_a_closed_gate_is_named_in_the_log(window, caplog):
     with caplog.at_level("INFO", logger="src.gui.main_window"):
         assert win._auto_rename_gate_open("finished", 1) is False
     assert "armed=True setting=False frozen=False -> skip" in caplog.text
+
+
+# ---------------------------------------------------- a playlist inside a folder
+
+
+def _nested_target(win, folder="Gigs", name="Friday"):
+    """A playlist inside a folder, picked in the header field by id."""
+    folder_id = win._library.create_folder(folder)
+    nested = win._library.create_playlist(name, parent_id=folder_id)
+    win._refresh_pipeline_playlists()
+    assert win._header.pipeline.select_node(nested)
+    return nested
+
+
+def test_a_nested_playlist_pick_receives_the_run(window, qtbot, tmp_path):
+    """The target is the header field's pick, folder or not — never a fresh
+    root playlist wearing the folder-spelled label as its name."""
+    win = window(pipeline_analyze_enabled=True)
+    nested = _nested_target(win)
+    path = _wav(tmp_path / "a.wav")
+    track = win._store.add_from_path(path)
+    win._store.update(track.id, state=TrackState.ANALYSED)  # direct-add leg
+
+    assert win._header.pipeline.pipeline_target() == (nested, "Gigs / Friday")
+    win._start_pipeline_from(STEP_ANALYZE)
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=10000)
+
+    assert [m.path for m in win._library.get_items(nested)] == [path]
+    root_names = [n.name for n in win._library.get_children(None)]
+    assert "Gigs / Friday" not in root_names and "Friday" not in root_names
+
+
+def test_a_nested_pick_survives_a_relaunch(window, qtbot):
+    """Remembered by label, and the label resolves back to the same node —
+    the trap is a restore that only types the text back, which creates a
+    new numbered playlist at root on the next Start."""
+    first = window(pipeline_analyze_enabled=True)
+    nested = _nested_target(first)
+    qtbot.waitUntil(lambda: first._config.pipeline_playlist == "Gigs / Friday")
+
+    # The fixture writes a fresh config per window, so hand the second one
+    # the remembered name the way a relaunch would find it on disk.
+    second = window(pipeline_analyze_enabled=True, pipeline_playlist="Gigs / Friday")
+    assert second._header.pipeline.pipeline_target() == (nested, "Gigs / Friday")
