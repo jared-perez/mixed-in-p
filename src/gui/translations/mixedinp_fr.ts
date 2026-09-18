@@ -1520,69 +1520,69 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="642"/>
-        <location filename="../main_window.py" line="671"/>
+        <location filename="../main_window.py" line="644"/>
+        <location filename="../main_window.py" line="673"/>
         <source>Export All Playlists</source>
         <translation>Exporter toutes les listes</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="663"/>
+        <location filename="../main_window.py" line="665"/>
         <source>Export failed</source>
         <translation>Échec de l’exportation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="664"/>
+        <location filename="../main_window.py" line="666"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Impossible d’écrire le fichier :
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="672"/>
+        <location filename="../main_window.py" line="674"/>
         <source>There are no playlists to export yet.</source>
         <translation>Il n’y a encore aucune liste de lecture à exporter.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="677"/>
+        <location filename="../main_window.py" line="679"/>
         <source>Export complete</source>
         <translation>Exportation terminée</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="678"/>
+        <location filename="../main_window.py" line="680"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} listes de lecture ({1} morceaux) exportées vers :
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="769"/>
+        <location filename="../main_window.py" line="771"/>
         <source>Select Audio Files</source>
         <translation>Sélectionner des fichiers audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="780"/>
+        <location filename="../main_window.py" line="782"/>
         <source>Select Folder</source>
         <translation>Sélectionner un dossier</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1024"/>
+        <location filename="../main_window.py" line="1026"/>
         <source>No Audio Files</source>
         <translation>Aucun fichier audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1025"/>
+        <location filename="../main_window.py" line="1027"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Aucun fichier audio trouvé dans :
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1030"/>
+        <location filename="../main_window.py" line="1032"/>
         <source>Invalid Folder</source>
         <translation>Dossier non valide</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1031"/>
+        <location filename="../main_window.py" line="1033"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Répertoire non valide :
@@ -1597,17 +1597,17 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Une analyse est déjà en cours. Veuillez patienter ou l&apos;annuler d&apos;abord.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1229"/>
+        <location filename="../main_window.py" line="1231"/>
         <source>Analyzing...</source>
         <translation>Analyse en cours...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1261"/>
+        <location filename="../main_window.py" line="1263"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Terminé : {0} analysés, {1} erreurs</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1265"/>
+        <location filename="../main_window.py" line="1267"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Terminé : {0} fichiers analysés</translation>
     </message>
@@ -1616,127 +1616,127 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Annulé</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1487"/>
+        <location filename="../main_window.py" line="1489"/>
         <source>Conversion in Progress</source>
         <translation>Conversion en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1488"/>
+        <location filename="../main_window.py" line="1490"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Une conversion est déjà en cours. Veuillez patienter.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1506"/>
+        <location filename="../main_window.py" line="1508"/>
         <source>Pipeline in Progress</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Pipeline en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1507"/>
+        <location filename="../main_window.py" line="1509"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>La dernière exécution du pipeline n&apos;est pas encore terminée — attendez qu&apos;elle s&apos;achève.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1524"/>
+        <location filename="../main_window.py" line="1526"/>
         <source>No Target Playlist</source>
         <translation>Aucune liste de destination</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1525"/>
-        <location filename="../main_window.py" line="1718"/>
+        <location filename="../main_window.py" line="1527"/>
+        <location filename="../main_window.py" line="1720"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>Indiquez d&apos;abord une liste pour l&apos;exécution dans la barre d&apos;en-tête.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1730"/>
+        <location filename="../main_window.py" line="1732"/>
         <source>Cannot Start</source>
         <translation>Démarrage impossible</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1740"/>
+        <location filename="../main_window.py" line="1742"/>
         <source>No Files</source>
         <translation>Aucun fichier</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1741"/>
+        <location filename="../main_window.py" line="1743"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Ajoutez des fichiers à ce panneau avant de démarrer une exécution du pipeline.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1751"/>
+        <location filename="../main_window.py" line="1753"/>
         <source>No Rename Adjustments</source>
         <translation>Aucun réglage de renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1752"/>
+        <location filename="../main_window.py" line="1754"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>Aucun réglage de renommage n&apos;est défini. Envoyer les fichiers tels quels ?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1847"/>
+        <location filename="../main_window.py" line="1849"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>Les fichiers avec perte restent dans Convertir : leur statut explique pourquoi.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1975"/>
+        <location filename="../main_window.py" line="1977"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Pipeline terminé : {added} ajoutés à {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1980"/>
+        <location filename="../main_window.py" line="1982"/>
         <source>{n} skipped</source>
         <translation>{n} ignorés</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1982"/>
+        <location filename="../main_window.py" line="1984"/>
         <source>{n} errors</source>
         <translation>{n} erreurs</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2074"/>
+        <location filename="../main_window.py" line="2076"/>
         <source>Converting...</source>
         <translation>Conversion en cours...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2090"/>
+        <location filename="../main_window.py" line="2092"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Terminé : {0} convertis, {1} erreurs</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2094"/>
+        <location filename="../main_window.py" line="2096"/>
         <source>Complete: {0} files converted</source>
         <translation>Terminé : {0} fichiers convertis</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2426"/>
+        <location filename="../main_window.py" line="2433"/>
         <source>Rename in Progress</source>
         <translation>Renommage en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2427"/>
+        <location filename="../main_window.py" line="2434"/>
         <source>A rename operation is already running.</source>
         <translation>Une opération de renommage est déjà en cours.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2535"/>
+        <location filename="../main_window.py" line="2542"/>
         <source>Rename Failed</source>
         <translation>Échec du renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2570"/>
+        <location filename="../main_window.py" line="2577"/>
         <source>Undo Rename</source>
         <translation>Annuler le renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2605"/>
+        <location filename="../main_window.py" line="2612"/>
         <source>Undo Failed</source>
         <translation>Échec de l’annulation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2661"/>
+        <location filename="../main_window.py" line="2668"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Activez l&apos;étape Convertir pour lancer le pipeline depuis ici.</translation>
@@ -1746,12 +1746,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Configurez d&apos;abord la chaîne dans le panneau Convertir.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1713"/>
+        <location filename="../main_window.py" line="1715"/>
         <source>A conversion is already running.</source>
         <translation>Une conversion est déjà en cours.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1715"/>
+        <location filename="../main_window.py" line="1717"/>
         <source>The last pipeline run is still finishing.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>La dernière exécution du pipeline n&apos;est pas encore terminée.</translation>
@@ -1770,22 +1770,22 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">{0} fichiers renommés</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2542"/>
+        <location filename="../main_window.py" line="2549"/>
         <source>No Session</source>
         <translation>Aucune session</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2542"/>
+        <location filename="../main_window.py" line="2549"/>
         <source>No rename session to undo.</source>
         <translation>Aucune session de renommage à annuler.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2551"/>
+        <location filename="../main_window.py" line="2558"/>
         <source>Confirm Undo</source>
         <translation>Confirmer l&apos;annulation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2552"/>
+        <location filename="../main_window.py" line="2559"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Annuler le renommage de {0} fichiers ?</translation>
     </message>
@@ -1794,7 +1794,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Annulation du renommage...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2571"/>
+        <location filename="../main_window.py" line="2578"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Annulé : {0} fichiers, {1} erreurs</translation>
     </message>
@@ -2185,18 +2185,18 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>MetronomeSection</name>
     <message>
-        <location filename="../widgets/metronome_section.py" line="88"/>
+        <location filename="../widgets/metronome_section.py" line="96"/>
         <source>Metronome</source>
         <translation>Métronome</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_section.py" line="152"/>
+        <location filename="../widgets/metronome_section.py" line="162"/>
         <source>Hide the metronome</source>
         <translatorcomment>Disclosure header for the Player panel&apos;s metronome section. Same register as the Waveform / Loop Slicer headers beside it; the tooltip states what the next click will do.</translatorcomment>
         <translation>Masquer le métronome</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_section.py" line="154"/>
+        <location filename="../widgets/metronome_section.py" line="164"/>
         <source>Show the metronome — tap a tempo and click along</source>
         <translatorcomment>Disclosure header for the Player panel&apos;s metronome section. Same register as the Waveform / Loop Slicer headers beside it; the tooltip states what the next click will do.</translatorcomment>
         <translation>Afficher le métronome — tapez un tempo et suivez le clic</translation>
@@ -2205,89 +2205,89 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>MetronomeView</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="420"/>
+        <location filename="../widgets/metronome_view.py" line="481"/>
         <source>One BPM slower</source>
         <translation>1 BPM plus lent</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="429"/>
+        <location filename="../widgets/metronome_view.py" line="490"/>
         <source>One BPM faster</source>
         <translation>1 BPM plus rapide</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="438"/>
+        <location filename="../widgets/metronome_view.py" line="499"/>
         <source>Tap</source>
         <translation>Taper</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="441"/>
+        <location filename="../widgets/metronome_view.py" line="502"/>
         <source>Tap along to set the tempo</source>
         <translation>Tapez en rythme pour régler le tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="449"/>
+        <location filename="../widgets/metronome_view.py" line="510"/>
         <source>Global Click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clic global</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="468"/>
+        <location filename="../widgets/metronome_view.py" line="529"/>
         <source>Track</source>
         <translation>Morceau</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="528"/>
+        <location filename="../widgets/metronome_view.py" line="591"/>
         <source>Hold to lean the beat back</source>
         <translation>Maintenez pour retarder le beat</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="531"/>
+        <location filename="../widgets/metronome_view.py" line="594"/>
         <source>Hold to push the beat forward</source>
         <translation>Maintenez pour avancer le beat</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="565"/>
-        <location filename="../widgets/metronome_view.py" line="582"/>
-        <location filename="../widgets/metronome_view.py" line="631"/>
+        <location filename="../widgets/metronome_view.py" line="628"/>
+        <location filename="../widgets/metronome_view.py" line="645"/>
+        <location filename="../widgets/metronome_view.py" line="694"/>
         <source>Start</source>
         <translation>Démarrer</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="831"/>
+        <location filename="../widgets/metronome_view.py" line="894"/>
         <source>Use the loaded track&apos;s tempo — {0} BPM</source>
         <translation>Utiliser le tempo du morceau chargé — {0} BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="833"/>
+        <location filename="../widgets/metronome_view.py" line="896"/>
         <source>No track with a BPM tag is loaded</source>
         <translation>Aucun morceau chargé n’a de tag BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="497"/>
+        <location filename="../widgets/metronome_view.py" line="560"/>
         <source>Silent — the light keeps time</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Silence : le voyant continue de battre la mesure</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="498"/>
+        <location filename="../widgets/metronome_view.py" line="561"/>
         <source>Standard click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clic standard</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="499"/>
+        <location filename="../widgets/metronome_view.py" line="562"/>
         <source>Higher-pitched click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clic plus aigu</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="664"/>
+        <location filename="../widgets/metronome_view.py" line="727"/>
         <source>Stop the click when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Arrêter le clic en quittant cet affichage</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="666"/>
+        <location filename="../widgets/metronome_view.py" line="729"/>
         <source>Keep the click going when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Garder le clic actif en quittant cet affichage</translation>
@@ -2297,8 +2297,8 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Volume du clic</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="582"/>
-        <location filename="../widgets/metronome_view.py" line="631"/>
+        <location filename="../widgets/metronome_view.py" line="645"/>
+        <location filename="../widgets/metronome_view.py" line="694"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
@@ -2306,12 +2306,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>PipelineCluster</name>
     <message>
-        <location filename="../widgets/pipeline_cluster.py" line="90"/>
+        <location filename="../widgets/pipeline_cluster.py" line="96"/>
         <source>Playlist name</source>
         <translation>Nom de la liste</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_cluster.py" line="92"/>
+        <location filename="../widgets/pipeline_cluster.py" line="98"/>
         <source>The playlist every pipeline run files its tracks into</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>La liste dans laquelle chaque exécution du pipeline classe ses morceaux</translation>
@@ -2320,37 +2320,37 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>PipelineToggle</name>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="61"/>
+        <location filename="../widgets/pipeline_toggle.py" line="69"/>
         <source>Include Rename in pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Inclure l&apos;étape Renommer dans les exécutions du pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="62"/>
+        <location filename="../widgets/pipeline_toggle.py" line="70"/>
         <source>Leave Rename out of pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Exclure l&apos;étape Renommer des exécutions du pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="65"/>
+        <location filename="../widgets/pipeline_toggle.py" line="73"/>
         <source>Include Convert in pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Inclure l&apos;étape Convertir dans les exécutions du pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="66"/>
+        <location filename="../widgets/pipeline_toggle.py" line="74"/>
         <source>Leave Convert out of pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Exclure l&apos;étape Convertir des exécutions du pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="69"/>
+        <location filename="../widgets/pipeline_toggle.py" line="77"/>
         <source>Include Analyze in pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Inclure l&apos;étape Analyser dans les exécutions du pipeline</translation>
     </message>
     <message>
-        <location filename="../widgets/pipeline_toggle.py" line="70"/>
+        <location filename="../widgets/pipeline_toggle.py" line="78"/>
         <source>Leave Analyze out of pipeline runs</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Exclure l&apos;étape Analyser des exécutions du pipeline</translation>
@@ -2359,74 +2359,74 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1972"/>
+        <location filename="../widgets/player_panel.py" line="1978"/>
         <source>Player</source>
         <translation>Lecteur</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2004"/>
-        <location filename="../widgets/player_panel.py" line="3566"/>
+        <location filename="../widgets/player_panel.py" line="2010"/>
+        <location filename="../widgets/player_panel.py" line="3575"/>
         <source>Search all playlists…</source>
         <translation>Rechercher dans toutes les listes…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2023"/>
+        <location filename="../widgets/player_panel.py" line="2029"/>
         <source>This playlist</source>
         <translation>Cette liste</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2024"/>
+        <location filename="../widgets/player_panel.py" line="2030"/>
         <source>All playlists</source>
         <translation>Toutes les listes</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2049"/>
+        <location filename="../widgets/player_panel.py" line="2055"/>
         <source>Choose a visualization</source>
         <translation>Choisir une visualisation</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2076"/>
+        <location filename="../widgets/player_panel.py" line="2082"/>
         <source>Backdrop stream</source>
         <translatorcomment>The visual was named &quot;Silly Scope&quot; when it shipped and is now &quot;stream&quot;, so the glossary ruling that kept it in English is retired with the pun: this is an ordinary noun for the look — a flowing ribbon of liquid — and it is translated exactly as its six sibling backdrop entries are.</translatorcomment>
         <translation>Arrière-plan : flux</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2084"/>
+        <location filename="../widgets/player_panel.py" line="2090"/>
         <source>Visuals off</source>
         <translation>Sans visualisation</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2077"/>
+        <location filename="../widgets/player_panel.py" line="2083"/>
         <source>Backdrop waveform</source>
         <translation>Arrière-plan : forme d&apos;onde</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2073"/>
+        <location filename="../widgets/player_panel.py" line="2079"/>
         <source>Backdrop oscilloscope</source>
         <translation>Arrière-plan : oscilloscope</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2074"/>
+        <location filename="../widgets/player_panel.py" line="2080"/>
         <source>Backdrop spectrum</source>
         <translation>Arrière-plan : spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2078"/>
+        <location filename="../widgets/player_panel.py" line="2084"/>
         <source>Backdrop fire</source>
         <translation>Arrière-plan : feu</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2071"/>
+        <location filename="../widgets/player_panel.py" line="2077"/>
         <source>Backdrop fractal</source>
         <translation>Arrière-plan : fractale</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2081"/>
+        <location filename="../widgets/player_panel.py" line="2087"/>
         <source>Popout oscilloscope</source>
         <translation>Fenêtre : oscilloscope</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2082"/>
+        <location filename="../widgets/player_panel.py" line="2088"/>
         <source>Popout spectrum bars</source>
         <translation>Fenêtre : barres de spectre</translation>
     </message>
@@ -2435,144 +2435,144 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Fenêtre : feu</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2079"/>
+        <location filename="../widgets/player_panel.py" line="2085"/>
         <source>Popout fractal</source>
         <translation>Fenêtre : fractale</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2117"/>
+        <location filename="../widgets/player_panel.py" line="2123"/>
         <source>Edit Lock</source>
         <translation>Verrou d&apos;édition</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2121"/>
+        <location filename="../widgets/player_panel.py" line="2127"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Verrouiller la modification des métadonnées dans la liste de lecture</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1505"/>
-        <location filename="../widgets/player_panel.py" line="3683"/>
+        <location filename="../widgets/player_panel.py" line="1511"/>
+        <location filename="../widgets/player_panel.py" line="3692"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1506"/>
+        <location filename="../widgets/player_panel.py" line="1512"/>
         <source>Filename</source>
         <translation>Nom de fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1507"/>
+        <location filename="../widgets/player_panel.py" line="1513"/>
         <source>Artist</source>
         <translation>Artiste</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1508"/>
+        <location filename="../widgets/player_panel.py" line="1514"/>
         <source>Title</source>
         <translation>Titre</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1509"/>
+        <location filename="../widgets/player_panel.py" line="1515"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1510"/>
+        <location filename="../widgets/player_panel.py" line="1516"/>
         <source>Key</source>
         <translation>Tonalité</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1511"/>
+        <location filename="../widgets/player_panel.py" line="1517"/>
         <source>Comment</source>
         <translation>Commentaire</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1512"/>
+        <location filename="../widgets/player_panel.py" line="1518"/>
         <source>Duration</source>
         <translation>Durée</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1513"/>
+        <location filename="../widgets/player_panel.py" line="1519"/>
         <source>Year</source>
         <translation>Année</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1514"/>
+        <location filename="../widgets/player_panel.py" line="1520"/>
         <source>Album</source>
         <translation>Album</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1515"/>
+        <location filename="../widgets/player_panel.py" line="1521"/>
         <source>Genre</source>
         <translation>Genre</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1516"/>
+        <location filename="../widgets/player_panel.py" line="1522"/>
         <source>Track #</source>
         <translation>N° de piste</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1517"/>
+        <location filename="../widgets/player_panel.py" line="1523"/>
         <source>Label</source>
         <translation>Label</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1518"/>
+        <location filename="../widgets/player_panel.py" line="1524"/>
         <source>Bitrate</source>
         <translation>Débit binaire</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1519"/>
+        <location filename="../widgets/player_panel.py" line="1525"/>
         <source>Energy</source>
         <translation>Énergie</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1520"/>
+        <location filename="../widgets/player_panel.py" line="1526"/>
         <source>Art</source>
         <translation>Pochette</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1521"/>
+        <location filename="../widgets/player_panel.py" line="1527"/>
         <source>Date Added</source>
         <translation>Date d&apos;ajout</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1522"/>
+        <location filename="../widgets/player_panel.py" line="1528"/>
         <source>Date Created</source>
         <translation>Date de création</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1523"/>
+        <location filename="../widgets/player_panel.py" line="1529"/>
         <source>Format</source>
         <translation>Format</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1524"/>
+        <location filename="../widgets/player_panel.py" line="1530"/>
         <source>Bit Depth</source>
         <translation>Profondeur de bits</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1989"/>
+        <location filename="../widgets/player_panel.py" line="1995"/>
         <source>Show this cover in the sidebar</source>
         <translation>Afficher cette pochette dans la barre latérale</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2075"/>
+        <location filename="../widgets/player_panel.py" line="2081"/>
         <source>Backdrop wormhole</source>
         <translation>Arrière-plan : trou de ver</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2072"/>
+        <location filename="../widgets/player_panel.py" line="2078"/>
         <source>Backdrop tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Arrière-plan : poursuite dans le tunnel</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2083"/>
+        <location filename="../widgets/player_panel.py" line="2089"/>
         <source>Popout wormhole</source>
         <translation>Fenêtre : trou de ver</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2080"/>
+        <location filename="../widgets/player_panel.py" line="2086"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Fenêtre : poursuite dans le tunnel</translation>
@@ -2583,40 +2583,40 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Arrière-plan : Silly Scope</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2210"/>
-        <location filename="../widgets/player_panel.py" line="3680"/>
+        <location filename="../widgets/player_panel.py" line="2216"/>
+        <location filename="../widgets/player_panel.py" line="3689"/>
         <source>Playlists</source>
         <translation>Listes</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2317"/>
+        <location filename="../widgets/player_panel.py" line="2323"/>
         <source>Previous</source>
         <translation>Précédent</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2328"/>
+        <location filename="../widgets/player_panel.py" line="2334"/>
         <source>Play / Pause  (Space)</source>
         <translation>Lecture / Pause  (Espace)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2335"/>
+        <location filename="../widgets/player_panel.py" line="2341"/>
         <source>Stop</source>
         <translation>Arrêter</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2342"/>
+        <location filename="../widgets/player_panel.py" line="2348"/>
         <source>Next</source>
         <translation>Suivant</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2360"/>
-        <location filename="../widgets/player_panel.py" line="3523"/>
-        <location filename="../widgets/player_panel.py" line="3528"/>
+        <location filename="../widgets/player_panel.py" line="2366"/>
+        <location filename="../widgets/player_panel.py" line="3532"/>
+        <location filename="../widgets/player_panel.py" line="3537"/>
         <source>Save Playlist</source>
         <translation>Enregistrer la liste</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2298"/>
+        <location filename="../widgets/player_panel.py" line="2304"/>
         <source>Vol</source>
         <translation>Vol</translation>
     </message>
@@ -2625,131 +2625,131 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Supprimer la sélection</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2365"/>
+        <location filename="../widgets/player_panel.py" line="2371"/>
         <source>Clear Playlist</source>
         <translation>Vider la liste de lecture</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2405"/>
+        <location filename="../widgets/player_panel.py" line="2411"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>Faites glisser ceci sur une liste pour y ajouter le morceau en lecture</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2429"/>
+        <location filename="../widgets/player_panel.py" line="2435"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>Ouvrir la liste depuis laquelle le morceau en cours est lu</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2727"/>
-        <location filename="../widgets/player_panel.py" line="3400"/>
-        <location filename="../widgets/player_panel.py" line="3510"/>
+        <location filename="../widgets/player_panel.py" line="2736"/>
+        <location filename="../widgets/player_panel.py" line="3409"/>
+        <location filename="../widgets/player_panel.py" line="3519"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3357"/>
+        <location filename="../widgets/player_panel.py" line="3366"/>
         <source>Playing: {0}</source>
         <translation>Lecture : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3410"/>
+        <location filename="../widgets/player_panel.py" line="3419"/>
         <source>In Playlist: {0}</source>
         <translation>Dans la liste : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3507"/>
+        <location filename="../widgets/player_panel.py" line="3516"/>
         <source>Search: {0}</source>
         <translation>Recherche : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3524"/>
+        <location filename="../widgets/player_panel.py" line="3533"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>La liste est vide : ajoutez d’abord des morceaux.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3528"/>
+        <location filename="../widgets/player_panel.py" line="3537"/>
         <source>Playlist name:</source>
         <translation>Nom de la liste :</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3563"/>
+        <location filename="../widgets/player_panel.py" line="3572"/>
         <source>Search scope: {0}</source>
         <translation>Portée de la recherche : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3568"/>
+        <location filename="../widgets/player_panel.py" line="3577"/>
         <source>Search this playlist…</source>
         <translation>Rechercher dans cette liste…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3591"/>
+        <location filename="../widgets/player_panel.py" line="3600"/>
         <source>No matching tracks</source>
         <translation>Aucun morceau correspondant</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3894"/>
+        <location filename="../widgets/player_panel.py" line="3903"/>
         <source>{0} bit</source>
         <translation>{0} bits</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4103"/>
+        <location filename="../widgets/player_panel.py" line="4112"/>
         <source>File not found:
 {0}</source>
         <translation>Fichier introuvable :
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4279"/>
+        <location filename="../widgets/player_panel.py" line="4288"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Masquer les morceaux qui se mixent avec la lecture en cours</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4281"/>
+        <location filename="../widgets/player_panel.py" line="4290"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Afficher les morceaux qui se mixent avec la lecture en cours</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4605"/>
+        <location filename="../widgets/player_panel.py" line="4614"/>
         <source>{0}+ results</source>
         <translation>{0}+ résultats</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4608"/>
+        <location filename="../widgets/player_panel.py" line="4617"/>
         <source>{0} result</source>
         <translation>{0} résultat</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4610"/>
+        <location filename="../widgets/player_panel.py" line="4619"/>
         <source>{0} results</source>
         <translation>{0} résultats</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4614"/>
+        <location filename="../widgets/player_panel.py" line="4623"/>
         <source>{0} track</source>
         <translation>{0} morceau</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4616"/>
+        <location filename="../widgets/player_panel.py" line="4625"/>
         <source>{0} tracks</source>
         <translation>{0} morceaux</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5240"/>
+        <location filename="../widgets/player_panel.py" line="5249"/>
         <source>Reset Columns</source>
         <translation>Réinitialiser les colonnes</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5246"/>
+        <location filename="../widgets/player_panel.py" line="5255"/>
         <source>Fit {0} to Longest</source>
         <translation>Ajuster {0} à la valeur la plus longue</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6202"/>
+        <location filename="../widgets/player_panel.py" line="6213"/>
         <source>“{0}” has moved.</source>
         <translation>« {0} » a été déplacé.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6204"/>
+        <location filename="../widgets/player_panel.py" line="6215"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n des fichiers sélectionnés a été déplacé.</numerusform>
@@ -2757,86 +2757,86 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6207"/>
+        <location filename="../widgets/player_panel.py" line="6218"/>
         <source>File Has Moved</source>
         <translation>Le fichier a été déplacé</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6211"/>
+        <location filename="../widgets/player_panel.py" line="6222"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Il ne se trouve plus à son emplacement enregistré : il ne peut donc pas être ajouté à une liste de lecture ni glissé vers l’extérieur. Un morceau déjà en lecture continue de jouer, car il a été chargé en mémoire avant le déplacement du fichier.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6216"/>
+        <location filename="../widgets/player_panel.py" line="6227"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Faites un clic droit sur le morceau et choisissez « Localiser le fichier manquant… »</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6357"/>
+        <location filename="../widgets/player_panel.py" line="6368"/>
         <source>Locate Missing File…</source>
         <translation>Localiser le fichier manquant…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6359"/>
+        <location filename="../widgets/player_panel.py" line="6370"/>
         <source>Open File Location</source>
         <translation>Ouvrir l&apos;emplacement du fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6360"/>
+        <location filename="../widgets/player_panel.py" line="6371"/>
         <source>Open in Metadata Panel</source>
         <translation>Ouvrir dans le panneau Métadonnées</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6361"/>
+        <location filename="../widgets/player_panel.py" line="6372"/>
         <source>Reload Metadata from File</source>
         <translation>Recharger les métadonnées du fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6365"/>
+        <location filename="../widgets/player_panel.py" line="6376"/>
         <source>Look Up Online…</source>
         <translation>Rechercher en ligne…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6367"/>
+        <location filename="../widgets/player_panel.py" line="6378"/>
         <source>Remove from Playlist</source>
         <translation>Retirer de la liste de lecture</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6423"/>
-        <location filename="../widgets/player_panel.py" line="6451"/>
-        <location filename="../widgets/player_panel.py" line="6551"/>
-        <location filename="../widgets/player_panel.py" line="6624"/>
-        <location filename="../widgets/player_panel.py" line="6654"/>
+        <location filename="../widgets/player_panel.py" line="6434"/>
+        <location filename="../widgets/player_panel.py" line="6462"/>
+        <location filename="../widgets/player_panel.py" line="6562"/>
+        <location filename="../widgets/player_panel.py" line="6635"/>
+        <location filename="../widgets/player_panel.py" line="6665"/>
         <source>Look Up Online</source>
         <translation>Rechercher en ligne</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6425"/>
+        <location filename="../widgets/player_panel.py" line="6436"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>Aucun des morceaux sélectionnés n’a d’artiste ou de titre pour la recherche, et leurs noms de fichier n’en donnent pas non plus.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6445"/>
+        <location filename="../widgets/player_panel.py" line="6456"/>
         <source>Looking up track details…</source>
         <translation>Recherche des informations des morceaux…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6446"/>
+        <location filename="../widgets/player_panel.py" line="6457"/>
         <source>Cancel</source>
         <translation>Annuler</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6476"/>
+        <location filename="../widgets/player_panel.py" line="6487"/>
         <source>Looking up {0} of {1}…</source>
         <translation>Recherche {0} sur {1}…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6484"/>
+        <location filename="../widgets/player_panel.py" line="6495"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Attente de la limite de requêtes Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6647"/>
+        <location filename="../widgets/player_panel.py" line="6658"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n morceau sans correspondance.</numerusform>
@@ -2844,7 +2844,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6650"/>
+        <location filename="../widgets/player_panel.py" line="6661"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n morceau mis à jour.</numerusform>
@@ -3487,7 +3487,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="803"/>
+        <location filename="../widgets/player_panel.py" line="804"/>
         <source>Drop audio files here</source>
         <translation>Déposez des fichiers audio ici</translation>
     </message>
@@ -4104,123 +4104,123 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">▸  Slicer de boucle (forme d&apos;onde)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="130"/>
+        <location filename="../widgets/slice_section.py" line="131"/>
         <source>Waveform</source>
         <translation>Forme d&apos;onde</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="132"/>
+        <location filename="../widgets/slice_section.py" line="133"/>
         <source>Zoomed Wave</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Onde zoomée</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="134"/>
+        <location filename="../widgets/slice_section.py" line="135"/>
         <source>Loop Slicer</source>
         <translatorcomment>Matches the old &apos;Slicer de boucle (forme d&apos;onde)&apos; header, minus the qualifier now carried by the Waveform button beside it.</translatorcomment>
         <translation>Slicer de boucle</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="203"/>
+        <location filename="../widgets/slice_section.py" line="215"/>
         <source>Slice start time (m:ss:mmm) — type to set</source>
         <translation>Temps de début de la découpe (m:ss:mmm) — saisir pour définir</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="212"/>
+        <location filename="../widgets/slice_section.py" line="224"/>
         <source>Slice end time (m:ss:mmm) — type to set</source>
         <translation>Temps de fin de la découpe (m:ss:mmm) — saisir pour définir</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="214"/>
-        <location filename="../widgets/slice_section.py" line="221"/>
+        <location filename="../widgets/slice_section.py" line="226"/>
+        <location filename="../widgets/slice_section.py" line="233"/>
         <source>Mark</source>
         <translation>Marquer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="215"/>
+        <location filename="../widgets/slice_section.py" line="227"/>
         <source>Mark start at playhead (Q)</source>
         <translation>Marquer le début à la tête de lecture (Q)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="222"/>
+        <location filename="../widgets/slice_section.py" line="234"/>
         <source>Mark end at playhead (E)</source>
         <translation>Marquer la fin à la tête de lecture (E)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="237"/>
+        <location filename="../widgets/slice_section.py" line="249"/>
         <source>Nudge start marker back 10 ms</source>
         <translation>Décaler le marqueur de début de 10 ms vers l&apos;arrière</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="239"/>
+        <location filename="../widgets/slice_section.py" line="251"/>
         <source>Nudge start marker forward 10 ms</source>
         <translation>Décaler le marqueur de début de 10 ms vers l&apos;avant</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="241"/>
+        <location filename="../widgets/slice_section.py" line="253"/>
         <source>Nudge end marker back 10 ms</source>
         <translation>Décaler le marqueur de fin de 10 ms vers l&apos;arrière</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="243"/>
+        <location filename="../widgets/slice_section.py" line="255"/>
         <source>Nudge end marker forward 10 ms</source>
         <translation>Décaler le marqueur de fin de 10 ms vers l&apos;avant</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="271"/>
+        <location filename="../widgets/slice_section.py" line="283"/>
         <source>Length</source>
         <translation>Longueur</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="275"/>
+        <location filename="../widgets/slice_section.py" line="287"/>
         <source>Shorten slice by 10 ms</source>
         <translation>Raccourcir la découpe de 10 ms</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="279"/>
+        <location filename="../widgets/slice_section.py" line="291"/>
         <source>Slice length (m:ss:mmm) — type to set; moves the end marker</source>
         <translation>Longueur de la découpe (m:ss:mmm) — saisir pour définir ; déplace le marqueur de fin</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="281"/>
+        <location filename="../widgets/slice_section.py" line="293"/>
         <source>Lengthen slice by 10 ms</source>
         <translation>Allonger la découpe de 10 ms</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="296"/>
+        <location filename="../widgets/slice_section.py" line="308"/>
         <source>&lt; Start</source>
         <translation>&lt; Début</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="399"/>
+        <location filename="../widgets/slice_section.py" line="411"/>
         <source>Hide the full-track waveform</source>
         <translation>Masquer la forme d&apos;onde complète</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="401"/>
+        <location filename="../widgets/slice_section.py" line="413"/>
         <source>Show the full-track waveform — click it to move playback</source>
         <translation>Afficher la forme d&apos;onde complète — cliquez dessus pour déplacer la lecture</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="410"/>
+        <location filename="../widgets/slice_section.py" line="422"/>
         <source>Hide the zoomed waveform</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Masquer la forme d&apos;onde zoomée</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="412"/>
+        <location filename="../widgets/slice_section.py" line="424"/>
         <source>Show the zoomed waveform around the playhead</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Afficher la forme d&apos;onde zoomée autour de la tête de lecture</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="421"/>
+        <location filename="../widgets/slice_section.py" line="433"/>
         <source>Hide the slice controls</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Masquer les commandes de découpe</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="423"/>
+        <location filename="../widgets/slice_section.py" line="435"/>
         <source>Show the slice controls — markers, length, loop and export</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Afficher les commandes de découpe : repères, durée, boucle et export</translation>
@@ -4238,12 +4238,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Placer la tête de lecture sur le marqueur de début</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="301"/>
+        <location filename="../widgets/slice_section.py" line="313"/>
         <source>Loop</source>
         <translation>Boucle</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="306"/>
+        <location filename="../widgets/slice_section.py" line="318"/>
         <source>Loop playback between the start and end markers (L)</source>
         <translatorcomment>Added (L) hotkey hint to the existing loop tooltip translation.</translatorcomment>
         <translation>Lire en boucle entre les marqueurs de début et de fin (L)</translation>
@@ -4253,27 +4253,27 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Lire en boucle entre les marqueurs de début et de fin</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="299"/>
+        <location filename="../widgets/slice_section.py" line="311"/>
         <source>Jump playhead to start marker (S)</source>
         <translation>Placer la tête de lecture sur le marqueur de début (S)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="313"/>
+        <location filename="../widgets/slice_section.py" line="325"/>
         <source>Save Slice As:</source>
         <translation>Enregistrer la découpe sous :</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="318"/>
+        <location filename="../widgets/slice_section.py" line="330"/>
         <source>output filename</source>
         <translation>nom du fichier de sortie</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="327"/>
+        <location filename="../widgets/slice_section.py" line="339"/>
         <source>Choose save folder</source>
         <translation>Choisir le dossier d&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="334"/>
+        <location filename="../widgets/slice_section.py" line="346"/>
         <source>Slice</source>
         <translation>Découper</translation>
     </message>
@@ -4283,17 +4283,17 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">▾  Slicer de boucle (forme d&apos;onde)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="744"/>
+        <location filename="../widgets/slice_section.py" line="765"/>
         <source>Choose Save Folder</source>
         <translation>Choisir le dossier d&apos;enregistrement</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="763"/>
+        <location filename="../widgets/slice_section.py" line="784"/>
         <source>Saved: {0}</source>
         <translation>Enregistré : {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="768"/>
+        <location filename="../widgets/slice_section.py" line="789"/>
         <source>Error: {0}</source>
         <translation>Erreur : {0}</translation>
     </message>
@@ -4301,7 +4301,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>SpectrogramView</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="84"/>
+        <location filename="../widgets/spectrum_panel.py" line="86"/>
         <source>Drop a single audio file to view its spectrum</source>
         <translation>Déposez un seul fichier audio pour afficher son spectre</translation>
     </message>
@@ -4309,59 +4309,79 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>SpectrumPanel</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="255"/>
+        <location filename="../widgets/spectrum_panel.py" line="467"/>
         <source>Spectrum</source>
         <translation>Spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="260"/>
+        <location filename="../widgets/spectrum_panel.py" line="472"/>
         <source>Drop a single audio file to see its acoustic spectrum. Frequency runs bottom (0 Hz) to top (Nyquist); time runs left to right; colour shows magnitude. Handy for spotting lossy-encode low-pass cutoffs.</source>
         <translation>Déposez un seul fichier audio pour voir son spectre acoustique. La fréquence va du bas (0 Hz) vers le haut (Nyquist) ; le temps va de gauche à droite ; la couleur indique l&apos;amplitude. Pratique pour repérer les coupures passe-bas des encodages avec perte.</translation>
     </message>
     <message>
+        <location filename="../widgets/spectrum_panel.py" line="265"/>
         <source>File</source>
-        <translation type="vanished">Fichier</translation>
+        <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="314"/>
+        <location filename="../widgets/spectrum_panel.py" line="289"/>
         <source>Sample rate</source>
         <translation>Fréquence d&apos;échantillonnage</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="315"/>
+        <location filename="../widgets/spectrum_panel.py" line="292"/>
         <source>Key</source>
         <translation>Tonalité</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="316"/>
+        <location filename="../widgets/spectrum_panel.py" line="295"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="336"/>
+        <location filename="../widgets/spectrum_panel.py" line="485"/>
         <source>Sensitivity:</source>
         <translation>Sensibilité :</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="347"/>
-        <location filename="../widgets/spectrum_panel.py" line="429"/>
-        <location filename="../widgets/spectrum_panel.py" line="444"/>
+        <location filename="../widgets/spectrum_panel.py" line="496"/>
+        <location filename="../widgets/spectrum_panel.py" line="648"/>
+        <location filename="../widgets/spectrum_panel.py" line="663"/>
         <source>{0} dB range</source>
         <translation>Plage de {0} dB</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="403"/>
-        <location filename="../widgets/spectrum_panel.py" line="404"/>
+        <location filename="../widgets/spectrum_panel.py" line="502"/>
+        <source>Split Screen</source>
+        <translation>Écran partagé</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spectrum_panel.py" line="530"/>
+        <source>Show one spectrum</source>
+        <translation>Afficher un seul spectre</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spectrum_panel.py" line="532"/>
+        <source>Compare two files side by side</source>
+        <translation>Comparer deux fichiers côte à côte</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spectrum_panel.py" line="538"/>
+        <source>Drop a second audio file here to compare</source>
+        <translation>Déposez ici un second fichier audio pour comparer</translation>
+    </message>
+    <message>
+        <location filename="../widgets/spectrum_panel.py" line="333"/>
         <source>Analyzing…</source>
         <translation>Analyse en cours…</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="493"/>
+        <location filename="../widgets/spectrum_panel.py" line="359"/>
         <source>Could not analyze this file.</source>
         <translation>Impossible d&apos;analyser ce fichier.</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="494"/>
+        <location filename="../widgets/spectrum_panel.py" line="361"/>
         <source>Error: {0}</source>
         <translation>Erreur : {0}</translation>
     </message>

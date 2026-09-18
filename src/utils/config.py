@@ -138,6 +138,8 @@ class AppConfig:
     pipeline_analyze_enabled: bool = False
     pipeline_playlist: str = ""
     spectrum_dynamic_range: float = 110.0
+    # Spectrum panel's Split Screen (two files side by side).
+    spectrum_split: bool = False
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
     # When True, the Player playlist's inline metadata editing is locked off.
@@ -408,6 +410,7 @@ def load_config() -> AppConfig:
                 spectrum_dynamic_range=float(
                     data.get("spectrum_dynamic_range", AppConfig.spectrum_dynamic_range)
                 ),
+                spectrum_split=bool(data.get("spectrum_split", AppConfig.spectrum_split)),
                 waveform_color=str(data.get("waveform_color", AppConfig.waveform_color)),
                 player_edit_locked=bool(
                     data.get("player_edit_locked", AppConfig.player_edit_locked)

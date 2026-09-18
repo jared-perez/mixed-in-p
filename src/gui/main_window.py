@@ -187,6 +187,7 @@ class MainWindow(QMainWindow):
         self._apply_online_lookup_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
         self._spectrum_panel.set_dynamic_range(self._config.spectrum_dynamic_range)
+        self._spectrum_panel.set_split(self._config.spectrum_split)
         # Playlist library: one shared main-thread connection. Opened at
         # startup (creating the database on first run) because Scratch
         # persistence — the Player's list surviving a restart — needs it.
@@ -454,6 +455,7 @@ class MainWindow(QMainWindow):
         # Spectrum panel signals
         self._spectrum_panel.files_dropped.connect(self._add_files)
         self._spectrum_panel.sensitivity_changed.connect(self._on_spectrum_sensitivity)
+        self._spectrum_panel.split_toggled.connect(self._on_spectrum_split)
 
         # Settings panel signals
         self._settings_panel.settings_changed.connect(self._on_settings_changed)
@@ -796,7 +798,7 @@ class MainWindow(QMainWindow):
         elif page == "metadata":
             self._metadata_panel._load_file(file_paths[0])
         elif page == "spectrum":
-            self._spectrum_panel._load_file(file_paths[0])
+            self._spectrum_panel.load_files(file_paths)
         else:
             # Default: rename panel (also handles settings, keycode, history)
             self._add_files_to_rename(file_paths)
@@ -2117,6 +2119,11 @@ class MainWindow(QMainWindow):
     def _on_spectrum_sensitivity(self, dr: float) -> None:
         """Persist the spectrum colour sensitivity when the slider is released."""
         self._config.spectrum_dynamic_range = dr
+        self._persist_config()
+
+    def _on_spectrum_split(self, enabled: bool) -> None:
+        """Persist the Spectrum panel's Split Screen toggle."""
+        self._config.spectrum_split = enabled
         self._persist_config()
 
     def _on_history_limit_changed(self, limit: int) -> None:

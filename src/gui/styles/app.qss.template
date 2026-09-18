@@ -298,6 +298,38 @@ QPushButton#autoToggle:checked:hover {
     border-color: @ACCENT_HOVER@;
 }
 
+/* The Spectrum panel's Split Screen toggle: the same kind of switch as
+   #autoToggle, so the same on/off colours. */
+QPushButton#splitToggle {
+    background-color: @BG_MEDIUM@;
+    color: @TEXT_SECONDARY@;
+    border: 1px solid @CHROME_DARK@;
+    border-radius: 4px;
+    padding: 6px 18px;
+    font-weight: bold;
+}
+
+QPushButton#splitToggle:hover {
+    border-color: @CHROME@;
+    color: @TEXT_PRIMARY@;
+}
+
+QPushButton#splitToggle:checked {
+    background-color: @NEON_YELLOW@;
+    color: @BG_DARK@;
+    border-color: @NEON_YELLOW@;
+}
+
+QPushButton#splitToggle:checked:hover {
+    background-color: @ACCENT_HOVER@;
+    border-color: @ACCENT_HOVER@;
+}
+
+/* A Spectrum result box is a layout container: keep the panel showing. */
+#spectrumPane, #spectrumPaneInfo {
+    background-color: transparent;
+}
+
 /* The Convert panel's pipeline toggle — the `|` at the foot of the panel that
    turns Convert into Convert -> Analyze -> playlist. Same on/off colours as
    #autoToggle, because it is the same kind of switch, but its label is one
