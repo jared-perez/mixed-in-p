@@ -784,8 +784,9 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
     """QTableWidget with internal drag-drop row reordering and external file drops.
 
     The RubberBandSelectMixin adds drag-a-box selection from empty space (the
-    same gesture as the Rename/Convert/Analyze tables); a press on a row still
-    falls through to row reorder / drag-out untouched. Box-selecting many tracks
+    same gesture as the Rename/Convert/Analyze tables), and from the ``#``
+    column, since a full playlist has no empty space; a press anywhere else on
+    a row still falls through to row reorder / drag-out untouched. Box-selecting many tracks
     is safe for memory because selection only ever prefetch-decodes the single
     current row (debounced, and suppressed during playback) — not every selected
     track."""
@@ -834,6 +835,11 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
 
     # Keys the slice section claims while it is expanded.
     _SLICE_KEYS = frozenset({Qt.Key.Key_S, Qt.Key.Key_Q, Qt.Key.Key_E, Qt.Key.Key_L})
+
+    def _band_gutter_at(self, pos) -> bool:
+        # The narrow "#" column: a full playlist has no empty space to start a
+        # box select from, and the row number is never what a drag wants.
+        return self.columnAt(pos.x()) == 0
 
     def set_slice_keys_active(self, predicate) -> None:
         self._slice_keys_active = predicate

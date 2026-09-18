@@ -24,6 +24,7 @@ from PySide6.QtGui import (
 )
 from PySide6.QtWidgets import (
     QAbstractItemView,
+    QApplication,
     QRubberBand,
     QTableView,
     QTableWidget,
@@ -83,6 +84,9 @@ class RubberBandSelectMixin:
 
     _rb_origin = None  # viewport-space press point while box-selecting, else None
     _rubber_band = None  # lazily-created QRubberBand
+    # A press in the gutter (see _band_gutter_at) waiting to learn whether it is
+    # a box select (it moves) or a click (it doesn't): (point, cloned press).
+    _rb_pending = None
 
     def _viewport_pos(self, event):
         """Cursor position in viewport coordinates.
@@ -94,26 +98,53 @@ class RubberBandSelectMixin:
         """
         return self.viewport().mapFromGlobal(event.globalPosition().toPoint())
 
+    def _band_gutter_at(self, pos) -> bool:
+        """Whether a press on a *row* at ``pos`` may start a box select.
+
+        None by default: a press on a row drags it. A view whose rows fill it
+        (so there is no empty space to start from) names a strip here; a press
+        there that moves draws the band, one that doesn't is an ordinary click.
+        """
+        return False
+
+    def _start_band(self, pos, modifiers) -> None:
+        self._rb_origin = pos
+        if self._rubber_band is None:
+            self._rubber_band = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
+        self._rubber_band.setGeometry(QRect(pos, QSize()))
+        self._rubber_band.show()
+        if not (modifiers & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
+            self.clearSelection()
+
     def mousePressEvent(self, event) -> None:
         pos = self._viewport_pos(event)
+        self._rb_pending = None
         if (
             event.button() == Qt.MouseButton.LeftButton
-            and not self.indexAt(pos).isValid()
             and self.selectionMode() == QAbstractItemView.SelectionMode.ExtendedSelection
         ):
-            self._rb_origin = pos
-            if self._rubber_band is None:
-                self._rubber_band = QRubberBand(QRubberBand.Shape.Rectangle, self.viewport())
-            self._rubber_band.setGeometry(QRect(pos, QSize()))
-            self._rubber_band.show()
-            if not (event.modifiers() & (Qt.KeyboardModifier.ControlModifier | Qt.KeyboardModifier.ShiftModifier)):
-                self.clearSelection()
-            event.accept()
-            return
+            if not self.indexAt(pos).isValid():
+                self._start_band(pos, event.modifiers())
+                event.accept()
+                return
+            if self._band_gutter_at(pos):
+                # Held back from Qt, which would arm a row drag; replayed on
+                # release if the press turns out to be a click.
+                self._rb_pending = (pos, event.clone())
+                self._rb_origin = None
+                event.accept()
+                return
         self._rb_origin = None
         super().mousePressEvent(event)
 
     def mouseMoveEvent(self, event) -> None:
+        if self._rb_pending is not None:
+            origin, press = self._rb_pending
+            if (self._viewport_pos(event) - origin).manhattanLength() < QApplication.startDragDistance():
+                event.accept()
+                return
+            self._rb_pending = None
+            self._start_band(origin, press.modifiers())
         if self._rb_origin is not None:
             rect = QRect(self._rb_origin, self._viewport_pos(event)).normalized()
             self._rubber_band.setGeometry(rect)
@@ -147,6 +178,15 @@ class RubberBandSelectMixin:
         sel_model.select(selection, QItemSelectionModel.SelectionFlag.ClearAndSelect)
 
     def mouseReleaseEvent(self, event) -> None:
+        if self._rb_pending is not None:
+            # A gutter click: give Qt the press it never saw, then the release,
+            # so selection, double-click-to-play and modifiers behave as on any
+            # other cell.
+            _, press = self._rb_pending
+            self._rb_pending = None
+            super().mousePressEvent(press)
+            super().mouseReleaseEvent(event)
+            return
         if self._rb_origin is not None:
             if self._rubber_band is not None:
                 self._rubber_band.hide()
