@@ -227,22 +227,34 @@ def nav_icon(page_id: str, angle: float = 0.0) -> QIcon:
     a circle of radius ``_DRAW / 2`` (the furthest ink, the magnifier's handle
     tip, sits at ~0.38 of the box), so none of them clip as they turn.
     """
-    paint = _PAINTERS.get(page_id)
     icon = QIcon()
-    if paint is None:
+    if page_id not in _PAINTERS:
         return icon
     for mode, state, color in _STATES:
-        pm = QPixmap(_DRAW, _DRAW)
-        pm.fill(Qt.GlobalColor.transparent)
-        p = QPainter(pm)
-        try:
-            p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-            if angle:
-                p.translate(_DRAW / 2.0, _DRAW / 2.0)
-                p.rotate(angle)
-                p.translate(-_DRAW / 2.0, -_DRAW / 2.0)
-            paint(p, color)
-        finally:
-            p.end()
-        icon.addPixmap(pm, mode, state)
+        icon.addPixmap(nav_glyph(page_id, color, angle), mode, state)
     return icon
+
+
+def nav_glyph(page_id: str, color: str, angle: float = 0.0) -> QPixmap:
+    """One nav glyph in one colour, at the 2x drawing size.
+
+    For a caller whose states are not a button's (the header's pipeline step
+    icons follow a *toggle's* state), so it picks the colour itself. A null
+    pixmap if the page has no glyph.
+    """
+    paint = _PAINTERS.get(page_id)
+    if paint is None:
+        return QPixmap()
+    pm = QPixmap(_DRAW, _DRAW)
+    pm.fill(Qt.GlobalColor.transparent)
+    p = QPainter(pm)
+    try:
+        p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        if angle:
+            p.translate(_DRAW / 2.0, _DRAW / 2.0)
+            p.rotate(angle)
+            p.translate(-_DRAW / 2.0, -_DRAW / 2.0)
+        paint(p, color)
+    finally:
+        p.end()
+    return pm

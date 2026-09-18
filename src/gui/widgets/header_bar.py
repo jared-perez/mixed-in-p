@@ -97,7 +97,7 @@ class HeaderBar(QFrame):
         # Spacer
         layout.addStretch()
 
-        # The pipeline's shape, left of Add: three mini step toggles and the
+        # The pipeline's shape, left of Add: three step toggles and the
         # playlist every run ends in. Here rather than in a panel because a run
         # can start from any of three panels and belongs to none of them.
         self._pipeline = PipelineCluster()

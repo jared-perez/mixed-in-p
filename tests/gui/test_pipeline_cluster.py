@@ -238,3 +238,11 @@ def test_locking_the_controls_greys_everything(cluster):
     assert all(not t.isEnabled() for t in cluster._toggles.values())
     cluster.set_controls_enabled(True)
     assert cluster._target.isEnabled()
+
+
+def test_the_header_toggles_are_marked_with_their_panels_glyph(cluster):
+    """Side by side in the header, nothing else says which step is which."""
+    from src.gui.widgets.pipeline_toggle import STEP_GLYPHS
+
+    for step in STEP_ORDER:
+        assert cluster._toggles[step].glyph() == STEP_GLYPHS[step]

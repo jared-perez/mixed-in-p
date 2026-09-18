@@ -24,6 +24,12 @@ is drawn in, so the outer edge is one colour in both states and only the fill
 changes. Unchecked wants none of it: the rim is already that grey and a second
 line would just double it.
 
+The header's three toggles carry their panel's sidebar glyph instead of the
+wave. They sit side by side with nothing else to say which step is which, so
+the picture inside has to name the step; in a panel the panel already does
+that, and the wave stays. The glyph is drawn in the ink colour, so it lights
+and dims exactly as the rim does.
+
 Self-painted from a ``QAbstractButton`` rather than styled from QSS: the shape
 is not a box, and the global button padding inside a box this small leaves no
 contents rect at all and would silently draw nothing (the #discogsApplyButton
@@ -35,19 +41,21 @@ from __future__ import annotations
 
 import math
 
-from PySide6.QtCore import QT_TRANSLATE_NOOP, QCoreApplication, QPointF, QSize, Qt
+from PySide6.QtCore import QT_TRANSLATE_NOOP, QCoreApplication, QPointF, QRectF, QSize, Qt
 from PySide6.QtGui import (
     QColor,
     QPainter,
     QPainterPath,
     QPainterPathStroker,
     QPen,
+    QPixmap,
     QPolygonF,
 )
 from PySide6.QtWidgets import QAbstractButton
 
 from ..convert_pipeline import STEP_ANALYZE, STEP_CONVERT, STEP_RENAME
 from ..styles.theme import Theme
+from .nav_icons import nav_glyph
 
 # What each toggle says the next click will do, off state first. Marked here
 # and translated at the display site so the panel triangle and its header mini
@@ -120,6 +128,23 @@ _WAVE_EDGE = (
 _WAVE_SQUEEZE = 0.88
 _WAVE_PIVOT = 0.30
 
+# Which sidebar page's glyph names each step, for a toggle that wears one.
+STEP_GLYPHS = {
+    STEP_RENAME: "rename",
+    STEP_CONVERT: "convert",
+    STEP_ANALYZE: "analysis",
+}
+
+# Where a glyph sits inside the sign, as fractions of the widget. A triangle's
+# roomy part is its lower middle, so the box is centred below half-height; its
+# side is what fits under the two slanted edges and above the rim.
+_GLYPH_CENTRE_Y = 0.65
+_GLYPH_SIDE = 0.40
+# The nav glyphs keep their ink inside roughly the middle 60% of their box (the
+# sidebar wants that margin round a 20px icon). Inside the sign the rim is the
+# margin, so draw only the middle and let the ink fill the space.
+_GLYPH_CROP = 0.17
+
 
 class PipelineToggle(QAbstractButton):
     """Checkable triangle marking one step as part of the pipeline."""
@@ -129,9 +154,12 @@ class PipelineToggle(QAbstractButton):
     # Header-size, small enough for three of them beside the Add button.
     SIZE_MINI = 18
 
-    def __init__(self, size: int = SIZE_PANEL, parent=None) -> None:
+    def __init__(self, size: int = SIZE_PANEL, parent=None, glyph: str | None = None) -> None:
         super().__init__(parent)
         self._size = size
+        # A sidebar page id, drawn in place of the wave; None keeps the wave.
+        self._glyph = glyph
+        self._glyph_cache: dict[str, QPixmap] = {}
         self.setCheckable(True)
         self.setFixedSize(size, size)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
@@ -140,9 +168,14 @@ class PipelineToggle(QAbstractButton):
         self._tip_off = ""
 
     @classmethod
-    def for_step(cls, step: str, size: int = SIZE_PANEL, parent=None) -> "PipelineToggle":
-        """A toggle for one pipeline step, already carrying its tooltips."""
-        toggle = cls(size, parent)
+    def for_step(
+        cls, step: str, size: int = SIZE_PANEL, parent=None, with_glyph: bool = False
+    ) -> "PipelineToggle":
+        """A toggle for one pipeline step, already carrying its tooltips.
+
+        `with_glyph` swaps the wave for the step's sidebar glyph.
+        """
+        toggle = cls(size, parent, STEP_GLYPHS[step] if with_glyph else None)
         off, on = STEP_TOOLTIPS[step]
         toggle.set_step_tooltips(
             # The context is spelled out at every call: a module constant here
@@ -287,7 +320,31 @@ class PipelineToggle(QAbstractButton):
         # scaling the triangle about its centroid would not, since its three
         # edges sit at different distances from it.
         inner = sign.subtracted(stroker.createStroke(sign))
+        if self._glyph is not None:
+            # The glyph is painted over the field, not cut out of it.
+            return inner
         return inner.subtracted(self._wave_region())
+
+    def glyph(self) -> str | None:
+        return self._glyph
+
+    def _glyph_rect(self) -> QRectF:
+        side = self._size * _GLYPH_SIDE
+        centre_x = self.width() / 2.0
+        centre_y = self.height() * _GLYPH_CENTRE_Y
+        return QRectF(centre_x - side / 2.0, centre_y - side / 2.0, side, side)
+
+    def _paint_glyph(self, painter: QPainter, color: QColor) -> None:
+        key = color.name()
+        pixmap = self._glyph_cache.get(key)
+        if pixmap is None:
+            pixmap = self._glyph_cache[key] = nav_glyph(self._glyph, key)
+        source = QRectF(pixmap.rect())
+        inset = source.width() * _GLYPH_CROP
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+        painter.drawPixmap(
+            self._glyph_rect(), pixmap, source.adjusted(inset, inset, -inset, -inset)
+        )
 
     # --------------------------------------------------------------- painting
 
@@ -381,6 +438,9 @@ class PipelineToggle(QAbstractButton):
             # The ink is whatever the field does not claim, so the rim and the
             # wave are one shape and cannot come out at different weights.
             painter.fillPath(sign.subtracted(field), ink)
+            if self._glyph is not None:
+                # In the ink colour: dark on the lit field, grey on the panel.
+                self._paint_glyph(painter, ink)
             if outline is not None:
                 # Last, and over the ink: the inner half of a centred stroke
                 # lands on the rim, which is what keeps the sign the same size

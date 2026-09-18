@@ -1,4 +1,4 @@
-"""The header's pipeline controls: three mini step toggles and the target.
+"""The header's pipeline controls: three step toggles and the target.
 
 The step toggles mirror the ones in the Rename, Convert and Analyze panels, so
 the whole shape of a run is readable — and changeable — from wherever you
@@ -10,6 +10,9 @@ the run, not to a step: a run that skips Convert entirely still ends in a
 playlist. It shows while any step is on and collapses when none are, so a user
 who has never turned the pipeline on never sees a field asking them to name
 something.
+
+The header toggles carry their panel's sidebar glyph where the panel toggles
+carry the wave: side by side here, nothing else says which step is which.
 """
 
 from __future__ import annotations
@@ -30,7 +33,7 @@ PIPELINE_TARGET_WIDTH = 174
 
 
 class PipelineCluster(QWidget):
-    """Three mini step toggles plus the run's target playlist."""
+    """Three step toggles, each marked with its panel's glyph, plus the target."""
 
     # (step id, on) — a request, not a fact. MainWindow decides and reflects.
     step_toggled = Signal(str, bool)
@@ -57,7 +60,10 @@ class PipelineCluster(QWidget):
         layout.setSpacing(6)
 
         for step in STEP_ORDER:
-            toggle = PipelineToggle.for_step(step, PipelineToggle.SIZE_MINI, self)
+            # Panel-size, so a step's toggle is the same size in both places.
+            toggle = PipelineToggle.for_step(
+                step, PipelineToggle.SIZE_PANEL, self, with_glyph=True
+            )
             toggle.toggled.connect(
                 lambda on, step=step: self.step_toggled.emit(step, on)
             )
@@ -227,7 +233,8 @@ class PipelineCluster(QWidget):
         if not widgets:
             return margins.left() + margins.right()
         return (
-            sum(w.sizeHint().width() for w in widgets)
+            # A size hint ignores setFixedWidth (the target has one), so cap it.
+            sum(min(w.sizeHint().width(), w.maximumWidth()) for w in widgets)
             + layout.spacing() * (len(widgets) - 1)
             + margins.left()
             + margins.right()

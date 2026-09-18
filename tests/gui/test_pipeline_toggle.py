@@ -304,3 +304,59 @@ def test_an_unchecked_toggle_does_not_double_its_rim_with_a_border(qtbot):
     assert toggle._colors()[2] is None
     toggle.setChecked(True)
     assert toggle._colors()[2] is not None
+
+
+# ------------------------------------------------------------ glyph toggles
+
+
+def test_only_a_glyph_toggle_carries_a_glyph(qtbot):
+    from src.gui.convert_pipeline import STEP_ORDER
+    from src.gui.widgets.pipeline_toggle import STEP_GLYPHS
+
+    for step in STEP_ORDER:
+        plain = PipelineToggle.for_step(step)
+        marked = PipelineToggle.for_step(step, PipelineToggle.SIZE_PANEL, with_glyph=True)
+        qtbot.addWidget(plain)
+        qtbot.addWidget(marked)
+        assert plain.glyph() is None
+        assert marked.glyph() == STEP_GLYPHS[step]
+
+
+def test_a_glyph_replaces_the_wave(qtbot):
+    """The wave is cut out of the field; with a glyph the field stays whole."""
+    toggle = PipelineToggle(PipelineToggle.SIZE_PANEL, glyph="rename")
+    wave = PipelineToggle(PipelineToggle.SIZE_PANEL)
+    qtbot.addWidget(toggle)
+    qtbot.addWidget(wave)
+    whole = toggle._field().boundingRect()
+    cut = wave._field().boundingRect()
+    assert whole.height() > cut.height()
+
+
+def test_the_glyph_is_drawn_in_the_ink_colour(qtbot):
+    """Dark on the lit field, the rim's grey on the panel."""
+    toggle = PipelineToggle(PipelineToggle.SIZE_PANEL, glyph="analysis")
+    qtbot.addWidget(toggle)
+    centre = toggle._glyph_rect().center().toPoint()
+
+    def darkest_near_centre() -> QColor:
+        image = _on_a_panel(toggle)
+        pixels = [
+            image.pixelColor(centre.x() + dx, centre.y() + dy)
+            for dx in range(-4, 5) for dy in range(-4, 5)
+        ]
+        return min(pixels, key=lambda c: c.lightness())
+
+    toggle.setChecked(True)
+    assert _gap(darkest_near_centre(), QColor(Theme.BG_DARK)) < _gap(
+        darkest_near_centre(), QColor(Theme.NEON_YELLOW)
+    )
+
+
+def test_the_glyph_sits_inside_the_sign(qtbot):
+    toggle = PipelineToggle(PipelineToggle.SIZE_PANEL, glyph="convert")
+    qtbot.addWidget(toggle)
+    rect = toggle._glyph_rect()
+    triangle = toggle.triangle()
+    for corner in (rect.topLeft(), rect.topRight(), rect.bottomLeft(), rect.bottomRight()):
+        assert triangle.containsPoint(corner, Qt.FillRule.OddEvenFill)
