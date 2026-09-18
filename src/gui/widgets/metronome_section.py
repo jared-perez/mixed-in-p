@@ -24,6 +24,11 @@ which matters in a panel where the playlist and the transport are competing
 for the same height. Both hide with the body, so a collapsed metronome reads
 exactly like the two sections beside it.
 
+Closed, the header does not sit on this row at all: the Player lends it the
+end of the slice toggles' row (:meth:`MetronomeSection.set_header_dock`), so
+the four disclosures read as one line, and opening it brings the header back
+here above its body.
+
 Collapsing silences it, and it does so through :meth:`MetronomeView.hideEvent`
 rather than through anything here: hiding the body IS the stop signal, and
 routing it that way means the Global Click setting is honoured by one code
@@ -66,6 +71,9 @@ class MetronomeSection(QWidget):
             f"#metronomeTray {{ background-color: {Theme.TRAY_BG}; border-radius: 6px; }}"
         )
         self._expanded = False
+        # Where the header sits while collapsed, if the host lends a slot —
+        # see set_header_dock.
+        self._header_dock: QWidget | None = None
         self._setup_ui(stream_factory, track_bpm)
         # Never capture focus, so Space stays play/pause and the panel's slice
         # keys are not swallowed — the same rule the slice section follows.
@@ -88,6 +96,7 @@ class MetronomeSection(QWidget):
         self._header_btn = section_header.header_button(self.tr("Metronome"))
         self._header_btn.toggled.connect(self._on_toggled)
         header_row = QHBoxLayout()
+        self._header_row = header_row
         header_row.setContentsMargins(0, 0, 0, 0)
         # Explicitly, because a layout handed to nothing takes the Qt style's
         # 6px rather than Theme.SPACING and this row is measured below.
@@ -147,12 +156,44 @@ class MetronomeSection(QWidget):
         # into a state the Global Click rule already owns.
         self._start_btn.setVisible(visible)
         self._tempo_row.setVisible(visible)
+        self._place_header(visible)
         section_header.sync_header_arrow(self._header_btn, visible)
         self._header_btn.setToolTip(
             self.tr("Hide the metronome")
             if visible
             else self.tr("Show the metronome — tap a tempo and click along")
         )
+
+    def set_header_dock(self, dock: QWidget) -> None:
+        """Lend the collapsed header a slot on another row.
+
+        The Player puts it at the end of the slice section's header row, so a
+        closed metronome reads as a fourth toggle beside Loop Slicer. Opening
+        it brings the header home to its own row, above the body it opens —
+        and while it is docked this section has nothing left to show, so it
+        hides whole rather than leaving an empty row and its spacing behind.
+        """
+        self._header_dock = dock
+        self._place_header(self._expanded)
+
+    def _place_header(self, expanded: bool) -> None:
+        if self._header_dock is None:
+            return
+        if expanded:
+            self._header_row.insertWidget(
+                0, self._header_btn, alignment=Qt.AlignmentFlag.AlignVCenter
+            )
+            self._header_dock.hide()
+            self.show()
+        else:
+            self._header_dock.layout().addWidget(self._header_btn)
+            self._header_btn.show()
+            self._header_dock.show()
+            self.hide()
+
+    def is_docked(self) -> bool:
+        """True while the header sits on the host's row and this is hidden."""
+        return self._header_dock is not None and not self._expanded
 
     def is_expanded(self) -> bool:
         return self._expanded
@@ -173,6 +214,9 @@ class MetronomeSection(QWidget):
         rows are allowed to want scrolling, this body is three short rows and
         there is nothing in it worth putting below the fold.
         """
+        if self.is_docked():
+            # Its header is on the slice row, counted there.
+            return 0
         h = self._header_btn.height()
         if self._expanded:
             # The header row grows to whichever is tallest once Start and the

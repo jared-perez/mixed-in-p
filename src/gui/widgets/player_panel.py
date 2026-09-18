@@ -2466,6 +2466,9 @@ class PlayerPanel(QWidget):
             self, track_bpm=self.loaded_track_bpm
         )
         layout.addWidget(self._metronome_section)
+        # Closed, its header rides at the end of the slice toggles' row, beside
+        # Loop Slicer; opening it takes the header back to its own row.
+        self._metronome_section.set_header_dock(self._slice.header_dock())
         # Any surplus the pinned playlist refuses must not be redistributed
         # into the chrome rows: QVBoxLayout hands leftover height to every row
         # whose size policy can grow, which is how the title and now-playing
@@ -6034,7 +6037,9 @@ class PlayerPanel(QWidget):
         """
         rows = [self._title_row_widget.sizeHint().height()]
         rows.append(self._slice.first_screen_height())
-        rows.append(self._metronome_section.first_screen_height())
+        if not self._metronome_section.is_docked():
+            # Docked, the section is hidden and takes no row or gap.
+            rows.append(self._metronome_section.first_screen_height())
         margins = self._content_layout.contentsMargins()
         # One gap per row plus one more for the trailing stretch: the rows,
         # the playlist and the spacer are len(rows) + 2 layout items.

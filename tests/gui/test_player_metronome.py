@@ -483,3 +483,60 @@ class TestTheKeyboardPanelNoLongerHostsIt:
             assert not hasattr(panel, "_metronome")
         finally:
             panel.stop_audio()
+
+
+class TestTheClosedHeaderSitsBesideLoopSlicer:
+    """Closed, the Metronome toggle is a fourth word on the slice toggles'
+    row; opened, it goes home to its own row above the body it opens."""
+
+    def header_row_widgets(self, player):
+        row = player._slice.layout().itemAt(0).layout()
+        return [row.itemAt(i).widget() for i in range(row.count())]
+
+    def test_closed_it_is_docked_right_of_loop_slicer(self, player):
+        section = player._metronome_section
+        dock = player._slice.header_dock()
+        widgets = self.header_row_widgets(player)
+
+        assert section._header_btn.parent() is dock
+        assert not dock.isHidden()
+        assert widgets.index(dock) > widgets.index(player._slice._slicer_btn)
+        assert section.isHidden(), "nothing of it is left below to show"
+
+    def test_opening_it_takes_the_header_home(self, player):
+        section = player._metronome_section
+        section.set_expanded(True)
+
+        assert section._header_btn.parent() is section
+        assert section.layout().itemAt(0).layout().itemAt(0).widget() is (
+            section._header_btn
+        )
+        assert player._slice.header_dock().isHidden()
+        assert not section.isHidden()
+
+    def test_closing_it_docks_it_again(self, player):
+        section = player._metronome_section
+        section.set_expanded(True)
+        section.set_expanded(False)
+
+        assert section._header_btn.parent() is player._slice.header_dock()
+        assert not section._header_btn.isHidden()
+        assert section.isHidden()
+
+    def test_the_docked_toggle_still_opens_it(self, player):
+        player._metronome_section._header_btn.click()
+
+        assert player._metronome_section.is_expanded()
+
+    def test_the_slice_row_minimum_counts_the_docked_toggle(self, player):
+        docked = player.slice_header_row_min_width()
+        player._metronome_section.set_expanded(True)
+
+        assert docked > player.slice_header_row_min_width()
+
+    def test_a_docked_section_reserves_no_height(self, player):
+        docked = player._height_outside_playlist()
+        player._metronome_section.set_expanded(True)
+        player._metronome_section.set_expanded(False)
+
+        assert player._height_outside_playlist() == docked

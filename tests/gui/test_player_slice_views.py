@@ -476,6 +476,8 @@ class TestTallRowsStayOnScreen:
         qtbot.wait(20)
 
         for row in (player._title_row_widget, player._metronome_section):
+            if row.isHidden():
+                continue  # a docked metronome takes no row at all
             assert row.height() <= row.sizeHint().height() + 1, (
                 f"{row.objectName() or row} inflated past its own height"
             )

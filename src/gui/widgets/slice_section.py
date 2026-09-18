@@ -124,6 +124,7 @@ class SliceSection(QWidget):
             # QWidget rule in app.qss.template would otherwise paint BG_DARK
             # over the tray it sits in.
             "#sliceControls { background: transparent; }"
+            "#sliceHeaderDock { background: transparent; }"
         )
 
         # Header toggles — three independent views, side by side.
@@ -139,6 +140,17 @@ class SliceSection(QWidget):
         header_row.setSpacing(_HEADER_GAP)
         for btn in self._header_buttons():
             header_row.addWidget(btn)
+        # A slot at the end of the row for a neighbouring section's collapsed
+        # header — the metronome's sits here while it is closed (see
+        # MetronomeSection.set_header_dock). Hidden while it holds nothing, so
+        # the row carries no trailing gap.
+        self._header_dock = QWidget()
+        self._header_dock.setObjectName("sliceHeaderDock")
+        dock_layout = QHBoxLayout(self._header_dock)
+        dock_layout.setContentsMargins(0, 0, 0, 0)
+        dock_layout.setSpacing(0)
+        self._header_dock.hide()
+        header_row.addWidget(self._header_dock)
         header_row.addStretch(1)
         layout.addLayout(header_row)
 
@@ -498,7 +510,16 @@ class SliceSection(QWidget):
         fixed-width from its own font metrics, so this is exact rather than a
         layout hint.
         """
-        return sum(b.width() for b in self._header_buttons()) + 2 * _HEADER_GAP
+        width = sum(b.width() for b in self._header_buttons()) + 2 * _HEADER_GAP
+        if not self._header_dock.isHidden():
+            width += _HEADER_GAP + sum(
+                w.width() for w in self._header_dock.findChildren(QPushButton)
+            )
+        return width
+
+    def header_dock(self) -> QWidget:
+        """The slot at the end of the header row another section may borrow."""
+        return self._header_dock
 
     def time_row_min_width(self) -> int:
         """Width needed to show the time-info + Mark-buttons row pushed together.

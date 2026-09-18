@@ -58,8 +58,8 @@ import threading
 import time
 
 import numpy as np
-from PySide6.QtCore import Qt, QTimer, Signal
-from PySide6.QtGui import QColor, QFontMetrics, QPainter
+from PySide6.QtCore import QPointF, QRectF, Qt, QTimer, Signal
+from PySide6.QtGui import QColor, QFontMetrics, QPainter, QPen, QPolygonF
 from PySide6.QtWidgets import (
     QButtonGroup,
     QHBoxLayout,
@@ -369,6 +369,67 @@ class ClickVolumeButton(QPushButton):
         painter.end()
 
 
+class SpeakerButton(QPushButton):
+    """A click-voice toggle wearing a speaker with ``waves`` sound arcs.
+
+    Painted rather than written, like :class:`ClickVolumeButton`: no font has
+    a speaker glyph that is both flat enough for this UI and present on every
+    platform (the emoji ones are colour pictures). The stylesheet still owns
+    the box and its hover/checked fill; only the icon is ours, drawn in the
+    colour the rule would have given the text — read at paint time so it
+    follows the palette.
+    """
+
+    # Geometry on the button's 24px square, in pixels.
+    _BOX_W = 3.0
+    _BOX_H = 5.0
+    _CONE_W = 4.0
+    _CONE_H = 11.0
+    _WAVE_RADII = (3.5, 6.5)
+    _WAVE_PEN = 1.6
+
+    def __init__(self, waves: int, parent: QWidget | None = None) -> None:
+        super().__init__(parent)
+        self._waves = max(0, min(len(self._WAVE_RADII), int(waves)))
+
+    def paintEvent(self, event) -> None:
+        super().paintEvent(event)
+        # QSS colours the text BG_DARK on hover and checked, TEXT_PRIMARY
+        # otherwise — see QPushButton#metroClickButton.
+        on = self.isChecked() or (self.isEnabled() and self.underMouse())
+        colour = QColor(Theme.BG_DARK if on else Theme.TEXT_PRIMARY)
+        reach = self._WAVE_RADII[self._waves - 1] + self._WAVE_PEN / 2 if self._waves else 0.0
+        glyph_w = self._BOX_W + self._CONE_W + reach
+        left = (self.width() - glyph_w) / 2
+        cy = self.height() / 2
+        mouth = left + self._BOX_W + self._CONE_W
+
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        painter.setPen(Qt.PenStyle.NoPen)
+        painter.setBrush(colour)
+        painter.drawPolygon(
+            QPolygonF(
+                [
+                    QPointF(left, cy - self._BOX_H / 2),
+                    QPointF(left + self._BOX_W, cy - self._BOX_H / 2),
+                    QPointF(mouth, cy - self._CONE_H / 2),
+                    QPointF(mouth, cy + self._CONE_H / 2),
+                    QPointF(left + self._BOX_W, cy + self._BOX_H / 2),
+                    QPointF(left, cy + self._BOX_H / 2),
+                ]
+            )
+        )
+        pen = QPen(colour, self._WAVE_PEN)
+        pen.setCapStyle(Qt.PenCapStyle.RoundCap)
+        painter.setPen(pen)
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        for r in self._WAVE_RADII[: self._waves]:
+            # A 90° arc facing right, centred on the cone's mouth.
+            painter.drawArc(QRectF(mouth - r, cy - r, 2 * r, 2 * r), -45 * 16, 90 * 16)
+        painter.end()
+
+
 class MetronomeView(QWidget):
     """The whole view: tempo controls, transport, and the beat light."""
 
@@ -493,12 +554,14 @@ class MetronomeView(QWidget):
         self._click_group = QButtonGroup(self)
         self._click_group.setExclusive(True)
         self._click_buttons: dict[str, QPushButton] = {}
-        for choice, glyph, tip in (
-            (SILENT, "\u2298", self.tr("Silent — the light keeps time")),
-            (SOFT, ")", self.tr("Standard click")),
-            (SHARP, "))", self.tr("Higher-pitched click")),
+        # Silent keeps its text glyph; the two voices are painted speakers,
+        # one sound wave for the standard click and two for the sharper one.
+        for choice, waves, tip in (
+            (SILENT, None, self.tr("Silent — the light keeps time")),
+            (SOFT, 1, self.tr("Standard click")),
+            (SHARP, 2, self.tr("Higher-pitched click")),
         ):
-            button = QPushButton(glyph)
+            button = QPushButton("\u2298") if waves is None else SpeakerButton(waves)
             button.setObjectName("metroClickButton")
             button.setCheckable(True)
             button.setFixedSize(24, 24)
