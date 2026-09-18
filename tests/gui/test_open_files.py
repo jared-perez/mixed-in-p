@@ -71,6 +71,19 @@ class SidebarStub:
         self.pages.append(page_id)
 
 
+class TreeStub:
+    def __init__(self):
+        self.selected = []
+
+    def select_node(self, node_id):
+        self.selected.append(node_id)
+
+
+class PlaylistsPanelStub:
+    def __init__(self):
+        self.tree = TreeStub()
+
+
 class WindowStub(QObject):
     """Just enough MainWindow to run the real open_files against.
 
@@ -88,6 +101,7 @@ class WindowStub(QObject):
         super().__init__()
         self._player_panel = PanelStub(loaded)
         self._sidebar = SidebarStub()
+        self._playlists_panel = PlaylistsPanelStub()
         self.pages = []
         self.raised = 0
         self._setup_open_batch()
@@ -127,6 +141,16 @@ class TestOpenFiles:
         open_now(window, [a])
 
         assert window._player_panel.loaded == [SCRATCH_NODE_ID]
+
+    def test_the_tree_highlights_scratch(self, tmp_path):
+        """Else the tree keeps the playlist that was showing, and the files
+        look as if they went there rather than into Scratch."""
+        (a,) = make_files(tmp_path, "a.mp3")
+        window = WindowStub(loaded=42)
+
+        open_now(window, [a])
+
+        assert window._playlists_panel.tree.selected == [SCRATCH_NODE_ID]
 
     def test_duplicates_are_forced_never_asked(self, tmp_path):
         """The prompt is deferred off a timer; during launch it could land

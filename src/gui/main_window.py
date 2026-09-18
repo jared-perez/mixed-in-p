@@ -885,6 +885,8 @@ class MainWindow(QMainWindow):
            playlist is showing would append to the user's set list and
            auto-save it. Scratch is the disposable working list; that is what
            makes this feature safe to trigger from a right-click.
+           The sidebar tree selects it as well, so the highlighted playlist
+           is the one the files went into and the track plays from.
         2. **Sort as the shell showed them.** Arrival order is a race result
            and means nothing to the user; see ``shell_sorted``.
         3. **Force duplicates.** The alternative is the duplicate prompt, and
@@ -914,6 +916,9 @@ class MainWindow(QMainWindow):
             return
 
         self._player_panel.load_node(library.SCRATCH_NODE_ID)
+        # The tree too, or it goes on highlighting the playlist that was
+        # showing before — which reads as the files having landed there.
+        self._playlists_panel.tree.select_node(library.SCRATCH_NODE_ID)
         self._sidebar.set_current_page("player")
         self._on_page_changed("player")
         # No scroll to the end: the row that matters is the *first* of these
