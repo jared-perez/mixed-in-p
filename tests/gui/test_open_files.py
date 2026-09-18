@@ -96,6 +96,8 @@ class WindowStub(QObject):
     _flush_open_batch = MainWindow._flush_open_batch
     _setup_open_batch = MainWindow._setup_open_batch
     _add_files_to_player = MainWindow._add_files_to_player
+    _show_page = MainWindow._show_page
+    _page_held = False
 
     def __init__(self, loaded=SCRATCH_NODE_ID):
         super().__init__()

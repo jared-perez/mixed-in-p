@@ -130,6 +130,9 @@ class MainWindow(QMainWindow):
         # Create track store
         self._store = TrackStore(self)
 
+        # True while a sidebar drop is handled; see _show_page.
+        self._page_held = False
+
         # Analysis thread reference
         self._analysis_thread: AnalysisThread | None = None
         # Cancelled analysis threads, detached from the UI but still running
@@ -528,8 +531,7 @@ class MainWindow(QMainWindow):
     def _on_playlist_activated(self, node_id: int) -> None:
         """A playlist (or Scratch) clicked in the tree loads into the Player."""
         self._player_panel.load_node(node_id)
-        self._sidebar.set_current_page("player")
-        self._on_page_changed("player")
+        self._show_page("player")
 
     def _on_header_art_clicked(self) -> None:
         """Open the sidebar's cover box on the track that is playing."""
@@ -569,8 +571,7 @@ class MainWindow(QMainWindow):
             self._player_panel.load_node(node_id)
         if node_id is not None:
             self._playlists_panel.tree.select_node(node_id)
-        self._sidebar.set_current_page("player")
-        self._on_page_changed("player")
+        self._show_page("player")
 
     def _on_playing_playlist_clicked(self, node_id: int) -> None:
         """The Player's "In Playlist" link: go to the list the track plays from.
@@ -607,8 +608,7 @@ class MainWindow(QMainWindow):
         node_id = self._player_panel.playing_node_id
         if node_id is None:
             return
-        self._sidebar.set_current_page("player")
-        self._on_page_changed("player")
+        self._show_page("player")
         if not self._player_panel.is_showing_node(node_id):
             self._player_panel.load_node(node_id)
         self._playlists_panel.tree.select_node(node_id)
@@ -758,11 +758,35 @@ class MainWindow(QMainWindow):
         if self._sidebar.playlists_mode and not self._sidebar.collapsed:
             self._playlists_sidebar_w = self._splitter.sizes()[0]
 
+    # Pages a sidebar drop opens. Both work on the file itself — a drop there
+    # means "show me this one" — whereas the list panels just take the files
+    # on, and switching to them would pull the user out of what they were doing.
+    _DROP_OPENS_PAGE = frozenset({"metadata", "spectrum"})
+
     def _on_sidebar_drop(self, page_id: str, file_paths: list[str]) -> None:
         """Handle files dropped on a sidebar button."""
+        if page_id in self._DROP_OPENS_PAGE:
+            self._show_page(page_id)
+            self._add_files(file_paths)
+            return
+        self._page_held = True
+        try:
+            self._add_files(file_paths, page_id)
+        finally:
+            self._page_held = False
+
+    def _show_page(self, page_id: str) -> None:
+        """Make a page current, unless a sidebar drop is being handled.
+
+        The hold covers everything a drop sets off synchronously — the add
+        helpers and a pipeline run the drop arms each switch pages for their
+        other callers.
+        """
+        if self._page_held:
+            logger.info("Page switch to %r held: files arrived by a sidebar drop", page_id)
+            return
         self._sidebar.set_current_page(page_id)
         self._on_page_changed(page_id)
-        self._add_files(file_paths)
 
     def _on_add_files(self) -> None:
         """Open file dialog to add audio files."""
@@ -785,9 +809,10 @@ class MainWindow(QMainWindow):
         if folder:
             self._add_folder(folder)
 
-    def _add_files(self, file_paths: list[str]) -> None:
-        """Route files to the currently active panel."""
-        page = self._current_page
+    def _add_files(self, file_paths: list[str], page: str | None = None) -> None:
+        """Route files to ``page``'s panel, the current one by default."""
+        if page is None:
+            page = self._current_page
 
         if page == "convert":
             self._conversion_panel.add_files(file_paths)
@@ -821,8 +846,7 @@ class MainWindow(QMainWindow):
         self._store.end_batch_update()
 
         if added > 0:
-            self._sidebar.set_current_page("rename")
-            self._on_page_changed("rename")
+            self._show_page("rename")
 
     def _setup_open_batch(self) -> None:
         """The buffer that turns several one-file arrivals into one batch.
@@ -919,8 +943,7 @@ class MainWindow(QMainWindow):
         # The tree too, or it goes on highlighting the playlist that was
         # showing before — which reads as the files having landed there.
         self._playlists_panel.tree.select_node(library.SCRATCH_NODE_ID)
-        self._sidebar.set_current_page("player")
-        self._on_page_changed("player")
+        self._show_page("player")
         # No scroll to the end: the row that matters is the *first* of these
         # files, which is about to start playing and is scrolled to below.
         self._add_files_to_player(paths, allow_duplicates=True, scroll_to_end=False)
@@ -1071,8 +1094,7 @@ class MainWindow(QMainWindow):
 
         if track_ids:
             # Switch to analysis page
-            self._sidebar.set_current_page("analysis")
-            self._on_page_changed("analysis")
+            self._show_page("analysis")
             self._pending_rename_operations = []  # enable auto-rename gate
             if self._config.auto_analyze:
                 self._start_analysis(track_ids)
@@ -1154,9 +1176,9 @@ class MainWindow(QMainWindow):
         if not file_paths:
             return
 
-        # Switch to analysis page
-        self._sidebar.set_current_page("analysis")
-        self._on_page_changed("analysis")
+        # No page switch here: callers that act on a user's request switch
+        # first, and the later batches (_start_pending_analysis, a run's idle
+        # pick-up) must not pull the user off whatever page they moved on to.
 
         # Start progress panel
         self._analysis_panel.progress_panel.start(len(file_paths))
@@ -1181,6 +1203,7 @@ class MainWindow(QMainWindow):
     ) -> None:
         """Start the full pipeline: analyze → metadata → auto-rename."""
         self._pending_rename_operations = operations
+        self._show_page("analysis")
         self._start_analysis(track_ids)
 
     def _cancel_analysis(self) -> None:
@@ -1844,8 +1867,7 @@ class MainWindow(QMainWindow):
         lives behind it.
         """
         self._conversion_panel.add_files(paths)
-        self._sidebar.set_current_page("convert")
-        self._on_page_changed("convert")
+        self._show_page("convert")
         # A lossy file the target refuses (anything but a smaller MP3) sits in
         # the table and is never converted, analysed or added. Say so rather
         # than hand back an emptier playlist than the user expects.
@@ -1929,8 +1951,7 @@ class MainWindow(QMainWindow):
         self._pipeline.await_analysis(pairs)
 
         if track_ids:
-            self._sidebar.set_current_page("analysis")
-            self._on_page_changed("analysis")
+            self._show_page("analysis")
             self._pending_rename_operations = []  # enable auto-rename gate
             logger.info("Pipeline: analysing %d file(s), auto-rename gate armed", len(track_ids))
             self._start_analysis(track_ids)
@@ -2641,14 +2662,12 @@ class MainWindow(QMainWindow):
     def _send_analyze_to_convert(self, file_paths: list[str]) -> None:
         """Receive files from Analyze panel into Convert panel."""
         self._conversion_panel.add_files(file_paths)
-        self._sidebar.set_current_page("convert")
-        self._on_page_changed("convert")
+        self._show_page("convert")
 
     def _send_rename_to_convert(self, file_paths: list[str]) -> None:
         """Receive files from Rename panel into Convert panel."""
         self._conversion_panel.add_files(file_paths)
-        self._sidebar.set_current_page("convert")
-        self._on_page_changed("convert")
+        self._show_page("convert")
 
     def _send_rename_to_auto_pipeline(self, file_paths: list[str]) -> None:
         """Send a set of files to Convert and run the pipeline from there.
@@ -2660,8 +2679,7 @@ class MainWindow(QMainWindow):
         """
         blocker = self._pipeline_blocker()
         self._conversion_panel.add_files(file_paths)
-        self._sidebar.set_current_page("convert")
-        self._on_page_changed("convert")
+        self._show_page("convert")
         if blocker:
             self._conversion_panel.show_notice(blocker)
             return
@@ -2683,8 +2701,7 @@ class MainWindow(QMainWindow):
     def _on_send_to_player(self, tracks: list[dict]) -> None:
         """Send tracks from analysis to the player panel."""
         self._player_panel.add_tracks(tracks)
-        self._sidebar.set_current_page("player")
-        self._on_page_changed("player")
+        self._show_page("player")
 
     def _play_from_metadata(self, file_path: str) -> None:
         """Play the file the tag editor has open (its path menu's "Play in Player").
@@ -2700,15 +2717,13 @@ class MainWindow(QMainWindow):
         so switching to the Player and switching back to keep editing works.
         """
         self._add_files_to_player([file_path])
-        self._sidebar.set_current_page("player")
-        self._on_page_changed("player")
+        self._show_page("player")
         self._player_panel.play_path(normalize_track_path(file_path))
 
     def _open_in_metadata_panel(self, file_path: str) -> None:
         """Load a file into the metadata panel and switch to it (from Player right-click)."""
         self._metadata_panel._load_file(file_path)
-        self._sidebar.set_current_page("metadata")
-        self._on_page_changed("metadata")
+        self._show_page("metadata")
 
     def _open_discogs_settings(self) -> None:
         """Metadata panel → Discogs Setup: the Settings page at that section.
@@ -2718,8 +2733,7 @@ class MainWindow(QMainWindow):
         within — its own layout has not been done — so scrolling first sets a
         position that is clamped to zero and then discarded.
         """
-        self._sidebar.set_current_page("settings")
-        self._on_page_changed("settings")
+        self._show_page("settings")
         self._settings_panel.scroll_to_online_metadata()
 
     def _on_about(self) -> None:

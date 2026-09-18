@@ -232,6 +232,8 @@ class WindowStub(QObject):
     _panel_for_step = MainWindow._panel_for_step
     _STEP_FIELDS = MainWindow._STEP_FIELDS
     _on_auto_analyze_toggled = MainWindow._on_auto_analyze_toggled
+    _show_page = MainWindow._show_page
+    _page_held = False
 
     def __init__(self, store, library, panel, cluster=None):
         super().__init__()
