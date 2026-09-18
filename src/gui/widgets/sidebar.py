@@ -17,7 +17,7 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
-    QStackedWidget,
+    QSizePolicy,
     QVBoxLayout,
     QWidget,
 )
@@ -38,6 +38,20 @@ _NAV_ICON_SIZE = QSize(30, 30)
 # would be 224 and simply does not fit — widening the rail is the lever for
 # that, not a wider widget inside a narrow one.
 _RAIL_MARGIN = 6
+
+# The split toggle's width: thin, but wide enough to hit without aiming.
+_SPLIT_BTN_WIDTH = 24
+
+# The expanded rail's collapse chevron: half the collapsed rail's button, so
+# the Playlists label gets the room back (it clips in ru and ja). The glyph
+# shrinks to fit, but the icon size keeps _NAV_ICON_SIZE's *height* so the
+# row stays as tall as it was — QIcon scales to fit, keeping its aspect.
+_CHEVRON_THIN_WIDTH = (Theme.SIDEBAR_WIDTH_COLLAPSED - 2 * _RAIL_MARGIN) // 2
+_CHEVRON_THIN_ICON = QSize(_CHEVRON_THIN_WIDTH - 2, _NAV_ICON_SIZE.height())
+
+# Width of the icon-only nav column in split view: the collapsed rail's
+# button width, so the glyphs sit exactly as they do collapsed.
+_SPLIT_NAV_WIDTH = Theme.SIDEBAR_WIDTH_COLLAPSED - 2 * _RAIL_MARGIN
 
 # A nav glyph spins while its panel is working, so a long analysis or
 # conversion is visible from anywhere in the app — including with the rail
@@ -195,6 +209,7 @@ class Sidebar(QFrame):
     page_changed = Signal(str)
     files_dropped_on_page = Signal(str, list)
     playlists_toggled = Signal(bool)
+    split_toggled = Signal(bool)
     collapsed_changed = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
@@ -207,6 +222,11 @@ class Sidebar(QFrame):
         self._labels: dict[QPushButton, str] = {}
         self._collapsed = False
         self._playlists_mode = False
+        # Split view: tree and an icon-only nav column side by side. Session
+        # only, like playlists mode. While it is on it overrides playlists
+        # mode rather than replacing it, so turning it off returns to
+        # whichever single view the Playlists button still holds.
+        self._split_mode = False
         self._auto_badge: QLabel | None = None
         self._auto_dot: QLabel | None = None
         self._auto_badge_enabled = False
@@ -226,7 +246,8 @@ class Sidebar(QFrame):
         )
         layout.setSpacing(4)
 
-        # Top row: Playlists mode toggle (2/3) + collapse/expand toggle (1/3).
+        # Top row: Playlists mode toggle (takes the slack) + the thin split
+        # toggle + the thin collapse/expand chevron.
         # Playlists sits on the LEFT so that when the sidebar is dragged
         # narrow, it's the label's tail that gets covered — the start of the
         # word stays readable.
@@ -241,15 +262,42 @@ class Sidebar(QFrame):
         self._playlists_btn.setCheckable(True)
         self._playlists_btn.clicked.connect(self._on_playlists_clicked)
         self._sync_playlists_tooltip()
-        top_row.addWidget(self._playlists_btn, 2)
+        # Ignored horizontally: a QPushButton will not shrink below its text,
+        # so a long translation would otherwise squeeze the two fixed-width
+        # buttons beside it instead (the split toggle was laid out at 7px).
+        # The label is what gives way — its tail, per the comment above.
+        self._playlists_btn.setSizePolicy(
+            QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed
+        )
+        top_row.addWidget(self._playlists_btn, 1)
+
+        # Split toggle: a thin "/" between Playlists and the chevron that shows
+        # the tree and the nav buttons at once. Its own object name, not
+        # sidebarButton: that rule's 12px/6px padding leaves a 24px-wide button
+        # no room to draw its label (CLAUDE.md), and its checked state takes the
+        # secondary accent so it doesn't read as another selected page. The
+        # label is a glyph, not a word, so it is not translated.
+        self._split_btn = QPushButton("/")
+        self._split_btn.setObjectName("sidebarSplitToggle")
+        self._split_btn.setCheckable(True)
+        # Fixed width, but free to grow vertically so it matches the height
+        # of its neighbours (whose height comes from font and icon) instead
+        # of sitting centred at its own shorter hint.
+        self._split_btn.setSizePolicy(
+            QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred
+        )
+        self._split_btn.setFixedWidth(_SPLIT_BTN_WIDTH)
+        self._split_btn.clicked.connect(self._on_split_clicked)
+        self._sync_split_tooltip()
+        top_row.addWidget(self._split_btn)
 
         self._toggle_btn = QPushButton()
         self._toggle_btn.setObjectName("sidebarButton")
         self._toggle_btn.setIcon(nav_icon("collapse"))
-        self._toggle_btn.setIconSize(_NAV_ICON_SIZE)
         self._toggle_btn.setToolTip(self.tr("Collapse sidebar"))
         self._toggle_btn.clicked.connect(self._toggle_collapsed)
-        top_row.addWidget(self._toggle_btn, 1)
+        self._size_chevron(collapsed=False)
+        top_row.addWidget(self._toggle_btn)
 
         layout.addLayout(top_row)
 
@@ -260,14 +308,18 @@ class Sidebar(QFrame):
         layout.addWidget(divider)
         layout.addSpacing(4)
 
-        # Below the divider the sidebar swaps between the nav rail and the
-        # playlists tree (the tree itself lands in a later step; the page
-        # exists now so the mode mechanics are final).
+        # Below the divider the sidebar shows the nav rail, the playlists tree,
+        # or (split) both side by side — tree on the left, icon-only nav on
+        # the right. Not a QStackedWidget because split shows two pages at
+        # once; _sync_mode_stack hides whichever is not wanted.
         # Object names so the stylesheet can make these containers
         # transparent: the global `QWidget` rule paints BG_DARK, which would
         # otherwise cover the sidebar frame's own BG_MEDIUM.
-        self._mode_stack = QStackedWidget()
+        self._mode_stack = QWidget()
         self._mode_stack.setObjectName("sidebarModeStack")
+        mode_layout = QHBoxLayout(self._mode_stack)
+        mode_layout.setContentsMargins(0, 0, 0, 0)
+        mode_layout.setSpacing(4)
         self._nav_page = QWidget()
         self._nav_page.setObjectName("sidebarNavPage")
         nav_layout = QVBoxLayout(self._nav_page)
@@ -326,15 +378,16 @@ class Sidebar(QFrame):
 
         # Spacer (inside the nav page, so the playlists page gets full height)
         nav_layout.addStretch()
-        self._mode_stack.addWidget(self._nav_page)
 
-        # Playlists page: empty container the tree drops into (next step).
+        # Playlists page: empty container MainWindow drops the tree into.
         self._playlists_page = QWidget()
         self._playlists_page.setObjectName("sidebarPlaylistsPage")
         self.playlists_layout = QVBoxLayout(self._playlists_page)
         self.playlists_layout.setContentsMargins(0, 0, 0, 0)
         self.playlists_layout.setSpacing(4)
-        self._mode_stack.addWidget(self._playlists_page)
+        mode_layout.addWidget(self._playlists_page, 1)
+        mode_layout.addWidget(self._nav_page)
+        self._playlists_page.hide()
 
         layout.addWidget(self._mode_stack, 1)
 
@@ -421,32 +474,62 @@ class Sidebar(QFrame):
         """Collapse the rail to icons only (labels move to tooltips), or expand
         it back to icon + label."""
         self._collapsed = collapsed
-        for btn, label in self._labels.items():
-            btn.setText("" if collapsed else label)
-            btn.setToolTip(label if collapsed else "")
-            btn.setProperty("collapsed", collapsed)
-            self._repolish(btn)
-
-        self._toggle_btn.setProperty("collapsed", collapsed)
-        self._repolish(self._toggle_btn)
+        self._size_chevron(collapsed)
         self._toggle_btn.setIcon(nav_icon("expand" if collapsed else "collapse"))
         self._toggle_btn.setToolTip(
             self.tr("Expand sidebar") if collapsed else self.tr("Collapse sidebar")
         )
 
-        # The Playlists toggle doesn't fit beside the chevron on the 56px
-        # rail, so it hides while collapsed. The mode itself survives —
-        # re-expanding brings the tree straight back.
+        # The Playlists and split toggles don't fit beside the chevron on the
+        # 56px rail, so they hide while collapsed. The modes themselves
+        # survive — re-expanding brings the tree straight back.
         self._playlists_btn.setVisible(not collapsed)
+        self._split_btn.setVisible(not collapsed)
         self._sync_art_box()
         self._sync_mode_stack()
         self._apply_width()
-        if self._auto_badge is not None:
-            self._auto_badge.setVisible(self._auto_badge_enabled and not collapsed)
-        if self._auto_dot is not None:
-            self._auto_dot.setVisible(self._auto_badge_enabled and collapsed)
-        self._position_auto_badge()
         self.collapsed_changed.emit(collapsed)
+
+    def _size_chevron(self, collapsed: bool) -> None:
+        """Thin beside Playlists; the whole rail's width once it is alone."""
+        btn = self._toggle_btn
+        btn.setProperty("collapsed", collapsed)
+        btn.setProperty("thin", not collapsed)
+        self._repolish(btn)
+        if collapsed:
+            btn.setMinimumWidth(0)
+            btn.setMaximumWidth(16777215)
+            btn.setIconSize(_NAV_ICON_SIZE)
+        else:
+            btn.setFixedWidth(_CHEVRON_THIN_WIDTH)
+            btn.setIconSize(_CHEVRON_THIN_ICON)
+
+    def _icon_only(self, btn: QPushButton) -> bool:
+        """Whether a nav button shows its glyph alone (label in the tooltip).
+
+        Collapsed, every button is; in split view only the nav column's are —
+        Settings and History sit full-width under both halves and keep theirs.
+        """
+        if self._collapsed:
+            return True
+        return self._split_active() and btn.parent() is self._nav_page
+
+    def _sync_nav_labels(self) -> None:
+        for btn, label in self._labels.items():
+            icon_only = self._icon_only(btn)
+            btn.setText("" if icon_only else label)
+            btn.setToolTip(label if icon_only else "")
+            if btn.property("collapsed") != icon_only:
+                btn.setProperty("collapsed", icon_only)
+                self._repolish(btn)
+        # The 'Auto' word overlaps the glyph on a narrow button; the dot
+        # stands in for it wherever Analyze is icon-only.
+        analysis_icon_only = self._icon_only(self._buttons["analysis"])
+        if self._auto_badge is not None:
+            self._auto_badge.setVisible(self._auto_badge_enabled and not analysis_icon_only)
+        if self._auto_dot is not None:
+            self._auto_dot.setVisible(self._auto_badge_enabled and analysis_icon_only)
+        self._position_auto_badge()
 
     # ------------------------------------------------------------ playlists mode
 
@@ -507,10 +590,55 @@ class Sidebar(QFrame):
         if self._collapsed:
             self.set_collapsed(False)
             on = True
+        elif self._split_mode:
+            # Split already shows the tree and the Playlists button is
+            # disabled under it, so "toggle playlists" can only sensibly mean
+            # "back to one view": leave split and land on the tree alone.
+            self.set_split_mode(False)
+            on = True
         else:
             on = not self._playlists_mode
         self.set_playlists_mode(on)
         self.playlists_toggled.emit(on)
+
+    # ------------------------------------------------------------ split view
+
+    @property
+    def split_mode(self) -> bool:
+        """Whether the tree and the nav buttons are shown side by side."""
+        return self._split_mode
+
+    def _split_active(self) -> bool:
+        # Collapsed wins, exactly as it does over playlists mode.
+        return self._split_mode and not self._collapsed
+
+    def tree_shown(self) -> bool:
+        """Whether the playlists tree is on screen — playlists mode or split,
+        with the rail expanded. The splitter's live handle keys off this."""
+        return (self._playlists_mode or self._split_mode) and not self._collapsed
+
+    def set_split_mode(self, on: bool) -> None:
+        """Show the playlists tree and the nav buttons together, or not."""
+        self._split_mode = on
+        self._split_btn.setChecked(on)
+        self._sync_split_tooltip()
+        # Playlists mode is overridden, not cleared: the button has nothing to
+        # do while both views show, and turning split off returns to it.
+        self._playlists_btn.setEnabled(not on)
+        self._sync_mode_stack()
+        self._apply_width()
+
+    def _sync_split_tooltip(self) -> None:
+        """Say what the next click will do (CLAUDE.md: UI copy)."""
+        self._split_btn.setToolTip(
+            self.tr("Show only Playlists or Navigation in the sidebar")
+            if self._split_mode
+            else self.tr("Show both Playlists and Navigation in the sidebar")
+        )
+
+    def _on_split_clicked(self, checked: bool) -> None:
+        self.set_split_mode(checked)
+        self.split_toggled.emit(checked)
 
     # ------------------------------------------------------------ album art
 
@@ -609,14 +737,23 @@ class Sidebar(QFrame):
 
     def _sync_mode_stack(self) -> None:
         # Collapsed always shows the icon rail — a 56px tree would be useless.
-        show_tree = self._playlists_mode and not self._collapsed
-        self._mode_stack.setCurrentWidget(
-            self._playlists_page if show_tree else self._nav_page
-        )
+        show_tree = self.tree_shown()
+        split = self._split_active()
+        self._playlists_page.setVisible(show_tree)
+        self._nav_page.setVisible(split or not show_tree)
+        # The nav column is exactly a collapsed rail's button width in split,
+        # so its glyphs sit where they would on the 56px rail.
+        if split:
+            self._nav_page.setFixedWidth(_SPLIT_NAV_WIDTH)
+        else:
+            self._nav_page.setMinimumWidth(0)
+            self._nav_page.setMaximumWidth(16777215)
         # History is the one bottom button the tree can spare: hiding it gives
         # the playlists a full button's worth of extra height. Settings stays,
         # since it's the only way back to the preferences from this mode.
-        self._history_btn.setVisible(not show_tree)
+        # Split keeps it: that view exists so nothing needs a toggle to reach.
+        self._history_btn.setVisible(split or not show_tree)
+        self._sync_nav_labels()
 
     def _apply_width(self) -> None:
         """One place owns the width constraints for every mode combination.
@@ -626,8 +763,11 @@ class Sidebar(QFrame):
         """
         if self._collapsed:
             self.setFixedWidth(Theme.SIDEBAR_WIDTH_COLLAPSED)
-        elif self._playlists_mode:
-            self.setMinimumWidth(Theme.SIDEBAR_PLAYLISTS_MIN)
+        elif self.tree_shown():
+            # Split's minimum leaves the tree the playlists-mode minimum
+            # beside the nav column, rather than squeezing the tree to nothing.
+            extra = _SPLIT_NAV_WIDTH + 4 if self._split_mode else 0
+            self.setMinimumWidth(Theme.SIDEBAR_PLAYLISTS_MIN + extra)
             self.setMaximumWidth(Theme.SIDEBAR_PLAYLISTS_MAX)
         else:
             self.setFixedWidth(Theme.SIDEBAR_WIDTH)
@@ -731,11 +871,7 @@ class Sidebar(QFrame):
             )
             self._auto_dot = dot
         self._auto_badge_enabled = enabled
-        # In the expanded rail the 'Auto' text shows; collapsed, the dot stands
-        # in for it (the word would overlap the icon on the narrow button).
-        self._auto_badge.setVisible(enabled and not self._collapsed)
-        self._auto_dot.setVisible(enabled and self._collapsed)
-        self._position_auto_badge()
+        self._sync_nav_labels()
 
     def _position_auto_badge(self) -> None:
         """Pin the 'Auto' badge to the top-right corner of the Analyze button."""

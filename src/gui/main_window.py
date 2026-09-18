@@ -354,6 +354,7 @@ class MainWindow(QMainWindow):
         self._sidebar.page_changed.connect(self._on_page_changed)
         self._sidebar.files_dropped_on_page.connect(self._on_sidebar_drop)
         self._sidebar.playlists_toggled.connect(self._on_playlists_toggled)
+        self._sidebar.split_toggled.connect(self._on_playlists_toggled)
         self._sidebar.collapsed_changed.connect(lambda _c: self._apply_playlists_splitter())
         self._apply_playlists_splitter()  # start with the handle locked
         # Shift+Tab shows/hides the playlists tree from anywhere in the window.
@@ -524,6 +525,7 @@ class MainWindow(QMainWindow):
             self._sizer.on_page_changed(page_id)
 
     def _on_playlists_toggled(self, on: bool) -> None:
+        # Also the split toggle's handler: either one can put the tree on screen.
         if on:
             self._playlists_panel.ensure_loaded()
         self._apply_playlists_splitter()
@@ -723,11 +725,11 @@ class MainWindow(QMainWindow):
     def _apply_playlists_splitter(self) -> None:
         """Sync the splitter with the sidebar's mode.
 
-        Expanded playlists mode gets a live handle and the session's
-        remembered width; every other state locks the handle and lets the
-        sidebar's fixed width dictate the split.
+        Whenever the tree shows (playlists mode or split view) the handle is
+        live with the session's remembered width; every other state locks the
+        handle and lets the sidebar's fixed width dictate the split.
         """
-        live = self._sidebar.playlists_mode and not self._sidebar.collapsed
+        live = self._sidebar.tree_shown()
         handle = self._splitter.handle(1)
         if handle is not None:
             handle.setEnabled(live)
@@ -755,7 +757,7 @@ class MainWindow(QMainWindow):
 
     def _on_splitter_moved(self, _pos: int, _index: int) -> None:
         """Remember the user's chosen sidebar width (session only)."""
-        if self._sidebar.playlists_mode and not self._sidebar.collapsed:
+        if self._sidebar.tree_shown():
             self._playlists_sidebar_w = self._splitter.sizes()[0]
 
     # Pages a sidebar drop opens. Both work on the file itself — a drop there

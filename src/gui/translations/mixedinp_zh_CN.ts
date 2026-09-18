@@ -1532,69 +1532,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="644"/>
-        <location filename="../main_window.py" line="673"/>
+        <location filename="../main_window.py" line="646"/>
+        <location filename="../main_window.py" line="675"/>
         <source>Export All Playlists</source>
         <translation>导出所有播放列表</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="665"/>
+        <location filename="../main_window.py" line="667"/>
         <source>Export failed</source>
         <translation>导出失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="666"/>
+        <location filename="../main_window.py" line="668"/>
         <source>Could not write the file:
 {0}</source>
         <translation>无法写入文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="674"/>
+        <location filename="../main_window.py" line="676"/>
         <source>There are no playlists to export yet.</source>
         <translation>暂无可导出的播放列表。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="679"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Export complete</source>
         <translation>导出完成</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="680"/>
+        <location filename="../main_window.py" line="682"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>已将 {0} 个播放列表（{1} 首曲目）导出到：
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="771"/>
+        <location filename="../main_window.py" line="797"/>
         <source>Select Audio Files</source>
         <translation>选择音频文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="782"/>
+        <location filename="../main_window.py" line="808"/>
         <source>Select Folder</source>
         <translation>选择文件夹</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1026"/>
+        <location filename="../main_window.py" line="1056"/>
         <source>No Audio Files</source>
         <translation>无音频文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1027"/>
+        <location filename="../main_window.py" line="1057"/>
         <source>No audio files found in:
 {0}</source>
         <translation>未在以下位置找到音频文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1032"/>
+        <location filename="../main_window.py" line="1062"/>
         <source>Invalid Folder</source>
         <translation>无效文件夹</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1033"/>
+        <location filename="../main_window.py" line="1063"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>不是有效的目录：
@@ -1609,17 +1609,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已有分析正在运行。请等待或先取消。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1231"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>Analyzing...</source>
         <translation>分析中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1263"/>
+        <location filename="../main_window.py" line="1293"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完成：已分析{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1267"/>
+        <location filename="../main_window.py" line="1297"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完成：已分析{0}个文件</translation>
     </message>
@@ -1628,123 +1628,123 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已取消</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1489"/>
+        <location filename="../main_window.py" line="1519"/>
         <source>Conversion in Progress</source>
         <translation>转换进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1490"/>
+        <location filename="../main_window.py" line="1520"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>已有转换正在运行。请稍候。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1508"/>
+        <location filename="../main_window.py" line="1538"/>
         <source>Pipeline in Progress</source>
         <translation>流水线进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1509"/>
+        <location filename="../main_window.py" line="1539"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translation>上一次流水线尚未结束 — 请等待其完成。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1526"/>
+        <location filename="../main_window.py" line="1556"/>
         <source>No Target Playlist</source>
         <translation>没有目标播放列表</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1527"/>
-        <location filename="../main_window.py" line="1720"/>
+        <location filename="../main_window.py" line="1557"/>
+        <location filename="../main_window.py" line="1750"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>请先在顶栏指定本次运行的播放列表。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1732"/>
+        <location filename="../main_window.py" line="1762"/>
         <source>Cannot Start</source>
         <translation>无法启动</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1742"/>
+        <location filename="../main_window.py" line="1772"/>
         <source>No Files</source>
         <translation>没有文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1743"/>
+        <location filename="../main_window.py" line="1773"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translation>启动流水线之前，请先向该面板添加文件。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1753"/>
+        <location filename="../main_window.py" line="1783"/>
         <source>No Rename Adjustments</source>
         <translation>没有重命名设置</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1754"/>
+        <location filename="../main_window.py" line="1784"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>尚未设置任何重命名。是否原样发送这些文件？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1849"/>
+        <location filename="../main_window.py" line="1878"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>有损文件留在“转换”中 — 原因见其状态。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1977"/>
+        <location filename="../main_window.py" line="2005"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>流水线完成：已将 {added} 个添加到 {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1982"/>
+        <location filename="../main_window.py" line="2010"/>
         <source>{n} skipped</source>
         <translation>跳过{n}个</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1984"/>
+        <location filename="../main_window.py" line="2012"/>
         <source>{n} errors</source>
         <translation>{n}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2076"/>
+        <location filename="../main_window.py" line="2104"/>
         <source>Converting...</source>
         <translation>转换中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2092"/>
+        <location filename="../main_window.py" line="2120"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完成：已转换{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2096"/>
+        <location filename="../main_window.py" line="2124"/>
         <source>Complete: {0} files converted</source>
         <translation>完成：已转换{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2433"/>
+        <location filename="../main_window.py" line="2461"/>
         <source>Rename in Progress</source>
         <translation>重命名进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2434"/>
+        <location filename="../main_window.py" line="2462"/>
         <source>A rename operation is already running.</source>
         <translation>已有重命名操作正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2542"/>
+        <location filename="../main_window.py" line="2570"/>
         <source>Rename Failed</source>
         <translation>重命名失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2577"/>
+        <location filename="../main_window.py" line="2605"/>
         <source>Undo Rename</source>
         <translation>撤销重命名</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2612"/>
+        <location filename="../main_window.py" line="2640"/>
         <source>Undo Failed</source>
         <translation>撤销失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2668"/>
+        <location filename="../main_window.py" line="2693"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translation>请打开「转换」步骤，以便从这里运行流水线。</translation>
     </message>
@@ -1753,12 +1753,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">请先在“转换”面板中设置流水线。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1715"/>
+        <location filename="../main_window.py" line="1745"/>
         <source>A conversion is already running.</source>
         <translation>已有转换正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1717"/>
+        <location filename="../main_window.py" line="1747"/>
         <source>The last pipeline run is still finishing.</source>
         <translation>上一次流水线尚未结束。</translation>
     </message>
@@ -1775,22 +1775,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2549"/>
+        <location filename="../main_window.py" line="2577"/>
         <source>No Session</source>
         <translation>无会话</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2549"/>
+        <location filename="../main_window.py" line="2577"/>
         <source>No rename session to undo.</source>
         <translation>没有可撤销的重命名会话。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2558"/>
+        <location filename="../main_window.py" line="2586"/>
         <source>Confirm Undo</source>
         <translation>确认撤销</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2559"/>
+        <location filename="../main_window.py" line="2587"/>
         <source>Undo renaming of {0} files?</source>
         <translation>撤销{0}个文件的重命名？</translation>
     </message>
@@ -1799,7 +1799,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">正在撤销重命名……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2578"/>
+        <location filename="../main_window.py" line="2606"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>已撤销：{0}个文件，{1}个错误</translation>
     </message>
@@ -4017,84 +4017,94 @@ or click “Add Artwork…”</source>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="250"/>
-        <location filename="../widgets/sidebar.py" line="434"/>
+        <location filename="../widgets/sidebar.py" line="283"/>
+        <location filename="../widgets/sidebar.py" line="466"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>折叠侧边栏</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="288"/>
+        <location filename="../widgets/sidebar.py" line="325"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="289"/>
+        <location filename="../widgets/sidebar.py" line="326"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="290"/>
+        <location filename="../widgets/sidebar.py" line="327"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="287"/>
+        <location filename="../widgets/sidebar.py" line="324"/>
         <source>Player</source>
         <translation>播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="239"/>
+        <location filename="../widgets/sidebar.py" line="252"/>
         <source>Playlists</source>
         <translation>播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="293"/>
+        <location filename="../widgets/sidebar.py" line="330"/>
         <source>Keyboard</source>
         <translation>键盘</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="291"/>
+        <location filename="../widgets/sidebar.py" line="328"/>
         <source>Metadata</source>
         <translation>元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="292"/>
+        <location filename="../widgets/sidebar.py" line="329"/>
         <source>Spectrum</source>
         <translatorcomment>Reviewed (zh pass): 频谱 confirmed (standard term).</translatorcomment>
         <translation>频谱</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="359"/>
-        <location filename="../widgets/sidebar.py" line="367"/>
+        <location filename="../widgets/sidebar.py" line="397"/>
+        <location filename="../widgets/sidebar.py" line="405"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="371"/>
-        <location filename="../widgets/sidebar.py" line="379"/>
+        <location filename="../widgets/sidebar.py" line="409"/>
+        <location filename="../widgets/sidebar.py" line="417"/>
         <source>History</source>
         <translatorcomment>Short tab label → 历史 (per glossary short form); full &apos;Rename History&apos; uses 重命名历史.</translatorcomment>
         <translation>历史</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="434"/>
+        <location filename="../widgets/sidebar.py" line="466"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>展开侧边栏</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="474"/>
+        <location filename="../widgets/sidebar.py" line="529"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>隐藏播放列表并重新显示导航按钮</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="476"/>
+        <location filename="../widgets/sidebar.py" line="531"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>在此处显示播放列表以取代导航按钮</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="713"/>
+        <location filename="../widgets/sidebar.py" line="606"/>
+        <source>Show only Playlists or Navigation in the sidebar</source>
+        <translation>在侧边栏只显示播放列表或导航</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sidebar.py" line="608"/>
+        <source>Show both Playlists and Navigation in the sidebar</source>
+        <translation>在侧边栏同时显示播放列表和导航</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sidebar.py" line="825"/>
         <source>Auto</source>
         <translatorcomment>自动 (auto-detect format). Short toggle label.</translatorcomment>
         <translation>自动</translation>
@@ -4320,81 +4330,81 @@ or click “Add Artwork…”</source>
 <context>
     <name>SpectrumPanel</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="467"/>
+        <location filename="../widgets/spectrum_panel.py" line="491"/>
         <source>Spectrum</source>
         <translatorcomment>Reviewed (zh pass): 频谱 confirmed (standard term).</translatorcomment>
         <translation>频谱</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="472"/>
+        <location filename="../widgets/spectrum_panel.py" line="496"/>
         <source>Drop a single audio file to see its acoustic spectrum. Frequency runs bottom (0 Hz) to top (Nyquist); time runs left to right; colour shows magnitude. Handy for spotting lossy-encode low-pass cutoffs.</source>
         <translation>拖入单个音频文件以查看其声学频谱。频率从底部（0 Hz）到顶部（奈奎斯特频率）；时间从左到右；颜色表示幅度。便于发现有损编码的低通截止。</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="265"/>
+        <location filename="../widgets/spectrum_panel.py" line="294"/>
         <source>File</source>
         <translation>文件</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="289"/>
+        <location filename="../widgets/spectrum_panel.py" line="313"/>
         <source>Sample rate</source>
         <translation>采样率</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="292"/>
+        <location filename="../widgets/spectrum_panel.py" line="316"/>
         <source>Key</source>
         <translatorcomment>Reviewed (zh pass): 调 for compact key labels per glossary (调性 used in full sentences).</translatorcomment>
         <translation>调</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="295"/>
+        <location filename="../widgets/spectrum_panel.py" line="319"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="485"/>
+        <location filename="../widgets/spectrum_panel.py" line="509"/>
         <source>Sensitivity:</source>
         <translation>灵敏度：</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="496"/>
-        <location filename="../widgets/spectrum_panel.py" line="648"/>
-        <location filename="../widgets/spectrum_panel.py" line="663"/>
+        <location filename="../widgets/spectrum_panel.py" line="529"/>
+        <location filename="../widgets/spectrum_panel.py" line="681"/>
+        <location filename="../widgets/spectrum_panel.py" line="696"/>
         <source>{0} dB range</source>
         <translation>{0} dB 范围</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="502"/>
+        <location filename="../widgets/spectrum_panel.py" line="535"/>
         <source>Split Screen</source>
         <translation>分屏</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="530"/>
+        <location filename="../widgets/spectrum_panel.py" line="563"/>
         <source>Show one spectrum</source>
         <translation>只显示一个频谱</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="532"/>
+        <location filename="../widgets/spectrum_panel.py" line="565"/>
         <source>Compare two files side by side</source>
         <translation>并排比较两个文件</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="538"/>
+        <location filename="../widgets/spectrum_panel.py" line="571"/>
         <source>Drop a second audio file here to compare</source>
         <translation>将第二个音频文件拖到此处进行比较</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="333"/>
+        <location filename="../widgets/spectrum_panel.py" line="357"/>
         <source>Analyzing…</source>
         <translation>分析中……</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="359"/>
+        <location filename="../widgets/spectrum_panel.py" line="383"/>
         <source>Could not analyze this file.</source>
         <translation>无法分析此文件。</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="361"/>
+        <location filename="../widgets/spectrum_panel.py" line="385"/>
         <source>Error: {0}</source>
         <translation>错误：{0}</translation>
     </message>

@@ -427,8 +427,10 @@ QPushButton#sidebarButton {
     color: @TEXT_SECONDARY@;
 }
 
-/* Collapsed rail: icon only, centred, no label. */
-QPushButton#sidebarButton[collapsed="true"] {
+/* Collapsed rail: icon only, centred, no label. The thin collapse chevron
+   on the expanded rail is the same shape, just narrower. */
+QPushButton#sidebarButton[collapsed="true"],
+QPushButton#sidebarButton[thin="true"] {
     text-align: center;
     padding: 12px 0px;
 }
@@ -471,10 +473,44 @@ QPushButton#sidebarButton:checked {
     border-left: 3px solid @NEON_YELLOW@;
 }
 
+/* The Playlists toggle is disabled while split view shows both halves. */
+QPushButton#sidebarButton:disabled {
+    background-color: transparent;
+    color: @TEXT_DISABLED@;
+}
+
+/* Thin "/" split-view toggle between Playlists and the chevron. Its own rule
+   because sidebarButton's padding would leave a 24px button no room for its
+   label, and its checked state uses the secondary accent (NEON_GREEN) so it
+   doesn't read as another selected page. */
+QPushButton#sidebarSplitToggle {
+    background-color: transparent;
+    border: none;
+    border-radius: 4px;
+    padding: 0px;
+    /* No min-width here: a QSS minimum replaces setFixedWidth's, and the
+       button then shrinks to its 7px label. */
+    min-height: 0px;
+    font-size: 18px;
+    font-weight: bold;
+    color: @TEXT_SECONDARY@;
+}
+
+QPushButton#sidebarSplitToggle:hover {
+    background-color: @BG_LIGHT@;
+    color: @TEXT_PRIMARY@;
+}
+
+QPushButton#sidebarSplitToggle:checked {
+    background-color: @BG_LIGHT@;
+    color: @NEON_GREEN@;
+    border-bottom: 3px solid @NEON_GREEN@;
+}
+
 /* Mode-swap containers inside the sidebar. These are plain QWidgets, so the
    global QWidget rule would paint them BG_DARK and hide the sidebar frame's
    own BG_MEDIUM. They are pure layout scaffolding — keep them invisible. */
-QStackedWidget#sidebarModeStack,
+QWidget#sidebarModeStack,
 QWidget#sidebarNavPage,
 QWidget#sidebarPlaylistsPage,
 QWidget#playlistTreePanel {

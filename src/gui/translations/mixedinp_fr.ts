@@ -1520,69 +1520,69 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="644"/>
-        <location filename="../main_window.py" line="673"/>
+        <location filename="../main_window.py" line="646"/>
+        <location filename="../main_window.py" line="675"/>
         <source>Export All Playlists</source>
         <translation>Exporter toutes les listes</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="665"/>
+        <location filename="../main_window.py" line="667"/>
         <source>Export failed</source>
         <translation>Échec de l’exportation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="666"/>
+        <location filename="../main_window.py" line="668"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Impossible d’écrire le fichier :
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="674"/>
+        <location filename="../main_window.py" line="676"/>
         <source>There are no playlists to export yet.</source>
         <translation>Il n’y a encore aucune liste de lecture à exporter.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="679"/>
+        <location filename="../main_window.py" line="681"/>
         <source>Export complete</source>
         <translation>Exportation terminée</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="680"/>
+        <location filename="../main_window.py" line="682"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} listes de lecture ({1} morceaux) exportées vers :
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="771"/>
+        <location filename="../main_window.py" line="797"/>
         <source>Select Audio Files</source>
         <translation>Sélectionner des fichiers audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="782"/>
+        <location filename="../main_window.py" line="808"/>
         <source>Select Folder</source>
         <translation>Sélectionner un dossier</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1026"/>
+        <location filename="../main_window.py" line="1056"/>
         <source>No Audio Files</source>
         <translation>Aucun fichier audio</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1027"/>
+        <location filename="../main_window.py" line="1057"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Aucun fichier audio trouvé dans :
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1032"/>
+        <location filename="../main_window.py" line="1062"/>
         <source>Invalid Folder</source>
         <translation>Dossier non valide</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1033"/>
+        <location filename="../main_window.py" line="1063"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Répertoire non valide :
@@ -1597,17 +1597,17 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Une analyse est déjà en cours. Veuillez patienter ou l&apos;annuler d&apos;abord.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1231"/>
+        <location filename="../main_window.py" line="1261"/>
         <source>Analyzing...</source>
         <translation>Analyse en cours...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1263"/>
+        <location filename="../main_window.py" line="1293"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Terminé : {0} analysés, {1} erreurs</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1267"/>
+        <location filename="../main_window.py" line="1297"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Terminé : {0} fichiers analysés</translation>
     </message>
@@ -1616,127 +1616,127 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Annulé</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1489"/>
+        <location filename="../main_window.py" line="1519"/>
         <source>Conversion in Progress</source>
         <translation>Conversion en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1490"/>
+        <location filename="../main_window.py" line="1520"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Une conversion est déjà en cours. Veuillez patienter.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1508"/>
+        <location filename="../main_window.py" line="1538"/>
         <source>Pipeline in Progress</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Pipeline en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1509"/>
+        <location filename="../main_window.py" line="1539"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>La dernière exécution du pipeline n&apos;est pas encore terminée — attendez qu&apos;elle s&apos;achève.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1526"/>
+        <location filename="../main_window.py" line="1556"/>
         <source>No Target Playlist</source>
         <translation>Aucune liste de destination</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1527"/>
-        <location filename="../main_window.py" line="1720"/>
+        <location filename="../main_window.py" line="1557"/>
+        <location filename="../main_window.py" line="1750"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>Indiquez d&apos;abord une liste pour l&apos;exécution dans la barre d&apos;en-tête.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1732"/>
+        <location filename="../main_window.py" line="1762"/>
         <source>Cannot Start</source>
         <translation>Démarrage impossible</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1742"/>
+        <location filename="../main_window.py" line="1772"/>
         <source>No Files</source>
         <translation>Aucun fichier</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1743"/>
+        <location filename="../main_window.py" line="1773"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Ajoutez des fichiers à ce panneau avant de démarrer une exécution du pipeline.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1753"/>
+        <location filename="../main_window.py" line="1783"/>
         <source>No Rename Adjustments</source>
         <translation>Aucun réglage de renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1754"/>
+        <location filename="../main_window.py" line="1784"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>Aucun réglage de renommage n&apos;est défini. Envoyer les fichiers tels quels ?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1849"/>
+        <location filename="../main_window.py" line="1878"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>Les fichiers avec perte restent dans Convertir : leur statut explique pourquoi.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1977"/>
+        <location filename="../main_window.py" line="2005"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Pipeline terminé : {added} ajoutés à {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1982"/>
+        <location filename="../main_window.py" line="2010"/>
         <source>{n} skipped</source>
         <translation>{n} ignorés</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1984"/>
+        <location filename="../main_window.py" line="2012"/>
         <source>{n} errors</source>
         <translation>{n} erreurs</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2076"/>
+        <location filename="../main_window.py" line="2104"/>
         <source>Converting...</source>
         <translation>Conversion en cours...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2092"/>
+        <location filename="../main_window.py" line="2120"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Terminé : {0} convertis, {1} erreurs</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2096"/>
+        <location filename="../main_window.py" line="2124"/>
         <source>Complete: {0} files converted</source>
         <translation>Terminé : {0} fichiers convertis</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2433"/>
+        <location filename="../main_window.py" line="2461"/>
         <source>Rename in Progress</source>
         <translation>Renommage en cours</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2434"/>
+        <location filename="../main_window.py" line="2462"/>
         <source>A rename operation is already running.</source>
         <translation>Une opération de renommage est déjà en cours.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2542"/>
+        <location filename="../main_window.py" line="2570"/>
         <source>Rename Failed</source>
         <translation>Échec du renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2577"/>
+        <location filename="../main_window.py" line="2605"/>
         <source>Undo Rename</source>
         <translation>Annuler le renommage</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2612"/>
+        <location filename="../main_window.py" line="2640"/>
         <source>Undo Failed</source>
         <translation>Échec de l’annulation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2668"/>
+        <location filename="../main_window.py" line="2693"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Activez l&apos;étape Convertir pour lancer le pipeline depuis ici.</translation>
@@ -1746,12 +1746,12 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Configurez d&apos;abord la chaîne dans le panneau Convertir.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1715"/>
+        <location filename="../main_window.py" line="1745"/>
         <source>A conversion is already running.</source>
         <translation>Une conversion est déjà en cours.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1717"/>
+        <location filename="../main_window.py" line="1747"/>
         <source>The last pipeline run is still finishing.</source>
         <translatorcomment>Terminology: &quot;pipeline&quot; left in English, as the local tech vocabulary already uses it and &quot;chain&quot; lost both the flow and the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>La dernière exécution du pipeline n&apos;est pas encore terminée.</translation>
@@ -1770,22 +1770,22 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">{0} fichiers renommés</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2549"/>
+        <location filename="../main_window.py" line="2577"/>
         <source>No Session</source>
         <translation>Aucune session</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2549"/>
+        <location filename="../main_window.py" line="2577"/>
         <source>No rename session to undo.</source>
         <translation>Aucune session de renommage à annuler.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2558"/>
+        <location filename="../main_window.py" line="2586"/>
         <source>Confirm Undo</source>
         <translation>Confirmer l&apos;annulation</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2559"/>
+        <location filename="../main_window.py" line="2587"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Annuler le renommage de {0} fichiers ?</translation>
     </message>
@@ -1794,7 +1794,7 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation type="vanished">Annulation du renommage...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2578"/>
+        <location filename="../main_window.py" line="2606"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Annulé : {0} fichiers, {1} erreurs</translation>
     </message>
@@ -4008,82 +4008,92 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="250"/>
-        <location filename="../widgets/sidebar.py" line="434"/>
+        <location filename="../widgets/sidebar.py" line="283"/>
+        <location filename="../widgets/sidebar.py" line="466"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Réduire la barre latérale</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="288"/>
+        <location filename="../widgets/sidebar.py" line="325"/>
         <source>Rename</source>
         <translation>Renommer</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="289"/>
+        <location filename="../widgets/sidebar.py" line="326"/>
         <source>Convert</source>
         <translation>Convertir</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="290"/>
+        <location filename="../widgets/sidebar.py" line="327"/>
         <source>Analyze</source>
         <translation>Analyser</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="287"/>
+        <location filename="../widgets/sidebar.py" line="324"/>
         <source>Player</source>
         <translation>Lecteur</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="239"/>
+        <location filename="../widgets/sidebar.py" line="252"/>
         <source>Playlists</source>
         <translation>Listes</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="293"/>
+        <location filename="../widgets/sidebar.py" line="330"/>
         <source>Keyboard</source>
         <translation>Clavier</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="291"/>
+        <location filename="../widgets/sidebar.py" line="328"/>
         <source>Metadata</source>
         <translation>Métadonnées</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="292"/>
+        <location filename="../widgets/sidebar.py" line="329"/>
         <source>Spectrum</source>
         <translation>Spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="359"/>
-        <location filename="../widgets/sidebar.py" line="367"/>
+        <location filename="../widgets/sidebar.py" line="397"/>
+        <location filename="../widgets/sidebar.py" line="405"/>
         <source>Settings</source>
         <translation>Réglages</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="371"/>
-        <location filename="../widgets/sidebar.py" line="379"/>
+        <location filename="../widgets/sidebar.py" line="409"/>
+        <location filename="../widgets/sidebar.py" line="417"/>
         <source>History</source>
         <translation>Historique</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="434"/>
+        <location filename="../widgets/sidebar.py" line="466"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Développer la barre latérale</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="474"/>
+        <location filename="../widgets/sidebar.py" line="529"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>Masquer vos listes de lecture et réafficher les boutons de navigation</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="476"/>
+        <location filename="../widgets/sidebar.py" line="531"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>Afficher ici vos listes de lecture à la place des boutons de navigation</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="713"/>
+        <location filename="../widgets/sidebar.py" line="606"/>
+        <source>Show only Playlists or Navigation in the sidebar</source>
+        <translation>Afficher seulement les listes ou la navigation dans la barre latérale</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sidebar.py" line="608"/>
+        <source>Show both Playlists and Navigation in the sidebar</source>
+        <translation>Afficher les listes et la navigation ensemble dans la barre latérale</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sidebar.py" line="825"/>
         <source>Auto</source>
         <translation>Auto</translation>
     </message>
@@ -4309,79 +4319,79 @@ ou cliquez sur « Ajouter une pochette… »</translation>
 <context>
     <name>SpectrumPanel</name>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="467"/>
+        <location filename="../widgets/spectrum_panel.py" line="491"/>
         <source>Spectrum</source>
         <translation>Spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="472"/>
+        <location filename="../widgets/spectrum_panel.py" line="496"/>
         <source>Drop a single audio file to see its acoustic spectrum. Frequency runs bottom (0 Hz) to top (Nyquist); time runs left to right; colour shows magnitude. Handy for spotting lossy-encode low-pass cutoffs.</source>
         <translation>Déposez un seul fichier audio pour voir son spectre acoustique. La fréquence va du bas (0 Hz) vers le haut (Nyquist) ; le temps va de gauche à droite ; la couleur indique l&apos;amplitude. Pratique pour repérer les coupures passe-bas des encodages avec perte.</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="265"/>
+        <location filename="../widgets/spectrum_panel.py" line="294"/>
         <source>File</source>
         <translation>Fichier</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="289"/>
+        <location filename="../widgets/spectrum_panel.py" line="313"/>
         <source>Sample rate</source>
         <translation>Fréquence d&apos;échantillonnage</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="292"/>
+        <location filename="../widgets/spectrum_panel.py" line="316"/>
         <source>Key</source>
         <translation>Tonalité</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="295"/>
+        <location filename="../widgets/spectrum_panel.py" line="319"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="485"/>
+        <location filename="../widgets/spectrum_panel.py" line="509"/>
         <source>Sensitivity:</source>
         <translation>Sensibilité :</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="496"/>
-        <location filename="../widgets/spectrum_panel.py" line="648"/>
-        <location filename="../widgets/spectrum_panel.py" line="663"/>
+        <location filename="../widgets/spectrum_panel.py" line="529"/>
+        <location filename="../widgets/spectrum_panel.py" line="681"/>
+        <location filename="../widgets/spectrum_panel.py" line="696"/>
         <source>{0} dB range</source>
         <translation>Plage de {0} dB</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="502"/>
+        <location filename="../widgets/spectrum_panel.py" line="535"/>
         <source>Split Screen</source>
         <translation>Écran partagé</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="530"/>
+        <location filename="../widgets/spectrum_panel.py" line="563"/>
         <source>Show one spectrum</source>
         <translation>Afficher un seul spectre</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="532"/>
+        <location filename="../widgets/spectrum_panel.py" line="565"/>
         <source>Compare two files side by side</source>
         <translation>Comparer deux fichiers côte à côte</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="538"/>
+        <location filename="../widgets/spectrum_panel.py" line="571"/>
         <source>Drop a second audio file here to compare</source>
         <translation>Déposez ici un second fichier audio pour comparer</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="333"/>
+        <location filename="../widgets/spectrum_panel.py" line="357"/>
         <source>Analyzing…</source>
         <translation>Analyse en cours…</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="359"/>
+        <location filename="../widgets/spectrum_panel.py" line="383"/>
         <source>Could not analyze this file.</source>
         <translation>Impossible d&apos;analyser ce fichier.</translation>
     </message>
     <message>
-        <location filename="../widgets/spectrum_panel.py" line="361"/>
+        <location filename="../widgets/spectrum_panel.py" line="385"/>
         <source>Error: {0}</source>
         <translation>Erreur : {0}</translation>
     </message>

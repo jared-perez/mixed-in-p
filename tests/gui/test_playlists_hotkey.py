@@ -55,7 +55,7 @@ def test_the_hotkey_shows_and_hides_the_tree(window, qtbot):
 
     press_hotkey(window)
     assert sidebar.playlists_mode
-    assert sidebar._mode_stack.currentWidget() is sidebar._playlists_page
+    assert not sidebar._playlists_page.isHidden() and sidebar._nav_page.isHidden()
 
     press_hotkey(window)
     assert not sidebar.playlists_mode
