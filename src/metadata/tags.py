@@ -955,6 +955,9 @@ def update_bpm_key(
 ) -> bool:
     """Convenience function to update just BPM and/or key.
 
+    A .wav returns True and keeps nothing: ask stores_tags() whether a write
+    will persist.
+
     Args:
         file_path: Path to the audio file
         bpm: BPM value to write (or None to skip)

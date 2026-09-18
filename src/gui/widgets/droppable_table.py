@@ -35,7 +35,10 @@ from .drop_zone import AUDIO_EXTENSIONS
 
 # MIME key marking a drag that originated from one of our panels (value = page id).
 # Lets the sidebar nav buttons tell an internal panel-drag from an external OS drop
-# and enforce the per-source routing allow-list.
+# and enforce the per-source routing allow-list (sidebar.DRAG_ROUTES). A source
+# with no DRAG_ROUTES entry is refused EVERYWHERE, so a list that owns no rows (a
+# query result such as CompatibleTracksPanel) must omit this and ship URLs only,
+# as a Copy: it then reads as a Finder drop. See compatible_panel.drag_mime.
 SOURCE_PAGE_MIME = "application/x-mixedinp-source-page"
 
 

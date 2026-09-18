@@ -176,7 +176,15 @@ class TrackStore(QObject):
 
 
 class TrackTableModel(QAbstractTableModel):
-    """Qt table model for displaying tracks."""
+    """Qt table model for displaying tracks.
+
+    Incremental updates (beginInsertRows / dataChanged) are keyed off
+    _get_row_for_id, which indexes the *unfiltered* store. A subclass that
+    filters rowCount()/data() must override the _on_track_* handlers with a
+    filter-aware refresh (see AnalysisTableModel), or every row number it
+    emits names a different row. Test that on the emitted signals, not on
+    rowCount(), which recomputes the filter and reads right against the bug.
+    """
 
     COLUMNS = ["Name", "Artist", "BPM", "Key", "Key Code", "Energy", "Status"]
     COLUMN_KEYS = ["display_name", "artist", "bpm", "key", "keycode", "energy", "state"]

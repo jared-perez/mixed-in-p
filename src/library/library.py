@@ -47,6 +47,9 @@ SCRATCH_NODE_ID = 1
 logger = logging.getLogger(__name__)
 
 _CONTENT_ID_BYTES = 64 * 1024
+# A new column in _SCHEMA reaches fresh installs only: CREATE TABLE IF NOT
+# EXISTS leaves an existing database's table as it was. Add its ALTER to
+# _migrate (keyed on PRAGMA table_info) and bump this. A new table needs neither.
 _SCHEMA_VERSION = 8
 
 _SCHEMA = """
@@ -171,9 +174,12 @@ _TAG_COLUMNS = (
 
 # Indexed search fields, in the order the FTS table declares them. Every name
 # is also a `tracks` column, so the index statements are generated from this
-# list rather than spelled out — adding a field here is the whole change.
-# Changing it rebuilds tracks_fts (see _ensure_fts_schema) and, on the next
-# open, every row's search_blob (see _migrate).
+# list rather than spelled out. Changing it rebuilds tracks_fts by itself (see
+# _ensure_fts_schema) — but NOT the stored search_blob of existing rows: bump
+# _SCHEMA_VERSION and add a `version < N` branch in _migrate that calls
+# _rebuild_search_blobs, or the LIKE fallback never finds the new field on old
+# rows. Rewrite a blob only via _indexed_from_row, never by spelling the fields
+# out.
 _FTS_COLUMNS = ("artist", "title", "album", "filename", "comment", "key")
 
 

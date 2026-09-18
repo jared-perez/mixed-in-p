@@ -32,12 +32,36 @@ pyside6-lrelease src/gui/translations/mixedinp_<code>.ts
 
 ## Status
 
-- **Shipping:** de, es, fr, it, pt_BR, ru, nl, pl, ja, zh_CN — `.ts`+`.qm`
-  generated and bundled. **es** has a representative sample translated as a
-  proof of concept; the rest are scaffolded with empty entries (they fall back
-  to English until filled in).
-- **Scaffolded for later:** da, nb, sv, tr, uk, vi, zh_TW, lt
-- **Deferred (hard to source):** sc, eo
+All eleven languages are shipping and fully translated: de, es, fr, it,
+pt_BR, ru, nl, pl, ja, zh_CN, ko (see `LANGUAGES`). Missing translations fall
+back to the English source string, so a partly-translated language is safe to
+ship — but `python scripts/build_translations.py --strict` should stay clean.
 
-Empty/missing translations always fall back to the English source string, so a
-partly-translated language is safe to ship.
+## Why the glossary says what it says
+
+The term rules themselves are in the repo's `CLAUDE.md` (Translation
+glossary). These are the reasons, kept here so a translator doesn't undo them.
+
+**`pipeline`** is the loanword in every Latin-script language, `пайплайн` in
+ru, `potok` in pl and `流水线` in zh_CN. It shipped as "chain" in six languages
+(es *cadena*, fr *chaîne*, it *catena*, pt_BR *cadeia*, ru *цепочка*, pl
+*łańcuch*), which was wrong three ways: a chain is rigid links, losing the
+liquid-through-a-pipe image the feature is named for; *cadena* and *catena*
+read first as **assembly line**; and pt_BR *cadeia* colloquially means
+**jail**. These languages' tech communities use "pipeline" untranslated
+anyway, and the surf reading is decisive — Banzai Pipeline keeps its English
+name everywhere, and the step toggle is the tsunami hazard sign, so
+translating the word breaks the symbol. Two exceptions: pl `potok` is both the
+established Polish CS term and literally a stream of water; zh_CN `流水线`
+already reads "flowing-water line" (the surf pun cannot survive in Chinese, so
+only *flow* is in play, and 管道 lacks it). ru's button is the noun
+`Запуск пайплайна` rather than the infinitive because `Запустить пайплайн`
+measures 164px against the button's 160px minimum.
+
+**`stream`** is translated as an ordinary noun for a flowing ribbon of liquid
+(de `Strom`, fr `flux`, ru `поток`, ja `流れ`, zh_CN `水流`), with its
+"Backdrop" prefix done as its sibling menu entries do it (de `Hintergrund:`,
+ru `Фон:`, ja `背景：`). The visual shipped as "Silly Scope", kept English as a
+proper name and a pun on "oscilloscope". Renaming it retired the pun and with
+it the only reason not to translate, so don't restore the English-everywhere
+rule from the `vanished` entries or the old `<translatorcomment>`.

@@ -15,8 +15,7 @@ from __future__ import annotations
 # (code, native display name). Order here is the order shown in the picker.
 # "en" is the built-in source language and always available (no .qm needed).
 #
-# Shipping now (translations being authored): de es fr it pt_BR ru nl pl ja zh_CN ko
-# Scaffolded for later (empty .ts/.qm to drop in): da nb sv tr uk vi zh_TW lt
+# Shipping, fully translated: de es fr it pt_BR ru nl pl ja zh_CN ko
 LANGUAGES: list[tuple[str, str]] = [
     ("en", "English"),
     ("de", "Deutsch"),

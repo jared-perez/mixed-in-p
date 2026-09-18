@@ -1953,7 +1953,7 @@ class MetadataPanel(QWidget):
         plural ships as its own source text, and an untranslated language falls
         back to that source — so English, the default, would read "Applied 5
         field(s)", which is not English. Spelling the two forms out instead
-        (the branch `compatible_panel._sync_seed_label` takes) fixes English
+        (the branch `CompatibleTracksPanel._update_header` takes) fixes English
         and breaks Russian and Polish, which need a third form for 2–4 and
         would get the plural one. The count is the least load-bearing part of
         the sentence — the form beside it has just been rebuilt from disk and
