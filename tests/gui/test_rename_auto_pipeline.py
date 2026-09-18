@@ -487,3 +487,103 @@ def test_an_open_with_mid_run_does_not_divert_the_track(window, qtbot, tmp_path,
     scratch = [Path(m.path).name for m in win._library.get_items(SCRATCH_NODE_ID)]
     assert scratch == ["other.wav"]
     assert win._player_panel.loaded_node_id == SCRATCH_NODE_ID
+
+
+# ------------------------------------------------- a drop into the Analyze panel
+
+
+def _drop_into_analyze(win, paths):
+    """What the panel emits when files land on it."""
+    win._analysis_panel.files_dropped.emit(list(paths))
+
+
+def _members(win, node_id):
+    return [Path(m.path).name for m in win._library.get_items(node_id)]
+
+
+def test_a_drop_with_auto_and_the_toggle_on_runs_the_pipeline(window, qtbot, tmp_path):
+    """Windows 10 findings, 2026-09-18: the drop took the plain auto-analyze
+    path, so the files were tagged and renamed and never filed. A drop with
+    the toggle on is a Start press now."""
+    win = window(auto_analyze=True, pipeline_analyze_enabled=True,
+                 pipeline_playlist="Friday set", auto_rename=False)
+    paths = [_wav(tmp_path / f"{n}.wav") for n in ("a", "b")]
+
+    _drop_into_analyze(win, paths)
+
+    assert win._pipeline.active
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=60000)
+    qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=60000)
+    assert sorted(_members(win, _playlist(win, "Friday set").id)) == ["a.wav", "b.wav"]
+
+
+def test_a_drop_with_the_toggle_off_analyses_without_a_run(window, qtbot, tmp_path):
+    """Unchanged: Auto on, toggle off is the plain analysis it always was."""
+    win = window(auto_analyze=True, pipeline_analyze_enabled=False,
+                 pipeline_playlist="Friday set", auto_rename=False)
+    _drop_into_analyze(win, [_wav(tmp_path / "a.wav")])
+
+    assert not win._pipeline.active
+    assert win._analysis_thread is not None
+    qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=60000)
+    assert win._library.get_children(None) == [] or "Friday set" not in [
+        n.name for n in win._library.get_children(None)
+    ]
+
+
+def test_a_drop_with_auto_off_waits_for_start(window, tmp_path):
+    """Unchanged: without Auto the rows sit PENDING for the Start press."""
+    win = window(auto_analyze=False, pipeline_analyze_enabled=True,
+                 pipeline_playlist="Friday set", auto_rename=False)
+    path = _wav(tmp_path / "a.wav")
+    _drop_into_analyze(win, [path])
+
+    assert not win._pipeline.active
+    assert win._analysis_thread is None
+    (track,) = win._store.get_all()
+    assert track.state == TrackState.PENDING
+
+
+def test_a_drop_during_a_run_joins_it(window, qtbot, tmp_path):
+    """A second drop while the first is analysing is the same run — one
+    target, one summary, every file filed."""
+    win = window(auto_analyze=True, pipeline_analyze_enabled=True,
+                 pipeline_playlist="Friday set", auto_rename=False)
+    first = _wav(tmp_path / "a.wav")
+    second = _wav(tmp_path / "b.wav")
+    _drop_into_analyze(win, [first])
+    run = win._pipeline.run
+    assert run is not None
+
+    _drop_into_analyze(win, [second])
+
+    assert win._pipeline.run is run  # joined, not replaced
+    qtbot.waitUntil(lambda: not win._pipeline.active, timeout=60000)
+    qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=60000)
+    assert sorted(_members(win, _playlist(win, "Friday set").id)) == ["a.wav", "b.wav"]
+
+
+def test_a_drop_with_no_target_falls_back_to_a_plain_analysis(window, qtbot, tmp_path, caplog):
+    """No playlist named in the header: analyse anyway, say so in the log,
+    never a modal — this runs from a drop handler."""
+    win = window(auto_analyze=True, pipeline_analyze_enabled=True,
+                 pipeline_playlist="", auto_rename=False)
+    with caplog.at_level("WARNING", logger="src.gui.main_window"):
+        _drop_into_analyze(win, [_wav(tmp_path / "a.wav")])
+
+    assert not win._pipeline.active
+    assert win._analysis_thread is not None
+    assert "no target playlist" in caplog.text
+    qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=60000)
+
+
+def test_a_refused_start_is_logged(window, monkeypatch, caplog):
+    """A refused press and a press never made used to read the same in a log.
+    Stubs the box, not _warn_pipeline: the log line lives in that funnel."""
+    shown = []
+    monkeypatch.setattr(QMessageBox, "information",
+                        lambda *a, **k: shown.append(a[2] if len(a) > 2 else ""))
+    win = window(pipeline_analyze_enabled=True, pipeline_playlist="")
+    with caplog.at_level("WARNING", logger="src.gui.main_window"):
+        win._start_pipeline_from(STEP_ANALYZE)
+    assert shown and "Pipeline start refused" in caplog.text

@@ -1032,7 +1032,21 @@ class MainWindow(QMainWindow):
             )
 
     def _add_and_analyze_files(self, file_paths: list[str]) -> None:
-        """Add files and start analysis (immediately if auto-analyze is on)."""
+        """Add files and start analysis (immediately if auto-analyze is on).
+
+        With Auto on and the Analyze panel's step toggle on, a drop *is* a
+        Start press: it arms a run (or joins the one in flight) so the files
+        end in the target playlist. It shipped taking the plain auto-analyze
+        path regardless of the toggle — analysed, tagged, renamed, and never
+        filed, with nothing to say why; the Windows 10 findings of 2026-09-18
+        read that as a design flaw rather than a bug, and this is the fix.
+        """
+        if (
+            self._config.auto_analyze
+            and self._step_enabled(STEP_ANALYZE)
+            and self._pipeline_drop(file_paths)
+        ):
+            return
         track_ids: list[str] = []
         self._store.begin_batch_update()
         for path in file_paths:
@@ -1055,6 +1069,48 @@ class MainWindow(QMainWindow):
             self._pending_rename_operations = []  # enable auto-rename gate
             if self._config.auto_analyze:
                 self._start_analysis(track_ids)
+
+    def _pipeline_drop(self, file_paths: list[str]) -> bool:
+        """Run a drop into Analyze through the pipeline. False = not possible.
+
+        A run already in flight adopts the files: they join its awaiting map
+        and are analysed when the current batch ends (_pipeline_analysis_idle
+        starts them), so a second drop is never a second run. Otherwise a run
+        is armed exactly as a Start press would arm it — same target, same
+        step snapshot — and analysis begins at once.
+
+        Two refusals, both falling back to the plain analysis rather than to a
+        modal (this is reached from drop handlers): a plain conversion in
+        flight, because _on_conversion_finished would forward its results into
+        whatever run is active; and no target named in the header.
+        """
+        paths = [normalize_track_path(p) for p in file_paths]
+        if not paths:
+            return False
+        if self._pipeline.active:
+            logger.info("Analyze drop: %d file(s) join the run in flight", len(paths))
+            self._pipeline_analyse(paths)
+            return True
+        if self._conversion_thread is not None and self._conversion_thread.isRunning():
+            logger.warning(
+                "Analyze drop: a conversion is running, so %d file(s) are analysed "
+                "without a run", len(paths),
+            )
+            return False
+        target = self._resolve_pipeline_target()
+        if target is None:
+            logger.warning(
+                "Analyze drop: no target playlist named in the header, so %d file(s) "
+                "are analysed without a run", len(paths),
+            )
+            return False
+        node_id, name = target
+        steps = self._enabled_steps()
+        logger.info("Pipeline armed from an Analyze drop: steps=%s target=%r (node %d), %d file(s)",
+                    sorted(steps), name, node_id, len(paths))
+        self._pipeline.arm(node_id, name, steps=steps)
+        self._pipeline_analyse(paths)
+        return True
 
     def _start_analysis(self, track_ids: list[str]) -> None:
         """Start analysis for the given tracks."""
@@ -1644,6 +1700,7 @@ class MainWindow(QMainWindow):
     def _warn_pipeline(self, title: str, body: str) -> None:
         """Say why a Start press did nothing. Fired from a button click, so it
         needs no QTimer hop — that rule is for drop and drag handlers."""
+        logger.warning("Pipeline start refused: %s", body)
         QMessageBox.information(self, title, body)
 
     def _pipeline_blocker(self) -> str | None:
@@ -2171,6 +2228,9 @@ class MainWindow(QMainWindow):
                 Path(result.file_path).name,
                 "analysis error" if result.error else "not part of this run",
             )
+        else:
+            logger.debug("Analysis of %r ended with no pipeline run active",
+                         Path(result.file_path).name)
 
     def _pipeline_add_to_playlist(self, path: str, result: AnalysisResult) -> None:
         """Put one analysed file into the run's playlist.
