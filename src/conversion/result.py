@@ -135,6 +135,38 @@ def is_quality_downgrade(
     return rate < source_rate or bits < source_bits
 
 
+def read_mp3_bitrate(file_path: str) -> int | None:
+    """An MP3's bitrate in kbps (the average, for VBR), or None if unreadable."""
+    try:
+        from mutagen.mp3 import MP3
+        bitrate = MP3(file_path).info.bitrate
+    except Exception:
+        return None
+    return round(bitrate / 1000) if bitrate else None
+
+
+def lowers_bitrate(source_kbps: int | None, target_kbps: int) -> bool:
+    """True when re-encoding an MP3 at `target_kbps` is a strict downgrade.
+
+    The one conversion a lossy source is allowed: MP3 to a smaller MP3, for a
+    player or a drive that wants it. Anything else would re-encode the same
+    losses at the same size or bigger. An unreadable bitrate answers False,
+    as is_quality_downgrade does for an unmeasurable file.
+    """
+    return source_kbps is not None and target_kbps < source_kbps
+
+
+def lossy_source_error(source_path: str, target_format: str) -> str:
+    """Why a lossy source was refused, in the engine's (English) words."""
+    from pathlib import Path
+
+    if target_format != "MP3":
+        return "Lossy-to-lossless conversion is not supported"
+    if Path(source_path).suffix.lower() != ".mp3":
+        return "Only an MP3 source can be re-encoded to MP3"
+    return ""
+
+
 def resolve_output_path(source_path: str, target_ext: str, output_dir: str | None = None):
     """Compute the destination path for a conversion, avoiding overwrites.
 

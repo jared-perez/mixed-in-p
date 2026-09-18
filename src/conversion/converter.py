@@ -2,9 +2,10 @@
 
 Converts between WAV, FLAC, and AIFF using soundfile.
 Supports encoding to MP3 via lameenc.
-Quality only ever goes down: lossy sources are blocked entirely, a conversion
-that would raise the sample rate or bit depth is refused, and converting a
-file into its own format runs only when it lowers one of them.
+Quality only ever goes down: a lossy source may only become an MP3 at a lower
+bitrate, a conversion that would raise the sample rate or bit depth is
+refused, and converting a file into its own format runs only when it lowers
+one of them.
 """
 
 from __future__ import annotations
@@ -24,8 +25,11 @@ from .result import (
     is_lossless,
     is_quality_downgrade,
     is_same_format,
+    lossy_source_error,
+    lowers_bitrate,
     raises_quality,
     read_audio_quality,
+    read_mp3_bitrate,
     resolve_output_path,
 )
 
@@ -37,10 +41,10 @@ def _convert_to_mp3(
     output_path: Path,
     bitrate: int = 320,
 ) -> None:
-    """Encode a lossless source to MP3 using lameenc.
+    """Encode a source to MP3 using lameenc.
 
     Args:
-        source_path: Path to the lossless source file.
+        source_path: Path to a lossless source, or an MP3 being re-encoded.
         output_path: Destination .mp3 path.
         bitrate: MP3 bitrate in kbps (e.g. 128, 192, 256, 320).
     """
@@ -183,17 +187,27 @@ def convert_file(
             error=f"Unknown target format: {target_format}",
         )
 
-    # Block lossy sources
+    # A lossy source may only become a smaller MP3. An MP3 at a bitrate that
+    # isn't lower is skipped, like a same-format lossless file with nothing
+    # to lower; every other lossy conversion is refused.
     src_ext = src_path.suffix.lower()
     if src_ext in LOSSY_EXTENSIONS:
-        return ConversionResult(
-            source_path=source_path,
-            output_path="",
-            target_format=target_format,
-            error="Lossy-to-lossless conversion is not supported",
-        )
-
-    if src_ext not in LOSSLESS_EXTENSIONS:
+        error = lossy_source_error(source_path, target_format)
+        if error:
+            return ConversionResult(
+                source_path=source_path,
+                output_path="",
+                target_format=target_format,
+                error=error,
+            )
+        if not lowers_bitrate(read_mp3_bitrate(source_path), bitrate):
+            return ConversionResult(
+                source_path=source_path,
+                output_path="",
+                target_format=target_format,
+                skipped=True,
+            )
+    elif src_ext not in LOSSLESS_EXTENSIONS:
         return ConversionResult(
             source_path=source_path,
             output_path="",

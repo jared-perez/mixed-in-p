@@ -1,4 +1,4 @@
-"""Conversion panel for batch lossless audio format conversion."""
+"""Conversion panel for batch audio format conversion."""
 
 from pathlib import Path
 
@@ -29,8 +29,11 @@ from src.conversion.result import (
     ConversionResult,
     is_quality_downgrade,
     is_same_format,
+    lossy_source_error,
+    lowers_bitrate,
     raises_quality,
     read_audio_quality,
+    read_mp3_bitrate,
 )
 from src.utils.config import load_config, save_config
 from src.utils.paths import normalize_track_path
@@ -45,7 +48,11 @@ from .progress_bar import ProgressPanel
 
 
 class ConversionPanel(QWidget):
-    """Panel for converting audio files between lossless formats."""
+    """Panel for converting audio files between formats.
+
+    Lossy files get rows too — a file moved here must be seen here — but the
+    only thing one can become is an MP3 at a lower bitrate.
+    """
 
     # (file_paths, target_format, bitrate, sample_rate, bit_depth, output_dir).
     # sample_rate/bit_depth are `object`, not `int`: None is the "Keep source"
@@ -75,6 +82,8 @@ class ConversionPanel(QWidget):
         # Feeds both the "From" label and the same-format downgrade test, so one
         # sf.info() per file covers both.
         self._quality_cache: dict[str, tuple[int | None, int | None]] = {}
+        # MP3 source path -> bitrate in kbps; None if unreadable.
+        self._bitrate_cache: dict[str, int | None] = {}
         self._convertible_count = 0  # READY rows, as of the last _refresh_table
         self._config = load_config()
         # The folder last picked, remembered even while the Source toggle is on
@@ -328,10 +337,9 @@ class ConversionPanel(QWidget):
         layout.addLayout(bottom_row)
         self._bottom_row = bottom_row
 
-        # Transient centered notice shown when a dropped lossy file is rejected.
-        # It floats over the panel (not in the layout); auto-hides after 3s or
-        # as soon as an allowed file is added.
-        self._lossy_notice = QLabel(self.tr("Lossy files not allowed"), self)
+        # Transient centered notice (show_notice). It floats over the panel,
+        # not in the layout, and auto-hides after 3s.
+        self._lossy_notice = QLabel(self)
         self._lossy_notice.setAlignment(Qt.AlignmentFlag.AlignCenter)
         # show_notice puts sentences here, not two words, so it wraps rather
         # than running off both edges of the panel.
@@ -366,6 +374,8 @@ class ConversionPanel(QWidget):
         self._samplerate_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitdepth_combo.currentIndexChanged.connect(self._refresh_table)
         self._bitrate_combo.currentTextChanged.connect(self._save_convert_settings)
+        # ...and the bitrate decides whether an MP3 row is one.
+        self._bitrate_combo.currentTextChanged.connect(self._refresh_table)
         self._pipeline_toggle.toggled.connect(self._on_pipeline_toggled)
         self._dest_choose_btn.clicked.connect(self._on_choose_output_dir)
         self._dest_source_toggle.toggled.connect(self._on_source_toggled)
@@ -389,9 +399,18 @@ class ConversionPanel(QWidget):
             self._quality_cache[file_path] = cached
         return cached
 
+    def _bitrate(self, file_path: str) -> int | None:
+        """An MP3's bitrate in kbps, read once and cached."""
+        if file_path not in self._bitrate_cache:
+            self._bitrate_cache[file_path] = read_mp3_bitrate(file_path)
+        return self._bitrate_cache[file_path]
+
     def _get_from_label(self, file_path: str, src_ext: str) -> str:
-        """Build a 'From' label like 'FLAC 44.1k/16' for the given file."""
+        """Build a 'From' label like 'FLAC 44.1k/16' (or 'MP3 320 kbps')."""
         ext_label = src_ext.upper().lstrip(".")
+        if src_ext == ".mp3":
+            kbps = self._bitrate(file_path)
+            return f"{ext_label} {kbps} kbps" if kbps else ext_label
         rate, bits = self._quality(file_path)
         if rate is None:
             return ext_label
@@ -402,12 +421,14 @@ class ConversionPanel(QWidget):
         """Extension for the currently selected target format."""
         return FORMAT_EXTENSION.get(self._format_combo.currentText(), ".aiff")
 
-    # Row verdicts. READY is the only one that converts; the other two each
+    # Row verdicts. READY is the only one that converts; the others each
     # need their own status text, because "there is nothing to lower" and
-    # "that would be an upsample" call for opposite corrections.
+    # "that would be an upsample" call for opposite corrections, and a lossy
+    # source can't be corrected into lossless at all.
     READY = "ready"
     SAME_FORMAT = "same_format"
     UPSAMPLE = "upsample"
+    LOSSY = "lossy"
 
     def _verdict(self, file_path: str, target_ext: str, is_mp3: bool) -> str:
         """What the current settings would do to this file.
@@ -418,8 +439,19 @@ class ConversionPanel(QWidget):
         equal settings are the whole point, so only a raise is refused. MP3 is
         exempt: the rate/depth selectors don't apply to it.
 
+        A lossy source only ever becomes an MP3 at a lower bitrate; an MP3 at
+        a bitrate that isn't lower is SAME_FORMAT, as the engine skips it.
+
         Ignores whether the file was already converted; callers handle that.
         """
+        if Path(file_path).suffix.lower() in LOSSY_EXTENSIONS:
+            target_format = "MP3" if is_mp3 else target_ext
+            if lossy_source_error(file_path, target_format):
+                return self.LOSSY
+            bitrate = int(self._bitrate_combo.currentText())
+            if lowers_bitrate(self._bitrate(file_path), bitrate):
+                return self.READY
+            return self.SAME_FORMAT
         if is_mp3:
             return self.READY
         rate, bits = self._quality(file_path)
@@ -434,27 +466,29 @@ class ConversionPanel(QWidget):
         return self.READY
 
     def add_files(self, paths: list[str]) -> None:
-        """Add files to the conversion list."""
+        """Add files to the conversion list.
+
+        Lossy files land as rows like any other. They used to be refused
+        here, but a move from another panel had already taken them out of it,
+        so a refused file was nowhere at all; the row's status says what it
+        can't do instead.
+        """
         existing = set(self._file_paths)
-        added_allowed = 0
-        dropped_lossy = 0
         for p in paths:
-            ext = Path(p).suffix.lower()
-            if ext in LOSSY_EXTENSIONS:
-                dropped_lossy += 1
             if p not in existing:
                 self._file_paths.append(p)
                 existing.add(p)
-                if ext in LOSSLESS_EXTENSIONS:
-                    added_allowed += 1
         self._refresh_table()
-        # An allowed file landing clears the notice; otherwise a rejected lossy
-        # drop raises it (3s auto-hide).
-        if added_allowed > 0:
-            self._hide_lossy_notice()
-        elif dropped_lossy > 0:
-            self._lossy_notice.setText(self.tr("Lossy files not allowed"))
-            self._show_lossy_notice()
+
+    def lossy_rows_held(self, paths: list[str]) -> bool:
+        """True if any of `paths` is a lossy row the current target refuses."""
+        target_ext = self._target_ext()
+        is_mp3 = self._format_combo.currentText() == "MP3"
+        return any(
+            Path(p).suffix.lower() in LOSSY_EXTENSIONS
+            and self._verdict(p, target_ext, is_mp3) == self.LOSSY
+            for p in paths
+        )
 
     def _position_lossy_notice(self) -> None:
         """Size and center the transient notice over the panel.
@@ -597,17 +631,17 @@ class ConversionPanel(QWidget):
     def pipeline_rows(self) -> tuple[list[str], list[str]]:
         """(to convert, forwarded as-is) for a Start press.
 
-        Start takes every lossless row that is not blocked, because the user's
+        Start takes every row that is not blocked, because the user's
         model is "these tracks, into that playlist, analysed" — a batch that
         already happens to be in the target format would otherwise leave the
         button dead and the pipeline unusable. A refused upsample stays in the
-        table; it is the one thing the pipeline cannot honour.
+        table, as does a lossy row the target refuses.
         """
         target_ext = self._target_ext()
         is_mp3 = self._format_combo.currentText() == "MP3"
         to_convert: list[str] = []
         passthrough: list[str] = []
-        for path in self._lossless_paths():
+        for path in self._row_paths():
             if path in self._converted_outputs:
                 passthrough.append(path)
                 continue
@@ -794,11 +828,8 @@ class ConversionPanel(QWidget):
     def _selected_source_paths(self) -> list[str]:
         """Return source paths for currently selected rows, in display order."""
         selected_rows = sorted({idx.row() for idx in self._file_table.selectedIndexes()})
-        lossless_paths = [
-            p for p in self._file_paths
-            if Path(p).suffix.lower() in LOSSLESS_EXTENSIONS
-        ]
-        return [lossless_paths[r] for r in selected_rows if r < len(lossless_paths)]
+        row_paths = self._row_paths()
+        return [row_paths[r] for r in selected_rows if r < len(row_paths)]
 
     def _effective_path(self, source_path: str) -> str:
         """Return the converted output path if the source was converted, else the source."""
@@ -811,6 +842,7 @@ class ConversionPanel(QWidget):
         for p in to_remove:
             self._converted_outputs.pop(p, None)
             self._quality_cache.pop(p, None)
+            self._bitrate_cache.pop(p, None)
         self._refresh_table()
 
     def _on_remove_selected(self) -> None:
@@ -863,20 +895,11 @@ class ConversionPanel(QWidget):
         target_ext = self._target_ext()
         is_mp3 = target_format == "MP3"
 
-        # Separate lossless from lossy
-        lossless_paths: list[str] = []
-        lossy_count = 0
-        for p in self._file_paths:
-            ext = Path(p).suffix.lower()
-            if ext in LOSSLESS_EXTENSIONS:
-                lossless_paths.append(p)
-            elif ext in LOSSY_EXTENSIONS:
-                lossy_count += 1
-
-        self._file_table.setRowCount(len(lossless_paths))
+        row_paths = self._row_paths()
+        self._file_table.setRowCount(len(row_paths))
         convertible_count = 0
 
-        for row, file_path in enumerate(lossless_paths):
+        for row, file_path in enumerate(row_paths):
             src_path = Path(file_path)
             src_ext = src_path.suffix.lower()
 
@@ -917,9 +940,21 @@ class ConversionPanel(QWidget):
                 if verdict == self.SAME_FORMAT:
                     status_text = self.tr("Same format")
                     colour = Qt.GlobalColor.darkYellow
-                    tooltip = self.tr(
-                        "Choose a lower sample rate or bit depth to convert this file."
-                    )
+                    if src_ext in LOSSY_EXTENSIONS:
+                        tooltip = self.tr("Choose a lower bitrate to convert this file.")
+                    else:
+                        tooltip = self.tr(
+                            "Choose a lower sample rate or bit depth to convert this file."
+                        )
+                elif verdict == self.LOSSY:
+                    status_text = self.tr("Lossy source")
+                    colour = Qt.GlobalColor.darkYellow
+                    if src_ext == ".mp3":
+                        tooltip = self.tr(
+                            "An MP3 can only become an MP3 at a lower bitrate."
+                        )
+                    else:
+                        tooltip = self.tr("Lossy files can't be converted.")
                 elif verdict == self.UPSAMPLE:
                     status_text = self.tr("Would upsample")
                     colour = Qt.GlobalColor.darkYellow
@@ -940,12 +975,10 @@ class ConversionPanel(QWidget):
 
         # Stats
         parts = []
-        if lossless_paths:
-            parts.append(self.tr("{count} files").format(count=len(lossless_paths)))
+        if row_paths:
+            parts.append(self.tr("{count} files").format(count=len(row_paths)))
         if convertible_count > 0:
             parts.append(self.tr("{count} to convert").format(count=convertible_count))
-        if lossy_count > 0:
-            parts.append(self.tr("({count} lossy skipped)").format(count=lossy_count))
         self._stats_label.setText(" | ".join(parts) if parts else self.tr("No files"))
 
         # Enable convert button only if there are convertible files. With the
@@ -972,9 +1005,8 @@ class ConversionPanel(QWidget):
         # Collect only convertible file paths (skip already converted). Shares
         # _verdict with the table so what runs matches what says "Ready".
         file_paths = [
-            p for p in self._file_paths
-            if Path(p).suffix.lower() in LOSSLESS_EXTENSIONS
-            and p not in self._converted_outputs
+            p for p in self._row_paths()
+            if p not in self._converted_outputs
             and self._verdict(p, target_ext, is_mp3) == self.READY
         ]
 
@@ -1005,12 +1037,10 @@ class ConversionPanel(QWidget):
         """Get the progress panel widget."""
         return self._progress_panel
 
-    def _lossless_paths(self) -> list[str]:
-        """The file list filtered to lossless paths, matching table row order."""
-        return [
-            p for p in self._file_paths
-            if Path(p).suffix.lower() in LOSSLESS_EXTENSIONS
-        ]
+    def _row_paths(self) -> list[str]:
+        """The file list filtered to audio the table shows, in row order."""
+        shown = LOSSLESS_EXTENSIONS | LOSSY_EXTENSIONS
+        return [p for p in self._file_paths if Path(p).suffix.lower() in shown]
 
     def _set_text_status(self, row: int, text: str, color) -> None:
         """Put a plain coloured-text status (e.g. Ready/Converting) in a row.
@@ -1044,11 +1074,11 @@ class ConversionPanel(QWidget):
         """Flag every row about to be converted with a yellow 'Converting'
         status, shown the moment the batch starts."""
         self._converting = set(file_paths)
-        lossless_paths = self._lossless_paths()
+        row_paths = self._row_paths()
         for row in range(self._file_table.rowCount()):
-            if row >= len(lossless_paths):
+            if row >= len(row_paths):
                 break
-            if lossless_paths[row] in self._converting:
+            if row_paths[row] in self._converting:
                 self._set_text_status(row, self.tr("Converting"), QColor(Theme.NEON_YELLOW))
 
     def mark_file_result(self, result: ConversionResult | None) -> None:
@@ -1056,11 +1086,11 @@ class ConversionPanel(QWidget):
         Done/Error independently rather than all at the end."""
         if result is None:
             return
-        lossless_paths = self._lossless_paths()
+        row_paths = self._row_paths()
         for row in range(self._file_table.rowCount()):
-            if row >= len(lossless_paths):
+            if row >= len(row_paths):
                 break
-            if lossless_paths[row] == result.source_path:
+            if row_paths[row] == result.source_path:
                 self._apply_result_to_row(row, result)
                 self._converting.discard(result.source_path)
                 return
@@ -1091,17 +1121,17 @@ class ConversionPanel(QWidget):
         """Final sweep after the batch finishes: apply every result and revert
         any row that never ran (e.g. a cancelled batch) back to 'Ready'."""
         result_map = {r.source_path: r for r in results}
-        lossless_paths = self._lossless_paths()
+        row_paths = self._row_paths()
 
         for row in range(self._file_table.rowCount()):
             name_item = self._file_table.item(row, 0)
             if name_item is None:
                 continue
 
-            if row >= len(lossless_paths):
+            if row >= len(row_paths):
                 break
 
-            path = lossless_paths[row]
+            path = row_paths[row]
             result = result_map.get(path)
             if result is not None:
                 self._apply_result_to_row(row, result)

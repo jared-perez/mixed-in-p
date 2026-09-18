@@ -609,8 +609,11 @@ def run_convert(args):
         LOSSY_EXTENSIONS,
         is_quality_downgrade,
         is_same_format,
+        lossy_source_error,
+        lowers_bitrate,
         raises_quality,
         read_audio_quality,
+        read_mp3_bitrate,
         resolve_output_path,
     )
 
@@ -620,7 +623,7 @@ def run_convert(args):
         sys.exit(1)
 
     # Collect files. convert_file vets each source itself (blocking lossy
-    # sources, skipping same-format), so we hand it everything find_audio_files
+    # sources bar a lower-bitrate MP3, skipping same-format), so we hand it everything find_audio_files
     # returns rather than pre-filtering — that way blocks/skips show up in the
     # report instead of silently vanishing.
     if path.is_file():
@@ -648,7 +651,14 @@ def run_convert(args):
             # MP3 ignores rate/depth, so it is exempt from the quality tests.
             rate, bits = (None, None) if args.to == "MP3" else read_audio_quality(fp)
             if ext in LOSSY_EXTENSIONS:
-                blocked.append((fp, "lossy source — lossless-to-lossy only"))
+                # Only an MP3 re-encoded to a lower bitrate is allowed.
+                if lossy_source_error(fp, args.to):
+                    blocked.append((fp, "lossy source — only a lower-bitrate MP3"))
+                elif lowers_bitrate(read_mp3_bitrate(fp), args.bitrate):
+                    out_path = resolve_output_path(fp, target_ext, args.output_dir)
+                    planned.append((fp, str(out_path)))
+                else:
+                    skipped.append(fp)
             elif ext not in LOSSLESS_EXTENSIONS:
                 blocked.append((fp, f"unsupported source format: {ext}"))
             elif is_same_format(fp, target_ext):

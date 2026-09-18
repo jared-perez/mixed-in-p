@@ -300,6 +300,8 @@ def test_the_convert_leg_says_so_when_lossy_files_cannot_travel(
     win._start_pipeline_from(STEP_RENAME)
 
     assert "Lossy files stayed in Convert" in win._conversion_panel._lossy_notice.text()
+    # ...and they are in its table, not lost between panels.
+    assert win._conversion_panel._file_table.rowCount() == 2
 
 
 def test_a_lossless_only_batch_gets_no_notice(window, monkeypatch, tmp_path):

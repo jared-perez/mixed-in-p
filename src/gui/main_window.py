@@ -55,7 +55,7 @@ from .models import TrackState, TrackStore
 from .models.undo_stack import UndoStack
 from .styles.theme import NoFocusDelegate, Theme
 from .window_sizer import CurrentPageStack, WindowSizer
-from src.conversion.result import LOSSY_EXTENSIONS, ConversionResult
+from src.conversion.result import ConversionResult
 
 from .widgets.analysis_panel import AnalysisPanel
 from .convert_pipeline import (
@@ -1839,12 +1839,12 @@ class MainWindow(QMainWindow):
         self._conversion_panel.add_files(paths)
         self._sidebar.set_current_page("convert")
         self._on_page_changed("convert")
-        # pipeline_rows() walks lossless paths only, so a lossy file sent here
-        # sits in the table and is never converted, analysed or added. Say so
-        # rather than hand back an emptier playlist than the user expects.
-        if any(Path(p).suffix.lower() in LOSSY_EXTENSIONS for p in paths):
+        # A lossy file the target refuses (anything but a smaller MP3) sits in
+        # the table and is never converted, analysed or added. Say so rather
+        # than hand back an emptier playlist than the user expects.
+        if self._conversion_panel.lossy_rows_held(paths):
             self._conversion_panel.show_notice(
-                self.tr("Lossy files stayed in Convert — the pipeline converts lossless sources only.")
+                self.tr("Lossy files stayed in Convert — their status says why.")
             )
         self._pipeline_entering_convert = True
         try:
