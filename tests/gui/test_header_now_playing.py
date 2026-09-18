@@ -175,8 +175,9 @@ class TestWhenItShows:
         player._play_track(1)
         assert window._header._now_playing.text() == "Playing: b.wav"
 
+        # Clear never stops playback: the track plays out, so it stays named.
         player._on_clear_playlist()
-        assert window._header._now_playing.isHidden()
+        assert window._header._now_playing.text() == "Playing: b.wav"
 
     def test_nothing_playing_shows_nothing(self, window):
         window._on_page_changed("analysis")

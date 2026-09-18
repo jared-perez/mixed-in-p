@@ -93,6 +93,14 @@ from src.utils.config import load_config, save_config
 
 from .. import lookup_flow
 from ..models.undo_stack import UndoStack
+from ..play_context import (
+    PlayContext,
+    index_of,
+    locate,
+    next_index,
+    prev_index,
+    resync,
+)
 from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
@@ -1636,13 +1644,18 @@ class PlayerPanel(QWidget):
         # Path of the track loaded in the engine. Playback is deliberately
         # independent of the visible list: switching playlists must not stop
         # the music. _current_index is just this track's row in the visible
-        # list (-1 when it isn't there).
+        # list (-1 when it isn't there, or when the playing row was removed).
         self._playing_path: str | None = None
-        # Which node the playing track was started from — the "In Playlist"
-        # link. Captured at play time and never re-derived, because the visible
-        # list is exactly what moves on underneath it. None when the track was
-        # started from a search result set, which is no playlist to go back to.
-        self._playing_node_id: int | None = None
+        # The playing context (play_context.py): which playlist play was
+        # pressed in and which ROW — an entry compared by identity, because a
+        # playlist may hold one file twice. Next/Previous/auto-advance walk
+        # this, never the visible list, and removing a row never stops it.
+        # None until something plays.
+        self._ctx: PlayContext | None = None
+        # The playing node's canonical order as of the last sync, so an edit
+        # can be followed by identity (resync needs the order before AND after).
+        # Only meaningful while that node is the loaded one.
+        self._ctx_order: list[PlaylistEntry] = []
         # Playlist library binding (set_library): the visible list persists
         # into the loaded node — Scratch by default, or a saved playlist the
         # user clicked in the tree (auto-save: every edit writes through).
@@ -3139,6 +3152,7 @@ class PlayerPanel(QWidget):
         finally:
             self._loading_playlist = False
         self._store_read_props(tracks)
+        self._rebind_context_after_load(node_id)
         # Re-link the playing track to its row if this list contains it.
         if self._playing_path is not None:
             self._relink_playing_row()
@@ -3162,6 +3176,52 @@ class PlayerPanel(QWidget):
         # away without it only because its rebuild happens to force one.
         self._table.doItemsLayout()
         self._table.verticalScrollBar().setValue(self._node_scroll.get(node_id, 0))
+
+    def _rebind_context_after_load(self, node_id: int) -> None:
+        """Point the playing context at the entries load_node just built.
+
+        A load builds NEW entry objects, so the context's identity is lost the
+        moment its playlist is reloaded. Re-find the row by position and path
+        (locate) and re-bind to the new object — but an orphan never re-binds
+        its entry: a same-path row here is a different copy, and highlighting
+        it is exactly the duplicate bug. Its gap's successor does re-bind, so
+        later edits can follow the gap by identity.
+        """
+        ctx = self._ctx
+        if ctx is None or ctx.snapshot is not None or ctx.node_id != node_id:
+            return
+        canonical = self._canonical_order()
+        ctx = locate(ctx, [e.file_path for e in canonical])
+        if not ctx.orphaned:
+            ctx.entry = canonical[ctx.position]
+        else:
+            ctx.successor = (
+                canonical[ctx.position] if ctx.position < len(canonical) else None
+            )
+        self._ctx = ctx
+        self._ctx_order = list(canonical)
+
+    def _resync_context(self) -> None:
+        """Follow the playing row through an edit of the loaded list.
+
+        Called after every write-through (_persist_playlist is the one hook
+        every remove, Clear, reorder, add and inline edit passes). Only when
+        the loaded node IS the playing one: any other list's edits cannot move
+        the playing row, which is what makes removing a track from another
+        playlist leave playback alone.
+        """
+        ctx = self._ctx
+        if (
+            ctx is None
+            or self._loading_playlist
+            or not self._playing_node_on_screen()
+        ):
+            return
+        canonical = self._canonical_order()
+        self._ctx = resync(ctx, self._ctx_order, canonical)
+        self._ctx_order = list(canonical)
+        self._relink_playing_row()
+        self._update_transport_state()
 
     def _store_read_props(self, tracks) -> None:
         """Keep what the load just read from the files but the rows lacked.
@@ -3201,6 +3261,12 @@ class PlayerPanel(QWidget):
 
     def _persist_playlist(self) -> None:
         """Auto-save: write the visible list through to the loaded node."""
+        self._write_playlist()
+        # After the write, and whether or not there was a library to write to:
+        # the playing row has to be followed either way.
+        self._resync_context()
+
+    def _write_playlist(self) -> None:
         # A visible search result list is NOT the loaded node's content —
         # persisting it would overwrite the playlist with the search hits.
         if self._library is None or self._loading_playlist or self._search_active:
@@ -3297,7 +3363,7 @@ class PlayerPanel(QWidget):
             # filename re-decides it — and no resize follows a track change.
             self._sync_title_row_width()
         else:
-            self._playing_node_id = None
+            self._ctx = None
             self._now_playing_label.hide()
             self._playing_playlist_link.hide()
             self._now_playing_row.hide()
@@ -3311,6 +3377,9 @@ class PlayerPanel(QWidget):
         """
         if self._playing_path:
             self._update_playing_playlist_link()
+            # Next/Previous walk the playing list, which the tree can have
+            # just appended to, emptied or deleted.
+            self._update_transport_state()
             # A delete can take the playlist away, which the header cares about
             # even though it only ever shows the filename: with no playlist
             # left, its click has nowhere to go but the Player itself.
@@ -3345,6 +3414,17 @@ class PlayerPanel(QWidget):
         node_id = self._playing_node_id
         if node_id is not None:
             self.playing_playlist_clicked.emit(node_id)
+
+    @property
+    def _playing_node_id(self) -> int | None:
+        return self._ctx.node_id if self._ctx is not None else None
+
+    @_playing_node_id.setter
+    def _playing_node_id(self, node_id: int | None) -> None:
+        # Only ever set to None, when the node has been deleted: the context
+        # then has no playlist to return to, or to advance through.
+        if self._ctx is not None:
+            self._ctx.node_id = node_id
 
     @property
     def playing_node_id(self) -> int | None:
@@ -3609,8 +3689,38 @@ class PlayerPanel(QWidget):
                 self._col_save_timer.start()
 
     def _relink_playing_row(self) -> None:
-        """Point _current_index at the engine's track in the visible list
-        (-1 when this list doesn't contain it)."""
+        """Point _current_index at the playing ROW in the visible list, or -1.
+
+        By identity, not by path: a list may hold the file twice, and the copy
+        that is playing is the one to highlight. -1 when the playing row was
+        removed (an orphan plays on with no row), and when this list is not
+        the one it plays from.
+        """
+        ctx = self._ctx
+        if ctx is not None:
+            if ctx.orphaned:
+                self._current_index = -1
+            elif ctx.snapshot is not None:
+                row = index_of(self._playlist, ctx.entry)
+                if row < 0 and self._search_active:
+                    # A re-run search builds fresh entries for its hits, and a
+                    # hit list names each file once, so the path is the row.
+                    row = next(
+                        (
+                            i
+                            for i, e in enumerate(self._playlist)
+                            if e.file_path == ctx.entry.file_path
+                        ),
+                        -1,
+                    )
+                self._current_index = row
+            elif ctx.node_id == self._loaded_node_id:
+                self._current_index = index_of(self._playlist, ctx.entry)
+            else:
+                self._current_index = -1
+            return
+        # No context: a path was set without playing through _play_entry
+        # (only tests do this). The old by-path answer is the best available.
         if self._playing_path is None:
             self._current_index = -1
             return
@@ -4464,7 +4574,6 @@ class PlayerPanel(QWidget):
         """Rebuild the internal playlist list from table row order after drag-drop."""
         new_playlist: list[PlaylistEntry] = []
         taken: set[int] = set()
-        old_current_path = self._playing_path
 
         # Rows carry their pre-drag index in UserRole (the drop handler moves
         # the QTableWidgetItems themselves, so the role rides along). Matching
@@ -4482,13 +4591,9 @@ class PlayerPanel(QWidget):
                 new_playlist.append(self._playlist[index])
 
         self._playlist = new_playlist
-
-        # Update current index to follow the playing track
-        if old_current_path:
-            for i, entry in enumerate(self._playlist):
-                if entry.file_path == old_current_path:
-                    self._current_index = i
-                    break
+        # By identity: the moved rows are the same objects, so this follows
+        # the playing COPY even when the list holds the file twice.
+        self._relink_playing_row()
 
         self._rebuild_table()
         self._persist_playlist()
@@ -5328,30 +5433,123 @@ class PlayerPanel(QWidget):
         self._current_time_label.setText(self._format_time(0))
 
     def _on_previous(self) -> None:
-        if self._current_index > 0:
-            self._play_track(self._current_index - 1)
-        elif self._playlist:
-            self._play_track(0)
+        target = self._advance_target(-1)
+        if target is not None:
+            self._play_entry(*target)
+        elif self._ctx is not None and not self._ctx.orphaned:
+            # At the top of its list: Previous restarts the track, as it
+            # always has. An orphan has no row to restart from.
+            self._play_entry(self._ctx.entry, self._ctx)
 
     def _on_next(self) -> None:
-        if self._current_index < len(self._playlist) - 1:
-            self._play_track(self._current_index + 1)
+        target = self._advance_target(+1)
+        if target is not None:
+            self._play_entry(*target)
 
     def _on_row_double_clicked(self, index) -> None:
         self._play_track(index.row())
 
+    def _canonical_order(self) -> list[PlaylistEntry]:
+        """The loaded node's stored order — what _persist_playlist writes."""
+        return self._unsorted_playlist if self._sorted else self._playlist
+
+    def _playing_node_on_screen(self) -> bool:
+        """True when the table shows the playing context's own playlist."""
+        ctx = self._ctx
+        return (
+            ctx is not None
+            and ctx.snapshot is None
+            and ctx.node_id is not None
+            and not self._search_active
+            and ctx.node_id == self._loaded_node_id
+        )
+
+    def _context_for_row(self, index: int) -> PlayContext:
+        """A playing context for visible row *index* of the loaded list."""
+        entry = self._playlist[index]
+        if self._search_active:
+            # A search result set is not a playlist — there is nothing to go
+            # back to, so the link stays off rather than naming whichever node
+            # happened to be loaded when the search started. The hits as they
+            # stand are what Next walks, even after the search is dismissed.
+            return PlayContext(None, entry, index, snapshot=list(self._playlist))
+        canonical = self._canonical_order()
+        self._ctx_order = list(canonical)
+        position = index_of(canonical, entry)
+        return PlayContext(self._loaded_node_id, entry, max(position, 0))
+
     def _play_track(self, index: int) -> None:
+        """Play visible row *index*, making its list the playing context."""
         if index < 0 or index >= len(self._playlist):
             return
-        self._current_index = index
-        entry = self._playlist[index]
+        self._play_entry(self._playlist[index], self._context_for_row(index))
+
+    def _advance_target(self, step: int) -> tuple[PlaylistEntry, PlayContext] | None:
+        """The entry Next (+1) or Previous (-1) plays, and its context.
+
+        Walks the PLAYING list, whatever is on screen. On screen (and not
+        searching) that is the visible order, sort included — what you see is
+        what plays next. Away, it is the node's stored order read fresh from
+        the library, because the tree, the pipeline, undo and delete all edit
+        it behind the Player's back; load_node clears any sort, so that is
+        also the order the user sees on coming back. A search context walks
+        the hits it was started from.
+        """
+        ctx = self._ctx
+        if ctx is None:
+            return None
+        pick = next_index if step > 0 else prev_index
+        if ctx.snapshot is not None:
+            i = pick(ctx, len(ctx.snapshot))
+            if i is None:
+                return None
+            entry = ctx.snapshot[i]
+            return entry, PlayContext(None, entry, i, snapshot=ctx.snapshot)
+        if ctx.node_id is None:
+            return None
+        if self._library is not None and self._library.get_node(ctx.node_id) is None:
+            return None  # the playlist was deleted: nothing left to advance to
+        if self._playing_node_on_screen():
+            row = self._visible_anchor(ctx)
+            if row is None:
+                return None
+            probe = PlayContext(ctx.node_id, ctx.entry, row, orphaned=ctx.orphaned)
+            i = pick(probe, len(self._playlist))
+            if i is None:
+                return None
+            return self._playlist[i], self._context_for_row(i)
+        if self._library is None:
+            return None
+        tracks = self._library.get_items(ctx.node_id)
+        self._ctx = ctx = locate(ctx, [t.path for t in tracks])
+        i = pick(ctx, len(tracks))
+        if i is None:
+            return None
+        entry = self._entry_from_track(tracks[i])
+        return entry, PlayContext(ctx.node_id, entry, i)
+
+    def _visible_anchor(self, ctx: PlayContext) -> int | None:
+        """The context's place in the visible list, as a row or a gap.
+
+        A row: the playing entry's visible row. An orphan's gap: the visible
+        row of the entry that followed it (under a sort that is wherever the
+        sort put it), or the end of the list when nothing did.
+        """
+        if not ctx.orphaned:
+            row = index_of(self._playlist, ctx.entry)
+            return row if row >= 0 else None
+        if ctx.successor is None:
+            return len(self._playlist)
+        row = index_of(self._playlist, ctx.successor)
+        return row if row >= 0 else None
+
+    def _play_entry(self, entry: PlaylistEntry, ctx: PlayContext) -> None:
+        """Start *entry* playing, with *ctx* as where it plays from."""
+        self._ctx = ctx
         self._playing_path = entry.file_path
+        self._relink_playing_row()
         # The tag, not a float: entry.bpm is a tag string ("128", "127.95", "").
         self._push_track_tempo(_parse_bpm(entry.bpm))
-        # A search result set is not a playlist — there is nothing to go back
-        # to, so the link stays off rather than naming whichever node happened
-        # to be loaded when the search started.
-        self._playing_node_id = None if self._search_active else self._loaded_node_id
         self._update_now_playing()
         logger.info(f"Playing: {entry.display_name}")
         self._engine.stop()
@@ -5562,7 +5760,9 @@ class PlayerPanel(QWidget):
             self._prefetch(self._playlist[index].file_path)
 
     def _prefetch_next(self) -> None:
-        self._prefetch_index(self._current_index + 1)
+        target = self._advance_target(+1)
+        if target is not None:
+            self._prefetch(target[0].file_path)
 
     def _prefetch_default_target(self) -> None:
         """Warm the track most likely to be played next: the selection, else the first."""
@@ -5601,11 +5801,39 @@ class PlayerPanel(QWidget):
             self._prefetch_index(row)
 
     def _update_transport_state(self) -> None:
-        has_tracks = len(self._playlist) > 0
+        # A track can play on with no row under it (its list cleared, or
+        # another list on screen), and it must still be pausable and stoppable.
+        loaded = self._engine.is_playing() or self._engine.is_paused()
+        has_tracks = len(self._playlist) > 0 or loaded
         self._play_btn.setEnabled(has_tracks)
         self._stop_btn.setEnabled(has_tracks)
-        self._prev_btn.setEnabled(self._current_index > 0)
-        self._next_btn.setEnabled(self._current_index < len(self._playlist) - 1)
+        self._prev_btn.setEnabled(self._can_advance(-1))
+        self._next_btn.setEnabled(self._can_advance(+1))
+
+    def _can_advance(self, step: int) -> bool:
+        """Whether Next/Previous has somewhere to go — without reading the list.
+
+        Runs on every transport refresh, so the away case counts the playing
+        node's rows (one count(*)) rather than fetching them; the position is
+        as of the last sync, which is what the button can honestly promise.
+        """
+        ctx = self._ctx
+        if ctx is None:
+            return False
+        pick = next_index if step > 0 else prev_index
+        if ctx.snapshot is not None:
+            return pick(ctx, len(ctx.snapshot)) is not None
+        if ctx.node_id is None:
+            return False
+        if self._playing_node_on_screen():
+            row = self._visible_anchor(ctx)
+            if row is None:
+                return False
+            probe = PlayContext(ctx.node_id, ctx.entry, row, orphaned=ctx.orphaned)
+            return pick(probe, len(self._playlist)) is not None
+        if self._library is None or self._library.get_node(ctx.node_id) is None:
+            return False
+        return pick(ctx, self._library.item_count(ctx.node_id)) is not None
 
     # ── Playback engine callbacks ───────────────────────────────
 
@@ -5643,9 +5871,10 @@ class PlayerPanel(QWidget):
 
     @Slot()
     def _on_track_finished(self) -> None:
-        # Auto-advance to the next track, or stop at the end of the playlist.
-        if self._current_index < len(self._playlist) - 1:
-            self._play_track(self._current_index + 1)
+        # Auto-advance through the PLAYING list, or stop at its end.
+        target = self._advance_target(+1)
+        if target is not None:
+            self._play_entry(*target)
         else:
             self._engine.stop()
 
@@ -5757,14 +5986,16 @@ class PlayerPanel(QWidget):
     def loaded_track_bpm(self) -> float | None:
         """Tag BPM of the track loaded in the engine, or None.
 
-        Derived on every call from ``_playing_path`` — never from
-        ``_current_index``, which is -1 whenever the visible list is a
-        different playlist from the one playing, and never cached, so an
-        inline edit of the BPM cell is picked up without a reload. The
-        metronome's Track button is the caller.
+        Read off the playing context's own entry — never the visible list,
+        which may be a different playlist (the Track button used to go blank
+        then) or hold another copy of the file. Never cached: an inline edit
+        of the BPM cell sets the attribute on that same entry object, so it is
+        picked up without a reload. The metronome's Track button is the caller.
         """
         if not self._playing_path:
             return None
+        if self._ctx is not None:
+            return _parse_bpm(self._ctx.entry.bpm)
         entry = next(
             (e for e in self._playlist if e.file_path == self._playing_path), None
         )
@@ -6030,8 +6261,11 @@ class PlayerPanel(QWidget):
         if not rows:
             return
 
-        playing_path = self._playing_path
-
+        # Removing a row never stops playback — not another playlist's copy,
+        # not a duplicate, not even the playing row itself, which plays on as
+        # an orphan (Next then plays whatever followed it). The engine decodes
+        # to memory up front, so nothing holds the file or its drive after the
+        # decode: there is no USB-eject reason to unload here either.
         for row in rows:
             if 0 <= row < len(self._playlist):
                 removed = self._playlist.pop(row)
@@ -6039,44 +6273,35 @@ class PlayerPanel(QWidget):
                 # has to reach it too or the row would come back on the next
                 # sort — and would be written back to the database.
                 self._forget_entries([removed])
-                self._cache_discard([removed.file_path])
-                if playing_path and removed.file_path == playing_path:
-                    # Unload to release the audio device and free the buffer
-                    # — required for ejecting USB drives the file lived on.
-                    self._engine.unload()
-                    self._slice.set_track(None, 0)
-                    self._pending_play_path = None
-                    playing_path = None
-                    self._playing_path = None
-                    self._update_now_playing()
-                    self._current_index = -1
-                    self._hide_artwork()
+                # Kept for the playing file, so Previous/Next into another
+                # copy of it does not have to decode again.
+                if removed.file_path != self._playing_path:
+                    self._cache_discard([removed.file_path])
 
-        # Recalculate current index
-        if playing_path:
-            self._current_index = next(
-                (i for i, e in enumerate(self._playlist) if e.file_path == playing_path),
-                -1,
-            )
-
+        # By identity, so the highlight stays on the copy that is playing.
+        self._relink_playing_row()
         self._rebuild_table()
         self._update_stats()
         self._update_transport_state()
         self._persist_playlist()
 
     def _on_clear_playlist(self) -> None:
-        # Unload to release the audio device and free the decoded buffer.
-        self._engine.unload()
-        self._slice.set_track(None, 0)
-        self._pending_play_path = None
-        self._playing_path = None
-        self._update_now_playing()
+        # Never stops playback, by the same rule as Remove: clearing the
+        # playing list orphans its track, which plays out with nothing after
+        # it; clearing any other list does not touch the engine at all.
         self._prefetch_queue.clear()
+        playing = (
+            self._pcm_cache.get(self._playing_path) if self._playing_path else None
+        )
         self._pcm_cache.clear()
-        self._playlist.clear()
+        if playing is not None:
+            self._pcm_cache[self._playing_path] = playing
+        # The sort comes off FIRST: clearing it puts the canonical list back
+        # into _playlist, so after the clear it restored every row and a
+        # sorted Clear did nothing at all.
         self._clear_sort()
+        self._playlist.clear()
         self._current_index = -1
-        self._hide_artwork()
         self._rebuild_table()
         self._update_stats()
         self._update_transport_state()

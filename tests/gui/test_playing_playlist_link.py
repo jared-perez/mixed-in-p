@@ -102,13 +102,23 @@ class TestWhatItNames:
     def test_nothing_playing_hides_the_whole_line(self, player, tmp_path):
         (a,) = make_files(tmp_path, "a.wav")
         player.add_tracks(track_dicts([a]))
-        player._play_track(0)
-        assert not player._now_playing_row.isHidden()
-
-        player._on_clear_playlist()
         assert player._now_playing_row.isHidden()
         assert player._playing_playlist_link.isHidden()
         assert player._playing_node_id is None
+
+        player._play_track(0)
+        assert not player._now_playing_row.isHidden()
+
+    def test_clearing_the_list_keeps_the_line(self, player, tmp_path):
+        # The track plays out after a Clear, and it still came from Scratch.
+        (a,) = make_files(tmp_path, "a.wav")
+        player.add_tracks(track_dicts([a]))
+        player._play_track(0)
+
+        player._on_clear_playlist()
+        assert not player._now_playing_row.isHidden()
+        assert not player._playing_playlist_link.isHidden()
+        assert player._playing_node_id == SCRATCH_NODE_ID
 
 
 class TestTheLineShares:

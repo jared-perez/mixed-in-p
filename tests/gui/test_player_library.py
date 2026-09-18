@@ -158,22 +158,25 @@ class TestPlaybackDecoupledFromList:
         player.load_node(SCRATCH_NODE_ID)  # back to the list that has it
         assert player._current_index == 0  # row re-linked
 
-    def test_clear_resets_now_playing(self, player, lib, tmp_path):
+    def test_clear_keeps_now_playing(self, player, lib, tmp_path):
+        # Clear never stops playback: the track plays out as an orphan.
         (a,) = make_files(tmp_path, "a.wav")
         player.add_tracks(track_dicts([a]))
         player._play_track(0)
         player._on_clear_playlist()
-        assert player._playing_path is None
-        assert player._now_playing_label.isHidden()
+        assert player._playing_path == a
+        assert not player._now_playing_label.isHidden()
+        assert player._ctx.orphaned
 
-    def test_removing_playing_row_unloads(self, player, lib, tmp_path):
+    def test_removing_playing_row_keeps_it_loaded(self, player, lib, tmp_path):
         a, b = make_files(tmp_path, "a.wav", "b.wav")
         player.add_tracks(track_dicts([a, b]))
         player._play_track(0)
         player._table.selectRow(0)
         player._on_remove_selected()
-        assert player._playing_path is None
-        assert player._now_playing_label.isHidden()
+        assert player._playing_path == a
+        assert not player._now_playing_label.isHidden()
+        assert player._current_index == -1  # no row: it is an orphan now
         assert [e.file_path for e in player._playlist] == [b]
 
 

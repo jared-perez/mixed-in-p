@@ -92,13 +92,14 @@ class TestSeedWiring:
         player._on_stop()
         assert rows(player._compat_panel) == ["match.wav"]
 
-    def test_clearing_the_playlist_clears_the_seed(self, player, lib, tmp_path):
-        add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
+    def test_clearing_the_playlist_keeps_the_seed(self, player, lib, tmp_path):
+        # Clear never stops playback: the track plays out, and the matches
+        # for the loaded track stay useful — the same answer as Stop.
+        seed = add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0)
         add_track(player, lib, tmp_path, "match.wav", key="8A", bpm=128.0)
         player._play_track(0)
         player._on_clear_playlist()
-        assert player._compat_panel.seed_path is None
-        assert rows(player._compat_panel) == []
+        assert player._compat_panel.seed_path == seed
 
     def test_the_ranking_order_is_what_the_panel_lists(self, player, lib, tmp_path):
         add_track(player, lib, tmp_path, "seed.wav", key="8A", bpm=128.0, energy=5)

@@ -109,9 +109,10 @@ class PlayerEngine(QObject):
     def unload(self) -> None:
         """Stop playback, release the audio device, and drop the buffer.
 
-        Used when clearing/removing tracks so RAM is freed and any USB drive the
-        file lived on can be ejected (the file handle is already gone — we decode
-        to memory up front — but this releases the output device too).
+        Removing or clearing tracks deliberately does NOT call this: the
+        playing track plays on after its row goes. Nothing here holds the file
+        or its drive anyway — we decode to memory up front — so there is no
+        eject to unblock; this releases the output device and the buffer.
         """
         self._close_stream()
         with self._lock:
