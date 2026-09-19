@@ -392,6 +392,9 @@ class MainWindow(QMainWindow):
         # Neither knows about the other, so the window joins them.
         self._player_panel.art_clicked.connect(self._on_header_art_clicked)
         self._player_panel.now_playing_changed.connect(self._sync_sidebar_art)
+        self._sidebar.art_box_open_changed.connect(
+            self._player_panel.set_art_box_open
+        )
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)
@@ -536,8 +539,15 @@ class MainWindow(QMainWindow):
         self._show_page("player")
 
     def _on_header_art_clicked(self) -> None:
-        """Open the sidebar's cover box on the track that is playing."""
-        self._sidebar.show_art_box(self._player_panel.playing_artwork())
+        """Toggle the sidebar's cover box, opening it on the playing track.
+
+        Keyed on ``art_box_open()``, not visibility: a box the collapsed rail
+        is hiding is still open, and a click closes it.
+        """
+        if self._sidebar.art_box_open():
+            self._sidebar.hide_art_box()
+        else:
+            self._sidebar.show_art_box(self._player_panel.playing_artwork())
 
     def _sync_sidebar_art(self) -> None:
         """Follow the playing track while the box is open.

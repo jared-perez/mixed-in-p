@@ -1532,69 +1532,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="646"/>
-        <location filename="../main_window.py" line="675"/>
+        <location filename="../main_window.py" line="657"/>
+        <location filename="../main_window.py" line="686"/>
         <source>Export All Playlists</source>
         <translation>导出所有播放列表</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="667"/>
+        <location filename="../main_window.py" line="678"/>
         <source>Export failed</source>
         <translation>导出失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="668"/>
+        <location filename="../main_window.py" line="679"/>
         <source>Could not write the file:
 {0}</source>
         <translation>无法写入文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="676"/>
+        <location filename="../main_window.py" line="687"/>
         <source>There are no playlists to export yet.</source>
         <translation>暂无可导出的播放列表。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="681"/>
+        <location filename="../main_window.py" line="692"/>
         <source>Export complete</source>
         <translation>导出完成</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="682"/>
+        <location filename="../main_window.py" line="693"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>已将 {0} 个播放列表（{1} 首曲目）导出到：
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="797"/>
+        <location filename="../main_window.py" line="808"/>
         <source>Select Audio Files</source>
         <translation>选择音频文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="808"/>
+        <location filename="../main_window.py" line="819"/>
         <source>Select Folder</source>
         <translation>选择文件夹</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1056"/>
+        <location filename="../main_window.py" line="1067"/>
         <source>No Audio Files</source>
         <translation>无音频文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1057"/>
+        <location filename="../main_window.py" line="1068"/>
         <source>No audio files found in:
 {0}</source>
         <translation>未在以下位置找到音频文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1062"/>
+        <location filename="../main_window.py" line="1073"/>
         <source>Invalid Folder</source>
         <translation>无效文件夹</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1063"/>
+        <location filename="../main_window.py" line="1074"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>不是有效的目录：
@@ -1609,17 +1609,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已有分析正在运行。请等待或先取消。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1261"/>
+        <location filename="../main_window.py" line="1272"/>
         <source>Analyzing...</source>
         <translation>分析中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1293"/>
+        <location filename="../main_window.py" line="1304"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完成：已分析{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1297"/>
+        <location filename="../main_window.py" line="1308"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完成：已分析{0}个文件</translation>
     </message>
@@ -1628,123 +1628,123 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已取消</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1519"/>
+        <location filename="../main_window.py" line="1530"/>
         <source>Conversion in Progress</source>
         <translation>转换进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1520"/>
+        <location filename="../main_window.py" line="1531"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>已有转换正在运行。请稍候。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1538"/>
+        <location filename="../main_window.py" line="1549"/>
         <source>Pipeline in Progress</source>
         <translation>流水线进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1539"/>
+        <location filename="../main_window.py" line="1550"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translation>上一次流水线尚未结束 — 请等待其完成。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1556"/>
+        <location filename="../main_window.py" line="1567"/>
         <source>No Target Playlist</source>
         <translation>没有目标播放列表</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1557"/>
-        <location filename="../main_window.py" line="1750"/>
+        <location filename="../main_window.py" line="1568"/>
+        <location filename="../main_window.py" line="1761"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>请先在顶栏指定本次运行的播放列表。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1762"/>
+        <location filename="../main_window.py" line="1773"/>
         <source>Cannot Start</source>
         <translation>无法启动</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1772"/>
+        <location filename="../main_window.py" line="1783"/>
         <source>No Files</source>
         <translation>没有文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1773"/>
+        <location filename="../main_window.py" line="1784"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translation>启动流水线之前，请先向该面板添加文件。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1783"/>
+        <location filename="../main_window.py" line="1794"/>
         <source>No Rename Adjustments</source>
         <translation>没有重命名设置</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1784"/>
+        <location filename="../main_window.py" line="1795"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>尚未设置任何重命名。是否原样发送这些文件？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1878"/>
+        <location filename="../main_window.py" line="1889"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>有损文件留在“转换”中 — 原因见其状态。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2005"/>
+        <location filename="../main_window.py" line="2016"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>流水线完成：已将 {added} 个添加到 {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2010"/>
+        <location filename="../main_window.py" line="2021"/>
         <source>{n} skipped</source>
         <translation>跳过{n}个</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2012"/>
+        <location filename="../main_window.py" line="2023"/>
         <source>{n} errors</source>
         <translation>{n}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2104"/>
+        <location filename="../main_window.py" line="2115"/>
         <source>Converting...</source>
         <translation>转换中……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2120"/>
+        <location filename="../main_window.py" line="2131"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完成：已转换{0}个，{1}个错误</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2124"/>
+        <location filename="../main_window.py" line="2135"/>
         <source>Complete: {0} files converted</source>
         <translation>完成：已转换{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2461"/>
+        <location filename="../main_window.py" line="2473"/>
         <source>Rename in Progress</source>
         <translation>重命名进行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2462"/>
+        <location filename="../main_window.py" line="2474"/>
         <source>A rename operation is already running.</source>
         <translation>已有重命名操作正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2570"/>
+        <location filename="../main_window.py" line="2582"/>
         <source>Rename Failed</source>
         <translation>重命名失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2605"/>
+        <location filename="../main_window.py" line="2617"/>
         <source>Undo Rename</source>
         <translation>撤销重命名</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2640"/>
+        <location filename="../main_window.py" line="2652"/>
         <source>Undo Failed</source>
         <translation>撤销失败</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2693"/>
+        <location filename="../main_window.py" line="2705"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translation>请打开「转换」步骤，以便从这里运行流水线。</translation>
     </message>
@@ -1753,12 +1753,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">请先在“转换”面板中设置流水线。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1745"/>
+        <location filename="../main_window.py" line="1756"/>
         <source>A conversion is already running.</source>
         <translation>已有转换正在运行。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1747"/>
+        <location filename="../main_window.py" line="1758"/>
         <source>The last pipeline run is still finishing.</source>
         <translation>上一次流水线尚未结束。</translation>
     </message>
@@ -1775,22 +1775,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">已重命名{0}个文件</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2577"/>
+        <location filename="../main_window.py" line="2589"/>
         <source>No Session</source>
         <translation>无会话</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2577"/>
+        <location filename="../main_window.py" line="2589"/>
         <source>No rename session to undo.</source>
         <translation>没有可撤销的重命名会话。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2586"/>
+        <location filename="../main_window.py" line="2598"/>
         <source>Confirm Undo</source>
         <translation>确认撤销</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2587"/>
+        <location filename="../main_window.py" line="2599"/>
         <source>Undo renaming of {0} files?</source>
         <translation>撤销{0}个文件的重命名？</translation>
     </message>
@@ -1799,7 +1799,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">正在撤销重命名……</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2606"/>
+        <location filename="../main_window.py" line="2618"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>已撤销：{0}个文件，{1}个错误</translation>
     </message>
@@ -2358,74 +2358,74 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="1978"/>
+        <location filename="../widgets/player_panel.py" line="1979"/>
         <source>Player</source>
         <translation>播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2010"/>
-        <location filename="../widgets/player_panel.py" line="3575"/>
+        <location filename="../widgets/player_panel.py" line="2011"/>
+        <location filename="../widgets/player_panel.py" line="3576"/>
         <source>Search all playlists…</source>
         <translation>搜索所有播放列表…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2029"/>
+        <location filename="../widgets/player_panel.py" line="2030"/>
         <source>This playlist</source>
         <translation>此播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2030"/>
+        <location filename="../widgets/player_panel.py" line="2031"/>
         <source>All playlists</source>
         <translation>所有播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2055"/>
+        <location filename="../widgets/player_panel.py" line="2056"/>
         <source>Choose a visualization</source>
         <translation>选择视觉效果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2082"/>
+        <location filename="../widgets/player_panel.py" line="2083"/>
         <source>Backdrop stream</source>
         <translatorcomment>The visual was named &quot;Silly Scope&quot; when it shipped and is now &quot;stream&quot;, so the glossary ruling that kept it in English is retired with the pun: this is an ordinary noun for the look — a flowing ribbon of liquid — and it is translated exactly as its six sibling backdrop entries are.</translatorcomment>
         <translation>背景：水流</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2090"/>
+        <location filename="../widgets/player_panel.py" line="2091"/>
         <source>Visuals off</source>
         <translation>关闭视觉效果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2083"/>
+        <location filename="../widgets/player_panel.py" line="2084"/>
         <source>Backdrop waveform</source>
         <translation>背景：波形</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2079"/>
+        <location filename="../widgets/player_panel.py" line="2080"/>
         <source>Backdrop oscilloscope</source>
         <translation>背景：示波器</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2080"/>
+        <location filename="../widgets/player_panel.py" line="2081"/>
         <source>Backdrop spectrum</source>
         <translation>背景：频谱</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2084"/>
+        <location filename="../widgets/player_panel.py" line="2085"/>
         <source>Backdrop fire</source>
         <translation>背景：火焰</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2077"/>
+        <location filename="../widgets/player_panel.py" line="2078"/>
         <source>Backdrop fractal</source>
         <translation>背景：分形</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2087"/>
+        <location filename="../widgets/player_panel.py" line="2088"/>
         <source>Popout oscilloscope</source>
         <translation>弹出窗口：示波器</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2088"/>
+        <location filename="../widgets/player_panel.py" line="2089"/>
         <source>Popout spectrum bars</source>
         <translation>弹出窗口：频谱条</translation>
     </message>
@@ -2434,145 +2434,145 @@ or click “Add Artwork…”</source>
         <translation type="vanished">弹出窗口：火焰</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2085"/>
+        <location filename="../widgets/player_panel.py" line="2086"/>
         <source>Popout fractal</source>
         <translation>弹出窗口：分形</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2123"/>
+        <location filename="../widgets/player_panel.py" line="2124"/>
         <source>Edit Lock</source>
         <translation>编辑锁定</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2127"/>
+        <location filename="../widgets/player_panel.py" line="2128"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>锁定播放列表中的元数据编辑</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1511"/>
-        <location filename="../widgets/player_panel.py" line="3692"/>
+        <location filename="../widgets/player_panel.py" line="1512"/>
+        <location filename="../widgets/player_panel.py" line="3693"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1512"/>
+        <location filename="../widgets/player_panel.py" line="1513"/>
         <source>Filename</source>
         <translation>文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1513"/>
+        <location filename="../widgets/player_panel.py" line="1514"/>
         <source>Artist</source>
         <translation>艺术家</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1514"/>
+        <location filename="../widgets/player_panel.py" line="1515"/>
         <source>Title</source>
         <translation>标题</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1515"/>
+        <location filename="../widgets/player_panel.py" line="1516"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1516"/>
+        <location filename="../widgets/player_panel.py" line="1517"/>
         <source>Key</source>
         <translatorcomment>Reviewed (zh pass): 调 for compact key labels per glossary (调性 used in full sentences).</translatorcomment>
         <translation>调</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1517"/>
+        <location filename="../widgets/player_panel.py" line="1518"/>
         <source>Comment</source>
         <translation>注释</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1518"/>
+        <location filename="../widgets/player_panel.py" line="1519"/>
         <source>Duration</source>
         <translation>时长</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1519"/>
+        <location filename="../widgets/player_panel.py" line="1520"/>
         <source>Year</source>
         <translation>年份</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1520"/>
+        <location filename="../widgets/player_panel.py" line="1521"/>
         <source>Album</source>
         <translation>专辑</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1521"/>
+        <location filename="../widgets/player_panel.py" line="1522"/>
         <source>Genre</source>
         <translation>流派</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1522"/>
+        <location filename="../widgets/player_panel.py" line="1523"/>
         <source>Track #</source>
         <translation>音轨号</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1523"/>
+        <location filename="../widgets/player_panel.py" line="1524"/>
         <source>Label</source>
         <translation>厂牌</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1524"/>
+        <location filename="../widgets/player_panel.py" line="1525"/>
         <source>Bitrate</source>
         <translation>比特率</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1525"/>
+        <location filename="../widgets/player_panel.py" line="1526"/>
         <source>Energy</source>
         <translation>能量</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1526"/>
+        <location filename="../widgets/player_panel.py" line="1527"/>
         <source>Art</source>
         <translation>封面</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1527"/>
+        <location filename="../widgets/player_panel.py" line="1528"/>
         <source>Date Added</source>
         <translation>添加日期</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1528"/>
+        <location filename="../widgets/player_panel.py" line="1529"/>
         <source>Date Created</source>
         <translation>创建日期</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1529"/>
+        <location filename="../widgets/player_panel.py" line="1530"/>
         <source>Format</source>
         <translation>格式</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1530"/>
+        <location filename="../widgets/player_panel.py" line="1531"/>
         <source>Bit Depth</source>
         <translation>位深度</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1995"/>
+        <location filename="../widgets/player_panel.py" line="5633"/>
         <source>Show this cover in the sidebar</source>
         <translation>在侧边栏中显示此封面</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2081"/>
+        <location filename="../widgets/player_panel.py" line="2082"/>
         <source>Backdrop wormhole</source>
         <translation>背景：虫洞</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2078"/>
+        <location filename="../widgets/player_panel.py" line="2079"/>
         <source>Backdrop tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>背景：隧道追逐</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2089"/>
+        <location filename="../widgets/player_panel.py" line="2090"/>
         <source>Popout wormhole</source>
         <translation>弹出窗口：虫洞</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2086"/>
+        <location filename="../widgets/player_panel.py" line="2087"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>弹出窗口：隧道追逐</translation>
@@ -2583,40 +2583,40 @@ or click “Add Artwork…”</source>
         <translation type="vanished">背景：Silly Scope</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2216"/>
-        <location filename="../widgets/player_panel.py" line="3689"/>
+        <location filename="../widgets/player_panel.py" line="2217"/>
+        <location filename="../widgets/player_panel.py" line="3690"/>
         <source>Playlists</source>
         <translation>播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2323"/>
+        <location filename="../widgets/player_panel.py" line="2324"/>
         <source>Previous</source>
         <translation>上一个</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2334"/>
+        <location filename="../widgets/player_panel.py" line="2335"/>
         <source>Play / Pause  (Space)</source>
         <translation>播放 / 暂停  (Space)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2341"/>
+        <location filename="../widgets/player_panel.py" line="2342"/>
         <source>Stop</source>
         <translation>停止</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2348"/>
+        <location filename="../widgets/player_panel.py" line="2349"/>
         <source>Next</source>
         <translation>下一个</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2366"/>
-        <location filename="../widgets/player_panel.py" line="3532"/>
-        <location filename="../widgets/player_panel.py" line="3537"/>
+        <location filename="../widgets/player_panel.py" line="2367"/>
+        <location filename="../widgets/player_panel.py" line="3533"/>
+        <location filename="../widgets/player_panel.py" line="3538"/>
         <source>Save Playlist</source>
         <translation>存储播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2304"/>
+        <location filename="../widgets/player_panel.py" line="2305"/>
         <source>Vol</source>
         <translation>音量</translation>
     </message>
@@ -2625,226 +2625,231 @@ or click “Add Artwork…”</source>
         <translation type="vanished">移除所选</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2371"/>
+        <location filename="../widgets/player_panel.py" line="2372"/>
         <source>Clear Playlist</source>
         <translation>清空播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2411"/>
+        <location filename="../widgets/player_panel.py" line="2412"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>将此项拖到播放列表即可添加正在播放的曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2435"/>
+        <location filename="../widgets/player_panel.py" line="2436"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>打开当前曲目所在的播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2736"/>
-        <location filename="../widgets/player_panel.py" line="3409"/>
-        <location filename="../widgets/player_panel.py" line="3519"/>
+        <location filename="../widgets/player_panel.py" line="2737"/>
+        <location filename="../widgets/player_panel.py" line="3410"/>
+        <location filename="../widgets/player_panel.py" line="3520"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3366"/>
+        <location filename="../widgets/player_panel.py" line="3367"/>
         <source>Playing: {0}</source>
         <translation>正在播放：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3419"/>
+        <location filename="../widgets/player_panel.py" line="3420"/>
         <source>In Playlist: {0}</source>
         <translation>播放列表：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3516"/>
+        <location filename="../widgets/player_panel.py" line="3517"/>
         <source>Search: {0}</source>
         <translation>搜索：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3533"/>
+        <location filename="../widgets/player_panel.py" line="3534"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>播放列表为空，请先添加曲目。</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3537"/>
+        <location filename="../widgets/player_panel.py" line="3538"/>
         <source>Playlist name:</source>
         <translation>播放列表名称：</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3572"/>
+        <location filename="../widgets/player_panel.py" line="3573"/>
         <source>Search scope: {0}</source>
         <translation>搜索范围：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3577"/>
+        <location filename="../widgets/player_panel.py" line="3578"/>
         <source>Search this playlist…</source>
         <translation>搜索此播放列表…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3600"/>
+        <location filename="../widgets/player_panel.py" line="3601"/>
         <source>No matching tracks</source>
         <translation>没有匹配的曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3903"/>
+        <location filename="../widgets/player_panel.py" line="3904"/>
         <source>{0} bit</source>
         <translation>{0} bit</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4112"/>
+        <location filename="../widgets/player_panel.py" line="4113"/>
         <source>File not found:
 {0}</source>
         <translation>找不到文件：
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4288"/>
+        <location filename="../widgets/player_panel.py" line="4289"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>隐藏与正在播放的曲目相配的曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4290"/>
+        <location filename="../widgets/player_panel.py" line="4291"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>显示与正在播放的曲目相配的曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4614"/>
+        <location filename="../widgets/player_panel.py" line="4615"/>
         <source>{0}+ results</source>
         <translation>{0}+ 个结果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4617"/>
+        <location filename="../widgets/player_panel.py" line="4618"/>
         <source>{0} result</source>
         <translation>{0} 个结果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4619"/>
+        <location filename="../widgets/player_panel.py" line="4620"/>
         <source>{0} results</source>
         <translation>{0} 个结果</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4623"/>
+        <location filename="../widgets/player_panel.py" line="4624"/>
         <source>{0} track</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>{0}首曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4625"/>
+        <location filename="../widgets/player_panel.py" line="4626"/>
         <source>{0} tracks</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>{0}首曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5249"/>
+        <location filename="../widgets/player_panel.py" line="5250"/>
         <source>Reset Columns</source>
         <translation>重置列</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5255"/>
+        <location filename="../widgets/player_panel.py" line="5256"/>
         <source>Fit {0} to Longest</source>
         <translation>将{0}列调整为最长内容</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6213"/>
+        <location filename="../widgets/player_panel.py" line="5631"/>
+        <source>Hide the cover in the sidebar</source>
+        <translation>隐藏侧边栏中的封面</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="6230"/>
         <source>“{0}” has moved.</source>
         <translation>“{0}”已被移动。</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6215"/>
+        <location filename="../widgets/player_panel.py" line="6232"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>所选文件中有 %n 个已被移动。</numerusform>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6218"/>
+        <location filename="../widgets/player_panel.py" line="6235"/>
         <source>File Has Moved</source>
         <translation>文件已被移动</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6222"/>
+        <location filename="../widgets/player_panel.py" line="6239"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>它已不在存储的位置，因此无法添加到播放列表，也无法拖出。已经在播放的曲目会继续播放，因为它在文件被移动之前就已载入内存。</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6227"/>
+        <location filename="../widgets/player_panel.py" line="6244"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>右键点按该曲目并选择“查找缺失文件…”</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6368"/>
+        <location filename="../widgets/player_panel.py" line="6385"/>
         <source>Locate Missing File…</source>
         <translation>查找缺失文件…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6370"/>
+        <location filename="../widgets/player_panel.py" line="6387"/>
         <source>Open File Location</source>
         <translation>打开文件位置</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6371"/>
+        <location filename="../widgets/player_panel.py" line="6388"/>
         <source>Open in Metadata Panel</source>
         <translation>在元数据面板中打开</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6372"/>
+        <location filename="../widgets/player_panel.py" line="6389"/>
         <source>Reload Metadata from File</source>
         <translation>从文件重新加载元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6376"/>
+        <location filename="../widgets/player_panel.py" line="6393"/>
         <source>Look Up Online…</source>
         <translation>在线查找…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6378"/>
+        <location filename="../widgets/player_panel.py" line="6395"/>
         <source>Remove from Playlist</source>
         <translation>从播放列表中移除</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6434"/>
-        <location filename="../widgets/player_panel.py" line="6462"/>
-        <location filename="../widgets/player_panel.py" line="6562"/>
-        <location filename="../widgets/player_panel.py" line="6635"/>
-        <location filename="../widgets/player_panel.py" line="6665"/>
+        <location filename="../widgets/player_panel.py" line="6451"/>
+        <location filename="../widgets/player_panel.py" line="6479"/>
+        <location filename="../widgets/player_panel.py" line="6579"/>
+        <location filename="../widgets/player_panel.py" line="6652"/>
+        <location filename="../widgets/player_panel.py" line="6682"/>
         <source>Look Up Online</source>
         <translation>在线查找</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6436"/>
+        <location filename="../widgets/player_panel.py" line="6453"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>所选曲目都没有可用于搜索的艺人或标题，文件名中也没有。</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6456"/>
+        <location filename="../widgets/player_panel.py" line="6473"/>
         <source>Looking up track details…</source>
         <translation>正在查找曲目信息…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6457"/>
+        <location filename="../widgets/player_panel.py" line="6474"/>
         <source>Cancel</source>
         <translation>取消</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6487"/>
+        <location filename="../widgets/player_panel.py" line="6504"/>
         <source>Looking up {0} of {1}…</source>
         <translation>正在查找第 {0} 个，共 {1} 个…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6495"/>
+        <location filename="../widgets/player_panel.py" line="6512"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>正在等待 Discogs 的请求限制…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6658"/>
+        <location filename="../widgets/player_panel.py" line="6675"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n 个曲目没有匹配结果。</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6661"/>
+        <location filename="../widgets/player_panel.py" line="6678"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>已更新 %n 个曲目。</numerusform>
@@ -3492,38 +3497,38 @@ or click “Add Artwork…”</source>
 <context>
     <name>SettingsPanel</name>
     <message>
-        <location filename="../widgets/settings_panel.py" line="75"/>
+        <location filename="../widgets/settings_panel.py" line="76"/>
         <source>Language</source>
         <translation>语言</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="93"/>
+        <location filename="../widgets/settings_panel.py" line="94"/>
         <source>Restart to apply language changes.</source>
         <translation>重启以应用语言更改。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="107"/>
-        <location filename="../widgets/settings_panel.py" line="827"/>
+        <location filename="../widgets/settings_panel.py" line="108"/>
+        <location filename="../widgets/settings_panel.py" line="845"/>
         <source>Default Audio Player</source>
         <translation>默认音频播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="116"/>
+        <location filename="../widgets/settings_panel.py" line="117"/>
         <source>Make Mixed in P your default audio player</source>
         <translation>将 Mixed in P 设为默认音频播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="126"/>
+        <location filename="../widgets/settings_panel.py" line="127"/>
         <source>Opens Windows Settings on the Mixed in P entry, where you can hand it your audio file types. Windows only lets you make that choice yourself.</source>
         <translation>在 Windows 设置中打开 Mixed in P 条目，你可以在那里把音频文件类型交给它。Windows 只允许你自己做这个选择。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="132"/>
+        <location filename="../widgets/settings_panel.py" line="133"/>
         <source>Double-clicking an audio file will open it here. Finder&apos;s Get Info panel puts it back.</source>
         <translation>双击音频文件将在这里打开。可在访达的「显示简介」中改回。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="143"/>
+        <location filename="../widgets/settings_panel.py" line="144"/>
         <source>Theme</source>
         <translation>主题</translation>
     </message>
@@ -3532,12 +3537,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">暗夜</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="161"/>
+        <location filename="../widgets/settings_panel.py" line="162"/>
         <source>Daylight</source>
         <translation>日光</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="174"/>
+        <location filename="../widgets/settings_panel.py" line="175"/>
         <source>Restart to apply theme changes.</source>
         <translation>重启以应用主题更改。</translation>
     </message>
@@ -3547,72 +3552,72 @@ or click “Add Artwork…”</source>
         <translation type="vanished">波形</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="190"/>
+        <location filename="../widgets/settings_panel.py" line="191"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>播放器中完整波形的颜色。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="209"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Default</source>
         <translation>默认</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="211"/>
+        <location filename="../widgets/settings_panel.py" line="212"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>使用主题的默认波形颜色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="219"/>
+        <location filename="../widgets/settings_panel.py" line="220"/>
         <source>Custom…</source>
         <translation>自定义…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="230"/>
+        <location filename="../widgets/settings_panel.py" line="248"/>
         <source>Playlist Text Size</source>
         <translation>播放列表文字大小</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="239"/>
+        <location filename="../widgets/settings_panel.py" line="257"/>
         <source>Size of the track rows in the player. Applies straight away.</source>
         <translation>播放器中曲目行的大小。立即生效。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="251"/>
+        <location filename="../widgets/settings_panel.py" line="269"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="252"/>
+        <location filename="../widgets/settings_panel.py" line="270"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="253"/>
+        <location filename="../widgets/settings_panel.py" line="271"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="272"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>Playlist Artwork</source>
         <translation>播放列表封面</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="282"/>
+        <location filename="../widgets/settings_panel.py" line="300"/>
         <source>Part of the cover art shown in the player&apos;s Art column. Full makes each row tall enough for the whole sleeve.</source>
         <translation>在播放器封面列中显示的部分。选择“完整”会加高每一行，以显示整张封面。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="296"/>
+        <location filename="../widgets/settings_panel.py" line="314"/>
         <source>Top</source>
         <translation>顶部</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="297"/>
+        <location filename="../widgets/settings_panel.py" line="315"/>
         <source>Middle</source>
         <translation>中部</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="298"/>
+        <location filename="../widgets/settings_panel.py" line="316"/>
         <source>Full</source>
         <translation>完整</translation>
     </message>
@@ -3629,60 +3634,60 @@ or click “Add Artwork…”</source>
         <translation type="vanished">在播放器中添加视觉效果选择器，并在分析或转换时显示动态波形。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="313"/>
+        <location filename="../widgets/settings_panel.py" line="331"/>
         <source>Tempo Range</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>速度范围</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="321"/>
+        <location filename="../widgets/settings_panel.py" line="339"/>
         <source>Min 50, Max 250.</source>
         <translation>最小 50，最大 250。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="327"/>
+        <location filename="../widgets/settings_panel.py" line="345"/>
         <source>Lowest BPM</source>
         <translation>最低 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="344"/>
+        <location filename="../widgets/settings_panel.py" line="362"/>
         <source>Highest BPM</source>
         <translation>最高 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="359"/>
+        <location filename="../widgets/settings_panel.py" line="377"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>分析后将调性/BPM 添加到文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="367"/>
+        <location filename="../widgets/settings_panel.py" line="385"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>拖入或发送到分析面板时自动分析</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="372"/>
+        <location filename="../widgets/settings_panel.py" line="390"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>分析后自动将 BPM 写入标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="376"/>
+        <location filename="../widgets/settings_panel.py" line="394"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>写入元数据时，BPM 会四舍五入为最接近的整数。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="381"/>
+        <location filename="../widgets/settings_panel.py" line="399"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translatorcomment>key → 调性 (full label form).</translatorcomment>
         <translation>分析后自动将调性写入标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="385"/>
+        <location filename="../widgets/settings_panel.py" line="403"/>
         <source>Automatically rename files after analysis</source>
         <translation>分析后自动重命名文件</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="392"/>
+        <location filename="../widgets/settings_panel.py" line="410"/>
         <source>Write key to comment</source>
         <translatorcomment>key → 调性.</translatorcomment>
         <translation>将调性写入注释</translation>
@@ -3697,319 +3702,319 @@ or click “Add Artwork…”</source>
         <translation type="vanished">当同时写入此项和能量标签注释时，能量在前，调性在后。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="398"/>
+        <location filename="../widgets/settings_panel.py" line="416"/>
         <source>Naming format:</source>
         <translation>命名格式：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="407"/>
+        <location filename="../widgets/settings_panel.py" line="425"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>128 8A - 原始文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="407"/>
+        <location filename="../widgets/settings_panel.py" line="425"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + 调性前缀</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="408"/>
+        <location filename="../widgets/settings_panel.py" line="426"/>
         <source>8A 128 - Original_File_Name</source>
         <translatorcomment>Same example convention → 原始文件名.</translatorcomment>
         <translation>8A 128 - 原始文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="408"/>
+        <location filename="../widgets/settings_panel.py" line="426"/>
         <source>Key + BPM prefix</source>
         <translation>调性 + BPM 前缀</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="409"/>
+        <location filename="../widgets/settings_panel.py" line="427"/>
         <source>8A - Original_File_Name</source>
         <translatorcomment>Same convention → 原始文件名.</translatorcomment>
         <translation>8A - 原始文件名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="409"/>
+        <location filename="../widgets/settings_panel.py" line="427"/>
         <source>Key prefix only</source>
         <translation>仅调性前缀</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="410"/>
+        <location filename="../widgets/settings_panel.py" line="428"/>
         <source>Original_File_Name - 8A 128</source>
         <translatorcomment>Same convention → 原始文件名.</translatorcomment>
         <translation>原始文件名 - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="410"/>
+        <location filename="../widgets/settings_panel.py" line="428"/>
         <source>suffix: Key + BPM</source>
         <translation>后缀：调性 + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="411"/>
+        <location filename="../widgets/settings_panel.py" line="429"/>
         <source>Original_File_Name - 8A</source>
         <translatorcomment>Same convention → 原始文件名.</translatorcomment>
         <translation>原始文件名 - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="411"/>
+        <location filename="../widgets/settings_panel.py" line="429"/>
         <source>suffix: Key only</source>
         <translation>后缀：仅调性</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="434"/>
+        <location filename="../widgets/settings_panel.py" line="452"/>
         <source>Notation</source>
         <translatorcomment>Rendered 记号 (notation system for key). Could be 表示法/记谱法; verify native term for key-notation toggle.</translatorcomment>
         <translation>记号</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="444"/>
+        <location filename="../widgets/settings_panel.py" line="462"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translation>同一时间只能启用一种记号。适用于分析期间写入标签/文件名的调性，以及键盘面板的琴键标签。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="456"/>
+        <location filename="../widgets/settings_panel.py" line="474"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>key codes → 键码; emoji and Latin codes preserved.</translatorcomment>
         <translation>👑 键码  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="457"/>
+        <location filename="../widgets/settings_panel.py" line="475"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translatorcomment>key → 调性; note names Am/Ebm/F# kept Latin.</translatorcomment>
         <translation>传统调性记号  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="458"/>
+        <location filename="../widgets/settings_panel.py" line="476"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>Reviewed (zh pass): confirmed.</translatorcomment>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="474"/>
+        <location filename="../widgets/settings_panel.py" line="492"/>
         <source>Energy Tag</source>
         <translation>能量标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="482"/>
+        <location filename="../widgets/settings_panel.py" line="500"/>
         <source>Write energy level to Comment tag</source>
         <translation>将能量级别写入注释标签</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="490"/>
+        <location filename="../widgets/settings_panel.py" line="508"/>
         <source>Energy level written first</source>
         <translation>先写入能量级别</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="494"/>
+        <location filename="../widgets/settings_panel.py" line="512"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>当能量和调性同时写入注释时，先写入能量，再写入调性。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="500"/>
+        <location filename="../widgets/settings_panel.py" line="518"/>
         <source>Format:</source>
         <translation>格式：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="508"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>Number only  (7)</source>
         <translation>仅数字  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="509"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>With label  (Energy 7)</source>
         <translation>带标签  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="518"/>
+        <location filename="../widgets/settings_panel.py" line="536"/>
         <source>Write mode:</source>
         <translation>写入模式：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="526"/>
+        <location filename="../widgets/settings_panel.py" line="544"/>
         <source>Prepend to existing comment</source>
         <translation>添加到现有注释之前</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="527"/>
+        <location filename="../widgets/settings_panel.py" line="545"/>
         <source>Append to existing comment</source>
         <translation>追加到现有注释之后</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="528"/>
+        <location filename="../widgets/settings_panel.py" line="546"/>
         <source>Replace existing comment</source>
         <translation>替换现有注释</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="548"/>
+        <location filename="../widgets/settings_panel.py" line="566"/>
         <source>Write energy level to its own tag field</source>
         <translation>将能量级别写入专用标签字段</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="551"/>
+        <location filename="../widgets/settings_panel.py" line="569"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>将能量存储在可以精确读回的位置，而不是从注释中解析。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="636"/>
+        <location filename="../widgets/settings_panel.py" line="654"/>
         <source>Playlists</source>
         <translation>播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="645"/>
+        <location filename="../widgets/settings_panel.py" line="663"/>
         <source>Duplicate tracks:</source>
         <translation>重复曲目：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="648"/>
+        <location filename="../widgets/settings_panel.py" line="666"/>
         <source>Ask each time</source>
         <translation>每次询问</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="649"/>
+        <location filename="../widgets/settings_panel.py" line="667"/>
         <source>Always add duplicates</source>
         <translation>始终添加重复曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="650"/>
+        <location filename="../widgets/settings_panel.py" line="668"/>
         <source>Always skip duplicates</source>
         <translation>始终跳过重复曲目</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="662"/>
+        <location filename="../widgets/settings_panel.py" line="680"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>当你添加播放列表中已有的曲目时如何处理。歌单可能会有意重复某首曲目，因此这里会询问你，而不是替你决定。选择其他选项即可不再询问。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="672"/>
+        <location filename="../widgets/settings_panel.py" line="690"/>
         <source>Keep Scratch between sessions</source>
         <translation>在会话之间保留 Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="679"/>
+        <location filename="../widgets/settings_panel.py" line="697"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch 是播放器打开时使用的工作列表，每次启动都是空的。开启此项可让它按上次的内容重新打开；无论哪种方式，“存储播放列表”都会保留一份副本。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="689"/>
+        <location filename="../widgets/settings_panel.py" line="707"/>
         <source>Always use full paths in exported playlists</source>
         <translation>在导出的播放列表中始终使用完整路径</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="697"/>
+        <location filename="../widgets/settings_panel.py" line="715"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>当曲目与播放列表文件位于同一位置时，导出的播放列表会使用相对于该文件的路径，因此你打包发送的文件夹在别人的电脑上依然可用。开启此项则始终写入完整路径。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="707"/>
+        <location filename="../widgets/settings_panel.py" line="725"/>
         <source>Export All Playlists…</source>
         <translation>导出所有播放列表…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="716"/>
+        <location filename="../widgets/settings_panel.py" line="734"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>写入一个与你的目录结构对应的播放列表文件夹，是任何其他应用都能读取的备份。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="563"/>
+        <location filename="../widgets/settings_panel.py" line="581"/>
         <source>Online Metadata</source>
         <translation>在线元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="160"/>
+        <location filename="../widgets/settings_panel.py" line="161"/>
         <source>Dark Mode</source>
         <translation>深色模式</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="162"/>
+        <location filename="../widgets/settings_panel.py" line="163"/>
         <source>Slate</source>
         <translatorcomment>Slate grey, read as a colour rather than the rock.</translatorcomment>
         <translation>石板灰</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="182"/>
+        <location filename="../widgets/settings_panel.py" line="183"/>
         <source>Waveform / Visuals</source>
         <translatorcomment>沿用已有的“波形”“视觉效果”，分隔符用全角斜杠。</translatorcomment>
         <translation>波形／视觉效果</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="574"/>
+        <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>在线查找曲目信息（Discogs）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="582"/>
+        <location filename="../widgets/settings_panel.py" line="600"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>默认关闭，开启前应用不会发起任何网络请求。查找时只发送所选曲目的艺人和标题，绝不发送你的音频或曲库。BPM、调性和能量始终来自本应用自己的分析。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="593"/>
+        <location filename="../widgets/settings_panel.py" line="611"/>
         <source>Discogs token:</source>
         <translation>Discogs 令牌：</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="599"/>
+        <location filename="../widgets/settings_panel.py" line="617"/>
         <source>Paste your token</source>
         <translation>粘贴你的令牌</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="602"/>
+        <location filename="../widgets/settings_panel.py" line="620"/>
         <source>Get a Token…</source>
         <translation>获取令牌…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="609"/>
+        <location filename="../widgets/settings_panel.py" line="627"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs 需要一个免费的个人令牌，才能返回封面图片并以完整速度响应。它是只读的，你可以随时在 Discogs 账户页面撤销。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="618"/>
+        <location filename="../widgets/settings_panel.py" line="636"/>
         <source>Fetch cover art with lookups</source>
         <translation>查找时一并获取封面</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="625"/>
+        <location filename="../widgets/settings_panel.py" line="643"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>将该版本的封面与你文件的封面并排显示，便于比较。在你确认之前不会写入任何内容。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="832"/>
+        <location filename="../widgets/settings_panel.py" line="850"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>音频文件现在会用 Mixed in P 打开。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="843"/>
+        <location filename="../widgets/settings_panel.py" line="861"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P 未在 Windows 中注册。重新安装即可注册。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="848"/>
+        <location filename="../widgets/settings_panel.py" line="866"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>无法打开 Windows 设置。你可以在「应用 → 默认应用」中自行设置。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="854"/>
+        <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>在访达中选择一个音频文件，按 Command-I，在「打开方式」中选择 Mixed in P，然后点按「全部更改」。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1006"/>
+        <location filename="../widgets/settings_panel.py" line="1036"/>
         <source>Waveform color</source>
         <translation>波形颜色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1038"/>
-        <location filename="../widgets/settings_panel.py" line="1051"/>
+        <location filename="../widgets/settings_panel.py" line="1068"/>
+        <location filename="../widgets/settings_panel.py" line="1081"/>
         <source>Restart required</source>
         <translation>需要重启</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1040"/>
+        <location filename="../widgets/settings_panel.py" line="1070"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>语言更改将在下次重启 Mixed in P 时生效。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1053"/>
+        <location filename="../widgets/settings_panel.py" line="1083"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>主题更改将在下次重启 Mixed in P 时生效。</translation>
     </message>
@@ -4017,94 +4022,94 @@ or click “Add Artwork…”</source>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="283"/>
-        <location filename="../widgets/sidebar.py" line="466"/>
+        <location filename="../widgets/sidebar.py" line="302"/>
+        <location filename="../widgets/sidebar.py" line="485"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>折叠侧边栏</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="325"/>
+        <location filename="../widgets/sidebar.py" line="345"/>
         <source>Rename</source>
         <translation>重命名</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="326"/>
+        <location filename="../widgets/sidebar.py" line="346"/>
         <source>Convert</source>
         <translation>转换</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="327"/>
+        <location filename="../widgets/sidebar.py" line="347"/>
         <source>Analyze</source>
         <translation>分析</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="324"/>
+        <location filename="../widgets/sidebar.py" line="344"/>
         <source>Player</source>
         <translation>播放器</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="252"/>
+        <location filename="../widgets/sidebar.py" line="263"/>
         <source>Playlists</source>
         <translation>播放列表</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="330"/>
+        <location filename="../widgets/sidebar.py" line="350"/>
         <source>Keyboard</source>
         <translation>键盘</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="328"/>
+        <location filename="../widgets/sidebar.py" line="348"/>
         <source>Metadata</source>
         <translation>元数据</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="329"/>
+        <location filename="../widgets/sidebar.py" line="349"/>
         <source>Spectrum</source>
         <translatorcomment>Reviewed (zh pass): 频谱 confirmed (standard term).</translatorcomment>
         <translation>频谱</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="397"/>
-        <location filename="../widgets/sidebar.py" line="405"/>
+        <location filename="../widgets/sidebar.py" line="417"/>
+        <location filename="../widgets/sidebar.py" line="425"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="409"/>
-        <location filename="../widgets/sidebar.py" line="417"/>
+        <location filename="../widgets/sidebar.py" line="429"/>
+        <location filename="../widgets/sidebar.py" line="437"/>
         <source>History</source>
         <translatorcomment>Short tab label → 历史 (per glossary short form); full &apos;Rename History&apos; uses 重命名历史.</translatorcomment>
         <translation>历史</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="466"/>
+        <location filename="../widgets/sidebar.py" line="485"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>展开侧边栏</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="529"/>
+        <location filename="../widgets/sidebar.py" line="562"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>隐藏播放列表并重新显示导航按钮</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="531"/>
+        <location filename="../widgets/sidebar.py" line="564"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>在此处显示播放列表以取代导航按钮</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="606"/>
+        <location filename="../widgets/sidebar.py" line="639"/>
         <source>Show only Playlists or Navigation in the sidebar</source>
         <translation>在侧边栏只显示播放列表或导航</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="608"/>
+        <location filename="../widgets/sidebar.py" line="641"/>
         <source>Show both Playlists and Navigation in the sidebar</source>
         <translation>在侧边栏同时显示播放列表和导航</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="825"/>
+        <location filename="../widgets/sidebar.py" line="864"/>
         <source>Auto</source>
         <translatorcomment>自动 (auto-detect format). Short toggle label.</translatorcomment>
         <translation>自动</translation>
@@ -4304,17 +4309,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">▾  波形循环切片器</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="765"/>
+        <location filename="../widgets/slice_section.py" line="770"/>
         <source>Choose Save Folder</source>
         <translation>选择保存文件夹</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="784"/>
+        <location filename="../widgets/slice_section.py" line="789"/>
         <source>Saved: {0}</source>
         <translation>已保存：{0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="789"/>
+        <location filename="../widgets/slice_section.py" line="794"/>
         <source>Error: {0}</source>
         <translation>错误：{0}</translation>
     </message>

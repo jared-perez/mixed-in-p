@@ -1445,7 +1445,8 @@ class HeaderArtLabel(QLabel):
     """The 56px cover in the Player's title row, clickable.
 
     56px is enough to recognise a sleeve and not enough to look at one, so a
-    click opens the big box at the foot of the sidebar. It only ever *asks*:
+    click opens the big box at the foot of the sidebar (and a second click
+    closes it). It only ever *asks*:
     the label knows nothing about the sidebar, and the panel's ``art_clicked``
     signal is what MainWindow wires up.
     """
@@ -1992,7 +1993,7 @@ class PlayerPanel(QWidget):
         self._art_label = HeaderArtLabel()
         self._art_label.setFixedSize(_HEADER_ART_SIZE, _HEADER_ART_SIZE)
         self._art_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self._art_label.setToolTip(self.tr("Show this cover in the sidebar"))
+        self.set_art_box_open(False)
         self._art_label.clicked.connect(self.art_clicked.emit)
         self._art_label.hide()
         title_row.addWidget(self._art_label, 0, Qt.AlignmentFlag.AlignVCenter)
@@ -5622,6 +5623,15 @@ class PlayerPanel(QWidget):
     def _hide_artwork(self) -> None:
         self._art_label.clear()
         self._art_label.hide()
+
+    def set_art_box_open(self, open_: bool) -> None:
+        """Reflect whether the sidebar's cover box is open: the header art's
+        tooltip says what the next click will do (CLAUDE.md)."""
+        self._art_label.setToolTip(
+            self.tr("Hide the cover in the sidebar")
+            if open_
+            else self.tr("Show this cover in the sidebar")
+        )
 
     def playing_artwork(self) -> bytes | None:
         """The playing track's embedded cover, full resolution, or None.

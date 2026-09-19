@@ -211,6 +211,9 @@ class Sidebar(QFrame):
     playlists_toggled = Signal(bool)
     split_toggled = Signal(bool)
     collapsed_changed = Signal(bool)
+    # The cover box opened (True) or closed (False), by any route — its own
+    # close button included, which the window cannot otherwise see.
+    art_box_open_changed = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -650,14 +653,20 @@ class Sidebar(QFrame):
 
     def show_art_box(self, data: bytes | None = None) -> None:
         """Open the cover box (and set what it shows)."""
+        was_open = self._art_box_open
         self._art_box_open = True
         self._art_box.set_artwork(data)
         self._sync_art_box()
+        if not was_open:
+            self.art_box_open_changed.emit(True)
 
     def hide_art_box(self) -> None:
         """Close the cover box. Stays closed through a collapse/expand."""
+        was_open = self._art_box_open
         self._art_box_open = False
         self._art_box.hide()
+        if was_open:
+            self.art_box_open_changed.emit(False)
 
     def set_art(self, data: bytes | None) -> None:
         """Update what an already-open box shows; a closed one is left alone."""

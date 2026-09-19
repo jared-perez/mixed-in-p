@@ -326,6 +326,34 @@ class TestTheWholeGesture:
         assert window._sidebar.art_box_open()
         assert window._sidebar._art_box.has_artwork()
 
+    def test_a_second_click_closes_it(self, window, qtbot, sf, tmp_path):
+        track = make_track(sf, tmp_path, "red.flac", cover(tmp_path, RED))
+        self.set_playing(window, qtbot, track)
+        art = window._player_panel._art_label
+        closed_tip = art.toolTip()
+
+        window._player_panel.art_clicked.emit()
+        assert window._sidebar.art_box_open()
+        assert art.toolTip() != closed_tip, "the tooltip still offers to open"
+
+        window._player_panel.art_clicked.emit()
+        assert not window._sidebar.art_box_open()
+        assert art.toolTip() == closed_tip
+
+    def test_the_boxs_own_close_button_resets_the_tooltip(
+        self, window, qtbot, sf, tmp_path
+    ):
+        track = make_track(sf, tmp_path, "red.flac", cover(tmp_path, RED))
+        self.set_playing(window, qtbot, track)
+        art = window._player_panel._art_label
+        closed_tip = art.toolTip()
+        window._player_panel.art_clicked.emit()
+
+        window._sidebar._art_box.closed.emit()
+
+        assert not window._sidebar.art_box_open()
+        assert art.toolTip() == closed_tip
+
     def test_the_next_track_swaps_the_picture(
         self, window, qtbot, sf, tmp_path
     ):
