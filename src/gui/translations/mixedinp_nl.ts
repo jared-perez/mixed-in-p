@@ -3923,6 +3923,16 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Golfvorm / Visualisaties</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>Halve golfvorm tonen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>Volledige golfvorm tonen</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Nummergegevens online opzoeken (Discogs)</translation>
@@ -3981,6 +3991,16 @@ of klik op “Artwork toevoegen…”</translation>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Selecteer een audiobestand in de Finder, druk op Command-I, kies Mixed in P bij ‘Open met’ en klik op ‘Wijzig alle’.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>Halve golfvorm tonen in de speler</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>Volledige golfvorm tonen in de speler</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

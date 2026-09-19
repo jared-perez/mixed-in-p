@@ -3938,6 +3938,16 @@ or click “Add Artwork…”</source>
         <translation>波形／视觉效果</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>显示半波形</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>显示完整波形</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>在线查找曲目信息（Discogs）</translation>
@@ -3996,6 +4006,16 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>在访达中选择一个音频文件，按 Command-I，在「打开方式」中选择 Mixed in P，然后点按「全部更改」。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>在播放器中显示半波形</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>在播放器中显示完整波形</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

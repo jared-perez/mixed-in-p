@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
 )
 
 from .fitted_combo import FittedComboBox
+from .toggle_switch import ToggleSwitch
 from .wheel_guard import NoWheelSpinBox
 
 import sys
@@ -222,6 +223,23 @@ class SettingsPanel(QWidget):
         swatch_row.addWidget(self._wave_custom_btn)
         swatch_row.addStretch(1)
         wave_layout.addLayout(swatch_row)
+
+        # Half/full as a left/right choice rather than an on/off checkbox:
+        # the switch sits between the two options, knob left = half.
+        half_row = self._row_layout()
+        half_row.setSpacing(10)
+        half_label = QLabel(self.tr("Show half waveform"))
+        half_label.setObjectName("settingsLabel")
+        self._waveform_full_switch = ToggleSwitch()
+        self._waveform_full_switch.toggled.connect(self._on_waveform_full_toggled)
+        full_label = QLabel(self.tr("Show full waveform"))
+        full_label.setObjectName("settingsLabel")
+        half_row.addWidget(half_label)
+        half_row.addWidget(self._waveform_full_switch)
+        half_row.addWidget(full_label)
+        half_row.addStretch(1)
+        wave_layout.addLayout(half_row)
+        self._sync_waveform_full_tooltip()
 
         outer.addWidget(wave_frame)
         self._restyle_waveform_swatches()
@@ -1001,6 +1019,18 @@ class SettingsPanel(QWidget):
         if emit:
             self.settings_changed.emit()
 
+    def _on_waveform_full_toggled(self, _checked: bool) -> None:
+        self._sync_waveform_full_tooltip()
+        self._emit_changed()
+
+    def _sync_waveform_full_tooltip(self) -> None:
+        """Say what the next click will do (CLAUDE.md, UI copy)."""
+        self._waveform_full_switch.setToolTip(
+            self.tr("Show the half waveform in the player")
+            if self._waveform_full_switch.isChecked()
+            else self.tr("Show the full waveform in the player")
+        )
+
     def _on_custom_waveform_color(self) -> None:
         chosen = QColorDialog.getColor(
             QColor(self._waveform_color), self, self.tr("Waveform color")
@@ -1120,6 +1150,7 @@ class SettingsPanel(QWidget):
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
             energy_written_first=self._energy_written_first_cb.isChecked(),
             waveform_color=self._waveform_color,
+            player_waveform_half=not self._waveform_full_switch.isChecked(),
             export_absolute_paths=self._export_absolute_cb.isChecked(),
             persist_scratch=self._persist_scratch_cb.isChecked(),
             duplicate_policy=self._duplicate_policy_combo.currentData(),
@@ -1153,6 +1184,10 @@ class SettingsPanel(QWidget):
         self._theme_combo.blockSignals(False)
 
         self._select_waveform_color(cfg.waveform_color, emit=False)
+        self._waveform_full_switch.blockSignals(True)
+        self._waveform_full_switch.setChecked(not cfg.player_waveform_half)
+        self._waveform_full_switch.blockSignals(False)
+        self._sync_waveform_full_tooltip()
 
         self._auto_rename_cb.setChecked(cfg.auto_rename)
         self._auto_write_bpm_cb.setChecked(cfg.auto_write_bpm)

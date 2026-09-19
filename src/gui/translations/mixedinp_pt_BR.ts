@@ -3957,6 +3957,16 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Forma de onda / Visualizações</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>Mostrar meia forma de onda</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>Mostrar forma de onda completa</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Buscar dados das faixas on-line (Discogs)</translation>
@@ -4015,6 +4025,16 @@ ou clique em “Adicionar capa…”</translation>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Selecione um arquivo de áudio no Finder, pressione Command-I, escolha o Mixed in P em “Abrir com” e clique em “Alterar tudo”.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>Mostrar meia forma de onda no player</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>Mostrar a forma de onda completa no player</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

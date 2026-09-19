@@ -3929,6 +3929,16 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <translation>Forme d&apos;onde / Visualisations</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>Afficher la demi-forme d&apos;onde</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>Afficher la forme d&apos;onde complète</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Rechercher les informations des morceaux en ligne (Discogs)</translation>
@@ -3987,6 +3997,16 @@ ou cliquez sur « Ajouter une pochette… »</translation>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Sélectionnez un fichier audio dans le Finder, appuyez sur Commande-I, choisissez Mixed in P sous « Ouvrir avec », puis cliquez sur « Tout modifier ».</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>Afficher la demi-forme d&apos;onde dans le lecteur</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>Afficher la forme d&apos;onde complète dans le lecteur</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

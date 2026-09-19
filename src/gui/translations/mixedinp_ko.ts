@@ -3916,6 +3916,16 @@ or click “Add Artwork…”</source>
         <translation>파형 / 시각 효과</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>반쪽 파형 표시</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>전체 파형 표시</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>트랙 정보를 온라인에서 찾기(Discogs)</translation>
@@ -3974,6 +3984,16 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Finder에서 오디오 파일을 선택하고 Command-I를 누른 다음, ‘다음으로 열기’에서 Mixed in P를 선택하고 ‘모두 변경’을 클릭하세요.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>플레이어에 반쪽 파형 표시</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>플레이어에 전체 파형 표시</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

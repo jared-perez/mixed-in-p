@@ -3934,6 +3934,16 @@ oder „Cover hinzufügen …“ klicken</translation>
         <translation>Wellenform / Visualisierungen</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>Halbe Wellenform anzeigen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>Volle Wellenform anzeigen</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Track-Angaben online suchen (Discogs)</translation>
@@ -3992,6 +4002,16 @@ oder „Cover hinzufügen …“ klicken</translation>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Wähle im Finder eine Audiodatei aus, drücke Befehlstaste-I, wähle unter „Öffnen mit“ Mixed in P und klicke auf „Alle ändern“.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>Halbe Wellenform im Player anzeigen</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>Volle Wellenform im Player anzeigen</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

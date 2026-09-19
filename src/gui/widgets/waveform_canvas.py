@@ -21,6 +21,19 @@ from ..styles.theme import Theme
 # Hit-test tolerance for grabbing markers (pixels)
 _MARKER_GRAB_PX = 8
 
+# Minimum heights of the two canvases in full (mirrored) view. Half view draws
+# only the upper envelope, so it keeps the same peak height in half the room.
+_FULL_MIN_HEIGHT = 160
+_ZOOM_FULL_MIN_HEIGHT = 120
+
+
+def _half_envelope(min_arr: np.ndarray, max_arr: np.ndarray) -> np.ndarray:
+    """Peak magnitude per bin, for half view: the louder of the two halves.
+
+    Taking only ``max`` would drop a transient that swings negative first.
+    """
+    return np.maximum(np.maximum(max_arr, -min_arr), 0.0)
+
 
 class WaveformCanvas(QWidget):
     """Custom-painted waveform with draggable start/end markers and playhead."""
@@ -41,7 +54,8 @@ class WaveformCanvas(QWidget):
         self._max_arr: np.ndarray | None = None
         self._dragging: str | None = None  # 'start' | 'end' | 'position'
         self._waveform_color = QColor(Theme.NEON_YELLOW)
-        self.setMinimumHeight(160)
+        self._half: bool = False
+        self.setMinimumHeight(_FULL_MIN_HEIGHT)
         self.setMouseTracking(True)
         # Take focus on click so the parent's keyboard shortcuts work
         # without the user first having to click elsewhere.
@@ -109,6 +123,19 @@ class WaveformCanvas(QWidget):
             self._waveform_color = c
             self.update()
 
+    def set_half(self, half: bool) -> None:
+        """Draw only the top half (from Settings), in half the height."""
+        half = bool(half)
+        if half == self._half:
+            return
+        self._half = half
+        self.setMinimumHeight(_FULL_MIN_HEIGHT // 2 if half else _FULL_MIN_HEIGHT)
+        self.updateGeometry()
+        self.update()
+
+    def is_half(self) -> bool:
+        return self._half
+
     def clear(self) -> None:
         self._duration_ms = 0
         self._start_ms = 0
@@ -159,9 +186,10 @@ class WaveformCanvas(QWidget):
             if self._min_arr is not None and self._max_arr is not None and len(self._min_arr):
                 self._draw_waveform(p, w, h)
 
-            # Center axis line
+            # Axis line: the centre, or the baseline in half view
+            axis_y = h - 1 if self._half else h // 2
             p.setPen(QPen(QColor(Theme.WAVE_AXIS), 1))
-            p.drawLine(0, h // 2, w, h // 2)
+            p.drawLine(0, axis_y, w, axis_y)
 
             # Markers
             self._draw_marker(p, sx, h, QColor(Theme.NEON_GREEN), "S")
@@ -176,10 +204,19 @@ class WaveformCanvas(QWidget):
 
     def _draw_waveform(self, p: QPainter, w: int, h: int) -> None:
         n = len(self._min_arr)
-        mid = h / 2
-        amp = (h - 4) / 2  # leave 2px padding top/bottom
         pen = QPen(self._waveform_color, 1)
         p.setPen(pen)
+        if self._half:
+            # Rise from a baseline at the bottom edge (2px padding at the top).
+            base = h - 1
+            amp = h - 3
+            peaks = _half_envelope(self._min_arr, self._max_arr)
+            for x in range(w):
+                bin_idx = min(int(x * n / w), n - 1)
+                p.drawLine(x, int(base - peaks[bin_idx] * amp), x, base)
+            return
+        mid = h / 2
+        amp = (h - 4) / 2  # leave 2px padding top/bottom
         for x in range(w):
             bin_idx = min(int(x * n / w), n - 1)
             y_top = int(mid - self._max_arr[bin_idx] * amp)
@@ -280,7 +317,8 @@ class ZoomedWaveformCanvas(QWidget):
         self._drag_anchor_x: int = 0
         self._drag_anchor_position_ms: int = 0
         self._drag_ms_per_px: float = 0.0
-        self.setMinimumHeight(120)
+        self._half: bool = False
+        self.setMinimumHeight(_ZOOM_FULL_MIN_HEIGHT)
         self.setMouseTracking(True)
 
     # ------------------------------------------------------------------ API
@@ -310,6 +348,21 @@ class ZoomedWaveformCanvas(QWidget):
     def setEndValue(self, ms: int) -> None:
         self._end_ms = max(0, min(int(ms), self._duration_ms))
         self.update()
+
+    def set_half(self, half: bool) -> None:
+        """Draw only the top half (from Settings), in half the height."""
+        half = bool(half)
+        if half == self._half:
+            return
+        self._half = half
+        self.setMinimumHeight(
+            _ZOOM_FULL_MIN_HEIGHT // 2 if half else _ZOOM_FULL_MIN_HEIGHT
+        )
+        self.updateGeometry()
+        self.update()
+
+    def is_half(self) -> bool:
+        return self._half
 
     def set_scrub_enabled(self, enabled: bool) -> None:
         self._scrub_enabled = bool(enabled)
@@ -381,9 +434,10 @@ class ZoomedWaveformCanvas(QWidget):
             ):
                 self._draw_waveform(p, w, h, view_start, view_end)
 
-            # Centre axis line
+            # Axis line: the centre, or the baseline in half view
+            axis_y = h - 1 if self._half else h // 2
             p.setPen(QPen(QColor(Theme.WAVE_AXIS), 1))
-            p.drawLine(0, h // 2, w, h // 2)
+            p.drawLine(0, axis_y, w, axis_y)
 
             # Start / end markers (when in view)
             if view_start <= self._start_ms <= view_end:
@@ -410,8 +464,6 @@ class ZoomedWaveformCanvas(QWidget):
         view_start_ms: int,
         view_end_ms: int,
     ) -> None:
-        mid = h / 2
-        amp = (h - 4) / 2  # 2 px padding top/bottom
         n = len(self._min_arr)
         bins_per_ms = self._bins_per_sec / 1000.0
         start_bin = max(0, int(view_start_ms * bins_per_ms))
@@ -436,8 +488,15 @@ class ZoomedWaveformCanvas(QWidget):
         seg_max = np.maximum.reduceat(sl_max, starts)
         seg_min = np.minimum.reduceat(sl_min, starts)
 
-        y_top = mid - seg_max * amp
-        y_bot = mid - seg_min * amp
+        if self._half:
+            # Rise from a baseline at the bottom edge (2px padding at the top).
+            y_bot = np.full(cols, h - 1.0)
+            y_top = y_bot - _half_envelope(seg_min, seg_max) * (h - 3)
+        else:
+            mid = h / 2
+            amp = (h - 4) / 2  # 2 px padding top/bottom
+            y_top = mid - seg_max * amp
+            y_bot = mid - seg_min * amp
         xs = np.arange(cols) / dpr
 
         pen = QPen(QColor(Theme.NEON_YELLOW))

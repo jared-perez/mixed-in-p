@@ -3991,6 +3991,16 @@ lub kliknij „Dodaj okładkę…”</translation>
         <translation>Kształt fali / Wizualizacje</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>Pokaż połowę kształtu fali</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>Pokaż pełny kształt fali</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Szukaj danych utworów online (Discogs)</translation>
@@ -4049,6 +4059,16 @@ lub kliknij „Dodaj okładkę…”</translation>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Zaznacz plik audio w Finderze, naciśnij Command-I, wybierz Mixed in P w „Otwórz za pomocą” i kliknij „Zmień wszystkie”.</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>Pokaż połowę kształtu fali w odtwarzaczu</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>Pokaż pełny kształt fali w odtwarzaczu</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>

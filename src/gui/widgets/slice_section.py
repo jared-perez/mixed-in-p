@@ -593,6 +593,11 @@ class SliceSection(QWidget):
         """Recolor the full-length waveform (the zoomed scrubber is unaffected)."""
         self._waveform.set_waveform_color(color)
 
+    def set_waveform_half(self, half: bool) -> None:
+        """Show only the top half of both waveforms, in half the height."""
+        self._waveform.set_half(half)
+        self._zoom_waveform.set_half(half)
+
     def set_position(self, position_ms: int) -> None:
         """Move the playhead (called on every engine position tick)."""
         self._position_label.setText(format_time_ms(position_ms, self._show_hours))

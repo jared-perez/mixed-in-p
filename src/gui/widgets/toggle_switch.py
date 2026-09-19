@@ -30,7 +30,6 @@ class ToggleSwitch(QCheckBox):
         self._pos = 1.0 if self.isChecked() else 0.0
         self._anim = QPropertyAnimation(self, b"knobPos", self)
         self._anim.setDuration(140)
-        self.toggled.connect(self._animate)
 
     # Animated knob position (registered Qt property so QPropertyAnimation works)
     def _get_pos(self) -> float:
@@ -42,10 +41,19 @@ class ToggleSwitch(QCheckBox):
 
     knobPos = Property(float, _get_pos, _set_pos)
 
+    def checkStateSet(self) -> None:
+        # Qt's hook, not ``toggled``: a caller loading state inside
+        # blockSignals would otherwise leave the knob on the old side.
+        super().checkStateSet()
+        self._animate(self.isChecked())
+
     def _animate(self, checked: bool) -> None:
+        end = 1.0 if checked else 0.0
+        if self._anim.state() != QPropertyAnimation.State.Running and self._pos == end:
+            return
         self._anim.stop()
         self._anim.setStartValue(self._pos)
-        self._anim.setEndValue(1.0 if checked else 0.0)
+        self._anim.setEndValue(end)
         self._anim.start()
 
     def sizeHint(self) -> QSize:

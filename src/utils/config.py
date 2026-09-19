@@ -142,6 +142,9 @@ class AppConfig:
     spectrum_split: bool = False
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
+    # Player's Waveform and Zoomed Wave views: True draws only the top half
+    # (the peak envelope) in half the height, False the mirrored full wave.
+    player_waveform_half: bool = True
     # When True, the Player playlist's inline metadata editing is locked off.
     player_edit_locked: bool = False
     # The visual showing in the Player, chosen from its eye-icon menu (see
@@ -412,6 +415,9 @@ def load_config() -> AppConfig:
                 ),
                 spectrum_split=bool(data.get("spectrum_split", AppConfig.spectrum_split)),
                 waveform_color=str(data.get("waveform_color", AppConfig.waveform_color)),
+                player_waveform_half=bool(
+                    data.get("player_waveform_half", AppConfig.player_waveform_half)
+                ),
                 player_edit_locked=bool(
                     data.get("player_edit_locked", AppConfig.player_edit_locked)
                 ),

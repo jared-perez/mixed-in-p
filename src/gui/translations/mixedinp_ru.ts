@@ -3936,6 +3936,16 @@ or click “Add Artwork…”</source>
         <translation>Форма волны / Визуализации</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="231"/>
+        <source>Show half waveform</source>
+        <translation>Половина формы волны</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="235"/>
+        <source>Show full waveform</source>
+        <translation>Полная форма волны</translation>
+    </message>
+    <message>
         <location filename="../widgets/settings_panel.py" line="592"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Искать сведения о треках в интернете (Discogs)</translation>
@@ -3994,6 +4004,16 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/settings_panel.py" line="872"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Выберите аудиофайл в Finder, нажмите Command-I, выберите Mixed in P в разделе «Открывать в программе» и нажмите «Настроить».</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1029"/>
+        <source>Show the half waveform in the player</source>
+        <translation>Показывать половину формы волны в плеере</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1031"/>
+        <source>Show the full waveform in the player</source>
+        <translation>Показывать полную форму волны в плеере</translation>
     </message>
     <message>
         <location filename="../widgets/settings_panel.py" line="1036"/>
