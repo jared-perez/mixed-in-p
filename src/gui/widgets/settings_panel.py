@@ -232,6 +232,8 @@ class SettingsPanel(QWidget):
         # the switch sits between the two options, knob left = half.
         half_row = self._row_layout()
         half_row.setSpacing(10)
+        # Its own sub-section, not a third swatch row — keep it off the colours.
+        wave_layout.addSpacing(14)
         half_label = QLabel(self.tr("Show half waveform"))
         half_label.setObjectName("settingsLabel")
         self._waveform_full_switch = ToggleSwitch()

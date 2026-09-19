@@ -30,6 +30,7 @@ class ToggleSwitch(QCheckBox):
         self._pos = 1.0 if self.isChecked() else 0.0
         self._anim = QPropertyAnimation(self, b"knobPos", self)
         self._anim.setDuration(140)
+        self.toggled.connect(self._on_toggled)
 
     # Animated knob position (registered Qt property so QPropertyAnimation works)
     def _get_pos(self) -> float:
@@ -42,14 +43,25 @@ class ToggleSwitch(QCheckBox):
     knobPos = Property(float, _get_pos, _set_pos)
 
     def checkStateSet(self) -> None:
-        # Qt's hook, not ``toggled``: a caller loading state inside
-        # blockSignals would otherwise leave the knob on the old side.
+        # Qt's hook, for the state a caller loads inside blockSignals: that
+        # emits no ``toggled``, so without this the knob stays on the old side.
         super().checkStateSet()
         self._animate(self.isChecked())
 
+    def _on_toggled(self, checked: bool) -> None:
+        # And ``toggled`` for the state the *user* sets, because a click never
+        # reaches checkStateSet(): QAbstractButtonPrivate::click() raises
+        # blockRefresh, which makes setChecked() skip the hook, and QCheckBox
+        # then calls its own checkStateSet() non-virtually — past this class.
+        # Both land on _animate, which ignores the second of a pair.
+        self._animate(checked)
+
     def _animate(self, checked: bool) -> None:
         end = 1.0 if checked else 0.0
-        if self._anim.state() != QPropertyAnimation.State.Running and self._pos == end:
+        running = self._anim.state() == QPropertyAnimation.State.Running
+        if running and self._anim.endValue() == end:
+            return
+        if not running and self._pos == end:
             return
         self._anim.stop()
         self._anim.setStartValue(self._pos)

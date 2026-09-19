@@ -10,6 +10,7 @@ import json
 
 import numpy as np
 import pytest
+from PySide6.QtCore import Qt
 from PySide6.QtGui import QColor
 
 from src.gui.styles.theme import Theme
@@ -137,8 +138,8 @@ class TestSetting:
 
 class TestToggleSwitchKnob:
     def test_knob_follows_a_state_set_with_signals_blocked(self, qtbot):
-        """load_config sets the switch inside blockSignals; the knob must still
-        slide, so it hangs off checkStateSet, not ``toggled``."""
+        """load_config sets the switch inside blockSignals, which emits no
+        ``toggled`` — so the knob also hangs off checkStateSet."""
         sw = ToggleSwitch()
         qtbot.addWidget(sw)
         sw.blockSignals(True)
@@ -146,4 +147,24 @@ class TestToggleSwitchKnob:
         sw.blockSignals(False)
         qtbot.waitUntil(lambda: sw.knobPos == 1.0, timeout=1000)
         sw.click()
+        qtbot.waitUntil(lambda: sw.knobPos == 0.0, timeout=1000)
+
+    def test_knob_follows_a_real_mouse_click(self, qtbot):
+        """The user's path, and NOT the same code path as ``click()``: a press
+        and release skip checkStateSet entirely (QAbstractButtonPrivate::click
+        raises blockRefresh, and QCheckBox then calls its own checkStateSet
+        non-virtually), so only ``toggled`` reports it. Written with
+        QTest.mouseClick for that reason — the ``click()`` above passes either
+        way and hid a switch whose knob never moved for a user.
+        """
+        sw = ToggleSwitch()
+        qtbot.addWidget(sw)
+        sw.show()
+        qtbot.waitExposed(sw)
+        center = sw.rect().center()
+        qtbot.mouseClick(sw, Qt.MouseButton.LeftButton, pos=center)
+        assert sw.isChecked()
+        qtbot.waitUntil(lambda: sw.knobPos == 1.0, timeout=1000)
+        qtbot.mouseClick(sw, Qt.MouseButton.LeftButton, pos=center)
+        assert not sw.isChecked()
         qtbot.waitUntil(lambda: sw.knobPos == 0.0, timeout=1000)
