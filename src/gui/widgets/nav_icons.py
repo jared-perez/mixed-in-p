@@ -194,6 +194,20 @@ def _paint_expand(p: QPainter, c: str) -> None:
         ]))
 
 
+def _paint_split(p: QPainter, c: str) -> None:
+    """Two vertical bars (the sidebar's split view), the left one the taller.
+
+    The right bar has the chevrons' stroke and vertical extent, so it stands
+    as tall as "<<" beside it. The left reaches 0.15 of the box further each
+    way — 3px at the 20px the sidebar shows it — and the pair sits wider
+    apart than a pause symbol's, which two equal close bars would read as.
+    """
+    s = _DRAW
+    p.setPen(_pen(c, 0.1))
+    p.drawLine(QPointF(s * 0.34, s * 0.15), QPointF(s * 0.34, s * 0.85))
+    p.drawLine(QPointF(s * 0.66, s * 0.30), QPointF(s * 0.66, s * 0.70))
+
+
 _PAINTERS = {
     "rename": _paint_rename,
     "convert": _paint_convert,
@@ -206,6 +220,7 @@ _PAINTERS = {
     "history": _paint_history,
     "collapse": _paint_collapse,
     "expand": _paint_expand,
+    "split": _paint_split,
 }
 
 # (mode, state, colour): Off = unselected, On = selected (:checked),
@@ -258,3 +273,20 @@ def nav_glyph(page_id: str, color: str, angle: float = 0.0) -> QPixmap:
     finally:
         p.end()
     return pm
+
+
+# ---------------------------------------------------------------- split toggle
+
+
+def split_icon() -> QIcon:
+    """The split toggle's icon. Checked it takes the secondary accent, not the
+    nav buttons' yellow, so it never reads as another selected page."""
+    icon = QIcon()
+    for mode, state, color in (
+        (QIcon.Mode.Normal, QIcon.State.Off, NAV_GREY),
+        (QIcon.Mode.Active, QIcon.State.Off, NAV_HOVER),
+        (QIcon.Mode.Normal, QIcon.State.On, Theme.NEON_GREEN),
+        (QIcon.Mode.Active, QIcon.State.On, Theme.NEON_GREEN),
+    ):
+        icon.addPixmap(nav_glyph("split", color), mode, state)
+    return icon

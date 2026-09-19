@@ -276,3 +276,11 @@ def test_top_row_buttons_get_their_widths_even_with_a_long_label(qtbot):
     qtbot.wait(10)
     assert sidebar._split_btn.width() == _SPLIT_BTN_WIDTH
     assert sidebar._toggle_btn.width() == sidebar._toggle_btn.maximumWidth()
+
+
+def test_split_toggle_is_an_icon_as_tall_as_the_chevron(qtbot):
+    sidebar = _make_sidebar(qtbot)
+    btn = sidebar._split_btn
+    assert btn.text() == ""
+    assert not btn.icon().isNull()
+    assert btn.iconSize() == sidebar._toggle_btn.iconSize()

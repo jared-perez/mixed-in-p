@@ -26,7 +26,7 @@ from src.utils.config import load_config
 from ..styles.theme import Theme
 from .drop_zone import AUDIO_EXTENSIONS
 from .droppable_table import SOURCE_PAGE_MIME
-from .nav_icons import nav_icon
+from .nav_icons import nav_icon, split_icon
 from .sidebar_art_box import SidebarArtBox
 
 # Display size for the sidebar nav glyphs.
@@ -271,13 +271,15 @@ class Sidebar(QFrame):
         )
         top_row.addWidget(self._playlists_btn, 1)
 
-        # Split toggle: a thin "/" between Playlists and the chevron that shows
-        # the tree and the nav buttons at once. Its own object name, not
+        # Split toggle: a thin "||" between Playlists and the chevron that
+        # shows the tree and the nav buttons at once. Its own object name, not
         # sidebarButton: that rule's 12px/6px padding leaves a 24px-wide button
-        # no room to draw its label (CLAUDE.md), and its checked state takes the
-        # secondary accent so it doesn't read as another selected page. The
-        # label is a glyph, not a word, so it is not translated.
-        self._split_btn = QPushButton("/")
+        # no room for its icon (CLAUDE.md), and its checked state takes the
+        # secondary accent so it doesn't read as another selected page.
+        self._split_btn = QPushButton()
+        self._split_btn.setIcon(split_icon())
+        # The chevron's icon size, so the bars stand exactly as tall as "<<".
+        self._split_btn.setIconSize(_CHEVRON_THIN_ICON)
         self._split_btn.setObjectName("sidebarSplitToggle")
         self._split_btn.setCheckable(True)
         # Fixed width, but free to grow vertically so it matches the height

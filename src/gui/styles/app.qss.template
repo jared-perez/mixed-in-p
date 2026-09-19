@@ -479,31 +479,27 @@ QPushButton#sidebarButton:disabled {
     color: @TEXT_DISABLED@;
 }
 
-/* Thin "/" split-view toggle between Playlists and the chevron. Its own rule
+/* Thin "||" split-view toggle between Playlists and the chevron. Its own rule
    because sidebarButton's padding would leave a 24px button no room for its
-   label, and its checked state uses the secondary accent (NEON_GREEN) so it
-   doesn't read as another selected page. */
+   icon, and its checked state uses the secondary accent (NEON_GREEN) so it
+   doesn't read as another selected page. The icon's colours are in
+   nav_icons.split_icon. */
 QPushButton#sidebarSplitToggle {
     background-color: transparent;
     border: none;
     border-radius: 4px;
     padding: 0px;
     /* No min-width here: a QSS minimum replaces setFixedWidth's, and the
-       button then shrinks to its 7px label. */
+       button then shrinks to its content. */
     min-height: 0px;
-    font-size: 18px;
-    font-weight: bold;
-    color: @TEXT_SECONDARY@;
 }
 
 QPushButton#sidebarSplitToggle:hover {
     background-color: @BG_LIGHT@;
-    color: @TEXT_PRIMARY@;
 }
 
 QPushButton#sidebarSplitToggle:checked {
     background-color: @BG_LIGHT@;
-    color: @NEON_GREEN@;
     border-bottom: 3px solid @NEON_GREEN@;
 }
 
