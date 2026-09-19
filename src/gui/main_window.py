@@ -48,7 +48,7 @@ from src.renamer import (
 )
 
 from src.utils.args import shell_sorted
-from src.utils.config import AppConfig, load_config, save_config
+from src.utils.config import AppConfig, load_config, reset_to_defaults, save_config
 from src.utils.paths import normalize_track_path
 
 from .models import TrackState, TrackStore
@@ -470,6 +470,7 @@ class MainWindow(QMainWindow):
         self._settings_panel.export_all_playlists.connect(
             self._on_export_all_playlists
         )
+        self._settings_panel.reset_requested.connect(self._on_settings_reset)
 
     def _load_last_session(self) -> None:
         """Load the most recent rename session for undo."""
@@ -2210,6 +2211,14 @@ class MainWindow(QMainWindow):
         """Persist settings whenever the user changes anything in the panel."""
         self._config = self._settings_panel.get_config(self._config)
         self._persist_config()
+        self._apply_settings_to_panels()
+
+    def _apply_settings_to_panels(self) -> None:
+        """Push the Settings-owned fields of ``self._config`` into their panels.
+
+        Shared by the per-change handler and by the reset, which needs the same
+        round of pushes for a config it did not build from the widgets.
+        """
         self._analysis_panel.set_auto_analyze(self._config.auto_analyze)
         self._analysis_panel.set_auto_write_bpm(self._config.auto_write_bpm)
         self._analysis_panel.set_auto_write_key(self._config.auto_write_key)
@@ -2223,6 +2232,46 @@ class MainWindow(QMainWindow):
         self._apply_visualization_settings()
         self._apply_online_lookup_settings()
         self._sidebar.set_auto_analyze_badge(self._config.auto_analyze)
+
+    def _on_settings_reset(self) -> None:
+        """Restore the shipped settings — the Settings page's Reset button.
+
+        Three things make this more than ``save_config(AppConfig())``.
+
+        It starts from *disk*, not from ``self._config``: several panels write
+        their own fields as the user clicks them, so the startup snapshot has
+        not seen those, and the fields the reset preserves (the window and
+        column layout) are among them.
+
+        It saves with ``save_config`` rather than ``_persist_config``, which
+        exists to re-read exactly those panel-owned fields from disk and copy
+        them back over — here that would quietly undo half the reset.
+
+        And it pushes the restored values into every panel holding one, rather
+        than leaving the window to catch up at the next launch: a Convert panel
+        still showing the old format would write it straight back.
+        """
+        self._config = reset_to_defaults(load_config())
+        save_config(self._config)
+
+        # The panel's own load emits settings_changed off several checkboxes,
+        # which would call get_config back on a half-loaded panel and save that
+        # mixture. Blocked, because this is a reflect, not a request.
+        blocked = self._settings_panel.blockSignals(True)
+        self._settings_panel.load_config(self._config)
+        self._settings_panel.blockSignals(blocked)
+
+        self._apply_settings_to_panels()
+        self._conversion_panel.reload_convert_settings()
+        self._player_panel.reload_persisted_settings()
+        self._history_panel.set_history_limit(self._config.history_display_limit)
+        self._spectrum_panel.set_dynamic_range(self._config.spectrum_dynamic_range)
+        self._spectrum_panel.set_split(self._config.spectrum_split)
+        self._sync_pipeline_steps()
+        self._header.pipeline.clear_pipeline_target()
+        # persist_scratch is deliberately not acted on: it is read once at
+        # startup, and "apply" for it would mean emptying Scratch — throwing
+        # away the user's working list on a click about preferences.
 
     def _apply_online_lookup_settings(self) -> None:
         """Push the online-metadata switch and token to the two panels that use it.

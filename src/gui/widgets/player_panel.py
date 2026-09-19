@@ -4232,6 +4232,31 @@ class PlayerPanel(QWidget):
             cfg.player_edit_locked = locked
             save_config(cfg)
 
+    def reload_persisted_settings(self) -> None:
+        """Re-read the config fields this panel owns and show them.
+
+        For Settings' "Reset to Default". These three are written here as the
+        user clicks them rather than through the Settings page, so a reset that
+        only rewrote the file would leave the controls showing the old state —
+        and the next click on one of them would write it back.
+
+        The column layout is *not* reloaded: it is deliberately not part of a
+        reset (see PRESERVED_ON_RESET), so there is nothing to bring back.
+        """
+        cfg = load_config()
+        self._edit_locked = cfg.player_edit_locked
+        # Reflect, don't act: the handler on the other side of `toggled` saves.
+        blocked = self._edit_lock_cb.blockSignals(True)
+        self._edit_lock_cb.setChecked(self._edit_locked)
+        self._edit_lock_cb.blockSignals(blocked)
+        self._apply_edit_triggers()
+        # Not blocked, because this one *is* the act: it ticks the menu row,
+        # closes a popout the reset just turned off, and redraws the backdrop.
+        # It writes nothing — the config already holds the value it is given.
+        if cfg.visualization_mode in self._vis_actions:
+            self._select_vis_mode(cfg.visualization_mode)
+        self._metronome_section.view.set_global_click(cfg.metronome_global_click)
+
     def _show_vis_menu(self) -> None:
         """Open the visuals menu just below the eye button."""
         self._vis_menu.exec(

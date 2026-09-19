@@ -711,6 +711,18 @@ class MetronomeView(QWidget):
         """Whether the click survives leaving the view."""
         return self._global_btn.isChecked()
 
+    def set_global_click(self, on: bool) -> None:
+        """Reflect Global Click from outside (Settings' "Reset to Default").
+
+        Signals blocked because this is a reflect: the handler below persists,
+        and the caller has already written the value this is showing. The
+        tooltip is therefore synced by hand — it normally rides on `toggled`.
+        """
+        blocked = self._global_btn.blockSignals(True)
+        self._global_btn.setChecked(on)
+        self._global_btn.blockSignals(blocked)
+        self._sync_global_tooltip(on)
+
     def _on_global_toggled(self, on: bool) -> None:
         self._sync_global_tooltip(on)
         # Re-loaded first so this never clobbers a field another panel wrote

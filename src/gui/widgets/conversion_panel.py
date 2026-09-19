@@ -548,6 +548,42 @@ class ConversionPanel(QWidget):
         self._bitdepth_combo.setVisible(not is_mp3)
         self._refresh_table()
 
+    def reload_convert_settings(self) -> None:
+        """Re-read the convert_* fields from disk and show them.
+
+        For Settings' "Reset to Default": this panel writes those fields
+        itself, so a reset that only rewrote the file would leave the combos
+        showing the old choices — and the next click in here would save them
+        straight back over the defaults.
+
+        The loading flag is what makes this a reflect: every one of these
+        setters emits, and _save_convert_settings answers by writing the
+        panel's state back out, so without it the first combo to change would
+        persist a half-restored mixture.
+        """
+        self._config = load_config()
+        self._loading_settings = True
+        try:
+            self._format_combo.setCurrentText(self._config.convert_target_format)
+            self._bitrate_combo.setCurrentText(str(self._config.convert_mp3_bitrate))
+            for combo, value in (
+                (self._samplerate_combo, self._config.convert_sample_rate),
+                (self._bitdepth_combo, self._config.convert_bit_depth),
+            ):
+                # findData matches None as readily as an int — "Keep source" is
+                # a selection here, not the absence of one.
+                index = combo.findData(value)
+                if index >= 0:
+                    combo.setCurrentIndex(index)
+            self._output_dir = self._config.convert_output_dir
+            self._use_source_dir = self._config.convert_use_source_dir
+            self._sync_destination()
+        finally:
+            self._loading_settings = False
+        # The format drives which quality controls are showing, and the rows'
+        # verdicts are computed from all of it.
+        self._on_format_changed(self._format_combo.currentText())
+
     def _save_convert_settings(self, *_args) -> None:
         """Persist current convert panel selections to config."""
         if self._loading_settings:

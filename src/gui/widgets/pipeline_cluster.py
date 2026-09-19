@@ -190,6 +190,17 @@ class PipelineCluster(QWidget):
                 return True
         return False
 
+    def clear_pipeline_target(self) -> None:
+        """Forget the target: no playlist picked, the placeholder showing.
+
+        Its own method rather than restore_pipeline_target(""), which returns
+        early on an empty name on purpose — at startup there is nothing to
+        clear, and clearing is a change, so the two callers want opposite
+        things from the same argument.
+        """
+        self._target.setCurrentIndex(-1)
+        self._target.setEditText("")
+
     def restore_pipeline_target(self, name: str) -> None:
         """Point the field at a remembered playlist.
 

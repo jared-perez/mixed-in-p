@@ -53,6 +53,10 @@ class SettingsPanel(QWidget):
     # (Plain "#", not "#:" — lupdate harvests a "#:" comment as an
     # extracomment and staples it onto the next translatable string.)
     export_all_playlists = Signal()
+    # "Reset" clicked and confirmed. Like the signal above, the panel only
+    # asks: the main window owns the config and is the only thing that can
+    # push the restored values back into every panel that holds one.
+    reset_requested = Signal()
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -741,6 +745,36 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(playlist_frame)
 
+        # ── Section: Reset to Default ───────────────────────────────────────
+        # Last on the page, because everything above it is what this undoes.
+        outer.addWidget(self._make_section_label(self.tr("Reset to Default")))
+
+        reset_frame = QFrame()
+        reset_frame.setObjectName("settingsSection")
+        reset_layout = QVBoxLayout(reset_frame)
+        reset_layout.setContentsMargins(16, 10, 16, 10)
+        reset_layout.setSpacing(8)
+
+        self._reset_btn = QPushButton(self.tr("Reset"))
+        self._reset_btn.clicked.connect(self._on_reset_clicked)
+        reset_row = self._row_layout()
+        reset_row.addWidget(self._reset_btn)
+        reset_row.addStretch(1)
+        reset_layout.addLayout(reset_row)
+
+        reset_hint = QLabel(
+            self.tr(
+                "Puts every setting back the way it shipped. Your language, "
+                "theme and window layout are kept, and so is your default "
+                "audio player — that one lives with the system."
+            )
+        )
+        reset_hint.setObjectName("settingsHint")
+        reset_hint.setWordWrap(True)
+        reset_layout.addWidget(reset_hint)
+
+        outer.addWidget(reset_frame)
+
         outer.addStretch()
 
         scroll.setWidget(container)
@@ -826,6 +860,36 @@ class SettingsPanel(QWidget):
         self._online_lookup_cb.blockSignals(True)
         self._online_lookup_cb.setChecked(True)
         self._online_lookup_cb.blockSignals(False)
+
+    def _on_reset_clicked(self) -> None:
+        """Confirm, then ask the window to restore the shipped settings.
+
+        Asked with Qt's own Reset and Cancel rather than custom buttons: the
+        labels then come from qtbase's translations in every language, and
+        sizing a custom QMessageBox button by hand is the one thing the
+        duplicate-policy dialog had to learn to do (see its _fit_buttons).
+        Cancel is the default button — a stray Return on this one is the
+        expensive keystroke.
+
+        Through the static ``warning`` rather than a built box: an instance's
+        ``exec`` is resolved through C++ and cannot be patched out, so a box
+        built here would open for real in the test suite and hang it.
+        """
+        question = self.tr("Put every setting back to the way it shipped?")
+        detail = self.tr(
+            "Your language, theme and window layout are kept. Your Discogs "
+            "token is cleared. This cannot be undone."
+        )
+        answer = QMessageBox.warning(
+            self,
+            self.tr("Reset to Default"),
+            f"{question}\n\n{detail}",
+            QMessageBox.StandardButton.Reset | QMessageBox.StandardButton.Cancel,
+            QMessageBox.StandardButton.Cancel,
+        )
+        if answer == QMessageBox.StandardButton.Reset:
+            logger.info("Settings reset to defaults by the user")
+            self.reset_requested.emit()
 
     def _on_token_help_clicked(self) -> None:
         """Open the Discogs page where a personal token is generated."""

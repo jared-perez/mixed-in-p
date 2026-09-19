@@ -6,7 +6,7 @@ import json
 import logging
 import os
 import re
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from pathlib import Path
 
 from .i18n import DEFAULT_LANGUAGE, LANGUAGE_CODES
@@ -527,6 +527,44 @@ def load_config() -> AppConfig:
     except Exception as exc:
         logger.warning("Failed to load config: %s", exc)
     return AppConfig()
+
+
+# What Settings' "Reset to Default" does NOT put back to its shipped value.
+#
+# Two groups, for two different reasons. Language and theme are the user's
+# reading of the app rather than a preference about DJing, and a reset that
+# threw someone back into English would be hard to undo *because* the button
+# that undid it just changed language. Everything after them is remembered
+# layout — where the window sat, how wide the playlist columns were — which the
+# Settings page never offered in the first place, so resetting it would be a
+# change nobody asked for from a page that never mentioned it. (The column
+# trio also travels together: see AppConfig's comments on the count and the
+# defaults version, either of which alone is worse than useless.)
+#
+# The OS's default audio player is absent from this list because it is absent
+# from the config: the registration lives with the OS, which is also why the
+# app cannot put it back. Reset leaves it alone by having nothing to say.
+PRESERVED_ON_RESET = (
+    "language",
+    "theme",
+    "window_geometry",
+    "player_column_state",
+    "player_column_count",
+    "player_column_defaults_version",
+)
+
+
+def reset_to_defaults(cfg: AppConfig) -> AppConfig:
+    """The shipped defaults, carrying *cfg*'s PRESERVED_ON_RESET fields over.
+
+    Built from a fresh AppConfig rather than by assigning defaults onto *cfg*,
+    so a field added later is reset by existing without anyone remembering to
+    add it here — the list that needs maintaining is the short one, and a
+    forgotten entry there is visible (the setting resets) rather than silent.
+    """
+    return replace(
+        AppConfig(), **{name: getattr(cfg, name) for name in PRESERVED_ON_RESET}
+    )
 
 
 def save_config(cfg: AppConfig) -> None:
