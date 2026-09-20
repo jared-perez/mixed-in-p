@@ -372,3 +372,113 @@ class TestTagPopulation:
         assert (entry.artist, entry.title) == ("Helene", "Astral")
         assert (entry.bpm, entry.key) == ("180", "6A")
         assert entry.duration == "6:50"
+
+
+class TestDeleteKeyConfirmation:
+    """Delete/Backspace asks first everywhere but Scratch.
+
+    The confirmation itself is patched out: a real QMessageBox would block the
+    headless run forever. What each test pins is *whether* it was raised, which
+    is the whole of the behaviour — the box's own contents are ordinary copy.
+    """
+
+    @staticmethod
+    def watch(player, monkeypatch, answer):
+        """Replace the prompt with a recorder returning *answer*."""
+        asked = []
+        monkeypatch.setattr(
+            player,
+            "_confirm_remove_selected",
+            lambda: (asked.append(True), answer)[1],
+        )
+        return asked
+
+    @staticmethod
+    def press_delete(table, *, forced=False):
+        """Delete, optionally with Ctrl/Cmd held — and then let it back up.
+
+        A modifier left latched is application state that silently rewrites a
+        later test's ``selectRow`` (see conftest's ``no_latched_modifiers``).
+        """
+        from PySide6.QtCore import Qt
+        from PySide6.QtTest import QTest
+
+        mods = (
+            Qt.KeyboardModifier.ControlModifier
+            if forced
+            else Qt.KeyboardModifier.NoModifier
+        )
+        QTest.keyClick(table, Qt.Key.Key_Delete, mods)
+        if forced:
+            QTest.keyRelease(table, Qt.Key.Key_Control)
+
+    def test_scratch_removes_without_asking(self, player, lib, tmp_path, monkeypatch):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        player.add_tracks(track_dicts([a, b]))
+        asked = self.watch(player, monkeypatch, False)
+
+        player._table.selectRow(0)
+        self.press_delete(player._table)
+
+        assert asked == []  # Scratch is disposable: no question
+        assert [e.file_path for e in player._playlist] == [b]
+
+    def test_saved_playlist_asks_and_keeps_the_track_on_no(
+        self, player, lib, tmp_path, monkeypatch
+    ):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = lib.create_playlist("Set")
+        lib.set_items(pl, [lib.add_track(a), lib.add_track(b)])
+        player.load_node(pl)
+        asked = self.watch(player, monkeypatch, False)
+
+        player._table.selectRow(0)
+        self.press_delete(player._table)
+
+        assert asked == [True]
+        assert [e.file_path for e in player._playlist] == [a, b]
+        assert [t.path for t in lib.get_items(pl)] == [a, b]
+
+    def test_saved_playlist_removes_on_yes(self, player, lib, tmp_path, monkeypatch):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = lib.create_playlist("Set")
+        lib.set_items(pl, [lib.add_track(a), lib.add_track(b)])
+        player.load_node(pl)
+        asked = self.watch(player, monkeypatch, True)
+
+        player._table.selectRow(0)
+        self.press_delete(player._table)
+
+        assert asked == [True]
+        assert [e.file_path for e in player._playlist] == [b]
+        assert [t.path for t in lib.get_items(pl)] == [b]
+
+    def test_ctrl_delete_skips_the_question(self, player, lib, tmp_path, monkeypatch):
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = lib.create_playlist("Set")
+        lib.set_items(pl, [lib.add_track(a), lib.add_track(b)])
+        player.load_node(pl)
+        asked = self.watch(player, monkeypatch, False)
+
+        player._table.selectRow(0)
+        self.press_delete(player._table, forced=True)
+
+        assert asked == []
+        assert [e.file_path for e in player._playlist] == [b]
+
+    def test_context_menu_remove_is_unchanged(
+        self, player, lib, tmp_path, monkeypatch
+    ):
+        # The row menu's "Remove from Playlist" is a deliberate click on the
+        # word Remove, so it keeps acting at once in a saved playlist too.
+        a, b = make_files(tmp_path, "a.wav", "b.wav")
+        pl = lib.create_playlist("Set")
+        lib.set_items(pl, [lib.add_track(a), lib.add_track(b)])
+        player.load_node(pl)
+        asked = self.watch(player, monkeypatch, False)
+
+        player._table.selectRow(0)
+        player._on_remove_selected()
+
+        assert asked == []
+        assert [e.file_path for e in player._playlist] == [b]

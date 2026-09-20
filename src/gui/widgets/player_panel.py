@@ -793,7 +793,8 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
 
     order_changed = Signal()
     files_dropped = Signal(list)
-    remove_requested = Signal()
+    # True when the key press asked to be confirmed first (see keyPressEvent).
+    remove_requested = Signal(bool)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -860,11 +861,15 @@ class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
     def keyPressEvent(self, event) -> None:
         # Backspace / Delete removes the selected track(s). Only fires while the
         # table has focus, so it never clashes with text editing elsewhere.
+        # Holding Ctrl (Cmd on macOS — Qt swaps them, which lands on the native
+        # "delete now" chord on both) skips the confirmation the panel would
+        # otherwise raise; the panel decides whether one is wanted at all.
         if (
             event.key() in (Qt.Key.Key_Backspace, Qt.Key.Key_Delete)
             and self.selectionModel().selectedRows()
         ):
-            self.remove_requested.emit()
+            forced = bool(event.modifiers() & Qt.KeyboardModifier.ControlModifier)
+            self.remove_requested.emit(not forced)
             event.accept()
             return
         if self._slice_claims_key(event):
@@ -2627,8 +2632,9 @@ class PlayerPanel(QWidget):
         # External file drops
         self._table.files_dropped.connect(self.files_dropped.emit)
 
-        # Backspace / Delete on a selected row removes it from the playlist.
-        self._table.remove_requested.connect(self._on_remove_selected)
+        # Backspace / Delete on a selected row removes it from the playlist,
+        # asking first everywhere but Scratch (see _on_remove_requested).
+        self._table.remove_requested.connect(self._on_remove_requested)
 
         # Drag selected tracks onto a sidebar nav button to route them. A move drop
         # removes them here (stopping playback if a dragged track was playing).
@@ -6304,6 +6310,50 @@ class PlayerPanel(QWidget):
         return paths, None
 
     # ── Remove / Clear ──────────────────────────────────────────
+
+    def _on_remove_requested(self, confirm: bool) -> None:
+        """Delete/Backspace asked to remove the selection.
+
+        Scratch is the disposable working list, so a key press there acts at
+        once as it always has. A saved playlist is someone's work, and the key
+        is easy to hit with the table focused by accident, so it asks first —
+        unless the user held Ctrl/Cmd, which says "I meant it".
+        """
+        if self._search_active:
+            return  # same reason as in _on_remove_selected
+        if confirm and self._loaded_node_id != SCRATCH_NODE_ID:
+            if not self._table.selectionModel().selectedRows():
+                return
+            if not self._confirm_remove_selected():
+                return
+        self._on_remove_selected()
+
+    def _confirm_remove_selected(self) -> bool:
+        """Ask before taking tracks out of a saved playlist.
+
+        Split out so a test can answer the question without opening a modal.
+        """
+        box = QMessageBox(self)
+        box.setIcon(QMessageBox.Icon.Question)
+        # Reuses the row menu's string, so the title costs no new translation.
+        box.setWindowTitle(self.tr("Remove from Playlist"))
+        box.setText(
+            self.tr("Are you sure you want to delete the selected tracks from the playlist?")
+        )
+        # Both keys work; name the one the keyboard has. A Mac laptop has no
+        # forward-delete key, and Key_Delete is exactly what macOS draws as ⌦,
+        # so there we name Backspace — the key whose cap reads "delete".
+        import sys
+
+        chord = QKeySequence(
+            "Ctrl+Backspace" if sys.platform == "darwin" else "Ctrl+Delete"
+        ).toString(QKeySequence.SequenceFormat.NativeText)
+        box.setInformativeText(self.tr("Press {0} to remove without asking.").format(chord))
+        box.setStandardButtons(
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        box.setDefaultButton(QMessageBox.StandardButton.No)
+        return box.exec() == QMessageBox.StandardButton.Yes
 
     def _on_remove_selected(self) -> None:
         # Removing a search result is undefined (remove from which playlist?)

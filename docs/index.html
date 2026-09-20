@@ -829,7 +829,8 @@
       <tr><td>Ctrl+L / Cmd+L</td><td>Jump to the playlist the current track is playing from</td><td>Anywhere in the window</td></tr>
       <tr><td>Space</td><td>Play / Pause</td><td>Player (when focused)</td></tr>
       <tr><td>Ctrl+Z / Cmd+Z</td><td>Undo the last playlist edit (this session)</td><td>Player, Playlists</td></tr>
-      <tr><td>Delete / Backspace</td><td>Remove selected rows</td><td>Player, Rename, Analysis</td></tr>
+      <tr><td>Delete / Backspace</td><td>Remove selected rows (a saved playlist asks first)</td><td>Player, Rename, Analysis</td></tr>
+      <tr><td>Ctrl+Delete / Cmd+Delete</td><td>Remove selected rows without being asked</td><td>Player</td></tr>
       <tr><td>Z / X</td><td>Shift octave down / up</td><td>Keyboard</td></tr>
       <tr><td>A–L, ;</td><td>Play notes</td><td>Keyboard</td></tr>
       <tr><td>W E T Y U O P</td><td>Play black-key notes</td><td>Keyboard</td></tr>
@@ -845,6 +846,11 @@
       leaves the sidebar alone &mdash; showing the tree is Shift+Tab's job. With nothing playing, or
       when the track was played out of a search or its playlist has since been deleted, it does
       nothing at all.</p>
+
+    <p><b>Delete / Backspace</b> in the Player depends on which list you are in. Scratch is the
+      disposable working list, so a press there takes the selected tracks straight out. In a saved
+      playlist it asks first, because the table is easy to have focused by accident. Hold
+      <b>Ctrl</b> (<b>Cmd</b> on macOS) with it to skip the question.</p>
 
     <h2 id="formats"><span class="num">09</span>Supported formats</h2><hr>
     <table>
