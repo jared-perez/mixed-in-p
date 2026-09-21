@@ -144,7 +144,10 @@ class TestItReachesTheLibrary:
             [{"file_path": flac, "display_name": Path(flac).name}],
             allow_duplicates=True,
         )
-        qtbot.wait(10)
+        # The energy is read from the file on a background thread, and the
+        # write-through that puts it in the library follows that read. A fixed
+        # wait passed on an idle machine and failed under a full-suite load.
+        assert player.wait_for_tags()
 
         assert lib.get_track_by_path(flac).energy == 8
 
@@ -173,6 +176,9 @@ class TestItReachesTheLibrary:
             [{"file_path": flac, "display_name": Path(flac).name}],
             allow_duplicates=True,
         )
-        qtbot.wait(10)
+        # Waited for rather than slept through: None is also what the column
+        # holds before the file has been read at all, so without this the
+        # test would pass even if the read never happened.
+        assert player.wait_for_tags()
 
         assert lib.get_track_by_path(flac).energy is None

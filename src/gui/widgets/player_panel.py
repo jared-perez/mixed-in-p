@@ -13,7 +13,10 @@ import shiboken6
 from PySide6.QtCore import (
     QT_TRANSLATE_NOOP,
     QByteArray,
+    QCoreApplication,
+    QDeadlineTimer,
     QEvent,
+    QEventLoop,
     QObject,
     QPoint,
     QPointF,
@@ -105,6 +108,7 @@ from ..styles.theme import Theme
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
 from ..workers.lookup_worker import LookupJob, LookupThread
+from ..workers.tag_read_worker import TagReadThread, TagReadWorker
 from ..workers.thread_keeper import keep_alive, wait_for_threads
 from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
 from .elided_label import HuggingElidedLabel, LinkLabel
@@ -456,6 +460,16 @@ class PlaylistEntry:
     # sorts as a number and what the library row stores. The cell says
     # "24 bit" — see `PlayerPanel._format_bit_depth`.
     bit_depth: str = ""
+    # True while this row's file has not been read yet, i.e. the blanks above
+    # mean "we have not looked" rather than "the file has nothing". The
+    # distinction matters twice: the cell shows a placeholder instead of
+    # reading as empty, and `_write_playlist` passes None rather than "" so an
+    # auto-save landing mid-read cannot blank the library row it has not seen.
+    #
+    # compare=False so this stays out of __eq__: two entries for one file are
+    # already equal by design (see play_context), and a flag that flickers
+    # during a read must not change that answer half way through.
+    pending: bool = field(default=False, compare=False)
 
     @property
     def file_type(self) -> str:
@@ -543,6 +557,22 @@ _SIZED_EXTENSIONS = {".wav", ".flac", ".aiff", ".aif", ".aifc"}
 def _has_bit_depth(path: str) -> bool:
     """Whether *path*'s format stores a bit depth at all."""
     return Path(path).suffix.lower() in _SIZED_EXTENSIONS
+
+
+# What a cell shows while its file is still queued for the tag reader: the row
+# is real, this particular answer is not in yet. Without it an unread row is
+# indistinguishable from a track that genuinely has no BPM, which is the one
+# way a background read can mislead where the old blocking one could not.
+#
+# Deliberately in the *view* only — the entry keeps "" — so nothing that reads
+# the model sees it: sorting still partitions these rows as blanks, search
+# still matches nothing, and the library is never handed an ellipsis. It also
+# needs no translation for the same reason a number does not.
+#
+# The text rather than the colour because all three foreground states are
+# already spoken for (playing, missing file, normal), and a background brush
+# would be ignored anyway — app.qss.template styles QTableView::item.
+_PENDING_TEXT = "…"
 
 
 def _widest_depth(widget: QWidget) -> str:
@@ -1560,6 +1590,35 @@ class PlayerPanel(QWidget):
     # entry attribute verbatim.
     _FORMAT_COLUMN = 18
     _BIT_DEPTH_COLUMN = 19
+    # Every column whose text is an entry attribute, for the background tag
+    # read to repaint by. '#' (0) and Art (15) are not here because neither is
+    # text off the entry, and Filename (1) is not because it is decorated with
+    # the missing-file marker and owns its own tooltip.
+    _COLUMN_ATTRIBUTES = {
+        2: "artist",
+        3: "title",
+        4: "bpm",
+        5: "key",
+        6: "comment",
+        7: "duration",
+        8: "year",
+        9: "album",
+        10: "genre",
+        11: "track_number",
+        12: "label",
+        13: "bitrate",
+        14: "energy",
+        16: "date_added",
+        17: "date_created",
+        18: "file_type",
+        19: "bit_depth",
+    }
+    # The subset a tag read can answer, and therefore the only cells allowed to
+    # show the "not looked yet" placeholder. The two dates and Format are off
+    # the list on purpose: none of them comes from the file's tags (the dates
+    # are the library's and the disk's, Format is derived from the extension),
+    # so they are never pending and an empty one is simply empty.
+    _FILLABLE_COLUMNS = frozenset({2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 19})
     # The shipped layout, as a *visual* order over those fixed logical indexes:
     # #, Art, Artist, Title, BPM, Key, Comment, Duration, Year, Filename, and
     # then the optional ones in their own order. Expressed this way because the
@@ -1732,6 +1791,20 @@ class PlayerPanel(QWidget):
         self._art_size_loaded: tuple[int, str] = (0, "")
         self._art_worker: ArtworkWorker | None = None
         self._art_thread: ArtworkThread | None = None
+        # The background tag reader (see the "Background tag reads" section).
+        # The queue accumulates entries added before the timer fires, so a
+        # burst of adds becomes one reader rather than one each.
+        self._tag_worker: TagReadWorker | None = None
+        self._tag_thread: TagReadThread | None = None
+        self._tag_queue: list[PlaylistEntry] = []
+        # Whether the queued rows came from a load (narrow tag write) or an
+        # add (full write-through). See `_queue_tag_read`.
+        self._tag_from_load = True
+        self._tag_writes_back = True
+        # Which playlist the reader in flight was started for: an answer that
+        # arrives after the user has moved on is dropped rather than written
+        # into whatever list is on screen by then.
+        self._tag_node_id = SCRATCH_NODE_ID
         self._num_col_width = 40
         # path -> "the file is gone", for the "!" marker (step 10). Memoised
         # because the table rebuilds on every list edit and a stat per row
@@ -2601,6 +2674,15 @@ class PlayerPanel(QWidget):
         self._art_timer.setSingleShot(True)
         self._art_timer.setInterval(120)
         self._art_timer.timeout.connect(self._load_visible_artwork)
+        # The tag reader starts on the next turn of the event loop rather than
+        # inside the add: `_start_tag_read` reads the rows on screen first, and
+        # `_visible_rows` cannot answer until Qt has laid the new rows out
+        # (load_node's own doItemsLayout is the last thing it does). Zero
+        # interval, so this is "after this add settles", not a delay.
+        self._tag_timer = QTimer(self)
+        self._tag_timer.setSingleShot(True)
+        self._tag_timer.setInterval(0)
+        self._tag_timer.timeout.connect(self._start_tag_read)
         self._table.verticalScrollBar().valueChanged.connect(
             self._schedule_artwork_load
         )
@@ -2774,14 +2856,15 @@ class PlayerPanel(QWidget):
             bit_depth = t.get("bit_depth", "")
             energy = t.get("energy", "")
             duration_sec = t.get("duration")
-            # Fall back to reading these from the file's tags when a caller didn't
-            # supply them (e.g. tracks sent from the Analyze panel, which only
-            # passes BPM/key), so the columns populate regardless of entry point.
+            # Whether this row still needs its file opened. The columns above
+            # are filled from the library where it knows them, and from the
+            # file's own tags where it does not (e.g. tracks sent from the
+            # Analyze panel, which only passes BPM/key).
             #
-            # Track number, label and bitrate are filled by this read but do NOT
-            # trigger it: plenty of files have no label or track number at all,
-            # so testing them here would open every such file on every add,
-            # forever, to learn nothing.
+            # Track number, label and bitrate are filled by that read but do
+            # NOT trigger it: plenty of files have no label or track number at
+            # all, so testing them here would open every such file on every
+            # add, forever, to learn nothing.
             #
             # Bit depth is the one exception, and only because its blanks are
             # knowable in advance: a lossy stream has no such number, so only a
@@ -2791,7 +2874,13 @@ class PlayerPanel(QWidget):
             # back. Without the trigger every row added before schema v8 would
             # show an empty cell forever, since a fully-tagged row asks for
             # nothing else.
-            if (
+            #
+            # The read itself is NOT done here: it is a full mutagen parse per
+            # file, which on a slow or cold disk is tens of milliseconds each
+            # and used to freeze the window for the length of the whole list.
+            # The row is built blank-and-marked instead, and `_on_tags_read`
+            # lands the answers from a reader thread. See tag_read_worker.
+            needs_read = (
                 not artist
                 or not title
                 or not bpm
@@ -2800,32 +2889,7 @@ class PlayerPanel(QWidget):
                 or not year
                 or duration_sec is None
                 or (not bit_depth and _has_bit_depth(t["file_path"]))
-            ):
-                try:
-                    from src.metadata.tags import read_metadata
-
-                    meta = read_metadata(t["file_path"])
-                    artist = artist or (meta.artist or "")
-                    title = title or (meta.title or "")
-                    album = album or (meta.album or "")
-                    genre = genre or (meta.genre or "")
-                    bpm = bpm or (str(int(round(meta.bpm))) if meta.bpm else "")
-                    key = key or (meta.key or "")
-                    comment = comment or (meta.comment or "")
-                    year = year or (str(meta.year) if meta.year else "")
-                    track_number = track_number or (
-                        str(meta.track_number) if meta.track_number else ""
-                    )
-                    label = label or (meta.label or "")
-                    bitrate = bitrate or (str(meta.bitrate) if meta.bitrate else "")
-                    bit_depth = bit_depth or (
-                        str(meta.bit_depth) if meta.bit_depth else ""
-                    )
-                    energy = energy or (str(meta.energy) if meta.energy else "")
-                    if duration_sec is None:
-                        duration_sec = meta.duration
-                except Exception:
-                    pass
+            )
             duration_str = (
                 self._format_time(int(duration_sec * 1000))
                 if isinstance(duration_sec, (int, float)) and duration_sec > 0
@@ -2851,6 +2915,7 @@ class PlayerPanel(QWidget):
                 or self._library_added_at(t["file_path"]),
                 date_created=_file_created_at(t["file_path"]),
                 bit_depth=bit_depth,
+                pending=needs_read,
             )
             # Duplicates were already resolved by add_tracks — whatever
             # reaches here has been cleared to land.
@@ -2879,6 +2944,10 @@ class PlayerPanel(QWidget):
         # instant instead of waiting on a full decode.
         self._prefetch_default_target()
         self._persist_playlist()
+        # Queue the tag reads for the rows that went up blank. After the
+        # persist, so a row the library has never seen already has its row
+        # (and its `added_at`) by the time an answer for it arrives.
+        self._queue_tag_read(added)
         # After the persist, because that is what gives a file the library had
         # never seen an `added_at` in the first place.
         self._fill_dates_added()
@@ -2936,6 +3005,247 @@ class PlayerPanel(QWidget):
         if filled and self._sort_column == self._DATE_ADDED_COLUMN:
             self._apply_sort()
 
+    # ── Background tag reads ────────────────────────────────────
+    #
+    # Rows appear immediately carrying whatever the library knows; the files
+    # themselves are opened on a reader thread and the blanks are filled in as
+    # the answers arrive. The rules that keep that honest:
+    #
+    #   * fill by IDENTITY, never by row or by path equality — rows move under
+    #     a sort and two entries for one file are equal as dataclasses;
+    #   * fill only what is STILL blank at apply time, so a value the user
+    #     typed in the meantime wins over the one that was on disk;
+    #   * an entry stays `pending` until its answer lands, because that is what
+    #     tells `_write_playlist` to leave the library row alone.
+
+    def _queue_tag_read(self, entries: list[PlaylistEntry]) -> None:
+        """Ask the reader for any of *entries* that went up blank.
+
+        Deferred by a single-shot timer rather than started here: the rows the
+        user is looking at are read first, and which those are cannot be known
+        until Qt has laid the table out. It also coalesces a burst of adds into
+        one reader.
+        """
+        pending = [e for e in entries if e.pending]
+        if not pending:
+            return
+        # Where these rows came from decides what is done with the answers.
+        # A LOAD built them from library rows that already hold these tags, so
+        # only the narrow `_store_read_props` write is wanted — a full
+        # auto-save there would rewrite the membership of the list it is still
+        # loading. An ADD is the opposite: nothing has stored these tags yet,
+        # and writing them through is what the synchronous read used to do at
+        # the end of `_append_tracks`. Mixed queues take the add's answer,
+        # which is a superset.
+        if not self._loading_playlist:
+            self._tag_from_load = False
+        self._tag_queue.extend(pending)
+        self._tag_timer.start()
+
+    def _start_tag_read(self) -> None:
+        """Read the queued rows, the ones on screen first."""
+        # One pass over the list rather than a scan per entry: this
+        # runs over the whole queue three times below, and that is quadratic
+        # on a list long enough for any of this to matter.
+        rows = self._row_index()
+        queued = [e for e in self._tag_queue if e.pending and id(e) in rows]
+        from_load = self._tag_from_load
+        self._tag_queue = []
+        self._tag_from_load = True
+        if not queued:
+            return
+        self._tag_writes_back = from_load
+        visible = set(self._visible_rows())
+        # Stable within each half, so a long list is still read top to bottom.
+        on_screen = [e for e in queued if rows[id(e)] in visible]
+        rest = [e for e in queued if rows[id(e)] not in visible]
+        paths: list[str] = []
+        for entry in (*on_screen, *rest):
+            # One read serves every row holding that file; the apply fans it
+            # back out to all of them.
+            if entry.file_path not in paths:
+                paths.append(entry.file_path)
+        # NB the reader calls `read_metadata`, which this module already
+        # imports at the top. That is load-bearing, not incidental: the
+        # worker imports it lazily, and two threads reaching mutagen's import
+        # together aborts the interpreter (see conftest's
+        # warm_lazy_audio_imports). The eager import up there means the GUI
+        # thread has always got there first.
+        self._cancel_tag_worker()
+        worker = TagReadWorker(paths)
+        thread = TagReadThread(worker)
+        self._tag_worker = worker
+        self._tag_thread = thread
+        # The node these rows belong to, captured now: an answer that arrives
+        # after the user has loaded a different playlist must not be written
+        # into whatever is on screen by then.
+        self._tag_node_id = self._loaded_node_id
+        keep_alive(self._thread_keep, thread, worker)
+        worker.batch.connect(self._on_tags_read)
+        worker.finished.connect(thread.quit)
+        thread.finished.connect(worker.deleteLater)
+        thread.finished.connect(thread.deleteLater)
+        thread.finished.connect(lambda t=thread: self._on_tag_thread_finished(t))
+        thread.start()
+
+    def _cancel_tag_worker(self) -> None:
+        """Ask the reader in flight to stop, if there is still one to ask.
+
+        Guarded by isValid for the same reason `_cancel_artwork_worker` is: the
+        attribute can outlive the C++ object it names.
+        """
+        worker = self._tag_worker
+        if worker is not None and shiboken6.isValid(worker):
+            worker.cancel()
+
+    def _on_tag_thread_finished(self, thread) -> None:
+        """Drop the references, unless a newer read has already taken them."""
+        if self._tag_thread is thread:
+            self._tag_thread = None
+            self._tag_worker = None
+
+    def _row_index(self) -> dict[int, int]:
+        """id(entry) -> its row in the visible list.
+
+        Keyed on identity, not on the entry and not on its path: PlaylistEntry
+        is a dataclass, so a playlist holding one file twice has two entries
+        that compare equal, and `index`/`in` would answer with the first of
+        them every time. `id()` is sound here only because `_playlist` holds
+        every key alive for as long as the map is used — never store one.
+        """
+        return {id(entry): row for row, entry in enumerate(self._playlist)}
+
+    def _on_tags_read(self, results: list) -> None:
+        """A batch came back: fill the blanks it answers and repaint them."""
+        if self._closing or not results:
+            return
+        # The list on screen is no longer the one these were read for.
+        if self._loaded_node_id != self._tag_node_id or self._search_active:
+            return
+        by_path = dict(results)
+        # Every pending entry for a path in this batch, including a second copy
+        # of the same file further down the list.
+        touched = [
+            e for e in self._playlist if e.pending and e.file_path in by_path
+        ]
+        if not touched:
+            return
+        # An open editor owns its cell; writing under it loses what is being
+        # typed and leaves the view and the model disagreeing.
+        editing = self._table.state() == QAbstractItemView.State.EditingState
+        editing_row = self._table.currentRow() if editing else -1
+        rows = self._row_index()
+        # `filled` learned something; `settled` merely stopped being pending.
+        # The two differ for an unreadable file, and the difference matters:
+        # such a row still carries whatever its CALLER supplied, and that has
+        # not reached the library yet — the auto-save at the end of the add
+        # deliberately skipped it while it was pending.
+        filled: list[PlaylistEntry] = []
+        settled = False
+        for entry in touched:
+            row = rows.get(id(entry))
+            if row is None or row == editing_row:
+                continue
+            meta = by_path[entry.file_path]
+            # None means the file could not be read. The row keeps its blanks,
+            # but it stops being pending either way: "we looked and found
+            # nothing" and "we could not look" are both answers, and neither
+            # should leave a placeholder sitting there for good.
+            if meta is not None:
+                self._apply_tags(entry, meta)
+                filled.append(entry)
+            entry.pending = False
+            settled = True
+            self._repaint_row(row, entry)
+        if not settled:
+            return
+        if self._tag_writes_back:
+            # These rows came from a load: the narrow write only, and only for
+            # rows that actually learned something. See `_queue_tag_read` for
+            # why a full auto-save is wrong here.
+            if filled:
+                self._store_read_props(filled)
+        else:
+            # These rows were added: write the tags through exactly as the
+            # synchronous read did at the end of `_append_tracks`, or a file
+            # dropped in would land in the library with none of them. The
+            # membership is unchanged, so this pushes no undo.
+            self._persist_playlist()
+        # Sorted BY a column this batch just filled, those rows sorted as
+        # blanks (last, both directions) and would now sit there wearing a
+        # value they should have been placed by. Same case `_fill_dates_added`
+        # handles, and the same answer.
+        if self._sorted and self._sort_column in self._FILLABLE_COLUMNS:
+            self._apply_sort()
+
+    def _apply_tags(self, entry: PlaylistEntry, meta) -> None:
+        """Copy *meta* onto *entry*, filling blanks only.
+
+        `or` and not assignment: between the read being queued and this
+        landing, the user may have typed into the row, and what they typed is
+        the newer truth. It is also what makes a second batch for the same
+        file (two copies, one read) idempotent.
+        """
+        entry.artist = entry.artist or (meta.artist or "")
+        entry.title = entry.title or (meta.title or "")
+        entry.album = entry.album or (meta.album or "")
+        entry.genre = entry.genre or (meta.genre or "")
+        entry.bpm = entry.bpm or (str(int(round(meta.bpm))) if meta.bpm else "")
+        entry.key = entry.key or (meta.key or "")
+        entry.comment = entry.comment or (meta.comment or "")
+        entry.year = entry.year or (str(meta.year) if meta.year else "")
+        entry.track_number = entry.track_number or (
+            str(meta.track_number) if meta.track_number else ""
+        )
+        entry.label = entry.label or (meta.label or "")
+        entry.bitrate = entry.bitrate or (str(meta.bitrate) if meta.bitrate else "")
+        entry.bit_depth = entry.bit_depth or (
+            str(meta.bit_depth) if meta.bit_depth else ""
+        )
+        entry.energy = entry.energy or (str(meta.energy) if meta.energy else "")
+        if not entry.duration and meta.duration and meta.duration > 0:
+            entry.duration = self._format_time(int(meta.duration * 1000))
+
+    def _repaint_row(self, row: int, entry: PlaylistEntry) -> None:
+        """Put *entry*'s filled values into its cells, placeholders and all.
+
+        In place rather than through `_rebuild_table`: this runs once per
+        batch, and rebuilding the whole table to change a few cells is how a
+        background read ends up slower than the blocking one it replaced.
+        """
+        self._table.blockSignals(True)
+        try:
+            for col in self._FILLABLE_COLUMNS:
+                item = self._table.item(row, col)
+                if item is None:
+                    continue
+                item.setText(self._cell_text(entry, col))
+        finally:
+            self._table.blockSignals(False)
+
+    def _cell_text(self, entry: PlaylistEntry, col: int) -> str:
+        """What column *col* shows for *entry* — its value, or the placeholder.
+
+        The placeholder only ever stands in for a blank we have not looked at
+        yet; once the file has been read, an empty cell means the file really
+        is empty there and says so by staying empty.
+        """
+        attribute = self._COLUMN_ATTRIBUTES.get(col)
+        if attribute is None:
+            return ""
+        value = getattr(entry, attribute, "") or ""
+        if col == self._BIT_DEPTH_COLUMN:
+            # A lossy stream has no bit depth and never will, and that is
+            # knowable from the extension alone. Promising an answer the read
+            # cannot produce would leave "…" in the cell until the file came
+            # back empty and it flickered away again.
+            if not _has_bit_depth(entry.file_path):
+                return ""
+            value = self._format_bit_depth(value)
+        if not value and entry.pending and col in self._FILLABLE_COLUMNS:
+            return _PENDING_TEXT
+        return value
+
     def play_path(self, path: str) -> bool:
         """Play *path* now, whatever is under way. True if the row was found.
 
@@ -2982,6 +3292,34 @@ class PlayerPanel(QWidget):
         """
         return wait_for_threads(self._thread_keep, timeout_ms)
 
+    def wait_for_tags(self, timeout_ms: int = 5000) -> bool:
+        """Block until every visible row's tags have been read. False on timeout.
+
+        The rows fill from a background reader, so anything that needs the
+        tags *now* rather than on screen shortly — a test, chiefly — has to
+        say so. Public for the same reason `wait_for_readers` is: the
+        alternative for a caller is to guess at a sleep.
+
+        Pumps the event loop, because the answers arrive on a queued signal
+        and a plain `wait()` on the thread would deadlock against it. That
+        makes this a top-level call, never something to reach for from inside
+        a handler.
+        """
+        # Skip the "settle first" timer: the caller is asking for the answer,
+        # not for it to be scheduled politely.
+        if self._tag_timer.isActive():
+            self._tag_timer.stop()
+            self._start_tag_read()
+        deadline = QDeadlineTimer(timeout_ms)
+        while any(e.pending for e in self._playlist):
+            if deadline.hasExpired():
+                logger.warning("Tag reads did not finish within %dms", timeout_ms)
+                return False
+            QCoreApplication.processEvents(
+                QEventLoop.ProcessEventsFlag.AllEvents, 10
+            )
+        return True
+
     def shutdown_workers(self) -> None:
         """Wait for any decode or waveform thread still reading a file.
 
@@ -2989,11 +3327,16 @@ class PlayerPanel(QWidget):
         the *readers*. Called from ``closeEvent``, which is what stops a
         running QThread being destroyed under Qt when the panel goes away.
 
-        The artwork reader is asked to stop first: its run() is a plain loop,
-        not an event loop, so quit() means nothing to it and the wait would
-        otherwise sit through every remaining file in the batch.
+        The artwork and tag readers are asked to stop first: their run() is a
+        plain loop, not an event loop, so quit() means nothing to them and the
+        wait would otherwise sit through every remaining file in the batch.
         """
         self._cancel_artwork_worker()
+        self._cancel_tag_worker()
+        # Nothing queued is worth starting now, and a timer that fires during
+        # teardown would build a reader for a panel that is going away.
+        self._tag_timer.stop()
+        self._tag_queue = []
         if self._lookup_thread is not None:
             self._lookup_thread.cancel()
         self._compat_panel.shutdown_workers()
@@ -3098,6 +3441,15 @@ class PlayerPanel(QWidget):
         """
         if self._library is None or self._library.get_node(node_id) is None:
             return
+        # Whatever the tag reader is still working through belongs to the list
+        # being replaced. Its answers would be dropped anyway (they carry the
+        # node they were read for), so the only thing left to do with it is
+        # stop it competing with this load for the same disk.
+        self._cancel_tag_worker()
+        self._tag_queue = []
+        # Back to the load's answer, or an add abandoned here would leave the
+        # *next* load writing the whole list back when its reads returned.
+        self._tag_from_load = True
         # Remember where the outgoing list was, before anything below can
         # move it and before _loaded_node_id is overwritten — this is the
         # last moment the id it belongs to is readable.
@@ -3167,7 +3519,6 @@ class PlayerPanel(QWidget):
             )
         finally:
             self._loading_playlist = False
-        self._store_read_props(tracks)
         self._rebind_context_after_load(node_id)
         # Re-link the playing track to its row if this list contains it.
         if self._playing_path is not None:
@@ -3239,8 +3590,8 @@ class PlayerPanel(QWidget):
         self._relink_playing_row()
         self._update_transport_state()
 
-    def _store_read_props(self, tracks) -> None:
-        """Keep what the load just read from the files but the rows lacked.
+    def _store_read_props(self, entries: list[PlaylistEntry]) -> None:
+        """Keep what the tag reader just learned but the library rows lacked.
 
         Two fields, both for the same reason: their column arrived after the
         library did, so rows written by an earlier build carry none. The
@@ -3254,16 +3605,17 @@ class PlayerPanel(QWidget):
         costs nothing and makes the playlist complete from the first time it
         is opened.
 
-        Deliberately not `_persist_playlist`: that is suppressed during a load
-        (it would rewrite the list it is loading, and push undo). This writes
-        tags only — never membership, never the undo stack. It also only ever
-        fills a value in, so a file that failed to read can't blank one.
+        Deliberately not `_persist_playlist`: during a load that one is
+        suppressed (it would rewrite the list it is loading, and push undo),
+        and by the time a read comes back the suppression has long since
+        lifted. This writes tags only — never membership, never the undo
+        stack. It also only ever fills a value in, so a file that failed to
+        read can't blank one.
         """
         if self._library is None:
             return
-        by_path = {t.path: t for t in tracks}
-        for entry in self._playlist:
-            track = by_path.get(entry.file_path)
+        for entry in entries:
+            track = self._library.get_track_by_path(entry.file_path)
             if track is None:
                 continue
             fields: dict[str, object] = {}
@@ -3307,28 +3659,40 @@ class PlayerPanel(QWidget):
         # (removing a row, adding files, retagging a cell) still have to
         # persist, so this cannot simply bail the way a search does.
         order = self._unsorted_playlist if self._sorted else self._playlist
-        track_ids = [
-            self._library.add_track(
-                e.file_path,
-                artist=e.artist,
-                title=e.title,
-                album=e.album,
-                genre=e.genre,
-                comment=e.comment,
-                bpm=_parse_bpm(e.bpm),
-                key=e.key,
-                year=e.year,
-                track_number=e.track_number,
-                label=e.label,
-                bitrate=_parse_int(e.bitrate),
-                bit_depth=_parse_int(e.bit_depth),
-                energy=_parse_int(e.energy),
-                duration=_parse_duration(e.duration),
-            )
-            for e in order
-        ]
+        track_ids = [self._add_track_for(e) for e in order]
         self._library.set_items(self._loaded_node_id, track_ids)
         self._push_items_undo(self._loaded_node_id, before, track_ids)
+
+    def _add_track_for(self, entry: PlaylistEntry) -> int:
+        """The library id for *entry*, writing its tags through on the way.
+
+        A **pending** entry passes nothing but its path. Its blank fields mean
+        "not read yet", not "empty", and `Library.add_track` skips only `None`
+        — a `""` is a value and overwrites. Passing the blanks would therefore
+        wipe the artist, title, key and comment off every library row the
+        reader had not reached yet, on any auto-save that happened to land
+        mid-read: a drag, a delete, a Clear, an inline edit. Silent, and not
+        undoable through the tag columns.
+        """
+        if entry.pending:
+            return self._library.add_track(entry.file_path)
+        return self._library.add_track(
+            entry.file_path,
+            artist=entry.artist,
+            title=entry.title,
+            album=entry.album,
+            genre=entry.genre,
+            comment=entry.comment,
+            bpm=_parse_bpm(entry.bpm),
+            key=entry.key,
+            year=entry.year,
+            track_number=entry.track_number,
+            label=entry.label,
+            bitrate=_parse_int(entry.bitrate),
+            bit_depth=_parse_int(entry.bit_depth),
+            energy=_parse_int(entry.energy),
+            duration=_parse_duration(entry.duration),
+        )
 
     def _push_items_undo(
         self, node_id: int, before: list, after_ids: list[int]
@@ -3662,6 +4026,12 @@ class PlayerPanel(QWidget):
         self._update_stats()
         self._update_transport_state()
         self._update_context_label()
+        # Ask again for anything the reader answered while the search was up:
+        # those batches were dropped (a search result list is not the loaded
+        # node, so nothing may be written into it), and without this a row
+        # searched over mid-read keeps its placeholder for good. A no-op when
+        # nothing is still pending, which is the usual case.
+        self._queue_tag_read(entries)
 
     def _dismiss_search(self) -> None:
         """Tear down the search UI without restoring the previous list (the
@@ -4121,31 +4491,34 @@ class PlayerPanel(QWidget):
                 name_item.setFlags(non_drop_flags)
                 self._table.setItem(row, 1, name_item)
 
-                artist_item = QTableWidgetItem(entry.artist)
+                # Text through _cell_text, which stands a placeholder in for a
+                # blank whose file the tag reader has not reached yet — see
+                # _PENDING_TEXT. Every one of these is a fillable column.
+                artist_item = QTableWidgetItem(self._cell_text(entry, 2))
                 artist_item.setFlags(editable_flags)
                 self._table.setItem(row, 2, artist_item)
 
-                title_item = QTableWidgetItem(entry.title)
+                title_item = QTableWidgetItem(self._cell_text(entry, 3))
                 title_item.setFlags(editable_flags)
                 self._table.setItem(row, 3, title_item)
 
-                bpm_item = QTableWidgetItem(entry.bpm)
+                bpm_item = QTableWidgetItem(self._cell_text(entry, 4))
                 bpm_item.setFlags(editable_flags)
                 self._table.setItem(row, 4, bpm_item)
 
-                key_item = QTableWidgetItem(entry.key)
+                key_item = QTableWidgetItem(self._cell_text(entry, 5))
                 key_item.setFlags(editable_flags)
                 self._table.setItem(row, 5, key_item)
 
-                comment_item = QTableWidgetItem(entry.comment)
+                comment_item = QTableWidgetItem(self._cell_text(entry, 6))
                 comment_item.setFlags(editable_flags)
                 self._table.setItem(row, 6, comment_item)
 
-                duration_item = QTableWidgetItem(entry.duration)
+                duration_item = QTableWidgetItem(self._cell_text(entry, 7))
                 duration_item.setFlags(non_drop_flags)
                 self._table.setItem(row, 7, duration_item)
 
-                year_item = QTableWidgetItem(entry.year)
+                year_item = QTableWidgetItem(self._cell_text(entry, 8))
                 year_item.setFlags(editable_flags)
                 self._table.setItem(row, 8, year_item)
 
@@ -4156,10 +4529,9 @@ class PlayerPanel(QWidget):
                 # editable set above is a deliberate list, and widening it is
                 # its own conversation.
                 for col, attribute in self._OPTIONAL_COLUMNS:
-                    value = getattr(entry, attribute) if attribute else ""
-                    if col == self._BIT_DEPTH_COLUMN:
-                        value = self._format_bit_depth(value)
-                    item = QTableWidgetItem(value)
+                    item = QTableWidgetItem(
+                        self._cell_text(entry, col) if attribute else ""
+                    )
                     item.setFlags(non_drop_flags)
                     if col == self._ARTWORK_COLUMN:
                         thumb = self._art_cache.get(self._art_key(entry.file_path))

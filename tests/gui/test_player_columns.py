@@ -437,7 +437,9 @@ class TestTheDataReachesThem:
             [{"file_path": str(path), "display_name": path.name}],
             allow_duplicates=True,
         )
-        qtbot.wait(10)
+        # Every one of these columns is filled by the background tag read, so
+        # without this they are all still showing the placeholder.
+        assert player.wait_for_tags()
 
         # Art is excluded: it carries a thumbnail, not text, and is covered
         # in test_player_artwork.py.

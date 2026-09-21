@@ -56,6 +56,9 @@ def add_track(player, tmp_path, name, **tags):
     entry = {"file_path": path, "display_name": name}
     entry.update({k: str(v) for k, v in tags.items()})
     player.add_tracks([entry])
+    # The tags reach the library on the write-through that follows the
+    # background tag read — see the same helper in test_compatible_panel.
+    assert player.wait_for_tags()
     return path
 
 

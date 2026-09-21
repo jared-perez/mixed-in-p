@@ -348,6 +348,7 @@ class TestTagPopulation:
             ),
         )
         player.add_tracks(track_dicts([a]))
+        assert player.wait_for_tags()  # the file is read off the GUI thread
 
         entry = player._playlist[0]
         assert (entry.bpm, entry.key) == ("180", "6A")

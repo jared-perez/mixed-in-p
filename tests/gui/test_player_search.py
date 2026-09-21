@@ -132,6 +132,9 @@ class TestCommentSearch:
         Player is comment-searchable without any further step."""
         (path,) = make_files(tmp_path, "one.wav")
         player.add_tracks(track_dicts([path], artist="Anz", comment="dubby stepper"))
+        # The row goes up first and its file is read behind it, so the
+        # write-through that makes it searchable lands a moment later.
+        assert player.wait_for_tags()
 
         assert lib.get_track_by_path(path).comment == "dubby stepper"
         search(player, "stepper")
@@ -167,6 +170,7 @@ class TestCommentSearch:
         )
 
         player.load_node(one)
+        assert player.wait_for_tags()  # the file is read off the GUI thread
 
         assert lib.get_items(one)[0].comment == "from the file"
         assert lib.search("from the file") == [lib.get_track_by_path(b).id]

@@ -68,6 +68,12 @@ def add_track(player, lib, tmp_path, name, **tags):
     entry = {"file_path": path, "display_name": name}
     entry.update({k: ("" if v is None else str(v)) for k, v in tags.items()})
     player.add_tracks([entry])
+    # A row whose caller left any field blank is read from its file on a
+    # background thread, and the write-through that puts these tags in the
+    # library happens once that read returns. These fixture files are not
+    # really audio, so the read fails — but the write-through is what carries
+    # the tags either way, so it still has to be waited for.
+    assert player.wait_for_tags()
     return path
 
 

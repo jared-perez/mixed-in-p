@@ -61,6 +61,9 @@ def fill(player, node, paths, bpms=None):
     for d, bpm in zip(dicts, bpms or []):
         d["bpm"] = bpm
     player.add_tracks(dicts, allow_duplicates=True, scroll_to_end=False)
+    # The rows go up before their files are read, and the BPM above only
+    # reaches the library on the write-through that follows that read.
+    assert player.wait_for_tags()
     for p in paths:
         player._cache_put(p, np.zeros((64, 2), dtype=np.float32), 44100)
 
