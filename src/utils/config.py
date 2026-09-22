@@ -218,6 +218,12 @@ class AppConfig:
     # same either way; "full" keeps the whole square and lets the row grow to
     # fit it. Applied live, like the text size it scales with.
     player_artwork_view: str = "top"
+    # Whether the playlist's context menus use the medium text size instead of
+    # the small one. Off by default: a menu is chrome, not content, and the
+    # small preset spends less of the window on it. Deliberately its own
+    # switch rather than following player_text_size — someone who wants big
+    # rows does not necessarily want a big menu over them.
+    player_menu_large_text: bool = False
     # Whether the Keyboard panel's metronome keeps clicking once you leave it
     # (its "Global Click" toggle). On by default: a DJ setting a tempo wants
     # it while they work, and the click is easy to find and stop. Written by
@@ -461,6 +467,11 @@ def load_config() -> AppConfig:
                 ),
                 player_artwork_view=data.get(
                     "player_artwork_view", AppConfig.player_artwork_view
+                ),
+                player_menu_large_text=bool(
+                    data.get(
+                        "player_menu_large_text", AppConfig.player_menu_large_text
+                    )
                 ),
                 metronome_global_click=bool(
                     data.get(

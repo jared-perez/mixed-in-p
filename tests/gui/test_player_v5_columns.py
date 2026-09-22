@@ -56,6 +56,11 @@ def add(player, path, qtbot):
         [{"file_path": path, "display_name": Path(path).name}],
         allow_duplicates=True,
     )
+    # The panel's own "I have read them" rather than a 10 ms wait: the fields
+    # asserted below arrive from the background tag reader, and a fixed wait
+    # covered it only while the suite happened to be fast enough — six extra
+    # widgets built earlier in the run were enough to leave `year` empty.
+    assert player.wait_for_tags(), "the tag reader did not finish"
     qtbot.wait(10)
 
 

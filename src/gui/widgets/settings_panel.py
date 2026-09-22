@@ -286,6 +286,24 @@ class SettingsPanel(QWidget):
         text_layout.addLayout(size_row)
         self._text_size_group.buttonClicked.connect(self._emit_changed)
 
+        # The playlist's right-click menus have their own size, and it does not
+        # follow the rows: they take the small preset, and this switch moves
+        # them to the medium one. A row under this section's label rather than
+        # a section of its own — it is the same "how big is the player's text"
+        # question, one answer down.
+        menu_row = self._row_layout()
+        menu_row.setSpacing(10)
+        text_layout.addSpacing(4)
+        self._menu_large_text_switch = ToggleSwitch()
+        self._menu_large_text_switch.toggled.connect(self._on_menu_large_text_toggled)
+        menu_label = QLabel(self.tr("Enable large menu text"))
+        menu_label.setObjectName("settingsLabel")
+        menu_row.addWidget(self._menu_large_text_switch)
+        menu_row.addWidget(menu_label)
+        menu_row.addStretch(1)
+        text_layout.addLayout(menu_row)
+        self._sync_menu_large_text_tooltip()
+
         outer.addWidget(text_frame)
 
         # ── Section: Playlist artwork ──────────────────────────────────────
@@ -1097,6 +1115,18 @@ class SettingsPanel(QWidget):
             else self.tr("Show the full waveform in the player")
         )
 
+    def _on_menu_large_text_toggled(self, _checked: bool) -> None:
+        self._sync_menu_large_text_tooltip()
+        self._emit_changed()
+
+    def _sync_menu_large_text_tooltip(self) -> None:
+        """Say what the next click will do (CLAUDE.md, UI copy)."""
+        self._menu_large_text_switch.setToolTip(
+            self.tr("Use smaller text in the playlist's menus")
+            if self._menu_large_text_switch.isChecked()
+            else self.tr("Use larger text in the playlist's menus")
+        )
+
     def _on_custom_waveform_color(self) -> None:
         chosen = QColorDialog.getColor(
             QColor(self._waveform_color), self, self.tr("Waveform color")
@@ -1211,6 +1241,7 @@ class SettingsPanel(QWidget):
             energy_field_enabled=self._energy_field_cb.isChecked(),
             player_text_size=self._selected_text_size(),
             player_artwork_view=self._selected_artwork_view(),
+            player_menu_large_text=self._menu_large_text_switch.isChecked(),
             energy_tag_format=energy_format,
             energy_tag_mode=energy_mode,
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
@@ -1306,6 +1337,10 @@ class SettingsPanel(QWidget):
         radio = self._artwork_view_radios.get(cfg.player_artwork_view)
         if radio is not None:
             radio.setChecked(True)
+        self._menu_large_text_switch.blockSignals(True)
+        self._menu_large_text_switch.setChecked(cfg.player_menu_large_text)
+        self._menu_large_text_switch.blockSignals(False)
+        self._sync_menu_large_text_tooltip()
         self._energy_written_first_cb.setChecked(cfg.energy_written_first)
         if cfg.energy_tag_format == "with_label":
             self._radio_with_label.setChecked(True)

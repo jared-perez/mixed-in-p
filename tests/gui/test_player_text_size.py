@@ -211,3 +211,131 @@ class TestTheSettingsRow:
             panel._text_size_group.buttonClicked.emit(
                 panel._text_size_radios["large"]
             )
+
+
+class TestTheMenuTextSize:
+    """The playlist's own menus have a size of their own, and it is not the
+    row size.
+
+    Without one they inherit the app stylesheet's global
+    ``QWidget { font-size: 14px }``, which is the medium preset whatever the
+    rows are set to — so a small playlist opened a medium menu over it, and
+    there was no way to ask for anything else. They now take the small preset,
+    and one switch in Settings moves them to medium.
+    """
+
+    def _menu_px(self, menu) -> int:
+        """The px the menu's own sheet asks for. Read from the sheet rather
+        than from ``menu.font()``: the sheet is the thing that reaches the
+        painted item, and the offscreen suite has no app stylesheet for a
+        font() to be beaten by in the first place."""
+        sheet = menu.styleSheet()
+        assert "font-size:" in sheet, sheet
+        return int(sheet.split("font-size:")[1].split("px")[0])
+
+    def _entry(self, tmp_path):
+        from src.gui.widgets.player_panel import PlaylistEntry
+
+        path = tmp_path / "t.flac"
+        path.write_bytes(b"")
+        return PlaylistEntry(file_path=str(path), display_name=path.name)
+
+    def test_the_presets_are_two_of_the_row_sizes(self):
+        from src.gui.widgets.player_panel import MENU_TEXT_SIZES
+
+        assert MENU_TEXT_SIZES == {False: TEXT_SIZES["small"], True: TEXT_SIZES["medium"]}
+
+    def test_a_row_menu_starts_small(self, player, tmp_path):
+        menu, _ = player._build_row_menu(self._entry(tmp_path))
+
+        assert self._menu_px(menu) == TEXT_SIZES["small"]
+
+    def test_the_switch_moves_a_row_menu_to_medium(self, player, tmp_path):
+        player.set_large_menu_text(True)
+
+        menu, _ = player._build_row_menu(self._entry(tmp_path))
+
+        assert self._menu_px(menu) == TEXT_SIZES["medium"]
+
+    def test_the_row_text_size_never_moves_it(self, player, tmp_path):
+        """The two settings are independent: big rows, small menu."""
+        for size in TEXT_SIZES:
+            player.set_text_size(size)
+            menu, _ = player._build_row_menu(self._entry(tmp_path))
+
+            assert self._menu_px(menu) == TEXT_SIZES["small"], size
+
+    def test_the_column_menu_follows_the_same_switch(self, player):
+        assert self._menu_px(player._build_column_menu()) == TEXT_SIZES["small"]
+
+        player.set_large_menu_text(True)
+
+        assert self._menu_px(player._build_column_menu()) == TEXT_SIZES["medium"]
+
+    def test_the_long_lived_menus_are_restyled_in_place(self, player):
+        """The scope and visuals menus are built once in _setup_ui, so unlike
+        the two context menus they cannot pick a new size up by being built
+        again — the setter has to reach them."""
+        assert self._menu_px(player._vis_menu) == TEXT_SIZES["small"]
+        assert self._menu_px(player._scope_menu) == TEXT_SIZES["small"]
+
+        player.set_large_menu_text(True)
+
+        assert self._menu_px(player._vis_menu) == TEXT_SIZES["medium"]
+        assert self._menu_px(player._scope_menu) == TEXT_SIZES["medium"]
+
+    def test_only_the_font_is_set(self, player, tmp_path):
+        """One property, so the app sheet's QMenu background, border and item
+        padding all still apply — a widget's own sheet merges with the
+        application's rather than replacing it."""
+        menu, _ = player._build_row_menu(self._entry(tmp_path))
+
+        assert "background" not in menu.styleSheet()
+        assert "padding" not in menu.styleSheet()
+
+    def test_the_setting_round_trips(self):
+        for value in (True, False):
+            save_config(AppConfig(player_menu_large_text=value))
+            assert load_config().player_menu_large_text is value
+
+    def test_it_is_off_by_default(self):
+        assert AppConfig().player_menu_large_text is False
+
+    def test_the_switch_reports_its_state(self, qtbot):
+        from src.gui.widgets.settings_panel import SettingsPanel
+
+        panel = SettingsPanel()
+        qtbot.addWidget(panel)
+        panel._menu_large_text_switch.setChecked(True)
+
+        assert panel.get_config(AppConfig()).player_menu_large_text is True
+
+    def test_the_switch_shows_the_stored_state(self, qtbot):
+        from src.gui.widgets.settings_panel import SettingsPanel
+
+        panel = SettingsPanel()
+        qtbot.addWidget(panel)
+        panel.load_config(AppConfig(player_menu_large_text=True))
+
+        assert panel._menu_large_text_switch.isChecked()
+
+    def test_flipping_it_announces_a_settings_change(self, qtbot):
+        from src.gui.widgets.settings_panel import SettingsPanel
+
+        panel = SettingsPanel()
+        qtbot.addWidget(panel)
+
+        with qtbot.waitSignal(panel.settings_changed):
+            panel._menu_large_text_switch.setChecked(True)
+
+    def test_its_tooltip_says_what_the_next_click_does(self, qtbot):
+        from src.gui.widgets.settings_panel import SettingsPanel
+
+        panel = SettingsPanel()
+        qtbot.addWidget(panel)
+        off = panel._menu_large_text_switch.toolTip()
+
+        panel._menu_large_text_switch.setChecked(True)
+
+        assert panel._menu_large_text_switch.toolTip() != off
+        assert off and panel._menu_large_text_switch.toolTip()

@@ -421,6 +421,15 @@ def _make_scope_all_icon(color: str = _TRANSPORT_GLYPH, size: int = 18) -> QIcon
 TEXT_SIZES = {"small": 12, "medium": 14, "large": 17}
 DEFAULT_TEXT_SIZE = "medium"
 
+# The font size of the playlist's own menus (row context menu, header
+# show/hide menu, the scope and visuals dropdowns), keyed on the "large menu
+# text" setting. Two of the row presets rather than a free pair of numbers,
+# and never "large": a menu is chrome over the playlist, and its job is to be
+# read once and dismissed. Without a size of its own it would inherit the app
+# stylesheet's global 14px, which is the medium preset no matter what the rows
+# are set to.
+MENU_TEXT_SIZES = {False: TEXT_SIZES["small"], True: TEXT_SIZES["medium"]}
+
 # What the Art column shows. "top"/"middle" are a band one row tall cut from a
 # cover scaled to _ART_STRIP_SCALE rows either way — so switching between them
 # changes only which part of the sleeve is on screen, never the layout. "full"
@@ -1774,6 +1783,10 @@ class PlayerPanel(QWidget):
         self._columns_changed_while_searching = False
         # Playlist text size; the table's inline QSS is rebuilt from it.
         self._text_size = DEFAULT_TEXT_SIZE
+        # Whether this panel's menus take the medium text size instead of the
+        # small one. Read by _apply_menu_text_size, which every menu built here
+        # goes through — set before _setup_ui, which builds two of them.
+        self._menu_large_text = False
         # Which part of the cover the Art column shows. Read before the table
         # exists, so it is set here rather than in the artwork section below.
         self._art_view = DEFAULT_ARTWORK_VIEW
@@ -2101,6 +2114,7 @@ class PlayerPanel(QWidget):
         self._scope_btn.setCursor(Qt.CursorShape.PointingHandCursor)
         self._scope_btn.setFixedSize(40, 26)
         self._scope_menu = QMenu(self)
+        self._apply_menu_text_size(self._scope_menu)
         scope_group = QActionGroup(self)
         scope_group.setExclusive(True)
         self._scope_actions: dict[bool, QAction] = {}
@@ -2135,6 +2149,7 @@ class PlayerPanel(QWidget):
         self._vis_button.setCursor(Qt.CursorShape.PointingHandCursor)
         self._vis_button.setFixedSize(40, 26)
         self._vis_menu = QMenu(self)
+        self._apply_menu_text_size(self._vis_menu)
         self._vis_action_group = QActionGroup(self)
         self._vis_action_group.setExclusive(True)
         self._vis_actions: dict[str, QAction] = {}
@@ -5417,6 +5432,33 @@ class PlayerPanel(QWidget):
         self._apply_art_icon_size()
         self._schedule_artwork_load()
 
+    def _apply_menu_text_size(self, menu: QMenu) -> QMenu:
+        """Give *menu* this panel's menu font size, and hand it back.
+
+        QSS rather than ``setFont()``, for the same reason the table's size is
+        QSS (see _table_stylesheet): the app stylesheet's global
+        ``QWidget { font-size: 14px }`` beats a plain font set on the widget.
+        Only that one property is set here, so the app sheet's QMenu
+        background, border and item padding all still apply — a widget's own
+        stylesheet merges with the application's rather than replacing it.
+        """
+        px = MENU_TEXT_SIZES[self._menu_large_text]
+        menu.setStyleSheet(f"QMenu {{ font-size: {px}px; }}")
+        return menu
+
+    def set_large_menu_text(self, enabled: bool) -> None:
+        """Set whether this panel's menus use the medium text size, live.
+
+        Only the two long-lived menus need restyling: the row and column menus
+        are built fresh on each right-click and read the new size themselves.
+        """
+        enabled = bool(enabled)
+        if enabled == self._menu_large_text:
+            return
+        self._menu_large_text = enabled
+        self._apply_menu_text_size(self._scope_menu)
+        self._apply_menu_text_size(self._vis_menu)
+
     def set_artwork_view(self, view: str) -> None:
         """Set which part of the cover the Art column shows, live.
 
@@ -5635,7 +5677,7 @@ class PlayerPanel(QWidget):
         the "Fit to Longest" entry at the bottom. -1 (a right-click past the
         last section) simply leaves that entry off.
         """
-        menu = QMenu(self)
+        menu = self._apply_menu_text_size(QMenu(self))
         # `other` rather than `col`: the loop must not shadow the section the
         # menu was opened on, which the fit entry below still needs.
         for other in range(self._table.columnCount()):
@@ -6824,7 +6866,7 @@ class PlayerPanel(QWidget):
         on a QMenu resolves through Qt's C++ side and cannot be patched out, so
         a test that drove the handler would open a real modal menu and hang.
         """
-        menu = QMenu(self._table)
+        menu = self._apply_menu_text_size(QMenu(self._table))
         actions: dict[str, object] = {}
         # Only when the file is actually gone: an always-present "Locate…"
         # would read as an invitation to repoint tracks that are fine.
