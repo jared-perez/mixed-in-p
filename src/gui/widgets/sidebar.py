@@ -1,5 +1,6 @@
 """Sidebar navigation widget."""
 
+import math
 from pathlib import Path
 
 from PySide6.QtCore import QEvent, QSize, Qt, QTimer, Signal
@@ -53,23 +54,45 @@ _CHEVRON_THIN_ICON = QSize(_CHEVRON_THIN_WIDTH - 2, _NAV_ICON_SIZE.height())
 # button width, so the glyphs sit exactly as they do collapsed.
 _SPLIT_NAV_WIDTH = Theme.SIDEBAR_WIDTH_COLLAPSED - 2 * _RAIL_MARGIN
 
-# A nav glyph spins while its panel is working, so a long analysis or
+# A nav glyph moves while its panel is working, so a long analysis or
 # conversion is visible from anywhere in the app — including with the rail
-# collapsed, where the icon is all there is to look at. 24 frames (one every
-# 15 degrees) at 40ms is a revolution a second: smooth at 30px, and slow
-# enough that a near-symmetric glyph still reads as turning rather than
-# strobing. The whole cycle is built and cached within the first revolution.
+# collapsed, where the icon is all there is to look at. Only Convert and
+# Analyze ever do; every other panel's work is instant or has its own bar.
+#
+# Convert spins: 24 frames (one every 15 degrees) at 40ms is a revolution a
+# second — smooth at 30px, and slow enough to read as turning, not strobing.
+# Its glyph is two opposing arrows, exactly 180-degree symmetric, so which way
+# it turns can't be seen; clockwise is what the code does.
 _SPIN_FRAMES = 24
 _SPIN_INTERVAL_MS = 40
 
-# The only two pages that spin at all, and which way each turns. Both go
-# clockwise: the spin says "this panel is working" and nothing more, so there
-# is no reason for them to disagree. Direction is only ever visible on Analyze
-# anyway — the Convert glyph is two opposing arrows, a shape with exact
-# 180-degree rotational symmetry, so its clockwise and counter-clockwise frames
-# are identical pixels. What tells the two buttons apart while collapsed is the
-# glyph and its position in the rail, never the spin.
-_SPIN_DIRECTION = {"convert": 1, "analysis": 1}  # +1 = clockwise on screen
+# Analyze "looks around" instead: the magnifier sways left and right while it
+# zooms slightly in and out. The zoom runs 3 cycles to the sway's 2, so the
+# glass isn't at the same size every time it reaches a side, which is what
+# makes it read as searching rather than as a pendulum. 120 frames is 4.8 s
+# for the whole figure (a sway every 2.4 s). The sway is a fraction of the
+# glyph box and the zoom a factor about its centre; at their joint extreme the
+# ink still ends ~0.1 of the box short of either edge, so nothing clips.
+_LOOK_FRAMES = 120
+_LOOK_SWAYS = 2
+_LOOK_ZOOMS = 3
+_LOOK_SWAY = 0.07
+_LOOK_ZOOM = 0.08
+
+_BUSY_PAGES = ("convert", "analysis")
+# One counter drives both, so it wraps where both cycles end together.
+_BUSY_CYCLE = math.lcm(_SPIN_FRAMES, _LOOK_FRAMES)
+
+
+def look_pose(frame: int) -> tuple[float, float]:
+    """The magnifier's (shift, scale) at one frame of its look-around cycle.
+
+    Frame 0 is the resting glyph, so starting the animation doesn't jump.
+    """
+    t = 2.0 * math.pi * (frame % _LOOK_FRAMES) / _LOOK_FRAMES
+    shift = _LOOK_SWAY * math.sin(_LOOK_SWAYS * t)
+    scale = 1.0 + _LOOK_ZOOM * math.sin(_LOOK_ZOOMS * t)
+    return shift, scale
 
 # The Playlists toggle's keyboard shortcut, defined here rather than beside the
 # QShortcut in MainWindow because the button's tooltip advertises it — one
@@ -805,14 +828,14 @@ class Sidebar(QFrame):
         return page_id in self._busy_pages
 
     def set_page_busy(self, page_id: str, busy: bool) -> None:
-        """Spin (or stop) a nav glyph to show that its panel is working.
+        """Animate (or stop) a nav glyph to show that its panel is working.
 
         Idempotent in both directions: the callers are the thread lifecycle
         handlers in MainWindow, and analysis in particular can finish and
         immediately chain into the next queued batch.
         """
         btn = self._buttons.get(page_id)
-        if btn is None or page_id not in _SPIN_DIRECTION:
+        if btn is None or page_id not in _BUSY_PAGES:
             return
         if busy:
             if page_id in self._busy_pages:
@@ -837,7 +860,7 @@ class Sidebar(QFrame):
                 self._spin_timer.stop()
 
     def _advance_spin(self) -> None:
-        self._spin_frame = (self._spin_frame + 1) % _SPIN_FRAMES
+        self._spin_frame = (self._spin_frame + 1) % _BUSY_CYCLE
         for page_id in self._busy_pages:
             self._apply_spin_frame(page_id)
 
@@ -848,10 +871,17 @@ class Sidebar(QFrame):
         level: they are QPixmaps, and a module-level cache would outlive the
         QApplication that created them.
         """
-        step = (self._spin_frame * _SPIN_DIRECTION[page_id]) % _SPIN_FRAMES
+        if page_id == "analysis":
+            step = self._spin_frame % _LOOK_FRAMES
+        else:
+            step = self._spin_frame % _SPIN_FRAMES
         icon = self._spin_cache.get((page_id, step))
         if icon is None:
-            icon = nav_icon(page_id, step * 360.0 / _SPIN_FRAMES)
+            if page_id == "analysis":
+                shift, scale = look_pose(step)
+                icon = nav_icon(page_id, shift=shift, scale=scale)
+            else:
+                icon = nav_icon(page_id, step * 360.0 / _SPIN_FRAMES)
             self._spin_cache[(page_id, step)] = icon
         self._buttons[page_id].setIcon(icon)
 

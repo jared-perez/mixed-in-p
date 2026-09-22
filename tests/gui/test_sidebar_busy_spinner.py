@@ -1,4 +1,4 @@
-"""The Convert and Analyze nav glyphs spin while their panel is working.
+"""The Convert and Analyze nav glyphs move while their panel is working.
 
 The point of the feature is that it survives a collapsed rail — with the
 labels gone, a turning icon is the only thing that says a long batch is still
@@ -7,10 +7,11 @@ assertions here are about the icon actually changing, not about a flag: a
 spinner that sets state and paints the same pixmap every frame would pass any
 test written against ``is_page_busy`` alone.
 
-Both glyphs turn clockwise (see ``_SPIN_DIRECTION``), and only one of them can
-be seen doing it: the Convert glyph is two opposing arrows and so is exactly
-180-degree symmetric, which is asserted here rather than left to be
-rediscovered as a bug in the sign.
+Convert spins clockwise, though no one can see which way: its glyph is two
+opposing arrows and so is exactly 180-degree symmetric, which is asserted here
+rather than left to be rediscovered as a bug in the sign. Analyze doesn't spin
+at all — its magnifier sways side to side while zooming slightly, to read as
+looking around (see ``look_pose``).
 """
 
 from __future__ import annotations
@@ -19,8 +20,13 @@ import pytest
 from PySide6.QtCore import QSize
 
 from src.gui.main_window import MainWindow
-from src.gui.widgets.nav_icons import nav_icon
-from src.gui.widgets.sidebar import _SPIN_FRAMES, Sidebar
+from src.gui.widgets.nav_icons import nav_glyph, nav_icon
+from src.gui.widgets.sidebar import (
+    _LOOK_FRAMES,
+    _SPIN_FRAMES,
+    Sidebar,
+    look_pose,
+)
 
 _ICON = QSize(30, 30)
 
@@ -40,6 +46,12 @@ def button_image(sidebar: Sidebar, page_id: str):
 def glyph_image(page_id: str, angle: float):
     """The same glyph rendered independently at a known angle."""
     return nav_icon(page_id, angle).pixmap(_ICON).toImage()
+
+
+def look_image(frame: int):
+    """The magnifier rendered independently at one look-around frame."""
+    shift, scale = look_pose(frame)
+    return nav_icon("analysis", shift=shift, scale=scale).pixmap(_ICON).toImage()
 
 
 # ------------------------------------------------------------------ mechanics
@@ -95,7 +107,7 @@ def test_a_restart_does_not_snap_the_glyph_back_upright(sidebar):
     """Analysis finishes and can immediately chain into the next queued batch.
 
     The frame counter carries across that gap on purpose — resetting it would
-    jerk the glyph back to 0 degrees, which reads as a stop the user then has
+    jerk the glyph back to its resting pose, which reads as a stop the user then has
     to second-guess.
     """
     sidebar.set_page_busy("analysis", True)
@@ -107,7 +119,7 @@ def test_a_restart_does_not_snap_the_glyph_back_upright(sidebar):
     sidebar.set_page_busy("analysis", True)
 
     assert sidebar._spin_frame == 5
-    assert button_image(sidebar, "analysis") == glyph_image("analysis", 75.0)
+    assert button_image(sidebar, "analysis") == look_image(5)
 
 
 def test_both_directions_are_idempotent(sidebar):
@@ -157,23 +169,53 @@ def test_the_convert_glyphs_direction_is_not_observable(sidebar):
     """
     assert glyph_image("convert", 90.0) == glyph_image("convert", 270.0)
     assert glyph_image("convert", 30.0) == glyph_image("convert", 210.0)
-    # Analyze's magnifier has no such symmetry, which is why the test below
-    # can assert a direction at all.
-    assert glyph_image("analysis", 90.0) != glyph_image("analysis", 270.0)
 
 
-def test_analyze_turns_clockwise_too(sidebar):
-    """The magnifier is the one glyph whose direction is observable, so this
-    is the assertion that would actually catch a flipped sign."""
+# ---------------------------------------------------------------- look around
+
+
+def test_analyze_looks_around_rather_than_spinning(sidebar):
+    """The magnifier never turns: every frame is the upright glyph moved."""
     sidebar.set_page_busy("analysis", True)
-    for _ in range(_SPIN_FRAMES // 4):
+    for frame in range(1, _LOOK_FRAMES // 4 + 1):
         sidebar._advance_spin()
+        assert button_image(sidebar, "analysis") == look_image(frame)
+    assert button_image(sidebar, "analysis") != glyph_image("analysis", 90.0)
 
-    assert button_image(sidebar, "analysis") == glyph_image("analysis", 90.0)
-    assert button_image(sidebar, "analysis") != glyph_image("analysis", 270.0)
+
+def test_the_look_sways_both_ways_and_zooms_both_ways():
+    poses = [look_pose(f) for f in range(_LOOK_FRAMES)]
+    shifts = [shift for shift, _ in poses]
+    scales = [scale for _, scale in poses]
+    assert min(shifts) < 0 < max(shifts)
+    assert min(scales) < 1 < max(scales)
+    # Frame 0 is the resting glyph, so starting up doesn't jump.
+    assert poses[0] == (0.0, 1.0)
 
 
-def test_the_two_pages_spin_off_one_frame_counter(sidebar):
+def test_the_glass_is_not_the_same_size_at_each_side():
+    """Zoom and sway run at different rates, so the glass reaches a side at
+    different sizes — the difference between searching and a pendulum."""
+    side_scales = {
+        round(scale, 3)
+        for shift, scale in (look_pose(f) for f in range(_LOOK_FRAMES))
+        if abs(shift) > 0.069
+    }
+    assert len(side_scales) > 1
+
+
+def test_the_look_never_clips_the_glyph():
+    """At the sway and zoom's joint extreme the ink stays off the box edge."""
+    for frame in range(_LOOK_FRAMES):
+        shift, scale = look_pose(frame)
+        img = nav_glyph("analysis", "#ffffff", shift=shift, scale=scale).toImage()
+        w, h = img.width(), img.height()
+        edge = [(x, 0) for x in range(w)] + [(x, h - 1) for x in range(w)]
+        edge += [(0, y) for y in range(h)] + [(w - 1, y) for y in range(h)]
+        assert all(img.pixelColor(x, y).alpha() == 0 for x, y in edge), frame
+
+
+def test_the_two_pages_animate_off_one_frame_counter(sidebar):
     """One timer, one counter — so two glyphs working at once stay in step
     with each other instead of drifting apart."""
     sidebar.set_page_busy("convert", True)
@@ -182,7 +224,7 @@ def test_the_two_pages_spin_off_one_frame_counter(sidebar):
 
     step = 360.0 / _SPIN_FRAMES
     assert button_image(sidebar, "convert") == glyph_image("convert", step)
-    assert button_image(sidebar, "analysis") == glyph_image("analysis", step)
+    assert button_image(sidebar, "analysis") == look_image(1)
 
 
 # -------------------------------------------------------------- window wiring

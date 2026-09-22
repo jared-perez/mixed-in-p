@@ -233,24 +233,38 @@ _STATES = (
 )
 
 
-def nav_icon(page_id: str, angle: float = 0.0) -> QIcon:
+def nav_icon(
+    page_id: str, angle: float = 0.0, *, shift: float = 0.0, scale: float = 1.0
+) -> QIcon:
     """Build a state-aware QIcon for a sidebar nav page, or an empty icon
     if the page has no glyph defined.
 
-    ``angle`` turns the glyph clockwise about its own centre (degrees) — the
-    sidebar's working spinner steps it. Every glyph here is drawn well inside
-    a circle of radius ``_DRAW / 2`` (the furthest ink, the magnifier's handle
-    tip, sits at ~0.38 of the box), so none of them clip as they turn.
+    ``angle`` turns the glyph clockwise about its own centre (degrees),
+    ``scale`` sizes it about that centre and ``shift`` slides it right by that
+    fraction of the box — the sidebar's working animations step these. Every
+    glyph here is drawn well inside a circle of radius ``_DRAW / 2`` (the
+    furthest ink, the magnifier's handle tip, sits at ~0.38 of the box), so
+    none of them clip as they turn; the magnifier's sway and zoom leave it
+    inside the box too (see ``_LOOK_SWAY`` in ``sidebar``).
     """
     icon = QIcon()
     if page_id not in _PAINTERS:
         return icon
     for mode, state, color in _STATES:
-        icon.addPixmap(nav_glyph(page_id, color, angle), mode, state)
+        icon.addPixmap(
+            nav_glyph(page_id, color, angle, shift=shift, scale=scale), mode, state
+        )
     return icon
 
 
-def nav_glyph(page_id: str, color: str, angle: float = 0.0) -> QPixmap:
+def nav_glyph(
+    page_id: str,
+    color: str,
+    angle: float = 0.0,
+    *,
+    shift: float = 0.0,
+    scale: float = 1.0,
+) -> QPixmap:
     """One nav glyph in one colour, at the 2x drawing size.
 
     For a caller whose states are not a button's (the header's pipeline step
@@ -265,9 +279,10 @@ def nav_glyph(page_id: str, color: str, angle: float = 0.0) -> QPixmap:
     p = QPainter(pm)
     try:
         p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-        if angle:
-            p.translate(_DRAW / 2.0, _DRAW / 2.0)
+        if angle or shift or scale != 1.0:
+            p.translate(_DRAW / 2.0 + _DRAW * shift, _DRAW / 2.0)
             p.rotate(angle)
+            p.scale(scale, scale)
             p.translate(-_DRAW / 2.0, -_DRAW / 2.0)
         paint(p, color)
     finally:
