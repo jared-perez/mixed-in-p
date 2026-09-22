@@ -1,6 +1,7 @@
 """Playlist tree: model building, CRUD write-through, drag-move semantics."""
 
 import pytest
+from PySide6.QtCore import QPoint
 from PySide6.QtWidgets import QMessageBox
 
 from src.gui.widgets.playlist_tree import (
@@ -322,6 +323,98 @@ class TestRowAddButton:
         tree._aim_row_add_button(scratch.center())
         assert tree._row_add_btn.isHidden()  # …and Scratch takes it away
         assert tree._row_add_node_id is None
+
+
+class TestContextMenu:
+    """The right-click menu, built but never exec'd (QMenu.exec would hang)."""
+
+    @staticmethod
+    def _shown(panel, qtbot):
+        panel.resize(240, 320)
+        panel.show()
+        qtbot.wait(10)
+
+    def test_a_playlist_row_can_create_beside_itself(self, tree):
+        lib = tree.library
+        node_id = lib.create_playlist("P")
+        tree._rebuild()
+        _menu, actions = tree._build_context_menu(
+            tree.visualRect(tree._find_item(node_id).index()).center()
+        )
+        assert "new_playlist" in actions and "new_folder" in actions
+
+    def test_scratch_gets_no_create_actions(self, tree):
+        tree._rebuild()
+        _menu, actions = tree._build_context_menu(
+            tree.visualRect(tree._find_item(SCRATCH_NODE_ID).index()).center()
+        )
+        assert "new_playlist" not in actions and "new_folder" not in actions
+        assert "export" in actions
+
+    def test_new_folder_lands_below_the_playlist_in_its_own_folder(self, tree):
+        lib = tree.library
+        folder = lib.create_folder("Crates")
+        third = lib.create_playlist("Third", parent_id=folder)
+        anchor = lib.create_playlist("Anchor", parent_id=folder)
+        first = lib.create_playlist("First", parent_id=folder)  # newest on top
+        tree._rebuild()
+        assert [n.id for n in lib.get_children(folder)] == [first, anchor, third]
+
+        tree.create_beside("folder", anchor)
+
+        ids = [n.id for n in lib.get_children(folder)]
+        assert ids[0] == first and ids[1] == anchor and ids[3] == third
+        new = lib.get_node(ids[2])
+        assert new.kind == "folder"
+        assert new.parent_id == folder  # nested where the user clicked
+
+    def test_create_beside_a_deleted_row_creates_nothing(self, tree):
+        lib = tree.library
+        node_id = lib.create_playlist("Gone")
+        tree._rebuild()
+        lib.delete_node(node_id)
+        tree.create_beside("folder", node_id)
+        assert lib.get_children(None) == []
+
+    def test_right_click_beside_a_short_name_still_hits_that_row(
+        self, panel, tree, qtbot
+    ):
+        # The column is only as wide as the name, so most of a row's band is
+        # "empty space" to indexAt — and the background menu creates at the
+        # root, which is the whole point of aiming at the row instead.
+        lib = tree.library
+        node_id = lib.create_playlist("Hi")
+        tree._rebuild()
+        self._shown(panel, qtbot)
+
+        rect = tree.visualRect(tree._find_item(node_id).index())
+        beside = rect.center()
+        beside.setX(tree.viewport().width() - _ROW_ADD_MARGIN - 1)
+        assert beside.x() > rect.right()  # genuinely outside the item rect
+        assert not tree.indexAt(beside).isValid()
+
+        _menu, actions = tree._build_context_menu(beside)
+        assert "rename" in actions  # the playlist's menu, not the background's
+        actions["new_folder"].trigger()
+
+        ids = [n.id for n in lib.get_children(None)]
+        assert ids == [node_id, ids[1]]
+        assert lib.get_node(ids[1]).kind == "folder"
+
+    def test_empty_space_below_every_row_still_creates_at_the_root(
+        self, panel, tree, qtbot
+    ):
+        lib = tree.library
+        lib.create_playlist("P")
+        tree._rebuild()
+        self._shown(panel, qtbot)
+        _menu, actions = tree._build_context_menu(
+            QPoint(4, tree.viewport().height() - 2)
+        )
+        assert "rename" not in actions
+        actions["new_folder"].trigger()
+        parents = {n.id: n.parent_id for n in lib.get_children(None)}
+        assert len(parents) == 2 and set(parents.values()) == {None}
 
 
 class TestMoves:

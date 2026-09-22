@@ -34,6 +34,7 @@ from PySide6.QtCore import (
     Signal,
 )
 from PySide6.QtGui import (
+    QAction,
     QBrush,
     QColor,
     QCursor,
@@ -852,6 +853,19 @@ class PlaylistTree(QTreeView):
     def create_folder(self, parent_id: int | None = None) -> None:
         self._create_node("folder", parent_id)
 
+    def create_beside(self, kind: str, node_id: int) -> None:
+        """Create a playlist or folder as *node_id*'s sibling, right below it.
+
+        The parent is read back from the database rather than taken off the
+        row: a menu is built from an index and the tree can have been rebuilt
+        (a drop, a delete, an undo) before the action fires.
+        """
+        self.ensure_loaded()
+        node = self._library.get_node(node_id) if self._library is not None else None
+        if node is None:
+            return
+        self._create_node(kind, node.parent_id, after_id=node_id)
+
     def _create_node(
         self, kind: str, parent_id: int | None, *, after_id: int | None = None
     ) -> None:
@@ -949,37 +963,82 @@ class PlaylistTree(QTreeView):
     # ------------------------------------------------------------ context menu
 
     def _on_context_menu(self, pos) -> None:
+        menu, _actions = self._build_context_menu(pos)
+        menu.exec(self.viewport().mapToGlobal(pos))
+
+    def _build_context_menu(self, pos) -> tuple[QMenu, dict[str, QAction]]:
+        """Build the menu for viewport point *pos* without exec'ing it.
+
+        Split from the exec because ``QMenu.exec`` cannot be monkeypatched out
+        (PySide6 resolves it through C++), so a test that drove the handler
+        would open a real modal and hang the suite. The keys of the returned
+        map are internal identifiers, never shown.
+        """
         self.ensure_loaded()
-        index = self.indexAt(pos)
+        # The row's whole band, not just the item rect: the single column is
+        # ResizeToContents with ElideNone, so the blank space to the right of
+        # a short name still belongs to that row as far as the user is
+        # concerned (and the floating create button already treats it that
+        # way). Hit-testing with indexAt alone gave a right-click beside a
+        # playlist name the background menu, which creates at the root.
+        index = self._row_index_at(pos)
         item = self._model.itemFromIndex(index) if index.isValid() else None
         kind = item.data(KIND_ROLE) if item is not None else None
         node_id = item.data(NODE_ID_ROLE) if item is not None else None
 
         menu = QMenu(self)
+        actions: dict[str, QAction] = {}
         if kind == "folder":
-            menu.addAction(self.tr("New Playlist"), lambda: self.create_playlist(node_id))
-            menu.addAction(self.tr("New Folder"), lambda: self.create_folder(node_id))
+            actions["new_playlist"] = menu.addAction(
+                self.tr("New Playlist"), lambda: self.create_playlist(node_id)
+            )
+            actions["new_folder"] = menu.addAction(
+                self.tr("New Folder"), lambda: self.create_folder(node_id)
+            )
             menu.addSeparator()
-            menu.addAction(self.tr("Rename"), lambda: self.edit(index))
-            menu.addAction(self.tr("Delete…"), lambda: self._delete_node(node_id))
+            actions["rename"] = menu.addAction(self.tr("Rename"), lambda: self.edit(index))
+            actions["delete"] = menu.addAction(
+                self.tr("Delete…"), lambda: self._delete_node(node_id)
+            )
             menu.addSeparator()
-            menu.addAction(self.tr("Export Folder…"), lambda: self._export_folder(node_id))
+            actions["export_folder"] = menu.addAction(
+                self.tr("Export Folder…"), lambda: self._export_folder(node_id)
+            )
         elif kind in ("playlist", "scratch"):
             if kind == "playlist":
-                menu.addAction(self.tr("Rename"), lambda: self.edit(index))
-                menu.addAction(self.tr("Delete…"), lambda: self._delete_node(node_id))
+                # Beside this playlist, in whatever folder holds it — creating
+                # at the root from a row the user pointed at is a move they
+                # then have to undo by hand. Scratch is pinned and owns no
+                # siblings the user arranges, so it gets neither.
+                actions["new_playlist"] = menu.addAction(
+                    self.tr("New Playlist"), lambda: self.create_beside("playlist", node_id)
+                )
+                actions["new_folder"] = menu.addAction(
+                    self.tr("New Folder"), lambda: self.create_beside("folder", node_id)
+                )
+                menu.addSeparator()
+                actions["rename"] = menu.addAction(self.tr("Rename"), lambda: self.edit(index))
+                actions["delete"] = menu.addAction(
+                    self.tr("Delete…"), lambda: self._delete_node(node_id)
+                )
                 menu.addSeparator()
             # Scratch is a real playlist with real contents — exporting it is
             # how you get a set out without naming it first.
-            menu.addAction(self.tr("Export…"), lambda: self._export_playlist(node_id))
-            menu.addAction(
+            actions["export"] = menu.addAction(
+                self.tr("Export…"), lambda: self._export_playlist(node_id)
+            )
+            actions["export_copy"] = menu.addAction(
                 self.tr("Export and Copy Tracks…"),
                 lambda: self._export_with_tracks(node_id),
             )
         else:  # empty background: create at the root
-            menu.addAction(self.tr("New Playlist"), lambda: self.create_playlist(None))
-            menu.addAction(self.tr("New Folder"), lambda: self.create_folder(None))
-        menu.exec(self.viewport().mapToGlobal(pos))
+            actions["new_playlist"] = menu.addAction(
+                self.tr("New Playlist"), lambda: self.create_playlist(None)
+            )
+            actions["new_folder"] = menu.addAction(
+                self.tr("New Folder"), lambda: self.create_folder(None)
+            )
+        return menu, actions
 
     # ------------------------------------------------------------------ export
 
