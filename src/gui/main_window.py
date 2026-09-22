@@ -135,6 +135,10 @@ class MainWindow(QMainWindow):
 
         # Analysis thread reference
         self._analysis_thread: AnalysisThread | None = None
+        # A pipeline summary waiting for the Analyze batch that ended the run
+        # to finish, so its own completion line does not paint over it. See
+        # _finish_pipeline_summary.
+        self._pipeline_analyze_notice: str | None = None
         # Cancelled analysis threads, detached from the UI but still running
         # out their current file. Held only so closeEvent can join them.
         self._orphaned_analysis_threads: list[AnalysisThread] = []
@@ -1308,6 +1312,7 @@ class MainWindow(QMainWindow):
             self._analysis_panel.progress_panel.complete(
                 self.tr("Complete: {0} files analyzed").format(success_count)
             )
+        self._flush_pipeline_analyze_notice()
 
         # Refresh the analysis table
         self._analysis_panel.refresh_table()
@@ -1361,6 +1366,7 @@ class MainWindow(QMainWindow):
         the user never asked for.
         """
         self._analysis_panel.progress_panel.cancelled()
+        self._pipeline_analyze_notice = None  # "Cancelled" is the truer word
 
         batch = [
             track
@@ -2029,9 +2035,29 @@ class MainWindow(QMainWindow):
             parts.append(self.tr("{n} skipped").format(n=skipped))
         if errors:
             parts.append(self.tr("{n} errors").format(n=errors))
+        message = ", ".join(parts)
         for panel in self._pipeline_report_panels(on_analyze):
-            panel.progress_panel.report(", ".join(parts))
+            # The last file of a run is filed from inside an analysis *progress*
+            # signal, so the run can end while the batch that ended it is still
+            # winding down — and _on_analysis_finished then writes its own
+            # "Complete: N files analyzed" straight over the summary. Hand the
+            # line to that handler rather than racing it.
+            if panel is self._analysis_panel and self._analysis_thread is not None:
+                self._pipeline_analyze_notice = message
+                continue
+            panel.progress_panel.report(message)
         self._pipeline.end()
+
+    def _flush_pipeline_analyze_notice(self) -> None:
+        """Put a held pipeline summary back on the Analyze panel.
+
+        Called at the end of every batch, right after the panel has written
+        its own outcome — the summary is the later, broader word and replaces
+        it. Nothing held means nothing to say.
+        """
+        message, self._pipeline_analyze_notice = self._pipeline_analyze_notice, None
+        if message is not None:
+            self._analysis_panel.progress_panel.report(message)
 
     def _pipeline_report_panels(self, on_analyze: bool = True) -> list:
         """The panels a finished run reports on: every step that took part.

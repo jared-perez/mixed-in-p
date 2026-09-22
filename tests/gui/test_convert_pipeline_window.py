@@ -153,6 +153,10 @@ class _AnalysisPanelStub:
     def __init__(self):
         self.progress_panel = _ProgressStub()
         self.auto = None
+        self.refreshed = 0
+
+    def refresh_table(self):
+        self.refreshed += 1
 
     def set_analyzing(self, on):
         pass
@@ -233,6 +237,7 @@ class WindowStub(QObject):
     _finish_pipeline_if_done = MainWindow._finish_pipeline_if_done
     _finish_pipeline_summary = MainWindow._finish_pipeline_summary
     _pipeline_report_panels = MainWindow._pipeline_report_panels
+    _flush_pipeline_analyze_notice = MainWindow._flush_pipeline_analyze_notice
     _resolve_pipeline_target = MainWindow._resolve_pipeline_target
     _unique_playlist_name = MainWindow._unique_playlist_name
     _refresh_pipeline_playlists = MainWindow._refresh_pipeline_playlists
@@ -259,6 +264,7 @@ class WindowStub(QObject):
         self._header = _HeaderStub(cluster or _ClusterStub())
         self._conversion_thread = None
         self._analysis_thread = None
+        self._pipeline_analyze_notice = None
         self._pipeline_entering_convert = False
         self._pending_pipeline_rename = False
         self.warnings = []
@@ -656,6 +662,13 @@ class _AddingWindow(WindowStub):
 
     _update_track_from_result = MainWindow._update_track_from_result
     _pipeline_add_to_playlist = MainWindow._pipeline_add_to_playlist
+    _on_analysis_finished = MainWindow._on_analysis_finished
+
+    def _auto_rename_gate_open(self, origin, count):
+        return False
+
+    def _start_pending_analysis(self):
+        pass
 
     def _apply_analysis_result(self, result):
         # The tag/history writes are covered by test_analysis_write_freeze;
@@ -879,3 +892,29 @@ def test_a_cancelled_analysis_keeps_its_own_word_on_the_analyze_panel(adding):
     assert _completions(adding._conversion_panel) == [
         "Pipeline complete: 0 added to Friday"
     ]
+
+
+def test_the_analyze_panel_keeps_the_summary_past_its_own_finish(adding, tmp_path):
+    """The bug the drop-into-Analyze run showed: the last file of a run is
+    filed from inside an analysis *progress* signal, so the run ends while the
+    batch is still winding down, and _on_analysis_finished then wrote
+    "Complete: 1 files analyzed" straight over the summary.
+    """
+    _arm_at(adding, "Tests / P")
+    path = _flac(tmp_path / "a.flac")
+    track = _await(adding, path)
+    running = _FakeThread([], "FLAC", 320)
+    running.started = True
+    adding._analysis_thread = running
+
+    adding._update_track_from_result(_result(track.file_path))
+    line = "Pipeline complete: 1 added to Tests / P"
+    assert adding._pipeline.run is None  # the run really did end here
+    assert _completions(adding._conversion_panel)[-1] == line
+    assert _completions(adding._analysis_panel) == []  # held, not raced
+
+    adding._on_analysis_finished([_result(track.file_path)])
+    assert _completions(adding._analysis_panel) == [
+        "Complete: 1 files analyzed", line,
+    ]
+    assert adding._pipeline_analyze_notice is None

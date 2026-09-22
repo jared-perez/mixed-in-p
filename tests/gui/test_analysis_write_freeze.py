@@ -165,6 +165,7 @@ class WindowStub(QObject):
     _finish_pipeline_if_done = MainWindow._finish_pipeline_if_done
     _finish_pipeline_summary = MainWindow._finish_pipeline_summary
     _pipeline_report_panels = MainWindow._pipeline_report_panels
+    _flush_pipeline_analyze_notice = MainWindow._flush_pipeline_analyze_notice
 
     def __init__(self, store):
         super().__init__()
@@ -176,6 +177,7 @@ class WindowStub(QObject):
         self._analysis_writes_frozen = False
         self._analyzing_track_ids = []
         self._analysis_thread = None
+        self._pipeline_analyze_notice = None
         self._pending_rename_operations = []
         # The analysis end paths now consult the pipeline; an unarmed one is
         # inert, which is what every test in this file wants.
@@ -341,3 +343,27 @@ class TestItIsSessionOnly:
         assert window._analysis_writes_frozen is True
         window._on_write_freeze_toggled(False)
         assert window._analysis_writes_frozen is False
+
+
+class TestTheHeldPipelineSummary:
+    """A run can end while the batch that ended it is still winding down, so
+    the summary is handed to _on_analysis_finished rather than racing it.
+    """
+
+    def test_a_cancel_drops_it_and_keeps_its_own_word(self, window, flac_file):
+        node_id = 1
+        window._pipeline.arm(node_id, "Tests / P")
+        window._pipeline_analyze_notice = "Pipeline complete: 1 added to Tests / P"
+
+        window._on_analysis_cancelled()
+
+        assert window._pipeline_analyze_notice is None
+        assert window._analysis_panel.progress_panel.messages == ["cancelled"]
+        # The tally still reaches the Convert panel.
+        assert window._conversion_panel.progress_panel.messages == [
+            "Pipeline complete: 0 added to Tests / P"
+        ]
+
+    def test_nothing_held_means_nothing_added(self, window):
+        window._flush_pipeline_analyze_notice()
+        assert window._analysis_panel.progress_panel.messages == []
