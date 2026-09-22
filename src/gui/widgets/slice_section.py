@@ -603,10 +603,11 @@ class SliceSection(QWidget):
         self._waveform.set_core_shading(core_shading)
         self._zoom_waveform.set_column_colors(colors)
 
-    def set_waveform_half(self, half: bool) -> None:
-        """Show only the top half of both waveforms, in half the height."""
+    def set_waveform_half(self, half: bool, zoom_half: bool) -> None:
+        """Show only the top half of the Waveform (*half*) and Zoomed Wave
+        (*zoom_half*) views, each in half its height."""
         self._waveform.set_half(half)
-        self._zoom_waveform.set_half(half)
+        self._zoom_waveform.set_half(zoom_half)
 
     def set_position(self, position_ms: int) -> None:
         """Move the playhead (called on every engine position tick)."""

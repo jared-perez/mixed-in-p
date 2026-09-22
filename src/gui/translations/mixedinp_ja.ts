@@ -1531,69 +1531,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="668"/>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="670"/>
+        <location filename="../main_window.py" line="699"/>
         <source>Export All Playlists</source>
         <translation>すべてのプレイリストを書き出す</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="689"/>
+        <location filename="../main_window.py" line="691"/>
         <source>Export failed</source>
         <translation>書き出しに失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="690"/>
+        <location filename="../main_window.py" line="692"/>
         <source>Could not write the file:
 {0}</source>
         <translation>ファイルを書き込めませんでした:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="698"/>
+        <location filename="../main_window.py" line="700"/>
         <source>There are no playlists to export yet.</source>
         <translation>書き出せるプレイリストがまだありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="703"/>
+        <location filename="../main_window.py" line="705"/>
         <source>Export complete</source>
         <translation>書き出しが完了しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="704"/>
+        <location filename="../main_window.py" line="706"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0}件のプレイリスト（{1}トラック）を次の場所に書き出しました:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="819"/>
+        <location filename="../main_window.py" line="821"/>
         <source>Select Audio Files</source>
         <translation>オーディオファイルを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="830"/>
+        <location filename="../main_window.py" line="832"/>
         <source>Select Folder</source>
         <translation>フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1078"/>
+        <location filename="../main_window.py" line="1080"/>
         <source>No Audio Files</source>
         <translation>オーディオファイルなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1079"/>
+        <location filename="../main_window.py" line="1081"/>
         <source>No audio files found in:
 {0}</source>
         <translation>次の場所にオーディオファイルが見つかりません:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1084"/>
+        <location filename="../main_window.py" line="1086"/>
         <source>Invalid Folder</source>
         <translation>無効なフォルダ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1085"/>
+        <location filename="../main_window.py" line="1087"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>有効なディレクトリではありません:
@@ -1608,17 +1608,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">すでに解析を実行中です。完了を待つか、先にキャンセルしてください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1283"/>
+        <location filename="../main_window.py" line="1285"/>
         <source>Analyzing...</source>
         <translation>解析中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1315"/>
+        <location filename="../main_window.py" line="1317"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>完了: {0}件解析済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1319"/>
+        <location filename="../main_window.py" line="1321"/>
         <source>Complete: {0} files analyzed</source>
         <translation>完了: {0}個のファイルを解析しました</translation>
     </message>
@@ -1627,123 +1627,123 @@ or click “Add Artwork…”</source>
         <translation type="vanished">キャンセルしました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1545"/>
+        <location filename="../main_window.py" line="1547"/>
         <source>Conversion in Progress</source>
         <translation>変換を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1546"/>
+        <location filename="../main_window.py" line="1548"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>すでに変換を実行中です。お待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1564"/>
+        <location filename="../main_window.py" line="1566"/>
         <source>Pipeline in Progress</source>
         <translation>パイプラインを実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1565"/>
+        <location filename="../main_window.py" line="1567"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translation>前回のパイプラインがまだ終わっていません — 完了するまでお待ちください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1582"/>
+        <location filename="../main_window.py" line="1584"/>
         <source>No Target Playlist</source>
         <translation>対象プレイリストがありません</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1583"/>
-        <location filename="../main_window.py" line="1776"/>
+        <location filename="../main_window.py" line="1585"/>
+        <location filename="../main_window.py" line="1778"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>先にヘッダーバーで実行先のプレイリストを指定してください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1788"/>
+        <location filename="../main_window.py" line="1790"/>
         <source>Cannot Start</source>
         <translation>開始できません</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1798"/>
+        <location filename="../main_window.py" line="1800"/>
         <source>No Files</source>
         <translation>ファイルがありません</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1799"/>
+        <location filename="../main_window.py" line="1801"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translation>パイプラインを開始する前に、このパネルにファイルを追加してください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1809"/>
+        <location filename="../main_window.py" line="1811"/>
         <source>No Rename Adjustments</source>
         <translation>名前変更の設定がありません</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1810"/>
+        <location filename="../main_window.py" line="1812"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>名前変更の設定がありません。ファイルをそのまま送りますか？</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1904"/>
+        <location filename="../main_window.py" line="1906"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>非可逆圧縮ファイルは変換パネルに残ります — 理由はステータスに表示されます。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2036"/>
+        <location filename="../main_window.py" line="2038"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>パイプライン完了: {playlist} に {added} 件追加しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2041"/>
+        <location filename="../main_window.py" line="2043"/>
         <source>{n} skipped</source>
         <translation>{n}件スキップ</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2043"/>
+        <location filename="../main_window.py" line="2045"/>
         <source>{n} errors</source>
         <translation>{n}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2175"/>
+        <location filename="../main_window.py" line="2177"/>
         <source>Converting...</source>
         <translation>変換中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2191"/>
+        <location filename="../main_window.py" line="2193"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>完了: {0}件変換済み、{1}件のエラー</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2195"/>
+        <location filename="../main_window.py" line="2197"/>
         <source>Complete: {0} files converted</source>
         <translation>完了: {0}個のファイルを変換しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2587"/>
+        <location filename="../main_window.py" line="2591"/>
         <source>Rename in Progress</source>
         <translation>名前変更を実行中</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2588"/>
+        <location filename="../main_window.py" line="2592"/>
         <source>A rename operation is already running.</source>
         <translation>すでに名前変更操作を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2696"/>
+        <location filename="../main_window.py" line="2700"/>
         <source>Rename Failed</source>
         <translation>名前の変更に失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2731"/>
+        <location filename="../main_window.py" line="2735"/>
         <source>Undo Rename</source>
         <translation>名前の変更を取り消す</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2766"/>
+        <location filename="../main_window.py" line="2770"/>
         <source>Undo Failed</source>
         <translation>取り消しに失敗しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2819"/>
+        <location filename="../main_window.py" line="2823"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translation>ここからパイプラインを実行するには「変換」ステップをオンにしてください。</translation>
     </message>
@@ -1752,12 +1752,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">先に「変換」パネルでパイプラインを設定してください。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1771"/>
+        <location filename="../main_window.py" line="1773"/>
         <source>A conversion is already running.</source>
         <translation>すでに変換を実行中です。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1773"/>
+        <location filename="../main_window.py" line="1775"/>
         <source>The last pipeline run is still finishing.</source>
         <translation>前回のパイプラインがまだ終わっていません。</translation>
     </message>
@@ -1774,22 +1774,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">{0}個のファイル名を変更しました</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2703"/>
+        <location filename="../main_window.py" line="2707"/>
         <source>No Session</source>
         <translation>セッションなし</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2703"/>
+        <location filename="../main_window.py" line="2707"/>
         <source>No rename session to undo.</source>
         <translation>取り消す名前変更セッションがありません。</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2712"/>
+        <location filename="../main_window.py" line="2716"/>
         <source>Confirm Undo</source>
         <translation>取り消しの確認</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2713"/>
+        <location filename="../main_window.py" line="2717"/>
         <source>Undo renaming of {0} files?</source>
         <translation>{0}個のファイルの名前変更を取り消しますか？</translation>
     </message>
@@ -1798,7 +1798,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">名前変更を取り消し中...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2732"/>
+        <location filename="../main_window.py" line="2736"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>取り消し完了: {0}個のファイル、{1}件のエラー</translation>
     </message>
@@ -3588,39 +3588,39 @@ or click “Add Artwork…”</source>
 <context>
     <name>SettingsPanel</name>
     <message>
-        <location filename="../widgets/settings_panel.py" line="80"/>
+        <location filename="../widgets/settings_panel.py" line="81"/>
         <source>Language</source>
         <translation>言語</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="98"/>
+        <location filename="../widgets/settings_panel.py" line="99"/>
         <source>Restart to apply language changes.</source>
         <translatorcomment>Neutral-polite imperative 再起動してください. Confirmed register.</translatorcomment>
         <translation>言語の変更を適用するには再起動してください。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="112"/>
-        <location filename="../widgets/settings_panel.py" line="992"/>
+        <location filename="../widgets/settings_panel.py" line="113"/>
+        <location filename="../widgets/settings_panel.py" line="1003"/>
         <source>Default Audio Player</source>
         <translation>デフォルトのオーディオプレーヤー</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="121"/>
+        <location filename="../widgets/settings_panel.py" line="122"/>
         <source>Make Mixed in P your default audio player</source>
         <translation>Mixed in P をデフォルトのオーディオプレーヤーにする</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="131"/>
+        <location filename="../widgets/settings_panel.py" line="132"/>
         <source>Opens Windows Settings on the Mixed in P entry, where you can hand it your audio file types. Windows only lets you make that choice yourself.</source>
         <translation>Windows の設定を Mixed in P の項目で開きます。そこでオーディオファイルの種類を割り当てられます。この選択は Windows がユーザー自身にしか許可していません。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="137"/>
+        <location filename="../widgets/settings_panel.py" line="138"/>
         <source>Double-clicking an audio file will open it here. Finder&apos;s Get Info panel puts it back.</source>
         <translation>オーディオファイルをダブルクリックすると、ここで開きます。Finder の「情報を見る」で元に戻せます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="148"/>
+        <location filename="../widgets/settings_panel.py" line="149"/>
         <source>Theme</source>
         <translation>テーマ</translation>
     </message>
@@ -3629,87 +3629,88 @@ or click “Add Artwork…”</source>
         <translation type="vanished">ナイトダーク</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="166"/>
+        <location filename="../widgets/settings_panel.py" line="167"/>
         <source>Daylight</source>
         <translation>デイライト</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
+        <location filename="../widgets/settings_panel.py" line="180"/>
         <source>Restart to apply theme changes.</source>
         <translation>テーマの変更を適用するには再起動してください。</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="310"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation type="vanished">波形</translation>
+        <translation>波形</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="224"/>
+        <location filename="../widgets/settings_panel.py" line="225"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>プレーヤーの全体波形の色。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="243"/>
+        <location filename="../widgets/settings_panel.py" line="244"/>
         <source>Default</source>
         <translation>デフォルト</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="245"/>
+        <location filename="../widgets/settings_panel.py" line="246"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>テーマのデフォルトの波形の色を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="253"/>
+        <location filename="../widgets/settings_panel.py" line="254"/>
         <source>Custom…</source>
         <translation>カスタム…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="317"/>
+        <location filename="../widgets/settings_panel.py" line="328"/>
         <source>Playlist Text Size</source>
         <translation>プレイリストの文字サイズ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="326"/>
+        <location filename="../widgets/settings_panel.py" line="337"/>
         <source>Size of the track rows in the player. Applies straight away.</source>
         <translation>プレイヤーのトラック行のサイズ。すぐに適用されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="338"/>
+        <location filename="../widgets/settings_panel.py" line="349"/>
         <source>Small</source>
         <translation>小</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="339"/>
+        <location filename="../widgets/settings_panel.py" line="350"/>
         <source>Medium</source>
         <translation>中</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="340"/>
+        <location filename="../widgets/settings_panel.py" line="351"/>
         <source>Large</source>
         <translation>大</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="377"/>
+        <location filename="../widgets/settings_panel.py" line="388"/>
         <source>Playlist Artwork</source>
         <translation>プレイリストのアートワーク</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="387"/>
+        <location filename="../widgets/settings_panel.py" line="398"/>
         <source>Part of the cover art shown in the player&apos;s Art column. Full makes each row tall enough for the whole sleeve.</source>
         <translation>プレイヤーのアートワーク列に表示する部分。「全体」を選ぶと、アートワーク全体が収まる高さまで各行が広がります。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="401"/>
+        <location filename="../widgets/settings_panel.py" line="412"/>
         <source>Top</source>
         <translation>上部</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="402"/>
+        <location filename="../widgets/settings_panel.py" line="413"/>
         <source>Middle</source>
         <translation>中央</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="403"/>
+        <location filename="../widgets/settings_panel.py" line="414"/>
         <source>Full</source>
         <translation>全体</translation>
     </message>
@@ -3726,58 +3727,58 @@ or click “Add Artwork…”</source>
         <translation type="vanished">プレイヤーにビジュアル選択メニューを追加し、解析中や変換中にアニメーション波形を表示します。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="418"/>
+        <location filename="../widgets/settings_panel.py" line="429"/>
         <source>Tempo Range</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>テンポ範囲</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="426"/>
+        <location filename="../widgets/settings_panel.py" line="437"/>
         <source>Min 50, Max 250.</source>
         <translation>最小50、最大250。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="432"/>
+        <location filename="../widgets/settings_panel.py" line="443"/>
         <source>Lowest BPM</source>
         <translation>最低BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="449"/>
+        <location filename="../widgets/settings_panel.py" line="460"/>
         <source>Highest BPM</source>
         <translation>最高BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="464"/>
+        <location filename="../widgets/settings_panel.py" line="475"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translation>解析後にキー/BPMをファイル名に追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="472"/>
+        <location filename="../widgets/settings_panel.py" line="483"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>解析パネルにドロップまたは送ったときに自動的に解析</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="477"/>
+        <location filename="../widgets/settings_panel.py" line="488"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>解析後にBPMをタグへ自動的に書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="481"/>
+        <location filename="../widgets/settings_panel.py" line="492"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM はメタデータに書き込む際、最も近い整数に丸められます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="486"/>
+        <location filename="../widgets/settings_panel.py" line="497"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translation>解析後にキーをタグへ自動的に書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="490"/>
+        <location filename="../widgets/settings_panel.py" line="501"/>
         <source>Automatically rename files after analysis</source>
         <translation>解析後にファイル名を自動的に変更</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="497"/>
+        <location filename="../widgets/settings_panel.py" line="508"/>
         <source>Write key to comment</source>
         <translation>キーをコメントに書き込む</translation>
     </message>
@@ -3791,278 +3792,313 @@ or click “Add Artwork…”</source>
         <translation type="vanished">この項目とエナジータグのコメントの両方を書き込む場合、エナジーを先に、キーを後に配置します。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="207"/>
+        <location filename="../widgets/settings_panel.py" line="208"/>
         <source>Color follows the mix of bass, mids and highs.</source>
         <translation>色が低音・中音・高音のバランスに合わせて変わります。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="279"/>
+        <location filename="../widgets/settings_panel.py" line="280"/>
         <source>Use full-spectrum colors</source>
         <translation>全スペクトルの色を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="503"/>
+        <location filename="../widgets/settings_panel.py" line="311"/>
+        <source>Zoomed Wave</source>
+        <translation>拡大波形</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="315"/>
+        <source>Half wave</source>
+        <translation>半分の波形</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="315"/>
+        <source>Full wave</source>
+        <translation>全体の波形</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="514"/>
         <source>Naming format:</source>
         <translation>命名フォーマット:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="512"/>
+        <location filename="../widgets/settings_panel.py" line="523"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Per instructions kept 128, 8A, &apos; - &apos;; rendered Original_File_Name as 元のファイル名 (no underscore). Consistent across all naming-example strings.</translatorcomment>
         <translation>128 8A - 元のファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="512"/>
+        <location filename="../widgets/settings_panel.py" line="523"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + キーのプレフィックス</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="513"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>8A 128 - Original_File_Name</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder.</translatorcomment>
         <translation>8A 128 - 元のファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="513"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>Key + BPM prefix</source>
         <translation>キー + BPMのプレフィックス</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="514"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>8A - Original_File_Name</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder.</translatorcomment>
         <translation>8A - 元のファイル名</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="514"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>Key prefix only</source>
         <translation>キーのプレフィックスのみ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="515"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>Original_File_Name - 8A 128</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder, code segments preserved.</translatorcomment>
         <translation>元のファイル名 - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="515"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>suffix: Key + BPM</source>
         <translation>サフィックス: キー + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="516"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>Original_File_Name - 8A</source>
         <translatorcomment>Same convention: 元のファイル名 used for the placeholder.</translatorcomment>
         <translation>元のファイル名 - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="516"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>suffix: Key only</source>
         <translation>サフィックス: キーのみ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="539"/>
+        <location filename="../widgets/settings_panel.py" line="550"/>
         <source>Notation</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>表記</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="549"/>
+        <location filename="../widgets/settings_panel.py" line="560"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translation>一度に有効にできる表記は1つだけです。解析時にタグ/ファイル名へ書き込まれるキーと、キーボードパネルのキーラベルに適用されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="561"/>
+        <location filename="../widgets/settings_panel.py" line="572"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>Preserved emoji and double-space before parens; キーコード per glossary. Code samples kept Latin.</translatorcomment>
         <translation>👑 キーコード  （8A、5A、2B）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="562"/>
+        <location filename="../widgets/settings_panel.py" line="573"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>従来のキー表記  （Am、Ebm、F#…）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="563"/>
+        <location filename="../widgets/settings_panel.py" line="574"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>Traktor Open Key  （1m、10m、9d…）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="579"/>
+        <location filename="../widgets/settings_panel.py" line="590"/>
         <source>Energy Tag</source>
         <translatorcomment>Reviewed (ja pass): follows the エナジー (Energy) term choice; revisit together if that changes.</translatorcomment>
         <translation>エナジータグ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="587"/>
+        <location filename="../widgets/settings_panel.py" line="598"/>
         <source>Write energy level to Comment tag</source>
         <translation>エナジーレベルをコメントタグに書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="595"/>
+        <location filename="../widgets/settings_panel.py" line="606"/>
         <source>Energy level written first</source>
         <translation>エナジーレベルを先に書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="599"/>
+        <location filename="../widgets/settings_panel.py" line="610"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>エナジーレベルとキーの両方をコメントに書き込む場合、エナジーレベルを先に、キーを後に書き込みます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="605"/>
+        <location filename="../widgets/settings_panel.py" line="616"/>
         <source>Format:</source>
         <translation>フォーマット:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="613"/>
+        <location filename="../widgets/settings_panel.py" line="624"/>
         <source>Number only  (7)</source>
         <translation>数値のみ  （7）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="614"/>
+        <location filename="../widgets/settings_panel.py" line="625"/>
         <source>With label  (Energy 7)</source>
         <translation>ラベル付き  （Energy 7）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="623"/>
+        <location filename="../widgets/settings_panel.py" line="634"/>
         <source>Write mode:</source>
         <translation>書き込みモード:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="631"/>
+        <location filename="../widgets/settings_panel.py" line="642"/>
         <source>Prepend to existing comment</source>
         <translation>既存のコメントの前に追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="632"/>
+        <location filename="../widgets/settings_panel.py" line="643"/>
         <source>Append to existing comment</source>
         <translation>既存のコメントの後ろに追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="633"/>
+        <location filename="../widgets/settings_panel.py" line="644"/>
         <source>Replace existing comment</source>
         <translation>既存のコメントを置き換える</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="653"/>
+        <location filename="../widgets/settings_panel.py" line="664"/>
         <source>Write energy level to its own tag field</source>
         <translation>エナジーレベルを専用のタグフィールドに書き込む</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="656"/>
+        <location filename="../widgets/settings_panel.py" line="667"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>コメントから読み取るのではなく、エナジーを正確に読み戻せる場所に保存します。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="741"/>
+        <location filename="../widgets/settings_panel.py" line="752"/>
         <source>Playlists</source>
         <translation>プレイリスト</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="750"/>
+        <location filename="../widgets/settings_panel.py" line="761"/>
         <source>Duplicate tracks:</source>
         <translation>重複したトラック:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="753"/>
+        <location filename="../widgets/settings_panel.py" line="764"/>
         <source>Ask each time</source>
         <translation>毎回確認</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="754"/>
+        <location filename="../widgets/settings_panel.py" line="765"/>
         <source>Always add duplicates</source>
         <translation>常に重複を追加</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="755"/>
+        <location filename="../widgets/settings_panel.py" line="766"/>
         <source>Always skip duplicates</source>
         <translation>常に重複をスキップ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="767"/>
+        <location filename="../widgets/settings_panel.py" line="778"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>プレイリストにすでに含まれているトラックを追加したときの動作です。セットリストでは意図的に同じトラックを繰り返すこともあるため、勝手に決めずに確認します。確認を止めるには他のオプションを選んでください。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="777"/>
+        <location filename="../widgets/settings_panel.py" line="788"/>
         <source>Keep Scratch between sessions</source>
         <translation>セッション間で Scratch を保持</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="784"/>
+        <location filename="../widgets/settings_panel.py" line="795"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch はプレイヤーが最初に開く作業用リストで、起動するたびに空になります。前回の内容のまま開くようにするにはこれをオンにしてください。どちらの場合も「プレイリストを保存」でコピーを残せます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="794"/>
+        <location filename="../widgets/settings_panel.py" line="805"/>
         <source>Always use full paths in exported playlists</source>
         <translation>書き出したプレイリストで常にフルパスを使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="802"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>書き出したプレイリストは、トラックがプレイリストファイルと同じ場所にあるときはそのファイルからの相対パスを使います。そのためフォルダを圧縮して送っても、他の人のマシンで動作します。常にフルパスを書き出すにはこれをオンにしてください。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="812"/>
+        <location filename="../widgets/settings_panel.py" line="823"/>
         <source>Export All Playlists…</source>
         <translation>すべてのプレイリストを書き出す…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="821"/>
+        <location filename="../widgets/settings_panel.py" line="832"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>ツリーを反映したプレイリストファイルのフォルダを1つ書き出します。他のどのアプリでも読めるバックアップです。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="668"/>
+        <location filename="../widgets/settings_panel.py" line="1247"/>
+        <source>Show the half wave in the Waveform view</source>
+        <translation>「波形」ビューに半分の波形を表示</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1249"/>
+        <source>Show the full wave in the Waveform view</source>
+        <translation>「波形」ビューに全体の波形を表示</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1252"/>
+        <source>Show the half wave in the Zoomed Wave view</source>
+        <translation>「拡大波形」ビューに半分の波形を表示</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1254"/>
+        <source>Show the full wave in the Zoomed Wave view</source>
+        <translation>「拡大波形」ビューに全体の波形を表示</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="679"/>
         <source>Online Metadata</source>
         <translation>オンラインのメタデータ</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="165"/>
+        <location filename="../widgets/settings_panel.py" line="166"/>
         <source>Dark Mode</source>
         <translation>ダークモード</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="167"/>
+        <location filename="../widgets/settings_panel.py" line="168"/>
         <source>Slate</source>
         <translatorcomment>Transliterated colour name, as the previous label was.</translatorcomment>
         <translation>スレート</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="187"/>
+        <location filename="../widgets/settings_panel.py" line="188"/>
         <source>Waveform / Visuals</source>
         <translatorcomment>既存の「波形」「ビジュアライゼーション」を流用し、区切りは全角スラッシュ。</translatorcomment>
         <translation>波形／ビジュアライゼーション</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="198"/>
+        <location filename="../widgets/settings_panel.py" line="199"/>
         <source>Color mode:</source>
         <translation>カラーモード:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="202"/>
+        <location filename="../widgets/settings_panel.py" line="203"/>
         <source>Solid</source>
         <translation>単色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="202"/>
+        <location filename="../widgets/settings_panel.py" line="203"/>
         <source>One color for the whole waveform.</source>
         <translation>波形全体を1色で表示。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="203"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Loudness</source>
         <translation>音量</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="203"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Color brightness follows the volume.</source>
         <translation>色の明るさが音量に合わせて変わります。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="205"/>
+        <location filename="../widgets/settings_panel.py" line="206"/>
         <source>Frequency bands</source>
         <translation>周波数帯域</translation>
     </message>
@@ -4071,12 +4107,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">赤は低音、緑は高音、青は中音。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="209"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Tone</source>
         <translation>音色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="209"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Color follows the balance from bass to treble.</source>
         <translation>色が低音と高音のバランスに合わせて変わります。</translation>
     </message>
@@ -4085,179 +4121,175 @@ or click “Add Artwork…”</source>
         <translation type="vanished">「周波数帯域」と「音色」は独自の色を使います。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="265"/>
+        <location filename="../widgets/settings_panel.py" line="266"/>
         <source>This track</source>
         <translation>このトラック</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="270"/>
         <source>Fixed</source>
         <translation>固定</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="286"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>Fixed colors every track on one scale, so tracks compare.</source>
         <translation>「固定」はすべてのトラックを同じ尺度で色付けするので、トラック同士を比較できます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="300"/>
         <source>Show half waveform</source>
-        <translation>半分の波形を表示</translation>
+        <translation type="vanished">半分の波形を表示</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="304"/>
         <source>Show full waveform</source>
-        <translation>全体の波形を表示</translation>
+        <translation type="vanished">全体の波形を表示</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="362"/>
+        <location filename="../widgets/settings_panel.py" line="373"/>
         <source>Enable large menu text</source>
         <translation>メニューの文字を大きくする</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="679"/>
+        <location filename="../widgets/settings_panel.py" line="690"/>
         <source>Look up track details online (Discogs)</source>
         <translation>トラック情報をオンラインで検索（Discogs）</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="687"/>
+        <location filename="../widgets/settings_panel.py" line="698"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>初期設定ではオフで、オンにするまでこのアプリはネットワークに接続しません。検索では選んだトラックのアーティストとタイトルのみを送信し、音声やライブラリを送ることはありません。BPM・キー・エネルギーは常にこのアプリ自身の解析結果です。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="698"/>
+        <location filename="../widgets/settings_panel.py" line="709"/>
         <source>Discogs token:</source>
         <translation>Discogs トークン:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="704"/>
+        <location filename="../widgets/settings_panel.py" line="715"/>
         <source>Paste your token</source>
         <translation>トークンを貼り付け</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="707"/>
+        <location filename="../widgets/settings_panel.py" line="718"/>
         <source>Get a Token…</source>
         <translation>トークンを取得…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="714"/>
+        <location filename="../widgets/settings_panel.py" line="725"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>カバー画像付きで、かつ制限のない速度で応答を受け取るには、Discogs の無料の個人トークンが必要です。読み取り専用で、Discogs のアカウントページからいつでも無効にできます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="723"/>
+        <location filename="../widgets/settings_panel.py" line="734"/>
         <source>Fetch cover art with lookups</source>
         <translation>検索時にカバー画像も取得</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="730"/>
+        <location filename="../widgets/settings_panel.py" line="741"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>リリースのカバーをファイルのカバーと並べて表示し、見比べられるようにします。承認するまで何も書き込まれません。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="833"/>
-        <location filename="../widgets/settings_panel.py" line="968"/>
+        <location filename="../widgets/settings_panel.py" line="844"/>
+        <location filename="../widgets/settings_panel.py" line="979"/>
         <source>Reset to Default</source>
         <translation>デフォルトに戻す</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="841"/>
+        <location filename="../widgets/settings_panel.py" line="852"/>
         <source>Reset</source>
         <translation>リセット</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="850"/>
+        <location filename="../widgets/settings_panel.py" line="861"/>
         <source>Puts every setting back the way it shipped. Your language, theme and window layout are kept, and so is your default audio player — that one lives with the system.</source>
         <translation>すべての設定を初期状態に戻します。言語、テーマ、ウインドウの配置はそのまま残り、デフォルトのオーディオプレイヤーも変わりません（これはシステム側の設定です）。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="961"/>
+        <location filename="../widgets/settings_panel.py" line="972"/>
         <source>Put every setting back to the way it shipped?</source>
         <translation>すべての設定を初期状態に戻しますか？</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="963"/>
+        <location filename="../widgets/settings_panel.py" line="974"/>
         <source>Your language, theme and window layout are kept. Your Discogs token is cleared. This cannot be undone.</source>
         <translation>言語、テーマ、ウインドウの配置はそのまま残ります。Discogs のトークンは消去されます。この操作は取り消せません。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="997"/>
+        <location filename="../widgets/settings_panel.py" line="1008"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>オーディオファイルは Mixed in P で開くようになりました。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1008"/>
+        <location filename="../widgets/settings_panel.py" line="1019"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P は Windows に登録されていません。再インストールすると登録されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1013"/>
+        <location filename="../widgets/settings_panel.py" line="1024"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>Windows の設定を開けませんでした。「アプリ → 既定のアプリ」で自分で設定できます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1019"/>
+        <location filename="../widgets/settings_panel.py" line="1030"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Finder でオーディオファイルを選択し、Command-I を押して、「このアプリケーションで開く」で Mixed in P を選び、「すべてを変更」をクリックします。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1212"/>
+        <location filename="../widgets/settings_panel.py" line="1223"/>
         <source>Use shades of the selected color</source>
         <translation>選択した色の濃淡を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1214"/>
+        <location filename="../widgets/settings_panel.py" line="1225"/>
         <source>Use the full range of colors instead of the selected color</source>
         <translation>選択した色の代わりにすべての色を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1224"/>
+        <location filename="../widgets/settings_panel.py" line="1235"/>
         <source>Scale the colors to each track&apos;s own range</source>
         <translation>各トラックの範囲に合わせて色を調整</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1226"/>
+        <location filename="../widgets/settings_panel.py" line="1237"/>
         <source>Scale the colors the same for every track</source>
         <translation>すべてのトラックで同じ尺度の色を使う</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1236"/>
         <source>Show the half waveform in the player</source>
-        <translation>プレーヤーに半分の波形を表示</translation>
+        <translation type="vanished">プレーヤーに半分の波形を表示</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1238"/>
         <source>Show the full waveform in the player</source>
-        <translation>プレーヤーに全体の波形を表示</translation>
+        <translation type="vanished">プレーヤーに全体の波形を表示</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1248"/>
+        <location filename="../widgets/settings_panel.py" line="1264"/>
         <source>Use smaller text in the playlist&apos;s menus</source>
         <translation>プレイリストのメニューに小さい文字を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1250"/>
+        <location filename="../widgets/settings_panel.py" line="1266"/>
         <source>Use larger text in the playlist&apos;s menus</source>
         <translation>プレイリストのメニューに大きい文字を使用</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1255"/>
+        <location filename="../widgets/settings_panel.py" line="1271"/>
         <source>Waveform color</source>
         <translation>波形の色</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1293"/>
-        <location filename="../widgets/settings_panel.py" line="1306"/>
+        <location filename="../widgets/settings_panel.py" line="1309"/>
+        <location filename="../widgets/settings_panel.py" line="1322"/>
         <source>Restart required</source>
         <translation>再起動が必要です</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1295"/>
+        <location filename="../widgets/settings_panel.py" line="1311"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>言語の変更は、次回Mixed in Pを再起動したときに反映されます。</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1308"/>
+        <location filename="../widgets/settings_panel.py" line="1324"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>テーマの変更は、次回Mixed in Pを再起動したときに反映されます。</translation>
     </message>
@@ -4552,17 +4584,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">▾  波形ループスライサー</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="780"/>
+        <location filename="../widgets/slice_section.py" line="781"/>
         <source>Choose Save Folder</source>
         <translation>保存先フォルダを選択</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="799"/>
+        <location filename="../widgets/slice_section.py" line="800"/>
         <source>Saved: {0}</source>
         <translation>保存しました: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="804"/>
+        <location filename="../widgets/slice_section.py" line="805"/>
         <source>Error: {0}</source>
         <translation>エラー: {0}</translation>
     </message>

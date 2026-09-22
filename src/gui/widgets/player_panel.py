@@ -6377,11 +6377,11 @@ class PlayerPanel(QWidget):
         # default filename/format; rebuilds the waveform if it's open).
         self._slice.set_track(self._current_path(), duration)
 
-    def set_waveform_half(self, half: bool) -> None:
-        """Show half or full waveforms in the Waveform and Zoomed Wave views
-        (from Settings), live. The zoomed canvas's height is part of the
-        playlist's budget, so the budget is re-applied."""
-        self._slice.set_waveform_half(half)
+    def set_waveform_half(self, half: bool, zoom_half: bool) -> None:
+        """Show half or full waveforms in the Waveform (*half*) and Zoomed
+        Wave (*zoom_half*) views (from Settings), live. The zoomed canvas's
+        height is part of the playlist's budget, so the budget is re-applied."""
+        self._slice.set_waveform_half(half, zoom_half)
         self._apply_table_height(self._scroll_content_wants_room())
 
     def set_waveform_color(self, color: str) -> None:

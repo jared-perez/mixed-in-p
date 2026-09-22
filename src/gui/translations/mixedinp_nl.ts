@@ -1522,69 +1522,69 @@ of klik op “Artwork toevoegen…”</translation>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="668"/>
-        <location filename="../main_window.py" line="697"/>
+        <location filename="../main_window.py" line="670"/>
+        <location filename="../main_window.py" line="699"/>
         <source>Export All Playlists</source>
         <translation>Alle playlists exporteren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="689"/>
+        <location filename="../main_window.py" line="691"/>
         <source>Export failed</source>
         <translation>Exporteren mislukt</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="690"/>
+        <location filename="../main_window.py" line="692"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Kan het bestand niet schrijven:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="698"/>
+        <location filename="../main_window.py" line="700"/>
         <source>There are no playlists to export yet.</source>
         <translation>Er zijn nog geen playlists om te exporteren.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="703"/>
+        <location filename="../main_window.py" line="705"/>
         <source>Export complete</source>
         <translation>Exporteren voltooid</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="704"/>
+        <location filename="../main_window.py" line="706"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>{0} playlists ({1} tracks) geëxporteerd naar:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="819"/>
+        <location filename="../main_window.py" line="821"/>
         <source>Select Audio Files</source>
         <translation>Audiobestanden selecteren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="830"/>
+        <location filename="../main_window.py" line="832"/>
         <source>Select Folder</source>
         <translation>Map selecteren</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1078"/>
+        <location filename="../main_window.py" line="1080"/>
         <source>No Audio Files</source>
         <translation>Geen audiobestanden</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1079"/>
+        <location filename="../main_window.py" line="1081"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Geen audiobestanden gevonden in:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1084"/>
+        <location filename="../main_window.py" line="1086"/>
         <source>Invalid Folder</source>
         <translation>Ongeldige map</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1085"/>
+        <location filename="../main_window.py" line="1087"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Geen geldige map:
@@ -1599,17 +1599,17 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Er loopt al een analyse. Wacht even of annuleer deze eerst.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1283"/>
+        <location filename="../main_window.py" line="1285"/>
         <source>Analyzing...</source>
         <translation>Analyseren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1315"/>
+        <location filename="../main_window.py" line="1317"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Voltooid: {0} geanalyseerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1319"/>
+        <location filename="../main_window.py" line="1321"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Voltooid: {0} bestanden geanalyseerd</translation>
     </message>
@@ -1618,123 +1618,123 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Geannuleerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1545"/>
+        <location filename="../main_window.py" line="1547"/>
         <source>Conversion in Progress</source>
         <translation>Conversie bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1546"/>
+        <location filename="../main_window.py" line="1548"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Er loopt al een conversie. Wacht even.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1564"/>
+        <location filename="../main_window.py" line="1566"/>
         <source>Pipeline in Progress</source>
         <translation>Pipeline bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1565"/>
+        <location filename="../main_window.py" line="1567"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translation>De laatste pipeline-run is nog bezig — wacht tot die klaar is.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1582"/>
+        <location filename="../main_window.py" line="1584"/>
         <source>No Target Playlist</source>
         <translation>Geen doelplaylist</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1583"/>
-        <location filename="../main_window.py" line="1776"/>
+        <location filename="../main_window.py" line="1585"/>
+        <location filename="../main_window.py" line="1778"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>Geef eerst een playlist voor de run op in de kopbalk.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1788"/>
+        <location filename="../main_window.py" line="1790"/>
         <source>Cannot Start</source>
         <translation>Kan niet starten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1798"/>
+        <location filename="../main_window.py" line="1800"/>
         <source>No Files</source>
         <translation>Geen bestanden</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1799"/>
+        <location filename="../main_window.py" line="1801"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translation>Voeg bestanden toe aan dit paneel voordat je een pipeline-run start.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1809"/>
+        <location filename="../main_window.py" line="1811"/>
         <source>No Rename Adjustments</source>
         <translation>Geen hernoeminstellingen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1810"/>
+        <location filename="../main_window.py" line="1812"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>Er zijn geen hernoeminstellingen ingesteld. De bestanden ongewijzigd doorsturen?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1904"/>
+        <location filename="../main_window.py" line="1906"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>Lossy-bestanden blijven in Converteren — hun status zegt waarom.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2036"/>
+        <location filename="../main_window.py" line="2038"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translation>Pipeline voltooid: {added} toegevoegd aan {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2041"/>
+        <location filename="../main_window.py" line="2043"/>
         <source>{n} skipped</source>
         <translation>{n} overgeslagen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2043"/>
+        <location filename="../main_window.py" line="2045"/>
         <source>{n} errors</source>
         <translation>{n} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2175"/>
+        <location filename="../main_window.py" line="2177"/>
         <source>Converting...</source>
         <translation>Converteren...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2191"/>
+        <location filename="../main_window.py" line="2193"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Voltooid: {0} geconverteerd, {1} fouten</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2195"/>
+        <location filename="../main_window.py" line="2197"/>
         <source>Complete: {0} files converted</source>
         <translation>Voltooid: {0} bestanden geconverteerd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2587"/>
+        <location filename="../main_window.py" line="2591"/>
         <source>Rename in Progress</source>
         <translation>Hernoemen bezig</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2588"/>
+        <location filename="../main_window.py" line="2592"/>
         <source>A rename operation is already running.</source>
         <translation>Er loopt al een hernoembewerking.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2696"/>
+        <location filename="../main_window.py" line="2700"/>
         <source>Rename Failed</source>
         <translation>Hernoemen mislukt</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2731"/>
+        <location filename="../main_window.py" line="2735"/>
         <source>Undo Rename</source>
         <translation>Hernoemen ongedaan maken</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2766"/>
+        <location filename="../main_window.py" line="2770"/>
         <source>Undo Failed</source>
         <translation>Ongedaan maken mislukt</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2819"/>
+        <location filename="../main_window.py" line="2823"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translation>Zet de stap Converteren aan om de pipeline vanaf hier te draaien.</translation>
     </message>
@@ -1743,12 +1743,12 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Stel de pipeline eerst in in het paneel Converteren.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1771"/>
+        <location filename="../main_window.py" line="1773"/>
         <source>A conversion is already running.</source>
         <translation>Er loopt al een conversie.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1773"/>
+        <location filename="../main_window.py" line="1775"/>
         <source>The last pipeline run is still finishing.</source>
         <translation>De laatste pipeline-run is nog bezig.</translation>
     </message>
@@ -1765,22 +1765,22 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">{0} bestanden hernoemd</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2703"/>
+        <location filename="../main_window.py" line="2707"/>
         <source>No Session</source>
         <translation>Geen sessie</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2703"/>
+        <location filename="../main_window.py" line="2707"/>
         <source>No rename session to undo.</source>
         <translation>Geen hernoemsessie om te herstellen.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2712"/>
+        <location filename="../main_window.py" line="2716"/>
         <source>Confirm Undo</source>
         <translation>Herstel bevestigen</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2713"/>
+        <location filename="../main_window.py" line="2717"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Hernoemen van {0} bestanden herstellen?</translation>
     </message>
@@ -1789,7 +1789,7 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Hernoemen herstellen...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2732"/>
+        <location filename="../main_window.py" line="2736"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Hersteld: {0} bestanden, {1} fouten</translation>
     </message>
@@ -3580,38 +3580,38 @@ of klik op “Artwork toevoegen…”</translation>
 <context>
     <name>SettingsPanel</name>
     <message>
-        <location filename="../widgets/settings_panel.py" line="80"/>
+        <location filename="../widgets/settings_panel.py" line="81"/>
         <source>Language</source>
         <translation>Taal</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="98"/>
+        <location filename="../widgets/settings_panel.py" line="99"/>
         <source>Restart to apply language changes.</source>
         <translation>Start opnieuw op om taalwijzigingen toe te passen.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="112"/>
-        <location filename="../widgets/settings_panel.py" line="992"/>
+        <location filename="../widgets/settings_panel.py" line="113"/>
+        <location filename="../widgets/settings_panel.py" line="1003"/>
         <source>Default Audio Player</source>
         <translation>Standaard audiospeler</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="121"/>
+        <location filename="../widgets/settings_panel.py" line="122"/>
         <source>Make Mixed in P your default audio player</source>
         <translation>Mixed in P instellen als standaard audiospeler</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="131"/>
+        <location filename="../widgets/settings_panel.py" line="132"/>
         <source>Opens Windows Settings on the Mixed in P entry, where you can hand it your audio file types. Windows only lets you make that choice yourself.</source>
         <translation>Opent Windows-instellingen bij het item Mixed in P, waar je het je audiobestandstypen kunt toewijzen. Windows laat die keuze alleen aan jou.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="137"/>
+        <location filename="../widgets/settings_panel.py" line="138"/>
         <source>Double-clicking an audio file will open it here. Finder&apos;s Get Info panel puts it back.</source>
         <translation>Dubbelklikken op een audiobestand opent het hier. Via ‘Toon info’ in de Finder draai je dit terug.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="148"/>
+        <location filename="../widgets/settings_panel.py" line="149"/>
         <source>Theme</source>
         <translation>Thema</translation>
     </message>
@@ -3620,87 +3620,88 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Nachtdonker</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="166"/>
+        <location filename="../widgets/settings_panel.py" line="167"/>
         <source>Daylight</source>
         <translation>Daglicht</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="179"/>
+        <location filename="../widgets/settings_panel.py" line="180"/>
         <source>Restart to apply theme changes.</source>
         <translation>Start opnieuw op om themawijzigingen toe te passen.</translation>
     </message>
     <message>
+        <location filename="../widgets/settings_panel.py" line="310"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
-        <translation type="vanished">Golfvorm</translation>
+        <translation>Golfvorm</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="224"/>
+        <location filename="../widgets/settings_panel.py" line="225"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>Kleur van de volledige golfvorm in de speler.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="243"/>
+        <location filename="../widgets/settings_panel.py" line="244"/>
         <source>Default</source>
         <translation>Standaard</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="245"/>
+        <location filename="../widgets/settings_panel.py" line="246"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>Standaard golfvormkleur van het thema gebruiken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="253"/>
+        <location filename="../widgets/settings_panel.py" line="254"/>
         <source>Custom…</source>
         <translation>Aangepast…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="317"/>
+        <location filename="../widgets/settings_panel.py" line="328"/>
         <source>Playlist Text Size</source>
         <translation>Playlist-tekstgrootte</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="326"/>
+        <location filename="../widgets/settings_panel.py" line="337"/>
         <source>Size of the track rows in the player. Applies straight away.</source>
         <translation>Grootte van de trackrijen in de speler. Wordt meteen toegepast.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="338"/>
+        <location filename="../widgets/settings_panel.py" line="349"/>
         <source>Small</source>
         <translation>Klein</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="339"/>
+        <location filename="../widgets/settings_panel.py" line="350"/>
         <source>Medium</source>
         <translation>Middel</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="340"/>
+        <location filename="../widgets/settings_panel.py" line="351"/>
         <source>Large</source>
         <translation>Groot</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="377"/>
+        <location filename="../widgets/settings_panel.py" line="388"/>
         <source>Playlist Artwork</source>
         <translation>Playlist-artwork</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="387"/>
+        <location filename="../widgets/settings_panel.py" line="398"/>
         <source>Part of the cover art shown in the player&apos;s Art column. Full makes each row tall enough for the whole sleeve.</source>
         <translation>Deel van het artwork dat in de kolom Artwork van de speler wordt getoond. Volledig maakt elke rij hoog genoeg voor het hele artwork.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="401"/>
+        <location filename="../widgets/settings_panel.py" line="412"/>
         <source>Top</source>
         <translation>Boven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="402"/>
+        <location filename="../widgets/settings_panel.py" line="413"/>
         <source>Middle</source>
         <translation>Midden</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="403"/>
+        <location filename="../widgets/settings_panel.py" line="414"/>
         <source>Full</source>
         <translation>Volledig</translation>
     </message>
@@ -3717,58 +3718,58 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Voegt een visualisatiekiezer toe aan de speler en toont een bewegende golfvorm tijdens het analyseren of converteren.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="418"/>
+        <location filename="../widgets/settings_panel.py" line="429"/>
         <source>Tempo Range</source>
         <translation>Tempobereik</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="426"/>
+        <location filename="../widgets/settings_panel.py" line="437"/>
         <source>Min 50, Max 250.</source>
         <translation>Min 50, max 250.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="432"/>
+        <location filename="../widgets/settings_panel.py" line="443"/>
         <source>Lowest BPM</source>
         <translation>Laagste BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="449"/>
+        <location filename="../widgets/settings_panel.py" line="460"/>
         <source>Highest BPM</source>
         <translation>Hoogste BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="464"/>
+        <location filename="../widgets/settings_panel.py" line="475"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translation>Toonsoort/BPM toevoegen aan bestandsnaam na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="472"/>
+        <location filename="../widgets/settings_panel.py" line="483"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translatorcomment>Reviewed (nl pass): confirmed.</translatorcomment>
         <translation>Automatisch analyseren bij slepen naar of sturen naar het Analyseren-paneel</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="477"/>
+        <location filename="../widgets/settings_panel.py" line="488"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translation>BPM automatisch naar tags schrijven na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="481"/>
+        <location filename="../widgets/settings_panel.py" line="492"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM wordt afgerond op het dichtstbijzijnde hele getal bij het schrijven naar de metadata.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="486"/>
+        <location filename="../widgets/settings_panel.py" line="497"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translation>Toonsoort automatisch naar tags schrijven na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="490"/>
+        <location filename="../widgets/settings_panel.py" line="501"/>
         <source>Automatically rename files after analysis</source>
         <translation>Bestanden automatisch hernoemen na analyse</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="497"/>
+        <location filename="../widgets/settings_panel.py" line="508"/>
         <source>Write key to comment</source>
         <translation>Toonsoort naar opmerking schrijven</translation>
     </message>
@@ -3781,273 +3782,308 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Als zowel dit als de Energietag-opmerking worden geschreven, zet dan energie eerst en toonsoort daarna.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="207"/>
+        <location filename="../widgets/settings_panel.py" line="208"/>
         <source>Color follows the mix of bass, mids and highs.</source>
         <translation>De kleur volgt de mix van bas, midden en hoog.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="279"/>
+        <location filename="../widgets/settings_panel.py" line="280"/>
         <source>Use full-spectrum colors</source>
         <translation>Kleuren van het hele spectrum gebruiken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="503"/>
+        <location filename="../widgets/settings_panel.py" line="311"/>
+        <source>Zoomed Wave</source>
+        <translation>Ingezoomde golf</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="315"/>
+        <source>Half wave</source>
+        <translation>Halve golf</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="315"/>
+        <source>Full wave</source>
+        <translation>Volledige golf</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="514"/>
         <source>Naming format:</source>
         <translation>Naamgevingsformaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="512"/>
+        <location filename="../widgets/settings_panel.py" line="523"/>
         <source>128 8A - Original_File_Name</source>
         <translation>128 8A - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="512"/>
+        <location filename="../widgets/settings_panel.py" line="523"/>
         <source>BPM + Key prefix</source>
         <translation>BPM + toonsoort prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="513"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="513"/>
+        <location filename="../widgets/settings_panel.py" line="524"/>
         <source>Key + BPM prefix</source>
         <translation>Toonsoort + BPM prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="514"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - Originele_Bestandsnaam</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="514"/>
+        <location filename="../widgets/settings_panel.py" line="525"/>
         <source>Key prefix only</source>
         <translation>Alleen toonsoort prefix</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="515"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>Originele_Bestandsnaam - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="515"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>suffix: Key + BPM</source>
         <translation>suffix: toonsoort + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="516"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>Original_File_Name - 8A</source>
         <translation>Originele_Bestandsnaam - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="516"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>suffix: Key only</source>
         <translation>suffix: alleen toonsoort</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="539"/>
+        <location filename="../widgets/settings_panel.py" line="550"/>
         <source>Notation</source>
         <translation>Notatie</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="549"/>
+        <location filename="../widgets/settings_panel.py" line="560"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translatorcomment>Reviewed (nl pass): confirmed.</translatorcomment>
         <translation>Er kan slechts één notatie tegelijk actief zijn. Geldt voor de toonsoort die tijdens analyse naar tags/bestandsnamen wordt geschreven en voor de toonsoortlabels van het Toetsenbord-paneel.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="561"/>
+        <location filename="../widgets/settings_panel.py" line="572"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translatorcomment>Kept &apos;Key codes&apos; English per glossary; key-code tokens (8A etc.) preserved.</translatorcomment>
         <translation>👑 Key codes  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="562"/>
+        <location filename="../widgets/settings_panel.py" line="573"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translation>Traditionele toonsoortnotatie  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="563"/>
+        <location filename="../widgets/settings_panel.py" line="574"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="579"/>
+        <location filename="../widgets/settings_panel.py" line="590"/>
         <source>Energy Tag</source>
         <translatorcomment>&apos;Tag&apos;-&gt;compound &apos;Energietag&apos;; &apos;tag&apos; kept English (standard for metadata tags in NL).</translatorcomment>
         <translation>Energietag</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="587"/>
+        <location filename="../widgets/settings_panel.py" line="598"/>
         <source>Write energy level to Comment tag</source>
         <translation>Energieniveau naar Opmerking-tag schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="595"/>
+        <location filename="../widgets/settings_panel.py" line="606"/>
         <source>Energy level written first</source>
         <translation>Energieniveau eerst schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="599"/>
+        <location filename="../widgets/settings_panel.py" line="610"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>Als zowel energie als toonsoort naar de opmerking wordt geschreven, komt de energie eerst en de toonsoort daarna.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="605"/>
+        <location filename="../widgets/settings_panel.py" line="616"/>
         <source>Format:</source>
         <translation>Formaat:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="613"/>
+        <location filename="../widgets/settings_panel.py" line="624"/>
         <source>Number only  (7)</source>
         <translation>Alleen getal  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="614"/>
+        <location filename="../widgets/settings_panel.py" line="625"/>
         <source>With label  (Energy 7)</source>
         <translatorcomment>Kept the literal example label &apos;Energy 7&apos; as-is since it represents the actual text written to the tag.</translatorcomment>
         <translation>Met label  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="623"/>
+        <location filename="../widgets/settings_panel.py" line="634"/>
         <source>Write mode:</source>
         <translation>Schrijfmodus:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="631"/>
+        <location filename="../widgets/settings_panel.py" line="642"/>
         <source>Prepend to existing comment</source>
         <translation>Vooraan bestaande opmerking toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="632"/>
+        <location filename="../widgets/settings_panel.py" line="643"/>
         <source>Append to existing comment</source>
         <translation>Achteraan bestaande opmerking toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="633"/>
+        <location filename="../widgets/settings_panel.py" line="644"/>
         <source>Replace existing comment</source>
         <translation>Bestaande opmerking vervangen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="653"/>
+        <location filename="../widgets/settings_panel.py" line="664"/>
         <source>Write energy level to its own tag field</source>
         <translation>Energieniveau naar een eigen tagveld schrijven</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="656"/>
+        <location filename="../widgets/settings_panel.py" line="667"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>Bewaart de energie op een plek waar die exact terug te lezen is, in plaats van uit de opmerking te worden gehaald.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="741"/>
+        <location filename="../widgets/settings_panel.py" line="752"/>
         <source>Playlists</source>
         <translation>Playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="750"/>
+        <location filename="../widgets/settings_panel.py" line="761"/>
         <source>Duplicate tracks:</source>
         <translation>Dubbele tracks:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="753"/>
+        <location filename="../widgets/settings_panel.py" line="764"/>
         <source>Ask each time</source>
         <translation>Elke keer vragen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="754"/>
+        <location filename="../widgets/settings_panel.py" line="765"/>
         <source>Always add duplicates</source>
         <translation>Dubbele altijd toevoegen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="755"/>
+        <location filename="../widgets/settings_panel.py" line="766"/>
         <source>Always skip duplicates</source>
         <translation>Dubbele altijd overslaan</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="767"/>
+        <location filename="../widgets/settings_panel.py" line="778"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>Wat er gebeurt als je een track toevoegt die de playlist al bevat. Een set kan een track met opzet herhalen, dus wordt het aan jou gevraagd in plaats van voor je beslist: kies een van de andere opties om niet meer gevraagd te worden.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="777"/>
+        <location filename="../widgets/settings_panel.py" line="788"/>
         <source>Keep Scratch between sessions</source>
         <translation>Scratch tussen sessies bewaren</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="784"/>
+        <location filename="../widgets/settings_panel.py" line="795"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch is de werklijst waarmee de speler opent, en die is bij elke start leeg. Zet dit aan om hem weer te openen met wat erin zat — hoe dan ook bewaart ‘Playlist opslaan’ een kopie.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="794"/>
+        <location filename="../widgets/settings_panel.py" line="805"/>
         <source>Always use full paths in exported playlists</source>
         <translation>Altijd volledige paden gebruiken in geëxporteerde playlists</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="802"/>
+        <location filename="../widgets/settings_panel.py" line="813"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>Geëxporteerde playlists gebruiken paden relatief aan het playlistbestand wanneer de tracks ernaast staan, zodat een map die je zipt en verstuurt ook werkt op de computer van iemand anders. Zet dit aan om altijd het volledige pad te schrijven.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="812"/>
+        <location filename="../widgets/settings_panel.py" line="823"/>
         <source>Export All Playlists…</source>
         <translation>Alle playlists exporteren…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="821"/>
+        <location filename="../widgets/settings_panel.py" line="832"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>Schrijft één map met playlistbestanden die je structuur weerspiegelt: een back-up die elke andere app kan lezen.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="668"/>
+        <location filename="../widgets/settings_panel.py" line="1247"/>
+        <source>Show the half wave in the Waveform view</source>
+        <translation>Halve golf tonen in de weergave Golfvorm</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1249"/>
+        <source>Show the full wave in the Waveform view</source>
+        <translation>Volledige golf tonen in de weergave Golfvorm</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1252"/>
+        <source>Show the half wave in the Zoomed Wave view</source>
+        <translation>Halve golf tonen in de weergave Ingezoomde golf</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1254"/>
+        <source>Show the full wave in the Zoomed Wave view</source>
+        <translation>Volledige golf tonen in de weergave Ingezoomde golf</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="679"/>
         <source>Online Metadata</source>
         <translation>Online metagegevens</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="165"/>
+        <location filename="../widgets/settings_panel.py" line="166"/>
         <source>Dark Mode</source>
         <translation>Donkere modus</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="167"/>
+        <location filename="../widgets/settings_panel.py" line="168"/>
         <source>Slate</source>
         <translatorcomment>Colour/stone name (leigrijs).</translatorcomment>
         <translation>Leisteen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="187"/>
+        <location filename="../widgets/settings_panel.py" line="188"/>
         <source>Waveform / Visuals</source>
         <translatorcomment>Beide helften hergebruiken de bestaande strings &apos;Golfvorm&apos; en &apos;Visualisaties&apos;.</translatorcomment>
         <translation>Golfvorm / Visualisaties</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="198"/>
+        <location filename="../widgets/settings_panel.py" line="199"/>
         <source>Color mode:</source>
         <translation>Kleurmodus:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="202"/>
+        <location filename="../widgets/settings_panel.py" line="203"/>
         <source>Solid</source>
         <translation>Effen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="202"/>
+        <location filename="../widgets/settings_panel.py" line="203"/>
         <source>One color for the whole waveform.</source>
         <translation>Eén kleur voor de hele golfvorm.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="203"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Loudness</source>
         <translation>Luidheid</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="203"/>
+        <location filename="../widgets/settings_panel.py" line="204"/>
         <source>Color brightness follows the volume.</source>
         <translation>De helderheid van de kleur volgt het volume.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="205"/>
+        <location filename="../widgets/settings_panel.py" line="206"/>
         <source>Frequency bands</source>
         <translation>Frequentiebanden</translation>
     </message>
@@ -4056,12 +4092,12 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Rood is bas, groen hoog, blauw midden.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="209"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Tone</source>
         <translation>Klank</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="209"/>
+        <location filename="../widgets/settings_panel.py" line="210"/>
         <source>Color follows the balance from bass to treble.</source>
         <translation>De kleur volgt de balans van bas naar hoog.</translation>
     </message>
@@ -4070,179 +4106,175 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">Frequentiebanden en Klank kiezen hun eigen kleuren.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="265"/>
+        <location filename="../widgets/settings_panel.py" line="266"/>
         <source>This track</source>
         <translation>Deze track</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="269"/>
+        <location filename="../widgets/settings_panel.py" line="270"/>
         <source>Fixed</source>
         <translation>Vast</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="286"/>
+        <location filename="../widgets/settings_panel.py" line="287"/>
         <source>Fixed colors every track on one scale, so tracks compare.</source>
         <translation>Vast kleurt elke track op dezelfde schaal, zodat tracks te vergelijken zijn.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="300"/>
         <source>Show half waveform</source>
-        <translation>Halve golfvorm tonen</translation>
+        <translation type="vanished">Halve golfvorm tonen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="304"/>
         <source>Show full waveform</source>
-        <translation>Volledige golfvorm tonen</translation>
+        <translation type="vanished">Volledige golfvorm tonen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="362"/>
+        <location filename="../widgets/settings_panel.py" line="373"/>
         <source>Enable large menu text</source>
         <translation>Grote menutekst inschakelen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="679"/>
+        <location filename="../widgets/settings_panel.py" line="690"/>
         <source>Look up track details online (Discogs)</source>
         <translation>Nummergegevens online opzoeken (Discogs)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="687"/>
+        <location filename="../widgets/settings_panel.py" line="698"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>Standaard uit; de app doet geen netwerkverzoeken totdat je dit aanzet. Een zoekopdracht stuurt de artiest en titel van het gekozen nummer — nooit je audio en nooit je bibliotheek. BPM, toonsoort en energie komen altijd uit de analyse van deze app.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="698"/>
+        <location filename="../widgets/settings_panel.py" line="709"/>
         <source>Discogs token:</source>
         <translation>Discogs-token:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="704"/>
+        <location filename="../widgets/settings_panel.py" line="715"/>
         <source>Paste your token</source>
         <translation>Plak je token</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="707"/>
+        <location filename="../widgets/settings_panel.py" line="718"/>
         <source>Get a Token…</source>
         <translation>Token ophalen…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="714"/>
+        <location filename="../widgets/settings_panel.py" line="725"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>Discogs heeft een gratis persoonlijk token nodig om hoezen mee te sturen en op volle snelheid te antwoorden. Het is alleen-lezen en je kunt het altijd intrekken op je Discogs-account.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="723"/>
+        <location filename="../widgets/settings_panel.py" line="734"/>
         <source>Fetch cover art with lookups</source>
         <translation>Hoes ophalen bij het opzoeken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="730"/>
+        <location filename="../widgets/settings_panel.py" line="741"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>Toont de hoes van de uitgave naast die van je bestand, zodat je ze kunt vergelijken. Er wordt niets geschreven totdat je akkoord gaat.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="833"/>
-        <location filename="../widgets/settings_panel.py" line="968"/>
+        <location filename="../widgets/settings_panel.py" line="844"/>
+        <location filename="../widgets/settings_panel.py" line="979"/>
         <source>Reset to Default</source>
         <translation>Standaardwaarden herstellen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="841"/>
+        <location filename="../widgets/settings_panel.py" line="852"/>
         <source>Reset</source>
         <translation>Herstellen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="850"/>
+        <location filename="../widgets/settings_panel.py" line="861"/>
         <source>Puts every setting back the way it shipped. Your language, theme and window layout are kept, and so is your default audio player — that one lives with the system.</source>
         <translation>Zet alle instellingen terug zoals ze geleverd werden. Taal, thema en vensterindeling blijven behouden, net als je standaard audiospeler — die hoort bij het systeem.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="961"/>
+        <location filename="../widgets/settings_panel.py" line="972"/>
         <source>Put every setting back to the way it shipped?</source>
         <translation>Alle instellingen terugzetten zoals ze geleverd werden?</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="963"/>
+        <location filename="../widgets/settings_panel.py" line="974"/>
         <source>Your language, theme and window layout are kept. Your Discogs token is cleared. This cannot be undone.</source>
         <translation>Taal, thema en vensterindeling blijven behouden. Je Discogs-token wordt gewist. Dit kan niet ongedaan worden gemaakt.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="997"/>
+        <location filename="../widgets/settings_panel.py" line="1008"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>Je audiobestanden worden nu geopend met Mixed in P.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1008"/>
+        <location filename="../widgets/settings_panel.py" line="1019"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P is niet geregistreerd bij Windows. Opnieuw installeren registreert het.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1013"/>
+        <location filename="../widgets/settings_panel.py" line="1024"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>Windows-instellingen kon niet worden geopend. Je kunt dit daar zelf instellen bij ‘Apps → Standaard-apps’.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1019"/>
+        <location filename="../widgets/settings_panel.py" line="1030"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Selecteer een audiobestand in de Finder, druk op Command-I, kies Mixed in P bij ‘Open met’ en klik op ‘Wijzig alle’.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1212"/>
+        <location filename="../widgets/settings_panel.py" line="1223"/>
         <source>Use shades of the selected color</source>
         <translation>Tinten van de gekozen kleur gebruiken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1214"/>
+        <location filename="../widgets/settings_panel.py" line="1225"/>
         <source>Use the full range of colors instead of the selected color</source>
         <translation>Alle kleuren gebruiken in plaats van de gekozen kleur</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1224"/>
+        <location filename="../widgets/settings_panel.py" line="1235"/>
         <source>Scale the colors to each track&apos;s own range</source>
         <translation>Kleuren schalen naar het bereik van elke track</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1226"/>
+        <location filename="../widgets/settings_panel.py" line="1237"/>
         <source>Scale the colors the same for every track</source>
         <translation>Kleuren voor elke track gelijk schalen</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1236"/>
         <source>Show the half waveform in the player</source>
-        <translation>Halve golfvorm tonen in de speler</translation>
+        <translation type="vanished">Halve golfvorm tonen in de speler</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1238"/>
         <source>Show the full waveform in the player</source>
-        <translation>Volledige golfvorm tonen in de speler</translation>
+        <translation type="vanished">Volledige golfvorm tonen in de speler</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1248"/>
+        <location filename="../widgets/settings_panel.py" line="1264"/>
         <source>Use smaller text in the playlist&apos;s menus</source>
         <translation>Kleinere tekst in de playlist-menu&apos;s gebruiken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1250"/>
+        <location filename="../widgets/settings_panel.py" line="1266"/>
         <source>Use larger text in the playlist&apos;s menus</source>
         <translation>Grotere tekst in de playlist-menu&apos;s gebruiken</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1255"/>
+        <location filename="../widgets/settings_panel.py" line="1271"/>
         <source>Waveform color</source>
         <translation>Golfvormkleur</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1293"/>
-        <location filename="../widgets/settings_panel.py" line="1306"/>
+        <location filename="../widgets/settings_panel.py" line="1309"/>
+        <location filename="../widgets/settings_panel.py" line="1322"/>
         <source>Restart required</source>
         <translation>Opnieuw opstarten vereist</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1295"/>
+        <location filename="../widgets/settings_panel.py" line="1311"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translation>De taalwijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1308"/>
+        <location filename="../widgets/settings_panel.py" line="1324"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>De themawijziging wordt van kracht zodra je Mixed in P opnieuw opstart.</translation>
     </message>
@@ -4538,17 +4570,17 @@ of klik op “Artwork toevoegen…”</translation>
         <translation type="vanished">▾  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="780"/>
+        <location filename="../widgets/slice_section.py" line="781"/>
         <source>Choose Save Folder</source>
         <translation>Kies opslagmap</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="799"/>
+        <location filename="../widgets/slice_section.py" line="800"/>
         <source>Saved: {0}</source>
         <translation>Opgeslagen: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="804"/>
+        <location filename="../widgets/slice_section.py" line="805"/>
         <source>Error: {0}</source>
         <translation>Fout: {0}</translation>
     </message>

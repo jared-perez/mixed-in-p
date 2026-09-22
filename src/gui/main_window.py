@@ -193,7 +193,9 @@ class MainWindow(QMainWindow):
             self._config.waveform_color_absolute,
             self._config.waveform_color_hue_mapped,
         )
-        self._player_panel.set_waveform_half(self._config.player_waveform_half)
+        self._player_panel.set_waveform_half(
+            self._config.player_waveform_half, self._config.player_zoom_waveform_half
+        )
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)
         self._player_panel.set_large_menu_text(self._config.player_menu_large_text)
@@ -2290,7 +2292,9 @@ class MainWindow(QMainWindow):
             self._config.waveform_color_absolute,
             self._config.waveform_color_hue_mapped,
         )
-        self._player_panel.set_waveform_half(self._config.player_waveform_half)
+        self._player_panel.set_waveform_half(
+            self._config.player_waveform_half, self._config.player_zoom_waveform_half
+        )
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)
         self._player_panel.set_large_menu_text(self._config.player_menu_large_text)

@@ -10,6 +10,7 @@ from PySide6.QtWidgets import (
     QColorDialog,
     QComboBox,
     QFrame,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -292,22 +293,32 @@ class SettingsPanel(QWidget):
         self._sync_waveform_spectrum_tooltip()
 
         # Half/full as a left/right choice rather than an on/off checkbox:
-        # the switch sits between the two options, knob left = half.
-        half_row = self._row_layout()
-        half_row.setSpacing(10)
+        # the switch sits between the two options, knob left = half. One row
+        # per view, in a grid so the two switches line up under each other.
+        half_grid = QGridLayout()
+        half_grid.setContentsMargins(0, 0, 0, 0)
+        half_grid.setHorizontalSpacing(10)
+        half_grid.setVerticalSpacing(Theme.SPACING)
         # Its own sub-section, not a third swatch row — keep it off the colours.
         wave_layout.addSpacing(14)
-        half_label = QLabel(self.tr("Show half waveform"))
-        half_label.setObjectName("settingsLabel")
         self._waveform_full_switch = ToggleSwitch()
         self._waveform_full_switch.toggled.connect(self._on_waveform_full_toggled)
-        full_label = QLabel(self.tr("Show full waveform"))
-        full_label.setObjectName("settingsLabel")
-        half_row.addWidget(half_label)
-        half_row.addWidget(self._waveform_full_switch)
-        half_row.addWidget(full_label)
-        half_row.addStretch(1)
-        wave_layout.addLayout(half_row)
+        self._zoom_waveform_full_switch = ToggleSwitch()
+        self._zoom_waveform_full_switch.toggled.connect(self._on_waveform_full_toggled)
+        for row, (name, switch) in enumerate(
+            (
+                (self.tr("Waveform"), self._waveform_full_switch),
+                (self.tr("Zoomed Wave"), self._zoom_waveform_full_switch),
+            )
+        ):
+            for col, widget in enumerate(
+                (QLabel(name), QLabel(self.tr("Half wave")), switch, QLabel(self.tr("Full wave")))
+            ):
+                if isinstance(widget, QLabel):
+                    widget.setObjectName("settingsLabel")
+                half_grid.addWidget(widget, row, col)
+        half_grid.setColumnStretch(4, 1)
+        wave_layout.addLayout(half_grid)
         self._sync_waveform_full_tooltip()
 
         outer.addWidget(wave_frame)
@@ -1233,9 +1244,14 @@ class SettingsPanel(QWidget):
     def _sync_waveform_full_tooltip(self) -> None:
         """Say what the next click will do (CLAUDE.md, UI copy)."""
         self._waveform_full_switch.setToolTip(
-            self.tr("Show the half waveform in the player")
+            self.tr("Show the half wave in the Waveform view")
             if self._waveform_full_switch.isChecked()
-            else self.tr("Show the full waveform in the player")
+            else self.tr("Show the full wave in the Waveform view")
+        )
+        self._zoom_waveform_full_switch.setToolTip(
+            self.tr("Show the half wave in the Zoomed Wave view")
+            if self._zoom_waveform_full_switch.isChecked()
+            else self.tr("Show the full wave in the Zoomed Wave view")
         )
 
     def _on_menu_large_text_toggled(self, _checked: bool) -> None:
@@ -1380,6 +1396,7 @@ class SettingsPanel(QWidget):
             waveform_color_absolute=self._waveform_absolute_switch.isChecked(),
             waveform_color_hue_mapped=self._waveform_spectrum_switch.isChecked(),
             player_waveform_half=not self._waveform_full_switch.isChecked(),
+            player_zoom_waveform_half=not self._zoom_waveform_full_switch.isChecked(),
             export_absolute_paths=self._export_absolute_cb.isChecked(),
             persist_scratch=self._persist_scratch_cb.isChecked(),
             duplicate_policy=self._duplicate_policy_combo.currentData(),
@@ -1413,9 +1430,13 @@ class SettingsPanel(QWidget):
         self._theme_combo.blockSignals(False)
 
         self._select_waveform_color(cfg.waveform_color, emit=False)
-        self._waveform_full_switch.blockSignals(True)
-        self._waveform_full_switch.setChecked(not cfg.player_waveform_half)
-        self._waveform_full_switch.blockSignals(False)
+        for switch, half in (
+            (self._waveform_full_switch, cfg.player_waveform_half),
+            (self._zoom_waveform_full_switch, cfg.player_zoom_waveform_half),
+        ):
+            switch.blockSignals(True)
+            switch.setChecked(not half)
+            switch.blockSignals(False)
         self._sync_waveform_full_tooltip()
         self._waveform_mode_combo.blockSignals(True)
         mode_index = self._waveform_mode_combo.findData(cfg.waveform_color_mode)

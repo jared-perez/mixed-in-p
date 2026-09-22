@@ -1,6 +1,7 @@
-"""Settings' half/full waveform switch and what it does to the Player's views.
+"""Settings' half/full waveform switches and what they do to the Player's views.
 
-Half view draws only the top of the Waveform and Zoomed Wave canvases, rising
+There is one switch per view. Half view draws only the top of the Waveform or
+Zoomed Wave canvas, rising
 from a baseline at the bottom edge, in half the height — the point is to give
 that room back to the playlist. The paint tests sample ``grab()`` rather than
 asserting on state, because the state is not the bug a user would see.
@@ -65,8 +66,16 @@ class TestCanvasHeight:
         sec.set_track(str(track), DURATION_MS)
         sec._zoom_btn.setChecked(True)
         full = sec.first_screen_height()
-        sec.set_waveform_half(True)
+        sec.set_waveform_half(False, True)
         assert sec.first_screen_height() == full - sec._zoom_waveform.minimumHeight()
+
+    @pytest.mark.parametrize("half, zoom_half", [(True, False), (False, True)])
+    def test_each_view_follows_its_own_setting(self, qtbot, half, zoom_half):
+        sec = SliceSection(PlayerEngine())
+        qtbot.addWidget(sec)
+        sec.set_waveform_half(half, zoom_half)
+        assert sec._waveform.is_half() is half
+        assert sec._zoom_waveform.is_half() is zoom_half
 
 
 class TestCanvasPaint:
@@ -107,6 +116,28 @@ class TestCanvasPaint:
 class TestSetting:
     def test_defaults_to_half(self):
         assert AppConfig().player_waveform_half is True
+        assert AppConfig().player_zoom_waveform_half is True
+
+    @pytest.mark.parametrize("half", [True, False])
+    def test_a_config_from_before_the_split_keeps_its_look_in_both_views(self, half):
+        from src.utils.app_dirs import get_app_data_dir
+
+        path = get_app_data_dir() / "config.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps({"player_waveform_half": half}))
+        cfg = load_config()
+        assert (cfg.player_waveform_half, cfg.player_zoom_waveform_half) == (half, half)
+
+    def test_the_two_settings_load_independently(self):
+        from src.utils.app_dirs import get_app_data_dir
+
+        path = get_app_data_dir() / "config.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps({"player_waveform_half": False, "player_zoom_waveform_half": True})
+        )
+        cfg = load_config()
+        assert (cfg.player_waveform_half, cfg.player_zoom_waveform_half) == (False, True)
 
     def test_an_old_config_without_the_key_loads_as_half(self, tmp_path):
         from src.utils.app_dirs import get_app_data_dir
@@ -116,24 +147,36 @@ class TestSetting:
         path.write_text(json.dumps({"waveform_color": "#f0ff00"}))
         assert load_config().player_waveform_half is True
 
-    @pytest.mark.parametrize("half", [True, False])
-    def test_round_trips_through_the_panel(self, qtbot, half):
+    @pytest.mark.parametrize("half, zoom_half", [(True, False), (False, True)])
+    def test_round_trips_through_the_panel(self, qtbot, half, zoom_half):
         panel = SettingsPanel()
         qtbot.addWidget(panel)
-        panel.load_config(AppConfig(player_waveform_half=half))
+        panel.load_config(
+            AppConfig(player_waveform_half=half, player_zoom_waveform_half=zoom_half)
+        )
         # Knob left = half, right = full.
         assert panel._waveform_full_switch.isChecked() is (not half)
-        assert panel.get_config().player_waveform_half is half
+        assert panel._zoom_waveform_full_switch.isChecked() is (not zoom_half)
+        cfg = panel.get_config()
+        assert (cfg.player_waveform_half, cfg.player_zoom_waveform_half) == (half, zoom_half)
 
-    def test_flipping_the_switch_emits_and_updates_its_tooltip(self, qtbot):
+    @pytest.mark.parametrize("which", ["full", "zoom"])
+    def test_flipping_a_switch_emits_and_updates_only_its_own_tooltip(self, qtbot, which):
         panel = SettingsPanel()
         qtbot.addWidget(panel)
-        panel.load_config(AppConfig(player_waveform_half=True))
-        before = panel._waveform_full_switch.toolTip()
+        panel.load_config(AppConfig(player_waveform_half=True, player_zoom_waveform_half=True))
+        flipped, other = panel._waveform_full_switch, panel._zoom_waveform_full_switch
+        if which == "zoom":
+            flipped, other = other, flipped
+        before, other_before = flipped.toolTip(), other.toolTip()
         with qtbot.waitSignal(panel.settings_changed, timeout=1000):
-            panel._waveform_full_switch.click()
-        assert panel.get_config().player_waveform_half is False
-        assert panel._waveform_full_switch.toolTip() != before
+            flipped.click()
+        cfg = panel.get_config()
+        halves = {"full": cfg.player_waveform_half, "zoom": cfg.player_zoom_waveform_half}
+        assert halves[which] is False
+        assert halves["zoom" if which == "full" else "full"] is True
+        assert flipped.toolTip() != before
+        assert other.toolTip() == other_before
 
 
 class TestToggleSwitchKnob:

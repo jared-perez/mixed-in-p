@@ -160,9 +160,12 @@ class AppConfig:
     # False stretches each track's own range across the colours (per-track);
     # True uses one fixed mapping, so two tracks compare. See waveform_palette.
     waveform_color_absolute: bool = False
-    # Player's Waveform and Zoomed Wave views: True draws only the top half
-    # (the peak envelope) in half the height, False the mirrored full wave.
+    # Player's Waveform view: True draws only the top half (the peak
+    # envelope) in half the height, False the mirrored full wave.
     player_waveform_half: bool = True
+    # The same choice for the Zoomed Wave view. It was one setting for both
+    # views, so a config from before the split inherits player_waveform_half.
+    player_zoom_waveform_half: bool = True
     # When True, the Player playlist's inline metadata editing is locked off.
     player_edit_locked: bool = False
     # The visual showing in the Player, chosen from its eye-icon menu (see
@@ -450,6 +453,12 @@ def load_config() -> AppConfig:
                 ),
                 player_waveform_half=bool(
                     data.get("player_waveform_half", AppConfig.player_waveform_half)
+                ),
+                player_zoom_waveform_half=bool(
+                    data.get(
+                        "player_zoom_waveform_half",
+                        data.get("player_waveform_half", AppConfig.player_zoom_waveform_half),
+                    )
                 ),
                 player_edit_locked=bool(
                     data.get("player_edit_locked", AppConfig.player_edit_locked)
