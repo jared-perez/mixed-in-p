@@ -6,6 +6,11 @@ a *view* of whatever the engine is playing, so it follows the track and shows
 a placeholder rather than vanishing when nothing is playing — a box that
 disappears on Stop reads as a crash rather than as an empty state.
 
+An image dropped on it becomes the playing track's cover, exactly as one
+dropped on the header art does. The box only reports the drop
+(``artwork_dropped``); whether a drop is taken at all is the Player's call,
+reflected in with ``set_droppable``.
+
 The side is an INPUT (``set_side``), never derived from the widget's own
 hints: a QLabel holding a pixmap reports *that pixmap* as its size hint, so a
 box that scaled its picture to its own width would converge on whatever it
@@ -22,10 +27,15 @@ layout to notice.
 from __future__ import annotations
 
 from PySide6.QtCore import QRect, Qt, Signal
-from PySide6.QtGui import QColor, QFont, QPainter, QPixmap
+from PySide6.QtGui import QPainter, QPixmap
 from PySide6.QtWidgets import QFrame, QLabel, QPushButton
 
-from src.gui.styles.theme import Theme
+from .art_placeholder import (
+    dropped_image,
+    image_urls,
+    paint_drop_outline,
+    paint_placeholder,
+)
 
 # Side of the round close button, and the inset it sits at from the corner.
 _CLOSE_SIDE = 18
@@ -48,6 +58,10 @@ class _ArtCanvas(QLabel):
         super().__init__()
         self.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self._pixmap_source: QPixmap | None = None
+        # Whether to invite a drop in the placeholder, and whether one is
+        # hovering right now. Both set by the box, which takes the drops.
+        self.droppable = False
+        self.drag_over = False
 
     def set_source(self, pixmap: QPixmap | None) -> None:
         self._pixmap_source = pixmap
@@ -74,15 +88,19 @@ class _ArtCanvas(QLabel):
     def paintEvent(self, event) -> None:  # type: ignore[override]
         if self._pixmap_source is not None and not self._pixmap_source.isNull():
             super().paintEvent(event)
-            return
-        painter = QPainter(self)
-        rect = self.rect()
-        painter.fillRect(rect, QColor(Theme.BG_LIGHT))
-        painter.setPen(QColor(Theme.TEXT_SECONDARY))
-        glyph = QFont(painter.font())
-        glyph.setPointSize(max(18, rect.height() // 3))
-        painter.setFont(glyph)
-        painter.drawText(rect, Qt.AlignmentFlag.AlignCenter, "♪")
+            painter = QPainter(self)
+        else:
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            paint_placeholder(
+                painter,
+                self.rect(),
+                self.tr("No artwork"),
+                self.tr("Drop an image here") if self.droppable else "",
+                padding=12,
+            )
+        if self.drag_over:
+            paint_drop_outline(painter, self.rect())
         painter.end()
 
 
@@ -91,6 +109,8 @@ class SidebarArtBox(QFrame):
 
     # The user asked for the box to go away.
     closed = Signal()
+    # (bytes, mime type) of an image dropped on the box.
+    artwork_dropped = Signal(object, object)
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
@@ -132,6 +152,43 @@ class SidebarArtBox(QFrame):
         """Whether a real cover is showing rather than the placeholder."""
         source = self._canvas._pixmap_source
         return source is not None and not source.isNull()
+
+    def set_droppable(self, droppable: bool) -> None:
+        """Whether a dropped image would be written to the playing track."""
+        self.setAcceptDrops(droppable)
+        self._canvas.droppable = droppable
+        if not droppable:
+            self._canvas.drag_over = False
+        self._canvas.update()
+
+    def is_droppable(self) -> bool:
+        return self._canvas.droppable
+
+    # The canvas doesn't accept drops, so Qt hands them to this frame.
+    def dragEnterEvent(self, event) -> None:
+        if self._canvas.droppable and image_urls(event.mimeData()):
+            event.setDropAction(Qt.DropAction.CopyAction)
+            event.accept()
+            self._set_drag_over(True)
+            return
+        event.ignore()
+
+    def dragLeaveEvent(self, event) -> None:
+        self._set_drag_over(False)
+
+    def dropEvent(self, event) -> None:
+        self._set_drag_over(False)
+        image = dropped_image(event.mimeData()) if self._canvas.droppable else None
+        if image is None:
+            event.ignore()
+            return
+        event.setDropAction(Qt.DropAction.CopyAction)
+        event.accept()
+        self.artwork_dropped.emit(*image)
+
+    def _set_drag_over(self, over: bool) -> None:
+        self._canvas.drag_over = over
+        self._canvas.update()
 
     def art_rect(self) -> QRect:
         """The square the cover is drawn in — for tests that sample pixels."""

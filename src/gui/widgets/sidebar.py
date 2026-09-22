@@ -237,6 +237,8 @@ class Sidebar(QFrame):
     # The cover box opened (True) or closed (False), by any route — its own
     # close button included, which the window cannot otherwise see.
     art_box_open_changed = Signal(bool)
+    # An image was dropped on the cover box: (bytes, mime type).
+    art_dropped = Signal(object, object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -428,6 +430,7 @@ class Sidebar(QFrame):
         # never opens it.
         self._art_box = SidebarArtBox()
         self._art_box.closed.connect(self.hide_art_box)
+        self._art_box.artwork_dropped.connect(self.art_dropped.emit)
         self._art_box.hide()
         # Remembered across a collapse, which hides the box without closing
         # it: 44px of cover on the 56px rail is noise, but the user did ask
@@ -695,6 +698,11 @@ class Sidebar(QFrame):
         """Update what an already-open box shows; a closed one is left alone."""
         if self._art_box_open:
             self._art_box.set_artwork(data)
+
+    def set_art_droppable(self, droppable: bool) -> None:
+        """Whether the cover box takes an image dropped on it (the Player's
+        call — see ``PlayerPanel.artwork_editable``)."""
+        self._art_box.set_droppable(droppable)
 
     def art_box_open(self) -> bool:
         """Whether the user has the cover box open.

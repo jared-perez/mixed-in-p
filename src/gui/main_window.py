@@ -408,6 +408,13 @@ class MainWindow(QMainWindow):
         self._sidebar.art_box_open_changed.connect(
             self._player_panel.set_art_box_open
         )
+        # Either cover takes a dropped image as the playing track's new one;
+        # the Player decides whether that's allowed and does the write.
+        self._player_panel.art_editable_changed.connect(
+            self._sidebar.set_art_droppable
+        )
+        self._sidebar.art_dropped.connect(self._player_panel.set_playing_artwork)
+        self._player_panel.playing_artwork_changed.connect(self._sync_sidebar_art)
 
         # Rename panel signals (file drop + full pipeline)
         self._rename_panel.files_dropped.connect(self._add_files)

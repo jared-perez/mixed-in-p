@@ -959,6 +959,19 @@ or click “Add Artwork…”</source>
     </message>
 </context>
 <context>
+    <name>HeaderArtLabel</name>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1609"/>
+        <source>No artwork</source>
+        <translation>Нет обложки</translation>
+    </message>
+    <message>
+        <location filename="../widgets/player_panel.py" line="1610"/>
+        <source>Drop…</source>
+        <translation>Перетащите…</translation>
+    </message>
+</context>
+<context>
     <name>HeaderBar</name>
     <message>
         <location filename="../widgets/header_bar.py" line="69"/>
@@ -1523,69 +1536,69 @@ or click “Add Artwork…”</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="670"/>
-        <location filename="../main_window.py" line="699"/>
+        <location filename="../main_window.py" line="677"/>
+        <location filename="../main_window.py" line="706"/>
         <source>Export All Playlists</source>
         <translation>Экспортировать все плейлисты</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="691"/>
+        <location filename="../main_window.py" line="698"/>
         <source>Export failed</source>
         <translation>Не удалось экспортировать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="692"/>
+        <location filename="../main_window.py" line="699"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Не удалось записать файл:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="700"/>
+        <location filename="../main_window.py" line="707"/>
         <source>There are no playlists to export yet.</source>
         <translation>Пока нет плейлистов для экспорта.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="705"/>
+        <location filename="../main_window.py" line="712"/>
         <source>Export complete</source>
         <translation>Экспорт завершён</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="706"/>
+        <location filename="../main_window.py" line="713"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Экспортировано плейлистов: {0} ({1} треков) в:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="821"/>
+        <location filename="../main_window.py" line="828"/>
         <source>Select Audio Files</source>
         <translation>Выберите аудиофайлы</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="832"/>
+        <location filename="../main_window.py" line="839"/>
         <source>Select Folder</source>
         <translation>Выберите папку</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1080"/>
+        <location filename="../main_window.py" line="1087"/>
         <source>No Audio Files</source>
         <translation>Нет аудиофайлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1081"/>
+        <location filename="../main_window.py" line="1088"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Аудиофайлы не найдены в:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1086"/>
+        <location filename="../main_window.py" line="1093"/>
         <source>Invalid Folder</source>
         <translation>Недопустимая папка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1087"/>
+        <location filename="../main_window.py" line="1094"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Недопустимый каталог:
@@ -1600,17 +1613,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Анализ уже выполняется. Подождите или сначала отмените его.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1285"/>
+        <location filename="../main_window.py" line="1292"/>
         <source>Analyzing...</source>
         <translation>Анализ...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1317"/>
+        <location filename="../main_window.py" line="1324"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Готово: {0} проанализировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1321"/>
+        <location filename="../main_window.py" line="1328"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Готово: {0} файлов проанализировано</translation>
     </message>
@@ -1619,127 +1632,127 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отменено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1547"/>
+        <location filename="../main_window.py" line="1554"/>
         <source>Conversion in Progress</source>
         <translation>Конвертация выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1548"/>
+        <location filename="../main_window.py" line="1555"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Конвертация уже выполняется. Подождите.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1566"/>
+        <location filename="../main_window.py" line="1573"/>
         <source>Pipeline in Progress</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Пайплайн выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1567"/>
+        <location filename="../main_window.py" line="1574"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Предыдущий пайплайн ещё завершается — дождитесь его окончания.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1584"/>
+        <location filename="../main_window.py" line="1591"/>
         <source>No Target Playlist</source>
         <translation>Нет целевого плейлиста</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1585"/>
-        <location filename="../main_window.py" line="1778"/>
+        <location filename="../main_window.py" line="1592"/>
+        <location filename="../main_window.py" line="1785"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>Сначала укажите плейлист для запуска в верхней панели.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1790"/>
+        <location filename="../main_window.py" line="1797"/>
         <source>Cannot Start</source>
         <translation>Не удаётся запустить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1800"/>
+        <location filename="../main_window.py" line="1807"/>
         <source>No Files</source>
         <translation>Нет файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1801"/>
+        <location filename="../main_window.py" line="1808"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Добавьте файлы на эту панель, прежде чем запускать пайплайн.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1811"/>
+        <location filename="../main_window.py" line="1818"/>
         <source>No Rename Adjustments</source>
         <translation>Нет настроек переименования</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1812"/>
+        <location filename="../main_window.py" line="1819"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>Настройки переименования не заданы. Отправить файлы без изменений?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1906"/>
+        <location filename="../main_window.py" line="1913"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>Файлы с потерями остаются в «Конвертации» — причина указана в их статусе.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2038"/>
+        <location filename="../main_window.py" line="2045"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Пайплайн завершён: {added} добавлено в {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2043"/>
+        <location filename="../main_window.py" line="2050"/>
         <source>{n} skipped</source>
         <translation>{n} пропущено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2045"/>
+        <location filename="../main_window.py" line="2052"/>
         <source>{n} errors</source>
         <translation>{n} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2177"/>
+        <location filename="../main_window.py" line="2184"/>
         <source>Converting...</source>
         <translation>Конвертация...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2193"/>
+        <location filename="../main_window.py" line="2200"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Готово: {0} конвертировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2197"/>
+        <location filename="../main_window.py" line="2204"/>
         <source>Complete: {0} files converted</source>
         <translation>Готово: {0} файлов конвертировано</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2591"/>
+        <location filename="../main_window.py" line="2598"/>
         <source>Rename in Progress</source>
         <translation>Переименование выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2592"/>
+        <location filename="../main_window.py" line="2599"/>
         <source>A rename operation is already running.</source>
         <translation>Операция переименования уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2700"/>
+        <location filename="../main_window.py" line="2707"/>
         <source>Rename Failed</source>
         <translation>Не удалось переименовать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2735"/>
+        <location filename="../main_window.py" line="2742"/>
         <source>Undo Rename</source>
         <translation>Отменить переименование</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2770"/>
+        <location filename="../main_window.py" line="2777"/>
         <source>Undo Failed</source>
         <translation>Не удалось отменить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2823"/>
+        <location filename="../main_window.py" line="2830"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Включите шаг «Конвертация», чтобы запустить пайплайн отсюда.</translation>
@@ -1749,12 +1762,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Сначала настройте цепочку на панели «Конвертация».</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1773"/>
+        <location filename="../main_window.py" line="1780"/>
         <source>A conversion is already running.</source>
         <translation>Конвертация уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1775"/>
+        <location filename="../main_window.py" line="1782"/>
         <source>The last pipeline run is still finishing.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Предыдущий пайплайн ещё завершается.</translation>
@@ -1773,22 +1786,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Переименовано {0} файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2707"/>
+        <location filename="../main_window.py" line="2714"/>
         <source>No Session</source>
         <translation>Нет сессии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2707"/>
+        <location filename="../main_window.py" line="2714"/>
         <source>No rename session to undo.</source>
         <translation>Нет сессии переименования для отмены.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2716"/>
+        <location filename="../main_window.py" line="2723"/>
         <source>Confirm Undo</source>
         <translation>Подтвердите отмену</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2717"/>
+        <location filename="../main_window.py" line="2724"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Отменить переименование {0} файлов?</translation>
     </message>
@@ -1797,7 +1810,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отмена переименования...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2736"/>
+        <location filename="../main_window.py" line="2743"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Отменено: {0} файлов, {1} ошибок</translation>
     </message>
@@ -2360,28 +2373,28 @@ or click “Add Artwork…”</source>
 <context>
     <name>PlayerPanel</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="2102"/>
+        <location filename="../widgets/player_panel.py" line="2191"/>
         <source>Player</source>
         <translation>Плеер</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2134"/>
-        <location filename="../widgets/player_panel.py" line="4015"/>
+        <location filename="../widgets/player_panel.py" line="2224"/>
+        <location filename="../widgets/player_panel.py" line="4105"/>
         <source>Search all playlists…</source>
         <translation>Поиск по всем плейлистам…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2154"/>
+        <location filename="../widgets/player_panel.py" line="2244"/>
         <source>This playlist</source>
         <translation>Этот плейлист</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2155"/>
+        <location filename="../widgets/player_panel.py" line="2245"/>
         <source>All playlists</source>
         <translation>Все плейлисты</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2180"/>
+        <location filename="../widgets/player_panel.py" line="2270"/>
         <source>Choose a visualization</source>
         <translation>Выбрать визуализацию</translation>
     </message>
@@ -2391,7 +2404,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Фон: поток</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2236"/>
+        <location filename="../widgets/player_panel.py" line="2326"/>
         <source>Visuals off</source>
         <translation>Без визуализации</translation>
     </message>
@@ -2416,12 +2429,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Фон: фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2233"/>
+        <location filename="../widgets/player_panel.py" line="2323"/>
         <source>Popout oscilloscope</source>
         <translation>Отдельное окно: осциллограф</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2234"/>
+        <location filename="../widgets/player_panel.py" line="2324"/>
         <source>Popout spectrum bars</source>
         <translation>Отдельное окно: полосы спектра</translation>
     </message>
@@ -2434,113 +2447,113 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отдельное окно: фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2271"/>
+        <location filename="../widgets/player_panel.py" line="2361"/>
         <source>Edit Lock</source>
         <translation>Блокировка правки</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2275"/>
+        <location filename="../widgets/player_panel.py" line="2365"/>
         <source>Lock metadata editing in the playlist</source>
         <translation>Заблокировать редактирование метаданных в плейлисте</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1577"/>
-        <location filename="../widgets/player_panel.py" line="4138"/>
+        <location filename="../widgets/player_panel.py" line="1666"/>
+        <location filename="../widgets/player_panel.py" line="4228"/>
         <source>#</source>
         <translation>#</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1578"/>
+        <location filename="../widgets/player_panel.py" line="1667"/>
         <source>Filename</source>
         <translation>Имя файла</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1579"/>
+        <location filename="../widgets/player_panel.py" line="1668"/>
         <source>Artist</source>
         <translation>Исполнитель</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1580"/>
+        <location filename="../widgets/player_panel.py" line="1669"/>
         <source>Title</source>
         <translation>Название</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1581"/>
+        <location filename="../widgets/player_panel.py" line="1670"/>
         <source>BPM</source>
         <translation>BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1582"/>
+        <location filename="../widgets/player_panel.py" line="1671"/>
         <source>Key</source>
         <translation>Тональность</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1583"/>
+        <location filename="../widgets/player_panel.py" line="1672"/>
         <source>Comment</source>
         <translation>Комментарий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1584"/>
+        <location filename="../widgets/player_panel.py" line="1673"/>
         <source>Duration</source>
         <translation>Длительность</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1585"/>
+        <location filename="../widgets/player_panel.py" line="1674"/>
         <source>Year</source>
         <translation>Год</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1586"/>
+        <location filename="../widgets/player_panel.py" line="1675"/>
         <source>Album</source>
         <translation>Альбом</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1587"/>
+        <location filename="../widgets/player_panel.py" line="1676"/>
         <source>Genre</source>
         <translation>Жанр</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1588"/>
+        <location filename="../widgets/player_panel.py" line="1677"/>
         <source>Track #</source>
         <translation>Номер трека</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1589"/>
+        <location filename="../widgets/player_panel.py" line="1678"/>
         <source>Label</source>
         <translation>Лейбл</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1590"/>
+        <location filename="../widgets/player_panel.py" line="1679"/>
         <source>Bitrate</source>
         <translation>Битрейт</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1591"/>
+        <location filename="../widgets/player_panel.py" line="1680"/>
         <source>Energy</source>
         <translation>Энергия</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1592"/>
+        <location filename="../widgets/player_panel.py" line="1681"/>
         <source>Art</source>
         <translation>Обложка</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1593"/>
+        <location filename="../widgets/player_panel.py" line="1682"/>
         <source>Date Added</source>
         <translation>Дата добавления</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1594"/>
+        <location filename="../widgets/player_panel.py" line="1683"/>
         <source>Date Created</source>
         <translation>Дата создания</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1595"/>
+        <location filename="../widgets/player_panel.py" line="1684"/>
         <source>Format</source>
         <translation>Формат</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="1596"/>
+        <location filename="../widgets/player_panel.py" line="1685"/>
         <source>Bit Depth</source>
         <translation>Разрядность</translation>
     </message>
@@ -2550,37 +2563,37 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2217"/>
+        <location filename="../widgets/player_panel.py" line="2307"/>
         <source>Tunnel chase</source>
         <translatorcomment>The menu rows for the backdrops dropped their &quot;Backdrop &quot; prefix — it said the same thing on all eight rows of a group the separator already sets apart. This is the noun half of the retired &quot;Backdrop tunnel chase&quot;, unchanged.</translatorcomment>
         <translation>Погоня в туннеле</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2218"/>
+        <location filename="../widgets/player_panel.py" line="2308"/>
         <source>Oscilloscope</source>
         <translatorcomment>The menu rows for the backdrops dropped their &quot;Backdrop &quot; prefix — it said the same thing on all eight rows of a group the separator already sets apart. This is the noun half of the retired &quot;Backdrop oscilloscope&quot;, unchanged.</translatorcomment>
         <translation>Осциллограф</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2219"/>
+        <location filename="../widgets/player_panel.py" line="2309"/>
         <source>Spectrum</source>
         <translatorcomment>The menu rows for the backdrops dropped their &quot;Backdrop &quot; prefix — it said the same thing on all eight rows of a group the separator already sets apart. This is the noun half of the retired &quot;Backdrop spectrum&quot;, unchanged.</translatorcomment>
         <translation>Спектр</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2220"/>
+        <location filename="../widgets/player_panel.py" line="2310"/>
         <source>Wormhole</source>
         <translatorcomment>The menu rows for the backdrops dropped their &quot;Backdrop &quot; prefix — it said the same thing on all eight rows of a group the separator already sets apart. This is the noun half of the retired &quot;Backdrop wormhole&quot;, unchanged.</translatorcomment>
         <translation>Червоточина</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2221"/>
+        <location filename="../widgets/player_panel.py" line="2311"/>
         <source>Stream</source>
         <translatorcomment>The menu rows for the backdrops dropped their &quot;Backdrop &quot; prefix — it said the same thing on all eight rows of a group the separator already sets apart. This is the noun half of the retired &quot;Backdrop stream&quot;, unchanged.</translatorcomment>
         <translation>Поток</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2222"/>
+        <location filename="../widgets/player_panel.py" line="2312"/>
         <source>Waveform</source>
         <translatorcomment>The menu rows for the backdrops dropped their &quot;Backdrop &quot; prefix — it said the same thing on all eight rows of a group the separator already sets apart. This is the noun half of the retired &quot;Backdrop waveform&quot;, unchanged.</translatorcomment>
         <translation>Форма волны</translation>
@@ -2591,7 +2604,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Огонь</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6132"/>
+        <location filename="../widgets/player_panel.py" line="6285"/>
         <source>Show this cover in the sidebar</source>
         <translation>Показать эту обложку на боковой панели</translation>
     </message>
@@ -2605,12 +2618,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Фон: погоня в туннеле</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2235"/>
+        <location filename="../widgets/player_panel.py" line="2325"/>
         <source>Popout wormhole</source>
         <translation>Отдельное окно: червоточина</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2232"/>
+        <location filename="../widgets/player_panel.py" line="2322"/>
         <source>Popout tunnel chase</source>
         <translatorcomment>Sibling of the wormhole row: same prefix, and &quot;tunnel chase&quot; as a noun phrase in the local language rather than kept in English.</translatorcomment>
         <translation>Отдельное окно: погоня в туннеле</translation>
@@ -2621,40 +2634,40 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Фон: Silly Scope</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2364"/>
-        <location filename="../widgets/player_panel.py" line="4135"/>
+        <location filename="../widgets/player_panel.py" line="2454"/>
+        <location filename="../widgets/player_panel.py" line="4225"/>
         <source>Playlists</source>
         <translation>Плейлисты</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2471"/>
+        <location filename="../widgets/player_panel.py" line="2561"/>
         <source>Previous</source>
         <translation>Предыдущий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2482"/>
+        <location filename="../widgets/player_panel.py" line="2572"/>
         <source>Play / Pause  (Space)</source>
         <translation>Воспроизведение / Пауза  (Пробел)</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2489"/>
+        <location filename="../widgets/player_panel.py" line="2579"/>
         <source>Stop</source>
         <translation>Стоп</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2496"/>
+        <location filename="../widgets/player_panel.py" line="2586"/>
         <source>Next</source>
         <translation>Следующий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2514"/>
-        <location filename="../widgets/player_panel.py" line="3972"/>
-        <location filename="../widgets/player_panel.py" line="3977"/>
+        <location filename="../widgets/player_panel.py" line="2604"/>
+        <location filename="../widgets/player_panel.py" line="4062"/>
+        <location filename="../widgets/player_panel.py" line="4067"/>
         <source>Save Playlist</source>
         <translation>Сохранить плейлист</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2452"/>
+        <location filename="../widgets/player_panel.py" line="2542"/>
         <source>Vol</source>
         <translation>Громк.</translation>
     </message>
@@ -2663,137 +2676,137 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Удалить выбранные</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2519"/>
+        <location filename="../widgets/player_panel.py" line="2609"/>
         <source>Clear Playlist</source>
         <translation>Очистить плейлист</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2559"/>
+        <location filename="../widgets/player_panel.py" line="2649"/>
         <source>Drag this onto a playlist to add the playing track</source>
         <translation>Перетащите сюда на плейлист, чтобы добавить звучащий трек</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2583"/>
+        <location filename="../widgets/player_panel.py" line="2673"/>
         <source>Open the playlist the current track is playing from</source>
         <translation>Открыть плейлист, из которого звучит текущий трек</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2894"/>
-        <location filename="../widgets/player_panel.py" line="3849"/>
-        <location filename="../widgets/player_panel.py" line="3959"/>
+        <location filename="../widgets/player_panel.py" line="2984"/>
+        <location filename="../widgets/player_panel.py" line="3939"/>
+        <location filename="../widgets/player_panel.py" line="4049"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3806"/>
+        <location filename="../widgets/player_panel.py" line="3896"/>
         <source>Playing: {0}</source>
         <translation>Играет: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3859"/>
+        <location filename="../widgets/player_panel.py" line="3949"/>
         <source>In Playlist: {0}</source>
         <translation>В плейлисте: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3956"/>
+        <location filename="../widgets/player_panel.py" line="4046"/>
         <source>Search: {0}</source>
         <translation>Поиск: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3973"/>
+        <location filename="../widgets/player_panel.py" line="4063"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>Плейлист пуст — сначала добавьте треки.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3977"/>
+        <location filename="../widgets/player_panel.py" line="4067"/>
         <source>Playlist name:</source>
         <translation>Название плейлиста:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4012"/>
+        <location filename="../widgets/player_panel.py" line="4102"/>
         <source>Search scope: {0}</source>
         <translation>Область поиска: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4017"/>
+        <location filename="../widgets/player_panel.py" line="4107"/>
         <source>Search this playlist…</source>
         <translation>Поиск в этом плейлисте…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4040"/>
+        <location filename="../widgets/player_panel.py" line="4130"/>
         <source>No matching tracks</source>
         <translation>Нет подходящих треков</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4349"/>
+        <location filename="../widgets/player_panel.py" line="4439"/>
         <source>{0} bit</source>
         <translatorcomment>Несклоняемая форма: подставляются 8, 16, 24 и 32, и «бит» здесь — техническая единица, одинаковая для всех этих чисел.</translatorcomment>
         <translation>{0} бит</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4558"/>
+        <location filename="../widgets/player_panel.py" line="4648"/>
         <source>File not found:
 {0}</source>
         <translation>Файл не найден:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4761"/>
+        <location filename="../widgets/player_panel.py" line="4853"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Скрыть треки, которые сводятся с играющим</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4763"/>
+        <location filename="../widgets/player_panel.py" line="4855"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Показать треки, которые сводятся с играющим</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5087"/>
+        <location filename="../widgets/player_panel.py" line="5179"/>
         <source>{0}+ results</source>
         <translation>{0}+ результатов</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5090"/>
+        <location filename="../widgets/player_panel.py" line="5182"/>
         <source>{0} result</source>
         <translation>{0} результат</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5092"/>
+        <location filename="../widgets/player_panel.py" line="5184"/>
         <source>{0} results</source>
         <translation>{0} результатов</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5096"/>
+        <location filename="../widgets/player_panel.py" line="5188"/>
         <source>{0} track</source>
         <translation>{0} трек</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5098"/>
+        <location filename="../widgets/player_panel.py" line="5190"/>
         <source>{0} tracks</source>
         <translation>{0} треков</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5749"/>
+        <location filename="../widgets/player_panel.py" line="5841"/>
         <source>Reset Columns</source>
         <translation>Сбросить столбцы</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5755"/>
+        <location filename="../widgets/player_panel.py" line="5847"/>
         <source>Fit {0} to Longest</source>
         <translation>Подогнать «{0}» по самому длинному значению</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6130"/>
+        <location filename="../widgets/player_panel.py" line="6283"/>
         <source>Hide the cover in the sidebar</source>
         <translation>Скрыть обложку на боковой панели</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6810"/>
+        <location filename="../widgets/player_panel.py" line="6963"/>
         <source>“{0}” has moved.</source>
         <translation>«{0}» был перемещён.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6812"/>
+        <location filename="../widgets/player_panel.py" line="6965"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n из выбранных файлов был перемещён.</numerusform>
@@ -2802,136 +2815,136 @@ or click “Add Artwork…”</source>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6815"/>
+        <location filename="../widgets/player_panel.py" line="6968"/>
         <source>File Has Moved</source>
         <translation>Файл был перемещён</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6819"/>
+        <location filename="../widgets/player_panel.py" line="6972"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Его больше нет в сохранённом расположении, поэтому его нельзя добавить в плейлист или перетащить наружу. Уже звучащий трек продолжает играть — он был загружен в память до перемещения файла.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6824"/>
+        <location filename="../widgets/player_panel.py" line="6977"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Нажмите на трек правой кнопкой и выберите «Найти отсутствующий файл…»</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6890"/>
+        <location filename="../widgets/player_panel.py" line="7043"/>
         <source>Are you sure you want to delete the selected tracks from the playlist?</source>
         <translatorcomment>English asks in full; every language here keeps the app&apos;s own shorter confirmation form (cf. &apos;Delete playlist &quot;{0}&quot;?&apos;).</translatorcomment>
         <translation>Удалить выбранные треки из плейлиста?</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6900"/>
+        <location filename="../widgets/player_panel.py" line="7053"/>
         <source>Press {0} to remove without asking.</source>
         <translation>Нажмите {0}, чтобы удалить без подтверждения.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7009"/>
+        <location filename="../widgets/player_panel.py" line="7162"/>
         <source>Locate Missing File…</source>
         <translation>Найти отсутствующий файл…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7011"/>
+        <location filename="../widgets/player_panel.py" line="7164"/>
         <source>Open File Location</source>
         <translation>Открыть расположение файла</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7012"/>
+        <location filename="../widgets/player_panel.py" line="7165"/>
         <source>Open in Metadata Panel</source>
         <translation>Открыть на панели метаданных</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7013"/>
+        <location filename="../widgets/player_panel.py" line="7166"/>
         <source>Reload Metadata from File</source>
         <translation>Обновить метаданные из файла</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7017"/>
+        <location filename="../widgets/player_panel.py" line="7170"/>
         <source>Look Up Online…</source>
         <translation>Найти в интернете…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6888"/>
-        <location filename="../widgets/player_panel.py" line="7019"/>
+        <location filename="../widgets/player_panel.py" line="7041"/>
+        <location filename="../widgets/player_panel.py" line="7172"/>
         <source>Remove from Playlist</source>
         <translation>Удалить из плейлиста</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2214"/>
+        <location filename="../widgets/player_panel.py" line="2304"/>
         <source>J Fractal</source>
         <translatorcomment>Renamed from &quot;Fractal&quot; on 2026-09-21 when two sibling fractals arrived; J is for the Julia set and stays a name.</translatorcomment>
         <translation>J-фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2215"/>
+        <location filename="../widgets/player_panel.py" line="2305"/>
         <source>Tri Fractal</source>
         <translation>Три-фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2216"/>
+        <location filename="../widgets/player_panel.py" line="2306"/>
         <source>Blade Fractal</source>
         <translation>Фрактал лезвий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2228"/>
+        <location filename="../widgets/player_panel.py" line="2318"/>
         <source>Smoke</source>
         <translatorcomment>Renamed from &quot;Fire&quot; on 2026-09-22: the picture reads as smoke, so the label follows the look. The config id stays `fire`. Plain noun, as the other backdrop rows are.</translatorcomment>
         <translation>Дым</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2229"/>
+        <location filename="../widgets/player_panel.py" line="2319"/>
         <source>Popout J Fractal</source>
         <translatorcomment>Renamed from &quot;Popout fractal&quot; on 2026-09-21; see &quot;J Fractal&quot;.</translatorcomment>
         <translation>Отдельное окно: j-фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2230"/>
+        <location filename="../widgets/player_panel.py" line="2320"/>
         <source>Popout Tri Fractal</source>
         <translation>Отдельное окно: три-фрактал</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2231"/>
+        <location filename="../widgets/player_panel.py" line="2321"/>
         <source>Popout Blade Fractal</source>
         <translation>Отдельное окно: фрактал лезвий</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7075"/>
-        <location filename="../widgets/player_panel.py" line="7103"/>
-        <location filename="../widgets/player_panel.py" line="7203"/>
-        <location filename="../widgets/player_panel.py" line="7276"/>
-        <location filename="../widgets/player_panel.py" line="7306"/>
+        <location filename="../widgets/player_panel.py" line="7228"/>
+        <location filename="../widgets/player_panel.py" line="7256"/>
+        <location filename="../widgets/player_panel.py" line="7356"/>
+        <location filename="../widgets/player_panel.py" line="7429"/>
+        <location filename="../widgets/player_panel.py" line="7459"/>
         <source>Look Up Online</source>
         <translation>Найти в интернете</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7077"/>
+        <location filename="../widgets/player_panel.py" line="7230"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>Ни у одного из выбранных треков нет исполнителя или названия для поиска, и имена файлов их не дают.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7097"/>
+        <location filename="../widgets/player_panel.py" line="7250"/>
         <source>Looking up track details…</source>
         <translation>Поиск сведений о треках…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7098"/>
+        <location filename="../widgets/player_panel.py" line="7251"/>
         <source>Cancel</source>
         <translation>Отмена</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7128"/>
+        <location filename="../widgets/player_panel.py" line="7281"/>
         <source>Looking up {0} of {1}…</source>
         <translation>Поиск {0} из {1}…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7136"/>
+        <location filename="../widgets/player_panel.py" line="7289"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Ожидание лимита запросов Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="7299"/>
+        <location filename="../widgets/player_panel.py" line="7452"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>Для %n трека не найдено совпадений.</numerusform>
@@ -2940,7 +2953,7 @@ or click “Add Artwork…”</source>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="7302"/>
+        <location filename="../widgets/player_panel.py" line="7455"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>Обновлён %n трек.</numerusform>
@@ -3590,7 +3603,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>ReorderableTableWidget</name>
     <message>
-        <location filename="../widgets/player_panel.py" line="865"/>
+        <location filename="../widgets/player_panel.py" line="867"/>
         <source>Drop audio files here</source>
         <translation>Перетащите аудиофайлы сюда</translation>
     </message>
@@ -4295,92 +4308,92 @@ or click “Add Artwork…”</source>
 <context>
     <name>Sidebar</name>
     <message>
-        <location filename="../widgets/sidebar.py" line="302"/>
-        <location filename="../widgets/sidebar.py" line="485"/>
+        <location filename="../widgets/sidebar.py" line="327"/>
+        <location filename="../widgets/sidebar.py" line="511"/>
         <source>Collapse sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Свернуть боковую панель</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="345"/>
+        <location filename="../widgets/sidebar.py" line="370"/>
         <source>Rename</source>
         <translation>Переименование</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="346"/>
+        <location filename="../widgets/sidebar.py" line="371"/>
         <source>Convert</source>
         <translation>Конвертация</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="347"/>
+        <location filename="../widgets/sidebar.py" line="372"/>
         <source>Analyze</source>
         <translation>Анализ</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="344"/>
+        <location filename="../widgets/sidebar.py" line="369"/>
         <source>Player</source>
         <translation>Плеер</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="263"/>
+        <location filename="../widgets/sidebar.py" line="288"/>
         <source>Playlists</source>
         <translation>Плейлисты</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="350"/>
+        <location filename="../widgets/sidebar.py" line="375"/>
         <source>Keyboard</source>
         <translation>Клавиатура</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="348"/>
+        <location filename="../widgets/sidebar.py" line="373"/>
         <source>Metadata</source>
         <translation>Метаданные</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="349"/>
+        <location filename="../widgets/sidebar.py" line="374"/>
         <source>Spectrum</source>
         <translation>Спектр</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="417"/>
-        <location filename="../widgets/sidebar.py" line="425"/>
+        <location filename="../widgets/sidebar.py" line="443"/>
+        <location filename="../widgets/sidebar.py" line="451"/>
         <source>Settings</source>
         <translation>Настройки</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="429"/>
-        <location filename="../widgets/sidebar.py" line="437"/>
+        <location filename="../widgets/sidebar.py" line="455"/>
+        <location filename="../widgets/sidebar.py" line="463"/>
         <source>History</source>
         <translation>История</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="485"/>
+        <location filename="../widgets/sidebar.py" line="511"/>
         <source>Expand sidebar</source>
         <translatorcomment>Sidebar collapse/expand tooltip; Apple-localized &apos;sidebar&apos; term.</translatorcomment>
         <translation>Развернуть боковую панель</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="562"/>
+        <location filename="../widgets/sidebar.py" line="588"/>
         <source>Hide your playlists and show the navigation buttons again</source>
         <translation>Скрыть плейлисты и снова показать кнопки навигации</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="564"/>
+        <location filename="../widgets/sidebar.py" line="590"/>
         <source>Show your playlists here in place of the navigation buttons</source>
         <translation>Показывать здесь плейлисты вместо кнопок навигации</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="639"/>
+        <location filename="../widgets/sidebar.py" line="665"/>
         <source>Show only Playlists or Navigation in the sidebar</source>
         <translation>Показывать на боковой панели только плейлисты или навигацию</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="641"/>
+        <location filename="../widgets/sidebar.py" line="667"/>
         <source>Show both Playlists and Navigation in the sidebar</source>
         <translation>Показывать плейлисты и навигацию вместе на боковой панели</translation>
     </message>
     <message>
-        <location filename="../widgets/sidebar.py" line="864"/>
+        <location filename="../widgets/sidebar.py" line="902"/>
         <source>Auto</source>
         <translation>Авто</translation>
     </message>
@@ -4388,7 +4401,7 @@ or click “Add Artwork…”</source>
 <context>
     <name>SidebarArtBox</name>
     <message>
-        <location filename="../widgets/sidebar_art_box.py" line="110"/>
+        <location filename="../widgets/sidebar_art_box.py" line="131"/>
         <source>Hide the cover</source>
         <translation>Скрыть обложку</translation>
     </message>
@@ -4691,6 +4704,19 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/vis_canvas.py" line="973"/>
         <source>Visualizer</source>
         <translation>Визуализатор</translation>
+    </message>
+</context>
+<context>
+    <name>_ArtCanvas</name>
+    <message>
+        <location filename="../widgets/sidebar_art_box.py" line="98"/>
+        <source>No artwork</source>
+        <translation>Нет обложки</translation>
+    </message>
+    <message>
+        <location filename="../widgets/sidebar_art_box.py" line="99"/>
+        <source>Drop an image here</source>
+        <translation>Перетащите изображение сюда</translation>
     </message>
 </context>
 <context>

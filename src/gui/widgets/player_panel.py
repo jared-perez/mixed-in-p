@@ -88,6 +88,7 @@ from src.metadata.tags import (
     TrackMetadata,
     delete_metadata_fields,
     read_metadata,
+    stores_tags,
     write_comment,
     write_metadata,
 )
@@ -118,6 +119,7 @@ from ..workers.waveform_worker import (
     spectral_columns,
     timed_envelope,
 )
+from .art_placeholder import dropped_image, image_urls, paint_drop_outline, paint_placeholder
 from .elided_label import HuggingElidedLabel, LinkLabel
 from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, VisualizerWindow
 
@@ -1507,20 +1509,56 @@ class NowPlayingLabel(HuggingElidedLabel):
 
 
 class HeaderArtLabel(QLabel):
-    """The 56px cover in the Player's title row, clickable.
+    """The 56px cover in the Player's title row, clickable and droppable.
 
     56px is enough to recognise a sleeve and not enough to look at one, so a
     click opens the big box at the foot of the sidebar (and a second click
     closes it). It only ever *asks*:
     the label knows nothing about the sidebar, and the panel's ``art_clicked``
     signal is what MainWindow wires up.
+
+    With no cover it shows an empty square instead of vanishing, so there is
+    somewhere to drop one. An image dropped here becomes the loaded track's
+    cover — only the loaded track's, which is the point of offering it here
+    rather than on the playlist's Art column, where a drop a row off would
+    re-tag the wrong file. The panel decides whether drops are allowed
+    (``set_droppable``) and does the writing (``image_dropped``).
     """
 
     clicked = Signal()
+    # (bytes, mime type) of an image dropped on the square.
+    image_dropped = Signal(object, object)
 
     def __init__(self, parent: QWidget | None = None) -> None:
         super().__init__(parent)
         self.setCursor(Qt.CursorShape.PointingHandCursor)
+        self._has_cover = False
+        self._droppable = False
+        self._drag_over = False
+
+    def set_cover(self, pixmap: QPixmap | None) -> None:
+        """Show *pixmap*, already scaled, or the empty square for None."""
+        self._has_cover = pixmap is not None
+        if pixmap is None:
+            self.clear()
+        else:
+            self.setPixmap(pixmap)
+        self.update()
+
+    def has_cover(self) -> bool:
+        return self._has_cover
+
+    def set_droppable(self, droppable: bool) -> None:
+        """Whether an image dropped here would be written (Edit Lock off,
+        a track loaded, a format that keeps tags)."""
+        self._droppable = droppable
+        self.setAcceptDrops(droppable)
+        if not droppable:
+            self._drag_over = False
+        self.update()
+
+    def is_droppable(self) -> bool:
+        return self._droppable
 
     def mouseReleaseEvent(self, event: QMouseEvent) -> None:
         # Containment, not just the button: Qt delivers the release to
@@ -1531,6 +1569,51 @@ class HeaderArtLabel(QLabel):
         ):
             self.clicked.emit()
         super().mouseReleaseEvent(event)
+
+    def dragEnterEvent(self, event) -> None:
+        if self._droppable and image_urls(event.mimeData()):
+            event.setDropAction(Qt.DropAction.CopyAction)
+            event.accept()
+            self._drag_over = True
+            self.update()
+            return
+        event.ignore()
+
+    def dragLeaveEvent(self, event) -> None:
+        self._drag_over = False
+        self.update()
+
+    def dropEvent(self, event) -> None:
+        self._drag_over = False
+        self.update()
+        image = dropped_image(event.mimeData()) if self._droppable else None
+        if image is None:
+            event.ignore()
+            return
+        # Copy, so a drag that started somewhere that deletes on a move
+        # keeps its source.
+        event.setDropAction(Qt.DropAction.CopyAction)
+        event.accept()
+        self.image_dropped.emit(*image)
+
+    def paintEvent(self, event) -> None:  # type: ignore[override]
+        if self._has_cover:
+            super().paintEvent(event)
+            painter = QPainter(self)
+        else:
+            painter = QPainter(self)
+            painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+            paint_placeholder(
+                painter,
+                self.rect(),
+                self.tr("No artwork"),
+                self.tr("Drop…") if self._droppable else "",
+                scale=0.75,
+                padding=3,
+            )
+        if self._drag_over:
+            paint_drop_outline(painter, self.rect())
+        painter.end()
 
 
 class PlayerPanel(QWidget):
@@ -1565,6 +1648,12 @@ class PlayerPanel(QWidget):
     # large, at the foot of the sidebar. The Player owns neither the sidebar
     # nor the box, so it only announces the request.
     art_clicked = Signal()
+    # Whether an image dropped on the playing track's cover (the header's or
+    # the sidebar box's) would be written, re-announced whenever it may have
+    # changed: the track, Stop, the Edit Lock. The sidebar box follows it.
+    art_editable_changed = Signal(bool)
+    # The playing track's cover was just re-written by a drop.
+    playing_artwork_changed = Signal()
 
     # Playlist columns, in logical order. The first nine are the shipped
     # defaults; everything after them is optional and hidden until the user
@@ -2118,6 +2207,7 @@ class PlayerPanel(QWidget):
         self._art_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.set_art_box_open(False)
         self._art_label.clicked.connect(self.art_clicked.emit)
+        self._art_label.image_dropped.connect(self.set_playing_artwork)
         self._art_label.hide()
         title_row.addWidget(self._art_label, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -4673,6 +4763,7 @@ class PlayerPanel(QWidget):
         """Toggle inline editing and persist the choice."""
         self._edit_locked = locked
         self._apply_edit_triggers()
+        self._sync_art_editable()
         # Re-load config first so we don't clobber a setting another panel changed.
         cfg = load_config()
         if cfg.player_edit_locked != locked:
@@ -4697,6 +4788,7 @@ class PlayerPanel(QWidget):
         self._edit_lock_cb.setChecked(self._edit_locked)
         self._edit_lock_cb.blockSignals(blocked)
         self._apply_edit_triggers()
+        self._sync_art_editable()
         # Not blocked, because this one *is* the act: it ticks the menu row,
         # closes a popout the reset just turned off, and redraws the backdrop.
         # It writes nothing — the config already holds the value it is given.
@@ -6092,36 +6184,97 @@ class PlayerPanel(QWidget):
     # ── Header album art ────────────────────────────────────────
 
     def _show_current_artwork(self) -> None:
-        """Show the current track's embedded album art in the header, or hide it."""
-        path = self._current_path()
-        data = None
-        if path is not None:
-            try:
-                from src.metadata.tags import read_metadata
+        """Show the current track's embedded album art in the header.
 
-                data = read_metadata(path).artwork
-            except Exception:
-                data = None
-        if not data:
+        A loaded track with no cover gets the empty square rather than
+        nothing, so there is somewhere to drop one; only with no track loaded
+        does the header art go away.
+        """
+        path = self._current_path()
+        if path is None:
             self._hide_artwork()
             return
+        data = None
+        try:
+            from src.metadata.tags import read_metadata
+
+            data = read_metadata(path).artwork
+        except Exception:
+            data = None
         pixmap = QPixmap()
-        if not pixmap.loadFromData(data):
-            self._hide_artwork()
-            return
-        self._art_label.setPixmap(
-            pixmap.scaled(
-                _HEADER_ART_SIZE,
-                _HEADER_ART_SIZE,
-                Qt.AspectRatioMode.KeepAspectRatio,
-                Qt.TransformationMode.SmoothTransformation,
+        if data and pixmap.loadFromData(data):
+            self._art_label.set_cover(
+                pixmap.scaled(
+                    _HEADER_ART_SIZE,
+                    _HEADER_ART_SIZE,
+                    Qt.AspectRatioMode.KeepAspectRatio,
+                    Qt.TransformationMode.SmoothTransformation,
+                )
             )
-        )
+        else:
+            self._art_label.set_cover(None)
         self._art_label.show()
+        self._sync_art_editable()
 
     def _hide_artwork(self) -> None:
-        self._art_label.clear()
+        self._art_label.set_cover(None)
         self._art_label.hide()
+        self._sync_art_editable()
+
+    def artwork_editable(self) -> bool:
+        """Whether a cover dropped now would be written to the loaded track.
+
+        Keyed on the header art being up (``isHidden``, not ``isVisible`` —
+        this panel need not be on screen) because that *is* "a track is
+        loaded": it goes on a full Stop, while ``_playing_path`` lingers.
+        """
+        path = self._current_path()
+        return (
+            path is not None
+            and not self._art_label.isHidden()
+            and not self._edit_locked
+            and stores_tags(path)
+        )
+
+    def _sync_art_editable(self) -> None:
+        editable = self.artwork_editable()
+        self._art_label.set_droppable(editable)
+        self.art_editable_changed.emit(editable)
+
+    def set_playing_artwork(self, data: bytes, mime: str | None) -> bool:
+        """Write *data* as the loaded track's cover, from a drop on either
+        cover. False, with the file untouched, if that isn't allowed now or
+        the write fails."""
+        path = self._current_path()
+        if not self.artwork_editable() or path is None:
+            logger.info("Ignored a cover drop: artwork is not editable now")
+            return False
+        try:
+            write_metadata(
+                path,
+                TrackMetadata(artwork=bytes(data), artwork_mime=mime),
+                fields=["artwork"],
+            )
+        except Exception as exc:  # noqa: BLE001
+            logger.error("Failed to write artwork to %s: %s", path, exc)
+            return False
+        logger.info("Wrote artwork (%d bytes) to %s", len(data), Path(path).name)
+        self._show_current_artwork()
+        self._forget_row_artwork(path)
+        self.playing_artwork_changed.emit()
+        return True
+
+    def _forget_row_artwork(self, path: str) -> None:
+        """Drop what the Art column knows about *path* and read it again.
+
+        Its cache is keyed on mtime, so the new cover would be read anyway
+        once the old entry aged out; this only makes it happen now, and stops
+        a "has no art" verdict from outliving the art it was about.
+        """
+        for key in [k for k in self._art_cache if k[0] == path]:
+            del self._art_cache[key]
+        self._art_missing = {k for k in self._art_missing if k[0] != path}
+        self._load_visible_artwork()
 
     def set_art_box_open(self, open_: bool) -> None:
         """Reflect whether the sidebar's cover box is open: the header art's
