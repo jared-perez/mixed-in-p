@@ -152,7 +152,7 @@ class AppConfig:
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
     # How the waveform body is coloured (WAVEFORM_COLOR_MODES).
-    waveform_color_mode: str = "solid"
+    waveform_color_mode: str = "loudness"
     # Bands and centroid only: True spreads the data over the whole hue wheel
     # ("Use full-spectrum colors", the picker then unused); False, the
     # default, shades the picker colour from deep to near-white.

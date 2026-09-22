@@ -1941,7 +1941,7 @@ class PlayerPanel(QWidget):
         # Waveform colour mode (from Settings) and what it is computed from:
         # the coarse min/max of the waveform on show, and — only once a
         # frequency mode asks — its spectral_columns, cached for that one track.
-        self._wf_color_mode: str = "solid"
+        self._wf_color_mode: str = "loudness"
         self._wf_color_absolute: bool = False
         self._wf_color_hue_mapped: bool = False
         self._wf_columns: tuple | None = None   # (path, coarse_min, coarse_max)

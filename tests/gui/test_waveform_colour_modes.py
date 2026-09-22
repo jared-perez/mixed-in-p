@@ -144,7 +144,7 @@ def _settings(qtbot, **fields):
 class TestSettings:
     def test_defaults(self):
         cfg = AppConfig()
-        assert cfg.waveform_color_mode == "solid"
+        assert cfg.waveform_color_mode == "loudness"
         assert cfg.waveform_color_absolute is False
         assert cfg.waveform_color_hue_mapped is False
 
@@ -184,14 +184,14 @@ class TestSettings:
             cfg.waveform_color_mode, cfg.waveform_color_absolute, cfg.waveform_color_hue_mapped
         ) == ("bands", True, True)
 
-    def test_an_unknown_stored_mode_loads_as_solid(self):
+    def test_an_unknown_stored_mode_loads_as_the_default(self):
         from src.utils.app_dirs import get_app_data_dir
         import json
 
         path = get_app_data_dir() / "config.json"
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps({"waveform_color_mode": "tone"}))
-        assert load_config().waveform_color_mode == "solid"
+        assert load_config().waveform_color_mode == "loudness"
 
     @pytest.mark.parametrize(
         "mode, hue_mapped, picker, scaled, spectrum_shown",
