@@ -49,12 +49,16 @@ _VALID_VIS_MODES = {
     "backdrop_spectrum",
     "backdrop_fire",
     "backdrop_fractal",
+    "backdrop_fractal_power",
+    "backdrop_fractal_trap",
     "backdrop_loop_tunnel",
     "backdrop_beat_tunnel",
     # Popout visualizer window.
     "oscilloscope",
     "spectrum",
     "fractal",
+    "fractal_power",
+    "fractal_trap",
     "loop_tunnel",
     "beat_tunnel",
 }

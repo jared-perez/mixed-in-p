@@ -226,19 +226,24 @@ class TestTheEyeMenu:
         assert not hasattr(player, "set_visualizations_enabled")
         assert not hasattr(player, "_visualizations_enabled")
 
-    def test_fractal_leads_each_group_and_wormhole_follows_spectrum(self, player):
+    def test_fractals_lead_each_group_and_wormhole_follows_spectrum(self, player):
         modes = [
             a.data() or a.text()
             for a in player._vis_menu.actions()
             if not a.isSeparator()
         ]
         labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
-        assert labels[0] == "Fractal"
+        # The three fractals lead, Julia first — the user's names, capitals
+        # included (2026-09-21, when the two siblings arrived).
+        assert labels[:3] == ["J Fractal", "Tri Fractal", "Blade Fractal"]
         assert labels[-1] == "Visuals off"
-        # Both halves lead with fractal and put the wormhole directly below
-        # spectrum; the tails diverge (waveform and fire have no popout twin).
-        popouts = labels[labels.index("Popout fractal") :]
-        assert popouts[0] == "Popout fractal"
+        # Both halves lead with the fractals and put the wormhole directly
+        # below spectrum; the tails diverge (waveform and fire have no popout
+        # twin).
+        popouts = labels[labels.index("Popout J Fractal") :]
+        assert popouts[:3] == [
+            "Popout J Fractal", "Popout Tri Fractal", "Popout Blade Fractal"
+        ]
         assert labels.index("Wormhole") == labels.index("Spectrum") + 1
         assert labels.index("Popout wormhole") == labels.index("Popout spectrum bars") + 1
         assert len(modes) == len(player._vis_actions)
@@ -252,8 +257,8 @@ class TestTheEyeMenu:
 
         for mode in {"backdrop", *_BACKDROP_VIS_MAP} - _HIDDEN_VIS_MODES:
             assert not player._vis_actions[mode].text().startswith("Backdrop")
-        for mode in ("fractal", "loop_tunnel", "oscilloscope", "spectrum",
-                     "beat_tunnel"):
+        for mode in ("fractal", "fractal_power", "fractal_trap", "loop_tunnel",
+                     "oscilloscope", "spectrum", "beat_tunnel"):
             assert player._vis_actions[mode].text().startswith("Popout ")
 
     def test_every_mode_is_offered_exactly_once(self, player):

@@ -135,6 +135,8 @@ _BACKDROP_VIS_MAP = {
     "backdrop_spectrum": "spectrum",
     "backdrop_fire": "fire",
     "backdrop_fractal": "fractal",
+    "backdrop_fractal_power": "fractal_power",
+    "backdrop_fractal_trap": "fractal_trap",
     "backdrop_loop_tunnel": "loop_tunnel",
     "backdrop_beat_tunnel": "beat_tunnel",
 }
@@ -2168,9 +2170,10 @@ class PlayerPanel(QWidget):
         self._vis_action_group = QActionGroup(self)
         self._vis_action_group.setExclusive(True)
         self._vis_actions: dict[str, QAction] = {}
-        # Order is a recommendation, and it is the user's: fractal leads each
-        # group, the wormhole sits below spectrum in both halves, and the rest
-        # follow in the order they are reached for. The halves do not run
+        # Order is a recommendation, and it is the user's: the three fractals
+        # lead each group (the Julia first, then its two siblings in the order
+        # they were built), the wormhole sits below spectrum in both halves,
+        # and the rest follow in the order they are reached for. The halves do not run
         # strictly in step — waveform has no popout twin to keep parallel with
         # anyway. "Visuals off" sits at the foot — it is the way out, not the
         # way in, and a menu that opens on its own "off" row buries what it
@@ -2187,8 +2190,15 @@ class PlayerPanel(QWidget):
         # "Backdrop " prefix on every row, which said the same thing eight
         # times over the group the separator already sets apart, so they are
         # bare nouns now and the prefix survives only where it distinguishes.
+        #
+        # The fractal labels are the user's names, capitals included: "J" for
+        # the Julia set, "Tri" for the three-fold figure the z²/z³ blend
+        # makes, "Blade" for the orbit trap's look. The ids stay mechanism
+        # names (``fractal_power``, ``fractal_trap``), as the tunnels' do.
         for mode, label in (
-            ("backdrop_fractal", self.tr("Fractal")),
+            ("backdrop_fractal", self.tr("J Fractal")),
+            ("backdrop_fractal_power", self.tr("Tri Fractal")),
+            ("backdrop_fractal_trap", self.tr("Blade Fractal")),
             ("backdrop_loop_tunnel", self.tr("Tunnel chase")),
             ("backdrop_oscilloscope", self.tr("Oscilloscope")),
             ("backdrop_spectrum", self.tr("Spectrum")),
@@ -2196,7 +2206,9 @@ class PlayerPanel(QWidget):
             ("backdrop_scope", self.tr("Stream")),
             ("backdrop", self.tr("Waveform")),
             ("backdrop_fire", self.tr("Fire")),
-            ("fractal", self.tr("Popout fractal")),
+            ("fractal", self.tr("Popout J Fractal")),
+            ("fractal_power", self.tr("Popout Tri Fractal")),
+            ("fractal_trap", self.tr("Popout Blade Fractal")),
             ("loop_tunnel", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),

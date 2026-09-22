@@ -75,8 +75,8 @@ stylized animated waveform that reads as "working":
 ### C. Player: classic visuals (popout AND backdrop)
 
 Rendering lives in `VisRenderer` (no widget): each frame drawn into a
-transparent-background `QImage`. The **retro** modes (spectrum, fire, fractal)
-draw into a small 152×64 one and are upscaled without smoothing, which is the
+transparent-background `QImage`. The **retro** modes (spectrum, fire, the three
+fractals) draw into a small 152×64 one and are upscaled without smoothing, which is the
 chunky pixel look and is the point of them. The rest — both tunnels, the scope
 and the stream — **own their image**, size it from *device* pixels under a cap
 of their own, and ask the host to upscale smoothly
@@ -93,7 +93,8 @@ Two hosts share it:
   pause so bars fall and fire burns down. Modes `backdrop_scope` (which draws
   the stream, not a scope — the row kept its id when its picture changed),
   `backdrop_oscilloscope`, `backdrop_spectrum`, `backdrop_fire`,
-  `backdrop_fractal`, `backdrop_loop_tunnel`, `backdrop_beat_tunnel`.
+  `backdrop_fractal`, `backdrop_fractal_power`, `backdrop_fractal_trap`,
+  `backdrop_loop_tunnel`, `backdrop_beat_tunnel`.
 
 Data path per frame (GUI-thread QTimer, `Qt.PreciseTimer`, 16 ms):
 
@@ -145,10 +146,35 @@ is radioactive):
    may render and not be offered — never the other way round, which
    `POPOUT_MODES` derives from `_BACKDROP_ONLY` rather than writing out, so a
    new render mode cannot be silently unreachable.
-4. **Fractal** — a spinning escape-time Julia set whose constant swings
-   through the rich arc of the classic |c| = 0.7885 orbit; level drives
+4. **J Fractal** (`fractal`) — a spinning escape-time Julia set whose constant
+   swings through the rich arc of the classic |c| = 0.7885 orbit; level drives
    spin/morph speed and brightness, the kick pulse punches the zoom.
-   ~0.7 ms/frame.
+   ~0.7 ms/frame. Labelled "Fractal" until its two siblings arrived
+   (2026-09-21); all three share one driver — orbit, camera, fade, palette —
+   and differ only in the per-pixel kernel:
+   - **Tri Fractal** (`fractal_power`) iterates a *blend* of z² and z³, the
+     weight swinging with the orbit phase, so the figure morphs between
+     two-fold and three-fold symmetry: chunky lobed bodies with a bright
+     fringe. Two multiplies and a lerp — not a fractional power, which would
+     cost five transcendentals per iteration for a picture that reads the
+     same. ~+15% on the Julia.
+   - **Blade Fractal** (`fractal_trap`) keeps the Julia orbit but colours by an
+     *orbit trap* — each pixel's closest approach to the two axes — instead of
+     by escape count: glowing blades and filaments. Its **fullness** follows
+     the music: `intensity = exp(-d·falloff)`, and the falloff is the one
+     scalar the music moves (3.5 = full soft glow on a kick, 18 = a thin
+     skeleton of the same shape between kicks, on a geometric scale). Mostly
+     the kick, not the level: level barely dips between the kicks of real
+     music, so a level-led mix held the shape two-thirds full with nothing to
+     swell into. The kick goes through a follower (release 0.75 per 33 ms,
+     rescaled in `set_frame_interval`) because the raw detector strobes.
+     Brightness is a smoothstep *gate* on level rather than a multiple, so
+     after the music stops the shape thins at full brightness (the skeleton
+     shows at ~0.7 s) and is gone by ~1.4 s — a multiple dimmed it as fast as
+     it thinned and the skeleton was never seen. Below falloff ~18 the lines
+     go sub-pixel at 152×64 and shimmer as the view turns; the fix would be
+     resolution, not tuning. Chosen from a contact sheet of eight candidate
+     looks and four kick-mix variants (`spitball/old widgets/fractal-sheet-2026-09-20/`).
 5. **Tunnel Chase** (`loop_tunnel`) — a wireframe tunnel flown along a closed 3-D loop (a periodic
    cubic spline through 25 frozen waypoints: 15 turns, three straightaways,
    ~70 s per lap), with small cross-shaped stars streaming past. Level drives travel
@@ -465,8 +491,8 @@ track start by seconds.
   present, and the first save without it (`asdict` no longer has the field)
   removes it for good.
 - Player eye-menu items, in order: the richest visuals lead each group
-  (Backdrop fractal, Backdrop wormhole, Backdrop tunnel chase, then
-  waveform/oscilloscope/spectrum/fire; then the popouts in the same order),
+  (the three fractals — J, Tri, Blade — then tunnel chase, oscilloscope,
+  spectrum, wormhole, waveform, fire; then the popouts in the same order),
   with **Visuals off** at the foot —
   it is the way out, not the way in, and a menu that opens on its own "off" row
   buries what it offers.

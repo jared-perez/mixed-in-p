@@ -1122,7 +1122,7 @@ def test_the_frame_rate_and_the_smoothing_are_per_mode(qapp):
     renderer.set_mode("loop_tunnel")
     assert renderer.frame_ms() == FRAME_MS
     assert renderer.smooth_upscale() is True
-    for mode in ("spectrum", "fire", "fractal"):
+    for mode in ("spectrum", "fire", "fractal", "fractal_power", "fractal_trap"):
         renderer.set_mode(mode)
         assert renderer.frame_ms() == FRAME_MS
         assert renderer.smooth_upscale() is False

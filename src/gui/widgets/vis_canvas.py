@@ -22,10 +22,21 @@ fast (non-smooth) transformation for a chunky pixel look:
   peak-hold caps that drop with accelerating speed.
 - ``fire`` — the classic heat-propagation fire effect, stoked from the bottom
   row by the same log-band energies.
-- ``fractal`` — a spinning escape-time Julia set (the Mandelbrot family). The
-  Julia constant orbits the classic radius so the branches continuously morph
-  between dendrites and spirals; overall level drives morph/spin speed and
-  brightness, and the kick pulse punches the zoom.
+- ``fractal`` — **labelled "J Fractal"**: a spinning escape-time Julia set
+  (the Mandelbrot family). The Julia constant orbits the classic radius so the
+  branches continuously morph between dendrites and spirals; overall level
+  drives morph/spin speed and brightness, and the kick pulse punches the zoom.
+- ``fractal_power`` — **labelled "Tri Fractal"**: the same orbit, camera and
+  fade, iterating a blend of ``z²`` and ``z³`` instead of ``z²`` alone. The
+  blend weight rides the orbit phase, so the figure morphs between two-fold
+  and three-fold symmetry — chunky lobed bodies with a bright fringe — for
+  two multiplies and a lerp, no fractional powers.
+- ``fractal_trap`` — **labelled "Blade Fractal"**: the Julia orbit coloured by
+  an *orbit trap* — how close each pixel's orbit ever comes to the real and
+  imaginary axes — instead of by escape time. Glowing blades and filaments
+  rather than dendrites, from the math already tuned for ``fractal``. Its
+  *fullness* follows the music: a kick shows the shape thick and full, and
+  between kicks it thins to a skeleton of the same shape.
 - ``loop_tunnel`` — **labelled "Tunnel chase"**: a wireframe tunnel flown
   along a closed 3-D loop, with pixelated stars streaming past. The odd one
   out: it draws antialiased lines into its own larger, host-shaped image (see
@@ -99,6 +110,32 @@ _JULIA_SPIN_LEVEL = 0.045  # extra spin at full level
 _JULIA_MORPH_BASE = 0.002  # c-orbit advance per frame (silence)
 _JULIA_MORPH_LEVEL = 0.022  # extra orbit speed at full level
 _JULIA_KICK_ZOOM = 0.14  # fraction of zoom-in on a full-strength kick
+# Tri Fractal: the z² ↔ z³ blend weight swings with the orbit phase at its own
+# rate, so the symmetry order and the Julia constant never repeat in step.
+_POWER_BLEND_RATE = 1.7
+# Blade Fractal. The trap is the two axes; intensity is exp(-distance *
+# falloff), and *falloff* is the one scalar the music moves: 3.5 is the shape
+# at its fullest (a wide soft glow around every blade), 18 the same shape as a
+# thin skeleton. Below ~18 the lines go sub-pixel at 152x64 and shimmer as the
+# view turns (measured on the contact sheet — the fix would be resolution, not
+# tuning). Fullness is mostly the kick, not the level: level barely dips
+# between the kicks of real music, so a level-led mix held the shape two-thirds
+# full and left the beat nothing to swell into.
+_TRAP_FALLOFF_FULL = 3.5
+_TRAP_FALLOFF_THIN = 18.0
+_TRAP_FULL_BASE = 0.05
+_TRAP_FULL_LEVEL = 0.45
+_TRAP_FULL_KICK = 0.55
+# The kick detector collapses a frame or two after the transient, so the raw
+# pulse strobes; this follower's release is the "in and out" of the swell.
+_TRAP_KICK_RELEASE = 0.75  # per 33 ms: halfway down ~100 ms after the kick
+# Brightness is a gate on level, not a multiple of it: thin lines are already
+# dim (low on the ramp, and the alpha follows intensity), so a brightness that
+# fell as fast as the shape thinned meant the skeleton was never seen. The
+# gate holds brightness while the shape thins after the music stops, then drops
+# it out — skeleton at ~0.7 s, gone by ~1.4 s.
+_TRAP_GATE_LO = 0.03
+_TRAP_GATE_HI = 0.25
 # Kick flux (the beat tunnel's feature): the half-wave-rectified rise in
 # 50-120 Hz energy, *gated* by the broadband log-spectral flux — a kick has a
 # click and a bass note does not, which is what separates the two on a track
@@ -109,9 +146,12 @@ _FLUX_PEAK_DECAY_AT_60FPS = 0.995  # ~3 s memory of "how big does this get"
 _PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 
 RENDER_MODES = (
-    "oscilloscope", "spectrum", "fire", "fractal", "loop_tunnel", "beat_tunnel",
-    "stream",
+    "oscilloscope", "spectrum", "fire", "fractal", "fractal_power", "fractal_trap",
+    "loop_tunnel", "beat_tunnel", "stream",
 )
+# The three modes that share the Julia driver (orbit, camera, fade, palette)
+# and differ only in what each pixel computes on the grid.
+FRACTAL_MODES = ("fractal", "fractal_power", "fractal_trap")
 # What the popout window offers, which is no longer everything the renderer can
 # draw: fire was retired from the menu's popout half and kept as a backdrop,
 # where it reads as lit rows rather than as the whole window, and the stream
@@ -168,6 +208,10 @@ class VisRenderer:
         self._fract_angle: float = 0.0
         self._fract_phase: float = 0.0
         self._fract_level: float = 0.0
+        # Blade Fractal's kick follower, and its release rescaled to the frame
+        # interval (see set_frame_interval).
+        self._trap_kick: float = 0.0
+        self._trap_release = _TRAP_KICK_RELEASE
         # Pixel → complex-plane grid, built once (square pixels, centered).
         xs = np.linspace(-0.5, 0.5, _W) * _JULIA_VIEW_SPAN
         ys = np.linspace(-0.5, 0.5, _H) * (_JULIA_VIEW_SPAN * _H / _W)
@@ -253,6 +297,7 @@ class VisRenderer:
         self._frame_ms = float(frame_ms)
         self._bass_alpha = _PULSE_ATTACK ** (frame_ms / FRAME_MS)
         self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS ** (frame_ms / (1000.0 / 60.0))
+        self._trap_release = _TRAP_KICK_RELEASE ** (frame_ms / FRAME_MS)
         self._clock.set_frame_interval(frame_ms / 1000.0)
         self._beat_tunnel.set_frame_interval(frame_ms)
         self._analog_scope.set_frame_interval(frame_ms)
@@ -297,6 +342,7 @@ class VisRenderer:
         self._fract_angle = 0.0
         self._fract_phase = 0.0
         self._fract_level = 0.0
+        self._trap_kick = 0.0
         self._kick_flux = 0.0
         self._prev_bass = 0.0
         self._prev_log = None
@@ -374,7 +420,7 @@ class VisRenderer:
                 return self._render_beat_tunnel(heights)
             if self._mode == "spectrum":
                 self._render_spectrum(heights)
-            elif self._mode == "fractal":
+            elif self._mode in FRACTAL_MODES:
                 self._render_fractal(heights)
             else:
                 self._render_fire(heights)
@@ -537,18 +583,70 @@ class VisRenderer:
         self._fract_angle += _JULIA_SPIN_BASE + _JULIA_SPIN_LEVEL * level
         self._fract_phase += _JULIA_MORPH_BASE + _JULIA_MORPH_LEVEL * level
 
+        # The Blade Fractal's swell is the kick through a follower; the raw
+        # detector would strobe. Advanced for every fractal so a mode switch
+        # never starts from a stale value, and it is a few flops.
+        self._trap_kick = max(self._pulse, self._trap_kick * self._trap_release)
+        kick = self._trap_kick if self._mode == "fractal_trap" else self._pulse
+
         theta = np.pi + _JULIA_ORBIT_SWING * np.sin(self._fract_phase)
         c = _JULIA_ORBIT_RADIUS * np.exp(1j * theta)
-        zoom = 1.0 - _JULIA_KICK_ZOOM * self._pulse
+        zoom = 1.0 - _JULIA_KICK_ZOOM * kick
         z = (self._fract_grid * (np.exp(-1j * self._fract_angle) * zoom)).ravel()
 
-        # Escape-time iteration; points that never escape (the set's interior)
-        # keep count 0 and are recolored to full brightness below.
+        # Three kernels on one grid. Each returns a 0..1 intensity per pixel;
+        # what the music does to the picture happens above (orbit, camera) and
+        # below (brightness), never in here — the math stays audio-blind.
+        if self._mode == "fractal_trap":
+            fullness = (
+                _TRAP_FULL_BASE
+                + _TRAP_FULL_LEVEL * self._fract_level
+                + _TRAP_FULL_KICK * kick
+            )
+            intensity = self._orbit_trap(z, c, fullness)
+            # Smoothstep gate on level, then the kick flash on top.
+            g = (self._fract_level - _TRAP_GATE_LO) / (_TRAP_GATE_HI - _TRAP_GATE_LO)
+            g = float(np.clip(g, 0.0, 1.0))
+            g = g * g * (3.0 - 2.0 * g)
+            brightness = g * (0.62 + 0.55 * kick)
+        else:
+            blend = None
+            if self._mode == "fractal_power":
+                blend = 0.5 + 0.5 * np.sin(_POWER_BLEND_RATE * self._fract_phase)
+            intensity = self._escape_time(z, c, blend)
+            brightness = self._fract_level * (0.8 + 0.5 * kick)
+        intensity = (intensity * np.clip(brightness, 0.0, 1.0)).reshape(_H, _W)
+
+        rgb = self._fire_lut[(intensity * 255).astype(np.uint8)]
+        bgra = np.empty((_H, _W, 4), dtype=np.uint8)
+        bgra[..., 0] = rgb[..., 2]
+        bgra[..., 1] = rgb[..., 1]
+        bgra[..., 2] = rgb[..., 0]
+        bgra[..., 3] = (np.clip(intensity * 2.2, 0.0, 1.0) * 255).astype(np.uint8)
+        self._image = QImage(
+            bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
+        ).copy()
+
+    @staticmethod
+    def _escape_time(z: np.ndarray, c: complex, blend: float | None) -> np.ndarray:
+        """Escape-time intensity for z ← z² + c, or the z²/z³ blend.
+
+        *blend* None is the Julia; 0..1 lerps the iterate between z² and z³
+        (not a fractional power — two multiplies and a lerp, and visually the
+        wanted thing: a continuous morph between two-fold and three-fold
+        symmetry).
+        """
+        # Points that never escape (the set's interior) keep count 0 and are
+        # recolored to mid brightness below.
         count = np.zeros(z.shape, dtype=np.float32)
         alive = np.ones(z.shape, dtype=bool)
         for i in range(1, _JULIA_ITERATIONS + 1):
             za = z[alive]
-            za = za * za + c
+            z2 = za * za
+            if blend is None:
+                za = z2 + c
+            else:
+                za = (1.0 - blend) * z2 + blend * (z2 * za) + c
             z[alive] = za
             escaped = np.abs(za) > 2.0
             idx = np.flatnonzero(alive)[escaped]
@@ -564,18 +662,34 @@ class VisRenderer:
         # far field for contrast.
         intensity = (count / _JULIA_ITERATIONS) ** 1.6
         intensity[alive] = 0.5
-        brightness = self._fract_level * (0.8 + 0.5 * self._pulse)
-        intensity = (intensity * np.clip(brightness, 0.0, 1.0)).reshape(_H, _W)
+        return intensity
 
-        rgb = self._fire_lut[(intensity * 255).astype(np.uint8)]
-        bgra = np.empty((_H, _W, 4), dtype=np.uint8)
-        bgra[..., 0] = rgb[..., 2]
-        bgra[..., 1] = rgb[..., 1]
-        bgra[..., 2] = rgb[..., 0]
-        bgra[..., 3] = (np.clip(intensity * 2.2, 0.0, 1.0) * 255).astype(np.uint8)
-        self._image = QImage(
-            bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
-        ).copy()
+    @staticmethod
+    def _orbit_trap(z: np.ndarray, c: complex, fullness: float) -> np.ndarray:
+        """Orbit-trap intensity: how near each orbit comes to the two axes.
+
+        Same iteration as the Julia, but instead of counting steps it keeps the
+        running minimum of ``min(|re|, |im|)`` — the distance to the trap —
+        for every point until it escapes. Intensity is ``exp(-d * falloff)``:
+        a wide soft glow at low falloff, a thin skeleton at high. *fullness*
+        0..1 picks the falloff on a geometric scale so equal steps look equal.
+        """
+        dmin = np.full(z.shape, np.inf, dtype=np.float32)
+        alive = np.ones(z.shape, dtype=bool)
+        for _ in range(_JULIA_ITERATIONS):
+            za = z[alive]
+            za = za * za + c
+            z[alive] = za
+            dmin[alive] = np.minimum(
+                dmin[alive], np.minimum(np.abs(za.real), np.abs(za.imag))
+            )
+            escaped = np.abs(za) > 2.0
+            alive[np.flatnonzero(alive)[escaped]] = False
+            if not alive.any():
+                break
+        ratio = _TRAP_FALLOFF_THIN / _TRAP_FALLOFF_FULL
+        falloff = _TRAP_FALLOFF_FULL * ratio ** (1.0 - float(np.clip(fullness, 0.0, 1.0)))
+        return np.exp(-dmin * falloff)
 
     def _render_loop_tunnel(self, heights: np.ndarray) -> QImage:
         # Same mean/max blend as the fractal: mean alone leaves a sparse
