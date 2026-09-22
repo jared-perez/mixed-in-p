@@ -138,6 +138,18 @@ _BACKDROP_VIS_MAP = {
     "backdrop_loop_tunnel": "loop_tunnel",
     "backdrop_beat_tunnel": "beat_tunnel",
 }
+
+# Modes the eye menu does not offer right now. Withheld, not retired: the
+# scene, the renderer mode and the config id all stay exactly where they are,
+# and putting a row back is emptying this set. So it is deliberately *not* a
+# `RETIRED_VIS_MODES` entry — that map is one-way and would overwrite the
+# stored id, which is the one thing that cannot be undone when the row returns.
+# A config still naming a withheld mode keeps its value and shows "off", the
+# same downgrade-without-persisting the popouts get at startup.
+#
+# ``backdrop_scope`` (the stream) was withheld on 2026-09-21 at the user's
+# request, with no fault found against it.
+_HIDDEN_VIS_MODES = {"backdrop_scope"}
 from .dialogs.duplicate_policy import ADD as DUPLICATES_ADD
 from .dialogs.duplicate_policy import SKIP as DUPLICATES_SKIP
 from .dialogs.duplicate_policy import resolve_additions
@@ -1875,9 +1887,12 @@ class PlayerPanel(QWidget):
         self._vis_mode: str = _cfg.visualization_mode
         # A popout visual doesn't survive a restart (a visualizer window
         # popping up at launch, before the main window, would be jarring);
-        # the backdrop does. Downgrade without persisting — the next explicit
-        # dropdown change writes the config anyway.
-        if self._vis_mode in POPOUT_MODES:
+        # the backdrop does. A withheld mode gets the same treatment, so a
+        # config already naming one doesn't draw a picture the menu can no
+        # longer reach. Downgrade without persisting — the next explicit
+        # dropdown change writes the config anyway, and until one does, the
+        # stored id is still there for the day the row comes back.
+        if self._vis_mode in POPOUT_MODES or self._vis_mode in _HIDDEN_VIS_MODES:
             self._vis_mode = "off"
         # Source PCM behind the playlist backdrop waveform: the track loaded
         # into the engine (a reference, not a copy). The envelope is computed
@@ -2167,15 +2182,20 @@ class PlayerPanel(QWidget):
         # tunnel's wall became nebula cloud. See :mod:`.vis_beat_tunnel`. So
         # ``beat_tunnel`` is the row reading "wormhole", and the two tunnels no
         # longer sit next to each other in either half.
+        #
+        # Only the popouts say where they draw. The backdrops carried a
+        # "Backdrop " prefix on every row, which said the same thing eight
+        # times over the group the separator already sets apart, so they are
+        # bare nouns now and the prefix survives only where it distinguishes.
         for mode, label in (
-            ("backdrop_fractal", self.tr("Backdrop fractal")),
-            ("backdrop_loop_tunnel", self.tr("Backdrop tunnel chase")),
-            ("backdrop_oscilloscope", self.tr("Backdrop oscilloscope")),
-            ("backdrop_spectrum", self.tr("Backdrop spectrum")),
-            ("backdrop_beat_tunnel", self.tr("Backdrop wormhole")),
-            ("backdrop_scope", self.tr("Backdrop stream")),
-            ("backdrop", self.tr("Backdrop waveform")),
-            ("backdrop_fire", self.tr("Backdrop fire")),
+            ("backdrop_fractal", self.tr("Fractal")),
+            ("backdrop_loop_tunnel", self.tr("Tunnel chase")),
+            ("backdrop_oscilloscope", self.tr("Oscilloscope")),
+            ("backdrop_spectrum", self.tr("Spectrum")),
+            ("backdrop_beat_tunnel", self.tr("Wormhole")),
+            ("backdrop_scope", self.tr("Stream")),
+            ("backdrop", self.tr("Waveform")),
+            ("backdrop_fire", self.tr("Fire")),
             ("fractal", self.tr("Popout fractal")),
             ("loop_tunnel", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
@@ -2183,6 +2203,8 @@ class PlayerPanel(QWidget):
             ("beat_tunnel", self.tr("Popout wormhole")),
             ("off", self.tr("Visuals off")),
         ):
+            if mode in _HIDDEN_VIS_MODES:
+                continue
             action = QAction(label, self)
             action.setCheckable(True)
             action.triggered.connect(lambda _=False, m=mode: self._select_vis_mode(m))

@@ -139,7 +139,7 @@ class TestThePopoutFireIsGone:
 
     def test_the_backdrop_still_offers_it(self, player):
         labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
-        assert "Backdrop fire" in labels
+        assert "Fire" in labels
         assert "backdrop_fire" in player._vis_actions
 
     def test_the_renderer_still_draws_fire(self):
@@ -158,6 +158,51 @@ class TestThePopoutFireIsGone:
         """Not "off" — the picture it picked still exists, so hand it back."""
         write_raw(visualization_mode="fire")
         assert load_config().visualization_mode == "backdrop_fire"
+
+
+class TestTheWithheldStream:
+    """Withheld from the menu on 2026-09-21 at the user's request.
+
+    Withheld, not retired: nothing about it was found wanting, so the whole
+    of it stays put — scene, renderer mode and config id — and the row comes
+    back by emptying `_HIDDEN_VIS_MODES`. That is the difference this class
+    exists to hold: a retirement rewrites the stored id one-way and cannot be
+    undone, so a withheld mode must stay out of RETIRED_VIS_MODES.
+    """
+
+    def test_the_menu_does_not_offer_it(self, player):
+        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        assert "Stream" not in labels
+        assert "backdrop_scope" not in player._vis_actions
+
+    def test_the_renderer_still_draws_it(self):
+        from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
+        from src.gui.widgets.vis_canvas import RENDER_MODES
+
+        assert _BACKDROP_VIS_MAP["backdrop_scope"] == "stream"
+        assert "stream" in RENDER_MODES
+
+    def test_the_stored_id_survives_untouched(self):
+        """No migration: `load_config` hands the id straight back, so the day
+        the row returns, whoever had it selected still has it selected."""
+        from src.gui.widgets.player_panel import _HIDDEN_VIS_MODES
+
+        assert not _HIDDEN_VIS_MODES & set(RETIRED_VIS_MODES)
+        assert "backdrop_scope" in _VALID_VIS_MODES
+        write_raw(visualization_mode="backdrop_scope")
+        assert load_config().visualization_mode == "backdrop_scope"
+
+    def test_a_config_holding_it_starts_off_without_being_rewritten(self, qtbot):
+        """Shown as off — the picture is unreachable from the menu, so drawing
+        it would leave no row ticked and no way back to it. The config keeps
+        the id all the same; only an explicit pick overwrites that."""
+        write_raw(visualization_mode="backdrop_scope")
+        panel = PlayerPanel()
+        qtbot.addWidget(panel)
+        assert panel._vis_mode == "off"
+        assert json.loads(_config_path().read_text())["visualization_mode"] == (
+            "backdrop_scope"
+        )
 
 
 class TestTheDefault:
@@ -188,22 +233,36 @@ class TestTheEyeMenu:
             if not a.isSeparator()
         ]
         labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
-        assert labels[0] == "Backdrop fractal"
+        assert labels[0] == "Fractal"
         assert labels[-1] == "Visuals off"
         # Both halves lead with fractal and put the wormhole directly below
         # spectrum; the tails diverge (waveform and fire have no popout twin).
         popouts = labels[labels.index("Popout fractal") :]
         assert popouts[0] == "Popout fractal"
-        assert labels.index("Backdrop wormhole") == labels.index("Backdrop spectrum") + 1
+        assert labels.index("Wormhole") == labels.index("Spectrum") + 1
         assert labels.index("Popout wormhole") == labels.index("Popout spectrum bars") + 1
         assert len(modes) == len(player._vis_actions)
 
+    def test_only_the_popouts_say_where_they_draw(self, player):
+        """The backdrops dropped their prefix on 2026-09-21: it repeated the
+        same word down a whole group the separator already sets apart. The
+        popout half keeps its prefix, which is what now tells the halves
+        apart, so the last row before the popouts must still be bare."""
+        from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP, _HIDDEN_VIS_MODES
+
+        for mode in {"backdrop", *_BACKDROP_VIS_MAP} - _HIDDEN_VIS_MODES:
+            assert not player._vis_actions[mode].text().startswith("Backdrop")
+        for mode in ("fractal", "loop_tunnel", "oscilloscope", "spectrum",
+                     "beat_tunnel"):
+            assert player._vis_actions[mode].text().startswith("Popout ")
+
     def test_every_mode_is_offered_exactly_once(self, player):
         from src.gui.widgets.vis_canvas import POPOUT_MODES
-        from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP
+        from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP, _HIDDEN_VIS_MODES
 
         offered = set(player._vis_actions)
-        assert offered == {"off", "backdrop"} | set(_BACKDROP_VIS_MAP) | set(POPOUT_MODES)
+        every = {"off", "backdrop"} | set(_BACKDROP_VIS_MAP) | set(POPOUT_MODES)
+        assert offered == every - _HIDDEN_VIS_MODES
         assert len(player._vis_menu.actions()) == len(offered) + 2  # two separators
 
 
