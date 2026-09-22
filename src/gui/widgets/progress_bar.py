@@ -175,6 +175,20 @@ class ProgressPanel(QFrame):
         self._activity.stop()
         self._activity.update()
 
+    def report(self, message: str) -> None:
+        """Show a finished-run line on a panel that may never have started.
+
+        ``complete`` alone assumes ``start`` already ran, but a pipeline step
+        can finish without its worker ever running (nothing left to convert,
+        every row already analysed), and the panel is hidden from __init__
+        until something starts. Ending a run is exactly when the user is
+        looking for the outcome, so make the readout visible first.
+        """
+        if self._show_activity:
+            self._activity.show()
+        self.show()
+        self.complete(message)
+
     def cancelled(self, message: str | None = None) -> None:
         """Mark the run as cancelled — a neutral outcome, not an error.
 

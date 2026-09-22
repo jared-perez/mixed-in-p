@@ -1404,7 +1404,9 @@ class MainWindow(QMainWindow):
         # playlist (they land one at a time); the rest stay PENDING in Analyze,
         # so the user can press Analyze again — they just will not be added.
         if self._pipeline.active:
-            self._finish_pipeline_summary()
+            # Not on Analyze: its panel already reads "Cancelled", which is
+            # the more honest word for what just happened there.
+            self._finish_pipeline_summary(on_analyze=False)
 
     def _auto_rename_gate_open(self, origin: str, count: int) -> bool:
         """The three things that must all hold for an analysis to end in a rename.
@@ -2004,8 +2006,13 @@ class MainWindow(QMainWindow):
             return
         self._finish_pipeline_summary()
 
-    def _finish_pipeline_summary(self) -> None:
-        """Report and end the run, whether or not it ran to the end."""
+    def _finish_pipeline_summary(self, on_analyze: bool = True) -> None:
+        """Report and end the run, whether or not it ran to the end.
+
+        `on_analyze` is False when the Analyze panel has already said
+        something truer about its own outcome — a cancel — which a green
+        "Pipeline complete" must not paint over.
+        """
         if not self._pipeline.active:
             return
         added, skipped, errors = self._pipeline.summary()
@@ -2022,8 +2029,28 @@ class MainWindow(QMainWindow):
             parts.append(self.tr("{n} skipped").format(n=skipped))
         if errors:
             parts.append(self.tr("{n} errors").format(n=errors))
-        self._conversion_panel.progress_panel.complete(", ".join(parts))
+        for panel in self._pipeline_report_panels(on_analyze):
+            panel.progress_panel.report(", ".join(parts))
         self._pipeline.end()
+
+    def _pipeline_report_panels(self, on_analyze: bool = True) -> list:
+        """The panels a finished run reports on: every step that took part.
+
+        The run's outcome belongs where the user is when it ends, and on an
+        Analyze-last run that is not the Convert panel — reporting only there
+        made a pipeline started from Analyze look like a button that does
+        nothing. Rename is left out deliberately: its readout is a plain bar
+        for one operation, not a place to end a run.
+
+        Convert is also the fallback, so a run that performed neither of the
+        two (rename straight into a playlist) still says what it did.
+        """
+        panels = []
+        if self._pipeline.has_step(STEP_CONVERT):
+            panels.append(self._conversion_panel)
+        if on_analyze and self._pipeline.has_step(STEP_ANALYZE):
+            panels.append(self._analysis_panel)
+        return panels or [self._conversion_panel]
 
     # A step's toggle appears twice — in its panel and as a mini in the header
     # — and the two mirror each other. This is the one owner: both ask here,

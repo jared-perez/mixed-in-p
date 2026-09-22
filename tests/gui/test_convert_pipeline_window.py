@@ -21,7 +21,12 @@ import pytest
 from PySide6.QtCore import QObject
 
 from src.conversion.result import ConversionResult
-from src.gui.convert_pipeline import STEP_CONVERT, ConvertPipeline
+from src.gui.convert_pipeline import (
+    STEP_ANALYZE,
+    STEP_CONVERT,
+    STEP_RENAME,
+    ConvertPipeline,
+)
 from src.gui.main_window import MainWindow
 from src.gui.models.state import TrackState
 from src.gui.models.track_model import TrackStore
@@ -40,6 +45,9 @@ class _ProgressStub:
         self.messages.append(("start", total))
 
     def complete(self, text):
+        self.messages.append(("complete", text))
+
+    def report(self, text):
         self.messages.append(("complete", text))
 
     def cancelled(self):
@@ -224,6 +232,7 @@ class WindowStub(QObject):
     _pipeline_analysis_idle = MainWindow._pipeline_analysis_idle
     _finish_pipeline_if_done = MainWindow._finish_pipeline_if_done
     _finish_pipeline_summary = MainWindow._finish_pipeline_summary
+    _pipeline_report_panels = MainWindow._pipeline_report_panels
     _resolve_pipeline_target = MainWindow._resolve_pipeline_target
     _unique_playlist_name = MainWindow._unique_playlist_name
     _refresh_pipeline_playlists = MainWindow._refresh_pipeline_playlists
@@ -820,3 +829,53 @@ def test_a_whole_run_completes_with_auto_analyze_off(adding, tmp_path, monkeypat
     adding._update_track_from_result(_result(track.file_path))
     assert [i.path for i in adding._library.get_items(node_id)] == [path]
     assert adding._pipeline.run is None
+
+
+# --------------------------------------------------- where the summary lands
+
+def _completions(panel):
+    return [m[1] for m in panel.progress_panel.messages if m[0] == "complete"]
+
+
+def test_the_summary_reaches_every_panel_whose_step_ran(adding, tmp_path):
+    """The Analyze panel is the last one the files pass through on a full run,
+    so it is where the user is looking when the run ends."""
+    _arm_at(adding, "Friday")
+    track = _await(adding, _flac(tmp_path / "a.flac"))
+    adding._update_track_from_result(_result(track.file_path))
+    line = "Pipeline complete: 1 added to Friday"
+    assert _completions(adding._conversion_panel)[-1] == line
+    assert _completions(adding._analysis_panel)[-1] == line
+
+
+def test_a_convert_off_run_does_not_report_on_the_convert_panel(adding, tmp_path):
+    node_id = adding._library.create_playlist("Friday")
+    adding._pipeline.arm(node_id, "Friday", [], [], steps={STEP_ANALYZE})
+    track = _await(adding, _flac(tmp_path / "a.flac"))
+    adding._update_track_from_result(_result(track.file_path))
+    assert _completions(adding._analysis_panel) == [
+        "Pipeline complete: 1 added to Friday"
+    ]
+    assert _completions(adding._conversion_panel) == []
+
+
+def test_a_run_with_neither_step_still_reports_somewhere(adding, tmp_path):
+    """Rename straight into a playlist: Convert is the fallback readout."""
+    node_id = adding._library.create_playlist("Friday")
+    adding._pipeline.arm(node_id, "Friday", [], [], steps={STEP_RENAME})
+    adding._pipeline_advance(STEP_RENAME, [_flac(tmp_path / "a.flac")])
+    assert _completions(adding._conversion_panel) == [
+        "Pipeline complete: 1 added to Friday"
+    ]
+    assert _completions(adding._analysis_panel) == []
+
+
+def test_a_cancelled_analysis_keeps_its_own_word_on_the_analyze_panel(adding):
+    """"Cancelled" is truer than a green "Pipeline complete" on the panel that
+    was cancelled — the Convert panel still carries the tally."""
+    _arm_at(adding, "Friday")
+    adding._finish_pipeline_summary(on_analyze=False)
+    assert _completions(adding._analysis_panel) == []
+    assert _completions(adding._conversion_panel) == [
+        "Pipeline complete: 0 added to Friday"
+    ]

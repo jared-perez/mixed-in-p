@@ -138,6 +138,9 @@ class _ProgressStub:
     def complete(self, text):
         self.messages.append(text)
 
+    def report(self, text):
+        self.messages.append(text)
+
     def cancelled(self):
         self.messages.append("cancelled")
 
@@ -161,6 +164,7 @@ class WindowStub(QObject):
     _pipeline_analysis_idle = MainWindow._pipeline_analysis_idle
     _finish_pipeline_if_done = MainWindow._finish_pipeline_if_done
     _finish_pipeline_summary = MainWindow._finish_pipeline_summary
+    _pipeline_report_panels = MainWindow._pipeline_report_panels
 
     def __init__(self, store):
         super().__init__()

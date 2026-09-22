@@ -105,3 +105,18 @@ def test_button_fits_its_translated_label(qtbot, code):
         )
     finally:
         app.removeTranslator(translator)
+
+
+def test_report_shows_a_panel_that_never_started(panel):
+    """A pipeline step can end without its worker ever running (nothing left
+    to convert, every row already analysed). `complete` alone would leave the
+    outcome on a panel still hidden from __init__, which is what made a
+    pipeline started from the Analyze panel look like a button that does
+    nothing at all.
+    """
+    assert panel.isHidden()
+    panel.report("Pipeline complete: 0 added to Friday")
+    assert not panel.isHidden()
+    assert panel._status_label.text() == "Pipeline complete: 0 added to Friday"
+    assert not panel._activity.isHidden()
+    assert not panel._cancel_btn.isVisible()
