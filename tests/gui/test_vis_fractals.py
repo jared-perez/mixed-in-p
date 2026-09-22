@@ -122,6 +122,53 @@ class TestTheThreeShareOneDriver:
         assert np.abs(frames["fractal_power"] - frames["fractal_trap"]).mean() > 5
 
 
+class TestTheTriFractalsHollowInterior:
+    """The blend's interior can be one body across most of the frame, and a
+    flat fill that size hid the playlist behind it (the user, 2026-09-22).
+    So it is shaded by depth from the set's edge: a rim, black inside."""
+
+    def test_the_julia_still_fills_its_interior_flat(self, qapp):
+        from src.gui.widgets.vis_canvas import _H, _W
+
+        renderer = VisRenderer()
+        renderer.set_mode("fractal")
+        z = renderer._fract_grid.ravel().copy()
+        intensity = renderer._escape_time(z, complex(-0.1, 0.0), None)
+        interior = intensity[np.isclose(intensity, 0.5)]
+        assert interior.size > 0.05 * _H * _W
+
+    def test_the_tri_fractals_deep_interior_goes_black(self, qapp):
+        from src.gui.widgets.vis_canvas import _H, _HOLLOW_STEPS, _W
+
+        renderer = VisRenderer()
+        renderer.set_mode("fractal_power")
+        z = renderer._fract_grid.ravel().copy()
+        flat = renderer._escape_time(z.copy(), complex(-0.1, 0.0), 0.5, hollow=False)
+        hollow = renderer._escape_time(z.copy(), complex(-0.1, 0.0), 0.5, hollow=True)
+        inside = np.isclose(flat, 0.5).reshape(_H, _W)
+        assert inside.mean() > 0.3  # a body worth hollowing
+        centre = hollow.reshape(_H, _W)[_H // 2, _W // 2]
+        assert inside[_H // 2, _W // 2]
+        assert centre < 0.5 * np.exp(-(_HOLLOW_STEPS - 1) / 4.0) * 1.01
+        # The rim keeps the fill's brightness; the far field is untouched.
+        assert hollow.max() >= 0.5
+        assert np.array_equal(hollow[~inside.ravel()], flat[~inside.ravel()])
+
+    def test_a_body_the_frame_crops_has_no_rim_along_the_frame(self, qapp):
+        """The frame edge is not the set's edge: padding the erosion with
+        'outside' lit a line along the border of every cropped body."""
+        from src.gui.widgets.vis_canvas import _H, _W
+
+        renderer = VisRenderer()
+        renderer.set_mode("fractal_power")
+        z = renderer._fract_grid.ravel().copy() * 0.35  # zoomed in: all interior
+        hollow = renderer._escape_time(z, complex(-0.1, 0.0), 0.5, hollow=True)
+        # Uniform (no rim anywhere) and below what the eye sees: the depth
+        # cap leaves 0.5·e^(-12/4) ≈ 0.025, an alpha of ~14/255.
+        assert hollow.max() - hollow.min() < 1e-6
+        assert hollow.max() < 0.03
+
+
 class TestTheBladeFractalsSwell:
     def test_a_kick_fills_the_shape_and_it_thins_again(self, qapp):
         """Fullness is mostly the kick: the lit area grows on the hit and

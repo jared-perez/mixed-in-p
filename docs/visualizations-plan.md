@@ -169,7 +169,12 @@ is radioactive):
      two-fold and three-fold symmetry: chunky lobed bodies with a bright
      fringe. Two multiplies and a lerp — not a fractional power, which would
      cost five transcendentals per iteration for a picture that reads the
-     same. ~+15% on the Julia.
+     same. Its interior is **hollow**: the blend's body can span most of the
+     frame, and a flat fill that size hid the playlist behind it, so the
+     interior is shaded by its depth from the set's edge (counted in
+     erosions of the interior mask, ~0.1 ms) — a rim four pixels deep
+     falling to black. The frame edge pads as *inside*, or a cropped body
+     grows a bright line along the border. ~1.3 ms/frame.
    - **Blade Fractal** (`fractal_trap`) keeps the Julia orbit but colours by an
      *orbit trap* — each pixel's closest approach to the two axes — instead of
      by escape count: glowing blades and filaments. Its **fullness** follows

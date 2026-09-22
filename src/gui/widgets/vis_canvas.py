@@ -178,6 +178,14 @@ _JULIA_KICK_ZOOM = 0.14  # fraction of zoom-in on a full-strength kick
 # Tri Fractal: the z² ↔ z³ blend weight swings with the orbit phase at its own
 # rate, so the symmetry order and the Julia constant never repeat in step.
 _POWER_BLEND_RATE = 1.7
+# The blend's interior is large — at mid-blend the set can be one body across
+# most of the frame — and a flat mid-brightness fill that size hides the
+# playlist behind it. So the Tri Fractal's interior is *hollow*: shaded by its
+# distance from the set's edge, a bright rim falling to black inside. The
+# distance is counted in erosions of the interior mask (a few numpy passes at
+# 152x64, ~0.1 ms), so it is in pixels of the grid, the same rim at any zoom.
+_HOLLOW_STEPS = 12  # erosions counted: past this depth the interior is black
+_HOLLOW_TAU = 4.0  # e-fold depth of the rim, in grid pixels
 # Blade Fractal. The trap is the two axes; intensity is exp(-distance *
 # falloff), and *falloff* is the one scalar the music moves: 3.5 is the shape
 # at its fullest (a wide soft glow around every blade), 18 the same shape as a
@@ -791,7 +799,7 @@ class VisRenderer:
             blend = None
             if self._mode == "fractal_power":
                 blend = 0.5 + 0.5 * np.sin(_POWER_BLEND_RATE * self._fract_phase)
-            intensity = self._escape_time(z, c, blend)
+            intensity = self._escape_time(z, c, blend, hollow=blend is not None)
             brightness = self._fract_level * (0.8 + 0.5 * kick)
         intensity = (intensity * np.clip(brightness, 0.0, 1.0)).reshape(_H, _W)
 
@@ -806,13 +814,16 @@ class VisRenderer:
         ).copy()
 
     @staticmethod
-    def _escape_time(z: np.ndarray, c: complex, blend: float | None) -> np.ndarray:
+    def _escape_time(
+        z: np.ndarray, c: complex, blend: float | None, hollow: bool = False
+    ) -> np.ndarray:
         """Escape-time intensity for z ← z² + c, or the z²/z³ blend.
 
         *blend* None is the Julia; 0..1 lerps the iterate between z² and z³
         (not a fractional power — two multiplies and a lerp, and visually the
         wanted thing: a continuous morph between two-fold and three-fold
-        symmetry).
+        symmetry). *hollow* shades the interior by depth instead of filling it
+        (see ``_HOLLOW_STEPS``).
         """
         # Points that never escape (the set's interior) keep count 0 and are
         # recolored to mid brightness below.
@@ -839,7 +850,27 @@ class VisRenderer:
         # interiors render as flat washed-out blobs. The exponent darkens the
         # far field for contrast.
         intensity = (count / _JULIA_ITERATIONS) ** 1.6
-        intensity[alive] = 0.5
+        if hollow and alive.any():
+            inside = alive.reshape(_H, _W)
+            depth = np.zeros((_H, _W), dtype=np.float32)
+            mask = inside
+            for _ in range(_HOLLOW_STEPS):
+                # One erosion: a pixel survives if its four neighbours are
+                # inside too. The frame edge pads as *inside*: a body the
+                # frame crops has no set edge there, and padding it as
+                # outside drew a bright rim along the frame border.
+                pad = np.pad(mask, 1, constant_values=True)
+                mask = (
+                    mask
+                    & pad[:-2, 1:-1] & pad[2:, 1:-1]
+                    & pad[1:-1, :-2] & pad[1:-1, 2:]
+                )
+                if not mask.any():
+                    break
+                depth += mask
+            intensity[alive] = 0.5 * np.exp(-depth[inside] / _HOLLOW_TAU)
+        else:
+            intensity[alive] = 0.5
         return intensity
 
     @staticmethod
