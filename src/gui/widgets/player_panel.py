@@ -105,7 +105,7 @@ from ..play_context import (
     resync,
 )
 from ..styles.theme import Theme
-from ..waveform_palette import column_colors, needs_spectral, peak_envelope
+from ..waveform_palette import column_colors, needs_spectral, peak_envelope, shades_core
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
 from ..workers.lookup_worker import LookupJob, LookupThread
@@ -1943,6 +1943,7 @@ class PlayerPanel(QWidget):
         # frequency mode asks — its spectral_columns, cached for that one track.
         self._wf_color_mode: str = "solid"
         self._wf_color_absolute: bool = False
+        self._wf_color_hue_mapped: bool = False
         self._wf_columns: tuple | None = None   # (path, coarse_min, coarse_max)
         self._wf_spectral: tuple | None = None  # (path, columns, low, mid, high, centroid)
 
@@ -6609,13 +6610,15 @@ class PlayerPanel(QWidget):
         budget = self._scroll.viewport().height() - self._height_outside_playlist()
         return max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, budget)
 
-    def set_waveform_color_mode(self, mode: str, absolute: bool) -> None:
+    def set_waveform_color_mode(self, mode: str, absolute: bool, hue_mapped: bool = False) -> None:
         """Colour the waveforms by *mode* (from Settings; see waveform_palette).
 
+        *hue_mapped* is "Use full-spectrum colors" for the frequency modes.
         The visualizers and backdrop keep the picker colour whatever the mode.
         """
         self._wf_color_mode = mode
         self._wf_color_absolute = bool(absolute)
+        self._wf_color_hue_mapped = bool(hue_mapped)
         self._refresh_waveform_colors()
 
     def _install_waveform(self, path: str, cmin, cmax, dmin, dmax, bps) -> None:
@@ -6651,9 +6654,12 @@ class PlayerPanel(QWidget):
             self._wf_color_absolute,
             base_color=self._waveform_color,
             columns=len(cmin),
+            hue_mapped=self._wf_color_hue_mapped,
             **kwargs,
         )
-        self._slice.set_column_colors(colors)
+        self._slice.set_column_colors(
+            colors, shades_core(self._wf_color_mode, self._wf_color_hue_mapped)
+        )
 
     def _spectral_for(self, path: str, columns: int):
         """(low, mid, high, centroid) for *path*, computed from the cached PCM.

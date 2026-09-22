@@ -85,10 +85,22 @@ class TestOverviewCanvas:
         canvas.grab()
         assert canvas._cache is cached
 
+    def test_core_shading_is_brightest_at_the_axis(self, canvas):
+        canvas.set_column_colors(np.full((N, 3), (0, 0, 255), np.uint8))
+        canvas.set_core_shading(True)
+        img = canvas.grab().toImage()
+        core = QColor(img.pixel(100, H // 2 - 2)).blue()
+        tip = QColor(img.pixel(100, H // 2 - 17)).blue()
+        assert core > tip > 0
+        canvas.set_core_shading(False)
+        img = canvas.grab().toImage()
+        assert QColor(img.pixel(100, H // 2 - 2)) == QColor(img.pixel(100, H // 2 - 17))
+
     def test_clear_drops_the_colours(self, canvas):
         canvas.set_column_colors(halves())
         canvas.clear()
         assert canvas._column_colors is None
+        assert canvas._core_shading is False
         assert canvas._cache is None
 
 
@@ -134,15 +146,24 @@ class TestSettings:
         cfg = AppConfig()
         assert cfg.waveform_color_mode == "solid"
         assert cfg.waveform_color_absolute is False
+        assert cfg.waveform_color_hue_mapped is False
 
+    @pytest.mark.parametrize("hue_mapped", [False, True])
     @pytest.mark.parametrize("absolute", [False, True])
     @pytest.mark.parametrize("mode", WAVEFORM_COLOR_MODES)
-    def test_round_trips_through_the_panel(self, qtbot, mode, absolute):
+    def test_round_trips_through_the_panel(self, qtbot, mode, absolute, hue_mapped):
         """get_config rebuilds the whole AppConfig from the widgets: a field it
         forgets resets on every other settings change."""
-        panel = _settings(qtbot, waveform_color_mode=mode, waveform_color_absolute=absolute)
+        panel = _settings(
+            qtbot,
+            waveform_color_mode=mode,
+            waveform_color_absolute=absolute,
+            waveform_color_hue_mapped=hue_mapped,
+        )
         cfg = panel.get_config(AppConfig())
-        assert (cfg.waveform_color_mode, cfg.waveform_color_absolute) == (mode, absolute)
+        assert (
+            cfg.waveform_color_mode, cfg.waveform_color_absolute, cfg.waveform_color_hue_mapped
+        ) == (mode, absolute, hue_mapped)
 
     def test_tone_is_stored_as_centroid(self, qtbot):
         panel = _settings(qtbot)
@@ -153,9 +174,15 @@ class TestSettings:
     def test_round_trips_through_disk(self, qtbot):
         from src.utils.config import save_config
 
-        save_config(AppConfig(waveform_color_mode="bands", waveform_color_absolute=True))
+        save_config(AppConfig(
+            waveform_color_mode="bands",
+            waveform_color_absolute=True,
+            waveform_color_hue_mapped=True,
+        ))
         cfg = load_config()
-        assert (cfg.waveform_color_mode, cfg.waveform_color_absolute) == ("bands", True)
+        assert (
+            cfg.waveform_color_mode, cfg.waveform_color_absolute, cfg.waveform_color_hue_mapped
+        ) == ("bands", True, True)
 
     def test_an_unknown_stored_mode_loads_as_solid(self):
         from src.utils.app_dirs import get_app_data_dir
@@ -167,20 +194,26 @@ class TestSettings:
         assert load_config().waveform_color_mode == "solid"
 
     @pytest.mark.parametrize(
-        "mode, picker, scaled",
+        "mode, hue_mapped, picker, scaled, spectrum_shown",
         [
-            ("solid", True, False),
-            ("loudness", True, True),
-            ("bands", False, True),
-            ("centroid", False, True),
+            ("solid", False, True, False, False),
+            ("solid", True, True, False, False),
+            ("loudness", True, True, True, False),
+            ("bands", False, True, True, True),
+            ("bands", True, False, True, True),
+            ("centroid", False, True, True, True),
+            ("centroid", True, False, True, True),
         ],
     )
-    def test_controls_follow_the_mode(self, qtbot, mode, picker, scaled):
-        panel = _settings(qtbot, waveform_color_mode=mode)
+    def test_controls_follow_the_mode(self, qtbot, mode, hue_mapped, picker, scaled, spectrum_shown):
+        """The picker is off only while full-spectrum colours are on in a
+        frequency mode; a stored switch left on under Solid must not grey it."""
+        panel = _settings(qtbot, waveform_color_mode=mode, waveform_color_hue_mapped=hue_mapped)
         assert panel._wave_custom_btn.isEnabled() is picker
         assert all(b.isEnabled() is picker for b in panel._wave_swatches.values())
-        assert panel._waveform_picker_hint.isHidden() is picker
         assert panel._waveform_absolute_switch.isEnabled() is scaled
+        assert panel._waveform_spectrum_switch.isHidden() is not spectrum_shown
+        assert panel._waveform_spectrum_label.isHidden() is not spectrum_shown
 
     def test_changing_the_mode_emits(self, qtbot):
         panel = _settings(qtbot)
@@ -188,7 +221,22 @@ class TestSettings:
             panel._waveform_mode_combo.setCurrentIndex(
                 panel._waveform_mode_combo.findData("bands")
             )
+        assert panel._wave_custom_btn.isEnabled(), "shades of the picker by default"
+        assert not panel._waveform_spectrum_switch.isHidden()
+
+    def test_a_real_click_on_full_spectrum_greys_the_picker(self, qtbot):
+        panel = _settings(qtbot, waveform_color_mode="centroid")
+        panel.show()
+        sw = panel._waveform_spectrum_switch
+        qtbot.waitExposed(sw)
+        before = sw.toolTip()
+        with qtbot.waitSignal(panel.settings_changed, timeout=1000):
+            qtbot.mouseClick(sw, Qt.MouseButton.LeftButton, pos=sw.rect().center())
+        assert panel.get_config().waveform_color_hue_mapped is True
         assert not panel._wave_custom_btn.isEnabled()
+        assert sw.toolTip() != before
+        qtbot.mouseClick(sw, Qt.MouseButton.LeftButton, pos=sw.rect().center())
+        assert panel._wave_custom_btn.isEnabled()
 
     def test_a_real_click_on_the_switch_emits_and_updates_its_tooltip(self, qtbot):
         panel = _settings(qtbot, waveform_color_mode="bands")
@@ -247,13 +295,29 @@ class TestPlayer:
         player.set_waveform_color("#123456")
         assert player.spectral_calls == 1
 
-    def test_bands_colour_the_bass_red_and_the_highs_green(self, player):
-        player.set_waveform_color_mode("bands", False)
+    def test_full_spectrum_bands_colour_the_bass_red_and_the_highs_green(self, player):
+        player.set_waveform_color_mode("bands", False, hue_mapped=True)
         colors = self.colors(player)
         n = len(colors)
         bass, highs = colors[n // 6], colors[5 * n // 6]
         assert bass[0] > bass[1] and bass[0] > bass[2]
         assert highs[1] > highs[0] and highs[1] > highs[2]
+
+    def test_shaded_bands_run_dark_for_bass_and_light_for_highs(self, player):
+        player.set_waveform_color("#2080c0")
+        player.set_waveform_color_mode("bands", False)
+        colors = self.colors(player).astype(int)
+        n = len(colors)
+        assert colors[5 * n // 6].sum() > colors[n // 6].sum() + 150
+
+    def test_core_shading_only_for_the_shaded_palette(self, player):
+        canvas = player._slice.waveform_widget()
+        player.set_waveform_color_mode("centroid", False)
+        assert canvas._core_shading is True
+        player.set_waveform_color_mode("centroid", False, hue_mapped=True)
+        assert canvas._core_shading is False
+        player.set_waveform_color_mode("loudness", False)
+        assert canvas._core_shading is False
 
     def test_both_canvases_get_the_colours(self, player):
         player.set_waveform_color_mode("centroid", False)

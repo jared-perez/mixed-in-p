@@ -594,10 +594,13 @@ class SliceSection(QWidget):
         self._waveform.set_waveform_color(color)
         self._zoom_waveform.set_waveform_color(color)
 
-    def set_column_colors(self, colors) -> None:
+    def set_column_colors(self, colors, core_shading: bool = False) -> None:
         """Per-column RGB for both waveforms, aligned with the coarse arrays
-        (see waveform_palette), or None to draw them solid."""
+        (see waveform_palette), or None to draw them solid. *core_shading*
+        applies to the full waveform only: the zoomed one draws a thin trace
+        of single cycles, which has no body to shade."""
         self._waveform.set_column_colors(colors)
+        self._waveform.set_core_shading(core_shading)
         self._zoom_waveform.set_column_colors(colors)
 
     def set_waveform_half(self, half: bool) -> None:

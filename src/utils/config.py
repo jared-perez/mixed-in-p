@@ -151,10 +151,12 @@ class AppConfig:
     spectrum_split: bool = False
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
-    # How the waveform body is coloured (WAVEFORM_COLOR_MODES). The picker
-    # colour above applies to solid and loudness only; bands and centroid
-    # carry data in the hue.
+    # How the waveform body is coloured (WAVEFORM_COLOR_MODES).
     waveform_color_mode: str = "solid"
+    # Bands and centroid only: True spreads the data over the whole hue wheel
+    # ("Use full-spectrum colors", the picker then unused); False, the
+    # default, shades the picker colour from deep to near-white.
+    waveform_color_hue_mapped: bool = False
     # False stretches each track's own range across the colours (per-track);
     # True uses one fixed mapping, so two tracks compare. See waveform_palette.
     waveform_color_absolute: bool = False
@@ -442,6 +444,9 @@ def load_config() -> AppConfig:
                 ),
                 waveform_color_absolute=bool(
                     data.get("waveform_color_absolute", AppConfig.waveform_color_absolute)
+                ),
+                waveform_color_hue_mapped=bool(
+                    data.get("waveform_color_hue_mapped", AppConfig.waveform_color_hue_mapped)
                 ),
                 player_waveform_half=bool(
                     data.get("player_waveform_half", AppConfig.player_waveform_half)

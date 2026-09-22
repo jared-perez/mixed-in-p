@@ -76,5 +76,7 @@ next to the words for key (*Tonalidad*, *Tonalité*, *Tonalità*,
 *Tonalidade*); nl is `Klank` for the same reason (*Toonsoort*), and pl is
 `Brzmienie` because *Barwa* also means colour, in a colour setting. The
 normalisation pair is `This track` / `Fixed`; ru has `Единая` (one shared
-scale) because a bare *фиксированный* reads as "stuck". The picker hint
-names the two modes, so it must use the same words as their combo items.
+scale) because a bare *фиксированный* reads as "stuck". "Use full-spectrum
+colors" is a noun phrase in ru (`Цвета всего спектра`) to keep that row short;
+it swaps the frequency modes' default (shades of the chosen colour) for the
+whole hue range, so translate it as *all the colours*, never as a physics term.

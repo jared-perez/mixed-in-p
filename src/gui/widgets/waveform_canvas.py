@@ -17,6 +17,7 @@ from PySide6.QtGui import QColor, QImage, QPainter, QPen, QPixmap, QPolygon
 from PySide6.QtWidgets import QWidget
 
 from ..styles.theme import Theme
+from ..waveform_palette import core_shading
 
 # Hit-test tolerance for grabbing markers (pixels)
 _MARKER_GRAB_PX = 8
@@ -63,6 +64,9 @@ class WaveformCanvas(QWidget):
         self._waveform_color = QColor(Theme.NEON_YELLOW)
         # Per-column RGB (N, 3) uint8 from waveform_palette, or None for solid.
         self._column_colors: np.ndarray | None = None
+        # Bright at the axis, darker toward each column's tip (the shaded
+        # frequency palette's look; see waveform_palette.core_shading).
+        self._core_shading: bool = False
         self._half: bool = False
         # The waveform body, rendered once and blitted on every position tick.
         # Rebuilt when its key (size, dpr) goes stale or an input changes.
@@ -142,6 +146,13 @@ class WaveformCanvas(QWidget):
         self._column_colors = colors
         self._invalidate()
 
+    def set_core_shading(self, on: bool) -> None:
+        """Shade each column from bright at the axis to darker at its tip."""
+        on = bool(on)
+        if on != self._core_shading:
+            self._core_shading = on
+            self._invalidate()
+
     def set_half(self, half: bool) -> None:
         """Draw only the top half (from Settings), in half the height."""
         half = bool(half)
@@ -163,6 +174,7 @@ class WaveformCanvas(QWidget):
         self._min_arr = None
         self._max_arr = None
         self._column_colors = None
+        self._core_shading = False
         self._dragging = None
         self._invalidate()
 
@@ -265,6 +277,15 @@ class WaveformCanvas(QWidget):
         bot = np.clip(np.maximum(bot, top), 0, ph - 1).astype(np.int64)
         rows = np.arange(ph)[:, None]
         mask = (rows >= top[None, :]) & (rows <= bot[None, :])
+        shade = None
+        if self._core_shading:
+            # Distance from the axis as a fraction of that side's own reach,
+            # so a lopsided column still peaks at the axis and dims at each tip.
+            axis = ph - 1 if self._half else int(round(h / 2 * dpr))
+            up = np.maximum(axis - top, 1)[None, :]
+            down = np.maximum(bot - axis, 1)[None, :]
+            dist = np.where(rows < axis, (axis - rows) / up, (rows - axis) / down)
+            shade = core_shading(dist)[..., None]
 
         colors = _usable_colors(self._column_colors, n)
         if colors is None:
@@ -274,11 +295,14 @@ class WaveformCanvas(QWidget):
             )
         else:
             rgb = colors[starts]
+        body = np.broadcast_to(rgb[None, :, :], (ph, pw, 3))
+        if shade is not None:
+            body = np.rint(body * shade).astype(np.uint8)
         # Format_ARGB32 is B, G, R, A in memory on every platform Qt ships on.
         buf = np.zeros((ph, pw, 4), dtype=np.uint8)
-        buf[..., 0] = np.where(mask, rgb[None, :, 2], 0)
-        buf[..., 1] = np.where(mask, rgb[None, :, 1], 0)
-        buf[..., 2] = np.where(mask, rgb[None, :, 0], 0)
+        buf[..., 0] = np.where(mask, body[..., 2], 0)
+        buf[..., 1] = np.where(mask, body[..., 1], 0)
+        buf[..., 2] = np.where(mask, body[..., 0], 0)
         buf[..., 3] = np.where(mask, 255, 0)
         image = QImage(buf.data, pw, ph, pw * 4, QImage.Format.Format_ARGB32).copy()
         pixmap = QPixmap.fromImage(image)

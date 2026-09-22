@@ -4,6 +4,8 @@ Qt-free. The distinction the normalisation setting exists for is pinned here:
 absolute maps one band share to one colour in every track, per-track does not.
 """
 
+import colorsys
+
 import numpy as np
 import pytest
 
@@ -25,10 +27,13 @@ def analysis(seed=0, n=N):
     return dict(peaks=peaks, low=low, mid=mid, high=high, centroid=centroid)
 
 
+@pytest.mark.parametrize("hue_mapped", [False, True])
 @pytest.mark.parametrize("absolute", [False, True])
 @pytest.mark.parametrize("mode", WAVEFORM_COLOR_MODES)
-def test_every_mode_returns_one_rgb_row_per_column(mode, absolute):
-    out = column_colors(mode, absolute, base_color=BASE, columns=N, **analysis())
+def test_every_mode_returns_one_rgb_row_per_column(mode, absolute, hue_mapped):
+    out = column_colors(
+        mode, absolute, base_color=BASE, columns=N, hue_mapped=hue_mapped, **analysis()
+    )
     assert out.shape == (N, 3)
     assert out.dtype == np.uint8
 
@@ -70,6 +75,48 @@ class TestLoudness:
         assert per_track[-1, 0] > absolute[-1, 0]
 
 
+class TestPalettes:
+    """The frequency modes shade the picker colour by default; full-spectrum
+    (hue_mapped) spreads the same data over the hue wheel."""
+
+    @pytest.mark.parametrize("mode", ["bands", "centroid"])
+    def test_shaded_stays_in_the_colours_family(self, mode):
+        """Deep shade to near-white: every coloured column is either within a
+        few degrees of the base hue or washed nearly white."""
+        teal = "#006992"
+        out = column_colors(mode, False, base_color=teal, columns=N, **analysis(8))
+        base_h = colorsys.rgb_to_hsv(*(c / 255 for c in wp.hex_to_rgb(teal)))[0]
+        for r, g, b in out / 255.0:
+            h, s, _v = colorsys.rgb_to_hsv(r, g, b)
+            drift = min(abs(h - base_h), 1 - abs(h - base_h))
+            assert drift < 0.08 or s < 0.25
+
+    @pytest.mark.parametrize("mode", ["bands", "centroid"])
+    def test_shaded_follows_the_picker_and_full_spectrum_ignores_it(self, mode):
+        a = analysis(9)
+        shaded = [column_colors(mode, False, base_color=c, columns=N, **a) for c in (BASE, "#006992")]
+        full = [
+            column_colors(mode, False, base_color=c, columns=N, hue_mapped=True, **a)
+            for c in (BASE, "#006992")
+        ]
+        assert not np.array_equal(*shaded)
+        np.testing.assert_array_equal(*full)
+
+    def test_shaded_centroid_runs_deep_to_near_white(self):
+        cen = np.linspace(200, 5000, N, dtype=np.float32)
+        out = column_colors("centroid", False, base_color="#2080c0", columns=N, centroid=cen)
+        dark, bright = out[0].astype(int), out[-1].astype(int)
+        assert dark.sum() < 0.6 * np.array([0x20, 0x80, 0xC0]).sum()
+        assert bright.min() > 200, "the bright end is near-white"
+
+    def test_core_shading_is_full_at_the_axis_and_falls_to_the_tip(self):
+        assert wp.core_shading(np.array([0.0]))[0] == 1.0
+        assert wp.core_shading(np.array([1.0]))[0] == pytest.approx(1 - wp.SHADE_CORE_FALLOFF)
+        assert wp.shades_core("bands", False) and wp.shades_core("centroid", False)
+        assert not wp.shades_core("centroid", True)
+        assert not wp.shades_core("loudness", False)
+
+
 class TestNormalisation:
     def test_absolute_gives_one_share_one_colour_in_every_track(self):
         """Two tracks that share a column's band shares but differ elsewhere."""
@@ -109,23 +156,26 @@ class TestNormalisation:
         rng = np.random.default_rng(6)
         cen = (1000 + rng.standard_normal(N)).astype(np.float32)  # +-1 Hz of noise
         out = column_colors("centroid", False, base_color=BASE, columns=N, centroid=cen)
-        blue_to_red = column_colors(
+        full_range = column_colors(
             "centroid", True, base_color=BASE, columns=2,
             centroid=np.array([80, 8000], np.float32),
         )
-        assert tuple(out[np.argmin(cen)]) == tuple(blue_to_red[0])
-        assert tuple(out[np.argmax(cen)]) == tuple(blue_to_red[1])
+        ends = out[[np.argmin(cen), np.argmax(cen)]].astype(int)
+        np.testing.assert_allclose(ends, full_range.astype(int), atol=2)
 
 
 class TestSilence:
+    @pytest.mark.parametrize("hue_mapped", [False, True])
     @pytest.mark.parametrize("absolute", [False, True])
     @pytest.mark.parametrize("mode", ["bands", "centroid"])
-    def test_silent_columns_are_the_base_colour(self, mode, absolute):
+    def test_silent_columns_are_the_base_colour(self, mode, absolute, hue_mapped):
         a = analysis(7)
         a["centroid"][:20] = 0
         for key in ("low", "mid", "high"):
             a[key][:20] = 1 / 3
-        out = column_colors(mode, absolute, base_color=BASE, columns=N, **a)
+        out = column_colors(
+            mode, absolute, base_color=BASE, columns=N, hue_mapped=hue_mapped, **a
+        )
         assert np.all(out[:20] == (0xF0, 0xFF, 0x00))
         assert not np.all(out[20:] == (0xF0, 0xFF, 0x00))
 
@@ -140,13 +190,13 @@ class TestSilence:
             assert np.all(out == (0xF0, 0xFF, 0x00))
 
 
-def test_bands_channel_mapping():
+def test_full_spectrum_bands_channel_mapping():
     """R = low, G = high, B = mid: bass reads red, hats cyan-green."""
     one, zero = np.ones(3, np.float32), np.zeros(3, np.float32)
     cen = np.full(3, 1000, np.float32)
-    bass = column_colors("bands", True, base_color=BASE, columns=3,
+    bass = column_colors("bands", True, base_color=BASE, columns=3, hue_mapped=True,
                          low=one, mid=zero, high=zero, centroid=cen)
-    hats = column_colors("bands", True, base_color=BASE, columns=3,
+    hats = column_colors("bands", True, base_color=BASE, columns=3, hue_mapped=True,
                          low=zero, mid=zero, high=one, centroid=cen)
     assert tuple(bass[0]) == (255, 0, 0)
     assert tuple(hats[0]) == (0, 255, 0)
