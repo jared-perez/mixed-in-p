@@ -323,13 +323,13 @@ def test_the_bore_stays_open_so_the_tunnel_reads_as_a_tunnel(scene):
     assert checked > 1000
 
 
-def test_it_draws_a_nebula_wall_stars_and_planets(scene):
-    """Cloud down the middle, pale sky behind it, a shaded disc among it.
+def test_it_draws_a_nebula_wall_and_stars(scene):
+    """Cloud down the middle, pale sky behind it.
 
     The wall used to be the theme gold and the mask used to look for it. It is
     the nebula's own palette now — blue, violet, magenta, teal, green, every
     one of which leaves red a long way behind, which nothing in the sky does:
-    stars and planets are washed toward white and the greys are balanced.
+    stars are washed toward white and the greys are balanced.
     """
     image = _fly(scene, 0.0, 4.0, pulse_at=4.0)
     raw = _pixels(image)
@@ -341,7 +341,12 @@ def test_it_draws_a_nebula_wall_stars_and_planets(scene):
     gold = lit & (red > 150) & (green > 150) & (blue < 80)
     assert cloud.sum() > 50_000
     assert pale.sum() > 100
-    assert cores.sum() > 20  # the white centres of the near four-point stars
+    # Presence, not a count: how many white star centres a fixed flight lands
+    # is pure seed noise. Measured over six seeds it ranges 11 to 38 here and
+    # ranged 6 to 27 before the planets were removed, so the old `> 20` was
+    # passing on seed 1's luck rather than on the mechanism. Nothing but the
+    # cores draws white, so a broken one goes to zero and any floor catches it.
+    assert cores.sum() > 3  # the white centres of the near four-point stars
     # The wireframe was replaced, not joined: `_NEBULA_MESH_ALPHA` is 0, so
     # the only gold left in the frame is what the sky's own tints carry.
     assert gold.sum() < 500
@@ -429,7 +434,7 @@ def _nebula_only(scene, background):
 def test_the_wall_never_paints_opaque_over_the_sky(scene):
     """The brief in one assertion: the stars still show through the cloud.
 
-    The wall is drawn last, over planets and stars that are already down, and
+    The wall is drawn last, over the galaxies and stars already down, and
     it is additive — so it can only ever brighten what it covers. An ordinary
     ``SourceOver`` pass at the same alphas would dim the sky behind every puff,
     which is the difference between a nebula and a painted tube.
@@ -462,11 +467,11 @@ def test_the_painter_is_handed_back_as_it_was_found(scene):
 
 
 def test_the_sky_is_paler_than_the_accent(scene):
-    """The brief: stars and planets pale versions of the colour, plus some grey.
+    """The brief: stars pale versions of the colour, plus some grey.
 
     The accent used to be the wall's colour too. The wall is the nebula's own
-    palette now, so this is the last thing wearing it — which is exactly why
-    `_palette()` and `_planet_tints()` were left alone by that change.
+    palette now, so the sky is the last thing wearing it — which is exactly
+    why `_palette()` was left alone by that change.
     """
     _fly(scene, 0.0, 4.0, pulse_at=4.0)
     palette = scene._palette()
@@ -475,352 +480,68 @@ def test_the_sky_is_paler_than_the_accent(scene):
         assert colour.blue() > mesh.blue()
 
 
-# ── Planets: three tints, and rings on a few ───────────────────────────────
-
-
-def _place_planet(scene, kind=0, rings=(), depth=12.0, radius=1.4, seed=4):
-    """One planet dead ahead, everything else in the sky moved out of frame.
-
-    The stars go behind the camera rather than being deleted so the arrays keep
-    their shape; nothing with a negative depth is drawn.
-    """
-    scene.reset()
-    scene._stars[:, 2] = -1.0
-    scene._planets[:] = 0.0
-    scene._planets[:, 2] = -1.0
-    scene._planet_ring_radii[:] = 0.0
-    scene._planets[0] = [0.0, 0.0, depth, radius]
-    scene._planet_kind[0] = kind
-    rng = np.random.default_rng(seed)
-    normal = rng.normal(size=3)
-    normal /= np.linalg.norm(normal)
-    aside = np.array([0.0, 0.0, 1.0]) if abs(normal[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
-    u = np.cross(normal, aside)
-    u /= np.linalg.norm(u)
-    scene._planet_ring_basis[0] = np.stack([u, np.cross(normal, u)])
-    for slot, value in enumerate(rings):
-        scene._planet_ring_radii[0, slot] = value
-    return scene
-
-
-def test_the_planet_tints_are_the_old_one_plus_four(scene):
-    """Most planets are exactly the shade they were; the others vary from it.
-
-    The brightness of the pale one was settled by eye in the running app, so
-    this pins it to the star palette's own wash rather than to a number: if that
-    wash moves, the planets should move with it.
-    """
-    pale, dark, tint, red, blue = scene._planet_tints()
-    assert pale == scene._palette()[1]  # unchanged, and still the same wash
-    for channel in ("red", "green", "blue"):
-        assert getattr(dark, channel)() < getattr(pale, channel)()
-    # Less washed toward white is more of the accent's own colour, and the
-    # theme colour is what the wash is pulling away from.
-    assert abs(tint.blue() - scene._color.blue()) < abs(pale.blue() - scene._color.blue())
-    # The red one leans red, the blue one blue — and both are *dull*: no
-    # channel outshines the pale planet's, so they read as different rock in
-    # the same sky rather than as new bright objects.
-    assert red.red() > red.blue() and red.red() > red.green()
-    assert blue.blue() > blue.red() and blue.blue() > blue.green()
-    for colour in (red, blue):
-        for channel in ("red", "green", "blue"):
-            assert getattr(colour, channel)() < max(pale.red(), pale.green(), pale.blue())
-
-
-def test_a_planet_keeps_its_tint_and_rings_until_it_is_replaced(scene):
-    """Everything about a planet is rolled at spawn, so it cannot change on screen."""
-    spawned = []
-    real = type(scene)._spawn_planet
-
-    def spy(self, index, depth=None):
-        spawned.append(index)
-        real(self, index, depth)
-
-    type(scene)._spawn_planet = spy
-    try:
-        step = 128.0 / 60.0 / 60.0
-        beat = 0.0
-        before = scene._planet_kind.copy()
-        for _ in range(400):
-            spawned.clear()
-            scene.render(beat, 0.6, 0.0)
-            beat += step
-            unchanged = [i for i in range(tc._N_PLANETS) if i not in spawned]
-            assert (scene._planet_kind[unchanged] == before[unchanged]).all()
-            before = scene._planet_kind.copy()
-    finally:
-        type(scene)._spawn_planet = real
-
-
-def test_only_a_few_planets_are_dusky_tinted_or_ringed(scene):
-    """"A small percentage" of a stream of three at a time — most stay pale."""
-    kinds: list[int] = []
-    ringed = 0
-    real = type(scene)._spawn_planet
-
-    def spy(self, index, depth=None):
-        real(self, index, depth)
-        nonlocal ringed
-        kinds.append(int(self._planet_kind[index]))
-        ringed += bool((self._planet_ring_radii[index] > 0).any())
-
-    type(scene)._spawn_planet = spy
-    try:
-        # The flight length is what pays for the sample, and the stream has
-        # been thinned twice (`_PLANET_REST`) since this was written: 240 beats
-        # bought 59 spawns after the second pass, one short of its own guard.
-        # So a further thinning lengthens the flight — never lowers the bar,
-        # which is the whole reason the guard is here.
-        _fly(scene, 0.0, 360.0)
-    finally:
-        type(scene)._spawn_planet = real
-    assert len(kinds) > 60  # the sample is big enough to say anything at all
-    # Pale is still the commonest by a distance — a plurality rather than a
-    # majority now that red and blue joined the dusky and tinted exceptions.
-    assert kinds.count(0) > 2 * max(kinds.count(k) for k in (1, 2, 3, 4))
-    for kind in (1, 2, 3, 4):  # dusky, accent-tinted, dull red, dull blue
-        assert 0 < kinds.count(kind) < len(kinds) * 0.35
-    assert 0 < ringed < len(kinds) * 0.4
-
-
-def test_a_ring_is_drawn_around_the_planet_and_not_only_over_it(scene):
-    """The same planet with and without rings, differenced.
-
-    Differential because the mesh and the stars are in the frame too and are
-    identical between the two renders — the only thing that moved is the rings.
-    Whether they are *legible* is not a question this can answer; that was
-    settled by rendering a real flight (``planet_sheet.py --flight``), and the
-    first cut of them passed a test like this while being invisible in the app.
-    """
-    plain = _pixels(_place_planet(scene, rings=()).render(0.0, 0.6, 1.0)).copy()
-    ringed = _pixels(_place_planet(scene, rings=(1.5, 2.0)).render(0.0, 0.6, 1.0))
-    changed = (plain != ringed).any(axis=2)
-    assert changed.sum() > 200
-
-    # The outer ring sits at 2.0 planet radii, so most of what changed has to be
-    # outside the disc rather than crossing its face.
-    height, width = changed.shape
-    ys, xs = np.nonzero(changed)
-    radius = scene._focal * 1.4 / 12.0
-    beyond = np.hypot(xs - width / 2, ys - height / 2) > radius
-    assert beyond.mean() > 0.5
-
-
-def _chain_segments(chains):
-    """How many of the ring's segments a list of polyline chains carries."""
-    return sum(chain.size() - 1 for chain in chains)
-
-
-def test_a_ring_passes_behind_the_planet_as_well_as_in_front(scene):
-    """A tilted ring is split at the planet's own depth — the Saturn silhouette."""
-    _place_planet(scene, rings=(1.6,))
-    behind, in_front = scene._ring_arcs(0, 1216, 512)
-    assert behind and in_front
-    assert _chain_segments(behind) + _chain_segments(in_front) <= tc._PLANET_RING_SEGMENTS
-
-
-def test_the_far_half_is_dropped_where_the_planet_covers_it(scene):
-    """The disc is translucent, so draw order cannot occlude — dropping does.
-
-    A near-edge-on ring sends its far half straight across the planet's face;
-    painted and merely overdrawn it shows through the gradient disc, which
-    reads as the ring passing in *front* — the bug the running app showed.
-    So the stretch inside the silhouette must be missing from the chains
-    entirely, and no surviving behind-point may sit deep inside the disc.
-    """
-    _place_planet(scene, rings=(1.6,))
-    scene._planet_ring_basis[0] = np.array([[1.0, 0.0, 0.0], [0.0, 0.1, 0.995]])
-    behind, in_front = scene._ring_arcs(0, 1216, 512)
-    assert _chain_segments(behind) + _chain_segments(in_front) < tc._PLANET_RING_SEGMENTS
-    depth, radius = scene._planets[0, 2], scene._planets[0, 3]
-    pr = scene._focal * radius / depth
-    for chain in behind:
-        for m in range(chain.size()):
-            point = chain.at(m)
-            assert np.hypot(point.x() - 1216 / 2, point.y() - 512 / 2) > pr * 0.8
-
-
-def test_a_ring_is_chains_not_beads(scene):
-    """One face-on ring is a single closed chain, and paints with no dots.
-
-    Drawn one line at a time, every shared endpoint of a translucent pen
-    double-paints, and the ring wears a bead of 36 dots — exactly what the
-    running app showed. A stroked polyline double-paints nothing, so no
-    pixel of the band may exceed the pen's own alpha.
-    """
-    _place_planet(scene, rings=(1.8,))
-    scene._planet_ring_basis[0] = np.array([[1.0, 0.0, 0.0], [0.0, 1.0, 0.0]])
-    behind, in_front = scene._ring_arcs(0, 1216, 512)
-    chains = behind + in_front
-    assert len(chains) == 1  # one unbroken chain...
-    assert chains[0].size() == tc._PLANET_RING_SEGMENTS + 1  # ...closed on itself
-
-    depth, radius = scene._planets[0, 2], scene._planets[0, 3]
-    alpha = _pixels(_planets_alone(scene, glow=1.0))[..., 3].astype(int)
-    ys, xs = np.indices(alpha.shape)
-    span = np.hypot(xs - 200, ys - 200) / (scene._focal * radius / depth)
-    band = alpha[(span > 1.6) & (span < 2.0)]
-    disc = QColor(scene._planet_tints()[0])
-    disc.setAlphaF(1.0)
-    pen_alpha = scene._ring_colour(disc).alphaF() * 255
-    assert band.max() <= pen_alpha + 5  # nothing double-painted anywhere
-
-
-def test_a_planet_without_rings_has_no_arcs(scene):
-    _place_planet(scene, rings=())
-    assert scene._ring_arcs(0, 1216, 512) == ([], [])
-
-
-def _planets_alone(scene, size=400, glow=_STAR_FLOOR):
-    """The planet layer on its own, with no mesh over it to confuse a sample.
-
-    *glow* defaults to the floor the sky sits at between kicks, which is where a
-    planet spends most of its life and the state the rings had to read in.
-    """
-    image = QImage(size, size, QImage.Format.Format_ARGB32_Premultiplied)
-    image.fill(Qt.GlobalColor.transparent)
-    painter = QPainter(image)
-    painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
-    scene._paint_planets(painter, scene._planet_tints(), size, size, glow, 1.0)
-    painter.end()
-    return image
-
-
-def test_a_ring_is_brighter_than_the_planet_it_circles(scene):
-    """A one-pixel line needs more alpha than a disc does, or it is not there.
-
-    The disc spreads its alpha over thousands of pixels and the ring over a
-    line, so matching them — which is what the first cut did — leaves the rings
-    invisible in the app. *How much* more is a judgement made by rendering a
-    real flight (``planet_sheet.py --flight``), not here; this pins the shape of
-    the rule and its ceiling.
-    """
-    disc = QColor(scene._planet_tints()[0])
-    disc.setAlphaF(0.4)  # about what the depth fade and the glow floor leave
-    assert scene._ring_colour(disc).alphaF() > disc.alphaF() * 1.25
-
-    close = QColor(disc)
-    close.setAlphaF(1.0)  # a rare close pass, where the disc is at full alpha
-    assert scene._ring_colour(close).alphaF() < 1.0  # never as bright as the mesh
-
-
-def test_the_painted_ring_really_is_the_brighter_colour(scene):
-    """That the rule above is the one the painter uses, and not bypassed.
-
-    Against the value the rule gives for *this* disc rather than against the
-    disc itself: the ring's two arcs composite where they meet, which alone puts
-    the band's brightest pixel half again above the disc — so "brighter than the
-    disc" is satisfied by a ring drawn at the disc's own colour, which is the
-    version that could not be seen in the app.
-    """
-    _place_planet(scene, rings=(1.8,))
-    depth, radius = scene._planets[0, 2], scene._planets[0, 3]
-    alpha = _pixels(_planets_alone(scene))[..., 3].astype(int)
-    height, width = alpha.shape
-    ys, xs = np.indices(alpha.shape)
-    span = np.hypot(xs - width / 2, ys - height / 2) / (scene._focal * radius / depth)
-
-    disc = QColor(scene._planet_tints()[0])
-    disc.setAlphaF(float(alpha[span < 0.9].max()) / 255)  # the gradient's own peak
-    expected = scene._ring_colour(disc).alphaF() * 255
-    assert alpha[(span > 1.5) & (span < 2.1)].max() >= expected - 2
-
-
-def test_the_ring_plane_is_fixed_in_the_world_not_to_the_camera(scene):
-    """It rotates with the camera each frame, and stays a rotation while it does.
-
-    Two halves of one property. If the rigid transform were not applied to the
-    basis the vectors would simply never change, and the rings would face the
-    camera the same way through every turn; if it were applied wrongly they
-    would stop being orthonormal within a few frames and the ring would shear
-    into an ellipse of its own.
-    """
-    _place_planet(scene, rings=(1.6,))
-    scene._planets[0, 2] = 20.0  # far enough not to be culled during the run
-    first = scene._planet_ring_basis[0].copy()
-    step = 128.0 / 60.0 / 60.0
-    beat = 0.0
-    for _ in range(240):  # four beats: a scheduled turn is inside this
-        scene.render(beat, 0.6, 0.0)
-        beat += step
-        u, v = scene._planet_ring_basis[0]
-        assert np.isclose(np.linalg.norm(u), 1.0, atol=1e-6)
-        assert np.isclose(np.linalg.norm(v), 1.0, atol=1e-6)
-        assert abs(float(u @ v)) < 1e-6
-    assert not np.allclose(scene._planet_ring_basis[0], first, atol=1e-3)
-
-
 # ── The sky thins out: rests, galaxies, and spiky stars ───────────────────
 
 
-def test_an_emptied_planet_slot_rests_before_it_refills(scene):
-    """"About 20% fewer planets": the stream's rate is lifetime *plus* rest.
+def test_an_emptied_sky_slot_rests_before_it_refills(scene):
+    """Sparse is the brief: the stream's rate is lifetime *plus* rest.
 
     The rest is in world units, not seconds or frames, so it scales with the
     tempo exactly as the churn it thins does and both frame-rate hosts agree.
-    Kill a planet by hand: the next frame parks it far behind the lens with a
-    wake arc-length, it stays parked until the camera has flown the gap, and
+    Kill the galaxy by hand: the next frame parks it far behind the lens with
+    a wake arc-length, it stays parked until the camera has flown the gap, and
     it refills on its own once it has.
     """
     step = 128.0 / 60.0 / 60.0
     beat = 1.0
     scene.render(beat, 0.6, 0.0)
-    scene._planets[0, 2] = 0.1  # shove it past the near bound
+    scene._galaxies[0] = [0.0, 0.0, 0.1, 3.0]  # in the sky, past the near bound
     beat += step
     scene.render(beat, 0.6, 0.0)
-    assert scene._planets[0, 2] == tc._SKY_PARKED
-    wake = float(scene._planet_wake[0])
+    assert scene._galaxies[0, 2] == tc._SKY_PARKED
+    wake = float(scene._galaxy_wake[0])
     assert scene._cam_s < wake  # a real rest, not an instant refill
     while (beat + step) * UNITS_PER_BEAT < wake:
         beat += step
         scene.render(beat, 0.6, 0.0)
-        assert scene._planets[0, 2] == tc._SKY_PARKED  # still resting
+        assert scene._galaxies[0, 2] == tc._SKY_PARKED  # still resting
     beat = wake / UNITS_PER_BEAT + step
     scene.render(beat, 0.6, 0.0)
-    assert scene._planets[0, 2] > 0  # back in the sky, ahead of the camera
+    assert scene._galaxies[0, 2] > 0  # back in the sky, ahead of the camera
 
 
 def test_a_fresh_sky_owes_its_first_galaxy_a_full_rest(scene):
     """Sparse is the brief, so a reset does not open on a galaxy.
 
     It also keeps every short deterministic flight in this file galaxy-free:
-    the shortest rest is 12 units and the planet fixtures fly 10.
+    the shortest rest is 12 units and the picture fixtures fly fewer.
     """
     assert (scene._galaxies[:, 2] == tc._SKY_PARKED).all()
     assert (scene._galaxy_wake >= tc._GALAXY_REST[0]).all()
 
 
-def test_galaxies_are_about_a_fifth_of_the_planet_stream(scene):
-    """Both streams counted over the same flight: a ratio, and a planet ceiling.
+def test_a_galaxy_comes_round_rarely_and_the_rest_gap_is_what_thins_it(scene):
+    """Counted over one 200-beat flight, against a band with a fix on each side.
 
-    Two instruments because they catch different regressions, checked by
-    running this with each fix removed. The ratio fails outright with the
-    galaxy slot dead (zero) but *survives* the planet rest gap being deleted
-    (0.14 against 0.23 — both inside any honest band for a 16-galaxy sample),
-    so the ceiling on the planet count is what pins the "20% fewer": this
-    flight spawns 70 with the rest and 90 without it.
+    The band has to fail in both directions or it is only testing that the
+    spy runs. Measured across three seeds: **13 to 15** as built, **0** with
+    the galaxy slot dead, and **21 to 26** with `_GALAXY_REST` zeroed — so the
+    ceiling is what pins "sparse", and the floor is what pins "at all".
     """
-    counts = {"planet": 0, "galaxy": 0}
-    real_planet = type(scene)._spawn_planet
-    real_galaxy = type(scene)._spawn_galaxy
+    count = 0
+    real = type(scene)._spawn_galaxy
 
-    def spy_planet(self, index, depth=None):
-        counts["planet"] += 1
-        real_planet(self, index, depth)
+    def spy(self, index):
+        nonlocal count
+        count += 1
+        real(self, index)
 
-    def spy_galaxy(self, index):
-        counts["galaxy"] += 1
-        real_galaxy(self, index)
-
-    type(scene)._spawn_planet = spy_planet
-    type(scene)._spawn_galaxy = spy_galaxy
+    type(scene)._spawn_galaxy = spy
     try:
         _fly(scene, 0.0, 200.0)
     finally:
-        type(scene)._spawn_planet = real_planet
-        type(scene)._spawn_galaxy = real_galaxy
-    assert 40 < counts["planet"] < 80
-    assert 0.08 < counts["galaxy"] / counts["planet"] < 0.4
+        type(scene)._spawn_galaxy = real
+    assert 8 < count < 19
 
 
 def _galaxy_alone(scene, depth=20.0, radius=3.0, size=400):
@@ -1046,7 +767,7 @@ def test_target_size_does_not_reallocate_when_unchanged(scene):
 def test_a_frame_stays_cheap(scene):
     """A loose guard against an accidental O(pixels) rewrite.
 
-    It measures ~3.4 ms at this size against a 16 ms budget; the bound is
+    It measures ~3.0 ms at this size against a 16 ms budget; the bound is
     generous so it cannot flake under a full-suite load. If it flakes anyway,
     delete it rather than widen it — the real cost lives in the plan.
     """

@@ -283,58 +283,47 @@ is radioactive):
    accent colour toward white). How spiky and how big a star is comes off
    **one roll skewed toward the small end** (`_STAR_SIZE_BIAS`), and the two
    ride that same roll deliberately — "less spiky" and "more compact" are the
-   same star, so a short-armed one never comes out as a fat plus. Past them
-   drift three shaded planets and, far more rarely, a single galaxy.
-   Measured **3.4 ms/frame at 1216×512** and 4.5 at popout size.
+   same star, so a short-armed one never comes out as a fat plus. Past them,
+   far more rarely, drifts a single galaxy.
+   Measured **3.0 ms/frame at 1216×512** and 4.3 at popout size. Removing the
+   planets was worth about 0.3 ms of the popout frame, measured back-to-back
+   against a worktree at the commit before they went (3.03 / 4.59 there).
+   Both halves of that pair are from one machine; the 3.4 / 4.5 this doc
+   carried before were not, which is why the delta is quoted rather than the
+   difference of the two headline numbers.
 
-   A planet's tint and its rings are rolled **once, at spawn** — so it cannot
-   change while it is on screen — and they are chances rather than counts,
-   because with only three planets at a time a "small percentage" is a property
-   of the stream. Measured over three minutes at 128 BPM, averaged across three
-   seeds: **about thirty planets a minute**, of which roughly five are dusky,
-   five wear the accent's own colour instead of the pale wash, three are a dull
-   red and three a dull blue (fixed constants, not accent washes — there is no
-   wash of a gold accent that comes out red), and seven carry one to three thin
-   rings in a plane of their own.
+   **The planets are gone.** Three shaded discs used to drift past among the
+   stars — rolled once at spawn for tint and rings, thinned twice, and given a
+   Saturn silhouette by drawing each ring in three passes. They read as *out
+   of place* in the running app: a tunnel flown to the beat through a nebula
+   is not a solar system, and a recognisable object passing the lens pulled
+   the eye off the tunnel, which is the subject. The galaxies stayed, because
+   haze at that distance reads as depth rather than as an approaching thing.
+   The whole subsystem was removed rather than turned down to nothing, so the
+   remaining sky is one stream and one set of knobs. What is worth keeping
+   from it is the rest-gap lesson below, which the galaxies now own alone.
 
-   **That rate is a tuned setting, and it is the rest gap that sets it.** An
-   emptied sky slot does not refill at once; it lies parked for a stretch of
-   *path* first (`_PLANET_REST`, in world units so the 16 ms and 33 ms hosts
-   agree and the rate scales with the tempo). The unthinned stream was
-   fifty-five a minute, and two passes have taken it to thirty. The knob is
-   **not linear** — the rate is lifetime plus rest, and the ~19 units of
-   lifetime sit in the denominator and do not move, so the second pass's "25%
-   fewer" needed the mean rest to go 4.8 → 12.7 rather than a 25% nudge — and
-   it is **noisy**: three seeds of one build measured 30.3 / 30.3 / 28.3 a
-   minute while a neighbouring setting measured 36.3 / 30.0 / 35.0, so a lone
-   three-minute figure carries about ±3/min, which is most of the distance
-   between two settings anyone would argue about. Quote a per-seed spread.
+   **A sky slot's rate is a tuned setting, and it is the rest gap that sets
+   it.** An emptied slot does not refill at once; it lies parked for a stretch
+   of *path* first (`_GALAXY_REST`, in world units so the 16 ms and 33 ms
+   hosts agree and the rate scales with the tempo). The knob is **not
+   linear** — the rate is lifetime plus rest, and the lifetime sits in the
+   denominator and does not move, so the retired planet stream's second
+   thinning pass, asking for "25% fewer", needed the mean rest to go 4.8 →
+   12.7 rather than a 25% nudge. It is also **noisy**: three seeds of one
+   build measured 30.3 / 30.3 / 28.3 planets a minute while a neighbouring
+   setting measured 36.3 / 30.0 / 35.0, so a lone three-minute figure carries
+   about ±3/min, which is most of the distance between two settings anyone
+   would argue about. Quote a per-seed spread.
 
-   The rings cost 0.02 ms a frame, and they are drawn in three passes — the arc
-   behind the planet, the disc, then the arc in front — which is the Saturn
-   silhouette for the price of a depth comparison per segment. They are drawn
-   **brighter than the disc they circle** (1.4×, ceiling 0.7) and have to be:
-   the disc spreads its alpha over thousands of pixels and the ring over a
-   one-pixel line, so at the disc's own alpha the first cut of them was
-   invisible in the app while passing every structural test. That was found by
-   rendering a real flight — `planet_sheet.py --flight` in the evidence
-   directory, which grabs the ringed planets as they actually pass rather than
-   placing one by hand at an alpha nothing produces. The multiplier has since
-   come *down* from 1.8: the double-painted segment joints were part of what
-   1.8 was tuned against, and once that beading was gone it read as too bright
-   in the running app. Both numbers are the user's judgement from the app, so
-   treat them as settled rather than as headroom.
-
-   **Galaxies are the sparse one**: a single slot, resting far longer than a
-   planet's between visits (`_GALAXY_REST`), measured at about nine a minute —
-   roughly 30% of the planet stream's rate, though that ratio was 22% before
-   the second thinning pass and has drifted up as the planets thinned rather
-   than being chosen: the galaxy's own rest gap has never moved.
-   Bigger than any planet in world units and drawn as translucent haze — a
-   tilted gradient disc, a round bulge and two spiral arms — so it reads as
-   background rather than as an approaching object. An arm is a run of
-   overlapping soft blobs rather than a stroke; the stroked version read as a
-   curled wire in the running app, and cloud is clumps.
+   **Galaxies are the sparse one**: a single slot, resting between visits, and
+   measured across three seeds at **13 to 15 over a 200-beat flight** (zero
+   with the slot dead, 21 to 26 with the rest gap zeroed — which is the band
+   its test is written as). Drawn as translucent haze — a tilted gradient
+   disc, a round bulge and two spiral arms — so it reads as background rather
+   than as an approaching object. An arm is a run of overlapping soft blobs
+   rather than a stroke; the stroked version read as a curled wire in the
+   running app, and cloud is clumps.
 
    Two things it does that no other mode does. It renders from **device**
    pixels and asks the host to upscale *smoothly* (`VisRenderer
@@ -348,7 +337,7 @@ is radioactive):
    **The wall is a nebula, not a wireframe.** The mesh is still what the
    picture is built on, but what is drawn at its vertices is a wall of
    translucent cloud: pre-rendered additive sprites ("puffs"), scattered blue,
-   violet, magenta, teal and green, that the stars and planets read straight
+   violet, magenta, teal and green, that the stars read straight
    through. Sprites won on more than cost — they inherit every hard-won piece
    of the existing geometry for free, because a puff is drawn *at* a mesh
    vertex, so the bends, the drift and the pulse ripple on the wall radius all
