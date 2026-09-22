@@ -20,8 +20,12 @@ fast (non-smooth) transformation for a chunky pixel look:
   migration either way.
 - ``spectrum`` — log-banded FFT bars with instant attack, linear falloff and
   peak-hold caps that drop with accelerating speed.
-- ``fire`` — the classic heat-propagation fire effect, stoked from the bottom
-  row by the same log-band energies.
+- ``fire`` — the classic heat-propagation fire effect (blur, cool, rise),
+  stoked from the bottom row by the same log-band energies *through a bed of
+  embers*: a few persistent hot spots that wander along the width, each
+  feeding one tongue that narrows to a point as it rises. Stoking every
+  column by the smooth band curve alone gave horizontal bands, not flames
+  (see ``_render_fire``).
 - ``fractal`` — **labelled "J Fractal"**: a spinning escape-time Julia set
   (the Mandelbrot family). The Julia constant orbits the classic radius so the
   branches continuously morph between dendrites and spirals; overall level
@@ -96,6 +100,67 @@ _BAR_FALL = 0.22
 _PEAK_START = 0.05
 _PEAK_ACCEL = 1.1
 _FIRE_STOKE_GAIN = 1.25
+# Fire. What the propagation makes is decided by the *source*: every column
+# of the bottom row stoked by the same smooth band curve gave horizontal bands
+# of heat rising in step (one per frame of band energy), which read as ripples
+# on water however they were bent. Flames are tongues, and a tongue needs a
+# hot spot that stays put for a while: the bottom row is the band curve times
+# an ember bed — two 1-D value-noise layers drifting in opposite directions,
+# multiplied, so a handful of spots wander slowly along the width. Each
+# spot's heat then narrows as it rises, because the blur spreads it and the
+# cooling clips the thin edges first: the flame dissipates into its hottest
+# point. The band curve itself is released slowly so a loud frame does not
+# stamp a bright row across every tongue.
+_FIRE_EMBER_CELLS = (9, 14)  # px per noise cell, the two layers
+_FIRE_EMBER_DRIFT = (3.6, -2.4)  # px/s each layer drifts
+_FIRE_EMBER_FLOOR = 0.2  # fraction of the band heat every column gets (the bed)
+_FIRE_EMBER_NORM = 0.5  # noise product at which a spot is fully hot
+_FIRE_EMBER_POWER = 1.4  # >1 sharpens the spots
+_FIRE_STOKE_RELEASE = 0.9  # per FRAME_MS: the band curve's fall between hits
+# A surge that lifts every column in the same frame rises as a shelf — a
+# horizontal edge at one height across every tongue, because the field moves
+# up in lock-step. So the band curve *attacks* per column: the hottest embers
+# take a rise almost at once, the bed takes it over ~15 frames, a static
+# per-patch jitter spreads the rest, and the edge lands at a different row in
+# every tongue. The kick accent goes through a follower for the same reason:
+# a one-frame gain stamped a thin bright line; released over ~half a second it
+# lifts a tongue and lets it settle. Attack and release are per FRAME_MS,
+# rescaled in set_frame_interval.
+_FIRE_ATTACK_SLOW = 0.07
+_FIRE_ATTACK_FAST = 0.6
+_FIRE_ATTACK_POWER = 1.5  # how sharply the fast attack belongs to the hottest spots
+_FIRE_ATTACK_JITTER = 0.45  # ± fraction, per patch of ~5 px
+_FIRE_KICK_RELEASE = 0.93
+# Height. Cooling per row grows with height (quadratic in rows above the
+# base, scaled to _FIRE_REACH), so the body burns slowly and the last stretch
+# cools fast; the old flat 0.028/row died 36 rows up and never cleared half
+# the playlist. Alpha wears a vertical envelope, full below _FIRE_FADE_LO and
+# gone by _FIRE_FADE_HI, so the fade-out is the same gradual curve whatever
+# the track is doing, and the rows above it stay clean. Measured over a real
+# track composited on playlist rows at the backdrop's 0.40: visible reach p50
+# 41 rows, max 47 of 64, every row still readable.
+_FIRE_COOL_BASE = 0.012
+_FIRE_COOL_TOP = 0.018
+_FIRE_REACH = 48.0  # rows: the 3/4 mark the cooling curve is scaled to
+_FIRE_VERTICAL_BLEND = 0.25  # weight of the cell two rows below in the blur
+_FIRE_FADE_LO = 0.6  # of _H, from the bottom
+_FIRE_FADE_HI = 0.9
+_FIRE_ALPHA_GAIN = 2.2
+# Sway: a wind. The blur's side weights are biased by a value that swings
+# with time and twists up the height, so heat drifts left then right as it
+# rises and a tongue leans and bends. Zero at the base (anchored), full from
+# a third of the way up. Per *column*, not per row: one wind for the whole
+# width leaned every tongue the same way at once, which looked like a stage
+# effect, so each patch of the width has its own phase (static, random) and
+# its own rate — slower on the hottest embers, since a big flame moves
+# slower than a small one — and neighbouring tongues cross. Rates are
+# radians per *second*. A display-time warp of the field was tried first and
+# shipped for a day: it bent the bands into travelling waves, which looked
+# like rippled water.
+_FIRE_WIND_AMP = 1.0  # side-weight bias at full swing (1.0 = one side gets 2/3)
+_FIRE_WIND_RATE_BED = 2.6  # rad/s on the bed, ~2.4 s per full sway
+_FIRE_WIND_RATE_HOT = 1.2  # rad/s on the hottest ember, ~5 s
+_FIRE_WIND_TWIST = 0.7  # turns of phase from base to top: a bend, not a tilt
 # Fractal (Julia set) tuning. The constant moves on the classic morphing-Julia
 # circle |c| = 0.7885, but swings back and forth through the arc around angle π
 # (measured sweep: the sets there are rich branches/spirals) instead of
@@ -179,6 +244,23 @@ def _fire_palette(color: QColor) -> np.ndarray:
     return rgb.astype(np.uint8)
 
 
+def _value_noise_1d(length: int, cell: int, seed: int) -> np.ndarray:
+    """1-D value noise in 0..1 that tiles at *length*, cosine-interpolated.
+
+    The fire's ember bed. Random control points every *cell* pixels, so the
+    spots are that wide; built once per layer, and a drifting window over it
+    is what makes them wander.
+    """
+    rng = np.random.default_rng(seed)
+    points = max(2, length // cell)
+    grid = rng.uniform(0.0, 1.0, points)
+    xs = np.arange(length) / cell
+    i0 = np.floor(xs).astype(int) % points
+    i1 = (i0 + 1) % points
+    f = 0.5 - 0.5 * np.cos(np.pi * (xs - np.floor(xs)))
+    return (grid[i0] * (1.0 - f) + grid[i1] * f).astype(np.float32)
+
+
 class VisRenderer:
     """Renders one visualization mode from mono sample blocks into a QImage."""
 
@@ -196,6 +278,39 @@ class VisRenderer:
         self._peak_vel = np.full(_N_BARS, _PEAK_START, dtype=np.float64)
         self._heat = np.zeros((_H, _W), dtype=np.float32)
         self._fire_lut = _fire_palette(self._color)
+        # Per-row fire profiles, built once, for rows 0..H-2 (the row above
+        # the stoked one is the last computed): cooling, the wind's amplitude
+        # and phase twist; the alpha envelope for all H rows; the ember noise
+        # layers (three widths long, so a drifting window never wraps
+        # visibly); and the fire's clock, in seconds.
+        above = (np.arange(_H - 1)[::-1] + 1).astype(np.float32)[:, None]
+        self._fire_cool = _FIRE_COOL_BASE + _FIRE_COOL_TOP * (above / _FIRE_REACH) ** 2
+        self._fire_wind_amp = _FIRE_WIND_AMP * np.clip(above / _H * 2.5, 0.0, 1.0)
+        twist = 2.0 * np.pi * _FIRE_WIND_TWIST * above / _H
+        self._fire_twist_sin = np.sin(twist)
+        self._fire_twist_cos = np.cos(twist)
+        # Each patch's own sway phase: value noise with cells the width of a
+        # tongue, over a full turn, so a tongue sways as one and its
+        # neighbour is anywhere in the cycle.
+        self._fire_wind_phase = 2.0 * np.pi * _value_noise_1d(_W, 16, 32)
+        height = (_H - np.arange(_H)).astype(np.float32)[:, None] / _H  # of each row, 1/H..1
+        fade = np.clip((height - _FIRE_FADE_LO) / (_FIRE_FADE_HI - _FIRE_FADE_LO), 0.0, 1.0)
+        self._fire_fade = 1.0 - fade * fade * (3.0 - 2.0 * fade)
+        self._fire_embers = tuple(
+            _value_noise_1d(_W * 3, cell, seed) for cell, seed in zip(_FIRE_EMBER_CELLS, (21, 22))
+        )
+        self._fire_stoke = np.zeros(_W, dtype=np.float32)
+        self._fire_release = _FIRE_STOKE_RELEASE
+        self._fire_kick_release = _FIRE_KICK_RELEASE
+        self._fire_frame_ratio = 1.0
+        self._fire_kick: float = 0.0
+        # The attack jitter: random per column, smoothed twice over ±2 px so
+        # it is per patch, normalised to ±1, then scaled by the constant.
+        jitter = np.random.default_rng(31).uniform(-1.0, 1.0, _W).astype(np.float32)
+        for _ in range(2):
+            jitter = sum(np.roll(jitter, k) for k in range(-2, 3)) / 5.0
+        self._fire_jitter = 1.0 + _FIRE_ATTACK_JITTER * jitter / max(float(np.abs(jitter).max()), 1e-6)
+        self._fire_time: float = 0.0
         # Beat pulse (Milkdrop-style): instantaneous bass energy against its
         # own smoothed average. Chosen over a precomputed librosa onset
         # envelope because heavy DSP during playback fights the audio callback
@@ -298,6 +413,9 @@ class VisRenderer:
         self._bass_alpha = _PULSE_ATTACK ** (frame_ms / FRAME_MS)
         self._flux_decay = _FLUX_PEAK_DECAY_AT_60FPS ** (frame_ms / (1000.0 / 60.0))
         self._trap_release = _TRAP_KICK_RELEASE ** (frame_ms / FRAME_MS)
+        self._fire_frame_ratio = frame_ms / FRAME_MS
+        self._fire_release = _FIRE_STOKE_RELEASE ** self._fire_frame_ratio
+        self._fire_kick_release = _FIRE_KICK_RELEASE ** self._fire_frame_ratio
         self._clock.set_frame_interval(frame_ms / 1000.0)
         self._beat_tunnel.set_frame_interval(frame_ms)
         self._analog_scope.set_frame_interval(frame_ms)
@@ -337,6 +455,9 @@ class VisRenderer:
         self._peaks[:] = 0.0
         self._peak_vel[:] = _PEAK_START
         self._heat[:] = 0.0
+        self._fire_stoke[:] = 0.0
+        self._fire_kick = 0.0
+        self._fire_time = 0.0
         self._bass_att = 0.0
         self._pulse = 0.0
         self._fract_angle = 0.0
@@ -546,32 +667,89 @@ class VisRenderer:
 
     def _render_fire(self, heights: np.ndarray) -> None:
         heat = self._heat
-        # Stoke the bottom row from band energies spread across the width.
-        stoke = np.interp(
+        self._fire_time += self._frame_ms / 1000.0
+        # Stoke the bottom row: band energies spread across the width, through
+        # the ember bed, with a per-column attack (hot spots first) and a slow
+        # release. Kick accent: flames leap on the beat, and settle.
+        curve = np.interp(
             np.arange(_W), np.linspace(0, _W - 1, _N_BARS), heights
         ).astype(np.float32)
-        # Kick accent: flames leap on the beat.
-        gain = _FIRE_STOKE_GAIN * (1.0 + 0.8 * self._pulse)
-        heat[_H - 1] = np.maximum(heat[_H - 1] * 0.5, stoke * gain)
-        # Classic propagation: each cell becomes a cooled average of the cells
-        # below it (straight + diagonal), so flames rise, waver, and die out.
+        self._fire_kick = max(self._pulse, self._fire_kick * self._fire_kick_release)
+        target = curve * _FIRE_STOKE_GAIN * (1.0 + 0.8 * self._fire_kick)
+        embers = self._fire_embers_now()
+        stoke = self._fire_stoke
+        rising = target > stoke
+        self._fire_stoke = np.where(
+            rising,
+            stoke + (target - stoke) * self._fire_attack(embers),
+            np.maximum(target, stoke * self._fire_release),
+        ).astype(np.float32)
+        heat[_H - 1] = np.minimum(self._fire_stoke * embers, 1.0)
+        # Classic propagation: each cell becomes a cooled blend of the cells
+        # below it — straight, both diagonals (weighted by the wind), and the
+        # one two rows down, which smooths the frame-to-frame steps in the
+        # stoke so a tongue is one shape rather than a stack of rows. The
+        # cooling is a per-row profile (see the constants).
         below = heat[1:]
-        avg = (below + np.roll(below, 1, axis=1) + np.roll(below, -1, axis=1)) / 3.0
-        heat[:-1] = np.maximum(avg - 0.028, 0.0)
+        wind = self._fire_wind(embers)
+        left = np.roll(below, 1, axis=1)  # a cell taking from its left neighbour
+        right = np.roll(below, -1, axis=1)
+        two_below = np.vstack([heat[2:], heat[-1:]])
+        blend = (
+            below + left * (1.0 + wind) + right * (1.0 - wind) + _FIRE_VERTICAL_BLEND * two_below
+        ) / (3.0 + _FIRE_VERTICAL_BLEND)
+        heat[:-1] = np.maximum(blend - self._fire_cool, 0.0)
         np.clip(heat, 0.0, 1.0, out=heat)
 
         rgb = self._fire_lut[(heat * 255).astype(np.uint8)]
         # QImage wants 32-bit rows; build BGRA from the palette lookup. Alpha
-        # follows heat so cold pixels are transparent (the backdrop host
-        # composites over grey; the popout fills black first — same look).
+        # follows heat, under the vertical fade envelope, so cold pixels are
+        # transparent (the backdrop host composites over grey; the popout
+        # fills black first — same look).
         bgra = np.empty((_H, _W, 4), dtype=np.uint8)
         bgra[..., 0] = rgb[..., 2]
         bgra[..., 1] = rgb[..., 1]
         bgra[..., 2] = rgb[..., 0]
-        bgra[..., 3] = (np.clip(heat * 2.5, 0.0, 1.0) * 255).astype(np.uint8)
+        alpha = np.clip(heat * _FIRE_ALPHA_GAIN, 0.0, 1.0) * self._fire_fade
+        bgra[..., 3] = (alpha * 255).astype(np.uint8)
         self._image = QImage(
             bgra.tobytes(), _W, _H, _W * 4, QImage.Format.Format_ARGB32
         ).copy()
+
+    def _fire_embers_now(self) -> np.ndarray:
+        """The ember bed at the current fire time: per column, floor..1."""
+        cols = np.arange(_W)
+        span = _W * 3
+        product = np.ones(_W, dtype=np.float32)
+        for layer, drift in zip(self._fire_embers, _FIRE_EMBER_DRIFT):
+            product *= layer[(cols + int(drift * self._fire_time)) % span]
+        spots = np.clip(product / _FIRE_EMBER_NORM, 0.0, 1.0) ** _FIRE_EMBER_POWER
+        return _FIRE_EMBER_FLOOR + (1.0 - _FIRE_EMBER_FLOOR) * spots
+
+    def _fire_attack(self, embers: np.ndarray) -> np.ndarray:
+        """Per-column attack fraction for a rising stoke, from the ember bed."""
+        spots = np.clip((embers - _FIRE_EMBER_FLOOR) / (1.0 - _FIRE_EMBER_FLOOR), 0.0, 1.0)
+        per_frame = _FIRE_ATTACK_SLOW + (_FIRE_ATTACK_FAST - _FIRE_ATTACK_SLOW) * spots**_FIRE_ATTACK_POWER
+        per_frame = np.clip(per_frame * self._fire_jitter, 0.05, 1.0)
+        # A lerp fraction is a per-frame number: the same rise over the same
+        # time at another interval is 1 - (1 - a) ** ratio.
+        return 1.0 - (1.0 - per_frame) ** self._fire_frame_ratio
+
+    def _fire_wind_rate(self, embers: np.ndarray) -> np.ndarray:
+        """Each column's sway rate in rad/s: slower the hotter its ember."""
+        spots = np.clip((embers - _FIRE_EMBER_FLOOR) / (1.0 - _FIRE_EMBER_FLOOR), 0.0, 1.0)
+        return _FIRE_WIND_RATE_BED + (_FIRE_WIND_RATE_HOT - _FIRE_WIND_RATE_BED) * spots
+
+    def _fire_wind(self, embers: np.ndarray) -> np.ndarray:
+        """The blur's side bias per cell (H-1 x W) at the current fire time.
+
+        sin(column phase + row twist) expanded, so it is a sin and a cos per
+        column and two outer products rather than a sin per cell.
+        """
+        column = self._fire_wind_rate(embers) * self._fire_time + self._fire_wind_phase
+        sin_c, cos_c = np.sin(column)[None, :], np.cos(column)[None, :]
+        swing = sin_c * self._fire_twist_cos + cos_c * self._fire_twist_sin
+        return self._fire_wind_amp * swing
 
     def _render_fractal(self, heights: np.ndarray) -> None:
         # Blend mean and max band height: mean alone leaves sparse spectra

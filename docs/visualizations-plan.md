@@ -140,7 +140,19 @@ is radioactive):
 3. **Fire bars** — same bars, palette ramp black→colour→white over bar height
    (derived from the waveform colour, so the classic red/orange is that ramp
    for pure red rather than a hardcoded palette); optional "flames" =
-   previous-frame upshift + colour decay (small feedback QImage).
+   previous-frame upshift + colour decay (small feedback QImage). The bottom
+   row is stoked through an *ember bed* (two drifting 1-D noise layers,
+   multiplied) so a few persistent hot spots each feed one tongue that
+   narrows to a point as it rises; stoking every column by the band curve
+   alone gave horizontal bands. The band curve attacks per column (hottest
+   embers first, a per-patch jitter on the rest) and the kick accent goes
+   through a follower, so a surge never rises as one shelf across every
+   tongue and a hit never stamps a thin line. Cooling is a per-row curve scaled to 3/4 of
+   the height, alpha wears a vertical fade envelope (full to 0.6 H, gone by
+   0.9 H), and a wind biases the blur's side weights per cell, swinging with
+   time and twisting up the height, with a random phase per patch and a
+   slower rate on the hottest embers, so the tongues lean, bend and cross
+   independently — see `_render_fire`.
    **Backdrop-only**: retired from the menu's popout half, where it read as the
    whole window, and kept as a backdrop, where it reads as lit rows. So a mode
    may render and not be offered — never the other way round, which
