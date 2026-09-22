@@ -388,7 +388,6 @@ class RenamePanel(QWidget):
         self._clear_ops_btn.clicked.connect(self._clear_operations)
         self._remove_underscores_btn.clicked.connect(self._on_remove_underscores)
         self._space_dashes_btn.clicked.connect(self._on_space_dashes)
-        self._preview_table.itemSelectionChanged.connect(self._on_selection_changed)
 
         # Delete/Backspace remove selected rows. WidgetShortcut keeps the
         # binding scoped to the table — won't fire when other widgets have focus.
@@ -487,6 +486,7 @@ class RenamePanel(QWidget):
             self._stats_label.setText(self.tr("No files"))
             self._previews = []
             self._apply_btn.setEnabled(False)
+            self._sync_remove_enabled()
             self._last_queued_paths = set()
             return
 
@@ -555,6 +555,7 @@ class RenamePanel(QWidget):
 
         # Apply needs a change to make; Start Pipeline only needs files.
         self._sync_apply_enabled()
+        self._sync_remove_enabled()
 
         # Snapshot current QUEUED paths for change detection on next batch.
         self._last_queued_paths = {t.file_path for t in all_tracks}
@@ -762,8 +763,16 @@ class RenamePanel(QWidget):
         )
         return tag
 
-    def _on_selection_changed(self) -> None:
-        """Enable/disable Remove All based on whether files exist."""
+    def _sync_remove_enabled(self) -> None:
+        """Enable Remove All whenever the panel holds files.
+
+        Driven from _update_preview, the only writer of the table, because
+        rows arrive without the user ever touching the table (drag-drop, Add
+        Files, a pipeline hand-off). Hanging this off itemSelectionChanged
+        alone left the button dead until a row happened to be clicked, which
+        read as "select something first" — it never was: _on_remove_all
+        ignores the selection and clears the whole QUEUED set.
+        """
         self._remove_btn.setEnabled(self._preview_table.rowCount() > 0)
 
     def _on_remove_all(self) -> None:
