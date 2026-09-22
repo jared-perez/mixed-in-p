@@ -2205,7 +2205,12 @@ class PlayerPanel(QWidget):
             ("backdrop_beat_tunnel", self.tr("Wormhole")),
             ("backdrop_scope", self.tr("Stream")),
             ("backdrop", self.tr("Waveform")),
-            ("backdrop_fire", self.tr("Fire")),
+            # "Smoke" is the label, `fire` stays the id: the mechanism is a
+            # column-propagation flame model and the picture it makes reads as
+            # smoke. Same split as the tunnels' — a name for the look goes
+            # stale when the look is re-judged, a name for the mechanism does
+            # not. No migration, because nothing persisted moved.
+            ("backdrop_fire", self.tr("Smoke")),
             ("fractal", self.tr("Popout J Fractal")),
             ("fractal_power", self.tr("Popout Tri Fractal")),
             ("fractal_trap", self.tr("Popout Blade Fractal")),

@@ -129,7 +129,9 @@ class TestThePopoutFireIsGone:
     """Withdrawn from the menu on 2026-08-24 — it did not look good full-window.
 
     The flames themselves stayed, as a backdrop, which is what a config that
-    had chosen them gets back.
+    had chosen them gets back. Relabelled **Smoke** on 2026-09-22 because that
+    is what the picture reads as; the id stayed `fire`, so this class still
+    asks about `fire` ids and "Smoke" text in the same breath.
     """
 
     def test_the_menu_does_not_offer_it(self, player):
@@ -139,8 +141,25 @@ class TestThePopoutFireIsGone:
 
     def test_the_backdrop_still_offers_it(self, player):
         labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
-        assert "Fire" in labels
+        assert "Smoke" in labels
         assert "backdrop_fire" in player._vis_actions
+
+    def test_the_old_label_is_gone_and_the_id_is_not(self, player):
+        """The rename is a label change and *only* a label change.
+
+        `backdrop_fire` is what a saved config holds, so renaming the id would
+        need a `RETIRED_VIS_MODES` entry and a migration. Relabelling needs
+        neither, and this is what says the shortcut was not taken: no `smoke`
+        id exists anywhere, and both sides of the existing `fire` arrangement
+        are untouched — `backdrop_fire` live, bare `fire` still retired to it
+        from when the popout was withdrawn.
+        """
+        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        assert "Fire" not in labels
+        assert not any("smoke" in mode for mode in _VALID_VIS_MODES)
+        assert not any("smoke" in mode for mode in RETIRED_VIS_MODES)
+        assert "backdrop_fire" in _VALID_VIS_MODES
+        assert RETIRED_VIS_MODES["fire"] == "backdrop_fire"
 
     def test_the_renderer_still_draws_fire(self):
         """The backdrop asks for exactly this mode, so it cannot be deleted.

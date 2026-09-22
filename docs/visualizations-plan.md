@@ -137,7 +137,13 @@ is radioactive):
    the classic look), dB floor ≈ -65, instant attack + linear falloff
    (~12 units/frame default), grey peak-hold caps with accelerating fall
    (counter 3.0, ×1.1/frame). Thin (75 bars) and wide (~19 bars) variants.
-3. **Fire bars** — same bars, palette ramp black→colour→white over bar height
+3. **Fire bars** — **labelled "Smoke" in the menu since 2026-09-22**, because
+   that is what the picture reads as; the config id stays `fire` /
+   `backdrop_fire` and the mechanism below is unchanged, so the rename needed
+   no `RETIRED_VIS_MODES` entry and no migration. Same split as the tunnels':
+   a name for the look goes stale when the look is re-judged, a name for the
+   mechanism does not — which is why this section still says fire throughout.
+   Same bars, palette ramp black→colour→white over bar height
    (derived from the waveform colour, so the classic red/orange is that ramp
    for pure red rather than a hardcoded palette); optional "flames" =
    previous-frame upshift + colour decay (small feedback QImage). The bottom
