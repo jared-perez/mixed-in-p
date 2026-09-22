@@ -266,6 +266,45 @@ _PUFF_SIZE_SWITCH = (45.3, 90.5)
 # 0.18 it costs a measured 3.5 ms.
 _NEBULA_MESH_ALPHA = 0.0
 
+# ── The cloud layer ────────────────────────────────────────────────────────
+#
+# The wall is drawn into an image of its own at 1/this and added over the sky
+# at full size, because a puff is soft noise and carries nothing fine enough
+# for the frame's resolution to hold. The stars are the opposite — one pixel
+# wide with a hard core — so they stay on the frame itself and only the wall
+# moves into the layer.
+#
+# It is sound because the pass is **additive, and addition commutes**: summing
+# the puffs in the layer and adding that sum to the frame is the same
+# arithmetic as adding each puff to the frame directly. The layer changes the
+# resolution the sum is carried out at and nothing else, which is why every
+# cull in `_puff_field` is expressed against the frame and comes out picking
+# exactly the same puffs at any setting (pinned by
+# `test_the_layer_changes_the_resolution_not_the_wall`).
+#
+# **To change it, change this number and nothing else.** Measured on seed 1 at
+# 128 BPM, medians of 120 frames, against the worst pixel of difference from
+# the full-res render taken at popout size and *full* opacity — the harshest
+# way to look at it, since the backdrop shows this at 0.40 over the playlist:
+#
+#   1.0   3.02 ms backdrop / 4.39 popout    the layer is skipped outright
+#   1.5   2.34 / 3.27   (-23% / -26%)   max  8/255,  0.000% over 8/255
+#   2.0   1.88 / 2.60   (-38% / -41%)   max 10/255,  0.000% over 8/255
+#   3.0   1.45 / 1.98   (-52% / -55%)   max 10/255,  0.005% over 8/255
+#
+# Compare the frames **composited**, never raw. The scene renders premultiplied
+# ARGB onto transparency, and un-premultiplying a pixel whose alpha is 1 turns
+# an off-by-one into 255 — diffing the raw frames reports a max of 255 and 16%
+# of pixels "differing" on a render that is in fact invisible.
+#
+# 3.0 measured very nearly as invisible as 2.0 and is a one-character change
+# away. It is not the default only because 2.0 already takes most of the saving
+# and leaves more headroom on a wall that may yet be retuned — a future puff
+# with a harder edge than today's would show at 3.0 before it showed at 2.0.
+# **1.0 is a real revert**, not an arithmetic identity: `_paint` skips the
+# layer entirely rather than allocating one and resampling through it.
+_CLOUD_DOWNSCALE = 2.0
+
 _SPRITE_CACHE: dict[int, list] = {}
 
 
@@ -538,6 +577,8 @@ class BeatTunnelScene:
         theta = np.linspace(0, 2 * np.pi, _SEGMENTS, endpoint=False) + np.pi / _SEGMENTS
         self._cos, self._sin = np.cos(theta), np.sin(theta)
         self._sprites = _bake_nebula_sprites(seed)
+        # The wall's own image, reallocated only when the frame's size moves.
+        self._cloud: QImage | None = None
         # Rows, not columns: every per-puff array below is (ring, segment), so
         # these broadcast against ``ring_s[:, None]`` without a reshape a frame.
         self._seg = np.arange(_SEGMENTS)[None, :]
@@ -887,7 +928,10 @@ class BeatTunnelScene:
             self._paint_mesh(
                 painter, geometry, ring_s, level, pulse, _NEBULA_MESH_ALPHA
             )
-        self._paint_nebula(painter, geometry, ring_s, level, pulse, scale)
+        if _CLOUD_DOWNSCALE == 1.0:
+            self._paint_nebula(painter, geometry, ring_s, level, pulse, scale)
+        else:
+            self._paint_cloud_layer(painter, geometry, ring_s, level, pulse, scale)
         painter.end()
 
     def _paint_galaxies(self, painter, width, height, glow, scale) -> None:
@@ -1092,7 +1136,8 @@ class BeatTunnelScene:
                     for m in range(_SEGMENTS) if spoke_ok[k, m]
                 ])
 
-    def _puff_field(self, geometry, ring_s, level, pulse, scale) -> dict:
+    def _puff_field(self, geometry, ring_s, level, pulse, scale,
+                    factor: float = 1.0) -> dict:
         """Every puff's colour, size, opacity and fate, as ``(ring, segment)`` grids.
 
         Deciding is separated from drawing for the reason the row menus are: a
@@ -1102,9 +1147,21 @@ class BeatTunnelScene:
         Everything here is a pure function of world arc length and the segment
         index — there is no per-frame state, so the 16 ms and 33 ms hosts
         render identical worlds and ``set_frame_interval`` has nothing to add.
+
+        *factor* is the target's size relative to the frame's: 1.0 for the
+        frame itself, ``_CLOUD_DOWNSCALE`` for the cloud layer. Positions and
+        radii come back in the *target's* pixels, while every cull below stays
+        expressed in frame pixels — both sides of each comparison carry the
+        same ``/ factor``, so the culls pick the same puffs whatever the layer
+        is sized at. A cull written in target pixels instead would quietly
+        thin the wall as the layer shrank, which is a change to the picture
+        wearing the costume of a resolution setting.
         """
-        sx, sy, z = geometry["puff_x"], geometry["puff_y"], geometry["puff_z"]
-        width, height = self._image.width(), self._image.height()
+        sx = geometry["puff_x"] / factor
+        sy = geometry["puff_y"] / factor
+        z = geometry["puff_z"]
+        width = self._image.width() / factor
+        height = self._image.height() / factor
         bright = 0.55 + 0.45 * min(1.0, level * 1.5 + pulse)
         arc = ring_s[:, None]
         seg = self._seg
@@ -1123,14 +1180,14 @@ class BeatTunnelScene:
         near = np.clip((z - _NEAR) / _NEAR_FADE, 0.0, 1.0)
         alpha = _PUFF_ALPHA * fade * near * bright * (0.6 + 0.4 * h2)
 
-        radius = self._focal * _PUFF_WORLD_R * (0.7 + 0.6 * h1) / np.maximum(
-            z, _DEPTH_FLOOR
+        radius = self._focal * _PUFF_WORLD_R * (0.7 + 0.6 * h1) / (
+            factor * np.maximum(z, _DEPTH_FLOOR)
         )
-        np.minimum(radius, _PUFF_MAX_PX * scale, out=radius)
+        np.minimum(radius, _PUFF_MAX_PX * scale / factor, out=radius)
 
         keep = (z >= _NEAR) & (alpha >= _PUFF_ALPHA_CULL)
-        keep &= radius >= _PUFF_MIN_PX * scale
-        keep &= ~((radius < _PUFF_THIN_PX * scale) & self._seg_odd)
+        keep &= radius >= _PUFF_MIN_PX * scale / factor
+        keep &= ~((radius < _PUFF_THIN_PX * scale / factor) & self._seg_odd)
         # Off-screen with the puff's own radius as the margin, so one whose
         # centre has left the frame still paints the part that has not.
         keep &= (sx > -radius) & (sx < width + radius)
@@ -1160,7 +1217,74 @@ class BeatTunnelScene:
             "hue": hue, "variant": variant, "sprite": sprite, "keep": keep,
         }
 
-    def _paint_nebula(self, painter, geometry, ring_s, level, pulse, scale) -> None:
+    def _cloud_layer(self) -> QImage:
+        """The wall's own image at 1/``_CLOUD_DOWNSCALE``, cleared and ready.
+
+        Reallocated only when the frame's size moves, so the steady state is a
+        fill rather than an allocation a frame. Rounded **up**, so the layer
+        never covers less than the frame it is stretched back over.
+        """
+        width = max(1, math.ceil(self._image.width() / _CLOUD_DOWNSCALE))
+        height = max(1, math.ceil(self._image.height() / _CLOUD_DOWNSCALE))
+        layer = self._cloud
+        if layer is None or layer.width() != width or layer.height() != height:
+            layer = QImage(width, height, QImage.Format.Format_ARGB32_Premultiplied)
+            self._cloud = layer
+        layer.fill(Qt.GlobalColor.transparent)
+        return layer
+
+    def _paint_cloud_layer(self, painter, geometry, ring_s, level, pulse,
+                           scale) -> None:
+        """Sum the wall in the small layer, then add the total over the sky.
+
+        Worth about 41% of the frame at ``_CLOUD_DOWNSCALE = 2.0``; the note on
+        that constant has the measurements and how to move it.
+
+        The composite is **Plus**, like the puffs themselves, and that one is
+        load-bearing: anything else dims every star the cloud covers, which is
+        the difference between a nebula and a painted tube.
+
+        The smooth upscale is a **choice, not a necessity**, and the measured
+        case for it is narrower than it looks. Nearest is about 0.15 ms cheaper
+        and at 2.0 very nearly as good — worst pixel 11/255 against smooth's 10
+        — because a puff is far too soft to hold an edge for a filter to lose.
+        What smooth buys is headroom as the layer shrinks: at 3.0 nearest
+        reaches 16/255 and 0.036% of pixels past the visible threshold, while
+        smooth stays at 10/255 and 0.005%. Since the point of
+        `_CLOUD_DOWNSCALE` is to be turnable, the filter that keeps turning it
+        safe is worth 0.15 ms. **No test separates the two at 2.0** — one
+        pixel of difference cannot be pinned without a knife-edge bound — so
+        this paragraph is the record, not a test name.
+
+        Everything else about the picture is carried by `_puff_field` deciding
+        in frame pixels.
+        """
+        layer = self._cloud_layer()
+        layer_painter = QPainter(layer)
+        layer_painter.setRenderHint(QPainter.RenderHint.Antialiasing, True)
+        try:
+            self._paint_nebula(
+                layer_painter, geometry, ring_s, level, pulse, scale,
+                _CLOUD_DOWNSCALE,
+            )
+        finally:
+            layer_painter.end()
+
+        was_smooth = painter.testRenderHint(
+            QPainter.RenderHint.SmoothPixmapTransform
+        )
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_Plus)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+        painter.drawImage(
+            QRectF(0.0, 0.0, float(self._image.width()), float(self._image.height())),
+            layer,
+        )
+        # Put the painter back, for the reason the puff pass does.
+        painter.setCompositionMode(QPainter.CompositionMode.CompositionMode_SourceOver)
+        painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, was_smooth)
+
+    def _paint_nebula(self, painter, geometry, ring_s, level, pulse, scale,
+                      factor: float = 1.0) -> None:
         """The wall: additive cloud puffs at the mesh's own vertices.
 
         QPainter has no batched image-draw, so the blits stay a Python loop —
@@ -1168,9 +1292,14 @@ class BeatTunnelScene:
         alone, with every number already decided.
 
         Draw order does not matter: ``CompositionMode_Plus`` is addition, and
-        addition commutes, so there is no back-to-front sort to pay for.
+        addition commutes, so there is no back-to-front sort to pay for. That
+        same commuting is what lets :meth:`_paint_cloud_layer` sum the puffs
+        somewhere else and add the total in one blit.
+
+        *factor* is the target's size relative to the frame's; see
+        :meth:`_puff_field`.
         """
-        field = self._puff_field(geometry, ring_s, level, pulse, scale)
+        field = self._puff_field(geometry, ring_s, level, pulse, scale, factor)
         keep = field["keep"].ravel()
         if not keep.any():
             return

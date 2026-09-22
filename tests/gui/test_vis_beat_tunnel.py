@@ -11,6 +11,7 @@ sampling every other pixel — a star arm is one pixel wide and a sampled test
 steps straight over it.
 """
 
+import math
 import time
 
 import numpy as np
@@ -40,6 +41,7 @@ from src.gui.widgets.vis_beat_tunnel import (
     BeatTunnelScene,
     schedule_turns,
 )
+from src.gui.styles.theme import Theme
 from src.utils.config import _VALID_VIS_MODES
 
 
@@ -416,6 +418,173 @@ def test_the_culls_bound_what_is_drawn(scene):
     assert min(counts) > 100  # ...and never so few that the wall goes missing
 
 
+# ── The cloud layer: the wall drawn small and added back ──────────────────
+#
+# The saving is resolution and nothing else, so these are written as
+# comparisons against `_CLOUD_DOWNSCALE = 1.0` — the same scene with the layer
+# skipped — rather than against remembered numbers.
+
+
+def _composited(image, background, opacity):
+    """What a viewer actually sees: the frame over a ground, at its opacity.
+
+    Never diff the raw frames. A scene renders premultiplied ARGB onto
+    transparency, and ``convertToFormat`` un-premultiplies: a pixel carrying
+    alpha 1 and a premultiplied channel of 1 comes back as 255, so an
+    off-by-one in the faintest corner of the cloud reports as a maximum
+    difference of 255. Measured, diffing raw frames called this render 16%
+    changed when the composited difference is a maximum of 4/255.
+    """
+    canvas = QImage(image.width(), image.height(), QImage.Format.Format_ARGB32)
+    canvas.fill(background)
+    painter = QPainter(canvas)
+    painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, True)
+    painter.setOpacity(opacity)
+    painter.drawImage(canvas.rect(), image)
+    painter.end()
+    return _pixels(canvas)[..., :3].astype(int)
+
+
+def _flight_at_downscale(monkeypatch, downscale, size=(1216, 512)):
+    """One frame of the same seeded flight, rendered at a given layer size."""
+    monkeypatch.setattr(tc, "_CLOUD_DOWNSCALE", downscale)
+    scene = BeatTunnelScene()
+    scene.set_target_size(*size)
+    return _fly(scene, 0.0, 12.0, fps=30).copy()
+
+
+def test_the_layer_changes_the_resolution_not_the_wall(scene):
+    """Which puffs are drawn, and in what colour, is the same at any layer size.
+
+    This is what lets the other `_puff_field` tests go on describing the wall
+    while asking for the full-resolution field: every cull in there is written
+    against *frame* pixels, both sides carrying the same divide, so the layer
+    cannot quietly thin the wall. Only the radii move, and they move exactly.
+
+    A cull expressed in the layer's own pixels instead would drop puffs as the
+    layer shrank — a change to the picture wearing the costume of a
+    performance setting, and invisible in a timing test.
+    """
+    _fly(scene, 0.0, 9.0)
+    scene.render(9.0, 0.6, 0.0)
+    full = scene._puff_field(scene._geometry, scene._ring_s, 0.6, 0.0, 1.0, 1.0)
+    for factor in (1.5, 2.0, 3.0):
+        small = scene._puff_field(
+            scene._geometry, scene._ring_s, 0.6, 0.0, 1.0, factor
+        )
+        assert np.array_equal(full["keep"], small["keep"]), factor
+        assert np.array_equal(full["hue"], small["hue"]), factor
+        assert np.array_equal(full["variant"], small["variant"]), factor
+        assert np.allclose(full["alpha"], small["alpha"]), factor
+        assert np.allclose(full["radius"], small["radius"] * factor), factor
+        assert np.allclose(full["x"], small["x"] * factor), factor
+
+
+def test_the_layer_is_invisible_where_the_viewer_meets_it(monkeypatch):
+    """The whole case for the layer, as a picture rather than as a clock.
+
+    Both contexts, because they are not equally forgiving: the popout shows
+    the frame at full opacity on black, the backdrop at 0.40 over the
+    playlist. Measured at the shipped 2.0 the worst pixel is 10/255 in the
+    popout and 4/255 on the backdrop, and no pixel anywhere moves by more
+    than 8; the bounds below leave room for a resampler that rounds
+    differently without leaving room for the wall actually changing.
+
+    What it deliberately does **not** pin is the upscale filter: nearest
+    measures 11/255 here against smooth's 10, and a bound that separated those
+    would be a knife edge rather than a test. The case for smooth is in
+    `_paint_cloud_layer`'s own comment, as a measurement.
+    """
+    for size, background, opacity, bound in (
+        ((1600, 720), QColor(0, 0, 0), 1.0, 16),
+        ((1216, 512), QColor(Theme.BG_DARK), 0.40, 10),
+    ):
+        full = _composited(
+            _flight_at_downscale(monkeypatch, 1.0, size), background, opacity
+        )
+        layered = _composited(
+            _flight_at_downscale(monkeypatch, tc._CLOUD_DOWNSCALE, size),
+            background, opacity,
+        )
+        diff = np.abs(full - layered)
+        assert diff.max() <= bound, (size, diff.max())
+        assert (diff.max(axis=2) > 8).mean() < 0.001, size
+
+
+def test_a_downscale_of_one_really_skips_the_layer(monkeypatch, scene):
+    """The revert path is a skip, not a factor of one.
+
+    Rounding through a same-size layer would land within the bound above and
+    still cost the allocation and the resample, so "1.0 restores the old
+    render" has to mean the layer is never built.
+    """
+    monkeypatch.setattr(tc, "_CLOUD_DOWNSCALE", 1.0)
+    _fly(scene, 0.0, 4.0)
+    assert scene._cloud is None
+
+
+def test_the_layer_is_kept_across_frames_and_rebuilt_only_on_a_resize(scene):
+    """One fill a frame, not one allocation a frame."""
+    _fly(scene, 0.0, 4.0)
+    first = scene._cloud
+    assert first is not None
+    assert first.width() == math.ceil(scene.image().width() / tc._CLOUD_DOWNSCALE)
+    _fly(scene, 4.0, 6.0)
+    assert scene._cloud is first  # same object, refilled
+
+    scene.set_target_size(800, 400)
+    _fly(scene, 6.0, 8.0)
+    assert scene._cloud is not first
+    assert scene._cloud.width() == math.ceil(
+        scene.image().width() / tc._CLOUD_DOWNSCALE
+    )
+
+
+def _cloud_layer_only(scene, background):
+    """Composite the layer alone onto *background*, and hand back the painter."""
+    canvas = QImage(
+        scene.image().width(), scene.image().height(),
+        QImage.Format.Format_ARGB32_Premultiplied,
+    )
+    canvas.fill(background)
+    painter = QPainter(canvas)
+    scene._paint_cloud_layer(
+        painter, scene._geometry, scene._ring_s, 0.6, 0.0,
+        canvas.height() / tc._REF_H,
+    )
+    return canvas, painter
+
+
+def test_the_layer_composite_is_additive_like_the_puffs_it_replaces(scene):
+    """The sibling of the puff pass's own test, one level up.
+
+    The puffs being additive is no use if the blit that carries their total
+    onto the frame is a `SourceOver`: that would dim every star the cloud
+    covers, which is the difference the wall exists to avoid.
+    """
+    _fly(scene, 0.0, 6.0)
+    canvas, painter = _cloud_layer_only(scene, QColor(40, 40, 40))
+    painter.end()
+    raw = _pixels(canvas)[..., :3].astype(int)
+    assert (raw >= 40).all()  # nothing the cloud covered got darker...
+    assert (raw > 60).any()  # ...and the cloud really arrived
+
+
+def test_the_layer_hands_the_painter_back_as_it_was_found(scene):
+    """As the puff pass does: Plus and the smooth hint are painter-wide."""
+    _fly(scene, 0.0, 6.0)
+    canvas, painter = _cloud_layer_only(scene, QColor(0, 0, 0))
+    painter.setRenderHint(QPainter.RenderHint.SmoothPixmapTransform, False)
+    scene._paint_cloud_layer(
+        painter, scene._geometry, scene._ring_s, 0.6, 0.0,
+        canvas.height() / tc._REF_H,
+    )
+    assert painter.compositionMode() == QPainter.CompositionMode.CompositionMode_SourceOver
+    assert painter.opacity() == 1.0
+    assert not painter.testRenderHint(QPainter.RenderHint.SmoothPixmapTransform)
+    painter.end()
+
+
 def _nebula_only(scene, background):
     """Paint the wall alone onto *background*, and hand back the painter used."""
     canvas = QImage(
@@ -767,7 +936,7 @@ def test_target_size_does_not_reallocate_when_unchanged(scene):
 def test_a_frame_stays_cheap(scene):
     """A loose guard against an accidental O(pixels) rewrite.
 
-    It measures ~3.0 ms at this size against a 16 ms budget; the bound is
+    It measures ~1.9 ms at this size against a 16 ms budget; the bound is
     generous so it cannot flake under a full-suite load. If it flakes anyway,
     delete it rather than widen it — the real cost lives in the plan.
     """

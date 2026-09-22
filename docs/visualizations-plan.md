@@ -285,12 +285,11 @@ is radioactive):
    ride that same roll deliberately — "less spiky" and "more compact" are the
    same star, so a short-armed one never comes out as a fat plus. Past them,
    far more rarely, drifts a single galaxy.
-   Measured **3.0 ms/frame at 1216×512** and 4.3 at popout size. Removing the
-   planets was worth about 0.3 ms of the popout frame, measured back-to-back
-   against a worktree at the commit before they went (3.03 / 4.59 there).
-   Both halves of that pair are from one machine; the 3.4 / 4.5 this doc
-   carried before were not, which is why the delta is quoted rather than the
-   difference of the two headline numbers.
+   Measured **1.9 ms/frame at 1216×512** and 2.6 at popout size, since the
+   cloud moved into a half-resolution layer (see below); it was 3.0 / 4.4
+   before that, and 3.4 / 4.5 on a different machine before the planets went.
+   Quote the deltas rather than differencing the headline numbers across
+   those rows: only measurements taken back-to-back on one machine subtract.
 
    **The planets are gone.** Three shaded discs used to drift past among the
    stars — rolled once at spawn for tint and rings, thinned twice, and given a
@@ -347,6 +346,62 @@ is radioactive):
    ms) and cannot follow a bent tube without the per-pixel ray/tube mapping
    that is the whole cost being avoided; and true raymarched volumetrics are
    shader-only, i.e. a new architecture for one mode.
+
+   **The wall is drawn at half resolution and added back** (`_CLOUD_DOWNSCALE`
+   in `vis_beat_tunnel.py`), which is worth **~41% of the whole frame** and is
+   the single largest saving available in this mode — the cloud was measured at
+   78% of the backdrop frame and 84% of the popout's, against 5% for all of the
+   geometry. It works because the pass is *additive and addition commutes*:
+   summing the puffs in a small layer and adding that total to the frame is the
+   same arithmetic as adding each puff to the frame, so the layer changes the
+   resolution the sum is carried out at and nothing else. A puff is soft noise
+   with nothing fine enough for the frame's resolution to hold; the stars are
+   the opposite, one pixel wide with hard cores, so they stay on the frame and
+   only the wall moves into the layer.
+
+   Two rules keep it honest, and both are load-bearing. **Every cull stays
+   expressed in frame pixels**, both sides of each comparison carrying the same
+   divide, so the same puffs survive at any layer size — a cull written in the
+   layer's own pixels would thin the wall as the layer shrank, which is a
+   change to the picture wearing the costume of a performance setting and
+   invisible in a timing test. And **the difference is measured composited,
+   never raw**: the scene renders premultiplied ARGB onto transparency, and
+   un-premultiplying a pixel carrying alpha 1 turns an off-by-one into 255, so
+   diffing the raw frames reported this render 16% changed when the composited
+   difference is a maximum of 4/255.
+
+   Measured, medians of 120 frames, against the worst pixel of difference from
+   the full-resolution render at popout size and *full* opacity (the harshest
+   case — the backdrop shows this at 0.40 over the playlist):
+
+   | `_CLOUD_DOWNSCALE` | backdrop | popout | max diff |
+   |---|---|---|---|
+   | 1.0 (layer skipped) | 3.02 ms | 4.39 ms | — |
+   | 1.5 | 2.34 | 3.27 | 8/255 |
+   | **2.0 (shipped)** | **1.88** | **2.60** | **10/255** |
+   | 3.0 | 1.45 | 1.98 | 10/255 |
+
+   3.0 measured very nearly as invisible and is a one-character change away;
+   2.0 is the default because it already takes most of the saving and leaves
+   headroom on a wall that may yet be retuned. 1.0 is a *real* revert — the
+   layer is never built, rather than being built at a factor of one.
+
+   The smooth upscale is a choice rather than a necessity: nearest is ~0.15 ms
+   cheaper and at 2.0 all but identical (11/255 against 10), but it degrades
+   faster as the layer shrinks (16/255 at 3.0), so smooth is what keeps the
+   knob safe to turn. No test separates the two at 2.0.
+
+   **What is left, if this mode ever needs to be cheaper again.** The cost that
+   survives the layer is per-blit, not per-pixel: ~262 `drawImage` calls at
+   ~4 µs each, about 1 ms a frame, which no resolution change touches. Only
+   drawing fewer puffs reaches it — `_SEGMENTS` 20 → 14 measured −28% and
+   `_PUFF_WORLD_R` 0.5 → 0.38 measured −29%, and both are changes to the
+   picture, not to its resolution. Note also that on the *backdrop* the win is
+   smaller than the scene number: the playlist rows repaint underneath
+   regardless (measured 3.1 ms at a 1192×502 viewport with 16 visible rows), so
+   the whole backdrop frame goes ~7.4 ms → ~5.9 ms. And do **not** reach for a
+   slower backdrop tick on this mode: 33 ms already makes the kick flux too
+   coarse, and the beat clock fails to lock on two of six test tracks.
 
    Three things the build is shaped by, all of them found by rendering.
    **Additive puffs stack where the tube converges** — the wireframe's bright
