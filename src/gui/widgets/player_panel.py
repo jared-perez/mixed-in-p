@@ -105,12 +105,19 @@ from ..play_context import (
     resync,
 )
 from ..styles.theme import Theme
+from ..waveform_palette import column_colors, needs_spectral, peak_envelope
 from ..workers.audio_decode_worker import AudioDecodeWorker
 from ..workers.artwork_worker import ArtworkThread, ArtworkWorker
 from ..workers.lookup_worker import LookupJob, LookupThread
 from ..workers.tag_read_worker import TagReadThread, TagReadWorker
 from ..workers.thread_keeper import keep_alive, wait_for_threads
-from ..workers.waveform_worker import WaveformWorker, downsample_waveform, timed_envelope
+from ..workers.waveform_worker import (
+    WaveformWorker,
+    downsample_waveform,
+    mono_mix,
+    spectral_columns,
+    timed_envelope,
+)
 from .elided_label import HuggingElidedLabel, LinkLabel
 from .vis_canvas import FFT_SIZE, FRAME_MS, POPOUT_MODES, VisRenderer, VisualizerWindow
 
@@ -1931,6 +1938,13 @@ class PlayerPanel(QWidget):
         self._wf_worker: WaveformWorker | None = None
         self._wf_loading: bool = False
         self._wf_path: str | None = None
+        # Waveform colour mode (from Settings) and what it is computed from:
+        # the coarse min/max of the waveform on show, and — only once a
+        # frequency mode asks — its spectral_columns, cached for that one track.
+        self._wf_color_mode: str = "solid"
+        self._wf_color_absolute: bool = False
+        self._wf_columns: tuple | None = None   # (path, coarse_min, coarse_max)
+        self._wf_spectral: tuple | None = None  # (path, columns, low, mid, high, centroid)
 
         # Online lookup, pushed down from Settings by MainWindow. Off until
         # then, and while off the context-menu entry does not exist at all.
@@ -6373,6 +6387,7 @@ class PlayerPanel(QWidget):
         """Recolor the full-length waveform body (from Settings)."""
         self._waveform_color = color
         self._slice.set_waveform_color(color)
+        self._refresh_waveform_colors()
         self._table.set_backdrop_color(color)
         if self._vis_window is not None:
             self._vis_window.set_color(color)
@@ -6594,6 +6609,74 @@ class PlayerPanel(QWidget):
         budget = self._scroll.viewport().height() - self._height_outside_playlist()
         return max(chrome + self._MIN_ROWS_WHEN_SLICING * row_h, budget)
 
+    def set_waveform_color_mode(self, mode: str, absolute: bool) -> None:
+        """Colour the waveforms by *mode* (from Settings; see waveform_palette).
+
+        The visualizers and backdrop keep the picker colour whatever the mode.
+        """
+        self._wf_color_mode = mode
+        self._wf_color_absolute = bool(absolute)
+        self._refresh_waveform_colors()
+
+    def _install_waveform(self, path: str, cmin, cmax, dmin, dmax, bps) -> None:
+        self._slice.set_waveform(cmin, cmax, dmin, dmax, bps)
+        self._wf_columns = (path, cmin, cmax)
+        self._refresh_waveform_colors()
+
+    def _refresh_waveform_colors(self) -> None:
+        """Push per-column colours for the waveform on show into both canvases.
+
+        Cheap (a few ms) whenever the analysis is in hand, which is what makes
+        the mode and normalisation settings feel instant; only the first switch
+        into a frequency mode on a track pays for spectral_columns (~30 ms).
+        """
+        columns = self._wf_columns
+        path = self._current_path()
+        if columns is None or columns[0] != path or self._wf_color_mode == "solid":
+            self._slice.set_column_colors(None)
+            return
+        _path, cmin, cmax = columns
+        kwargs = {}
+        if needs_spectral(self._wf_color_mode):
+            spectral = self._spectral_for(path, len(cmin))
+            if spectral is None:
+                # Solid until the analysis exists (a fallback decode is under way).
+                self._slice.set_column_colors(None)
+                return
+            kwargs.update(zip(("low", "mid", "high", "centroid"), spectral))
+        else:
+            kwargs["peaks"] = peak_envelope(cmin, cmax)
+        colors = column_colors(
+            self._wf_color_mode,
+            self._wf_color_absolute,
+            base_color=self._waveform_color,
+            columns=len(cmin),
+            **kwargs,
+        )
+        self._slice.set_column_colors(colors)
+
+    def _spectral_for(self, path: str, columns: int):
+        """(low, mid, high, centroid) for *path*, computed from the cached PCM.
+
+        Returns None when the PCM has been evicted; a one-shot decode is then
+        started, and its result re-runs the colouring.
+        """
+        cached = self._wf_spectral
+        if cached is not None and cached[0] == path and cached[1] == columns:
+            return cached[2:]
+        entry = self._cache_get(path)
+        if entry is None:
+            self._start_waveform_fallback(path)
+            return None
+        pcm, sr = entry
+        try:
+            result = spectral_columns(mono_mix(pcm), sr, columns)
+        except Exception as e:  # noqa: BLE001
+            logger.warning(f"Waveform colour analysis failed for {path}: {e}")
+            return None
+        self._wf_spectral = (path, columns, *result)
+        return result
+
     def _build_waveform_for_current(self) -> None:
         """Supply the slice section a waveform for the current track.
 
@@ -6611,7 +6694,7 @@ class PlayerPanel(QWidget):
             except Exception as e:  # noqa: BLE001
                 logger.warning(f"Waveform build failed for {path}: {e}")
                 return
-            self._slice.set_waveform(cmin, cmax, dmin, dmax, bps)
+            self._install_waveform(path, cmin, cmax, dmin, dmax, bps)
             return
         # Cache miss — decode just for the waveform off the UI thread.
         self._start_waveform_fallback(path)
@@ -6629,6 +6712,7 @@ class PlayerPanel(QWidget):
         # Keep the wrappers alive until C++ destroys them (see _pump_decode).
         keep_alive(self._thread_keep, thread, worker)
         thread.started.connect(worker.run)
+        worker.audio_ready.connect(self._on_waveform_fallback_audio)
         worker.finished.connect(self._on_waveform_fallback_ready)
         worker.finished.connect(thread.quit)
         worker.error.connect(thread.quit)
@@ -6637,11 +6721,17 @@ class PlayerPanel(QWidget):
         thread.finished.connect(self._on_waveform_fallback_finished)
         thread.start()
 
+    @Slot(object, int)
+    def _on_waveform_fallback_audio(self, pcm, sr: int) -> None:
+        # Re-cache the decode, so a frequency colour mode has PCM to analyse.
+        if self._wf_path is not None:
+            self._cache_put(self._wf_path, pcm, sr)
+
     @Slot(object, object, int, object, object, float)
     def _on_waveform_fallback_ready(self, cmin, cmax, _dur, dmin, dmax, bps) -> None:
         # Only render if a view is still open on the same track.
         if self._wf_path == self._current_path() and self._slice.needs_waveform():
-            self._slice.set_waveform(cmin, cmax, dmin, dmax, bps)
+            self._install_waveform(self._wf_path, cmin, cmax, dmin, dmax, bps)
 
     @Slot()
     def _on_waveform_fallback_finished(self) -> None:

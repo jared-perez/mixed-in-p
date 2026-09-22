@@ -65,3 +65,16 @@ ru `Фон:`, ja `背景：`). The visual shipped as "Silly Scope", kept English
 proper name and a pun on "oscilloscope". Renaming it retired the pun and with
 it the only reason not to translate, so don't restore the English-everywhere
 rule from the `vanished` entries or the old `<translatorcomment>`.
+
+**The waveform colour modes** (Settings → Waveform / Visuals) are labelled
+Solid · Loudness · Frequency bands · **Tone**, and the fourth is stored as
+`centroid` — the id names the mechanism, so relabelling costs no migration.
+"Tone" means *timbre*, dark to bright, never pitch (pitch is *key* in this
+app). So it is `Ton` in de, `Тон` in ru and `音色` in ja/zh_CN/`음색` in ko,
+but **`Timbre`/`Timbro` in es/fr/it/pt_BR**, where *tono/ton/tom* sit right
+next to the words for key (*Tonalidad*, *Tonalité*, *Tonalità*,
+*Tonalidade*); nl is `Klank` for the same reason (*Toonsoort*), and pl is
+`Brzmienie` because *Barwa* also means colour, in a colour setting. The
+normalisation pair is `This track` / `Fixed`; ru has `Единая` (one shared
+scale) because a bare *фиксированный* reads as "stuck". The picker hint
+names the two modes, so it must use the same words as their combo items.

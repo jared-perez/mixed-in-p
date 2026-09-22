@@ -29,6 +29,7 @@ import numpy as np
 import sounddevice as sd
 from PySide6.QtCore import QObject, QTimer, Signal
 
+from ..workers.waveform_worker import mono_mix
 from .loop_player import _BLOCK, _POS_TIMER_MS, UnderrunLog, output_stream_kwargs
 
 logger = logging.getLogger(__name__)
@@ -158,7 +159,7 @@ class PlayerEngine(QObject):
             return None
         end = max(0, min(pos, pcm.shape[0]))
         start = max(0, end - n)
-        mono = pcm[start:end].mean(axis=1).astype(np.float32, copy=False)
+        mono = mono_mix(pcm[start:end])
         if len(mono) < n:
             mono = np.concatenate([np.zeros(n - len(mono), dtype=np.float32), mono])
         return mono

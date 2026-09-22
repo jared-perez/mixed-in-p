@@ -88,6 +88,8 @@ class ToggleSwitch(QCheckBox):
         try:
             p.setRenderHint(QPainter.RenderHint.Antialiasing, True)
             p.setPen(Qt.PenStyle.NoPen)
+            if not self.isEnabled():
+                p.setOpacity(0.4)
 
             t = self._pos
             rect = QRectF(self.rect().adjusted(0, 0, -1, -1))

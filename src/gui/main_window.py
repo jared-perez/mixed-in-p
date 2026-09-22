@@ -188,6 +188,9 @@ class MainWindow(QMainWindow):
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
+        self._player_panel.set_waveform_color_mode(
+            self._config.waveform_color_mode, self._config.waveform_color_absolute
+        )
         self._player_panel.set_waveform_half(self._config.player_waveform_half)
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)
@@ -2280,6 +2283,9 @@ class MainWindow(QMainWindow):
         self._keyboard_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_key_notation(self._config.key_notation)
         self._player_panel.set_waveform_color(self._effective_waveform_color())
+        self._player_panel.set_waveform_color_mode(
+            self._config.waveform_color_mode, self._config.waveform_color_absolute
+        )
         self._player_panel.set_waveform_half(self._config.player_waveform_half)
         self._player_panel.set_text_size(self._config.player_text_size)
         self._player_panel.set_artwork_view(self._config.player_artwork_view)

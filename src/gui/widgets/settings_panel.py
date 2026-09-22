@@ -192,10 +192,48 @@ class SettingsPanel(QWidget):
         wave_layout.setContentsMargins(16, 10, 16, 10)
         wave_layout.setSpacing(10)
 
+        # Colour mode. Items carry the persisted id (the mechanism: "centroid"
+        # is labelled "Tone"), so a relabel never touches config.
+        mode_row = self._row_layout()
+        mode_label = QLabel(self.tr("Color mode:"))
+        mode_label.setObjectName("settingsLabel")
+        self._waveform_mode_combo = FittedComboBox()
+        for label, code, tip in (
+            (self.tr("Solid"), "solid", self.tr("One color for the whole waveform.")),
+            (self.tr("Loudness"), "loudness", self.tr("Color brightness follows the volume.")),
+            (
+                self.tr("Frequency bands"),
+                "bands",
+                self.tr("Red is bass, green highs, blue mids."),
+            ),
+            (self.tr("Tone"), "centroid", self.tr("Color follows the balance from bass to treble.")),
+        ):
+            self._waveform_mode_combo.addItem(label, code)
+            self._waveform_mode_combo.setItemData(
+                self._waveform_mode_combo.count() - 1, tip, Qt.ItemDataRole.ToolTipRole
+            )
+        self._waveform_mode_combo.setSizeAdjustPolicy(
+            QComboBox.SizeAdjustPolicy.AdjustToContents
+        )
+        self._waveform_mode_combo.currentIndexChanged.connect(self._on_waveform_mode_changed)
+        mode_row.addWidget(mode_label)
+        mode_row.addWidget(self._waveform_mode_combo)
+        mode_row.addStretch(1)
+        wave_layout.addLayout(mode_row)
+
         wave_hint = QLabel(self.tr("Color of the full-length waveform in the player."))
         wave_hint.setObjectName("settingsHint")
         wave_hint.setWordWrap(True)
         wave_layout.addWidget(wave_hint)
+        # Shown instead of the swatches' usual effect in the frequency modes,
+        # whose hue carries data.
+        self._waveform_picker_hint = QLabel(
+            self.tr("Frequency bands and Tone choose their own colors.")
+        )
+        self._waveform_picker_hint.setObjectName("settingsHint")
+        self._waveform_picker_hint.setWordWrap(True)
+        self._waveform_picker_hint.setVisible(False)
+        wave_layout.addWidget(self._waveform_picker_hint)
 
         # Live color, mirrored by the swatch borders. Set for real in load_config.
         self._waveform_color: str = _WAVEFORM_PRESETS[0]
@@ -228,6 +266,30 @@ class SettingsPanel(QWidget):
         swatch_row.addStretch(1)
         wave_layout.addLayout(swatch_row)
 
+        # Normalisation, as a left/right choice like half/full below: knob
+        # left = this track's own range (the default), right = one fixed scale.
+        norm_row = self._row_layout()
+        norm_row.setSpacing(10)
+        wave_layout.addSpacing(14)
+        self._waveform_track_label = QLabel(self.tr("This track"))
+        self._waveform_track_label.setObjectName("settingsLabel")
+        self._waveform_absolute_switch = ToggleSwitch()
+        self._waveform_absolute_switch.toggled.connect(self._on_waveform_absolute_toggled)
+        self._waveform_fixed_label = QLabel(self.tr("Fixed"))
+        self._waveform_fixed_label.setObjectName("settingsLabel")
+        norm_row.addWidget(self._waveform_track_label)
+        norm_row.addWidget(self._waveform_absolute_switch)
+        norm_row.addWidget(self._waveform_fixed_label)
+        norm_row.addStretch(1)
+        wave_layout.addLayout(norm_row)
+        self._waveform_norm_hint = QLabel(
+            self.tr("Fixed colors every track on one scale, so tracks compare.")
+        )
+        self._waveform_norm_hint.setObjectName("settingsHint")
+        self._waveform_norm_hint.setWordWrap(True)
+        wave_layout.addWidget(self._waveform_norm_hint)
+        self._sync_waveform_absolute_tooltip()
+
         # Half/full as a left/right choice rather than an on/off checkbox:
         # the switch sits between the two options, knob left = half.
         half_row = self._row_layout()
@@ -248,7 +310,7 @@ class SettingsPanel(QWidget):
         self._sync_waveform_full_tooltip()
 
         outer.addWidget(wave_frame)
-        self._restyle_waveform_swatches()
+        self._sync_waveform_mode_controls()
 
         # ── Section: Playlist text size ────────────────────────────────────
         outer.addWidget(self._make_section_label(self.tr("Playlist Text Size")))
@@ -994,6 +1056,9 @@ class SettingsPanel(QWidget):
                 font-size: 11px;
                 font-style: italic;
             }}
+            QLabel#settingsLabel:disabled, QLabel#settingsHint:disabled {{
+                color: {Theme.TEXT_DISABLED};
+            }}
             QFrame#settingsSection {{
                 background-color: transparent;
                 border: none;
@@ -1103,6 +1168,47 @@ class SettingsPanel(QWidget):
         if emit:
             self.settings_changed.emit()
 
+    def _selected_waveform_mode(self) -> str:
+        return self._waveform_mode_combo.currentData() or "solid"
+
+    def _on_waveform_mode_changed(self, _index: int) -> None:
+        self._sync_waveform_mode_controls()
+        self._emit_changed()
+
+    def _sync_waveform_mode_controls(self) -> None:
+        """Enable what the mode uses: the picker for Solid and Loudness, the
+        normalisation switch for everything but Solid."""
+        mode = self._selected_waveform_mode()
+        self._waveform_mode_combo.setToolTip(
+            self._waveform_mode_combo.currentData(Qt.ItemDataRole.ToolTipRole) or ""
+        )
+        picker = mode in ("solid", "loudness")
+        for btn in self._wave_swatches.values():
+            btn.setEnabled(picker)
+        self._wave_custom_btn.setEnabled(picker)
+        self._waveform_picker_hint.setVisible(not picker)
+        scaled = mode != "solid"
+        for w in (
+            self._waveform_track_label,
+            self._waveform_absolute_switch,
+            self._waveform_fixed_label,
+            self._waveform_norm_hint,
+        ):
+            w.setEnabled(scaled)
+        self._restyle_waveform_swatches()
+
+    def _on_waveform_absolute_toggled(self, _checked: bool) -> None:
+        self._sync_waveform_absolute_tooltip()
+        self._emit_changed()
+
+    def _sync_waveform_absolute_tooltip(self) -> None:
+        """Say what the next click will do (CLAUDE.md, UI copy)."""
+        self._waveform_absolute_switch.setToolTip(
+            self.tr("Scale the colors to each track's own range")
+            if self._waveform_absolute_switch.isChecked()
+            else self.tr("Scale the colors the same for every track")
+        )
+
     def _on_waveform_full_toggled(self, _checked: bool) -> None:
         self._sync_waveform_full_tooltip()
         self._emit_changed()
@@ -1138,7 +1244,7 @@ class SettingsPanel(QWidget):
         """Highlight the preset matching the active color (none, if it's custom)."""
         active = self._waveform_color.lower()
         for hexcolor, btn in self._wave_swatches.items():
-            selected = hexcolor.lower() == active
+            selected = hexcolor.lower() == active and btn.isEnabled()
             if hexcolor == _DEFAULT_PRESET:
                 # Outlined chip: the live theme's accent when it's the active
                 # choice, muted grey otherwise — outline and label share a colour.
@@ -1150,8 +1256,14 @@ class SettingsPanel(QWidget):
                 )
             else:
                 border = Theme.TEXT_PRIMARY if selected else "transparent"
+                # Inline rules carry no :disabled state, so dim by hand while
+                # a frequency mode owns the colour.
+                fill = hexcolor
+                if not btn.isEnabled():
+                    c = QColor(hexcolor)
+                    fill = f"rgba({c.red()}, {c.green()}, {c.blue()}, 70)"
                 btn.setStyleSheet(
-                    f"#waveSwatch {{ background-color: {hexcolor};"
+                    f"#waveSwatch {{ background-color: {fill};"
                     f" border: 2px solid {border}; border-radius: 4px; }}"
                 )
 
@@ -1247,6 +1359,8 @@ class SettingsPanel(QWidget):
             key_in_comment_enabled=self._key_in_comment_cb.isChecked(),
             energy_written_first=self._energy_written_first_cb.isChecked(),
             waveform_color=self._waveform_color,
+            waveform_color_mode=self._selected_waveform_mode(),
+            waveform_color_absolute=self._waveform_absolute_switch.isChecked(),
             player_waveform_half=not self._waveform_full_switch.isChecked(),
             export_absolute_paths=self._export_absolute_cb.isChecked(),
             persist_scratch=self._persist_scratch_cb.isChecked(),
@@ -1285,6 +1399,15 @@ class SettingsPanel(QWidget):
         self._waveform_full_switch.setChecked(not cfg.player_waveform_half)
         self._waveform_full_switch.blockSignals(False)
         self._sync_waveform_full_tooltip()
+        self._waveform_mode_combo.blockSignals(True)
+        mode_index = self._waveform_mode_combo.findData(cfg.waveform_color_mode)
+        self._waveform_mode_combo.setCurrentIndex(mode_index if mode_index >= 0 else 0)
+        self._waveform_mode_combo.blockSignals(False)
+        self._waveform_absolute_switch.blockSignals(True)
+        self._waveform_absolute_switch.setChecked(cfg.waveform_color_absolute)
+        self._waveform_absolute_switch.blockSignals(False)
+        self._sync_waveform_absolute_tooltip()
+        self._sync_waveform_mode_controls()
 
         self._auto_rename_cb.setChecked(cfg.auto_rename)
         self._auto_write_bpm_cb.setChecked(cfg.auto_write_bpm)

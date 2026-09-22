@@ -590,8 +590,15 @@ class SliceSection(QWidget):
         self._waveform_loaded = True
 
     def set_waveform_color(self, color: str) -> None:
-        """Recolor the full-length waveform (the zoomed scrubber is unaffected)."""
+        """Recolor both waveforms where no column colours apply (Solid mode)."""
         self._waveform.set_waveform_color(color)
+        self._zoom_waveform.set_waveform_color(color)
+
+    def set_column_colors(self, colors) -> None:
+        """Per-column RGB for both waveforms, aligned with the coarse arrays
+        (see waveform_palette), or None to draw them solid."""
+        self._waveform.set_column_colors(colors)
+        self._zoom_waveform.set_column_colors(colors)
 
     def set_waveform_half(self, half: bool) -> None:
         """Show only the top half of both waveforms, in half the height."""

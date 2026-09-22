@@ -18,6 +18,23 @@ logger = logging.getLogger(__name__)
 DETAIL_BINS_PER_SEC = 4000
 
 
+def mono_mix(pcm: np.ndarray) -> np.ndarray:
+    """Mono mix-down of ``(frames, channels)`` PCM as float32.
+
+    NOT ``pcm.mean(axis=1)``: numpy reduces a length-2 fast axis
+    pathologically (67.8 ms vs 3.8 ms on a 5-minute stereo track). Works on a
+    slice, since the player engine mixes ``pcm[start:end]``.
+    """
+    if pcm.ndim == 1:
+        return pcm.astype(np.float32, copy=False)
+    channels = pcm.shape[1]
+    if channels == 1:
+        return pcm[:, 0].astype(np.float32)
+    if channels == 2:
+        return ((pcm[:, 0] + pcm[:, 1]) * 0.5).astype(np.float32, copy=False)
+    return pcm.mean(axis=1).astype(np.float32)
+
+
 def timed_envelope(pcm: np.ndarray, sr: int, bins_per_sec: int = 200):
     """Time-indexed mono min/max envelope at ~*bins_per_sec* resolution.
 
@@ -33,7 +50,7 @@ def timed_envelope(pcm: np.ndarray, sr: int, bins_per_sec: int = 200):
     n_samples = pcm.shape[0]
     if n_samples == 0 or sr <= 0:
         raise ValueError("Empty audio")
-    mono = pcm.mean(axis=1).astype(np.float32)
+    mono = mono_mix(pcm)
     samples_per_bin = max(1, int(round(sr / bins_per_sec)))
     if n_samples < samples_per_bin:
         return (
@@ -72,7 +89,7 @@ def downsample_waveform(
         raise ValueError("Empty audio")
 
     # Mono mix drives the displayed waveform.
-    mono = pcm.mean(axis=1).astype(np.float32)
+    mono = mono_mix(pcm)
     duration_ms = int(round(n_samples * 1000 / sr))
 
     # --- Coarse (overview) ---
@@ -99,6 +116,86 @@ def downsample_waveform(
         detail_bps = 0.0
 
     return coarse_min, coarse_max, duration_ms, detail_min, detail_max, float(detail_bps)
+
+
+# Spectral colouring (``spectral_columns``). Non-overlapping frames give 100%
+# sample coverage for ~30 ms on a 5-minute track; 2048 at 44.1 kHz resolves
+# down to ~21 Hz, so bass lands in the low band rather than smearing into mid.
+SPECTRAL_N_FFT = 2048
+# Band edges in Hz: low < 250 <= mid < 4000 <= high.
+SPECTRAL_LOW_MID_HZ = 250.0
+SPECTRAL_MID_HIGH_HZ = 4000.0
+# A column quieter than this RMS (-60 dBFS) is silence: it reports centroid 0
+# and equal shares, and the palette paints it the base colour rather than
+# stretching dither into colour.
+SPECTRAL_SILENCE_RMS = 1e-3
+
+
+def spectral_columns(mono: np.ndarray, sr: int, columns: int = 2000):
+    """Per-column band shares and spectral centroid, for waveform colouring.
+
+    Returns ``(low, mid, high, centroid_hz)``, each float32 of length
+    *columns*, aligned with ``downsample_waveform``'s coarse columns for the
+    same *columns*. low/mid/high are SHARES summing to 1 — loudness is already
+    divided out, so the result depends on neither the colour mode nor the
+    normalisation setting, and flipping either needs no re-analysis. A silent
+    column reports centroid 0 and shares of 1/3.
+    """
+    mono = np.asarray(mono, dtype=np.float32)
+    n_samples = mono.shape[0]
+    if n_samples == 0 or sr <= 0:
+        raise ValueError("Empty audio")
+    columns = max(1, min(int(columns), n_samples))
+    n_fft = SPECTRAL_N_FFT
+    if n_samples < n_fft:
+        mono = np.pad(mono, (0, n_fft - n_samples))
+    frames = max(1, mono.shape[0] // n_fft)
+    framed = mono[: frames * n_fft].reshape(frames, n_fft)
+
+    spec = np.abs(np.fft.rfft(framed * np.hanning(n_fft).astype(np.float32), axis=1))
+    freqs = np.fft.rfftfreq(n_fft, 1.0 / sr)
+    k_low = int(np.searchsorted(freqs, SPECTRAL_LOW_MID_HZ))
+    k_high = int(np.searchsorted(freqs, SPECTRAL_MID_HIGH_HZ))
+    low_f = spec[:, :k_low].sum(axis=1)
+    mid_f = spec[:, k_low:k_high].sum(axis=1)
+    high_f = spec[:, k_high:].sum(axis=1)
+    mag_f = low_f + mid_f + high_f
+    weighted_f = spec @ freqs  # sum(|X| * f) per frame
+    energy_f = np.einsum("ij,ij->i", framed, framed)
+
+    # Frames -> columns by where each frame's centre falls, in the same
+    # sample space as downsample_waveform's coarse columns. Sums, so centroid
+    # is energy-weighted (sum(cen*mag)/sum(mag)), never a mean of centroids.
+    samples_per_col = max(1, n_samples // columns)
+    centres = (np.arange(frames) * n_fft + n_fft // 2) // samples_per_col
+    col_of_frame = np.minimum(centres, columns - 1)
+
+    def per_col(values):
+        return np.bincount(col_of_frame, weights=values, minlength=columns)
+
+    count = per_col(np.ones(frames))
+    low, mid, high = per_col(low_f), per_col(mid_f), per_col(high_f)
+    mag, weighted, energy = per_col(mag_f), per_col(weighted_f), per_col(energy_f)
+
+    # A column narrower than a frame holds no frame centre: borrow the frame
+    # its own centre falls in.
+    empty = count == 0
+    if empty.any():
+        cols = np.nonzero(empty)[0]
+        src = np.minimum((cols * samples_per_col + samples_per_col // 2) // n_fft, frames - 1)
+        low[cols], mid[cols], high[cols] = low_f[src], mid_f[src], high_f[src]
+        mag[cols], weighted[cols], energy[cols] = mag_f[src], weighted_f[src], energy_f[src]
+        count[cols] = 1
+
+    rms = np.sqrt(energy / (count * n_fft))
+    silent = (rms < SPECTRAL_SILENCE_RMS) | (mag <= 0)
+    safe = np.where(silent, 1.0, mag)
+    third = np.float32(1.0 / 3.0)
+    low_s = np.where(silent, third, low / safe).astype(np.float32)
+    mid_s = np.where(silent, third, mid / safe).astype(np.float32)
+    high_s = np.where(silent, third, high / safe).astype(np.float32)
+    centroid = np.where(silent, 0.0, weighted / safe).astype(np.float32)
+    return low_s, mid_s, high_s, centroid
 
 
 class WaveformWorker(QObject):

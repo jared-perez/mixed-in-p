@@ -89,10 +89,10 @@ def read_mono(path: str, seconds: float | None) -> tuple[np.ndarray, int]:
     The app's own decode path, reused rather than reimplemented so a file the
     app can play is a file this can render.
     """
-    from src.gui.workers.waveform_worker import WaveformWorker
+    from src.gui.workers.waveform_worker import WaveformWorker, mono_mix
 
     pcm, sr = WaveformWorker._read_audio(path)
-    mono = pcm.mean(axis=1).astype(np.float32)
+    mono = mono_mix(pcm)
     if seconds is not None:
         mono = mono[: int(seconds * sr)]
     return mono, int(sr)

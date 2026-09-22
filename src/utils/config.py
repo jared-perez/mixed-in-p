@@ -64,6 +64,11 @@ _VALID_VIS_MODES = {
 }
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 
+# Player waveform colour modes, in the Settings combo's order. Persisted ids
+# name the MECHANISM, never the label: "centroid" is labelled "Tone", so a
+# relabel costs one tr() string and no config migration. Do not store "tone".
+WAVEFORM_COLOR_MODES = ("solid", "loudness", "bands", "centroid")
+
 
 def _valid_theme_ids() -> set[str] | None:
     """The selectable theme ids, sourced from the GUI theme registry (THEMES).
@@ -146,6 +151,13 @@ class AppConfig:
     spectrum_split: bool = False
     # Full-length player waveform body color (#RRGGBB). Default is neon yellow.
     waveform_color: str = "#f0ff00"
+    # How the waveform body is coloured (WAVEFORM_COLOR_MODES). The picker
+    # colour above applies to solid and loudness only; bands and centroid
+    # carry data in the hue.
+    waveform_color_mode: str = "solid"
+    # False stretches each track's own range across the colours (per-track);
+    # True uses one fixed mapping, so two tracks compare. See waveform_palette.
+    waveform_color_absolute: bool = False
     # Player's Waveform and Zoomed Wave views: True draws only the top half
     # (the peak envelope) in half the height, False the mirrored full wave.
     player_waveform_half: bool = True
@@ -425,6 +437,12 @@ def load_config() -> AppConfig:
                 ),
                 spectrum_split=bool(data.get("spectrum_split", AppConfig.spectrum_split)),
                 waveform_color=str(data.get("waveform_color", AppConfig.waveform_color)),
+                waveform_color_mode=str(
+                    data.get("waveform_color_mode", AppConfig.waveform_color_mode)
+                ),
+                waveform_color_absolute=bool(
+                    data.get("waveform_color_absolute", AppConfig.waveform_color_absolute)
+                ),
                 player_waveform_half=bool(
                     data.get("player_waveform_half", AppConfig.player_waveform_half)
                 ),
@@ -527,6 +545,8 @@ def load_config() -> AppConfig:
             cfg.spectrum_dynamic_range = max(60.0, min(cfg.spectrum_dynamic_range, 150.0))
             if not _HEX_COLOR_RE.match(cfg.waveform_color):
                 cfg.waveform_color = AppConfig.waveform_color
+            if cfg.waveform_color_mode not in WAVEFORM_COLOR_MODES:
+                cfg.waveform_color_mode = AppConfig.waveform_color_mode
             if cfg.visualization_mode not in _VALID_VIS_MODES:
                 cfg.visualization_mode = AppConfig.visualization_mode
             if cfg.duplicate_policy not in _VALID_DUPLICATE_POLICIES:

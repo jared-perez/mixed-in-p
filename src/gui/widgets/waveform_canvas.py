@@ -13,7 +13,7 @@ from __future__ import annotations
 import numpy as np
 
 from PySide6.QtCore import Qt, QLineF, QPoint, Signal
-from PySide6.QtGui import QColor, QPainter, QPen, QPolygon
+from PySide6.QtGui import QColor, QImage, QPainter, QPen, QPixmap, QPolygon
 from PySide6.QtWidgets import QWidget
 
 from ..styles.theme import Theme
@@ -35,6 +35,13 @@ def _half_envelope(min_arr: np.ndarray, max_arr: np.ndarray) -> np.ndarray:
     return np.maximum(np.maximum(max_arr, -min_arr), 0.0)
 
 
+def _usable_colors(colors: np.ndarray | None, n: int) -> np.ndarray | None:
+    """*colors* if it is one RGB row per waveform column, else None (solid)."""
+    if colors is None or len(colors) != n:
+        return None
+    return colors
+
+
 class WaveformCanvas(QWidget):
     """Custom-painted waveform with draggable start/end markers and playhead."""
 
@@ -54,7 +61,13 @@ class WaveformCanvas(QWidget):
         self._max_arr: np.ndarray | None = None
         self._dragging: str | None = None  # 'start' | 'end' | 'position'
         self._waveform_color = QColor(Theme.NEON_YELLOW)
+        # Per-column RGB (N, 3) uint8 from waveform_palette, or None for solid.
+        self._column_colors: np.ndarray | None = None
         self._half: bool = False
+        # The waveform body, rendered once and blitted on every position tick.
+        # Rebuilt when its key (size, dpr) goes stale or an input changes.
+        self._cache: QPixmap | None = None
+        self._cache_key: tuple | None = None
         self.setMinimumHeight(_FULL_MIN_HEIGHT)
         self.setMouseTracking(True)
         # Take focus on click so the parent's keyboard shortcuts work
@@ -114,14 +127,20 @@ class WaveformCanvas(QWidget):
         """Install downsampled min/max arrays (produced by WaveformWorker)."""
         self._min_arr = min_arr
         self._max_arr = max_arr
-        self.update()
+        self._invalidate()
 
     def set_waveform_color(self, color: str) -> None:
         """Set the waveform body color (#RRGGBB). The playhead stays white."""
         c = QColor(color)
         if c.isValid():
             self._waveform_color = c
-            self.update()
+            self._invalidate()
+
+    def set_column_colors(self, colors: np.ndarray | None) -> None:
+        """Colour each waveform column: ``(N, 3)`` uint8 RGB aligned with the
+        min/max arrays, or None to draw the whole body in the waveform color."""
+        self._column_colors = colors
+        self._invalidate()
 
     def set_half(self, half: bool) -> None:
         """Draw only the top half (from Settings), in half the height."""
@@ -131,7 +150,7 @@ class WaveformCanvas(QWidget):
         self._half = half
         self.setMinimumHeight(_FULL_MIN_HEIGHT // 2 if half else _FULL_MIN_HEIGHT)
         self.updateGeometry()
-        self.update()
+        self._invalidate()
 
     def is_half(self) -> bool:
         return self._half
@@ -143,7 +162,13 @@ class WaveformCanvas(QWidget):
         self._position_ms = 0
         self._min_arr = None
         self._max_arr = None
+        self._column_colors = None
         self._dragging = None
+        self._invalidate()
+
+    def _invalidate(self) -> None:
+        self._cache = None
+        self._cache_key = None
         self.update()
 
     # ----------------------------------------------------------- coord maps
@@ -182,9 +207,14 @@ class WaveformCanvas(QWidget):
                 band.setAlpha(32)
                 p.fillRect(sx, 0, ex - sx, h, band)
 
-            # Waveform (filled, neon yellow)
+            # Waveform body, from the cache
             if self._min_arr is not None and self._max_arr is not None and len(self._min_arr):
-                self._draw_waveform(p, w, h)
+                dpr = self.devicePixelRatioF()
+                key = (w, h, dpr)
+                if self._cache is None or self._cache_key != key:
+                    self._cache = self._render_waveform(w, h, dpr)
+                    self._cache_key = key
+                p.drawPixmap(0, 0, self._cache)
 
             # Axis line: the centre, or the baseline in half view
             axis_y = h - 1 if self._half else h // 2
@@ -202,26 +232,58 @@ class WaveformCanvas(QWidget):
         finally:
             p.end()
 
-    def _draw_waveform(self, p: QPainter, w: int, h: int) -> None:
+    def _render_waveform(self, w: int, h: int, dpr: float) -> QPixmap:
+        """The waveform body as a transparent pixmap at physical resolution.
+
+        Built with numpy rather than a drawLine per column: the canvas repaints
+        on every position tick, and a blit is ~11x cheaper than the loop (and
+        per-column colour would otherwise mean a setPen per column).
+        """
+        pw = max(1, int(round(w * dpr)))
+        ph = max(1, int(round(h * dpr)))
         n = len(self._min_arr)
-        pen = QPen(self._waveform_color, 1)
-        p.setPen(pen)
+        # Max/min over each physical column's bins, so a narrow canvas keeps
+        # its transients; a wide one repeats bins. reduceat reduces over
+        # [starts[i], starts[i+1]) and returns a[starts[i]] for equal starts.
+        starts = np.minimum((np.arange(pw, dtype=np.int64) * n) // pw, n - 1)
+        seg_max = np.maximum.reduceat(self._max_arr, starts)
+        seg_min = np.minimum.reduceat(self._min_arr, starts)
+
+        # Geometry in logical pixels, as the old per-line painter drew it.
         if self._half:
             # Rise from a baseline at the bottom edge (2px padding at the top).
-            base = h - 1
-            amp = h - 3
-            peaks = _half_envelope(self._min_arr, self._max_arr)
-            for x in range(w):
-                bin_idx = min(int(x * n / w), n - 1)
-                p.drawLine(x, int(base - peaks[bin_idx] * amp), x, base)
-            return
-        mid = h / 2
-        amp = (h - 4) / 2  # leave 2px padding top/bottom
-        for x in range(w):
-            bin_idx = min(int(x * n / w), n - 1)
-            y_top = int(mid - self._max_arr[bin_idx] * amp)
-            y_bot = int(mid - self._min_arr[bin_idx] * amp)
-            p.drawLine(x, y_top, x, y_bot)
+            y_bot = np.full(pw, h - 1.0)
+            y_top = y_bot - _half_envelope(seg_min, seg_max) * (h - 3)
+        else:
+            mid = h / 2
+            amp = (h - 4) / 2  # leave 2px padding top/bottom
+            y_top = mid - seg_max * amp
+            y_bot = mid - seg_min * amp
+        # A logical row covers dpr physical rows; fill all of the bottom one.
+        top = np.clip(np.floor(y_top.astype(np.int64) * dpr), 0, ph - 1).astype(np.int64)
+        bot = np.floor((y_bot.astype(np.int64) + 1) * dpr) - 1
+        bot = np.clip(np.maximum(bot, top), 0, ph - 1).astype(np.int64)
+        rows = np.arange(ph)[:, None]
+        mask = (rows >= top[None, :]) & (rows <= bot[None, :])
+
+        colors = _usable_colors(self._column_colors, n)
+        if colors is None:
+            c = self._waveform_color
+            rgb = np.broadcast_to(
+                np.array([c.red(), c.green(), c.blue()], dtype=np.uint8), (pw, 3)
+            )
+        else:
+            rgb = colors[starts]
+        # Format_ARGB32 is B, G, R, A in memory on every platform Qt ships on.
+        buf = np.zeros((ph, pw, 4), dtype=np.uint8)
+        buf[..., 0] = np.where(mask, rgb[None, :, 2], 0)
+        buf[..., 1] = np.where(mask, rgb[None, :, 1], 0)
+        buf[..., 2] = np.where(mask, rgb[None, :, 0], 0)
+        buf[..., 3] = np.where(mask, 255, 0)
+        image = QImage(buf.data, pw, ph, pw * 4, QImage.Format.Format_ARGB32).copy()
+        pixmap = QPixmap.fromImage(image)
+        pixmap.setDevicePixelRatio(dpr)
+        return pixmap
 
     @staticmethod
     def _draw_marker(p: QPainter, x: int, h: int, color: QColor, _letter: str) -> None:
@@ -318,6 +380,12 @@ class ZoomedWaveformCanvas(QWidget):
         self._drag_anchor_position_ms: int = 0
         self._drag_ms_per_px: float = 0.0
         self._half: bool = False
+        self._waveform_color = QColor(Theme.NEON_YELLOW)
+        # The overview's per-column RGB (see WaveformCanvas.set_column_colors),
+        # sampled by time: colour is necessarily far coarser than this view's
+        # shape (a band needs a ~23 ms window to see bass), and reusing the
+        # overview's costs nothing at load.
+        self._column_colors: np.ndarray | None = None
         self.setMinimumHeight(_ZOOM_FULL_MIN_HEIGHT)
         self.setMouseTracking(True)
 
@@ -327,6 +395,18 @@ class ZoomedWaveformCanvas(QWidget):
         self._min_arr = min_arr
         self._max_arr = max_arr
         self._bins_per_sec = float(bins_per_sec)
+        self.update()
+
+    def set_waveform_color(self, color: str) -> None:
+        """Set the waveform body color (#RRGGBB) used where there are no column colours."""
+        c = QColor(color)
+        if c.isValid():
+            self._waveform_color = c
+            self.update()
+
+    def set_column_colors(self, colors: np.ndarray | None) -> None:
+        """The overview's per-column RGB, spread over the whole track, or None for solid."""
+        self._column_colors = colors
         self.update()
 
     def setRange(self, lo: int, hi: int) -> None:  # noqa: ARG002 (lo always 0)
@@ -377,6 +457,7 @@ class ZoomedWaveformCanvas(QWidget):
         self._min_arr = None
         self._max_arr = None
         self._bins_per_sec = 0.0
+        self._column_colors = None
         self._dragging = False
         self.update()
 
@@ -499,10 +580,29 @@ class ZoomedWaveformCanvas(QWidget):
             y_bot = mid - seg_min * amp
         xs = np.arange(cols) / dpr
 
-        pen = QPen(QColor(Theme.NEON_YELLOW))
+        pen = QPen(self._waveform_color)
         pen.setCosmetic(True)  # 1 physical pixel wide regardless of DPI
-        p.setPen(pen)
-        p.drawLines([QLineF(x, t, x, b) for x, t, b in zip(xs, y_top, y_bot)])
+        colors = self._column_colors
+        if colors is None or not len(colors) or self._duration_ms <= 0:
+            p.setPen(pen)
+            p.drawLines([QLineF(x, t, x, b) for x, t, b in zip(xs, y_top, y_bot)])
+            return
+        # Each physical column takes the colour of the overview column its
+        # time falls in. Only ~20 distinct ones cross a 1 s window, so draw one
+        # run of same-coloured lines per setPen, never a setPen per column.
+        n_colors = len(colors)
+        ms = (start_bin + starts) / bins_per_ms
+        idx = np.clip((ms * n_colors / self._duration_ms).astype(np.int64), 0, n_colors - 1)
+        breaks = np.flatnonzero(np.diff(idx)) + 1
+        bounds = np.concatenate(([0], breaks, [cols]))
+        for a, b in zip(bounds[:-1], bounds[1:]):
+            r, g, bl = colors[idx[a]]
+            pen.setColor(QColor(int(r), int(g), int(bl)))
+            p.setPen(pen)
+            p.drawLines([
+                QLineF(x, t, x, bt)
+                for x, t, bt in zip(xs[a:b], y_top[a:b], y_bot[a:b])
+            ])
 
     # ------------------------------------------------------------- mouse
 

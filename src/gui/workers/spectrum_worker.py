@@ -14,7 +14,7 @@ import numpy as np
 from PySide6.QtCore import QObject, Signal, Slot
 from PySide6.QtGui import QImage
 
-from .waveform_worker import WaveformWorker
+from .waveform_worker import WaveformWorker, mono_mix
 
 logger = logging.getLogger(__name__)
 
@@ -109,7 +109,7 @@ class SpectrumWorker(QObject):
         if n_samples == 0 or sr <= 0:
             raise ValueError("Empty audio")
 
-        mono = pcm.mean(axis=1).astype(np.float32)
+        mono = mono_mix(pcm)
         duration_ms = int(round(n_samples * 1000 / sr))
 
         n_fft = cls.N_FFT
