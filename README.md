@@ -7,12 +7,12 @@ The full audio file preparation workflow for DJs.
 ## Features
 
 - Batch file renaming with undo
-- Audio conversion (MP3/WAV/FLAC/AIFF) — quality is only ever kept or lowered, including same-format downgrades (96k/24-bit FLAC → 44.1k/16-bit FLAC), writing beside each source or into a folder of your choosing, toggled per batch
-- Pipeline — mark any of Rename, Convert and Analyze with its step toggle and one press runs a batch through the marked steps in order, filing each track into a playlist as it lands; start it from whichever marked panel you like, and pick an existing playlist or type a name and one gets made
-- Acoustic spectrum analyzer
-- Audio Player + Slicer for sample lifting, with a metronome beside them — tap tempo, take the loaded track's tempo, time-bend, 2-decimal BPM, a choice of click (silent, tick, or a sharper beep), and a Global Click that keeps it sounding while you work on other panels
-- Playlist library — folders, saved playlists, a name filter for the tree, search across every playlist at once, export to `.m3u8`/`.m3u`/tracklist, and Shift+Tab to show or hide the tree from anywhere
-- Playlist view you can shape — cover art in the list (top / middle / full sleeve), optional Album, Genre, Track #, Label, Bitrate, Energy, Date Added, Date Created, Format and Bit Depth columns, a per-column Fit to Longest, and Small/Medium/Large text
+- Audio conversion (MP3/WAV/FLAC/AIFF) — quality is only ever kept or lowered, including same-format downgrades (96k/24-bit FLAC → 44.1k/16-bit FLAC) and MP3 to a lower-bitrate MP3, writing beside each source or into a folder of your choosing, toggled per batch
+- Pipeline — mark any of Rename, Convert and Analyze with its step toggle and one press runs a batch through the marked steps in order, filing each track into a playlist as it lands; start it from whichever marked panel you like (or just drop files on Analyze with its step lit), and pick an existing playlist or type a name and one gets made
+- Acoustic spectrum analyzer, with a Split Screen to compare two files side by side
+- Audio Player + Slicer for sample lifting, with a Mark on beat switch that snaps marks, jumps and loop starts to the metronome's next click, and a metronome beside them — tap tempo, take the loaded track's tempo, time-bend, 2-decimal BPM, a choice of click (silent, tick, or a sharper beep), and a Global Click that keeps it sounding while you work on other panels
+- Playlist library — folders, saved playlists, a name filter for the tree, search across every playlist at once, export to `.m3u8`/`.m3u`/tracklist, Shift+Tab to show or hide the tree from anywhere, and a split view that shows the tree and the panel buttons side by side
+- Playlist view you can shape — cover art in the list (top / middle / full sleeve), optional Album, Genre, Track #, Label, Bitrate, Energy, Date Added, Date Created, Format and Bit Depth columns, a per-column Fit to Longest, Small/Medium/Large text, and a dropped image on the playing track's cover to set its artwork
 - Compatible Tracks — what else in your library mixes with the track in the player, ranked by key, tempo (half- and double-time count) and energy, with click-and-hold preview
 - "Open with Mixed in P" from Finder or Explorer, and an option to become your default audio player
 - Keyboard to play chords for key comparison
@@ -21,11 +21,12 @@ The full audio file preparation workflow for DJs.
 - Energy level detection — written to the comment, to its own tag field, or both
 - Live analysis queue with per-track status, and a Cancel that keeps the results already in
 - Freeze toggle — analyze and read the results without writing anything to your files
-- Auto-write metadata to file tags & Manual metadata editing, with the full path of the file you're editing and a jump to it in Finder/Explorer
+- Auto-write metadata to file tags & Manual metadata editing (WAVs open read-only, since the format can't hold tags), with the full path of the file you're editing and a jump to it in Finder/Explorer
 - Online lookup (opt-in) — fill in title, artist, album, label, genre, year, track number and cover art from Discogs, one file or a whole selection, with every value reviewed before anything is written, and the right pressing and track picked when there is more than one. Off by default; BPM, key and energy always come from your own analysis
 - Remembers which Discogs release a file was tagged from, so a second look opens on the one you approved — and keeps that release on its own tab, offline, to read or apply a field at a time; plus a cover-only search for when the tags are already right
-- Player visualizations — nine of them behind the playlist, seven of which also open in their own window, including a nebula tunnel that turns on the beat of the track it is playing
-- Dark/Light modes and waveform color customization
+- Player visualizations — nine of them behind the playlist, seven of which also open in their own window, including three fractals and a nebula tunnel that turns on the beat of the track it is playing
+- Five color themes, and waveforms colored by loudness, frequency band or tone, drawn as a half or full wave
+- Settings with a keyboard-shortcut table, a Show Log File button for bug reports, and Reset to Default
 
 ## Install
 
@@ -54,7 +55,11 @@ Or use the launcher scripts:
 ```bash
 mixed-in-p analyze path/to/music/
 mixed-in-p rename path/to/music/ --add-bpm --add-key
+# from a checkout
+python -m src.main --cli analyze path/to/music/
 ```
+
+The CLI uses the app's default tempo range (99–199 BPM), not your saved Settings; change it with `--min-bpm` / `--max-bpm`.
 
 ## Build
 
