@@ -50,9 +50,11 @@ os.environ["QT_LOGGING_RULES"] = (
 def main():
     """Main entry point."""
     if "--cli" in sys.argv:
-        # Run CLI mode
+        # Run CLI mode. --cli picks the mode and is not a CLI argument, so it
+        # is taken out: left in, argparse refused every command with
+        # "unrecognized arguments: --cli".
         from src.cli import main as cli_main
-        sys.exit(cli_main())
+        sys.exit(cli_main([a for a in sys.argv[1:] if a != "--cli"]))
     else:
         # Run GUI mode
         from src.gui import run_app

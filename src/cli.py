@@ -21,8 +21,12 @@ from .analysis.analyzer import (
 from .analysis.keycode import get_compatible_keys
 
 
-def main():
-    """Main entry point for the CLI."""
+def main(argv: list[str] | None = None):
+    """Main entry point for the CLI.
+
+    argv defaults to sys.argv[1:]. src.main passes its own arguments with
+    the --cli switch taken out, since that switch is not the CLI's own.
+    """
     parser = argparse.ArgumentParser(
         prog="mixed-in-p",
         description="Analyze audio files for BPM and musical key detection",
@@ -273,7 +277,7 @@ def main():
         help="List planned conversions (and blocked/skipped files) without writing",
     )
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     if args.command is None:
         parser.print_help()
