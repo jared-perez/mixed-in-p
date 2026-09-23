@@ -5,35 +5,34 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="151"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="153"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
         <source>docs</source>
         <translatorcomment>Native script for a non-Latin UI (cf. sample/slicer rule).</translatorcomment>
-        <translation>문서</translation>
+        <translation type="vanished">문서</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="146"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
         <source>Jared P presents</source>
         <translatorcomment>Left in English as a proper-name credit line (creator name). Could be rendered &quot;Jared P 제공&quot; if a localized credit is preferred. Flag for native review.</translatorcomment>
         <translation>Jared P presents</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="163"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>&quot;toolkit&quot; → 툴킷 (standard loanword). Noun-phrase tagline.</translatorcomment>
         <translation>DJ 오디오 분석 툴킷</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="174"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="176"/>
         <source>Version {0}</source>
         <translation>버전 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="183"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="185"/>
         <source>Check for updates</source>
         <translation>업데이트 확인</translation>
     </message>
@@ -63,12 +62,12 @@ Features:
   - 스펙트럼 분석기</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="244"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="246"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>지원 형식: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="263"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="265"/>
         <source>Find Your Way Around</source>
         <translatorcomment>Section heading → noun phrase &quot;둘러보기&quot; (Apple-style &quot;take a look around&quot;). Flag for native review.</translatorcomment>
         <translation>둘러보기</translation>
@@ -84,67 +83,72 @@ Features:
         <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;파일을 아무 패널에나 끌어다 놓으면 시작돼요.&lt;br&gt;사이드바는 탐색만을 위한 것이 아니에요 — 버튼 위로&lt;br&gt;파일을 끌어다 놓아 원하는 패널로 보낼 수 있어요.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;이름 변경&lt;/span&gt; — 먼저 파일명을 정리해요&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;다듬기, 접두사 추가, 적용 전 미리 보기&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;변환&lt;/span&gt; — 형식을 바꿔요&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;분석&lt;/span&gt; — BPM, 조성, 에너지를 감지해요&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;태그 자동 기록 + 이름 변경을 한 번에&lt;/span&gt;&lt;br&gt;&lt;br&gt;패널의 &lt;span style=&quot;color: {y};&quot;&gt;파이프라인&lt;/span&gt; 단계를 켜면 한 묶음을 한 번에 처리할 수 있어요.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="276"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="278"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Split from its final sentence only so the pipeline step&apos;s hazard-triangle icon can be drawn between the two; no wording changed. This translation is the previous one with that sentence moved to the string below.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;파일을 아무 패널에나 끌어다 놓으면 시작돼요.&lt;br&gt;사이드바는 탐색만을 위한 것이 아니에요 — 버튼 위로&lt;br&gt;파일을 끌어다 놓아 원하는 패널로 보낼 수 있어요.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;이름 변경&lt;/span&gt; — 먼저 파일명을 정리해요&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;다듬기, 접두사 추가, 적용 전 미리 보기&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;변환&lt;/span&gt; — 형식을 바꿔요&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;분석&lt;/span&gt; — BPM, 조성, 에너지를 감지해요&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;태그 자동 기록 + 이름 변경을 한 번에&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="343"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
         <translatorcomment>The closing sentence of slide 2, moved into its own string so the step toggle&apos;s triangle can sit above it. Wording unchanged — spliced verbatim from the previous translation.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;패널의 &lt;span style=&quot;color: {y};&quot;&gt;파이프라인&lt;/span&gt; 단계를 켜면 한 묶음을 한 번에 처리할 수 있어요.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="385"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="387"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Slide 3&apos;s SLICE blurb was replaced by the Discogs one; the rest of this string is the old translation, spliced back verbatim. DISCOGS stays in Latin script in every language (brand name), and {credit} is the untranslated attribution constant — leave the placeholder alone.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — 파일에 빠진 정보를 채워요.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;메타데이터 화면에서 릴리스를 찾아&lt;br&gt;아티스트, 앨범, 레이블, 발매 연도, 커버를 가져와요.&lt;br&gt;쓰기 전에 모든 항목을 확인할 수 있어요.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;메타데이터&lt;/span&gt; — 파일을 끌어다 놓고 태그를 편집해요.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;다른 곳으로 이동하면 자동 저장돼요.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;건반&lt;/span&gt; — 원하는 조성으로 음을 연주해요.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;참고용 하모닉 키 스트립이 바로 옆에 있어요.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;스펙트럼&lt;/span&gt; — 음향 스펙트럼 분석기.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;오디오 품질을 시각적으로 표현해요.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;설정&lt;/span&gt; — BPM 범위, 조성 형식,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;자동 이름 변경 규칙.&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="432"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="434"/>
         <source>click for more</source>
         <translatorcomment>Compact hint → noun phrase &quot;자세히 보기&quot; (see more), avoiding an imperative. Flag for native review.</translatorcomment>
         <translation>자세히 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="453"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="455"/>
         <source>Checking…</source>
         <translation>확인 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="477"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="479"/>
         <source>You&apos;re on the latest version</source>
         <translation>최신 버전을 사용 중입니다</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="481"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="483"/>
         <source>Download</source>
         <translation>다운로드</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="482"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="484"/>
         <source>Update available: {0}</source>
         <translation>업데이트가 있습니다: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="490"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="492"/>
         <source>see all releases</source>
         <translation>모든 릴리스 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="491"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="493"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>업데이트를 확인할 수 없습니다</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="366"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="368"/>
         <source>The Rest of the Kit</source>
         <translatorcomment>Section heading → noun phrase &quot;나머지 기능&quot; (the rest of the features). Flag for native review.</translatorcomment>
         <translation>나머지 기능</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="222"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="123"/>
+        <source>Guide</source>
+        <translation>가이드</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="224"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 

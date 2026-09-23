@@ -5,23 +5,22 @@
     <name>AboutDialog</name>
     <message>
         <location filename="../widgets/dialogs/about_dialog.py" line="112"/>
-        <location filename="../widgets/dialogs/about_dialog.py" line="151"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="153"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="121"/>
         <source>docs</source>
         <translatorcomment>Kept in English: ubiquitous software borrowing in a Latin-script UI (cf. sample/slicer rule).</translatorcomment>
-        <translation>docs</translation>
+        <translation type="vanished">docs</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="146"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="148"/>
         <source>Jared P presents</source>
         <translation>Jared P presenteert</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="161"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="163"/>
         <source>DJ Audio Analysis Toolkit</source>
         <translatorcomment>Kept &apos;toolkit&apos; (compound &apos;Audio-analysetoolkit&apos;) as it reads naturally to Dutch users; &apos;toolkit&apos; is common in NL.</translatorcomment>
         <translation>DJ Audio-analysetoolkit</translation>
@@ -58,12 +57,12 @@ Functies:
         <translation type="vanished">Versie 1.3.0</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="174"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="176"/>
         <source>Version {0}</source>
         <translation>Versie {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="183"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="185"/>
         <source>Check for updates</source>
         <translation>Controleren op updates</translation>
     </message>
@@ -93,12 +92,12 @@ Functies:
   - Spectrumanalyser</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="244"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="246"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>Ondersteunde formaten: MP3, WAV, FLAC, AIFF, M4A, OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="263"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="265"/>
         <source>Find Your Way Around</source>
         <translation>Vind je weg</translation>
     </message>
@@ -112,65 +111,70 @@ Functies:
         <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Sleep je bestanden op een willekeurig paneel om te beginnen.&lt;br&gt;De zijbalk is niet alleen voor navigatie — je kunt&lt;br&gt;bestanden direct op de knoppen slepen om ze te routeren.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;HERNOEMEN&lt;/span&gt; — Ruim eerst bestandsnamen op&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;inkorten, prefix, voorbeeld vóór je bevestigt&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTEREN&lt;/span&gt; — Wissel van formaat&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSEREN&lt;/span&gt; — Detecteert BPM, toonsoort &amp;amp; energie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;schrijft tags automatisch + hernoemt in één keer&lt;/span&gt;&lt;br&gt;&lt;br&gt;Zet de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt;-stap van een paneel aan om een batch in één keer door te sturen.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="276"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="278"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Split from its final sentence only so the pipeline step&apos;s hazard-triangle icon can be drawn between the two; no wording changed. This translation is the previous one with that sentence moved to the string below.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Sleep je bestanden op een willekeurig paneel om te beginnen.&lt;br&gt;De zijbalk is niet alleen voor navigatie — je kunt&lt;br&gt;bestanden direct op de knoppen slepen om ze te routeren.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;HERNOEMEN&lt;/span&gt; — Ruim eerst bestandsnamen op&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;inkorten, prefix, voorbeeld vóór je bevestigt&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERTEREN&lt;/span&gt; — Wissel van formaat&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYSEREN&lt;/span&gt; — Detecteert BPM, toonsoort &amp;amp; energie&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;schrijft tags automatisch + hernoemt in één keer&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="341"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="343"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
         <translatorcomment>The closing sentence of slide 2, moved into its own string so the step toggle&apos;s triangle can sit above it. Wording unchanged — spliced verbatim from the previous translation.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Zet de &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt;-stap van een paneel aan om een batch in één keer door te sturen.&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="385"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="387"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Slide 3&apos;s SLICE blurb was replaced by the Discogs one; the rest of this string is the old translation, spliced back verbatim. DISCOGS stays in Latin script in every language (brand name), and {credit} is the untranslated attribution constant — leave the placeholder alone.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Vul aan wat een bestand mist.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Zoek de release op vanuit het Metadata-paneel en&lt;br&gt;haal artiest, album, label, jaar en hoes op.&lt;br&gt;Controleer elk veld voordat er iets wordt geschreven.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Sleep een bestand erin, bewerk de tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Slaat automatisch op als je verdergaat.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;TOETSENBORD&lt;/span&gt; — Speel noten in elke toonsoort.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonische key strip direct als referentie.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Akoestische spectrumanalyser.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visuele weergave van de audiokwaliteit.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;INSTELLINGEN&lt;/span&gt; — BPM-bereik, toonsoortformaat,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;regels voor automatisch hernoemen.&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="432"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="434"/>
         <source>click for more</source>
         <translation>klik voor meer</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="453"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="455"/>
         <source>Checking…</source>
         <translation>Bezig met controleren…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="477"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="479"/>
         <source>You&apos;re on the latest version</source>
         <translation>Je gebruikt de nieuwste versie</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="481"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="483"/>
         <source>Download</source>
         <translation>Downloaden</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="482"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="484"/>
         <source>Update available: {0}</source>
         <translation>Update beschikbaar: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="490"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="492"/>
         <source>see all releases</source>
         <translation>alle versies bekijken</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="491"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="493"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>Kan niet op updates controleren</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="366"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="368"/>
         <source>The Rest of the Kit</source>
         <translation>De rest van de kit</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="222"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="123"/>
+        <source>Guide</source>
+        <translation>Handleiding</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="224"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 

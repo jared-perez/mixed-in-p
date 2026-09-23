@@ -115,14 +115,16 @@ class AboutDialog(QDialog):
             )
         image_layout.addWidget(self._image_page)
 
-        # Docs link under the icon. setOpenExternalLinks routes the click to the
-        # user's default browser. The label is pulled into its own tr() call
-        # because lupdate does not extract tr() nested inside an f-string field.
-        docs_label = self.tr("docs")
+        # Guide link under the icon: the plain-language tour of the app, which
+        # itself links on to the full docs. setOpenExternalLinks routes the
+        # click to the user's default browser. The label is pulled into its own
+        # tr() call because lupdate does not extract tr() nested inside an
+        # f-string field.
+        guide_label = self.tr("Guide")
         link = QLabel(
-            '<a href="https://jared-perez.github.io/mixed-in-p/docs/"'
+            '<a href="https://jared-perez.github.io/mixed-in-p/guide/"'
             f' style="color: {Theme.NEON_YELLOW}; text-decoration: none;">'
-            f"{docs_label}</a>"
+            f"{guide_label}</a>"
         )
         link.setAlignment(Qt.AlignmentFlag.AlignCenter)
         link.setOpenExternalLinks(True)
@@ -201,7 +203,7 @@ class AboutDialog(QDialog):
 
         # Result / progress text. Hidden until a check starts. Rich text so the
         # "available" and "error" states can embed a browser link (like the
-        # docs link above). Links open externally; non-link clicks fall through
+        # guide link above). Links open externally; non-link clicks fall through
         # to the dialog and cycle the slide, which is fine.
         self._update_status = QLabel()
         self._update_status.setAlignment(Qt.AlignmentFlag.AlignCenter)
