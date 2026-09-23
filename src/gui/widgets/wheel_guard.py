@@ -63,7 +63,7 @@ combo popup is a separate window whose list still scrolls normally.
 
 from __future__ import annotations
 
-from PySide6.QtCore import QPointF, Qt
+from PySide6.QtCore import QPoint, QPointF, Qt
 from PySide6.QtGui import QWheelEvent
 from PySide6.QtWidgets import QAbstractScrollArea, QApplication, QSlider, QSpinBox
 
@@ -123,3 +123,81 @@ class NoWheelSpinBox(WheelGuardMixin, QSpinBox):
 
 class NoWheelSlider(WheelGuardMixin, QSlider):
     """A ``QSlider`` that a page scroll passes straight over."""
+
+
+class AxisLockedWheelMixin:
+    """Mix in ahead of a scroll area nested in a scrolling page.
+
+    A trackpad swipe is never perfectly straight, and Qt routes each wheel
+    event by its *dominant* axis. A long downward swipe over a table that has
+    both scroll bars therefore runs the rows down, and once they are at the
+    bottom the vertical bar ignores the rest -- except the momentum tail's
+    events, whose shrinking y is soon outweighed by sideways drift, and those
+    the horizontal bar accepts. Meanwhile ``QApplication`` has latched the
+    whole gesture onto this widget (the first accepted event of a phased
+    sequence claims every later one, with no propagation), so the page never
+    gets a turn: the swipe crawls the columns to the far right instead.
+
+    So the axis is decided once per gesture, by its first moving event, and
+    the other axis is dropped for the rest of it. A vertical gesture the rows
+    can no longer take is handed to the enclosing page, exactly as
+    ``WheelGuardMixin`` hands on a control's; a horizontal one stops at the
+    edge, since the page has no sideways scroll to give it. A mouse wheel
+    (``NoScrollPhase``) has no gesture, so each notch is judged alone and
+    Shift+wheel still scrolls sideways.
+    """
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._wheel_axis: Qt.Orientation | None = None
+
+    def _scrolling_ancestor(self) -> QAbstractScrollArea | None:
+        return WheelGuardMixin._scrolling_ancestor(self)
+
+    def wheelEvent(self, event) -> None:  # noqa: N802 - Qt naming
+        phase = event.phase()
+        if phase == Qt.ScrollPhase.ScrollBegin:
+            self._wheel_axis = None
+        angle = event.angleDelta()
+        pixel = event.pixelDelta()
+        dx = angle.x() or pixel.x()
+        dy = angle.y() or pixel.y()
+        dominant = Qt.Orientation.Horizontal if abs(dx) > abs(dy) else Qt.Orientation.Vertical
+        if phase == Qt.ScrollPhase.NoScrollPhase:
+            axis = dominant
+        else:
+            if self._wheel_axis is None and (dx or dy):
+                self._wheel_axis = dominant
+            axis = self._wheel_axis or dominant
+        vertical = axis == Qt.Orientation.Vertical
+        straight = QWheelEvent(
+            event.position(),
+            event.globalPosition(),
+            QPoint(0, pixel.y()) if vertical else QPoint(pixel.x(), 0),
+            QPoint(0, angle.y()) if vertical else QPoint(angle.x(), 0),
+            event.buttons(),
+            event.modifiers(),
+            phase,
+            event.inverted(),
+            event.source(),
+        )
+        straight.ignore()
+        super().wheelEvent(straight)
+        if vertical and not straight.isAccepted():
+            area = self._scrolling_ancestor()
+            if area is not None:
+                viewport = area.viewport()
+                QApplication.sendEvent(viewport, QWheelEvent(
+                    QPointF(self.mapTo(viewport, event.position().toPoint())),
+                    event.globalPosition(),
+                    straight.pixelDelta(),
+                    straight.angleDelta(),
+                    event.buttons(),
+                    event.modifiers(),
+                    phase,
+                    event.inverted(),
+                    event.source(),
+                ))
+        # Always accepted: this gesture is dealt with here or by the page we
+        # handed it to, and must not be delivered to the page a second time.
+        event.accept()

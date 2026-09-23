@@ -177,7 +177,7 @@ from .compatible_panel import CompatibleTracksPanel
 from .player_engine import PlayerEngine
 from .metronome_section import MetronomeSection
 from .slice_section import SliceSection
-from .wheel_guard import NoWheelSlider
+from .wheel_guard import AxisLockedWheelMixin, NoWheelSlider
 
 logger = logging.getLogger(__name__)
 
@@ -842,7 +842,7 @@ class SeparatorHeaderView(QHeaderView):
         painter.restore()
 
 
-class ReorderableTableWidget(RubberBandSelectMixin, QTableWidget):
+class ReorderableTableWidget(AxisLockedWheelMixin, RubberBandSelectMixin, QTableWidget):
     """QTableWidget with internal drag-drop row reordering and external file drops.
 
     The RubberBandSelectMixin adds drag-a-box selection from empty space (the
