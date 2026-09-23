@@ -33,6 +33,8 @@ from ...online import discogs
 from ...utils import default_app
 from ...utils.config import AppConfig
 from ...utils.i18n import LANGUAGES
+from ...utils.reveal import reveal_in_file_manager
+from ..app import log_file_path
 from ..styles.theme import THEMES, Theme
 
 logger = logging.getLogger(__name__)
@@ -839,6 +841,36 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(playlist_frame)
 
+        # ── Section: Troubleshooting ────────────────────────────────────────
+        # The installed build has no console, so the log file is the only
+        # record of what happened; this makes "send me your log" one click
+        # instead of a path to type into Finder or Explorer.
+        outer.addWidget(self._make_section_label(self.tr("Troubleshooting")))
+
+        log_frame = QFrame()
+        log_frame.setObjectName("settingsSection")
+        log_layout = QVBoxLayout(log_frame)
+        log_layout.setContentsMargins(16, 10, 16, 10)
+        log_layout.setSpacing(8)
+
+        self._show_log_btn = QPushButton(self.tr("Show Log File"))
+        self._show_log_btn.clicked.connect(self._on_show_log_clicked)
+        log_row = self._row_layout()
+        log_row.addWidget(self._show_log_btn)
+        log_row.addStretch(1)
+        log_layout.addLayout(log_row)
+
+        log_hint = QLabel(
+            self.tr("Selects the app's log in File Explorer. Attach it when you report a problem.")
+            if sys.platform == "win32"
+            else self.tr("Selects the app's log in Finder. Attach it when you report a problem.")
+        )
+        log_hint.setObjectName("settingsHint")
+        log_hint.setWordWrap(True)
+        log_layout.addWidget(log_hint)
+
+        outer.addWidget(log_frame)
+
         # ── Section: Reset to Default ───────────────────────────────────────
         # Last on the page, because everything above it is what this undoes.
         outer.addWidget(self._make_section_label(self.tr("Reset to Default")))
@@ -988,6 +1020,26 @@ class SettingsPanel(QWidget):
     def _on_token_help_clicked(self) -> None:
         """Open the Discogs page where a personal token is generated."""
         QDesktopServices.openUrl(QUrl(discogs.TOKEN_PAGE_URL))
+
+    def _on_show_log_clicked(self) -> None:
+        """Reveal the log file, else open its folder, else say there is none.
+
+        The file is normally there (setup_logging creates it at launch), but
+        a user may have cleared the folder, and a button that does nothing
+        is exactly the report this section exists to answer.
+        """
+        path = log_file_path()
+        if reveal_in_file_manager(str(path)):
+            logger.info("Show log file: revealed %s", path)
+            return
+        if path.parent.is_dir():
+            logger.info("Show log file: %s missing, opened its folder", path)
+            QDesktopServices.openUrl(QUrl.fromLocalFile(str(path.parent)))
+            return
+        logger.warning("Show log file: no log folder at %s", path.parent)
+        QMessageBox.information(
+            self, self.tr("Show Log File"), self.tr("No log has been written yet.")
+        )
 
     def _on_make_default_clicked(self) -> None:
         """Ask the OS, then say only what actually happened.
