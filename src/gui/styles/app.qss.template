@@ -946,6 +946,13 @@ QLineEdit:disabled, QTextEdit:disabled {
     color: @TEXT_DISABLED@;
 }
 
+/* Metadata fields on a file that cannot store tags (WAV): read-only, so they
+   must not look like the editable ones. Still selectable for copying. */
+#metadataTagsPage QLineEdit[readOnly="true"] {
+    background-color: @BG_DARK@;
+    color: @TEXT_SECONDARY@;
+}
+
 /* ===== Spin Boxes ===== */
 QSpinBox, QDoubleSpinBox {
     background-color: @BG_MEDIUM@;

@@ -25,9 +25,11 @@ def panel(qtbot):
 
 @pytest.fixture
 def audio_file(tmp_path):
+    # AIFF, not WAV: a WAV loads read-only with no cover column at all, and
+    # these tests are about where the cover sits.
     sf = pytest.importorskip("soundfile")
-    path = tmp_path / "a track.wav"
-    sf.write(str(path), np.zeros(4410, dtype=np.float32), 44100, subtype="PCM_16")
+    path = tmp_path / "a track.aiff"
+    sf.write(str(path), np.zeros(4410, dtype=np.float32), 44100, format="AIFF", subtype="PCM_16")
     return str(path)
 
 

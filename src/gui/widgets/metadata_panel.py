@@ -40,6 +40,7 @@ from src.metadata.tags import (
     TrackMetadata,
     read_bitrate,
     read_metadata,
+    stores_tags,
     write_metadata,
     write_comment,
     delete_metadata_fields,
@@ -197,6 +198,10 @@ class MetadataPanel(QWidget):
         self._file_path: str | None = None
         self._field_edits: dict[str, QLineEdit] = {}
         self._saving = False  # guard against re-entrant saves
+        # A file that cannot hold tags (WAV) loads read-only: mutagen rejects
+        # every field on one, and the write still reports success, so an edit
+        # would look saved and be gone on the next load.
+        self._tagless = False
         # Online lookup state. Off until MainWindow pushes the setting down —
         # while off the button is hidden, not greyed, so the app looks as
         # offline as it is.
@@ -394,6 +399,19 @@ class MetadataPanel(QWidget):
         self._file_header_widget.setStyleSheet("#fileHeader { background: transparent; }")
         self._file_header_widget.setVisible(False)
         layout.addWidget(self._file_header_widget)
+
+        # Shown over a WAV, whose tags cannot be edited. Wrapped rather than
+        # elided: it is the one sentence explaining why the panel is locked.
+        self._tagless_notice = QLabel(
+            self.tr("WAV files can't store tags. Convert to AIFF or FLAC to edit them.")
+        )
+        self._tagless_notice.setObjectName("taglessNotice")
+        self._tagless_notice.setWordWrap(True)
+        self._tagless_notice.setStyleSheet(
+            f"color: {Theme.ACCENT_TEXT}; background: transparent;"
+        )
+        self._tagless_notice.setVisible(False)
+        layout.addWidget(self._tagless_notice)
 
         # Body: horizontal split — text fields on left (2/3), artwork on right (1/3)
         body = QHBoxLayout()
@@ -910,7 +928,10 @@ class MetadataPanel(QWidget):
         button.setObjectName("discogsApplyButton")
         button.setFixedSize(_APPLY_BUTTON_SIDE, _APPLY_BUTTON_SIDE)
         button.setCursor(Qt.CursorShape.PointingHandCursor)
-        if self._writes_are_current(writes):
+        if self._tagless:
+            button.setEnabled(False)
+            button.setToolTip(self._tagless_notice.text())
+        elif self._writes_are_current(writes):
             button.setEnabled(False)
             button.setToolTip(self.tr("Already in this file's tags."))
         elif len(writes) > 1:
@@ -948,7 +969,7 @@ class MetadataPanel(QWidget):
         takes, so the WAV guard and the Windows file-lock retries apply here
         for free rather than being reimplemented for a second entry point.
         """
-        if self._file_path is None or not writes:
+        if self._file_path is None or not writes or self._tagless:
             return
         error = lookup_flow.apply_values(self._file_path, writes)
         if error:
@@ -1256,6 +1277,9 @@ class MetadataPanel(QWidget):
         self._path_label.setToolTip(path)
         self._info_label.setText(_format_audio_props(path))
         self._file_header_widget.setVisible(True)
+        self._tagless = not stores_tags(path)
+        if self._tagless:
+            logger.info("Metadata panel: %s cannot store tags, loaded read-only", Path(path).name)
 
         try:
             meta = read_metadata(path)
@@ -1293,6 +1317,9 @@ class MetadataPanel(QWidget):
                 self._add_field_row(field_key, label, str(value))
                 shown_fields.add(field_key)
 
+        # Nothing can be added to a file that cannot keep it.
+        self._add_combo.setVisible(not self._tagless)
+
         # Populate the "Add field" combo with remaining fields
         self._add_combo.blockSignals(True)
         self._add_combo.clear()
@@ -1315,14 +1342,19 @@ class MetadataPanel(QWidget):
         self._controls_row_widget.setVisible(True)
         self._reload_btn.setVisible(True)
         self._eject_btn.setVisible(True)
-        self._artwork.setVisible(True)
-        self._add_artwork_btn.setVisible(True)
+        # A WAV has no cover either, and the empty box's "Drop an image here"
+        # would be an offer the file cannot keep, so the column goes.
+        self._artwork.setVisible(not self._tagless)
+        self._add_artwork_btn.setVisible(not self._tagless)
+        self._tagless_notice.setVisible(self._tagless)
         self._sync_lookup_button()
         self._bottom_spacer.changeSize(0, 0, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed)
 
     def _add_field_row(self, field_key: str, label: str, value: str = "") -> None:
         edit = QLineEdit(value)
         edit.setObjectName(f"metaField_{field_key}")
+        # Still selectable, so a value can be copied off a WAV.
+        edit.setReadOnly(self._tagless)
         edit.editingFinished.connect(self._on_editing_finished)
         self._field_edits[field_key] = edit
         row_label = QLabel(self.tr(label))
@@ -1366,7 +1398,7 @@ class MetadataPanel(QWidget):
     # --------------------------------------------------------------- save
 
     def _save_metadata(self) -> None:
-        if self._file_path is None or self._saving:
+        if self._file_path is None or self._saving or self._tagless:
             return
         self._saving = True
         try:
@@ -1541,6 +1573,8 @@ class MetadataPanel(QWidget):
         """Reset panel to drop state."""
         self._clear_provenance()
         self._file_path = None
+        self._tagless = False
+        self._tagless_notice.setVisible(False)
         self._disconnect_fields()
         self._field_edits.clear()
         while self._form_layout.rowCount():
@@ -1635,7 +1669,10 @@ class MetadataPanel(QWidget):
         # the one most likely to be missing its sleeve. Set here rather than
         # in `_refresh_discogs_tab` because `_clear` redraws the tab *before*
         # it drops the file path, so a button synced there survived the eject.
-        self._find_cover_btn.setVisible(visible)
+        # Except on a WAV, which has nowhere to put the cover it would find.
+        # Look Up Online stays: its review dialog says the values won't save,
+        # and reading what Discogs knows is still worth something.
+        self._find_cover_btn.setVisible(visible and not self._tagless)
         self._sync_empty_hint(visible)
         if not visible:
             self._lookup_status.setVisible(False)
@@ -1653,7 +1690,9 @@ class MetadataPanel(QWidget):
         advertises something the user cannot reach, the same rule the
         provenance link follows.
         """
-        blank = lookup_offered and not any(
+        # Not over a WAV: offering to fill tags that cannot be saved would
+        # contradict the notice above it.
+        blank = lookup_offered and not self._tagless and not any(
             self._field_edits[key].text().strip()
             for key in ("artist", "title")
             if key in self._field_edits
@@ -1922,7 +1961,9 @@ class MetadataPanel(QWidget):
         release_id = getattr(chosen, "release_id", 0) or None
         result = self._last_result
         self._remember_release(release_id)
-        if values:
+        # A WAV keeps none of it; writing would only show a provenance line
+        # for a write that never happened. The dialog has already said so.
+        if values and not self._tagless:
             error = lookup_flow.apply_values(self._file_path, values)
             if error:
                 QMessageBox.warning(self, self.tr("Look Up Online"), error)
@@ -2026,7 +2067,7 @@ class MetadataPanel(QWidget):
 
     def _on_artwork_changed(self, data, mime) -> None:
         """Persist artwork changes from a drop, Add Artwork, or the cover menu."""
-        if self._file_path is None or self._saving:
+        if self._file_path is None or self._saving or self._tagless:
             return
         self._saving = True
         try:
