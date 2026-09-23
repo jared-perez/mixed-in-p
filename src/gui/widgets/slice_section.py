@@ -29,6 +29,7 @@ so a casual listener never pays for waveform RAM for a track they don't slice.
 from __future__ import annotations
 
 import logging
+import time
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
@@ -37,6 +38,7 @@ from PySide6.QtWidgets import (
     QAbstractButton,
     QComboBox,
     QFileDialog,
+    QGridLayout,
     QHBoxLayout,
     QLabel,
     QLineEdit,
@@ -58,6 +60,10 @@ from .waveform_canvas import WaveformCanvas, ZoomedWaveformCanvas
 
 logger = logging.getLogger(__name__)
 
+# Slack past the player's render lead when scheduling a jump on a click, so
+# the callback already in flight cannot reach the frame before the jump does.
+_JUMP_MARGIN_MS = 5.0
+
 # Gap between the header toggles. Wider than Theme.SPACING on purpose: accent
 # words a normal gap apart read as one phrase rather than as separate buttons.
 _HEADER_GAP = 24
@@ -78,6 +84,9 @@ class SliceSection(QWidget):
     request_waveform = Signal()
     # User moved the playhead on the waveform — panel forwards to engine.seek_ms.
     seek_requested = Signal(int)
+    # Mark on beat switched — the panel opens the metronome and sets its tempo
+    # from the track when it goes on. Not emitted for a programmatic reflect.
+    mark_on_beat_changed = Signal(bool)
 
     def __init__(self, engine: PlayerEngine, parent: QWidget | None = None) -> None:
         super().__init__(parent)
@@ -90,6 +99,11 @@ class SliceSection(QWidget):
         self._waveform_shown: bool = False
         self._zoom_shown: bool = False
         self._waveform_loaded: bool = False
+        # Mark on beat's clock: a callable answering "ms from this perf_counter
+        # moment until the next metronome click is heard", or None when there
+        # is no click to wait for. Handed in by the panel (set_beat_source),
+        # which owns both the metronome and this section.
+        self._beat_source = None
 
         self._setup_ui()
 
@@ -189,16 +203,12 @@ class SliceSection(QWidget):
         # Qt style default (6px) instead.
         controls_layout.setSpacing(Theme.SPACING)
 
-        section_label_style = (
-            f"font-size: 24px; color: {Theme.TEXT_SECONDARY}; font-weight: bold;"
-        )
         # Type-scope the rule so the button's width caps don't leak onto its
         # QToolTip (a bare max-width: 20px clipped the tooltip to one letter).
         nudge_style = (
             "QPushButton { font-weight: bold; padding: 0px 4px;"
             " min-width: 20px; max-width: 20px; }"
         )
-        _SECTION_LABEL_WIDTH = 120
 
         # Time row: start edit | Mark | position | Mark | end edit
         time_row = QHBoxLayout()
@@ -280,9 +290,14 @@ class SliceSection(QWidget):
         length_row = QHBoxLayout()
         length_row.setContentsMargins(0, 8, 0, 8)
         length_row.setSpacing(Theme.SPACING)  # symmetric nudge gaps (see time_row)
+        # Save Slice As's size and colour, but bold. Bold is set on the font
+        # rather than in QSS so sizeHint() measures the face that paints —
+        # the balancing spacer below is taken from it.
         length_section_label = QLabel(self.tr("Length"))
-        length_section_label.setStyleSheet(section_label_style)
-        length_section_label.setFixedWidth(_SECTION_LABEL_WIDTH)
+        length_section_label.setStyleSheet(f"color: {Theme.TEXT_SECONDARY};")
+        length_font = length_section_label.font()
+        length_font.setBold(True)
+        length_section_label.setFont(length_font)
         self._length_dec_btn = self._nudge_button(nudge_style, "<")
         self._length_dec_btn.setToolTip(self.tr("Shorten slice by 10 ms"))
         self._length_edit = QLineEdit("0:00:000")
@@ -291,33 +306,61 @@ class SliceSection(QWidget):
         self._length_edit.setToolTip(self.tr("Slice length (m:ss:mmm) — type to set; moves the end marker"))
         self._length_inc_btn = self._nudge_button(nudge_style, ">")
         self._length_inc_btn.setToolTip(self.tr("Lengthen slice by 10 ms"))
-        length_row.addWidget(length_section_label)
+        # The word sits against its "<", and a spacer of its own width on the
+        # far side keeps the box centred under the playhead time above it.
         length_row.addStretch(1)
+        length_row.addWidget(length_section_label)
         length_row.addWidget(self._length_dec_btn)
         length_row.addWidget(self._length_edit)
         length_row.addWidget(self._length_inc_btn)
+        length_row.addSpacing(length_section_label.sizeHint().width() + Theme.SPACING)
         length_row.addStretch(1)
-        length_row.addSpacing(_SECTION_LABEL_WIDTH)
         controls_layout.addLayout(length_row)
 
-        # Controls row: "< Start" jump + Loop checkbox. Play/Stop come from the
-        # player's own transport — looping just changes how the engine plays.
-        controls_row = QHBoxLayout()
+        # Controls row: Mark on beat at the left edge; "< Start" jump + Loop
+        # checkbox centred. Play/Stop come from the player's own transport —
+        # looping just changes how the engine plays. A grid rather than a box
+        # so the centre group stays centred however wide the translated
+        # left-hand label runs: its two outer columns share the slack equally.
+        controls_row = QGridLayout()
         controls_row.setContentsMargins(0, 8, 0, 8)
-        controls_row.addStretch()
+        controls_row.setHorizontalSpacing(Theme.SPACING)
+        controls_row.setColumnStretch(0, 1)
+        controls_row.setColumnStretch(2, 1)
+
+        beat_group = QHBoxLayout()
+        beat_group.setContentsMargins(0, 0, 0, 0)
+        beat_group.setSpacing(Theme.SPACING)
+        self._mark_on_beat_switch = ToggleSwitch()
+        # QMacStyle trims a QCheckBox's layout rect for the native box this
+        # switch never draws, which put the label a pixel INTO the painted
+        # track; lay it out by the rect it actually paints.
+        self._mark_on_beat_switch.setAttribute(Qt.WidgetAttribute.WA_LayoutUsesWidgetRect)
+        self._mark_on_beat_switch.toggled.connect(self._on_mark_on_beat_toggled)
+        beat_group.addWidget(self._mark_on_beat_switch)
+        mark_on_beat_label = QLabel(self.tr("Mark on beat"))
+        mark_on_beat_label.setStyleSheet(f"color: {Theme.TEXT_PRIMARY};")
+        beat_group.addWidget(mark_on_beat_label)
+        beat_group.addStretch(1)
+        self._sync_mark_on_beat_tooltip(False)
+        controls_row.addLayout(beat_group, 0, 0)
+
+        centre_group = QHBoxLayout()
+        centre_group.setContentsMargins(0, 0, 0, 0)
+        centre_group.setSpacing(Theme.SPACING)
         self._goto_start_btn = QPushButton(self.tr("< Start"))
         self._goto_start_btn.setMinimumWidth(70)
         self._goto_start_btn.setStyleSheet("padding-left: 2px; padding-right: 2px;")
         self._goto_start_btn.setToolTip(self.tr("Jump playhead to start marker (S)"))
-        controls_row.addWidget(self._goto_start_btn)
+        centre_group.addWidget(self._goto_start_btn)
         loop_label = QLabel(self.tr("Loop"))
         loop_label.setStyleSheet(f"color: {Theme.TEXT_PRIMARY};")
-        controls_row.addSpacing(12)
-        controls_row.addWidget(loop_label)
+        centre_group.addSpacing(12)
+        centre_group.addWidget(loop_label)
         self._loop_checkbox = ToggleSwitch()
         self._loop_checkbox.setToolTip(self.tr("Loop playback between the start and end markers (L)"))
-        controls_row.addWidget(self._loop_checkbox)
-        controls_row.addStretch()
+        centre_group.addWidget(self._loop_checkbox)
+        controls_row.addLayout(centre_group, 0, 1)
         controls_layout.addLayout(controls_row)
 
         # Save row
@@ -632,7 +675,7 @@ class SliceSection(QWidget):
     def on_mark_start(self) -> None:
         if self._file_path is None:
             return
-        pos = self._engine.current_ms()
+        pos = self._mark_position()
         if pos >= self._range_slider.endValue():
             self._range_slider.setEndValue(self._duration_ms)
         self._range_slider.setStartValue(pos)
@@ -640,13 +683,92 @@ class SliceSection(QWidget):
     def on_mark_end(self) -> None:
         if self._file_path is None:
             return
-        pos = self._engine.current_ms()
+        pos = self._mark_position()
         if pos <= self._range_slider.startValue():
             return
         self._range_slider.setEndValue(pos)
 
+    # ------------------------------------------------------------ mark on beat
+
+    def set_beat_source(self, source) -> None:
+        """Hand in Mark on beat's clock: ``source(when, not_before_ms)``
+        answers the ms from ``perf_counter`` moment *when* until the first
+        click heard at least *not_before_ms* later, or None while the
+        metronome is not running."""
+        self._beat_source = source
+
+    def is_mark_on_beat(self) -> bool:
+        return self._mark_on_beat_switch.isChecked()
+
+    def _next_click_track_ms(self, jump: bool) -> float | None:
+        """Track position (ms) that will be heard at the metronome's next
+        click, or None when Mark on beat is off or there is nothing to line
+        up — the click is stopped, or playback is paused or just seeked.
+
+        Worked out at the press rather than by waiting for the click: both
+        positions come from the streams' own clocks (see StreamClock), so the
+        answer is exact to the sample instead of a timer's few ms late, and a
+        seek or pause before the click cannot leave anything half-armed.
+
+        A *jump* (the retrigger, a loop start) acts on audio before it is
+        heard, so it takes the first click past what the player has already
+        rendered; a mark only records a position and may take any click.
+        """
+        if not self.is_mark_on_beat() or self._beat_source is None:
+            return None
+        when = time.perf_counter()
+        heard = self._engine.heard_ms_at(when)
+        if heard is None:
+            return None
+        not_before = 0.0
+        if jump:
+            lead = self._engine.render_lead_ms(when)
+            if lead is None:
+                return None
+            not_before = max(0.0, lead) + _JUMP_MARGIN_MS
+        wait = self._beat_source(when, not_before)
+        if wait is None:
+            return None
+        target = heard + wait
+        # A looping engine wraps at the end marker, and so does where it is
+        # heard. The bounds are the engine's, which this section keeps in step.
+        if self._engine.loop_enabled:
+            lstart, lend = self._engine.loop_bounds_ms()
+            if lend > lstart and target >= lend:
+                target = lstart + (target - lstart) % (lend - lstart)
+        return target
+
+    def _mark_position(self) -> int:
+        """Where a Mark press puts its marker, in ms: the playhead, or with
+        Mark on beat the track position heard at the next click — so the
+        marker lands just ahead of the playhead, which reaches it on the
+        click."""
+        target = self._next_click_track_ms(jump=False)
+        if target is None:
+            return self._engine.current_ms()
+        return max(0, min(int(round(target)), self._duration_ms))
+
+    def _on_mark_on_beat_toggled(self, on: bool) -> None:
+        self._sync_mark_on_beat_tooltip(on)
+        self.mark_on_beat_changed.emit(on)
+
+    def _sync_mark_on_beat_tooltip(self, on: bool) -> None:
+        # What the NEXT click of the switch does, in both directions.
+        self._mark_on_beat_switch.setToolTip(
+            self.tr("Stop snapping to the metronome")
+            if on
+            else self.tr("Snap marks, jumps and loops to the metronome's next click")
+        )
+
     def on_goto_start(self) -> None:
-        self.seek_requested.emit(self._range_slider.startValue())
+        start = self._range_slider.startValue()
+        # With Mark on beat, the retrigger waits for the next click, so a
+        # loop started by hand comes back in on the metronome's grid.
+        target = self._next_click_track_ms(jump=True)
+        if target is not None and target < self._duration_ms:
+            self._engine.schedule_jump_ms(target, start)
+            return
+        self.seek_requested.emit(start)
 
     def on_preview_start(self) -> None:
         """S held: seek to start marker and play."""
@@ -770,9 +892,19 @@ class SliceSection(QWidget):
 
     def _on_loop_toggled(self, checked: bool) -> None:
         if checked:
-            self._engine.set_loop_bounds(
-                self._range_slider.startValue(), self._range_slider.endValue()
-            )
+            start = self._range_slider.startValue()
+            self._engine.set_loop_bounds(start, self._range_slider.endValue())
+            # With Mark on beat the loop starts on the next click, from its
+            # start marker: markers set on beat then keep every pass on the
+            # metronome's grid. The switch shows on at once; the engine
+            # starts looping at the click.
+            target = self._next_click_track_ms(jump=True)
+            if target is not None and target < self._duration_ms:
+                self._engine.schedule_jump_ms(target, start, enable_loop=True)
+                return
+        else:
+            # Off before its click: the loop must not start after all.
+            self._engine.cancel_jump(loop_start_only=True)
         self._engine.set_loop_enabled(checked)
 
     # ------------------------------------------------------------- folder/save

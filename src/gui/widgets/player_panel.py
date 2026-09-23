@@ -2914,6 +2914,10 @@ class PlayerPanel(QWidget):
         self._slice.zoom_shown_changed.connect(self._on_slice_view_changed)
         self._slice.request_waveform.connect(self._build_waveform_for_current)
         self._slice.seek_requested.connect(self._on_seek)
+        # Mark on beat: the slicer asks the metronome when its next click is
+        # heard, and switching it on opens the metronome at the track's tempo.
+        self._slice.set_beat_source(self._metronome_section.view.ms_to_next_click)
+        self._slice.mark_on_beat_changed.connect(self._on_mark_on_beat_changed)
         # The metronome's Track button follows the loaded track. This signal
         # is the panel's own "the loaded track changed" — played, removed
         # from under the player, or cleared — and the refresh is a re-read,
@@ -6679,6 +6683,15 @@ class PlayerPanel(QWidget):
             (e for e in self._playlist if e.file_path == self._playing_path), None
         )
         return _parse_bpm(entry.bpm) if entry is not None else None
+
+    def _on_mark_on_beat_changed(self, on: bool) -> None:
+        """Snapping marks to the click needs a click: open the metronome and
+        take the loaded track's tempo, as its Track button would. Starting it
+        is left to the user — a click that begins on its own is a surprise."""
+        if not on:
+            return
+        self._metronome_section.set_expanded(True)
+        self._metronome_section.view.take_track_tempo()
 
     def metronome_row_min_width(self) -> int:
         """Width the metronome's own controls need, for the window minimum."""

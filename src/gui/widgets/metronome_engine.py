@@ -27,6 +27,7 @@ Keep it that way.
 
 from __future__ import annotations
 
+import math
 import statistics
 import threading
 
@@ -223,6 +224,27 @@ class MetronomeEngine:
         if gain != 1.0:
             out *= gain
         self._pos = end
+
+    # ── where the next click lands ──────────────────────────────────
+
+    @property
+    def sample_position(self) -> int:
+        """First sample of the block :meth:`render` will fill next."""
+        return self._pos
+
+    def next_click_sample(self, after: float) -> float:
+        """Onset (in this engine's samples) of the first click at or after
+        sample *after*.
+
+        Counted back and forward from ``_next_beat`` on the current period, so
+        it also finds a click already rendered into the device buffer but not
+        yet heard — at a 2048-frame block that is the next click often enough
+        to matter. A bend in progress is honoured, as it is by the clicks.
+        """
+        with self._lock:
+            period = self.sr * 60.0 / (self._bpm * self._bend)
+        steps = math.ceil((after - self._next_beat) / period)
+        return self._next_beat + steps * period
 
     # ── what the eye reads ──────────────────────────────────────────
 

@@ -73,6 +73,7 @@ from PySide6.QtWidgets import (
 from ...utils.config import load_config, save_config
 from ..styles.theme import Theme
 from .loop_player import _BLOCK, UnderrunLog, output_stream_kwargs
+from .stream_clock import StreamClock
 from .metronome_engine import (
     BEATS_PER_BAR,
     SHARP,
@@ -89,9 +90,10 @@ SAMPLE_RATE = 44100
 # repaints alone can exceed while a track plays, and a Python callback that
 # can't take the GIL in time underruns as a burst of static. A metronome
 # doesn't need low latency: output latency is a constant offset on a
-# free-running click (nothing syncs it to the track, tap tempo measures
-# input timing, and the light polls the engine's own sample clock), so the
-# headroom is free.
+# free-running click (tap tempo measures input timing, the light polls the
+# engine's own sample clock, and the one thing lined up against the track —
+# the slicer's Mark on beat — asks a StreamClock, which knows the latency),
+# so the headroom is free.
 BLOCK_SIZE = _BLOCK
 
 # How far a vertical drag moves the tempo. 4px per BPM was the spike's
@@ -451,6 +453,8 @@ class MetronomeView(QWidget):
         self._underruns = UnderrunLog("Metronome click stream")
         self._stream = None
         self._stream_lock = threading.Lock()
+        # When each rendered block is heard — see ms_to_next_click.
+        self._clock = StreamClock(SAMPLE_RATE)
         # Injected in tests so nothing here ever opens a real device.
         self._stream_factory = stream_factory or self._open_stream
         self._setup_ui()
@@ -699,9 +703,13 @@ class MetronomeView(QWidget):
 
     def start(self) -> None:
         self._engine.reset()
+        self._clock.reset()
         with self._stream_lock:
             if self._stream is None:
                 self._stream = self._stream_factory()
+            stream = self._stream
+        if stream is not None:
+            self._clock.set_latency(getattr(stream, "latency", 0.0))
         # The timer runs whether or not a device opened: on a machine with no
         # output the light should still keep time rather than looking broken.
         self._vis_timer.start()
@@ -853,6 +861,7 @@ class MetronomeView(QWidget):
     def _callback(self, outdata, frames, time_info, status) -> None:  # noqa: ARG002
         self._underruns.count(status)
         mono = outdata[:, 0]
+        self._clock.mark(self._engine.sample_position, time_info)
         self._engine.render(mono)
 
     def _tick(self) -> None:
@@ -866,6 +875,29 @@ class MetronomeView(QWidget):
             self._engine.render(np.zeros(int(SAMPLE_RATE * _VIS_INTERVAL_MS / 1000)))
         beat, phase = self._engine.phase_snapshot()
         self._light.set_phase(beat, phase, True)
+
+    def ms_to_next_click(self, when: float, not_before_ms: float = 0.0) -> float | None:
+        """Milliseconds from ``perf_counter`` moment *when* until the next
+        click is heard — the first at least *not_before_ms* away — or None
+        while there is no click to wait for.
+
+        *not_before_ms* is for a caller that must act on the player's audio
+        before it is heard (the slicer's scheduled jumps): a click due sooner
+        than the player's own render lead is one it can no longer reach.
+
+        Heard, not rendered: the click stream runs a device latency and up to
+        a block ahead of the speaker, so the answer comes from the
+        StreamClock rather than the engine's own counter. None when stopped,
+        and when no device opened — the grid then advances on the vis timer
+        in 33 ms steps, which is no clock to quantize a marker against.
+        """
+        if self._stream is None or not self._start_btn.isChecked():
+            return None
+        heard = self._clock.sample_at(when)
+        if heard is None:
+            return None
+        onset = self._engine.next_click_sample(heard + not_before_ms * SAMPLE_RATE / 1000.0)
+        return (onset - heard) * 1000.0 / SAMPLE_RATE
 
     # ── tap ─────────────────────────────────────────────────────────
 
@@ -907,6 +939,10 @@ class MetronomeView(QWidget):
             if bpm is not None
             else self.tr("No track with a BPM tag is loaded")
         )
+
+    def take_track_tempo(self) -> None:
+        """Set the tempo to the loaded track's, as the Track button does."""
+        self._on_take_track_tempo()
 
     def _on_take_track_tempo(self) -> None:
         # Read again rather than trusting the enabled state: the button's

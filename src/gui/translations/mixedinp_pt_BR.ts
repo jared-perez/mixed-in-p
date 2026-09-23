@@ -470,7 +470,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>BpmScrubBox</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="164"/>
+        <location filename="../widgets/metronome_view.py" line="166"/>
         <source>Drag up or down to change the tempo</source>
         <translation>Arraste para cima ou para baixo para mudar o tempo</translation>
     </message>
@@ -478,7 +478,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>ClickVolumeButton</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="325"/>
+        <location filename="../widgets/metronome_view.py" line="327"/>
         <source>Click volume — press to cycle quiet / medium / loud</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. Three loudness levels on one cycling button; the label names all three because the button&apos;s bars show which is on.</translatorcomment>
         <translation>Volume do clique — clique para alternar baixo / médio / alto</translation>
@@ -2231,89 +2231,89 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>MetronomeView</name>
     <message>
-        <location filename="../widgets/metronome_view.py" line="481"/>
+        <location filename="../widgets/metronome_view.py" line="485"/>
         <source>One BPM slower</source>
         <translation>1 BPM mais lento</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="490"/>
+        <location filename="../widgets/metronome_view.py" line="494"/>
         <source>One BPM faster</source>
         <translation>1 BPM mais rápido</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="499"/>
+        <location filename="../widgets/metronome_view.py" line="503"/>
         <source>Tap</source>
         <translation>Marcar</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="502"/>
+        <location filename="../widgets/metronome_view.py" line="506"/>
         <source>Tap along to set the tempo</source>
         <translation>Marque no ritmo para definir o tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="510"/>
+        <location filename="../widgets/metronome_view.py" line="514"/>
         <source>Global Click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clique global</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="529"/>
+        <location filename="../widgets/metronome_view.py" line="533"/>
         <source>Track</source>
         <translation>Faixa</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="591"/>
+        <location filename="../widgets/metronome_view.py" line="595"/>
         <source>Hold to lean the beat back</source>
         <translation>Segure para atrasar o beat</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="594"/>
+        <location filename="../widgets/metronome_view.py" line="598"/>
         <source>Hold to push the beat forward</source>
         <translation>Segure para adiantar o beat</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="628"/>
-        <location filename="../widgets/metronome_view.py" line="645"/>
-        <location filename="../widgets/metronome_view.py" line="694"/>
+        <location filename="../widgets/metronome_view.py" line="632"/>
+        <location filename="../widgets/metronome_view.py" line="649"/>
+        <location filename="../widgets/metronome_view.py" line="698"/>
         <source>Start</source>
         <translation>Iniciar</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="906"/>
+        <location filename="../widgets/metronome_view.py" line="938"/>
         <source>Use the loaded track&apos;s tempo — {0} BPM</source>
         <translation>Usar o tempo da faixa carregada — {0} BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="908"/>
+        <location filename="../widgets/metronome_view.py" line="940"/>
         <source>No track with a BPM tag is loaded</source>
         <translation>Nenhuma faixa carregada tem tag de BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="560"/>
+        <location filename="../widgets/metronome_view.py" line="564"/>
         <source>Silent — the light keeps time</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Silêncio: a luz continua marcando o tempo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="561"/>
+        <location filename="../widgets/metronome_view.py" line="565"/>
         <source>Standard click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clique padrão</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="562"/>
+        <location filename="../widgets/metronome_view.py" line="566"/>
         <source>Higher-pitched click</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Clique mais agudo</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="739"/>
+        <location filename="../widgets/metronome_view.py" line="747"/>
         <source>Stop the click when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Parar o clique ao sair desta visualização</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="741"/>
+        <location filename="../widgets/metronome_view.py" line="749"/>
         <source>Keep the click going when you leave this view</source>
         <translatorcomment>The metronome&apos;s click, an ordinary noun in every language — not a mouse click. &apos;Global Click&apos; is the mode that lets it keep sounding outside the Keyboard panel.</translatorcomment>
         <translation>Manter o clique tocando ao sair desta visualização</translation>
@@ -2323,8 +2323,8 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Volume do clique</translation>
     </message>
     <message>
-        <location filename="../widgets/metronome_view.py" line="645"/>
-        <location filename="../widgets/metronome_view.py" line="694"/>
+        <location filename="../widgets/metronome_view.py" line="649"/>
+        <location filename="../widgets/metronome_view.py" line="698"/>
         <source>Stop</source>
         <translation>Parar</translation>
     </message>
@@ -2392,7 +2392,7 @@ ou clique em “Adicionar capa…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="2224"/>
-        <location filename="../widgets/player_panel.py" line="4105"/>
+        <location filename="../widgets/player_panel.py" line="4109"/>
         <source>Search all playlists…</source>
         <translation>Buscar em todas as playlists…</translation>
     </message>
@@ -2471,7 +2471,7 @@ ou clique em “Adicionar capa…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="1666"/>
-        <location filename="../widgets/player_panel.py" line="4228"/>
+        <location filename="../widgets/player_panel.py" line="4232"/>
         <source>#</source>
         <translation>#</translation>
     </message>
@@ -2618,7 +2618,7 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Fogo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6285"/>
+        <location filename="../widgets/player_panel.py" line="6289"/>
         <source>Show this cover in the sidebar</source>
         <translation>Mostrar esta capa na barra lateral</translation>
     </message>
@@ -2649,7 +2649,7 @@ ou clique em “Adicionar capa…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="2454"/>
-        <location filename="../widgets/player_panel.py" line="4225"/>
+        <location filename="../widgets/player_panel.py" line="4229"/>
         <source>Playlists</source>
         <translation>Playlists</translation>
     </message>
@@ -2676,8 +2676,8 @@ ou clique em “Adicionar capa…”</translation>
     </message>
     <message>
         <location filename="../widgets/player_panel.py" line="2604"/>
-        <location filename="../widgets/player_panel.py" line="4062"/>
-        <location filename="../widgets/player_panel.py" line="4067"/>
+        <location filename="../widgets/player_panel.py" line="4066"/>
+        <location filename="../widgets/player_panel.py" line="4071"/>
         <source>Save Playlist</source>
         <translation>Salvar playlist</translation>
     </message>
@@ -2706,121 +2706,121 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Abrir a playlist de onde a faixa atual está tocando</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="2984"/>
-        <location filename="../widgets/player_panel.py" line="3939"/>
-        <location filename="../widgets/player_panel.py" line="4049"/>
+        <location filename="../widgets/player_panel.py" line="2988"/>
+        <location filename="../widgets/player_panel.py" line="3943"/>
+        <location filename="../widgets/player_panel.py" line="4053"/>
         <source>Scratch</source>
         <translation>Scratch</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3896"/>
+        <location filename="../widgets/player_panel.py" line="3900"/>
         <source>Playing: {0}</source>
         <translation>Reproduzindo: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="3949"/>
+        <location filename="../widgets/player_panel.py" line="3953"/>
         <source>In Playlist: {0}</source>
         <translation>Na playlist: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4046"/>
+        <location filename="../widgets/player_panel.py" line="4050"/>
         <source>Search: {0}</source>
         <translation>Busca: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4063"/>
+        <location filename="../widgets/player_panel.py" line="4067"/>
         <source>The playlist is empty — add some tracks first.</source>
         <translation>A playlist está vazia: adicione algumas faixas primeiro.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4067"/>
+        <location filename="../widgets/player_panel.py" line="4071"/>
         <source>Playlist name:</source>
         <translation>Nome da playlist:</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4102"/>
+        <location filename="../widgets/player_panel.py" line="4106"/>
         <source>Search scope: {0}</source>
         <translation>Escopo da busca: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4107"/>
+        <location filename="../widgets/player_panel.py" line="4111"/>
         <source>Search this playlist…</source>
         <translation>Buscar nesta playlist…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4130"/>
+        <location filename="../widgets/player_panel.py" line="4134"/>
         <source>No matching tracks</source>
         <translation>Nenhuma faixa correspondente</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4439"/>
+        <location filename="../widgets/player_panel.py" line="4443"/>
         <source>{0} bit</source>
         <translation>{0} bits</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4648"/>
+        <location filename="../widgets/player_panel.py" line="4652"/>
         <source>File not found:
 {0}</source>
         <translation>Arquivo não encontrado:
 {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4853"/>
+        <location filename="../widgets/player_panel.py" line="4857"/>
         <source>Hide tracks that mix with the playing track</source>
         <translation>Ocultar faixas que combinam com a faixa em reprodução</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="4855"/>
+        <location filename="../widgets/player_panel.py" line="4859"/>
         <source>Show tracks that mix with the playing track</source>
         <translation>Mostrar faixas que combinam com a faixa em reprodução</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5179"/>
+        <location filename="../widgets/player_panel.py" line="5183"/>
         <source>{0}+ results</source>
         <translation>{0}+ resultados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5182"/>
+        <location filename="../widgets/player_panel.py" line="5186"/>
         <source>{0} result</source>
         <translation>{0} resultado</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5184"/>
+        <location filename="../widgets/player_panel.py" line="5188"/>
         <source>{0} results</source>
         <translation>{0} resultados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5188"/>
+        <location filename="../widgets/player_panel.py" line="5192"/>
         <source>{0} track</source>
         <translation>{0} faixa</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5190"/>
+        <location filename="../widgets/player_panel.py" line="5194"/>
         <source>{0} tracks</source>
         <translation>{0} faixas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5841"/>
+        <location filename="../widgets/player_panel.py" line="5845"/>
         <source>Reset Columns</source>
         <translation>Redefinir colunas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="5847"/>
+        <location filename="../widgets/player_panel.py" line="5851"/>
         <source>Fit {0} to Longest</source>
         <translation>Ajustar {0} ao valor mais longo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6283"/>
+        <location filename="../widgets/player_panel.py" line="6287"/>
         <source>Hide the cover in the sidebar</source>
         <translation>Ocultar a capa na barra lateral</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6963"/>
+        <location filename="../widgets/player_panel.py" line="6976"/>
         <source>“{0}” has moved.</source>
         <translation>“{0}” foi movido.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="6965"/>
+        <location filename="../widgets/player_panel.py" line="6978"/>
         <source>%n of the selected files have moved.</source>
         <translation>
             <numerusform>%n dos arquivos selecionados foi movido.</numerusform>
@@ -2828,59 +2828,59 @@ ou clique em “Adicionar capa…”</translation>
         </translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6968"/>
+        <location filename="../widgets/player_panel.py" line="6981"/>
         <source>File Has Moved</source>
         <translation>O arquivo foi movido</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6972"/>
+        <location filename="../widgets/player_panel.py" line="6985"/>
         <source>It is no longer at its saved location, so it can&apos;t be added to a playlist or dragged out. A track already playing keeps playing — it was loaded into memory before the file moved.</source>
         <translation>Ele não está mais no local salvo, então não pode ser adicionado a uma playlist nem arrastado para fora. Uma faixa que já está tocando continua tocando: ela foi carregada na memória antes de o arquivo ser movido.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="6977"/>
+        <location filename="../widgets/player_panel.py" line="6990"/>
         <source>Right-click the track and choose Locate Missing File…</source>
         <translation>Clique com o botão direito na faixa e escolha “Localizar arquivo ausente…”</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7043"/>
+        <location filename="../widgets/player_panel.py" line="7056"/>
         <source>Are you sure you want to delete the selected tracks from the playlist?</source>
         <translatorcomment>English asks in full; every language here keeps the app&apos;s own shorter confirmation form (cf. &apos;Delete playlist &quot;{0}&quot;?&apos;).</translatorcomment>
         <translation>Remover as faixas selecionadas da playlist?</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7053"/>
+        <location filename="../widgets/player_panel.py" line="7066"/>
         <source>Press {0} to remove without asking.</source>
         <translation>Pressione {0} para remover sem perguntar.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7162"/>
+        <location filename="../widgets/player_panel.py" line="7175"/>
         <source>Locate Missing File…</source>
         <translation>Localizar arquivo ausente…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7164"/>
+        <location filename="../widgets/player_panel.py" line="7177"/>
         <source>Open File Location</source>
         <translation>Abrir local do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7165"/>
+        <location filename="../widgets/player_panel.py" line="7178"/>
         <source>Open in Metadata Panel</source>
         <translation>Abrir no painel de metadados</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7166"/>
+        <location filename="../widgets/player_panel.py" line="7179"/>
         <source>Reload Metadata from File</source>
         <translation>Recarregar metadados do arquivo</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7170"/>
+        <location filename="../widgets/player_panel.py" line="7183"/>
         <source>Look Up Online…</source>
         <translation>Buscar on-line…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7041"/>
-        <location filename="../widgets/player_panel.py" line="7172"/>
+        <location filename="../widgets/player_panel.py" line="7054"/>
+        <location filename="../widgets/player_panel.py" line="7185"/>
         <source>Remove from Playlist</source>
         <translation>Remover da playlist</translation>
     </message>
@@ -2923,41 +2923,41 @@ ou clique em “Adicionar capa…”</translation>
         <translation>Janela: fractal de lâminas</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7228"/>
-        <location filename="../widgets/player_panel.py" line="7256"/>
-        <location filename="../widgets/player_panel.py" line="7356"/>
-        <location filename="../widgets/player_panel.py" line="7429"/>
-        <location filename="../widgets/player_panel.py" line="7459"/>
+        <location filename="../widgets/player_panel.py" line="7241"/>
+        <location filename="../widgets/player_panel.py" line="7269"/>
+        <location filename="../widgets/player_panel.py" line="7369"/>
+        <location filename="../widgets/player_panel.py" line="7442"/>
+        <location filename="../widgets/player_panel.py" line="7472"/>
         <source>Look Up Online</source>
         <translation>Buscar on-line</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7230"/>
+        <location filename="../widgets/player_panel.py" line="7243"/>
         <source>None of the selected tracks have an artist or title to search with, and their filenames don&apos;t give one either.</source>
         <translation>Nenhuma das faixas selecionadas tem artista ou título para buscar, e os nomes dos arquivos também não informam.</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7250"/>
+        <location filename="../widgets/player_panel.py" line="7263"/>
         <source>Looking up track details…</source>
         <translation>Buscando dados das faixas…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7251"/>
+        <location filename="../widgets/player_panel.py" line="7264"/>
         <source>Cancel</source>
         <translation>Cancelar</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7281"/>
+        <location filename="../widgets/player_panel.py" line="7294"/>
         <source>Looking up {0} of {1}…</source>
         <translation>Buscando {0} de {1}…</translation>
     </message>
     <message>
-        <location filename="../widgets/player_panel.py" line="7289"/>
+        <location filename="../widgets/player_panel.py" line="7302"/>
         <source>Waiting for the Discogs rate limit…</source>
         <translation>Aguardando o limite de requisições do Discogs…</translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="7452"/>
+        <location filename="../widgets/player_panel.py" line="7465"/>
         <source>%n track(s) had no match.</source>
         <translation>
             <numerusform>%n faixa sem correspondência.</numerusform>
@@ -2965,7 +2965,7 @@ ou clique em “Adicionar capa…”</translation>
         </translation>
     </message>
     <message numerus="yes">
-        <location filename="../widgets/player_panel.py" line="7455"/>
+        <location filename="../widgets/player_panel.py" line="7468"/>
         <source>Updated %n track(s).</source>
         <translation>
             <numerusform>%n faixa atualizada.</numerusform>
@@ -4425,7 +4425,7 @@ ou clique em “Adicionar capa…”</translation>
 <context>
     <name>SidebarArtBox</name>
     <message>
-        <location filename="../widgets/sidebar_art_box.py" line="131"/>
+        <location filename="../widgets/sidebar_art_box.py" line="130"/>
         <source>Hide the cover</source>
         <translation>Ocultar a capa</translation>
     </message>
@@ -4438,127 +4438,142 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">▸  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="131"/>
+        <location filename="../widgets/slice_section.py" line="145"/>
         <source>Waveform</source>
         <translation>Forma de onda</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="133"/>
+        <location filename="../widgets/slice_section.py" line="147"/>
         <source>Zoomed Wave</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Onda ampliada</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="135"/>
+        <location filename="../widgets/slice_section.py" line="149"/>
         <source>Loop Slicer</source>
         <translatorcomment>Producer tool name — kept English here, as the old &apos;Waveform Loop Slicer&apos; header was.</translatorcomment>
         <translation>Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="215"/>
+        <location filename="../widgets/slice_section.py" line="225"/>
         <source>Slice start time (m:ss:mmm) — type to set</source>
         <translation>Tempo de início do slice (m:ss:mmm) — digite para definir</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="224"/>
+        <location filename="../widgets/slice_section.py" line="234"/>
         <source>Slice end time (m:ss:mmm) — type to set</source>
         <translation>Tempo de fim do slice (m:ss:mmm) — digite para definir</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="226"/>
-        <location filename="../widgets/slice_section.py" line="233"/>
+        <location filename="../widgets/slice_section.py" line="236"/>
+        <location filename="../widgets/slice_section.py" line="243"/>
         <source>Mark</source>
         <translation>Marcar</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="227"/>
+        <location filename="../widgets/slice_section.py" line="237"/>
         <source>Mark start at playhead (Q)</source>
         <translatorcomment>Reviewed (pt_BR pass): &apos;cursor de reprodução&apos; = playhead (Apple term) - confirmed.</translatorcomment>
         <translation>Marcar início no cursor de reprodução (Q)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="234"/>
+        <location filename="../widgets/slice_section.py" line="244"/>
         <source>Mark end at playhead (E)</source>
         <translation>Marcar fim no cursor de reprodução (E)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="249"/>
+        <location filename="../widgets/slice_section.py" line="259"/>
         <source>Nudge start marker back 10 ms</source>
         <translation>Mover o marcador de início 10 ms para trás</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="251"/>
+        <location filename="../widgets/slice_section.py" line="261"/>
         <source>Nudge start marker forward 10 ms</source>
         <translation>Mover o marcador de início 10 ms para frente</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="253"/>
+        <location filename="../widgets/slice_section.py" line="263"/>
         <source>Nudge end marker back 10 ms</source>
         <translation>Mover o marcador de fim 10 ms para trás</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="255"/>
+        <location filename="../widgets/slice_section.py" line="265"/>
         <source>Nudge end marker forward 10 ms</source>
         <translation>Mover o marcador de fim 10 ms para frente</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="283"/>
+        <location filename="../widgets/slice_section.py" line="296"/>
         <source>Length</source>
         <translation>Duração</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="287"/>
+        <location filename="../widgets/slice_section.py" line="302"/>
         <source>Shorten slice by 10 ms</source>
         <translation>Encurtar o slice em 10 ms</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="291"/>
+        <location filename="../widgets/slice_section.py" line="306"/>
         <source>Slice length (m:ss:mmm) — type to set; moves the end marker</source>
         <translation>Duração do slice (m:ss:mmm) — digite para definir; move o marcador de fim</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="293"/>
+        <location filename="../widgets/slice_section.py" line="308"/>
         <source>Lengthen slice by 10 ms</source>
         <translation>Aumentar o slice em 10 ms</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="308"/>
+        <location filename="../widgets/slice_section.py" line="341"/>
+        <source>Mark on beat</source>
+        <translation>Marcar no tempo</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="351"/>
         <source>&lt; Start</source>
         <translation>&lt; Início</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="411"/>
+        <location filename="../widgets/slice_section.py" line="454"/>
         <source>Hide the full-track waveform</source>
         <translation>Ocultar a forma de onda da faixa inteira</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="413"/>
+        <location filename="../widgets/slice_section.py" line="456"/>
         <source>Show the full-track waveform — click it to move playback</source>
         <translation>Mostrar a forma de onda da faixa inteira — clique nela para mover a reprodução</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="422"/>
+        <location filename="../widgets/slice_section.py" line="465"/>
         <source>Hide the zoomed waveform</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Ocultar a forma de onda ampliada</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="424"/>
+        <location filename="../widgets/slice_section.py" line="467"/>
         <source>Show the zoomed waveform around the playhead</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Mostrar a forma de onda ampliada ao redor do cursor de reprodução</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="433"/>
+        <location filename="../widgets/slice_section.py" line="476"/>
         <source>Hide the slice controls</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Ocultar os controles de slice</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="435"/>
+        <location filename="../widgets/slice_section.py" line="478"/>
         <source>Show the slice controls — markers, length, loop and export</source>
         <translatorcomment>The Loop Slicer&apos;s zoomed waveform became its own disclosure toggle, so the two halves of the old &apos;zoomed waveform and slice controls&apos; tooltip are now separate strings; wording spliced from that entry (see vanished). &apos;Zoomed Wave&apos; is a header label beside Waveform and Loop Slicer — keep it short.</translatorcomment>
         <translation>Mostrar os controles de slice: marcadores, duração, loop e exportação</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="758"/>
+        <source>Stop snapping to the metronome</source>
+        <translation>Parar de alinhar ao metrônomo</translation>
+    </message>
+    <message>
+        <location filename="../widgets/slice_section.py" line="760"/>
+        <source>Snap marks, jumps and loops to the metronome&apos;s next click</source>
+        <translation>Alinhar marcas, saltos e loops ao próximo clique do metrônomo</translation>
     </message>
     <message>
         <source>Hide the zoomed waveform and slice controls</source>
@@ -4573,13 +4588,13 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Levar o cursor de reprodução ao marcador de início</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="313"/>
+        <location filename="../widgets/slice_section.py" line="356"/>
         <source>Loop</source>
         <translatorcomment>Kept English &apos;loop&apos; per glossary.</translatorcomment>
         <translation>Loop</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="318"/>
+        <location filename="../widgets/slice_section.py" line="361"/>
         <source>Loop playback between the start and end markers (L)</source>
         <translatorcomment>Added (L) hotkey hint to the existing loop tooltip translation.</translatorcomment>
         <translation>Repetir a reprodução em loop entre os marcadores de início e fim (L)</translation>
@@ -4589,28 +4604,28 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">Repetir a reprodução em loop entre os marcadores de início e fim</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="311"/>
+        <location filename="../widgets/slice_section.py" line="354"/>
         <source>Jump playhead to start marker (S)</source>
         <translation>Levar o cursor de reprodução ao marcador de início (S)</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="325"/>
+        <location filename="../widgets/slice_section.py" line="368"/>
         <source>Save Slice As:</source>
         <translatorcomment>&apos;Slice&apos; kept English per glossary (producer slicer term).</translatorcomment>
         <translation>Salvar slice como:</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="330"/>
+        <location filename="../widgets/slice_section.py" line="373"/>
         <source>output filename</source>
         <translation>nome do arquivo de saída</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="339"/>
+        <location filename="../widgets/slice_section.py" line="382"/>
         <source>Choose save folder</source>
         <translation>Escolher pasta de salvamento</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="346"/>
+        <location filename="../widgets/slice_section.py" line="389"/>
         <source>Slice</source>
         <translatorcomment>Kept English &apos;Slice&apos; per glossary (slicer-derived producer term).</translatorcomment>
         <translation>Slice</translation>
@@ -4621,17 +4636,17 @@ ou clique em “Adicionar capa…”</translation>
         <translation type="vanished">▾  Waveform Loop Slicer</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="781"/>
+        <location filename="../widgets/slice_section.py" line="913"/>
         <source>Choose Save Folder</source>
         <translation>Escolher pasta de salvamento</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="800"/>
+        <location filename="../widgets/slice_section.py" line="932"/>
         <source>Saved: {0}</source>
         <translation>Salvo: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/slice_section.py" line="805"/>
+        <location filename="../widgets/slice_section.py" line="937"/>
         <source>Error: {0}</source>
         <translation>Erro: {0}</translation>
     </message>
