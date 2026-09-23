@@ -92,12 +92,12 @@ Features:
   - スペクトラムアナライザー</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="246"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="247"/>
         <source>Supported formats: MP3, WAV, FLAC, AIFF, M4A, OGG</source>
         <translation>対応フォーマット: MP3、WAV、FLAC、AIFF、M4A、OGG</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="265"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="266"/>
         <source>Find Your Way Around</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>使い方ガイド</translation>
@@ -112,60 +112,98 @@ Features:
         <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;いずれかのパネルにファイルをドロップすると始められます。&lt;br&gt;サイドバーはナビゲーション用だけではありません。&lt;br&gt;ボタンに直接ファイルをドラッグして振り分けられます。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;名前変更&lt;/span&gt; — まずファイル名を整えます&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;確定前にトリミング・プレフィックス・プレビュー&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;変換&lt;/span&gt; — フォーマットを切り替え&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;解析&lt;/span&gt; — BPM・キー・エナジーを検出&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;タグの自動書き込みと名前変更を一括で実行&lt;/span&gt;&lt;br&gt;&lt;br&gt;パネルの&lt;span style=&quot;color: {y};&quot;&gt;パイプライン&lt;/span&gt;ステップをオンにすると、まとめて一気に処理できます。&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="278"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="279"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Drop your files onto any panel to get started.&lt;br&gt;The sidebar isn&apos;t just for navigation — you can&lt;br&gt;drag files right onto the buttons to route them.&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;RENAME&lt;/span&gt; — Clean up filenames first&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;trim, prefix, preview before you commit&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;CONVERT&lt;/span&gt; — Flip formats&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;ANALYZE&lt;/span&gt; — Detects BPM, key &amp;amp; energy&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-writes tags + renames in one shot&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Split from its final sentence only so the pipeline step&apos;s hazard-triangle icon can be drawn between the two; no wording changed. This translation is the previous one with that sentence moved to the string below.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;いずれかのパネルにファイルをドロップすると始められます。&lt;br&gt;サイドバーはナビゲーション用だけではありません。&lt;br&gt;ボタンに直接ファイルをドラッグして振り分けられます。&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;名前変更&lt;/span&gt; — まずファイル名を整えます&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;確定前にトリミング・プレフィックス・プレビュー&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;変換&lt;/span&gt; — フォーマットを切り替え&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;WAV ↔ FLAC ↔ AIFF ↔ MP3&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;↓&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;解析&lt;/span&gt; — BPM・キー・エナジーを検出&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;タグの自動書き込みと名前変更を一括で実行&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="343"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="344"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;Switch on a panel&apos;s &lt;span style=&quot;color: {y};&quot;&gt;pipeline&lt;/span&gt; step to run a batch straight through.&lt;/div&gt;</source>
         <translatorcomment>The closing sentence of slide 2, moved into its own string so the step toggle&apos;s triangle can sit above it. Wording unchanged — spliced verbatim from the previous translation.</translatorcomment>
         <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.6; text-align: center;&quot;&gt;パネルの&lt;span style=&quot;color: {y};&quot;&gt;パイプライン&lt;/span&gt;ステップをオンにすると、まとめて一気に処理できます。&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="387"/>
         <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;METADATA&lt;/span&gt; — Drop a file in, edit its tags.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Auto-saves when you move on.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
         <translatorcomment>Slide 3&apos;s SLICE blurb was replaced by the Discogs one; the rest of this string is the old translation, spliced back verbatim. DISCOGS stays in Latin script in every language (brand name), and {credit} is the untranslated attribution constant — leave the placeholder alone.</translatorcomment>
-        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — ファイルに足りない情報を補います。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;メタデータ画面からリリースを検索して、&lt;br&gt;アーティスト、アルバム、レーベル、年、カバーを取得。&lt;br&gt;書き込む前にすべての項目を確認できます。&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;メタデータ&lt;/span&gt; — ファイルをドロップしてタグを編集。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;次に移ると自動保存されます。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;キーボード&lt;/span&gt; — 任意のキーで音を鳴らせます。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;参照用のハーモニックキーストリップをすぐ横に表示。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;スペクトラム&lt;/span&gt; — 音響スペクトラムアナライザー。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;音質を視覚的に表示します。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;設定&lt;/span&gt; — BPM範囲、キーの表記、&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;自動名前変更のルール。&lt;/span&gt;&lt;/div&gt;</translation>
+        <translation type="vanished">&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — ファイルに足りない情報を補います。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;メタデータ画面からリリースを検索して、&lt;br&gt;アーティスト、アルバム、レーベル、年、カバーを取得。&lt;br&gt;書き込む前にすべての項目を確認できます。&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;メタデータ&lt;/span&gt; — ファイルをドロップしてタグを編集。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;次に移ると自動保存されます。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;キーボード&lt;/span&gt; — 任意のキーで音を鳴らせます。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;参照用のハーモニックキーストリップをすぐ横に表示。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;スペクトラム&lt;/span&gt; — 音響スペクトラムアナライザー。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;音質を視覚的に表示します。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;設定&lt;/span&gt; — BPM範囲、キーの表記、&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;自動名前変更のルール。&lt;/span&gt;&lt;/div&gt;</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="434"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="224"/>
+        <source>Analyze audio files to detect BPM and musical key.
+Convert audio formats.
+Rename and sort your tracks.
+
+Features:
+  - Batch file renaming with Undo
+  - Metadata editing
+  - Audio file conversion
+  - Player with built-in slicer for sample lifting
+  - Harmonic keyboard
+  - BPM detection using beat tracking
+  - Key detection using Chroma analysis
+  - Spectrum analyzer</source>
+        <translation>オーディオファイルを解析してBPMとキーを検出します。
+オーディオ形式を変換します。
+トラックの名前変更と整理ができます。
+
+機能:
+  - 取り消し対応の一括ファイル名変更
+  - メタデータの編集
+  - オーディオファイルの変換
+  - サンプル抽出用のスライサーを内蔵したプレイヤー
+  - ハーモニックキーボード
+  - ビートトラッキングによるBPM検出
+  - Chroma解析によるキー検出
+  - スペクトラムアナライザー</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="354"/>
+        <source>Tracks are dropped into a playlist.</source>
+        <translation>トラックはプレイリストに入ります。</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="394"/>
+        <source>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — Fill in what a file is missing.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look up its release from the Metadata panel and&lt;br&gt;pull in artist, album, label, year and cover art.&lt;br&gt;Review every field before anything is written.&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SPECTRUM&lt;/span&gt; — Acoustic spectrum analyzer.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Visual representation of audio quality.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;KEYBOARD&lt;/span&gt; — Play notes in any key.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Harmonic key strip right there for reference.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;HISTORY&lt;/span&gt; — Undo a rename session.&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;Look back at every key you&apos;ve detected.&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;SETTINGS&lt;/span&gt; — BPM range, key format,&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;auto-rename rules.&lt;/span&gt;&lt;/div&gt;</source>
+        <translation>&lt;div style=&quot;color: {p}; font-size: 13px; line-height: 1.7; text-align: center;&quot;&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;DISCOGS&lt;/span&gt; — ファイルに足りない情報を補います。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;メタデータ画面からリリースを検索して、&lt;br&gt;アーティスト、アルバム、レーベル、年、カバーを取得。&lt;br&gt;書き込む前にすべての項目を確認できます。&lt;/span&gt;&lt;br&gt;&lt;span style=&quot;color: {s}; font-size: 11px;&quot;&gt;{credit}&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;スペクトラム&lt;/span&gt; — 音響スペクトラムアナライザー。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;音質を視覚的に表示します。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;キーボード&lt;/span&gt; — 任意のキーで音を鳴らせます。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;参照用のハーモニックキーストリップをすぐ横に表示。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;履歴&lt;/span&gt; — 名前変更をセッション単位で取り消し。&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;検出したすべてのキーを振り返れます。&lt;/span&gt;&lt;br&gt;&lt;br&gt;&lt;span style=&quot;color: {y}; font-weight: bold;&quot;&gt;設定&lt;/span&gt; — BPM範囲、キーの表記、&lt;br&gt;&lt;span style=&quot;color: {s};&quot;&gt;自動名前変更のルール。&lt;/span&gt;&lt;/div&gt;</translation>
+    </message>
+    <message>
+        <location filename="../widgets/dialogs/about_dialog.py" line="441"/>
         <source>click for more</source>
         <translation>詳しくはクリック</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="455"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="462"/>
         <source>Checking…</source>
         <translation>確認中…</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="479"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="486"/>
         <source>You&apos;re on the latest version</source>
         <translation>最新バージョンです</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="483"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="490"/>
         <source>Download</source>
         <translation>ダウンロード</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="484"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="491"/>
         <source>Update available: {0}</source>
         <translation>アップデートを利用できます: {0}</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="492"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="499"/>
         <source>see all releases</source>
         <translation>すべてのリリースを表示</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="493"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="500"/>
         <source>Couldn&apos;t check for updates</source>
         <translation>アップデートを確認できませんでした</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="368"/>
+        <location filename="../widgets/dialogs/about_dialog.py" line="375"/>
         <source>The Rest of the Kit</source>
         <translatorcomment>Reviewed (ja pass): confirmed.</translatorcomment>
         <translation>その他の機能</translation>
@@ -176,7 +214,6 @@ Features:
         <translation>ガイド</translation>
     </message>
     <message>
-        <location filename="../widgets/dialogs/about_dialog.py" line="224"/>
         <source>Analyze audio files to detect BPM and musical key.
 Results displayed as harmonic key codes for easy harmonic mixing.
 
@@ -190,7 +227,7 @@ Features:
   - Key detection using Chroma analysis
   - Spectrum analyzer</source>
         <translatorcomment>Only one bullet was added (audio file conversion); the rest of this string is the old translation, spliced back verbatim.</translatorcomment>
-        <translation>オーディオファイルを解析してBPMとキーを検出します。
+        <translation type="vanished">オーディオファイルを解析してBPMとキーを検出します。
 結果はハーモニックミキシングに便利なハーモニックキーコードで表示されます。
 
 機能:

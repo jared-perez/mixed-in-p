@@ -222,7 +222,8 @@ class AboutDialog(QDialog):
         desc = QLabel(
             self.tr(
                 "Analyze audio files to detect BPM and musical key.\n"
-                "Results displayed as harmonic key codes for easy harmonic mixing.\n\n"
+                "Convert audio formats.\n"
+                "Rename and sort your tracks.\n\n"
                 "Features:\n"
                 "  - Batch file renaming with Undo\n"
                 "  - Metadata editing\n"
@@ -346,6 +347,12 @@ class AboutDialog(QDialog):
                 ' step to run a batch straight through.'
                 '</div>'
             ).format(p=p, y=y)
+            # Its own tr() so the sentence above keeps its translations; a
+            # second <div> in the same label reads as the next line.
+            + '<div style="color: {p}; font-size: 13px; line-height: 1.6;'
+            ' text-align: center;">{text}</div>'.format(
+                p=p, text=self.tr("Tracks are dropped into a playlist.")
+            )
         )
         h1_pipeline.setAlignment(Qt.AlignmentFlag.AlignCenter)
         h1_pipeline.setTextFormat(Qt.TextFormat.RichText)
@@ -395,20 +402,20 @@ class AboutDialog(QDialog):
                 '<br>'
                 '<span style="color: {s}; font-size: 11px;">{credit}</span>'
                 '<br><br>'
-                '<span style="color: {y}; font-weight: bold;">METADATA</span>'
-                ' — Drop a file in, edit its tags.<br>'
+                '<span style="color: {y}; font-weight: bold;">SPECTRUM</span>'
+                ' — Acoustic spectrum analyzer.<br>'
                 '<span style="color: {s};">'
-                'Auto-saves when you move on.</span>'
+                'Visual representation of audio quality.</span>'
                 '<br><br>'
                 '<span style="color: {y}; font-weight: bold;">KEYBOARD</span>'
                 ' — Play notes in any key.<br>'
                 '<span style="color: {s};">'
                 'Harmonic key strip right there for reference.</span>'
                 '<br><br>'
-                '<span style="color: {y}; font-weight: bold;">SPECTRUM</span>'
-                ' — Acoustic spectrum analyzer.<br>'
+                '<span style="color: {y}; font-weight: bold;">HISTORY</span>'
+                ' — Undo a rename session.<br>'
                 '<span style="color: {s};">'
-                'Visual representation of audio quality.</span>'
+                'Look back at every key you\'ve detected.</span>'
                 '<br><br>'
                 '<span style="color: {y}; font-weight: bold;">SETTINGS</span>'
                 ' — BPM range, key format,<br>'
