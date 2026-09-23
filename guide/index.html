@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mixed in P Guide</title>
+<meta name="description" content="A plain-language tour of Mixed in P: what each part of the app does, the problems it solves for DJs, and how to use it.">
+<link rel="icon" href="../assets/p_icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* Same palette as the landing page (index.html), so the two read as one site. */
+  :root{
+    --bg:#0a1228; --bg-deep:#05070d;
+    --panel:#121a2c; --panel-2:#172132; --line:#26324a;
+    --yellow:#ebff00; --yellow-dim:#7a8500;
+    --text:#e7ebf2; --muted:#a2abbb;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{
+    scroll-behavior:smooth;scroll-padding-top:16px;
+    overflow-x:hidden;overflow-x:clip;
+    background-color:var(--bg-deep);
+    background-image:linear-gradient(to bottom,var(--bg) 0,var(--bg-deep) 120vh);
+    background-repeat:no-repeat;
+  }
+  body{
+    color:var(--text);font-family:'Space Grotesk',sans-serif;font-size:17px;line-height:1.65;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;overflow-x:clip;
+  }
+  a{color:var(--yellow);text-decoration:none}
+  a:hover{text-decoration:underline}
+  a:focus-visible,summary:focus-visible{outline:2px solid var(--yellow);outline-offset:3px;border-radius:3px}
+  img{max-width:100%;height:auto;display:block}
+  b,strong{font-weight:700;color:#f3f5f9}
+  code,kbd,.k{
+    font-family:'JetBrains Mono',monospace;font-size:.84em;
+    background:#060a16;color:var(--yellow);border:1px solid var(--line);
+    padding:1px 6px;border-radius:4px;white-space:nowrap;
+  }
+
+  .layout{display:grid;grid-template-columns:250px minmax(0,1fr);max-width:1180px;margin:0 auto}
+
+  /* ---------- Table of contents ---------- */
+  nav.toc{
+    position:sticky;top:0;align-self:start;height:100vh;overflow:auto;
+    padding:28px 18px 40px;border-right:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:22px;color:var(--text)}
+  .brand img{width:34px;height:34px}
+  .brand span{font-family:'Unbounded',sans-serif;font-weight:700;font-size:15px}
+  .brand:hover{text-decoration:none}
+  nav.toc summary{display:none}
+  nav.toc .group{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--yellow-dim);margin:18px 8px 4px;
+  }
+  nav.toc a.item{display:block;color:var(--muted);font-size:14.5px;padding:4px 8px;border-radius:5px}
+  nav.toc a.item:hover{color:var(--text);background:var(--panel);text-decoration:none}
+  nav.toc a.item.on{color:var(--yellow);background:var(--panel)}
+  nav.toc .other{margin-top:26px;padding-top:16px;border-top:1px solid var(--line)}
+
+  /* ---------- Content ---------- */
+  main{padding:48px 48px 90px;min-width:0}
+  .hero{margin-bottom:24px}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--yellow);
+  }
+  h1{font-family:'Unbounded',sans-serif;font-weight:700;font-size:clamp(30px,5vw,48px);line-height:1.1;margin:10px 0 14px}
+  h1 .yel{color:var(--yellow)}
+  .lede{color:#bcc4d4;font-size:19px;max-width:680px}
+  .hero .alt{margin-top:14px;color:var(--muted);font-size:15px}
+
+  section{padding-top:8px}
+  h2{
+    font-family:'Unbounded',sans-serif;font-weight:500;font-size:clamp(22px,3.2vw,28px);
+    margin:64px 0 4px;padding-bottom:10px;border-bottom:1px solid var(--line);
+  }
+  h3{font-size:19px;margin:34px 0 4px;color:var(--yellow)}
+  h4{font-size:16px;margin:22px 0 2px}
+  p{margin:12px 0}
+  ul,ol{padding-left:22px;margin:10px 0}
+  li{margin:6px 0}
+  li>ul{margin:4px 0}
+
+  /* The "In short" line every feature opens with. */
+  .short{font-size:19px;color:var(--text);margin:14px 0 6px}
+  .short::before{
+    content:"In short";display:inline-block;margin-right:10px;vertical-align:2px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:#0a0e16;background:var(--yellow);padding:2px 7px;border-radius:3px;
+  }
+  .why{
+    background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--yellow);
+    border-radius:8px;padding:12px 16px;margin:16px 0;color:#c9d0dc;
+  }
+  .why::before{
+    content:"Why it's there";display:block;margin-bottom:2px;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);
+  }
+  .note{
+    background:var(--panel-2);border:1px solid var(--line);border-radius:8px;padding:12px 16px;margin:18px 0;color:#c9d0dc;
+  }
+  .label{font-weight:700;color:var(--text);margin:20px 0 4px}
+
+  .shot{margin:20px 0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+
+  .tablewrap{overflow-x:auto;margin:16px 0;border:1px solid var(--line);border-radius:8px}
+  table{border-collapse:collapse;width:100%;font-size:15px}
+  th,td{padding:8px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+  tr:last-child td{border-bottom:none}
+  th{
+    background:var(--panel);color:var(--yellow);font-family:'JetBrains Mono',monospace;
+    font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;
+  }
+  tr:nth-child(even) td{background:rgba(18,26,44,.55)}
+  td.c{text-align:center}
+
+  .rule{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin:18px 0}
+  .rule>div{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:12px 14px}
+  .rule .codes{font-family:'JetBrains Mono',monospace;color:var(--yellow);font-size:20px;font-weight:600}
+  .rule .what{color:var(--muted);font-size:14px}
+
+  .qa h4{color:var(--text)}
+  .qa p{margin-top:2px}
+
+  footer{
+    border-top:1px solid var(--line);margin-top:72px;padding-top:22px;color:var(--muted);font-size:14px;text-align:center;
+  }
+
+  @media (max-width:860px){
+    .layout{grid-template-columns:minmax(0,1fr)}
+    nav.toc{position:static;height:auto;border-right:none;border-bottom:1px solid var(--line);padding:14px 16px}
+    nav.toc summary{
+      display:flex;align-items:center;justify-content:space-between;cursor:pointer;list-style:none;
+      font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--yellow);
+    }
+    nav.toc summary::-webkit-details-marker{display:none}
+    nav.toc summary::after{content:"＋"}
+    nav.toc details[open] summary::after{content:"－"}
+    .brand{margin-bottom:12px}
+    main{padding:28px 16px 70px}
+    body{font-size:16px}
+    .lede,.short{font-size:17px}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+
+  <nav class="toc" aria-label="Contents">
+    <a class="brand" href="../"><img src="../assets/p_icon.png" alt=""><span>Mixed in P</span></a>
+    <details id="tocDetails" open>
+      <summary>Contents</summary>
+      <div class="group">Start here</div>
+      <a class="item" href="#start">What it does</a>
+      <a class="item" href="#first">A typical first session</a>
+      <a class="item" href="#harmonic">Harmonic mixing in 60s</a>
+      <a class="item" href="#around">Getting around</a>
+      <div class="group">Prep your tracks</div>
+      <a class="item" href="#pipeline">The pipeline</a>
+      <a class="item" href="#rename">Rename</a>
+      <a class="item" href="#convert">Convert</a>
+      <a class="item" href="#analyze">Analyze</a>
+      <div class="group">Play &amp; organise</div>
+      <a class="item" href="#player">Player &amp; playlists</a>
+      <a class="item" href="#compatible">Compatible Tracks</a>
+      <a class="item" href="#slicer">Slicer &amp; metronome</a>
+      <a class="item" href="#visuals">Visuals</a>
+      <div class="group">Tags &amp; tools</div>
+      <a class="item" href="#metadata">Metadata &amp; Discogs</a>
+      <a class="item" href="#keyboard">Keyboard</a>
+      <a class="item" href="#spectrum">Spectrum</a>
+      <a class="item" href="#history">History</a>
+      <a class="item" href="#settings">Settings</a>
+      <a class="item" href="#openwith">Open with Mixed in P</a>
+      <div class="group">Reference</div>
+      <a class="item" href="#shortcuts">Keyboard shortcuts</a>
+      <a class="item" href="#formats">Formats</a>
+      <a class="item" href="#keycodes">Key codes</a>
+      <a class="item" href="#faq">Questions &amp; fixes</a>
+      <div class="other">
+        <a class="item" href="../docs/">Full reference docs →</a>
+        <a class="item" href="../#download">Download →</a>
+      </div>
+    </details>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <p class="eyebrow">Guide</p>
+      <h1>How Mixed in P <span class="yel">works</span></h1>
+      <p class="lede">A plain-language tour of the app: what each part does, what problem it
+        solves, and how to use it. No programming knowledge needed.</p>
+      <p class="alt">Want every setting and option spelled out? The
+        <a href="../docs/">reference docs</a> cover the same ground in more detail.</p>
+    </header>
+
+    <!-- ===================== START HERE ===================== -->
+    <section id="start">
+      <h2>What Mixed in P does</h2>
+      <p>Mixed in P gets your tracks ready to play out. Drop in a folder of new music and it can:</p>
+      <ul>
+        <li><b>Find the tempo, key and energy</b> of every track.</li>
+        <li><b>Clean up the filenames</b>, and add the tempo and key to them if you like.</li>
+        <li><b>Convert</b> files to the format your gear wants, without ever making the quality
+          worse than you asked for.</li>
+        <li><b>Tag</b> them: fix artist, title, label, cover art and so on, by hand or from Discogs.</li>
+        <li><b>File them into playlists</b> you can export to Rekordbox, Serato or Traktor.</li>
+      </ul>
+      <p>It also has a full player with a loop slicer and metronome, a list of tracks that mix with
+        the one playing, a piano for checking keys by ear, and a spectrum view for spotting
+        fake-quality files.</p>
+      <p>It is a <b>prep tool</b>. It's for the hours before the gig, not for performing with.</p>
+    </section>
+
+    <section id="first">
+      <h2>A typical first session</h2>
+      <ol>
+        <li><b>Drag a folder of new tracks onto the Analyze button</b> in the sidebar. Analysis
+          starts on its own.</li>
+        <li>Watch the <b>BPM</b>, <b>Key Code</b> and <b>Energy</b> columns fill in.</li>
+        <li>By default the app also <b>writes the results into each file's tags</b> and
+          <b>renames each file</b> with its tempo and key, e.g. <code>128 8A - Track Name</code>.
+          If you'd rather look first, press <b>Freeze</b> before you drop (see
+          <a href="#analyze">Analyze</a>).</li>
+        <li>Drag the tracks onto the <b>Player</b> button. Play them, sort by key or BPM, and save
+          the ones you want as a playlist.</li>
+        <li>Right-click the playlist in the sidebar, choose <b>Export…</b>, and import it into
+          your DJ software.</li>
+      </ol>
+      <p>When you do this every week, the <a href="#pipeline">pipeline</a> turns steps 1–4 into
+        one button press.</p>
+      <div class="note"><b>Heads-up:</b> out of the box, analysis <i>changes your files</i>. It
+        writes BPM, key and energy tags, and it renames files. That's usually what you want, and
+        renames can be undone from <a href="#history">History</a>. Every part of it can be switched
+        off in <a href="#settings">Settings</a>, or paused for a session with <b>Freeze</b>.</div>
+    </section>
+
+    <section id="harmonic">
+      <h2>Harmonic mixing in 60 seconds</h2>
+      <p>Two tracks blend smoothly when their keys are related. If they aren't, even a perfect
+        beatmatch can sound sour where the basslines and pads overlap.</p>
+      <p>Key names like “F♯ minor” or “D♭ major” are hard to compare in your head if you aren't
+        familiar with them, so Mixed in P gives every key a <b>key code</b>: a number from
+        <b>1 to 12</b> plus a letter. <b>A</b> means minor and <b>B</b> means major. The numbers go
+        round like a clock face.</p>
+      <p><b>The rule:</b> a track mixes well with any track that has</p>
+      <div class="rule">
+        <div><div class="codes">8A → 8A</div><div class="what">the same code</div></div>
+        <div><div class="codes">8A ↔ 8B</div><div class="what">the same number, other letter: the
+          same notes in a different mood</div></div>
+        <div><div class="codes">8A → 7A · 9A</div><div class="what">one step either way on the same
+          letter</div></div>
+      </div>
+      <p>So from <code>8A</code>, your safe next picks are <code>8A</code>, <code>8B</code>,
+        <code>7A</code> and <code>9A</code>.</p>
+      <p>Where you'll see this in the app:</p>
+      <ul>
+        <li><a href="#compatible">Compatible Tracks</a> in the Player finds these matches in your
+          library for you.</li>
+        <li>The <a href="#keyboard">Keyboard</a> panel lets you <i>hear</i> why: play two chords
+          and compare.</li>
+        <li>Prefer note names (<code>Am</code>) or Traktor's Open Key (<code>1m</code>)? Change it
+          in <b>Settings → Notation</b>.</li>
+      </ul>
+      <p>The full table of codes is under <a href="#keycodes">Key codes</a>.</p>
+    </section>
+
+    <section id="around">
+      <h2>Getting around</h2>
+      <h3>The sidebar</h3>
+      <p class="short">The buttons down the left switch pages, and they also take drops.</p>
+      <p>The pages, top to bottom: <b>Player, Rename, Convert, Analyze, Metadata, Spectrum,
+        Keyboard</b>, then <b>Settings</b> and <b>History</b> at the bottom.</p>
+      <p class="label">Drop files on a button to send them there.</p>
+      <p>You don't have to open a panel first. Drag files or whole folders from Finder or Explorer
+        onto a button, and they go straight into that panel. Folders are searched all the way
+        down.</p>
+      <ul>
+        <li>Dropping on <b>Player, Rename, Convert or Analyze</b> adds the files and leaves you
+          where you are, so you can keep working.</li>
+        <li>Dropping on <b>Metadata or Spectrum</b> opens that page with the file loaded.</li>
+      </ul>
+      <p class="label">You can drag rows between panels the same way.</p>
+      <p>Select rows in one panel and drop them on another panel's button.</p>
+      <ul>
+        <li>Between Rename, Convert and Analyze, tracks <b>move</b>. They're a to-do list, so a
+          track leaves one step when it goes to the next.</li>
+        <li>Out of the Player, tracks are always <b>copied</b>. A playlist only loses a track when
+          you remove it on purpose.</li>
+        <li>Onto Metadata or Spectrum, a track is just <b>opened for viewing</b>.</li>
+      </ul>
+      <p class="label">Other things the sidebar shows you</p>
+      <ul>
+        <li>The <b>Convert</b> icon spins and the <b>Analyze</b> magnifier looks around while they're
+          working, so you can see progress from any page.</li>
+        <li>A small <b>Auto</b> badge on Analyze means dropped files are analyzed straight away.</li>
+        <li><b>Playlists</b> (or <kbd>Shift</kbd>+<kbd>Tab</kbd> from anywhere) swaps the buttons
+          for your playlist tree. The thin <b>||</b> button shows both side by side.</li>
+      </ul>
+
+      <h3>The header bar</h3>
+      <ul>
+        <li><b>Add</b>: pick <b>Files…</b> or <b>Folder…</b> to add to the page you're looking at.</li>
+        <li><b>Playing: …</b>: click it to jump to the playlist the current track is playing from.</li>
+        <li><b>Three small pipeline toggles</b> and a <b>Playlist name</b> box. See
+          <a href="#pipeline">The pipeline</a>.</li>
+        <li><b>?</b> opens the About box. Click through its slides for a quick tour, or use
+          <b>Check for updates</b>.</li>
+      </ul>
+    </section>
+
+    <!-- ===================== PREP ===================== -->
+    <section id="pipeline">
+      <h2>The pipeline</h2>
+      <p class="short">One button takes new tracks through Rename → Convert → Analyze and files
+        them into a playlist.</p>
+      <div class="why">Prepping a batch of new music is the same four chores every time: clean the
+        names, convert, analyze, file it somewhere. The pipeline does them in one go, in the right
+        order, and nothing gets missed.</div>
+      <p class="label">How to use it</p>
+      <ol>
+        <li><b>Pick the steps you want.</b> Rename, Convert and Analyze each have a small
+          <b>wave-in-a-triangle toggle</b> next to their main button. The same three toggles appear
+          in the header. Lit means the step is included.</li>
+        <li><b>Name the target playlist</b> in the <b>Playlist name</b> box in the header. Pick an
+          existing playlist, or type a new name and one is created for you.</li>
+        <li><b>Load the files into the first step you want</b> and press <b>Start Pipeline</b>.
+          That's the panel's main button, renamed while its step is on.</li>
+      </ol>
+      <p>The files are processed step by step and land in the playlist. The run reports at the end:
+        <i>“Pipeline complete: 12 added to New Friday, 0 skipped, 0 errors.”</i></p>
+      <p class="label">Good to know</p>
+      <ul>
+        <li>The order is always Rename → Convert → Analyze. A run goes <i>forward</i> from the panel
+          you started in, so starting in Convert never renames.</li>
+        <li>Every run ends in the playlist, so you don't need a toggle for that part.</li>
+        <li>Set up your rename and convert options <i>before</i> starting. The pipeline uses
+          whatever is set in each panel.</li>
+        <li>Tracks that are already analyzed aren't analyzed again. They go straight to the
+          playlist.</li>
+        <li>Files Convert can't take (see <a href="#convert">Convert</a>) <b>stay behind in
+          Convert</b>, with their status saying why. The rest carry on.</li>
+        <li>With <b>Auto</b> on and the Analyze step lit, <b>dropping files onto Analyze starts a
+          run</b>. Files dropped mid-run join the run in progress. If no playlist is named yet,
+          the files are only analyzed, and a notice tells you so.</li>
+        <li>Duplicates are skipped during a run rather than asking every time.</li>
+      </ul>
+    </section>
+
+    <section id="rename">
+      <h2>Rename</h2>
+      <p class="short">Clean up lots of filenames at once, with a live preview.</p>
+      <div class="why">Downloads arrive as <code>01_artist-track_(original_mix)_promo.wav</code>.
+        Tidy names are easier to search in your DJ software and easier to read on a CDJ
+        screen.</div>
+      <p><b>How to use it:</b> drop files in, set the options, check the <b>Preview</b> column, and
+        press <b>Apply Rename</b>.</p>
+      <div class="shot"><img src="../assets/rename.webp" alt="Rename panel with a live preview of batch filename changes" loading="lazy"></div>
+      <p class="label">The options (applied in this order)</p>
+      <ul>
+        <li><b>Trim Start / Trim End</b>: chop a number of characters off the front or back of every
+          name, e.g. to strip <code>01_</code> track numbers or a <code>_promo</code> tag. The file
+          extension is never touched.</li>
+        <li><b>Prepend Text / Append Text</b>: add text to the start, the end, or both. Typing in a
+          box switches it on.</li>
+        <li><b>Remove Underscores</b>: <code>Artist_Track</code> → <code>Artist Track</code>.</li>
+        <li><b>Space Dashes</b>: <code>Artist-Track</code> → <code>Artist - Track</code>. Some DJ
+          software searches badly on names without spaces around the dash.</li>
+        <li><b>Clear</b> resets everything.</li>
+      </ul>
+      <p class="label">Good to know</p>
+      <ul>
+        <li>The preview shows the result before anything changes on disk.</li>
+        <li>A <b>Conflict</b> means two files would end up with the same name, or a file with that
+          name already exists. Conflicting rows are skipped.</li>
+        <li>Renamed rows turn green and say <b>Changed</b>.</li>
+        <li><b>Undo Last</b> puts the last batch back. Older batches can be undone from
+          <a href="#history">History</a>. Undo also fixes the names in your playlists, so nothing
+          goes missing.</li>
+        <li>Double-click a name to open it as text you can select and copy.</li>
+      </ul>
+
+      <h3>Automatic renaming after analysis</h3>
+      <p>Separately from this panel, analysis can rename each file with its tempo and key as it
+        finishes. This is on by default. Choose the style in <b>Settings → Naming format</b>:</p>
+      <div class="tablewrap"><table>
+        <tr><th>Style</th><th>Example</th></tr>
+        <tr><td>BPM + key first (default)</td><td><code>128 8A - Track Name</code></td></tr>
+        <tr><td>Key + BPM first</td><td><code>8A 128 - Track Name</code></td></tr>
+        <tr><td>Key first</td><td><code>8A - Track Name</code></td></tr>
+        <tr><td>Key + BPM last</td><td><code>Track Name - 8A 128</code></td></tr>
+        <tr><td>Key last</td><td><code>Track Name - 8A</code></td></tr>
+      </table></div>
+      <p>Why do this? Your tempo and key then travel with the file into any app, any USB stick,
+        and any folder view, sorted and readable at a glance.</p>
+      <p>If any new name in a batch would clash with an existing file, nothing in that batch is
+        renamed, and a notice names the file that clashed.</p>
+    </section>
+
+    <section id="convert">
+      <h2>Convert</h2>
+      <p class="short">Change files to WAV, FLAC, AIFF or MP3, without ever accidentally making
+        them worse.</p>
+      <div class="why">Your gear or your DJ software may want a particular format. Older CDJs, for
+        example, can choke on FLAC or on 96 kHz/24-bit files. Convert makes the copies it needs.
+        It also refuses conversions that would only <i>pretend</i> to improve quality, because
+        those fill your drive for nothing.</div>
+      <p class="label">How to use it</p>
+      <ol>
+        <li>Drop files in.</li>
+        <li>Pick the <b>Target Format</b>. For WAV, FLAC or AIFF, also pick a <b>Sample Rate</b>
+          and <b>Bit Depth</b>. For MP3, pick a <b>Bitrate</b>. <b>Keep source</b> leaves that
+          setting as it is on each file, which is handy for a mixed batch.</li>
+        <li>Choose where the new files go:
+          <ul>
+            <li>With the <b>Source</b> toggle lit, each new file is saved next to its original.</li>
+            <li>Otherwise it goes into a folder you pick.</li>
+          </ul>
+        </li>
+        <li>Check the <b>Status</b> column, then press <b>Convert</b>.</li>
+      </ol>
+      <p>Your originals are never deleted or overwritten. Tags and cover art are copied over to the
+        new files.</p>
+      <div class="shot"><img src="../assets/convert.webp" alt="Convert panel with format options and a status for each file" loading="lazy"></div>
+      <p class="label">Reading the Status column</p>
+      <div class="tablewrap"><table>
+        <tr><th>Status</th><th>Meaning</th></tr>
+        <tr><td><b>Ready</b></td><td>Will convert.</td></tr>
+        <tr><td><b>Same format</b></td><td>Already this format at these settings. There's nothing
+          to do unless you pick a <i>lower</i> rate, depth or bitrate.</td></tr>
+        <tr><td><b>Would upsample</b></td><td>You asked for a higher sample rate or bit depth than
+          the file has. Pick one no higher than the file's.</td></tr>
+        <tr><td><b>Lossy source</b></td><td>MP3, M4A and OGG can't become WAV, FLAC or AIFF. An MP3
+          can only become a <i>lower-bitrate</i> MP3.</td></tr>
+        <tr><td><b>Incomplete</b></td><td>The file seems cut short, like a download that didn't
+          finish. Re-download it.</td></tr>
+      </table></div>
+      <div class="note"><b>Why “quality never goes up”:</b> turning an MP3 into a WAV makes a file
+        ten times bigger that sounds exactly like the MP3. The missing detail was thrown away when
+        the MP3 was made and can't be put back. The same goes for “upsampling” 44.1 kHz to 96 kHz.
+        Mixed in P stops you before you fill a drive with files that only <i>look</i> better.</div>
+    </section>
+
+    <section id="analyze">
+      <h2>Analyze</h2>
+      <p class="short">Finds each track's BPM, key and energy (1–10).</p>
+      <div class="why">Knowing the tempo and key of every track is the base of beatmatching and
+        harmonic mixing. Doing it by ear for a whole crate takes forever.</div>
+      <p><b>How to use it:</b> drop files onto the panel, or onto its sidebar button.</p>
+      <ul>
+        <li>With <b>Auto</b> on (the default), analysis starts immediately.</li>
+        <li>With it off, files wait as <b>Pending</b> until you press <b>Analyze</b>.</li>
+      </ul>
+      <p>It takes a few seconds per track.</p>
+      <div class="shot"><img src="../assets/analyze.webp" alt="Analyze panel showing BPM, key, key code and energy for a batch of tracks" loading="lazy"></div>
+      <p class="label">The columns</p>
+      <ul>
+        <li><b>BPM</b>, with a <b>Conf</b> (confidence) score.</li>
+        <li><b>Key</b> and <b>Key Code</b>, with their own <b>Conf</b>.</li>
+        <li><b>Alt Keys</b>: the next most likely keys and how likely they are. Useful when a track
+          sits between two keys.</li>
+        <li><b>Energy</b>: 1 (chilled) to 10 (peak time). It's worked out from loudness, how busy
+          the rhythm is, and how bright the sound is.</li>
+        <li><b>Status</b>: <b>Pending → Analyzing → Analyzed</b>, or <b>Error</b>.</li>
+      </ul>
+      <p class="label">What happens after each track</p>
+      <p>All of these are on by default, and all can be changed in <a href="#settings">Settings</a>:</p>
+      <ul>
+        <li>The BPM and key are written into the file's tags, so they show up in Rekordbox, Serato,
+          Traktor and so on.</li>
+        <li>The energy is written into the comment (e.g. <code>6 - visit my webpage</code>) and
+          into its own tag field.</li>
+        <li>The file is renamed with its BPM and key (see <a href="#rename">Rename</a>).</li>
+      </ul>
+
+      <h3>Freeze</h3>
+      <p class="short">Analyze without changing anything.</p>
+      <p>Press <b>Freeze</b> and analysis still fills in the table, but writes nothing to your files
+        and renames nothing. Use it to try the app on music you don't want touched yet, or to check
+        results before committing. It lasts until you press it again or restart the app.</p>
+
+      <h3>Cancel</h3>
+      <p><b>Cancel</b> stops the batch right away. Tracks that already finished keep their results.
+        Tracks that never started go back to <b>Pending</b>, so you can press <b>Analyze</b> to pick
+        up where you left off.</p>
+
+      <p class="label">Good to know</p>
+      <ul>
+        <li><b>Half/double tempo.</b> A 128 BPM track can just as easily be heard as 64 or 256.
+          Analysis keeps results inside a DJ-friendly range, <b>99–199 BPM</b> by default. If you
+          play drum &amp; bass, dubstep or downtempo, adjust <b>Settings → Tempo Range</b> so
+          results land where you'd count them.</li>
+        <li><b>Low confidence</b> is worth a listen. The <b>History → Key History</b> view flags
+          tracks whose key or tempo was a close call.</li>
+        <li><b>WAV files can't hold tags.</b> WAV rows are tinted and say <b>Analyzed, no tags</b>.
+          The results are still shown, and the file can still be renamed with them. If you want
+          tags, convert to AIFF or FLAC; both are just as lossless.</li>
+      </ul>
+    </section>
+
+    <!-- ===================== PLAY ===================== -->
+    <section id="player">
+      <h2>Player &amp; playlists</h2>
+      <p class="short">Play your tracks, organise them into playlists, and see what mixes with
+        what.</p>
+      <div class="shot"><img src="../assets/player.webp" alt="Player panel with a playlist, the playlist tree and the transport" loading="lazy"></div>
+
+      <h3>Playing</h3>
+      <ul>
+        <li>Double-click a track to play it. <kbd>Space</kbd> plays and pauses.</li>
+        <li>The <b>Previous</b>, <b>Play / Pause</b>, <b>Stop</b> and <b>Next</b> buttons and the
+          <b>Vol</b> slider are pinned at the bottom.</li>
+        <li><b>Playback follows the playlist it started from</b>, not whatever is on screen. You can
+          browse other playlists or search while a set plays on.</li>
+        <li>The <b>Playing:</b> line at the bottom has two uses:
+          <ul>
+            <li>Drag it onto any playlist to add the current track.</li>
+            <li>Click <b>In Playlist: …</b> (or press <kbd>Cmd/Ctrl</kbd>+<kbd>L</kbd>) to jump
+              back to where it's playing from.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Playlists</h3>
+      <p>Show the tree with the sidebar's <b>Playlists</b> button, or press
+        <kbd>Shift</kbd>+<kbd>Tab</kbd> from anywhere.</p>
+      <ul>
+        <li><b>Scratch</b> is your throwaway working list. It starts empty each launch, like a
+          notepad. (Settings can keep it between sessions.) <b>Save Playlist</b> turns whatever is
+          in it into a real playlist.</li>
+        <li><b>+ Playlist</b> and <b>+ Folder</b> create new items. Drag them to reorder or to nest
+          them inside folders.</li>
+        <li><b>Dropping tracks on a playlist adds copies.</b> Nothing is removed from where it came
+          from.</li>
+        <li><b>Removing</b> tracks (<kbd>Delete</kbd>/<kbd>Backspace</kbd>) asks first in a saved
+          playlist. <kbd>Cmd</kbd>+<kbd>Backspace</kbd> (<kbd>Ctrl</kbd>+<kbd>Delete</kbd> on
+          Windows) skips the question. Removing never stops the music.</li>
+        <li><kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd> undoes playlist edits, including adds, removes,
+          clears and moves.</li>
+        <li>If a track is already in the playlist, you'll be asked whether to add it again. A set
+          can repeat a track on purpose. Settings can make this always add or always skip.</li>
+      </ul>
+
+      <h3>Export to your DJ software</h3>
+      <p>Right-click a playlist → <b>Export…</b> and choose <code>.m3u8</code>, <code>.m3u</code>
+        or a <b>Tracklist (.txt)</b> for posting online. Then import it:</p>
+      <ul>
+        <li><b>Rekordbox</b>: File → Import Playlist.</li>
+        <li><b>Serato</b>: drag the file onto the crate panel.</li>
+        <li><b>Traktor</b>: File → Import.</li>
+      </ul>
+      <p><b>Export and Copy Tracks…</b> copies the audio files <i>and</i> a playlist into one
+        folder. Zip it and send it, and it works on the other machine. <b>Export Folder…</b>
+        exports a whole folder of playlists. <b>Settings → Export All Playlists…</b> makes a full
+        backup.</p>
+
+      <h3>When files have moved</h3>
+      <p>Moved a folder, renamed a drive, or plugged your USB stick into a different port? Missing
+        tracks show dimmed. Right-click one and choose <b>Locate Missing File…</b>:</p>
+      <ul>
+        <li><b>Locate…</b> lets you point at that one file.</li>
+        <li><b>Find in Folder…</b> scans a folder and relinks <i>every</i> missing track it finds
+          there, across all your playlists, in one go. It recognises files by their contents even
+          if they were renamed.</li>
+      </ul>
+
+      <h3>Search</h3>
+      <p>Type in the search box to search <b>All playlists</b> (the default) or <b>This
+        playlist</b>. You can switch between them with the button beside the box.</p>
+      <ul>
+        <li>Searching everything matches artist, title, album, filename, comment and key.</li>
+        <li>The <b>#</b> column shows how many playlists each result is in. Hover it to see which
+          ones.</li>
+        <li>Select a result and the playlists holding it light up in the tree.</li>
+        <li><kbd>Esc</kbd> leaves the search.</li>
+      </ul>
+
+      <h3>Columns and look</h3>
+      <ul>
+        <li>Right-click the column headers to show extra columns: <b>Album, Genre, Track #, Label,
+          Bitrate, Energy, Art, Date Added, Date Created, Format, Bit Depth</b>.</li>
+        <li>Drag columns to reorder or resize them. The same menu has <b>Fit … to Longest</b> and
+          <b>Reset Columns</b>.</li>
+        <li>Click a header to sort. A third click goes back to your own order.</li>
+        <li><b>Settings → Playlist Text Size</b> and <b>Playlist Artwork</b> (how much of the cover
+          the Art column shows) change how the list looks.</li>
+      </ul>
+
+      <h3>Editing tags in the list</h3>
+      <p>Click a cell in an already-selected row to edit <b>Artist, Title, BPM, Key, Comment</b> or
+        <b>Year</b>. It works like renaming in Finder. Changes are written straight into the
+        file.</p>
+      <p>To avoid editing by accident while you browse, tick <b>Edit Lock</b> at the top right.</p>
+
+      <h3>Cover art</h3>
+      <p>Click the small cover next to the title to show a big version in the sidebar. <b>Drop a
+        JPG or PNG onto either cover</b> to make it the playing track's artwork. (Edit Lock must be
+        off.)</p>
+    </section>
+
+    <section id="compatible">
+      <h2>Compatible Tracks</h2>
+      <p class="short">“What can I play next?”, answered from your own library.</p>
+      <p>Click the <b>Compatible Tracks</b> button while a track is playing. A panel opens listing
+        every track in your playlists that mixes with it, best first:</p>
+      <ol>
+        <li><b>Key</b>: the same key first, then relative major/minor, then one step around the
+          wheel.</li>
+        <li><b>Tempo</b>: within about 8%. Half- and double-time matches are included but marked,
+          since they mix at a different feel.</li>
+        <li><b>Energy</b>: the closest energy wins ties, so you can hold the room steady.</li>
+      </ol>
+      <p><b>Preview:</b> press and hold the play icon beside a match to hear it. Sound stops when you
+        move away, and clicking again skips ahead 30 seconds. Previewing stops the main player.</p>
+      <p>Double-click a match to add it to the list on screen.</p>
+      <p>It only knows about tracks that are in a playlist and have been analyzed.</p>
+    </section>
+
+    <section id="slicer">
+      <h2>Loop Slicer, waveforms &amp; metronome</h2>
+      <p>These live in the Player, in the collapsible row under the playlist. Each part has its own
+        toggle, so you can open just what you need.</p>
+
+      <h3>Waveform and Zoomed Wave</h3>
+      <ul>
+        <li><b>Waveform</b> swaps the seek bar for the whole track's waveform. You can see the
+          build-ups and breakdowns and click anywhere to jump.</li>
+        <li><b>Zoomed Wave</b> is a close-up around the playhead. You can scrub it while paused to
+          find an exact hit.</li>
+        <li>The colours are set in <b>Settings → Waveform / Visuals</b>:
+          <ul>
+            <li><b>Solid</b>: one colour.</li>
+            <li><b>Loudness</b>: brighter where it's louder.</li>
+            <li><b>Frequency bands</b>: bass, mids and highs tinted differently, so kicks, vocals
+              and hats stand out.</li>
+            <li><b>Tone</b>: coloured by how bright or dark the sound is.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h3>Loop Slicer</h3>
+      <p class="short">Cut a loop or sample out of a track and save it as its own file.</p>
+      <div class="why">For lifting a loop, an acapella phrase, or a drum hit into your sampler or
+        DAW without opening a whole production app.</div>
+      <div class="shot"><img src="../assets/slicer.webp" alt="Loop Slicer with start and end markers on the waveform" loading="lazy"></div>
+      <p class="label">How to use it</p>
+      <ol>
+        <li>Play the track. Press <kbd>Q</kbd> (or <b>Mark</b>) at the start point and
+          <kbd>E</kbd> at the end point. You can also drag the markers on the waveform.</li>
+        <li>Fine-tune with the 10 ms nudge buttons, or type a <b>Length</b>.</li>
+        <li>Switch on <b>Loop</b> (<kbd>L</kbd>) to hear it loop.</li>
+        <li><b>Hold <kbd>S</kbd></b> to audition from the start marker. It jumps back when you let
+          go.</li>
+        <li>Name it under <b>Save Slice As</b>, pick a format, and press <b>Slice</b>.</li>
+      </ol>
+      <p>The slice is saved next to the original by default. Nothing is ever overwritten.</p>
+      <p><b>Mark on beat:</b> switch this on and your marks, jumps and loop starts snap to the
+        metronome's next click. With the metronome set to the track's tempo, your loops land on the
+        beat without fiddly nudging. Switching it on opens the metronome and loads the track's BPM,
+        but you start the click yourself.</p>
+      <p>The keys <kbd>Q</kbd>, <kbd>E</kbd>, <kbd>S</kbd> and <kbd>L</kbd> only work while the
+        slicer is open and you aren't typing in a box.</p>
+
+      <h3>Metronome</h3>
+      <p class="short">A click track for checking a tempo or practising along.</p>
+      <ul>
+        <li><b>Start</b> / <b>Stop</b>.</li>
+        <li>Set the tempo by any of:
+          <ul>
+            <li>typing it;</li>
+            <li>dragging the BPM box up or down (hold <kbd>Shift</kbd> for fine steps);</li>
+            <li>using <b>−</b> and <b>+</b>;</li>
+            <li><b>Tap</b> along;</li>
+            <li><b>Track</b>, which takes the loaded track's tempo.</li>
+          </ul>
+        </li>
+        <li>The <b>‹ ›</b> bend buttons nudge the beat back or forward while held, like pushing a
+          platter.</li>
+        <li>Pick a click sound (silent light, standard or higher-pitched) and a volume. The first
+          beat of each bar is accented.</li>
+        <li><b>Global Click</b> keeps the click going when you switch to another page.</li>
+      </ul>
+    </section>
+
+    <section id="visuals">
+      <h2>Visuals</h2>
+      <p class="short">Eye candy that moves to the music, either behind the playlist or in its own
+        window.</p>
+      <p>Click the <b>eye</b> button in the Player and pick one. Every visual can play
+        <b>behind the playlist</b>. All but Waveform and Smoke also come as a <b>Popout</b> in
+        their own window, which is good for a second screen. <b>Visuals off</b> turns them
+        off.</p>
+      <div class="tablewrap"><table>
+        <tr><th>Visual</th><th>What you see</th></tr>
+        <tr><td><b>J Fractal</b></td><td>A spinning fractal that morphs with the music; the kick
+          punches the zoom.</td></tr>
+        <tr><td><b>Tri Fractal</b></td><td>The same idea with a three-fold, triangular
+          symmetry.</td></tr>
+        <tr><td><b>Blade Fractal</b></td><td>Glowing blades: thick on the kick, a thin skeleton in
+          between.</td></tr>
+        <tr><td><b>Tunnel chase</b></td><td>Flying down a wireframe tunnel. Stars flash on the
+          kick, and the speed follows the loudness.</td></tr>
+        <tr><td><b>Oscilloscope</b></td><td>A green CRT beam tracing the sound wave.</td></tr>
+        <tr><td><b>Spectrum</b></td><td>Classic frequency bars with falling peaks.</td></tr>
+        <tr><td><b>Wormhole</b></td><td>A nebula tunnel flown at the track's tempo, turning on the
+          first beat of each bar.</td></tr>
+        <tr><td><b>Waveform</b></td><td>The track's waveform, drawn behind the rows.</td></tr>
+        <tr><td><b>Smoke</b></td><td>Smoke that billows with the music.</td></tr>
+      </table></div>
+    </section>
+
+    <!-- ===================== TAGS & TOOLS ===================== -->
+    <section id="metadata">
+      <h2>Metadata &amp; Discogs</h2>
+      <p class="short">View and edit one file's tags and cover art.</p>
+      <div class="why">Good tags are how your DJ software sorts, searches and displays your music.
+        Most promos arrive with missing or messy ones.</div>
+      <p><b>How to use it:</b> drop a file on the panel or its sidebar button, or right-click a
+        Player track → <b>Open in Metadata Panel</b>.</p>
+      <div class="shot"><img src="../assets/metadata.webp" alt="Metadata panel with tag fields and cover art" loading="lazy"></div>
+      <ul>
+        <li>Edit <b>Title, Artist, Album, Label, Genre, BPM, Key, Year, Track #</b> or
+          <b>Comment</b>. <b>Each field saves as soon as you click away</b>; there's no Save
+          button.</li>
+        <li>Clearing a field removes that tag from the file.</li>
+        <li>Need a field that isn't shown? Pick it from <b>Add field…</b>.</li>
+        <li><b>Cover art:</b> drop a JPG or PNG onto the art box, or use <b>Add Artwork…</b>. Click
+          the cover to see it large; right-click to remove it.</li>
+        <li><b>Reload</b> re-reads the file if something else changed it. <b>Eject</b> closes
+          it.</li>
+        <li><b>Open File Location</b> shows the file in Finder or Explorer.</li>
+      </ul>
+      <p><b>Good to know:</b> WAV files can't store these tags. Use AIFF or FLAC if you want tags on
+        a lossless file.</p>
+
+      <h3>Discogs lookup (optional)</h3>
+      <p class="short">Fill in missing details and cover art from Discogs, and approve every change
+        before it's written.</p>
+      <div class="why">Typing label, year and catalogue details by hand for every promo is tedious,
+        and a cover makes a track easy to spot in your library.</div>
+      <p class="label">Setting it up (once)</p>
+      <ol>
+        <li>Go to <b>Settings → Online Metadata</b> and tick <b>Look up track details online
+          (Discogs)</b>.</li>
+        <li>Click <b>Get a Token…</b>, which opens Discogs in your browser. Create a free personal
+          token there and paste it in.</li>
+      </ol>
+      <p>It's <b>off by default</b>, and the app makes no internet requests until you turn it on. A
+        lookup sends only the artist and title, never your audio or your library. BPM, key and
+        energy always come from Mixed in P's own analysis.</p>
+      <p class="label">Using it</p>
+      <ul>
+        <li>In Metadata, click <b>Look Up Online…</b>.</li>
+        <li>A review window shows <b>Current</b> beside <b>From Discogs</b>. Tick what you want and
+          click <b>Apply</b>:
+          <ul>
+            <li>Empty fields come pre-ticked.</li>
+            <li>Fields you've already filled in are not ticked, so nothing gets overwritten unless
+              you choose it.</li>
+          </ul>
+        </li>
+        <li><b>Wrong pressing?</b> Pick another from <b>Select release</b>.</li>
+        <li><b>Wrong track?</b> Pick the right one from <b>Select track</b>.</li>
+        <li><b>Lots of tracks?</b> Select them in the Player, right-click → <b>Look Up Online…</b>,
+          and review each in turn.</li>
+      </ul>
+      <p><b>The Discogs tab</b> remembers which release a file was tagged from and shows its full
+        details offline next time: label, catalogue number, tracklist, credits and more. Click the
+        small arrow beside any value to copy it into the tags.</p>
+      <p><b>Find Cover Online…</b> is for when the tags are fine but the cover is missing. It lets
+        you borrow the cover from any pressing of the release.</p>
+    </section>
+
+    <section id="keyboard">
+      <h2>Keyboard</h2>
+      <p class="short">A piano for hearing how keys fit together.</p>
+      <div class="why">The key-code rules are easier to trust once you've heard them. Play the chord
+        of one track's key, then a compatible one, then an incompatible one, and you'll hear the
+        difference.</div>
+      <div class="shot"><img src="../assets/keyboard.webp" alt="Keyboard panel with the piano and the harmonic key grid" loading="lazy"></div>
+      <p class="label">How to use it</p>
+      <ul>
+        <li>Click the keys, or play them on your computer keyboard:
+          <ul>
+            <li>White keys: <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>G</kbd>
+              <kbd>H</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>L</kbd> <kbd>;</kbd></li>
+            <li>Black keys: <kbd>W</kbd> <kbd>E</kbd> <kbd>T</kbd> <kbd>Y</kbd> <kbd>U</kbd>
+              <kbd>O</kbd> <kbd>P</kbd></li>
+          </ul>
+        </li>
+        <li><kbd>Z</kbd> / <kbd>X</kbd> move down or up an octave.</li>
+        <li><b>Minor Chord / Major Chord</b> chooses which kind of chord each key plays.</li>
+        <li>Each piano key is labelled with its key code.</li>
+      </ul>
+      <p><b>The key wheel</b> (the strip and the <b>Hex Grid</b> or <b>Circle of Fifths</b> view)
+        lights up the compatible keys while you hold a chord. Click any segment to hear it. The info
+        box spells out the key and what it mixes with.</p>
+    </section>
+
+    <section id="spectrum">
+      <h2>Spectrum</h2>
+      <p class="short">A picture of a file's frequencies, for spotting fake or low-quality
+        files.</p>
+      <div class="why">A “WAV” or “320 MP3” from a sketchy source is sometimes a low-quality MP3 in
+        disguise. You can't always hear it on laptop speakers, but you'll hear it on a club
+        system.</div>
+      <p><b>How to read it:</b> drop a file on the panel. Time runs left to right, pitch from low
+        (bottom) to high (top), and colour shows loudness.</p>
+      <div class="shot"><img src="../assets/spectrum.webp" alt="Spectrum panel showing a full-range spectrogram of an audio file" loading="lazy"></div>
+      <ul>
+        <li>A <b>real</b> lossless or high-quality file usually has content reaching near the
+          top.</li>
+        <li>A <b>low-bitrate</b> file shows a hard, flat <b>ceiling</b> where everything above a
+          certain height is cut off. Around 16 kHz is typical of 128 kbps.</li>
+      </ul>
+      <p><b>Split Screen</b> puts two files side by side, e.g. the “WAV” you bought next to a
+        known-good file. <b>Sensitivity</b> adjusts how much quiet detail is shown.</p>
+    </section>
+
+    <section id="history">
+      <h2>History</h2>
+      <ul>
+        <li><b>Rename History</b> lists every rename batch. Select one and press <b>Undo
+          Selected</b> to put those names back.</li>
+        <li><b>Key History</b> lists recently analyzed tracks and their results, with a note when a
+          key or tempo was a close call.</li>
+        <li><b>Export CSV</b> saves either list for a spreadsheet.</li>
+      </ul>
+    </section>
+
+    <section id="settings">
+      <h2>Settings</h2>
+      <p>Settings save as you change them. Language and theme apply after a restart.</p>
+      <ul>
+        <li><b>Language</b>: 12 languages.</li>
+        <li><b>Theme</b>: Nuevo Leon, Dark Mode, Daylight, Slate or Neon Dark.</li>
+        <li><b>Default Audio Player</b>: make Mixed in P open when you double-click an audio
+          file.</li>
+        <li><b>Waveform / Visuals</b>: colour mode, colour, and half or full waveform.</li>
+        <li><b>Playlist Text Size / Playlist Artwork</b>: how the Player list looks.</li>
+        <li><b>Tempo Range</b>: the BPM range analysis aims for (default 99–199).</li>
+        <li><b>After analysis</b>: whether to auto-analyze on drop, write BPM and key tags, rename
+          files, and the <b>Naming format</b>.</li>
+        <li><b>Notation</b>: key codes (<code>8A</code>), note names (<code>Am</code>) or Open Key
+          (<code>1m</code>).</li>
+        <li><b>Energy Tag</b>: whether and how energy goes into the comment, and whether it gets its
+          own tag field.</li>
+        <li><b>Online Metadata</b>: the Discogs switch and token.</li>
+        <li><b>Playlists</b>: the duplicates prompt, keeping Scratch between sessions, full vs
+          relative paths in exports, and <b>Export All Playlists…</b>.</li>
+        <li><b>Troubleshooting</b>: <b>Show Log File</b> finds the app's log for you, to attach to a
+          bug report.</li>
+        <li><b>Reset to Default</b>: puts everything back, apart from language, theme and window
+          layout.</li>
+      </ul>
+    </section>
+
+    <section id="openwith">
+      <h2>Open with Mixed in P</h2>
+      <p>Right-click audio files in Finder or Explorer → <b>Open With → Mixed in P</b>, or make it
+        your default player in Settings. The files go into <b>Scratch</b> and the first one starts
+        playing straight away, like any music player. Your saved playlists are never touched by
+        this.</p>
+    </section>
+
+    <!-- ===================== REFERENCE ===================== -->
+    <section id="shortcuts">
+      <h2>Keyboard shortcuts</h2>
+      <div class="tablewrap"><table>
+        <tr><th>Keys</th><th>Does</th><th>Where</th></tr>
+        <tr><td><kbd>Space</kbd></td><td>Play / pause</td><td>Player</td></tr>
+        <tr><td><kbd>Cmd/Ctrl</kbd>+<kbd>L</kbd></td><td>Jump to the playing playlist</td><td>Anywhere</td></tr>
+        <tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Show / hide the playlist tree</td><td>Anywhere</td></tr>
+        <tr><td><kbd>Cmd/Ctrl</kbd>+<kbd>Z</kbd></td><td>Undo a playlist edit</td><td>Anywhere</td></tr>
+        <tr><td><kbd>Delete</kbd> / <kbd>Backspace</kbd></td><td>Remove selected tracks</td><td>Player, Rename, Analyze</td></tr>
+        <tr><td><kbd>Cmd</kbd>+<kbd>Backspace</kbd> (<kbd>Ctrl</kbd>+<kbd>Delete</kbd>)</td><td>Remove without asking</td><td>Player</td></tr>
+        <tr><td><kbd>Esc</kbd></td><td>Leave search</td><td>Player</td></tr>
+        <tr><td><kbd>Q</kbd> / <kbd>E</kbd></td><td>Mark slice start / end</td><td>Loop Slicer open</td></tr>
+        <tr><td><kbd>S</kbd> (hold)</td><td>Play from start marker</td><td>Loop Slicer open</td></tr>
+        <tr><td><kbd>L</kbd></td><td>Loop on/off</td><td>Loop Slicer open</td></tr>
+        <tr><td><kbd>A</kbd>–<kbd>;</kbd> and <kbd>W</kbd>–<kbd>P</kbd></td><td>Play chords</td><td>Keyboard</td></tr>
+        <tr><td><kbd>Z</kbd> / <kbd>X</kbd></td><td>Octave down / up</td><td>Keyboard</td></tr>
+      </table></div>
+    </section>
+
+    <section id="formats">
+      <h2>Formats</h2>
+      <div class="tablewrap"><table>
+        <tr><th></th><th>MP3</th><th>WAV</th><th>FLAC</th><th>AIFF</th><th>M4A</th><th>OGG</th></tr>
+        <tr><td>Play, analyze</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+        <tr><td>Tags &amp; cover art</td><td class="c">✓</td><td class="c">✗</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td></tr>
+        <tr><td>Convert <i>to</i></td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">✓</td><td class="c">–</td><td class="c">–</td></tr>
+      </table></div>
+    </section>
+
+    <section id="keycodes">
+      <h2>Key codes</h2>
+      <div class="tablewrap"><table>
+        <tr><th>Code</th><th>Minor</th><th>Code</th><th>Major</th></tr>
+        <tr><td><code>1A</code></td><td>A♭m</td><td><code>1B</code></td><td>B</td></tr>
+        <tr><td><code>2A</code></td><td>E♭m</td><td><code>2B</code></td><td>F♯</td></tr>
+        <tr><td><code>3A</code></td><td>B♭m</td><td><code>3B</code></td><td>D♭</td></tr>
+        <tr><td><code>4A</code></td><td>Fm</td><td><code>4B</code></td><td>A♭</td></tr>
+        <tr><td><code>5A</code></td><td>Cm</td><td><code>5B</code></td><td>E♭</td></tr>
+        <tr><td><code>6A</code></td><td>Gm</td><td><code>6B</code></td><td>B♭</td></tr>
+        <tr><td><code>7A</code></td><td>Dm</td><td><code>7B</code></td><td>F</td></tr>
+        <tr><td><code>8A</code></td><td>Am</td><td><code>8B</code></td><td>C</td></tr>
+        <tr><td><code>9A</code></td><td>Em</td><td><code>9B</code></td><td>G</td></tr>
+        <tr><td><code>10A</code></td><td>Bm</td><td><code>10B</code></td><td>D</td></tr>
+        <tr><td><code>11A</code></td><td>F♯m</td><td><code>11B</code></td><td>A</td></tr>
+        <tr><td><code>12A</code></td><td>D♭m</td><td><code>12B</code></td><td>E</td></tr>
+      </table></div>
+    </section>
+
+    <section id="faq" class="qa">
+      <h2>Questions &amp; fixes</h2>
+      <h4>The BPM is half or double what I expected.</h4>
+      <p>Change <b>Settings → Tempo Range</b> so it covers the tempos you actually play, then
+        re-analyze.</p>
+      <h4>The key looks wrong.</h4>
+      <p>Check <b>Alt Keys</b>: the runner-up is often right on tracks with ambiguous harmony.
+        Cleared the Analyze results already? The same Alt Keys are kept in <b>History → Key
+        History</b>. Fix the key in <b>Metadata</b>, or inline in the Player.</p>
+      <h4>My tags didn't show up in my DJ software.</h4>
+      <p>Is it a WAV? WAV can't store tags. Otherwise, was <b>Freeze</b> on? Some DJ apps also need
+        you to re-read the file's tags after a change.</p>
+      <h4>I renamed files by mistake.</h4>
+      <p><b>History → Rename History → Undo Selected.</b></p>
+      <h4>A track shows as dimmed / missing.</h4>
+      <p>The file moved. Right-click → <b>Locate Missing File…</b> → <b>Find in Folder…</b>.</p>
+      <h4>Convert won't convert a file.</h4>
+      <p>Read its <b>Status</b>. It's almost always a lossy file or a setting higher than the
+        source.</p>
+      <h4>Sound comes out of the wrong device.</h4>
+      <p>The app uses whichever output was selected when it launched. Switch outputs first, then
+        restart Mixed in P.</p>
+      <h4>Something went wrong and I want to report it.</h4>
+      <p>Go to <b>Settings → Troubleshooting → Show Log File</b>, and attach that file to your
+        report on <a href="https://github.com/jared-perez/mixed-in-p/issues">GitHub</a>.</p>
+    </section>
+
+    <footer>
+      <strong>Mixed in P</strong> · © Jared P · MIT License ·
+      <a href="../">Home</a> · <a href="../docs/">Reference docs</a> ·
+      <a href="https://github.com/jared-perez/mixed-in-p/issues">Report a bug</a>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* Highlight the section in view in the contents list; collapse the list on
+   phones so it doesn't push the page down, and close it after a tap. */
+(function () {
+  var details = document.getElementById('tocDetails');
+  var narrow = window.matchMedia('(max-width:860px)');
+  function syncOpen() { if (narrow.matches) details.removeAttribute('open'); else details.setAttribute('open', ''); }
+  syncOpen();
+  narrow.addEventListener ? narrow.addEventListener('change', syncOpen) : narrow.addListener(syncOpen);
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a.item[href^="#"]'));
+  links.forEach(function (a) {
+    a.addEventListener('click', function () { if (narrow.matches) details.removeAttribute('open'); });
+  });
+  if (!('IntersectionObserver' in window)) return;
+  var byId = {};
+  links.forEach(function (a) { byId[a.getAttribute('href').slice(1)] = a; });
+  var io = new IntersectionObserver(function (entries) {
+    entries.forEach(function (e) {
+      if (!e.isIntersecting) return;
+      links.forEach(function (a) { a.classList.remove('on'); });
+      var a = byId[e.target.id];
+      if (a) a.classList.add('on');
+    });
+  }, { rootMargin: '0px 0px -70% 0px' });
+  Object.keys(byId).forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) io.observe(el);
+  });
+})();
+</script>
+
+<!-- GoatCounter analytics (privacy-friendly, no cookies) -->
+<script data-goatcounter="https://jared-perez.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
