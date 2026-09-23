@@ -18,12 +18,17 @@ from PySide6.QtWidgets import (
 from ..styles.theme import Theme
 from .elided_label import LinkLabel
 from .pipeline_cluster import PipelineCluster
+from .pipeline_toggle import PipelineToggle
 
 # The header's now-playing line elides rather than pushing the Add button off
 # the bar, and floors out at roughly "Playing: <a few characters>…" — below
 # that it says nothing the user couldn't get from the tab strip.
 _NOW_PLAYING_MIN_WIDTH = 90
 _NOW_PLAYING_GAP = 16
+
+# Add and ? stand as tall as the pipeline's step toggles beside them, so the
+# right end of the bar reads as one row of controls.
+_ACTION_HEIGHT = PipelineToggle.SIZE_PANEL
 
 if getattr(sys, "frozen", False) and hasattr(sys, "_MEIPASS"):
     _ASSETS = Path(sys._MEIPASS) / "src" / "gui" / "assets"
@@ -114,6 +119,7 @@ class HeaderBar(QFrame):
         # setStyleSheet, so it doesn't leak into the button's tooltip/menu font.
         self._add_btn.setObjectName("headerActionButton")
         self._add_btn.setPopupMode(QToolButton.ToolButtonPopupMode.InstantPopup)
+        self._add_btn.setFixedHeight(_ACTION_HEIGHT)
         self._add_btn.setToolTip(
             self.tr("Add files or a folder to the panel you're currently viewing")
         )
@@ -125,10 +131,9 @@ class HeaderBar(QFrame):
         layout.addWidget(self._add_btn)
 
         self._about_btn = QPushButton("?")
-        self._about_btn.setFixedSize(36, 36)
-        self._about_btn.setStyleSheet(
-            "border-radius: 18px; font-size: 18px; font-weight: bold; padding: 0px;"
-        )
+        # Round via #headerAboutButton, whose radius is half this size.
+        self._about_btn.setObjectName("headerAboutButton")
+        self._about_btn.setFixedSize(_ACTION_HEIGHT, _ACTION_HEIGHT)
         self._about_btn.clicked.connect(self.about_clicked.emit)
         layout.addWidget(self._about_btn)
 

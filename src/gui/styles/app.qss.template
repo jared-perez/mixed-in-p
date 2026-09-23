@@ -162,11 +162,27 @@ QToolButton#headerActionButton {
     border: 1px solid @BG_LIGHTER@;
     border-radius: 4px;
     /* Extra right padding reserves room for the menu-indicator arrow so it
-       doesn't overlap the label. */
-    padding: 8px 28px 8px 16px;
-    font-size: 16px;
+       doesn't overlap the label. Slim vertical padding because the header
+       fixes the button at the step toggles' height (28px); the global 8px
+       would leave the label no room at all. */
+    padding: 2px 24px 2px 12px;
+    font-size: 14px;
     font-weight: 500;
-    min-height: 20px;
+    min-height: 0px;
+}
+
+/* The header's round "?" button, as tall as the step toggles beside it
+   (_ACTION_HEIGHT in header_bar.py, 28px); the radius is half of that. The
+   size is restated here because a QSS minimum replaces the one setFixedSize
+   sets, and the global QPushButton padding would leave no room for the "?".
+   The minimum excludes the 1px border, hence 26 for a 28px button. */
+QPushButton#headerAboutButton {
+    border-radius: 14px;
+    font-size: 15px;
+    font-weight: bold;
+    padding: 0px;
+    min-height: 26px;
+    min-width: 26px;
 }
 
 QToolButton#headerActionButton:hover {
