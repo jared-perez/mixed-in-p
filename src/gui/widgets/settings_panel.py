@@ -2,8 +2,8 @@
 
 import logging
 
-from PySide6.QtCore import QPoint, Qt, QUrl, Signal
-from PySide6.QtGui import QColor, QDesktopServices
+from PySide6.QtCore import QPoint, Qt, QTimer, QUrl, Signal
+from PySide6.QtGui import QColor, QDesktopServices, QKeySequence
 from PySide6.QtWidgets import (
     QButtonGroup,
     QCheckBox,
@@ -22,6 +22,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
+from . import section_header
 from .fitted_combo import FittedComboBox
 from .toggle_switch import ToggleSwitch
 from .wheel_guard import NoWheelSpinBox
@@ -901,6 +902,10 @@ class SettingsPanel(QWidget):
 
         outer.addWidget(reset_frame)
 
+        # ── Section: Keyboard Shortcuts ─────────────────────────────────────
+        # Reference, not a setting, so it sits below Reset and starts closed.
+        self._build_shortcuts_section(outer)
+
         outer.addStretch()
 
         scroll.setWidget(container)
@@ -1088,6 +1093,101 @@ class SettingsPanel(QWidget):
         else:
             QMessageBox.warning(self, title, text)
 
+    def _build_shortcuts_section(self, outer: QVBoxLayout) -> None:
+        """A collapsible table of the app's shortcuts, like the Player's sections.
+
+        Kept in step with the guide page's table (guide/index.html). Keys are
+        spelled by QKeySequence in native form, so a Mac shows ⌘L and ⌫ where
+        Windows shows Ctrl+L and Backspace, in the user's language.
+        """
+        self._shortcuts_btn = section_header.header_button(self.tr("Keyboard Shortcuts"))
+        # Flat, like the Player's headers; see #shortcutsHeader in the sheet.
+        self._shortcuts_btn.setObjectName("shortcutsHeader")
+        self._shortcuts_btn.toggled.connect(self._on_shortcuts_toggled)
+        outer.addWidget(self._shortcuts_btn)
+
+        def native(*keys) -> str:
+            return " / ".join(
+                QKeySequence(k).toString(QKeySequence.SequenceFormat.NativeText)
+                for k in keys
+            )
+
+        # The Player's own chord: a Mac laptop has no forward-delete key.
+        remove_now = "Ctrl+Backspace" if sys.platform == "darwin" else "Ctrl+Delete"
+        player = self.tr("Player")
+        anywhere = self.tr("Anywhere")
+        slicer = self.tr("Loop Slicer")
+        keyboard = self.tr("Keyboard")
+        rows = [
+            (native(Qt.Key.Key_Space), self.tr("Play / pause"), player),
+            (native("Ctrl+L"), self.tr("Jump to the playing playlist"), anywhere),
+            (native("Shift+Tab"), self.tr("Show / hide the playlist tree"), anywhere),
+            (native(QKeySequence.StandardKey.Undo), self.tr("Undo a playlist edit"), anywhere),
+            (
+                native(Qt.Key.Key_Backspace, Qt.Key.Key_Delete),
+                self.tr("Remove selected tracks"),
+                self.tr("Player, Rename"),
+            ),
+            (native(remove_now), self.tr("Remove without asking"), player),
+            # Spelled out: macOS's native ⎋ is a glyph few people recognise,
+            # and the key itself reads "esc".
+            ("Esc", self.tr("Leave search"), player),
+            ("Q / E", self.tr("Mark slice start / end"), slicer),
+            ("S", self.tr("Hold to play from the start marker"), slicer),
+            ("L", self.tr("Loop on / off"), slicer),
+            ("A–;   W–P", self.tr("Play chords"), keyboard),
+            ("Z / X", self.tr("Octave down / up"), keyboard),
+        ]
+
+        self._shortcuts_frame = QFrame()
+        self._shortcuts_frame.setObjectName("settingsSection")
+        grid = QGridLayout(self._shortcuts_frame)
+        grid.setContentsMargins(16, 10, 16, 10)
+        grid.setHorizontalSpacing(24)
+        grid.setVerticalSpacing(8)
+        for col, heading in enumerate(
+            (self.tr("Keys"), self.tr("Does"), self.tr("Where"))
+        ):
+            label = QLabel(heading)
+            label.setObjectName("settingsHint")
+            grid.addWidget(label, 0, col)
+        for row, (keys, does, where) in enumerate(rows, start=1):
+            key_label = QLabel(keys)
+            key_label.setObjectName("shortcutKeys")
+            grid.addWidget(key_label, row, 0)
+            # Both wrap: the page has no horizontal scroll, and at the window
+            # minimum a long language needs more width than a row gets.
+            does_label = QLabel(does)
+            does_label.setWordWrap(True)
+            grid.addWidget(does_label, row, 1)
+            where_label = QLabel(where)
+            where_label.setObjectName("settingsHint")
+            where_label.setWordWrap(True)
+            grid.addWidget(where_label, row, 2)
+        # Slack is shared between Does and an empty last column: all of it on
+        # Does pushed Where to the far edge of a wide window, and none of it
+        # left Does at a wrapping label's narrow hint, wrapping with room to
+        # spare.
+        grid.setColumnStretch(1, 1)
+        grid.setColumnStretch(3, 1)
+        self._shortcuts_frame.setVisible(False)
+        outer.addWidget(self._shortcuts_frame)
+        self._on_shortcuts_toggled(False)
+
+    def _on_shortcuts_toggled(self, open_: bool) -> None:
+        self._shortcuts_frame.setVisible(open_)
+        section_header.sync_header_arrow(self._shortcuts_btn, open_)
+        self._shortcuts_btn.setToolTip(
+            self.tr("Hide the keyboard shortcuts")
+            if open_
+            else self.tr("Show the keyboard shortcuts")
+        )
+        if open_:
+            # It opens at the foot of the page, below the fold: bring it up.
+            QTimer.singleShot(
+                0, lambda: self._scroll.ensureWidgetVisible(self._shortcuts_frame)
+            )
+
     @staticmethod
     def _row_layout():
         row = QHBoxLayout()
@@ -1119,6 +1219,13 @@ class SettingsPanel(QWidget):
                 color: {Theme.TEXT_SECONDARY};
                 font-size: 11px;
                 font-style: italic;
+            }}
+            QPushButton#shortcutsHeader, QPushButton#shortcutsHeader:hover {{
+                background: transparent;
+            }}
+            QLabel#shortcutKeys {{
+                color: {Theme.ACCENT_TEXT};
+                font-weight: bold;
             }}
             QLabel#settingsLabel:disabled, QLabel#settingsHint:disabled {{
                 color: {Theme.TEXT_DISABLED};

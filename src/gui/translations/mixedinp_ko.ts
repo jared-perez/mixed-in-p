@@ -2166,7 +2166,7 @@ or click “Add Artwork…”</source>
         <location filename="../widgets/metadata_panel.py" line="976"/>
         <location filename="../widgets/metadata_panel.py" line="1749"/>
         <location filename="../widgets/metadata_panel.py" line="1854"/>
-        <location filename="../widgets/metadata_panel.py" line="1967"/>
+        <location filename="../widgets/metadata_panel.py" line="1969"/>
         <source>Look Up Online</source>
         <translation>온라인에서 찾기</translation>
     </message>
@@ -2191,12 +2191,12 @@ or click “Add Artwork…”</source>
         <translation>Discogs 요청 제한이 풀리기를 기다리는 중…</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="2002"/>
+        <location filename="../widgets/metadata_panel.py" line="2004"/>
         <source>Applied from Discogs</source>
         <translation>Discogs에서 적용함</translation>
     </message>
     <message>
-        <location filename="../widgets/metadata_panel.py" line="2052"/>
+        <location filename="../widgets/metadata_panel.py" line="2054"/>
         <source>Select cover art</source>
         <translation>커버 아트 선택</translation>
     </message>
@@ -3599,38 +3599,38 @@ or click “Add Artwork…”</source>
 <context>
     <name>SettingsPanel</name>
     <message>
-        <location filename="../widgets/settings_panel.py" line="83"/>
+        <location filename="../widgets/settings_panel.py" line="84"/>
         <source>Language</source>
         <translation>언어</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="101"/>
+        <location filename="../widgets/settings_panel.py" line="102"/>
         <source>Restart to apply language changes.</source>
         <translation>언어 변경을 적용하려면 재시작하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="115"/>
-        <location filename="../widgets/settings_panel.py" line="1055"/>
+        <location filename="../widgets/settings_panel.py" line="116"/>
+        <location filename="../widgets/settings_panel.py" line="1060"/>
         <source>Default Audio Player</source>
         <translation>기본 오디오 플레이어</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="124"/>
+        <location filename="../widgets/settings_panel.py" line="125"/>
         <source>Make Mixed in P your default audio player</source>
         <translation>Mixed in P를 기본 오디오 플레이어로 설정</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="134"/>
+        <location filename="../widgets/settings_panel.py" line="135"/>
         <source>Opens Windows Settings on the Mixed in P entry, where you can hand it your audio file types. Windows only lets you make that choice yourself.</source>
         <translation>Windows 설정에서 Mixed in P 항목을 엽니다. 거기서 오디오 파일 형식을 지정할 수 있습니다. Windows는 이 선택을 사용자 본인만 할 수 있게 합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="140"/>
+        <location filename="../widgets/settings_panel.py" line="141"/>
         <source>Double-clicking an audio file will open it here. Finder&apos;s Get Info panel puts it back.</source>
         <translation>오디오 파일을 두 번 클릭하면 여기서 열립니다. Finder의 ‘정보 가져오기’에서 되돌릴 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="151"/>
+        <location filename="../widgets/settings_panel.py" line="152"/>
         <source>Theme</source>
         <translation>테마</translation>
     </message>
@@ -3639,88 +3639,88 @@ or click “Add Artwork…”</source>
         <translation type="vanished">나이트 다크</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="169"/>
+        <location filename="../widgets/settings_panel.py" line="170"/>
         <source>Daylight</source>
         <translation>데이라이트</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="182"/>
+        <location filename="../widgets/settings_panel.py" line="183"/>
         <source>Restart to apply theme changes.</source>
         <translation>테마 변경을 적용하려면 재시작하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="312"/>
+        <location filename="../widgets/settings_panel.py" line="313"/>
         <source>Waveform</source>
         <translatorcomment>Descriptive Settings label — localized normally; the player&apos;s &apos;Waveform Loop Slicer&apos; tool name stays English.</translatorcomment>
         <translation>파형</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="227"/>
+        <location filename="../widgets/settings_panel.py" line="228"/>
         <source>Color of the full-length waveform in the player.</source>
         <translation>플레이어의 전체 파형 색상.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="246"/>
+        <location filename="../widgets/settings_panel.py" line="247"/>
         <source>Default</source>
         <translation>기본값</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="248"/>
+        <location filename="../widgets/settings_panel.py" line="249"/>
         <source>Use the theme&apos;s default waveform color</source>
         <translation>테마의 기본 파형 색상 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="256"/>
+        <location filename="../widgets/settings_panel.py" line="257"/>
         <source>Custom…</source>
         <translation>사용자 설정…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="330"/>
+        <location filename="../widgets/settings_panel.py" line="331"/>
         <source>Playlist Text Size</source>
         <translation>재생목록 텍스트 크기</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="339"/>
+        <location filename="../widgets/settings_panel.py" line="340"/>
         <source>Size of the track rows in the player. Applies straight away.</source>
         <translation>플레이어의 곡 행 크기입니다. 바로 적용됩니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="351"/>
+        <location filename="../widgets/settings_panel.py" line="352"/>
         <source>Small</source>
         <translation>작게</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="352"/>
+        <location filename="../widgets/settings_panel.py" line="353"/>
         <source>Medium</source>
         <translation>보통</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="353"/>
+        <location filename="../widgets/settings_panel.py" line="354"/>
         <source>Large</source>
         <translation>크게</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="390"/>
+        <location filename="../widgets/settings_panel.py" line="391"/>
         <source>Playlist Artwork</source>
         <translation>재생목록 아트워크</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="400"/>
+        <location filename="../widgets/settings_panel.py" line="401"/>
         <source>Part of the cover art shown in the player&apos;s Art column. Full makes each row tall enough for the whole sleeve.</source>
         <translation>플레이어의 아트워크 열에 표시할 부분입니다. 전체를 선택하면 아트워크 전체가 들어가도록 각 행이 높아집니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="414"/>
+        <location filename="../widgets/settings_panel.py" line="415"/>
         <source>Top</source>
         <translation>위쪽</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="415"/>
+        <location filename="../widgets/settings_panel.py" line="416"/>
         <source>Middle</source>
         <translation>가운데</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="416"/>
+        <location filename="../widgets/settings_panel.py" line="417"/>
         <source>Full</source>
         <translation>전체</translation>
     </message>
@@ -3737,61 +3737,61 @@ or click “Add Artwork…”</source>
         <translation type="vanished">플레이어에 시각 효과 선택 메뉴를 추가하고, 분석 또는 변환 중에 움직이는 파형을 표시합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="431"/>
+        <location filename="../widgets/settings_panel.py" line="432"/>
         <source>Tempo Range</source>
         <translatorcomment>tempo → 템포 (loanword). Flag for native review.</translatorcomment>
         <translation>템포 범위</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="439"/>
+        <location filename="../widgets/settings_panel.py" line="440"/>
         <source>Min 50, Max 250.</source>
         <translation>최소 50, 최대 250.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="445"/>
+        <location filename="../widgets/settings_panel.py" line="446"/>
         <source>Lowest BPM</source>
         <translation>최저 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="462"/>
+        <location filename="../widgets/settings_panel.py" line="463"/>
         <source>Highest BPM</source>
         <translation>최고 BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="477"/>
+        <location filename="../widgets/settings_panel.py" line="478"/>
         <source>Key/BPM adding to filename after analysis</source>
         <translatorcomment>key → 조성. Flag for native review.</translatorcomment>
         <translation>분석 후 파일명에 조성/BPM 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="485"/>
+        <location filename="../widgets/settings_panel.py" line="486"/>
         <source>Auto-analyze when dropping or sending to the Analyze panel</source>
         <translation>분석 패널에 끌어다 놓거나 보낼 때 자동 분석</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="490"/>
+        <location filename="../widgets/settings_panel.py" line="491"/>
         <source>Automatically write BPM to metadata after analysis</source>
         <translatorcomment>Particle: BPM (비피엠, ends in ㅁ) takes 을 → &quot;BPM을&quot;. Flag for native review.</translatorcomment>
         <translation>분석 후 BPM을 태그에 자동 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="494"/>
+        <location filename="../widgets/settings_panel.py" line="495"/>
         <source>BPM rounds to the nearest whole number when written to metadata.</source>
         <translation>BPM은 메타데이터에 기록될 때 가장 가까운 정수로 반올림됩니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="499"/>
+        <location filename="../widgets/settings_panel.py" line="500"/>
         <source>Automatically write the key to metadata after analysis</source>
         <translatorcomment>key → 조성; 조성을 (object particle 을 after consonant). Flag for native review.</translatorcomment>
         <translation>분석 후 조성을 태그에 자동 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="503"/>
+        <location filename="../widgets/settings_panel.py" line="504"/>
         <source>Automatically rename files after analysis</source>
         <translation>분석 후 파일 이름 자동 변경</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="510"/>
+        <location filename="../widgets/settings_panel.py" line="511"/>
         <source>Write key to comment</source>
         <translatorcomment>key → 조성; comment → 코멘트 (consistent with the Comment tag). Flag for native review.</translatorcomment>
         <translation>조성을 코멘트에 기록</translation>
@@ -3807,339 +3807,454 @@ or click “Add Artwork…”</source>
         <translation type="vanished">이 항목과 에너지 태그 코멘트를 모두 기록할 때, 에너지를 먼저, 조성을 나중에 표시해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="210"/>
+        <location filename="../widgets/settings_panel.py" line="211"/>
         <source>Color follows the mix of bass, mids and highs.</source>
         <translation>색이 저음, 중음, 고음의 비율을 따라갑니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="282"/>
+        <location filename="../widgets/settings_panel.py" line="283"/>
         <source>Use full-spectrum colors</source>
         <translation>전체 스펙트럼 색상 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="313"/>
+        <location filename="../widgets/settings_panel.py" line="314"/>
         <source>Zoomed Wave</source>
         <translation>확대 파형</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="317"/>
+        <location filename="../widgets/settings_panel.py" line="318"/>
         <source>Half wave</source>
         <translation>반쪽 파형</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="317"/>
+        <location filename="../widgets/settings_panel.py" line="318"/>
         <source>Full wave</source>
         <translation>전체 파형</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="516"/>
+        <location filename="../widgets/settings_panel.py" line="517"/>
         <source>Naming format:</source>
         <translation>이름 형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="525"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>128 8A - Original_File_Name</source>
         <translatorcomment>Example pattern; the &quot;Original_File_Name&quot; placeholder is translated to 원본_파일명 so Korean users see where the original name lands. BPM/key code kept Latin. Flag for native review.</translatorcomment>
         <translation>128 8A - 원본_파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="525"/>
+        <location filename="../widgets/settings_panel.py" line="526"/>
         <source>BPM + Key prefix</source>
         <translatorcomment>key → 조성; prefix → 접두사.</translatorcomment>
         <translation>BPM + 조성 접두사</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="526"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>8A 128 - Original_File_Name</source>
         <translation>8A 128 - 원본_파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="526"/>
+        <location filename="../widgets/settings_panel.py" line="527"/>
         <source>Key + BPM prefix</source>
         <translation>조성 + BPM 접두사</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="527"/>
+        <location filename="../widgets/settings_panel.py" line="528"/>
         <source>8A - Original_File_Name</source>
         <translation>8A - 원본_파일명</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="527"/>
+        <location filename="../widgets/settings_panel.py" line="528"/>
         <source>Key prefix only</source>
         <translation>조성 접두사만</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="528"/>
+        <location filename="../widgets/settings_panel.py" line="529"/>
         <source>Original_File_Name - 8A 128</source>
         <translation>원본_파일명 - 8A 128</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="528"/>
+        <location filename="../widgets/settings_panel.py" line="529"/>
         <source>suffix: Key + BPM</source>
         <translatorcomment>suffix → 접미사; key → 조성.</translatorcomment>
         <translation>접미사: 조성 + BPM</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="529"/>
+        <location filename="../widgets/settings_panel.py" line="530"/>
         <source>Original_File_Name - 8A</source>
         <translation>원본_파일명 - 8A</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="529"/>
+        <location filename="../widgets/settings_panel.py" line="530"/>
         <source>suffix: Key only</source>
         <translation>접미사: 조성만</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="552"/>
+        <location filename="../widgets/settings_panel.py" line="553"/>
         <source>Notation</source>
         <translatorcomment>notation → 표기법. Flag for native review.</translatorcomment>
         <translation>표기법</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="562"/>
+        <location filename="../widgets/settings_panel.py" line="563"/>
         <source>Only one notation can be active at a time. Applies to the key written to tags/filenames during analysis and to the Keyboard panel key labels.</source>
         <translatorcomment>key → 조성; &quot;Keyboard panel key labels&quot; → 건반 패널의 건반 레이블 (piano keys). 해요체. Flag for native review.</translatorcomment>
         <translation>한 번에 하나의 표기법만 활성화할 수 있어요. 분석 중 태그/파일명에 기록되는 조성과 건반 패널의 건반 레이블에 적용돼요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="574"/>
+        <location filename="../widgets/settings_panel.py" line="575"/>
         <source>👑 Key Codes  (8A, 5A, 2B)</source>
         <translation>👑 키 코드  (8A, 5A, 2B)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="575"/>
+        <location filename="../widgets/settings_panel.py" line="576"/>
         <source>Traditional Key Notation  (Am, Ebm, F#…)</source>
         <translatorcomment>key → 조성; note names (Am, Ebm, F#) kept Latin per CLAUDE.md.</translatorcomment>
         <translation>전통 조성 표기  (Am, Ebm, F#…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="576"/>
+        <location filename="../widgets/settings_panel.py" line="577"/>
         <source>Traktor Open Key  (1m, 10m, 9d…)</source>
         <translatorcomment>Traktor Open Key kept as a product name (English); code values kept Latin.</translatorcomment>
         <translation>Traktor Open Key  (1m, 10m, 9d…)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="592"/>
+        <location filename="../widgets/settings_panel.py" line="593"/>
         <source>Energy Tag</source>
         <translation>에너지 태그</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="600"/>
+        <location filename="../widgets/settings_panel.py" line="601"/>
         <source>Write energy level to Comment tag</source>
         <translatorcomment>energy level → 에너지 레벨; Comment tag → 코멘트 태그.</translatorcomment>
         <translation>에너지 레벨을 코멘트 태그에 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="608"/>
+        <location filename="../widgets/settings_panel.py" line="609"/>
         <source>Energy level written first</source>
         <translation>에너지 레벨을 먼저 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="612"/>
+        <location filename="../widgets/settings_panel.py" line="613"/>
         <source>When both energy and key are written to the comment, put energy first and key second.</source>
         <translation>에너지와 조성을 모두 코멘트에 기록할 때 에너지를 먼저, 조성을 나중에 기록합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="618"/>
+        <location filename="../widgets/settings_panel.py" line="619"/>
         <source>Format:</source>
         <translation>형식:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="626"/>
+        <location filename="../widgets/settings_panel.py" line="627"/>
         <source>Number only  (7)</source>
         <translation>숫자만  (7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="627"/>
+        <location filename="../widgets/settings_panel.py" line="628"/>
         <source>With label  (Energy 7)</source>
         <translatorcomment>&quot;Energy 7&quot; left in English because it is the literal text written to the tag, not UI prose.</translatorcomment>
         <translation>레이블 포함  (Energy 7)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="636"/>
+        <location filename="../widgets/settings_panel.py" line="637"/>
         <source>Write mode:</source>
         <translation>기록 방식:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="644"/>
+        <location filename="../widgets/settings_panel.py" line="645"/>
         <source>Prepend to existing comment</source>
         <translation>기존 코멘트 앞에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="645"/>
+        <location filename="../widgets/settings_panel.py" line="646"/>
         <source>Append to existing comment</source>
         <translation>기존 코멘트 뒤에 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="646"/>
+        <location filename="../widgets/settings_panel.py" line="647"/>
         <source>Replace existing comment</source>
         <translation>기존 코멘트 대체</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="666"/>
+        <location filename="../widgets/settings_panel.py" line="667"/>
         <source>Write energy level to its own tag field</source>
         <translation>에너지 레벨을 전용 태그 필드에 기록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="669"/>
+        <location filename="../widgets/settings_panel.py" line="670"/>
         <source>Stores the energy where it can be read back exactly, instead of parsed out of the comment.</source>
         <translation>코멘트에서 파싱하는 대신, 에너지를 정확히 다시 읽을 수 있는 위치에 저장합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="754"/>
+        <location filename="../widgets/settings_panel.py" line="755"/>
         <source>Playlists</source>
         <translation>재생목록</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="763"/>
+        <location filename="../widgets/settings_panel.py" line="764"/>
         <source>Duplicate tracks:</source>
         <translation>중복된 곡:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="766"/>
+        <location filename="../widgets/settings_panel.py" line="767"/>
         <source>Ask each time</source>
         <translation>매번 묻기</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="767"/>
+        <location filename="../widgets/settings_panel.py" line="768"/>
         <source>Always add duplicates</source>
         <translation>항상 중복 추가</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="768"/>
+        <location filename="../widgets/settings_panel.py" line="769"/>
         <source>Always skip duplicates</source>
         <translation>항상 중복 건너뛰기</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="780"/>
+        <location filename="../widgets/settings_panel.py" line="781"/>
         <source>What happens when you add a track a playlist already contains. A set list can repeat a track on purpose, so this asks rather than deciding for you — pick one of the other options to stop being asked.</source>
         <translation>재생목록에 이미 있는 곡을 추가할 때의 동작이에요. 셋리스트에서는 같은 곡을 의도적으로 반복할 수도 있으므로, 대신 결정하지 않고 물어봐요. 묻지 않게 하려면 다른 옵션을 선택하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="790"/>
+        <location filename="../widgets/settings_panel.py" line="791"/>
         <source>Keep Scratch between sessions</source>
         <translation>세션 간에 Scratch 유지</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="797"/>
+        <location filename="../widgets/settings_panel.py" line="798"/>
         <source>Scratch is the working list the Player opens on, and it starts empty each time you launch. Turn this on to have it reopen with whatever was in it — either way, Save Playlist keeps a copy.</source>
         <translation>Scratch는 플레이어가 처음 여는 작업 목록으로, 앱을 실행할 때마다 비어 있어요. 이전 내용을 그대로 열려면 이 옵션을 켜세요. 어느 쪽이든 ‘재생목록 저장’으로 사본을 남길 수 있어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="807"/>
+        <location filename="../widgets/settings_panel.py" line="808"/>
         <source>Always use full paths in exported playlists</source>
         <translation>내보낸 재생목록에서 항상 전체 경로 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="815"/>
+        <location filename="../widgets/settings_panel.py" line="816"/>
         <source>Exported playlists use paths relative to the playlist file when the tracks sit beside it, so a folder you zip and send still works on someone else&apos;s machine. Turn this on to always write the full path instead.</source>
         <translation>곡이 재생목록 파일과 같은 위치에 있으면 내보낸 재생목록은 그 파일을 기준으로 한 상대 경로를 사용해요. 그래서 폴더를 압축해 보내도 다른 사람의 컴퓨터에서 그대로 작동합니다. 항상 전체 경로를 쓰려면 이 옵션을 켜세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="825"/>
+        <location filename="../widgets/settings_panel.py" line="826"/>
         <source>Export All Playlists…</source>
         <translation>모든 재생목록 내보내기…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="834"/>
+        <location filename="../widgets/settings_panel.py" line="835"/>
         <source>Writes one folder of playlist files mirroring your tree — a backup any other app can read.</source>
         <translation>트리 구조를 그대로 반영한 재생목록 파일 폴더를 하나 만듭니다. 다른 어떤 앱에서도 읽을 수 있는 백업이에요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="848"/>
+        <location filename="../widgets/settings_panel.py" line="849"/>
         <source>Troubleshooting</source>
         <translation>문제 해결</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="856"/>
-        <location filename="../widgets/settings_panel.py" line="1041"/>
+        <location filename="../widgets/settings_panel.py" line="857"/>
+        <location filename="../widgets/settings_panel.py" line="1046"/>
         <source>Show Log File</source>
         <translation>로그 파일 보기</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="864"/>
+        <location filename="../widgets/settings_panel.py" line="865"/>
         <source>Selects the app&apos;s log in File Explorer. Attach it when you report a problem.</source>
         <translation>파일 탐색기에서 앱의 로그를 선택합니다. 문제를 신고할 때 첨부하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="866"/>
+        <location filename="../widgets/settings_panel.py" line="867"/>
         <source>Selects the app&apos;s log in Finder. Attach it when you report a problem.</source>
         <translation>Finder에서 앱의 로그를 선택합니다. 문제를 신고할 때 첨부하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1041"/>
+        <location filename="../widgets/settings_panel.py" line="1046"/>
         <source>No log has been written yet.</source>
         <translation>아직 기록된 로그가 없습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1299"/>
+        <location filename="../widgets/settings_panel.py" line="1103"/>
+        <source>Keyboard Shortcuts</source>
+        <translation>키보드 단축키</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1117"/>
+        <source>Player</source>
+        <translation>플레이어</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1118"/>
+        <source>Anywhere</source>
+        <translation>어디서나</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1119"/>
+        <source>Loop Slicer</source>
+        <translation>루프 슬라이서</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1120"/>
+        <source>Keyboard</source>
+        <translation>건반</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1122"/>
+        <source>Play / pause</source>
+        <translation>재생 / 일시 정지</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1123"/>
+        <source>Jump to the playing playlist</source>
+        <translation>재생 중인 재생목록으로 이동</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1124"/>
+        <source>Show / hide the playlist tree</source>
+        <translation>재생목록 트리 보기 / 숨기기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1125"/>
+        <source>Undo a playlist edit</source>
+        <translation>재생목록 편집 실행 취소</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1128"/>
+        <source>Remove selected tracks</source>
+        <translation>선택한 트랙 제거</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1129"/>
+        <source>Player, Rename</source>
+        <translation>플레이어, 이름 변경</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1131"/>
+        <source>Remove without asking</source>
+        <translation>묻지 않고 제거</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1134"/>
+        <source>Leave search</source>
+        <translation>검색 나가기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1135"/>
+        <source>Mark slice start / end</source>
+        <translation>슬라이스 시작 / 끝 표시</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1136"/>
+        <source>Hold to play from the start marker</source>
+        <translation>누르고 있으면 시작 마커부터 재생</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1137"/>
+        <source>Loop on / off</source>
+        <translation>루프 켜기 / 끄기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1138"/>
+        <source>Play chords</source>
+        <translation>코드 연주</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1139"/>
+        <source>Octave down / up</source>
+        <translation>옥타브 내리기 / 올리기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1149"/>
+        <source>Keys</source>
+        <translation>키</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1149"/>
+        <source>Does</source>
+        <translation>동작</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1149"/>
+        <source>Where</source>
+        <translation>위치</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1181"/>
+        <source>Hide the keyboard shortcuts</source>
+        <translation>키보드 단축키 숨기기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1183"/>
+        <source>Show the keyboard shortcuts</source>
+        <translation>키보드 단축키 보기</translation>
+    </message>
+    <message>
+        <location filename="../widgets/settings_panel.py" line="1406"/>
         <source>Show the half wave in the Waveform view</source>
         <translation>&apos;파형&apos; 보기에 반쪽 파형 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1301"/>
+        <location filename="../widgets/settings_panel.py" line="1408"/>
         <source>Show the full wave in the Waveform view</source>
         <translation>&apos;파형&apos; 보기에 전체 파형 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1304"/>
+        <location filename="../widgets/settings_panel.py" line="1411"/>
         <source>Show the half wave in the Zoomed Wave view</source>
         <translation>&apos;확대 파형&apos; 보기에 반쪽 파형 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1306"/>
+        <location filename="../widgets/settings_panel.py" line="1413"/>
         <source>Show the full wave in the Zoomed Wave view</source>
         <translation>&apos;확대 파형&apos; 보기에 전체 파형 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="681"/>
+        <location filename="../widgets/settings_panel.py" line="682"/>
         <source>Online Metadata</source>
         <translation>온라인 메타데이터</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="168"/>
+        <location filename="../widgets/settings_panel.py" line="169"/>
         <source>Dark Mode</source>
         <translation>다크 모드</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="170"/>
+        <location filename="../widgets/settings_panel.py" line="171"/>
         <source>Slate</source>
         <translatorcomment>Transliterated colour name, as the previous label was.</translatorcomment>
         <translation>슬레이트</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="190"/>
+        <location filename="../widgets/settings_panel.py" line="191"/>
         <source>Waveform / Visuals</source>
         <translatorcomment>기존 문자열 &apos;파형&apos;과 &apos;시각 효과&apos;를 그대로 사용.</translatorcomment>
         <translation>파형 / 시각 효과</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="201"/>
+        <location filename="../widgets/settings_panel.py" line="202"/>
         <source>Color mode:</source>
         <translation>색상 모드:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="205"/>
+        <location filename="../widgets/settings_panel.py" line="206"/>
         <source>Solid</source>
         <translation>단색</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="205"/>
+        <location filename="../widgets/settings_panel.py" line="206"/>
         <source>One color for the whole waveform.</source>
         <translation>파형 전체를 한 가지 색으로 표시.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="206"/>
+        <location filename="../widgets/settings_panel.py" line="207"/>
         <source>Loudness</source>
         <translation>음량</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="206"/>
+        <location filename="../widgets/settings_panel.py" line="207"/>
         <source>Color brightness follows the volume.</source>
         <translation>색의 밝기가 음량을 따라갑니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="208"/>
+        <location filename="../widgets/settings_panel.py" line="209"/>
         <source>Frequency bands</source>
         <translation>주파수 대역</translation>
     </message>
@@ -4148,12 +4263,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">빨강은 저음, 초록은 고음, 파랑은 중음.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="212"/>
+        <location filename="../widgets/settings_panel.py" line="213"/>
         <source>Tone</source>
         <translation>음색</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="212"/>
+        <location filename="../widgets/settings_panel.py" line="213"/>
         <source>Color follows the balance from bass to treble.</source>
         <translation>색이 저음과 고음의 균형을 따라갑니다.</translation>
     </message>
@@ -4162,17 +4277,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">주파수 대역과 음색은 자체 색상을 사용합니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="268"/>
+        <location filename="../widgets/settings_panel.py" line="269"/>
         <source>This track</source>
         <translation>이 트랙</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="272"/>
+        <location filename="../widgets/settings_panel.py" line="273"/>
         <source>Fixed</source>
         <translation>고정</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="289"/>
+        <location filename="../widgets/settings_panel.py" line="290"/>
         <source>Fixed colors every track on one scale, so tracks compare.</source>
         <translation>고정은 모든 트랙을 같은 기준으로 색칠해 트랙끼리 비교할 수 있습니다.</translation>
     </message>
@@ -4185,113 +4300,113 @@ or click “Add Artwork…”</source>
         <translation type="vanished">전체 파형 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="375"/>
+        <location filename="../widgets/settings_panel.py" line="376"/>
         <source>Enable large menu text</source>
         <translation>큰 메뉴 텍스트 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="692"/>
+        <location filename="../widgets/settings_panel.py" line="693"/>
         <source>Look up track details online (Discogs)</source>
         <translation>트랙 정보를 온라인에서 찾기(Discogs)</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="700"/>
+        <location filename="../widgets/settings_panel.py" line="701"/>
         <source>Off by default, and the app makes no network requests until you turn it on. A lookup sends the artist and title of the track you chose — never your audio, and never your library. BPM, key and energy always come from this app&apos;s own analysis.</source>
         <translation>기본값은 꺼짐이며, 켜기 전까지 앱은 어떤 네트워크 요청도 하지 않아요. 검색할 때는 선택한 트랙의 아티스트와 제목만 보내며, 오디오나 라이브러리는 절대 보내지 않아요. BPM·키·에너지는 언제나 이 앱의 자체 분석 결과예요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="711"/>
+        <location filename="../widgets/settings_panel.py" line="712"/>
         <source>Discogs token:</source>
         <translation>Discogs 토큰:</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="717"/>
+        <location filename="../widgets/settings_panel.py" line="718"/>
         <source>Paste your token</source>
         <translation>토큰을 붙여넣으세요</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="720"/>
+        <location filename="../widgets/settings_panel.py" line="721"/>
         <source>Get a Token…</source>
         <translation>토큰 받기…</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="727"/>
+        <location filename="../widgets/settings_panel.py" line="728"/>
         <source>Discogs needs a free personal token to answer with cover images and at full speed. It is read-only, and you can revoke it on your Discogs account page at any time.</source>
         <translation>커버 이미지를 받고 최대 속도로 응답을 받으려면 Discogs의 무료 개인 토큰이 필요해요. 읽기 전용이며 Discogs 계정 페이지에서 언제든지 해지할 수 있어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="736"/>
+        <location filename="../widgets/settings_panel.py" line="737"/>
         <source>Fetch cover art with lookups</source>
         <translation>찾을 때 커버 이미지도 가져오기</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="743"/>
+        <location filename="../widgets/settings_panel.py" line="744"/>
         <source>Shows the release&apos;s cover next to your file&apos;s, so you can compare them. Nothing is written until you approve it.</source>
         <translation>릴리스의 커버를 파일의 커버와 나란히 보여 줘서 비교할 수 있어요. 승인하기 전에는 아무것도 기록되지 않아요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="876"/>
-        <location filename="../widgets/settings_panel.py" line="1011"/>
+        <location filename="../widgets/settings_panel.py" line="877"/>
+        <location filename="../widgets/settings_panel.py" line="1016"/>
         <source>Reset to Default</source>
         <translation>기본값으로 재설정</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="884"/>
+        <location filename="../widgets/settings_panel.py" line="885"/>
         <source>Reset</source>
         <translation>재설정</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="893"/>
+        <location filename="../widgets/settings_panel.py" line="894"/>
         <source>Puts every setting back the way it shipped. Your language, theme and window layout are kept, and so is your default audio player — that one lives with the system.</source>
         <translation>모든 설정을 처음 상태로 되돌려요. 언어, 테마, 창 배치는 그대로 유지되고, 기본 오디오 플레이어도 바뀌지 않아요 — 그건 시스템이 관리해요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1004"/>
+        <location filename="../widgets/settings_panel.py" line="1009"/>
         <source>Put every setting back to the way it shipped?</source>
         <translation>모든 설정을 처음 상태로 되돌릴까요?</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1006"/>
+        <location filename="../widgets/settings_panel.py" line="1011"/>
         <source>Your language, theme and window layout are kept. Your Discogs token is cleared. This cannot be undone.</source>
         <translation>언어, 테마, 창 배치는 유지돼요. Discogs 토큰은 지워져요. 이 작업은 되돌릴 수 없어요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1060"/>
+        <location filename="../widgets/settings_panel.py" line="1065"/>
         <source>Mixed in P now opens your audio files.</source>
         <translation>이제 오디오 파일이 Mixed in P에서 열립니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1071"/>
+        <location filename="../widgets/settings_panel.py" line="1076"/>
         <source>Mixed in P is not registered with Windows. Reinstalling it will register it.</source>
         <translation>Mixed in P가 Windows에 등록되어 있지 않습니다. 다시 설치하면 등록됩니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1076"/>
+        <location filename="../widgets/settings_panel.py" line="1081"/>
         <source>Windows Settings did not open. You can set this yourself there, under Apps → Default apps.</source>
         <translation>Windows 설정을 열지 못했습니다. ‘앱 → 기본 앱’에서 직접 설정할 수 있습니다.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1082"/>
+        <location filename="../widgets/settings_panel.py" line="1087"/>
         <source>Select an audio file in Finder, press Command-I, choose Mixed in P under “Open with”, then click Change All.</source>
         <translation>Finder에서 오디오 파일을 선택하고 Command-I를 누른 다음, ‘다음으로 열기’에서 Mixed in P를 선택하고 ‘모두 변경’을 클릭하세요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1275"/>
+        <location filename="../widgets/settings_panel.py" line="1382"/>
         <source>Use shades of the selected color</source>
         <translation>선택한 색상의 음영 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1277"/>
+        <location filename="../widgets/settings_panel.py" line="1384"/>
         <source>Use the full range of colors instead of the selected color</source>
         <translation>선택한 색상 대신 모든 색상 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1287"/>
+        <location filename="../widgets/settings_panel.py" line="1394"/>
         <source>Scale the colors to each track&apos;s own range</source>
         <translation>각 트랙의 범위에 맞춰 색상 조정</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1289"/>
+        <location filename="../widgets/settings_panel.py" line="1396"/>
         <source>Scale the colors the same for every track</source>
         <translation>모든 트랙에 같은 색상 기준 사용</translation>
     </message>
@@ -4304,34 +4419,34 @@ or click “Add Artwork…”</source>
         <translation type="vanished">플레이어에 전체 파형 표시</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1316"/>
+        <location filename="../widgets/settings_panel.py" line="1423"/>
         <source>Use smaller text in the playlist&apos;s menus</source>
         <translation>재생목록 메뉴에 더 작은 텍스트 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1318"/>
+        <location filename="../widgets/settings_panel.py" line="1425"/>
         <source>Use larger text in the playlist&apos;s menus</source>
         <translation>재생목록 메뉴에 더 큰 텍스트 사용</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1323"/>
+        <location filename="../widgets/settings_panel.py" line="1430"/>
         <source>Waveform color</source>
         <translation>파형 색상</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1361"/>
-        <location filename="../widgets/settings_panel.py" line="1374"/>
+        <location filename="../widgets/settings_panel.py" line="1468"/>
+        <location filename="../widgets/settings_panel.py" line="1481"/>
         <source>Restart required</source>
         <translation>재시작 필요</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1363"/>
+        <location filename="../widgets/settings_panel.py" line="1470"/>
         <source>The language change will take effect the next time you restart Mixed in P.</source>
         <translatorcomment>Product name &quot;Mixed in P&quot; kept Latin; object particle 를 after the vowel-final &quot;P&quot; (피). Flag for native review.</translatorcomment>
         <translation>언어 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>
     <message>
-        <location filename="../widgets/settings_panel.py" line="1376"/>
+        <location filename="../widgets/settings_panel.py" line="1483"/>
         <source>The theme change will take effect the next time you restart Mixed in P.</source>
         <translation>테마 변경은 Mixed in P를 다음에 재시작할 때 적용돼요.</translation>
     </message>
