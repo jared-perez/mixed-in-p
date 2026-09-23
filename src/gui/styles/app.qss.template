@@ -96,6 +96,17 @@ QLabel#statusError {
     color: @ERROR@;
 }
 
+/* The window's transient notice card (floating_notice.py). Border width and
+   the inner margins are mirrored in FloatingNotice, which sizes the card. */
+QLabel#floatingNotice {
+    background-color: @BG_MEDIUM@;
+    border: 1px solid @NEON_YELLOW@;
+    border-radius: 8px;
+    color: @TEXT_PRIMARY@;
+    font-size: 18px;
+    font-weight: bold;
+}
+
 /* ===== Buttons ===== */
 QPushButton {
     background-color: @BG_LIGHT@;

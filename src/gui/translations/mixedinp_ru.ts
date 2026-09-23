@@ -586,81 +586,81 @@ or click “Add Artwork…”</source>
 <context>
     <name>ConversionPanel</name>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="151"/>
-        <location filename="../widgets/conversion_panel.py" line="329"/>
-        <location filename="../widgets/conversion_panel.py" line="624"/>
+        <location filename="../widgets/conversion_panel.py" line="150"/>
+        <location filename="../widgets/conversion_panel.py" line="328"/>
+        <location filename="../widgets/conversion_panel.py" line="558"/>
         <source>Convert</source>
         <translation>Конвертация</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="154"/>
+        <location filename="../widgets/conversion_panel.py" line="153"/>
         <source>Convert audio files between formats (WAV, FLAC, AIFF, MP3).</source>
         <translation>Конвертация аудиофайлов между форматами (WAV, FLAC, AIFF, MP3).</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="166"/>
+        <location filename="../widgets/conversion_panel.py" line="165"/>
         <source>Target Format:</source>
         <translation>Целевой формат:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="175"/>
+        <location filename="../widgets/conversion_panel.py" line="174"/>
         <source>Sample Rate:</source>
         <translation>Частота дискретизации:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="182"/>
-        <location filename="../widgets/conversion_panel.py" line="200"/>
+        <location filename="../widgets/conversion_panel.py" line="181"/>
+        <location filename="../widgets/conversion_panel.py" line="199"/>
         <source>Keep source</source>
         <translatorcomment>Combo item: keep the source file&apos;s own sample rate / bit depth (the engine leaves that axis alone).</translatorcomment>
         <translation>Как в источнике</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="183"/>
+        <location filename="../widgets/conversion_panel.py" line="182"/>
         <source>96 kHz (DVD)</source>
         <translation>96 kHz (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="184"/>
+        <location filename="../widgets/conversion_panel.py" line="183"/>
         <source>48 kHz (DAT)</source>
         <translation>48 kHz (DAT)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="185"/>
+        <location filename="../widgets/conversion_panel.py" line="184"/>
         <source>44.1 kHz (CD)</source>
         <translation>44.1 kHz (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="186"/>
+        <location filename="../widgets/conversion_panel.py" line="185"/>
         <source>32 kHz</source>
         <translation>32 kHz</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="196"/>
+        <location filename="../widgets/conversion_panel.py" line="195"/>
         <source>Bit Depth:</source>
         <translation>Разрядность:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="201"/>
+        <location filename="../widgets/conversion_panel.py" line="200"/>
         <source>32 bit</source>
         <translation>32 бит</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="202"/>
+        <location filename="../widgets/conversion_panel.py" line="201"/>
         <source>24 bit (DVD)</source>
         <translation>24 бит (DVD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="203"/>
+        <location filename="../widgets/conversion_panel.py" line="202"/>
         <source>16 bit (CD)</source>
         <translation>16 бит (CD)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="204"/>
+        <location filename="../widgets/conversion_panel.py" line="203"/>
         <source>8 bit</source>
         <translation>8 бит</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="214"/>
+        <location filename="../widgets/conversion_panel.py" line="213"/>
         <source>Bitrate:</source>
         <translation>Битрейт:</translation>
     </message>
@@ -669,8 +669,8 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Сохранять в:</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="236"/>
-        <location filename="../widgets/conversion_panel.py" line="780"/>
+        <location filename="../widgets/conversion_panel.py" line="235"/>
+        <location filename="../widgets/conversion_panel.py" line="714"/>
         <source>Choose the folder converted files are saved to</source>
         <translation>Выберите папку для сохранения конвертированных файлов</translation>
     </message>
@@ -696,48 +696,48 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отправить треки по цепочке</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="773"/>
+        <location filename="../widgets/conversion_panel.py" line="707"/>
         <source>Save converted files next to the originals</source>
         <translation>Сохранять конвертированные файлы рядом с оригиналами</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="281"/>
+        <location filename="../widgets/conversion_panel.py" line="280"/>
         <source>Files</source>
         <translation>Файлы</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="248"/>
+        <location filename="../widgets/conversion_panel.py" line="247"/>
         <source>Source</source>
         <translation>Источник</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="284"/>
+        <location filename="../widgets/conversion_panel.py" line="283"/>
         <source>Drop audio files here to add them</source>
         <translation>Перетащите аудиофайлы сюда, чтобы добавить их</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="287"/>
+        <location filename="../widgets/conversion_panel.py" line="286"/>
         <source>Filename</source>
         <translation>Имя файла</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="288"/>
+        <location filename="../widgets/conversion_panel.py" line="287"/>
         <source>From</source>
         <translation>Из</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="289"/>
+        <location filename="../widgets/conversion_panel.py" line="288"/>
         <source>To</source>
         <translation>В</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="290"/>
+        <location filename="../widgets/conversion_panel.py" line="289"/>
         <source>Status</source>
         <translation>Статус</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="317"/>
-        <location filename="../widgets/conversion_panel.py" line="1018"/>
+        <location filename="../widgets/conversion_panel.py" line="316"/>
+        <location filename="../widgets/conversion_panel.py" line="952"/>
         <source>No files</source>
         <translation>Нет файлов</translation>
     </message>
@@ -774,39 +774,39 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Та же папка, что и у исходного файла</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="619"/>
+        <location filename="../widgets/conversion_panel.py" line="553"/>
         <source>Start Pipeline</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on. Noun form on purpose: &quot;Запустить пайплайн&quot; measures 164px against the button&apos;s 160px minimum and would be cut off at both ends.</translatorcomment>
         <translation>Запуск пайплайна</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="621"/>
+        <location filename="../widgets/conversion_panel.py" line="555"/>
         <source>Send these tracks through the pipeline, starting here</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Отправить эти треки по пайплайну, начиная отсюда</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="752"/>
+        <location filename="../widgets/conversion_panel.py" line="686"/>
         <source>Same folder as source</source>
         <translation>Папка источника</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="771"/>
+        <location filename="../widgets/conversion_panel.py" line="705"/>
         <source>Save converted files to a folder instead</source>
         <translation>Сохранять конвертированные файлы в папку</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="801"/>
+        <location filename="../widgets/conversion_panel.py" line="735"/>
         <source>Choose Output Folder</source>
         <translation>Выбор папки назначения</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="857"/>
+        <location filename="../widgets/conversion_panel.py" line="791"/>
         <source>Output Folder Unavailable</source>
         <translation>Папка назначения недоступна</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="858"/>
+        <location filename="../widgets/conversion_panel.py" line="792"/>
         <source>Can&apos;t save converted files to {folder}.
 
 {error}</source>
@@ -815,76 +815,76 @@ or click “Add Artwork…”</source>
 {error}</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="896"/>
+        <location filename="../widgets/conversion_panel.py" line="830"/>
         <source>Open File Location</source>
         <translation>Открыть расположение файла</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="898"/>
+        <location filename="../widgets/conversion_panel.py" line="832"/>
         <source>Remove</source>
         <translation>Удалить</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="964"/>
-        <location filename="../widgets/conversion_panel.py" line="1154"/>
+        <location filename="../widgets/conversion_panel.py" line="898"/>
+        <location filename="../widgets/conversion_panel.py" line="1088"/>
         <source>Done</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="977"/>
+        <location filename="../widgets/conversion_panel.py" line="911"/>
         <source>Same format</source>
         <translation>Тот же формат</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="980"/>
+        <location filename="../widgets/conversion_panel.py" line="914"/>
         <source>Choose a lower bitrate to convert this file.</source>
         <translation>Выберите более низкий битрейт, чтобы конвертировать этот файл.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="983"/>
+        <location filename="../widgets/conversion_panel.py" line="917"/>
         <source>Choose a lower sample rate or bit depth to convert this file.</source>
         <translation>Выберите более низкую частоту дискретизации или разрядность, чтобы конвертировать этот файл.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="986"/>
+        <location filename="../widgets/conversion_panel.py" line="920"/>
         <source>Lossy source</source>
         <translation>С потерями</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="990"/>
+        <location filename="../widgets/conversion_panel.py" line="924"/>
         <source>An MP3 can only become an MP3 at a lower bitrate.</source>
         <translation>MP3 можно превратить только в MP3 с более низким битрейтом.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="993"/>
+        <location filename="../widgets/conversion_panel.py" line="927"/>
         <source>Lossy files can&apos;t be converted.</source>
         <translation>Файлы с потерями нельзя конвертировать.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="995"/>
+        <location filename="../widgets/conversion_panel.py" line="929"/>
         <source>Would upsample</source>
         <translatorcomment>Status label in a fixed 120px column. Rendered as &apos;higher than the source&apos; rather than the technical noun for upsampling, which does not fit and does not convey that the row is refused.</translatorcomment>
         <translation>Выше источника</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="998"/>
+        <location filename="../widgets/conversion_panel.py" line="932"/>
         <source>Choose a sample rate and bit depth no higher than this file&apos;s.</source>
         <translation>Выберите частоту дискретизации и разрядность не выше, чем у этого файла.</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1001"/>
-        <location filename="../widgets/conversion_panel.py" line="1146"/>
-        <location filename="../widgets/conversion_panel.py" line="1176"/>
+        <location filename="../widgets/conversion_panel.py" line="935"/>
+        <location filename="../widgets/conversion_panel.py" line="1080"/>
+        <location filename="../widgets/conversion_panel.py" line="1110"/>
         <source>Ready</source>
         <translation>Готово</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1015"/>
+        <location filename="../widgets/conversion_panel.py" line="949"/>
         <source>{count} files</source>
         <translation>{count} файлов</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1017"/>
+        <location filename="../widgets/conversion_panel.py" line="951"/>
         <source>{count} to convert</source>
         <translation>{count} к конвертации</translation>
     </message>
@@ -893,17 +893,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">({count} с потерями пропущено)</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1118"/>
+        <location filename="../widgets/conversion_panel.py" line="1052"/>
         <source>Converting</source>
         <translation>Конвертация</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1139"/>
+        <location filename="../widgets/conversion_panel.py" line="1073"/>
         <source>Incomplete</source>
         <translation>Не завершено</translation>
     </message>
     <message>
-        <location filename="../widgets/conversion_panel.py" line="1139"/>
+        <location filename="../widgets/conversion_panel.py" line="1073"/>
         <source>Error</source>
         <translation>Ошибка</translation>
     </message>
@@ -1531,74 +1531,74 @@ or click “Add Artwork…”</source>
 <context>
     <name>MainWindow</name>
     <message>
-        <location filename="../main_window.py" line="128"/>
+        <location filename="../main_window.py" line="129"/>
         <source>Mixed in P</source>
         <translation>Mixed in P</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="677"/>
-        <location filename="../main_window.py" line="706"/>
+        <location filename="../main_window.py" line="681"/>
+        <location filename="../main_window.py" line="710"/>
         <source>Export All Playlists</source>
         <translation>Экспортировать все плейлисты</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="698"/>
+        <location filename="../main_window.py" line="702"/>
         <source>Export failed</source>
         <translation>Не удалось экспортировать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="699"/>
+        <location filename="../main_window.py" line="703"/>
         <source>Could not write the file:
 {0}</source>
         <translation>Не удалось записать файл:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="707"/>
+        <location filename="../main_window.py" line="711"/>
         <source>There are no playlists to export yet.</source>
         <translation>Пока нет плейлистов для экспорта.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="712"/>
+        <location filename="../main_window.py" line="716"/>
         <source>Export complete</source>
         <translation>Экспорт завершён</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="713"/>
+        <location filename="../main_window.py" line="717"/>
         <source>Exported {0} playlists ({1} tracks) to:
 {2}</source>
         <translation>Экспортировано плейлистов: {0} ({1} треков) в:
 {2}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="828"/>
+        <location filename="../main_window.py" line="837"/>
         <source>Select Audio Files</source>
         <translation>Выберите аудиофайлы</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="839"/>
+        <location filename="../main_window.py" line="848"/>
         <source>Select Folder</source>
         <translation>Выберите папку</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1087"/>
+        <location filename="../main_window.py" line="1096"/>
         <source>No Audio Files</source>
         <translation>Нет аудиофайлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1088"/>
+        <location filename="../main_window.py" line="1097"/>
         <source>No audio files found in:
 {0}</source>
         <translation>Аудиофайлы не найдены в:
 {0}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1093"/>
+        <location filename="../main_window.py" line="1102"/>
         <source>Invalid Folder</source>
         <translation>Недопустимая папка</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1094"/>
+        <location filename="../main_window.py" line="1103"/>
         <source>Not a valid directory:
 {0}</source>
         <translation>Недопустимый каталог:
@@ -1613,17 +1613,17 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Анализ уже выполняется. Подождите или сначала отмените его.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1292"/>
+        <location filename="../main_window.py" line="1308"/>
         <source>Analyzing...</source>
         <translation>Анализ...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1324"/>
+        <location filename="../main_window.py" line="1340"/>
         <source>Complete: {0} analyzed, {1} errors</source>
         <translation>Готово: {0} проанализировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1328"/>
+        <location filename="../main_window.py" line="1344"/>
         <source>Complete: {0} files analyzed</source>
         <translation>Готово: {0} файлов проанализировано</translation>
     </message>
@@ -1632,127 +1632,142 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отменено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1554"/>
+        <location filename="../main_window.py" line="1171"/>
+        <source>A conversion is running, so these are only analyzed.</source>
+        <translation>Идёт конвертация, поэтому файлы только анализируются.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1182"/>
+        <source>No playlist named in the header, so these are only analyzed.</source>
+        <translation>В верхней панели не указан плейлист, поэтому файлы только анализируются.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1523"/>
+        <source>Nothing was renamed: &quot;{0}&quot; would clash with another file.</source>
+        <translation>Ничего не переименовано: имя «{0}» совпало бы с другим файлом.</translation>
+    </message>
+    <message>
+        <location filename="../main_window.py" line="1577"/>
         <source>Conversion in Progress</source>
         <translation>Конвертация выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1555"/>
+        <location filename="../main_window.py" line="1578"/>
         <source>A conversion is already running. Please wait.</source>
         <translation>Конвертация уже выполняется. Подождите.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1573"/>
+        <location filename="../main_window.py" line="1596"/>
         <source>Pipeline in Progress</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Пайплайн выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1574"/>
+        <location filename="../main_window.py" line="1597"/>
         <source>The last pipeline run is still finishing — wait for it to complete.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Предыдущий пайплайн ещё завершается — дождитесь его окончания.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1591"/>
+        <location filename="../main_window.py" line="1614"/>
         <source>No Target Playlist</source>
         <translation>Нет целевого плейлиста</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1592"/>
-        <location filename="../main_window.py" line="1785"/>
+        <location filename="../main_window.py" line="1615"/>
+        <location filename="../main_window.py" line="1808"/>
         <source>Name a playlist for the run in the header bar first.</source>
         <translation>Сначала укажите плейлист для запуска в верхней панели.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1797"/>
+        <location filename="../main_window.py" line="1820"/>
         <source>Cannot Start</source>
         <translation>Не удаётся запустить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1807"/>
+        <location filename="../main_window.py" line="1830"/>
         <source>No Files</source>
         <translation>Нет файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1808"/>
+        <location filename="../main_window.py" line="1831"/>
         <source>Add files to this panel before starting a pipeline run.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Добавьте файлы на эту панель, прежде чем запускать пайплайн.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1818"/>
+        <location filename="../main_window.py" line="1841"/>
         <source>No Rename Adjustments</source>
         <translation>Нет настроек переименования</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1819"/>
+        <location filename="../main_window.py" line="1842"/>
         <source>No rename adjustments are set. Send the files on unchanged?</source>
         <translation>Настройки переименования не заданы. Отправить файлы без изменений?</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1913"/>
+        <location filename="../main_window.py" line="1936"/>
         <source>Lossy files stayed in Convert — their status says why.</source>
         <translation>Файлы с потерями остаются в «Конвертации» — причина указана в их статусе.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2045"/>
+        <location filename="../main_window.py" line="2068"/>
         <source>Pipeline complete: {added} added to {playlist}</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Пайплайн завершён: {added} добавлено в {playlist}</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2050"/>
+        <location filename="../main_window.py" line="2073"/>
         <source>{n} skipped</source>
         <translation>{n} пропущено</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2052"/>
+        <location filename="../main_window.py" line="2075"/>
         <source>{n} errors</source>
         <translation>{n} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2184"/>
+        <location filename="../main_window.py" line="2207"/>
         <source>Converting...</source>
         <translation>Конвертация...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2200"/>
+        <location filename="../main_window.py" line="2223"/>
         <source>Complete: {0} converted, {1} errors</source>
         <translation>Готово: {0} конвертировано, {1} ошибок</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2204"/>
+        <location filename="../main_window.py" line="2227"/>
         <source>Complete: {0} files converted</source>
         <translation>Готово: {0} файлов конвертировано</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2598"/>
+        <location filename="../main_window.py" line="2621"/>
         <source>Rename in Progress</source>
         <translation>Переименование выполняется</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2599"/>
+        <location filename="../main_window.py" line="2622"/>
         <source>A rename operation is already running.</source>
         <translation>Операция переименования уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2707"/>
+        <location filename="../main_window.py" line="2730"/>
         <source>Rename Failed</source>
         <translation>Не удалось переименовать</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2742"/>
+        <location filename="../main_window.py" line="2765"/>
         <source>Undo Rename</source>
         <translation>Отменить переименование</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2777"/>
+        <location filename="../main_window.py" line="2800"/>
         <source>Undo Failed</source>
         <translation>Не удалось отменить</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2830"/>
+        <location filename="../main_window.py" line="2853"/>
         <source>Switch the Convert step on to run the pipeline from here.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Включите шаг «Конвертация», чтобы запустить пайплайн отсюда.</translation>
@@ -1762,12 +1777,12 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Сначала настройте цепочку на панели «Конвертация».</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1780"/>
+        <location filename="../main_window.py" line="1803"/>
         <source>A conversion is already running.</source>
         <translation>Конвертация уже выполняется.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="1782"/>
+        <location filename="../main_window.py" line="1805"/>
         <source>The last pipeline run is still finishing.</source>
         <translatorcomment>Terminology: &quot;пайплайн&quot; rather than &quot;цепочка&quot; — what Russian producers and developers actually say, and it keeps the surf-break reading the app&apos;s wave symbol depends on.</translatorcomment>
         <translation>Предыдущий пайплайн ещё завершается.</translation>
@@ -1786,22 +1801,22 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Переименовано {0} файлов</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2714"/>
+        <location filename="../main_window.py" line="2737"/>
         <source>No Session</source>
         <translation>Нет сессии</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2714"/>
+        <location filename="../main_window.py" line="2737"/>
         <source>No rename session to undo.</source>
         <translation>Нет сессии переименования для отмены.</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2723"/>
+        <location filename="../main_window.py" line="2746"/>
         <source>Confirm Undo</source>
         <translation>Подтвердите отмену</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2724"/>
+        <location filename="../main_window.py" line="2747"/>
         <source>Undo renaming of {0} files?</source>
         <translation>Отменить переименование {0} файлов?</translation>
     </message>
@@ -1810,7 +1825,7 @@ or click “Add Artwork…”</source>
         <translation type="vanished">Отмена переименования...</translation>
     </message>
     <message>
-        <location filename="../main_window.py" line="2743"/>
+        <location filename="../main_window.py" line="2766"/>
         <source>Undone: {0} files, {1} errors</source>
         <translation>Отменено: {0} файлов, {1} ошибок</translation>
     </message>

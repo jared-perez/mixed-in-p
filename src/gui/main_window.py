@@ -68,6 +68,7 @@ from .convert_pipeline import (
 from .widgets.conversion_panel import ConversionPanel
 from .widgets.dialogs import duplicate_policy
 from .widgets.dialogs.about_dialog import AboutDialog
+from .widgets.floating_notice import FloatingNotice
 from .widgets.header_bar import HeaderBar
 from .widgets.history_panel import HistoryPanel
 from .widgets.metadata_panel import MetadataPanel
@@ -287,6 +288,9 @@ class MainWindow(QMainWindow):
 
         # Create pages
         self._create_pages()
+        # One notice for the whole window, over whichever page is current:
+        # what it reports often happens on a page the user has left.
+        self._notice = FloatingNotice(central_widget, self._pages)
         # Open on the Player panel (top of the sidebar) rather than the
         # stacked widget's first-added page (Rename, index 0).
         self._pages.setCurrentWidget(self._player_panel)
@@ -808,6 +812,11 @@ class MainWindow(QMainWindow):
         finally:
             self._page_held = False
 
+    def _show_notice(self, text: str) -> None:
+        """Float a line over the pages for 3s — where a silent skip speaks."""
+        logger.info("Notice shown: %s", text)
+        self._notice.show_text(text)
+
     def _show_page(self, page_id: str) -> None:
         """Make a page current, unless a sidebar drop is being handled.
 
@@ -1158,12 +1167,19 @@ class MainWindow(QMainWindow):
                 "Analyze drop: a conversion is running, so %d file(s) are analysed "
                 "without a run", len(paths),
             )
+            self._show_notice(
+                self.tr("A conversion is running, so these are only analyzed.")
+            )
             return False
         target = self._resolve_pipeline_target()
         if target is None:
             logger.warning(
                 "Analyze drop: no target playlist named in the header, so %d file(s) "
                 "are analysed without a run", len(paths),
+            )
+            # The Analyze step is on, so the user expects these filed.
+            self._show_notice(
+                self.tr("No playlist named in the header, so these are only analyzed.")
             )
             return False
         node_id, name = target
@@ -1499,6 +1515,13 @@ class MainWindow(QMainWindow):
         if has_conflicts(all_previews):
             logger.warning(
                 "Auto-rename skipped: the batch has a name conflict (see the plan above)"
+            )
+            # All or nothing, so one clash holds back every file in the batch;
+            # name it, or the user sees tagged files that were never renamed.
+            clash = next(p for p in all_previews if p.will_conflict)
+            self._show_notice(
+                self.tr('Nothing was renamed: "{0}" would clash with another file.')
+                .format(clash.new_name)
             )
             return
         if not has_changes(all_previews):
@@ -1909,7 +1932,7 @@ class MainWindow(QMainWindow):
         # the table and is never converted, analysed or added. Say so rather
         # than hand back an emptier playlist than the user expects.
         if self._conversion_panel.lossy_rows_held(paths):
-            self._conversion_panel.show_notice(
+            self._show_notice(
                 self.tr("Lossy files stayed in Convert — their status says why.")
             )
         self._pipeline_entering_convert = True
@@ -2820,13 +2843,13 @@ class MainWindow(QMainWindow):
         self._conversion_panel.add_files(file_paths)
         self._show_page("convert")
         if blocker:
-            self._conversion_panel.show_notice(blocker)
+            self._show_notice(blocker)
             return
         steps = self._enabled_steps()
         if STEP_CONVERT not in steps:
             # This entry point starts the run *at* Convert, so it is the one
             # step it cannot skip. The files are in the panel either way.
-            self._conversion_panel.show_notice(
+            self._show_notice(
                 self.tr("Switch the Convert step on to run the pipeline from here.")
             )
             return

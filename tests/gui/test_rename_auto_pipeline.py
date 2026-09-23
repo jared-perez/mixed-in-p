@@ -299,7 +299,7 @@ def test_the_convert_leg_says_so_when_lossy_files_cannot_travel(
 
     win._start_pipeline_from(STEP_RENAME)
 
-    assert "Lossy files stayed in Convert" in win._conversion_panel._lossy_notice.text()
+    assert "Lossy files stayed in Convert" in win._notice.text()
     # ...and they are in its table, not lost between panels.
     assert win._conversion_panel._file_table.rowCount() == 2
 
@@ -313,7 +313,7 @@ def test_a_lossless_only_batch_gets_no_notice(window, monkeypatch, tmp_path):
     monkeypatch.setattr(type(win._conversion_panel), "press_convert",
                         lambda self: None)
     win._start_pipeline_from(STEP_RENAME)
-    assert win._conversion_panel._lossy_notice.isHidden()
+    assert win._notice.isHidden()
 
 
 def test_the_convert_leg_presses_the_panels_own_button(window, monkeypatch, tmp_path):
@@ -576,7 +576,31 @@ def test_a_drop_with_no_target_falls_back_to_a_plain_analysis(window, qtbot, tmp
     assert not win._pipeline.active
     assert win._analysis_thread is not None
     assert "no target playlist" in caplog.text
+    # ...and on screen, since the log is not where the user looks.
+    assert not win._notice.isHidden()
+    assert "No playlist named" in win._notice.text()
     qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=60000)
+
+
+def test_a_drop_during_a_conversion_says_it_only_analyses(window, qtbot, tmp_path):
+    """The other fallback: a plain conversion in flight. Same analysis, and
+    now the same word on screen rather than a line in the log."""
+
+    class _Running:
+        def isRunning(self):
+            return True
+
+    win = window(auto_analyze=True, pipeline_analyze_enabled=True,
+                 pipeline_playlist="Friday set", auto_rename=False)
+    win._conversion_thread = _Running()
+    try:
+        _drop_into_analyze(win, [_wav(tmp_path / "a.wav")])
+        assert not win._pipeline.active
+        assert "conversion is running" in win._notice.text()
+        assert not win._notice.isHidden()
+        qtbot.waitUntil(lambda: win._analysis_thread is None, timeout=60000)
+    finally:
+        win._conversion_thread = None
 
 
 def test_a_refused_start_is_logged(window, monkeypatch, caplog):
@@ -589,3 +613,41 @@ def test_a_refused_start_is_logged(window, monkeypatch, caplog):
     with caplog.at_level("WARNING", logger="src.gui.main_window"):
         win._start_pipeline_from(STEP_ANALYZE)
     assert shown and "Pipeline start refused" in caplog.text
+
+
+# ------------------------------------------- an auto-rename held back by a clash
+
+
+def test_an_auto_rename_clash_is_said_on_screen(window, qtbot, monkeypatch, tmp_path):
+    """One clash holds back the whole batch, and that used to reach only the
+    log: the user saw tagged files that were never renamed. Said over
+    whatever page is up — the user has often moved on by the time it fires."""
+    from src.analysis.result import AnalysisResult
+
+    win = window(auto_rename=True)
+    win.show()
+    qtbot.waitExposed(win)
+    assert win._pages.currentWidget() is win._player_panel
+    path = _wav(tmp_path / "a.wav")
+    track = win._store.add_from_path(path)
+    win._store.update(track.id, state=TrackState.ANALYSED, bpm=128.0,
+                      key="Am", keycode="8A")
+    win._pending_rename_operations = []
+    started = []
+    monkeypatch.setattr(win, "_start_rename", lambda previews, *a: started.append(previews))
+    result = AnalysisResult(file_path=path, bpm=128.0, bpm_confidence=0.9,
+                            key="Am", key_confidence=0.8, keycode="8A")
+
+    # The control: with nothing in the way it renames, and says nothing.
+    win._auto_rename_after_analysis([result])
+    (previews,) = started
+    assert win._notice.isHidden()
+
+    # Now the name it wants is taken.
+    (tmp_path / previews[0].new_name).write_bytes(b"")
+    win._auto_rename_after_analysis([result])
+
+    assert len(started) == 1  # held back
+    assert win._notice.isVisible()  # on screen, over the Player
+    assert win._notice.geometry().intersects(win._pages.geometry())
+    assert previews[0].new_name in win._notice.text()

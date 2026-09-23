@@ -2,7 +2,7 @@
 
 from pathlib import Path
 
-from PySide6.QtCore import Qt, QTimer, Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QColor
 from PySide6.QtWidgets import (
     QComboBox,
@@ -140,7 +140,6 @@ class ConversionPanel(QWidget):
     def resizeEvent(self, event) -> None:
         super().resizeEvent(event)
         self._bg_overlay.setGeometry(self.rect())
-        self._position_lossy_notice()
 
     def _setup_ui(self) -> None:
         layout = QVBoxLayout(self)
@@ -337,24 +336,6 @@ class ConversionPanel(QWidget):
         layout.addLayout(bottom_row)
         self._bottom_row = bottom_row
 
-        # Transient centered notice (show_notice). It floats over the panel,
-        # not in the layout, and auto-hides after 3s.
-        self._lossy_notice = QLabel(self)
-        self._lossy_notice.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        # show_notice puts sentences here, not two words, so it wraps rather
-        # than running off both edges of the panel.
-        self._lossy_notice.setWordWrap(True)
-        self._lossy_notice.setAttribute(Qt.WidgetAttribute.WA_TransparentForMouseEvents)
-        self._lossy_notice.setStyleSheet(
-            f"color: {Theme.TEXT_PRIMARY}; font-size: 18px; font-weight: bold;"
-            " background: transparent;"
-        )
-        self._lossy_notice.hide()
-        self._lossy_notice_timer = QTimer(self)
-        self._lossy_notice_timer.setSingleShot(True)
-        self._lossy_notice_timer.setInterval(3000)
-        self._lossy_notice_timer.timeout.connect(self._hide_lossy_notice)
-
         # Apply initial visibility based on persisted target format
         self._on_format_changed(self._format_combo.currentText())
 
@@ -489,53 +470,6 @@ class ConversionPanel(QWidget):
             and self._verdict(p, target_ext, is_mp3) == self.LOSSY
             for p in paths
         )
-
-    def _position_lossy_notice(self) -> None:
-        """Size and center the transient notice over the panel.
-
-        Sized by hand rather than by adjustSize(): word wrap is on, so the
-        label is only as tall as the width it is given, and it is floated
-        rather than laid out — there is no parent to ask heightForWidth for
-        it. Measured off the string with QFontMetrics, never asked of the
-        label, and capped at the panel so a long sentence wraps instead of
-        overhanging both edges.
-        """
-        available = max(1, self.width() - Theme.PADDING * 2)
-        metrics = self._lossy_notice.fontMetrics()
-        text = self._lossy_notice.text()
-        # +2: an advance can round just under what the wrapper needs, which
-        # would break a fitting line in two.
-        width = min(available, metrics.horizontalAdvance(text) + 2)
-        rect = metrics.boundingRect(
-            0, 0, width, 0,
-            int(Qt.TextFlag.TextWordWrap) | int(Qt.AlignmentFlag.AlignCenter),
-            text,
-        )
-        self._lossy_notice.resize(width, rect.height())
-        x = (self.width() - self._lossy_notice.width()) // 2
-        y = (self.height() - self._lossy_notice.height()) // 2
-        self._lossy_notice.move(max(0, x), max(0, y))
-
-    def show_notice(self, text: str) -> None:
-        """Float a transient line over the panel for 3s.
-
-        The app has no status bar, and the progress line is owned by the run
-        (_on_conversion_started overwrites it a moment later), so this is where
-        a one-off word to the user goes.
-        """
-        self._lossy_notice.setText(text)
-        self._show_lossy_notice()
-
-    def _show_lossy_notice(self) -> None:
-        """Show the current notice text and (re)start its 3s timeout."""
-        self._position_lossy_notice()
-        self._lossy_notice.show()
-        self._lossy_notice.raise_()  # above the faint background overlay
-        self._lossy_notice_timer.start()
-
-    def _hide_lossy_notice(self) -> None:
-        self._lossy_notice_timer.stop()
-        self._lossy_notice.hide()
 
     def _on_format_changed(self, text: str) -> None:
         """Handle target format change."""
