@@ -186,6 +186,42 @@ class TestConvertExecution:
             cli.run_convert(_make_args(path="/no/such/path", to="FLAC"))
 
 
+class TestConvertOutputDir:
+    """--output-dir that does not exist yet used to fail every file with
+    "No such file or directory", and the dry run still listed them as PLAN."""
+
+    def test_a_missing_folder_is_created(self, wav_file, tmp_path, capsys):
+        out = tmp_path / "new" / "nested"
+        cli.run_convert(_make_args(path=str(wav_file), to="FLAC",
+                                   output_dir=str(out), format="json"))
+        report = json.loads(capsys.readouterr().out)
+        assert report[0]["status"] == "ok"
+        assert (out / "tone.flac").exists()
+
+    def test_the_dry_run_says_so_and_creates_nothing(self, wav_file, tmp_path, capsys):
+        out = tmp_path / "new"
+        cli.run_convert(_make_args(path=str(wav_file), to="FLAC",
+                                   output_dir=str(out), dry_run=True))
+        assert "will be created" in capsys.readouterr().out
+        assert not out.exists()
+
+    def test_the_dry_run_is_quiet_about_an_existing_folder(self, wav_file, tmp_path, capsys):
+        out = tmp_path / "there"
+        out.mkdir()
+        cli.run_convert(_make_args(path=str(wav_file), to="FLAC",
+                                   output_dir=str(out), dry_run=True))
+        assert "will be created" not in capsys.readouterr().out
+
+    def test_a_file_in_the_way_is_refused_once(self, wav_file, tmp_path, capsys):
+        blocker = tmp_path / "not-a-folder"
+        blocker.write_text("")
+        with pytest.raises(SystemExit) as exit_info:
+            cli.run_convert(_make_args(path=str(wav_file), to="FLAC",
+                                       output_dir=str(blocker)))
+        assert exit_info.value.code == 1
+        assert "not a folder" in capsys.readouterr().err
+
+
 class TestConvertOutputHelpers:
     """Output formatters handle the three non-error outcomes."""
 
@@ -210,3 +246,18 @@ class TestConvertOutputHelpers:
         cli.convert_output_table(results)
         out = capsys.readouterr().out
         assert "1 converted, 1 skipped, 1 failed." in out
+
+
+class TestBpmWindowDefaults:
+    """The CLI folds tempo into the app's own default window, not a private
+    85-175 of its own (a 180 BPM track read as 90 here and 180 in the app)."""
+
+    @pytest.mark.parametrize("command", ["analyze", "rename"])
+    def test_defaults_match_the_app(self, monkeypatch, command):
+        from src.utils.config import AppConfig
+
+        captured = {}
+        monkeypatch.setattr(cli, f"run_{command}", lambda args: captured.update(vars(args)))
+        cli.main([command, "song.wav"])
+        assert (captured["min_bpm"], captured["max_bpm"]) == (AppConfig.min_bpm, AppConfig.max_bpm)
+        assert (captured["min_bpm"], captured["max_bpm"]) == (99.0, 199.0)

@@ -19,6 +19,7 @@ from .analysis.analyzer import (
     SUPPORTED_EXTENSIONS,
 )
 from .analysis.keycode import get_compatible_keys
+from .utils.config import AppConfig
 
 
 def main(argv: list[str] | None = None):
@@ -60,14 +61,14 @@ def main(argv: list[str] | None = None):
     analyze_parser.add_argument(
         "--min-bpm",
         type=float,
-        default=85.0,
-        help="Minimum expected BPM (default: 85)",
+        default=AppConfig.min_bpm,
+        help=f"Minimum expected BPM (default: {AppConfig.min_bpm:g}, as in the app)",
     )
     analyze_parser.add_argument(
         "--max-bpm",
         type=float,
-        default=175.0,
-        help="Maximum expected BPM (default: 175)",
+        default=AppConfig.max_bpm,
+        help=f"Maximum expected BPM (default: {AppConfig.max_bpm:g}, as in the app)",
     )
     analyze_parser.add_argument(
         "--compatible",
@@ -128,7 +129,7 @@ def main(argv: list[str] | None = None):
         "--replace",
         nargs=2,
         metavar=("OLD", "NEW"),
-        help="Replace OLD text with NEW text in filename",
+        help="Replace OLD text with NEW text in the original filename (not in added prefix/suffix)",
     )
 
     # BPM/Key operations
@@ -203,14 +204,14 @@ def main(argv: list[str] | None = None):
     rename_parser.add_argument(
         "--min-bpm",
         type=float,
-        default=85.0,
-        help="Minimum expected BPM (default: 85)",
+        default=AppConfig.min_bpm,
+        help=f"Minimum expected BPM (default: {AppConfig.min_bpm:g}, as in the app)",
     )
     rename_parser.add_argument(
         "--max-bpm",
         type=float,
-        default=175.0,
-        help="Maximum expected BPM (default: 175)",
+        default=AppConfig.max_bpm,
+        help=f"Maximum expected BPM (default: {AppConfig.max_bpm:g}, as in the app)",
     )
 
     # Convert command
@@ -238,7 +239,7 @@ def main(argv: list[str] | None = None):
     convert_parser.add_argument(
         "-o", "--output-dir",
         metavar="DIR",
-        help="Output directory (default: alongside each source file)",
+        help="Output directory, created if missing (default: alongside each source file)",
     )
     convert_parser.add_argument(
         "--bitrate",
@@ -406,14 +407,17 @@ def run_rename(args):
     if args.trim_end:
         operations.append(TrimEnd(count=args.trim_end))
 
+    # Replace edits the file's own name only: it runs before the prefix and
+    # suffix, so text added by --add-prefix/--add-suffix arrives exactly as
+    # typed. After the trims, so their counts are of the name as you see it.
+    if args.replace:
+        operations.append(Replace(find=args.replace[0], replace=args.replace[1]))
+
     if args.add_prefix:
         operations.append(AddPrefix(prefix=args.add_prefix))
 
     if args.add_suffix:
         operations.append(AddSuffix(suffix=args.add_suffix))
-
-    if args.replace:
-        operations.append(Replace(find=args.replace[0], replace=args.replace[1]))
 
     # Check if we need analysis
     needs_analysis = args.add_bpm or args.add_key
@@ -640,6 +644,16 @@ def run_convert(args):
 
     target_ext = FORMAT_EXTENSION[args.to]
 
+    # A missing --output-dir is created (on a real run) rather than failing
+    # every file with "No such file or directory" one by one, which the dry
+    # run could not predict. A path that exists but is a file is refused once,
+    # up front.
+    out_dir = Path(args.output_dir) if args.output_dir else None
+    if out_dir is not None and out_dir.exists() and not out_dir.is_dir():
+        print(f"Error: Output path is not a folder: {args.output_dir}", file=sys.stderr)
+        sys.exit(1)
+    creates_out_dir = out_dir is not None and not out_dir.exists()
+
     # Dry run: classify each file without touching disk. Blocks (lossy/
     # unsupported source) and skips (same-format that isn't a downgrade) are
     # predicted exactly — same helpers convert_file uses — and planned output
@@ -687,7 +701,17 @@ def run_convert(args):
             print(json.dumps(report, indent=2))
         else:
             _report_convert_plan(planned, skipped, blocked, args.to)
+            if creates_out_dir and planned:
+                print(f"The output folder will be created: {args.output_dir}")
         return
+
+    if creates_out_dir:
+        try:
+            out_dir.mkdir(parents=True, exist_ok=True)
+        except OSError as e:
+            print(f"Error: Could not create output folder {args.output_dir}: {e}",
+                  file=sys.stderr)
+            sys.exit(1)
 
     # Execute. convert_file never raises — every outcome rides on the
     # returned ConversionResult (ok / skipped / error / incomplete).
