@@ -12,8 +12,11 @@
 <style>
   :root{
     --bg:#0a1228;              /* deep blue — the top of the page; cool enough that neon yellow reads as an accent */
-    --bg-lift:#2d3f66;         /* lifted slate blue the page reaches halfway down */
-    --dl-card-bg:#172033;      /* download card background — tweak to recolor just the cards */
+    --bg-deep:#05070d;         /* blue-black the page fades to below the hero: black to the eye,
+                                  but tinted so the navy bands and cards sit with it (pure #000
+                                  reads as a void next to navy and smears on OLED phones) */
+    --band:var(--bg);          /* navy full-width bands: demo video, download — same navy as the hero and footer */
+    --dl-card-bg:var(--bg);    /* download cards + the "And more" grid cells — tweak to recolor just the cards */
     --panel:#121a2c;
     --panel-2:#172132;
     --line:#26324a;            /* slate border */
@@ -21,8 +24,7 @@
     --yellow-bright:#f6ff66;
     --yellow-dim:#7a8500;
     --text:#e7ebf2;            /* cool white */
-    --muted:#a2abbb;           /* slate gray — lifted from #8893a8 so it clears 4.5:1
-                                  against --bg-lift, the palest ground the page reaches */
+    --muted:#a2abbb;           /* slate gray — 8:1 on the navy, the palest ground the page reaches */
   }
   *{margin:0;padding:0;box-sizing:border-box}
   html{
@@ -32,16 +34,18 @@
        entirely. The first line is the fallback for pre-2022 browsers. */
     overflow-x:hidden;
     overflow-x:clip;
-    background-color:var(--bg-lift);
-    /* One continuous ease from deep blue at the very top to the lifted blue
-       halfway down, held from there to the foot — no seam at the fold.
-       The 50% resolves against <html>'s box, which is the full document
-       height, so the fade tracks the page rather than the viewport.
+    background-color:var(--bg-deep);
+    /* Deep blue behind the hero, easing to blue-black just past it and held
+       from there to the foot, so the navy bands and cards below read as
+       raised panels on dark ground. The stop is in viewport units (the hero
+       is 100svh tall), not a percentage of the document, so the navy ends
+       with the hero at every page length. The waveform script mirrors this
+       stop in FADE_END_VH — change both together.
        Set on <html> so the root background paints the full canvas edge-to-edge
        (body's overflow-x:hidden would block background propagation). */
     background-image:linear-gradient(to bottom,
       var(--bg) 0,
-      var(--bg-lift) 50%);
+      var(--bg-deep) 150vh);
     background-repeat:no-repeat;
   }
   body{
@@ -186,7 +190,9 @@
     border-radius:10px;
     overflow:hidden;
     background:var(--panel);
-    box-shadow:0 24px 60px rgba(0,0,0,.45);
+    /* A black drop shadow vanishes on the blue-black ground; a faint navy
+       glow lifts the frame instead. */
+    box-shadow:0 20px 60px rgba(45,63,102,.35);
   }
   .feature .tag{
     font-family:'JetBrains Mono',monospace;
@@ -236,7 +242,9 @@
     border-radius:10px;
     overflow:hidden;
     background:var(--panel);
-    box-shadow:0 24px 60px rgba(0,0,0,.45);
+    /* A black drop shadow vanishes on the blue-black ground; a faint navy
+       glow lifts the frame instead. */
+    box-shadow:0 20px 60px rgba(45,63,102,.35);
   }
   .demo-frame video{display:block;width:100%;height:auto}
 
@@ -260,11 +268,6 @@
   }
   .step b{display:block;font-weight:500;margin-bottom:2px}
   .step span{color:var(--muted);font-size:15px}
-  /* Quick Start sits on the palest ground the page reaches (the gradient has
-     completed and holds --bg-lift from halfway down), where --muted body copy
-     falls to 3.4:1. These steps carry install instructions people read word
-     by word, so they take --text instead — 8.7:1 on the same ground. */
-  #quickstart .step span{color:var(--text)}
   /* macOS / Windows install notes: big OS logo in its own left column,
      sitting under the "01", with the paragraph to its right. */
   .os-row{display:flex;align-items:center;gap:16px;margin-top:18px}
@@ -358,13 +361,19 @@
   }
   @keyframes dlNoteIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 
+  /* full-width navy band with rules above and below */
+  .band{
+    background:var(--band);
+    border-top:1px solid var(--line);
+    border-bottom:1px solid var(--line);
+  }
+
   footer{
     padding:48px 24px 40px;
     border-top:1px solid var(--line);
     text-align:center;
-    /* Back to the top-of-page blue: it puts --muted at 6.0:1 down here
-       instead of the 3.4:1 it gets on the lifted ground. Flat band with a
-       rule above it, the same treatment the download section uses. */
+    /* Back to the top-of-page blue: a flat navy strip closing the page,
+       with a rule above it. */
     background:var(--bg);
   }
   footer .logo-img{width:200px;margin:0 auto 16px;opacity:.9}
@@ -506,8 +515,23 @@
   </div>
 </section>
 
+<!-- ================= DEMO VIDEO ================= -->
+<section class="band">
+  <div class="wrap">
+    <p class="eyebrow">See it in action</p>
+    <h2>From folder to finished, in one clip.</h2>
+    <p class="lede">A folder dropped in, renamed, converted, analyzed and sliced — the whole workflow in one take.</p>
+    <div class="demo-frame">
+      <video controls preload="none" poster="assets/video_poster_app4.jpg" playsinline>
+        <source src="assets/demo_app4.mp4" type="video/mp4">
+        Your browser doesn't support embedded video — <a href="assets/demo_app4.mp4">download the demo clip</a> instead.
+      </video>
+    </div>
+  </div>
+</section>
+
 <!-- ================= MORE TOOLS ================= -->
-<section style="padding-top:0">
+<section>
   <div class="wrap">
     <p class="eyebrow">And more</p>
     <h2>One app, an entire toolkit.</h2>
@@ -577,23 +601,8 @@
   </div>
 </section>
 
-<!-- ================= DEMO VIDEO ================= -->
-<section style="padding-top:0">
-  <div class="wrap">
-    <p class="eyebrow">See it in action</p>
-    <h2>From folder to finished, in one clip.</h2>
-    <p class="lede">A folder dropped in, renamed, converted, analyzed and sliced — the whole workflow in one take.</p>
-    <div class="demo-frame">
-      <video controls preload="none" poster="assets/video_poster_app4.jpg" playsinline>
-        <source src="assets/demo_app4.mp4" type="video/mp4">
-        Your browser doesn't support embedded video — <a href="assets/demo_app4.mp4">download the demo clip</a> instead.
-      </video>
-    </div>
-  </div>
-</section>
-
 <!-- ================= DOWNLOAD ================= -->
-<section id="download" style="background:#172033;border-top:1px solid var(--line);border-bottom:1px solid var(--line);position:relative">
+<section id="download" class="band" style="position:relative">
   <div class="wrap">
     <p class="eyebrow">Get it</p>
     <h2>Download Mixed in P — free.</h2>
@@ -670,25 +679,26 @@
   const BAR_W = 3, GAP = 2;
 
   /* The hero scrim has to be the colour the PAGE is at that height, not a
-     fixed one: the background keeps lightening past the fold, so a scrim
-     mixed from the top colour alone would leave a dark band at exactly
-     100vh — the seam this gradient exists to avoid. Read the two ends off
-     the custom properties and lerp, so changing --bg / --bg-lift moves the
-     scrim with them. */
+     fixed one: the background keeps darkening past the fold, so a scrim
+     mixed from the top colour alone would leave a band at exactly 100vh —
+     the seam the gradient exists to avoid. Read the two ends off the custom
+     properties and lerp, so changing --bg / --bg-deep moves the scrim with
+     them. FADE_END_VH must match the gradient stop on <html>. */
   const css = getComputedStyle(document.documentElement);
   const hexToRgb = h => {
     h = h.trim().replace('#','');
     return [0,2,4].map(i => parseInt(h.slice(i, i+2), 16));
   };
   const BG_TOP = hexToRgb(css.getPropertyValue('--bg') || '#0a1228');
-  const BG_MID = hexToRgb(css.getPropertyValue('--bg-lift') || '#2d3f66');
+  const BG_END = hexToRgb(css.getPropertyValue('--bg-deep') || '#05070d');
+  const FADE_END_VH = 1.5;
 
-  /* `y` is a document offset in CSS px; the gradient reaches BG_MID at half
-     the document height and holds it from there. */
+  /* `y` is a document offset in CSS px; the gradient reaches BG_END at
+     FADE_END_VH viewport heights and holds it from there. */
   function pageColorAt(y, alpha){
-    const half = Math.max(1, document.documentElement.scrollHeight * 0.5);
-    const t = Math.min(1, Math.max(0, y / half));
-    const c = BG_TOP.map((v, i) => Math.round(v + (BG_MID[i] - v) * t));
+    const end = Math.max(1, window.innerHeight * FADE_END_VH);
+    const t = Math.min(1, Math.max(0, y / end));
+    const c = BG_TOP.map((v, i) => Math.round(v + (BG_END[i] - v) * t));
     return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + alpha + ')';
   }
 
