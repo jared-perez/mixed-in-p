@@ -53,6 +53,7 @@ _VALID_VIS_MODES = {
     "backdrop_fractal_trap",
     "backdrop_loop_tunnel",
     "backdrop_beat_tunnel",
+    "backdrop_terrain",
     # Popout visualizer window.
     "oscilloscope",
     "spectrum",
@@ -61,6 +62,7 @@ _VALID_VIS_MODES = {
     "fractal_trap",
     "loop_tunnel",
     "beat_tunnel",
+    "terrain",
 }
 _HEX_COLOR_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
 

@@ -52,6 +52,11 @@ fast (non-smooth) transformation for a chunky pixel look:
   :mod:`.vis_beat_tunnel`). It is the only mode that *counts beats*, so it is
   also the only one with a tempo (:mod:`.beat_clock`), a per-mode frame rate
   (60 fps in the popout) and a smooth upscale rather than chunky pixels.
+- ``terrain`` — **labelled "Mountain flight"**: soaring over a wireframe
+  mountain range that is built on the horizon from the volume and mirrored
+  overhead, with the camera banking through slow turns (see
+  :mod:`.vis_terrain`). Like the loop tunnel, its own host-shaped image and
+  O(lines); it is the mode with the most lines, so it has the lowest popout cap.
 
 The rendering lives in :class:`VisRenderer` (no widget), shared by two hosts:
 the popout :class:`VisCanvas`, and the Player playlist's backdrop (which blits
@@ -78,6 +83,7 @@ from .vis_analog_scope import AnalogScopeScene
 from .vis_beat_tunnel import BeatTunnelScene
 from .vis_loop_tunnel import LoopTunnelScene
 from .vis_stream import StreamScene
+from .vis_terrain import TerrainScene
 
 # Internal render resolution; hosts scale it up without smoothing.
 _W, _H = 152, 64
@@ -220,7 +226,7 @@ _PULSE_ATTACK = 0.97  # per 33 ms: a ~1.1 s time constant on the bass average
 
 RENDER_MODES = (
     "oscilloscope", "spectrum", "fire", "fractal", "fractal_power", "fractal_trap",
-    "loop_tunnel", "beat_tunnel", "stream",
+    "loop_tunnel", "beat_tunnel", "stream", "terrain",
 )
 # The three modes that share the Julia driver (orbit, camera, fade, palette)
 # and differ only in what each pixel computes on the grid.
@@ -363,6 +369,8 @@ class VisRenderer:
         # The backdrop's scope slot. Its own image again, and cheap to build:
         # the LUTs and the bead sprites, nothing per-frame.
         self._stream = StreamScene()
+        # The terrain flight: its own image, a flat plain until it renders.
+        self._terrain = TerrainScene()
 
     # ── Public API ─────────────────────────────────────────────────────────
 
@@ -375,6 +383,8 @@ class VisRenderer:
             return self._loop_tunnel.image()
         if self._mode == "beat_tunnel":
             return self._beat_tunnel.image()
+        if self._mode == "terrain":
+            return self._terrain.image()
         return self._image
 
     def frame_ms(self) -> int:
@@ -405,7 +415,7 @@ class VisRenderer:
         than for the mode, because the backdrop's face was the chunky grid;
         that face is gone, so the question is a per-mode one again.
         """
-        return self._mode in ("beat_tunnel", "loop_tunnel", "oscilloscope", "stream")
+        return self._mode in ("beat_tunnel", "loop_tunnel", "oscilloscope", "stream", "terrain")
 
     def set_frame_interval(self, frame_ms: float) -> None:
         """Tell the renderer how often it is being advanced.
@@ -428,6 +438,7 @@ class VisRenderer:
         self._beat_tunnel.set_frame_interval(frame_ms)
         self._analog_scope.set_frame_interval(frame_ms)
         self._stream.set_frame_interval(frame_ms)
+        self._terrain.set_frame_interval(frame_ms)
 
     def set_track_tempo(self, bpm: float | None) -> None:
         """The playing track's tag BPM — the beat clock's period.
@@ -486,6 +497,8 @@ class VisRenderer:
         elif mode == "beat_tunnel":
             self._beat_tunnel.reset()
             self._clock.reset()
+        elif mode == "terrain":
+            self._terrain.reset()
 
     def set_color(self, color: str) -> None:
         self._color = QColor(color)
@@ -494,6 +507,7 @@ class VisRenderer:
         self._beat_tunnel.set_color(self._color)
         self._analog_scope.set_color(self._color)
         self._stream.set_color(self._color)
+        self._terrain.set_color(self._color)
 
     def set_target_size(self, width: int, height: int, popout: bool = False) -> None:
         """Tell the renderer the host's pixel size; a no-op for most modes.
@@ -516,6 +530,7 @@ class VisRenderer:
         self._beat_tunnel.set_target_size(width, height, popout)
         self._analog_scope.set_target_size(width, height, popout)
         self._stream.set_target_size(width, height, popout)
+        self._terrain.set_target_size(width, height, popout)
 
     def render(self, samples: np.ndarray | None, sr: int) -> QImage:
         """Advance one frame from a mono block (zeros/None = silence)."""
@@ -547,6 +562,9 @@ class VisRenderer:
                 return self._render_loop_tunnel(heights)
             if self._mode == "beat_tunnel":
                 return self._render_beat_tunnel(heights)
+            if self._mode == "terrain":
+                # Returned, never assigned — the tunnels' rule.
+                return self._render_terrain(heights)
             if self._mode == "spectrum":
                 self._render_spectrum(heights)
             elif self._mode in FRACTAL_MODES:
@@ -915,6 +933,13 @@ class VisRenderer:
         return self._beat_tunnel.render(
             self._clock.phase, level, self._pulse, self._clock.bar_slot
         )
+
+    def _render_terrain(self, heights: np.ndarray) -> QImage:
+        # The tunnel's mean/max blend again: level sets travel speed,
+        # brightness and how tall the rows born this frame are; the kick
+        # plants a peak.
+        level = float(np.clip(0.5 * heights.mean() + 0.6 * heights.max(), 0.0, 1.0))
+        return self._terrain.render(level, self._pulse)
 
 
 class VisCanvas(QWidget):

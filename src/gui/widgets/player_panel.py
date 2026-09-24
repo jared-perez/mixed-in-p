@@ -148,6 +148,7 @@ _BACKDROP_VIS_MAP = {
     "backdrop_fractal_trap": "fractal_trap",
     "backdrop_loop_tunnel": "loop_tunnel",
     "backdrop_beat_tunnel": "beat_tunnel",
+    "backdrop_terrain": "terrain",
 }
 
 # Modes the eye menu does not offer right now. Withheld, not retired: the
@@ -2300,14 +2301,18 @@ class PlayerPanel(QWidget):
         # the Julia set, "Tri" for the three-fold figure the z²/z³ blend
         # makes, "Blade" for the orbit trap's look. The ids stay mechanism
         # names (``fractal_power``, ``fractal_trap``), as the tunnels' do.
+        # Row order is the user's too: on 2026-09-23 the mountain flight took
+        # the Blade Fractal's third row and the Blade went where the mountains
+        # had been, below the wormhole — in both halves.
         for mode, label in (
             ("backdrop_fractal", self.tr("J Fractal")),
             ("backdrop_fractal_power", self.tr("Tri Fractal")),
-            ("backdrop_fractal_trap", self.tr("Blade Fractal")),
+            ("backdrop_terrain", self.tr("Mountain flight")),
             ("backdrop_loop_tunnel", self.tr("Tunnel chase")),
             ("backdrop_oscilloscope", self.tr("Oscilloscope")),
             ("backdrop_spectrum", self.tr("Spectrum")),
             ("backdrop_beat_tunnel", self.tr("Wormhole")),
+            ("backdrop_fractal_trap", self.tr("Blade Fractal")),
             ("backdrop_scope", self.tr("Stream")),
             ("backdrop", self.tr("Waveform")),
             # "Smoke" is the label, `fire` stays the id: the mechanism is a
@@ -2318,11 +2323,12 @@ class PlayerPanel(QWidget):
             ("backdrop_fire", self.tr("Smoke")),
             ("fractal", self.tr("Popout J Fractal")),
             ("fractal_power", self.tr("Popout Tri Fractal")),
-            ("fractal_trap", self.tr("Popout Blade Fractal")),
+            ("terrain", self.tr("Popout mountain flight")),
             ("loop_tunnel", self.tr("Popout tunnel chase")),
             ("oscilloscope", self.tr("Popout oscilloscope")),
             ("spectrum", self.tr("Popout spectrum bars")),
             ("beat_tunnel", self.tr("Popout wormhole")),
+            ("fractal_trap", self.tr("Popout Blade Fractal")),
             ("off", self.tr("Visuals off")),
         ):
             if mode in _HIDDEN_VIS_MODES:

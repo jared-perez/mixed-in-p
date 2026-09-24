@@ -493,6 +493,52 @@ is radioactive):
    are tuned as a **pair**, against decoded audio, never separately against
    synthetic band heights.
 
+8. **Mountain flight** (`terrain`) — soaring over a wireframe mountain range
+   that is **built on the horizon from the volume**, mirrored overhead, with
+   the camera banking through slow turns. A heightfield of world-fixed rows
+   slides toward the camera (the loop tunnel's rings, laid flat); each row the
+   camera passes is retired and a new one is born at the far edge — on the
+   horizon, mid-screen — from the music at that moment: the level through a
+   fast-attack / slow-release follower sets its height, a lateral ridge
+   profile (two value-noise layers drifting sideways row by row, so ridges run
+   diagonally, plus a finer rock layer) gives it shape, and the kick plants a
+   peak at a random spot that decays over the following rows. A loud passage
+   therefore builds a range in the distance and a quiet one a plain, and what
+   was built arrives a couple of seconds later; newborn rows rise out of the
+   horizon over their first few rows so the range is *seen* growing. One
+   height buffer is drawn twice, as a floor at `-ALT` and a ceiling at `+ALT`,
+   with a shallow valley down the centre columns so nothing reaches the flight
+   line. The camera soars: yaw on two incommensurate sines, the **bank follows
+   the yaw rate** (a bird leans into its turn), pitch and altitude bob on slow
+   sines of their own; all in seconds, rescaled in `set_frame_interval`.
+
+   Two lessons from the look rounds, both measured on contact sheets. **The
+   ratio of peak height to camera altitude is the picture**: at 0.85 one near
+   ridge hid everything behind it and the flight read as skimming between two
+   hills; at 0.55 a dozen silhouettes stack up the lower half. And **a
+   wireframe terrain needs hidden-line removal** or it reads as a rippling
+   transparent sheet — so the surface patches between rows are painted far to
+   near, each *erased* (`CompositionMode_Source`, transparent, so the backdrop
+   still composites the playlist through the mountain's body) before its
+   ridgeline and spokes are stroked. Spokes are drawn in the near field only,
+   at a third of the ridgeline's alpha: silhouettes carry the picture, and a
+   fan of spokes converging on the vanishing point was both the ugliest and
+   the most expensive thing in the first cut.
+
+   Cost is a **pen-width cliff, not a pixel count**: Qt strokes an
+   antialiased pen wider than one pixel through the general path stroker, and
+   the ~1200 lines of a frame cost 14 ms that way against 5 ms at exactly
+   1.0. So the pen is one image pixel and the image is **half the host's
+   device pixels** (under caps of 1000×400 backdrop, 1400×700 popout), smoothly
+   upscaled: about two device pixels of line, 4 ms a frame at the popout cap
+   and 3.5 at the backdrop's, an aliased erase included (an antialiased erase
+   is 6 ms more for an edge that sits under a line anyway).
+   `src/gui/widgets/vis_terrain.py`; the flight is asserted in
+   `tests/gui/test_vis_terrain.py` (rows slide past, loud builds and quiet
+   flattens, the kick plants a peak, the ceiling mirrors the ground, the
+   horizon sits mid-frame, a near ridge hides the rows behind it, the bank
+   tracks the yaw rate, and 16 ms and 33 ms hosts fly the same second).
+
 ### The beat clock
 
 The beat tunnel is the first visual that *counts beats*, which the kick pulse
@@ -558,8 +604,10 @@ track start by seconds.
   present, and the first save without it (`asdict` no longer has the field)
   removes it for good.
 - Player eye-menu items, in order: the richest visuals lead each group
-  (the three fractals — J, Tri, Blade — then tunnel chase, oscilloscope,
-  spectrum, wormhole, waveform, fire; then the popouts in the same order),
+  (J Fractal, Tri Fractal, mountain flight, then tunnel chase, oscilloscope,
+  spectrum, wormhole, Blade Fractal, waveform, fire; then the popouts in the
+  same order — the mountains and the Blade swapped rows at the user's request
+  on 2026-09-23),
   with **Visuals off** at the foot —
   it is the way out, not the way in, and a menu that opens on its own "off" row
   buries what it offers.

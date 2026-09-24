@@ -245,26 +245,30 @@ class TestTheEyeMenu:
         assert not hasattr(player, "set_visualizations_enabled")
         assert not hasattr(player, "_visualizations_enabled")
 
-    def test_fractals_lead_each_group_and_wormhole_follows_spectrum(self, player):
+    def test_the_lead_rows_and_wormhole_follows_spectrum(self, player):
         modes = [
             a.data() or a.text()
             for a in player._vis_menu.actions()
             if not a.isSeparator()
         ]
         labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
-        # The three fractals lead, Julia first — the user's names, capitals
-        # included (2026-09-21, when the two siblings arrived).
-        assert labels[:3] == ["J Fractal", "Tri Fractal", "Blade Fractal"]
+        # J and Tri Fractal lead, then the mountain flight — the user's names,
+        # capitals included (2026-09-21), and the user's order: on 2026-09-23
+        # the mountains took the Blade Fractal's third row and the Blade went
+        # where the mountains had been, right below the wormhole.
+        assert labels[:3] == ["J Fractal", "Tri Fractal", "Mountain flight"]
         assert labels[-1] == "Visuals off"
-        # Both halves lead with the fractals and put the wormhole directly
-        # below spectrum; the tails diverge (waveform and fire have no popout
-        # twin).
+        # Both halves lead the same way and put the wormhole directly below
+        # spectrum with the Blade under it; the tails diverge (waveform and
+        # fire have no popout twin).
         popouts = labels[labels.index("Popout J Fractal") :]
         assert popouts[:3] == [
-            "Popout J Fractal", "Popout Tri Fractal", "Popout Blade Fractal"
+            "Popout J Fractal", "Popout Tri Fractal", "Popout mountain flight"
         ]
         assert labels.index("Wormhole") == labels.index("Spectrum") + 1
+        assert labels.index("Blade Fractal") == labels.index("Wormhole") + 1
         assert labels.index("Popout wormhole") == labels.index("Popout spectrum bars") + 1
+        assert labels.index("Popout Blade Fractal") == labels.index("Popout wormhole") + 1
         assert len(modes) == len(player._vis_actions)
 
     def test_only_the_popouts_say_where_they_draw(self, player):
@@ -277,7 +281,7 @@ class TestTheEyeMenu:
         for mode in {"backdrop", *_BACKDROP_VIS_MAP} - _HIDDEN_VIS_MODES:
             assert not player._vis_actions[mode].text().startswith("Backdrop")
         for mode in ("fractal", "fractal_power", "fractal_trap", "loop_tunnel",
-                     "oscilloscope", "spectrum", "beat_tunnel"):
+                     "oscilloscope", "spectrum", "beat_tunnel", "terrain"):
             assert player._vis_actions[mode].text().startswith("Popout ")
 
     def test_every_mode_is_offered_exactly_once(self, player):
