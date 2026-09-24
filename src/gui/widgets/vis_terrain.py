@@ -99,8 +99,11 @@ _SPEED_LEVEL = 1.5  # extra travel at full level, as a multiple of base
 # spacing, 1/z on screen) and the far dozen read as a solid band unless they
 # go dim; the newest rows are still seen being built because they rise out
 # of the horizon (_RISE_ROWS) as they brighten.
-_FADE_EXP = 2.0
-_RISE_ROWS = 4  # a newborn row rises from flat to full height over this many rows
+_FADE_EXP = 1.7
+_RISE_ROWS = 4
+# Line alpha at the nearest row in silence; the music lifts it to 1.0. The
+# user's first walk found 0.55 too dim (2026-09-24).
+_BRIGHT_FLOOR = 0.7  # a newborn row rises from flat to full height over this many rows
 # Spokes (the lines running away from the camera) are drawn only in the near
 # field, fading out toward _SPOKE_FAR. Beyond it the rows are ridgelines
 # alone: that is what a range on the horizon looks like, and it is also what
@@ -297,7 +300,7 @@ class TerrainScene:
         projected = [self._project(mesh @ basis, width, height) for mesh in (ground, ceiling)]
 
         fade = np.clip(1.0 - z / self._far, 0.0, 1.0) ** _FADE_EXP
-        bright = 0.55 + 0.45 * min(1.0, level * 1.5 + pulse)
+        bright = _BRIGHT_FLOOR + (1.0 - _BRIGHT_FLOOR) * min(1.0, level * 1.5 + pulse)
         spokes = np.clip((_SPOKE_FAR - z) / (_SPOKE_FAR - _SPOKE_NEAR), 0.0, 1.0)
         # Where "down the mountainside" points on screen: world -y under the
         # roll (pitch and yaw barely move it, and it only has to reach off
