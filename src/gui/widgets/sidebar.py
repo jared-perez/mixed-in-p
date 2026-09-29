@@ -226,6 +226,70 @@ class _DroppableSidebarButton(QPushButton):
         self.files_dropped.emit(audio_files)
 
 
+# How long a drag must hold over the Playlists toggle before it springs the
+# nav buttons back into view (like a spring-loaded folder in Finder).
+_SPRING_DELAY_MS = 2000
+
+
+class _SpringLoadedButton(QPushButton):
+    """The Playlists toggle: a drag held over it fires `spring_fired`.
+
+    `arms(event)` decides whether a drag qualifies; the Sidebar answers "only
+    in playlists mode, and only for a drag some nav button would take", so a
+    drag nothing below could accept never flips the view.
+
+    A qualifying drag is *accepted* even though a drop here does nothing
+    (dropEvent refuses it). Accepting is what guarantees a dragLeave or a
+    dropEvent always arrives to stop the timer; a target that refused the
+    enter is at the platform's mercy for the leave, and a missed one would
+    flip the sidebar two seconds after the drag had already ended.
+    """
+
+    spring_fired = Signal()
+
+    def __init__(self, text: str, arms, parent: QWidget | None = None) -> None:
+        super().__init__(text, parent)
+        self._arms = arms
+        self.setAcceptDrops(True)
+        self._spring_timer = QTimer(self)
+        self._spring_timer.setSingleShot(True)
+        self._spring_timer.setInterval(_SPRING_DELAY_MS)
+        self._spring_timer.timeout.connect(self._on_spring_timeout)
+
+    def spring_pending(self) -> bool:
+        return self._spring_timer.isActive()
+
+    def _disarm(self) -> None:
+        self._spring_timer.stop()
+        self.setStyleSheet("")
+
+    def dragEnterEvent(self, event: QDragEnterEvent) -> None:
+        if not self._arms(event):
+            event.ignore()
+            return
+        event.accept()
+        # The same cue the nav buttons show for a drag they will take.
+        self.setStyleSheet(f"border: 2px solid {Theme.NEON_YELLOW};")
+        self._spring_timer.start()
+
+    def dragMoveEvent(self, event: QDragMoveEvent) -> None:
+        # Hold still or wiggle, it's the same hover: the timer is not restarted.
+        event.accept()
+
+    def dragLeaveEvent(self, event: QDragLeaveEvent) -> None:
+        self._disarm()
+
+    def dropEvent(self, event: QDropEvent) -> None:
+        # Dropped before (or after) the spring: nothing here takes files, so
+        # refuse it and the source keeps its rows.
+        self._disarm()
+        event.ignore()
+
+    def _on_spring_timeout(self) -> None:
+        self.setStyleSheet("")
+        self.spring_fired.emit()
+
+
 class Sidebar(QFrame):
     """Left sidebar with navigation buttons."""
 
@@ -285,10 +349,15 @@ class Sidebar(QFrame):
         # Playlists is a *mode* toggle, not a page: it must stay out of
         # _button_group (exclusive), or checking it would deselect the
         # active panel's nav button.
-        self._playlists_btn = QPushButton(self.tr("Playlists"))
+        # Spring-loaded: holding a track drag over it brings the nav buttons
+        # back, so the drag can go on to land on a panel.
+        self._playlists_btn = _SpringLoadedButton(
+            self.tr("Playlists"), self._spring_arms
+        )
         self._playlists_btn.setObjectName("sidebarButton")
         self._playlists_btn.setCheckable(True)
         self._playlists_btn.clicked.connect(self._on_playlists_clicked)
+        self._playlists_btn.spring_fired.connect(self._on_playlists_spring)
         self._sync_playlists_tooltip()
         # Ignored horizontally: a QPushButton will not shrink below its text,
         # so a long translation would otherwise squeeze the two fixed-width
@@ -600,6 +669,27 @@ class Sidebar(QFrame):
     def _on_playlists_clicked(self, checked: bool) -> None:
         self.set_playlists_mode(checked)
         self.playlists_toggled.emit(checked)
+
+    def _spring_arms(self, event) -> bool:
+        """Whether a drag held over the Playlists toggle should bring the nav
+        buttons back: only while the tree hides them, and only for a drag one
+        of them would take (a playlist node dragged out of the tree has no
+        route, so springing for it would only move the rail under the user)."""
+        if not self._playlists_mode or self._split_mode or self._collapsed:
+            return False
+        return any(
+            btn._drag_policy(event)[0]
+            for btn in self._buttons.values()
+            if isinstance(btn, _DroppableSidebarButton)
+        )
+
+    def _on_playlists_spring(self) -> None:
+        # Re-checked: the view may have changed during the hold (the Shift+Tab
+        # shortcut still works mid-drag).
+        if not self._playlists_mode or self._split_mode or self._collapsed:
+            return
+        # Exactly the click's path, so the splitter and tooltip follow.
+        self._on_playlists_clicked(False)
 
     def toggle_playlists_mode(self) -> None:
         """Flip playlists mode — the keyboard shortcut's entry point.
