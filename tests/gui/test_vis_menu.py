@@ -30,6 +30,16 @@ def player(qtbot):
     return panel
 
 
+def rows(menu):
+    """A menu's own rows, top to bottom: no separators, no submenu titles."""
+    return [a for a in menu.actions() if not a.isSeparator() and a.menu() is None]
+
+
+def every_label(player):
+    """Every row the eye menu offers, the Popout submenu's included."""
+    return [a.text() for a in rows(player._vis_menu) + rows(player._vis_popout_menu)]
+
+
 def write_raw(**data):
     """A config.json as an older build would have left it."""
     _config_path().write_text(json.dumps(data), encoding="utf-8")
@@ -135,12 +145,12 @@ class TestThePopoutFireIsGone:
     """
 
     def test_the_menu_does_not_offer_it(self, player):
-        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        labels = every_label(player)
         assert "Popout fire" not in labels
         assert "fire" not in player._vis_actions
 
     def test_the_backdrop_still_offers_it(self, player):
-        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        labels = every_label(player)
         assert "Smoke" in labels
         assert "backdrop_fire" in player._vis_actions
 
@@ -154,7 +164,7 @@ class TestThePopoutFireIsGone:
         are untouched — `backdrop_fire` live, bare `fire` still retired to it
         from when the popout was withdrawn.
         """
-        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        labels = every_label(player)
         assert "Fire" not in labels
         assert not any("smoke" in mode for mode in _VALID_VIS_MODES)
         assert not any("smoke" in mode for mode in RETIRED_VIS_MODES)
@@ -190,7 +200,7 @@ class TestTheWithheldStream:
     """
 
     def test_the_menu_does_not_offer_it(self, player):
-        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        labels = every_label(player)
         assert "Stream" not in labels
         assert "backdrop_scope" not in player._vis_actions
 
@@ -246,12 +256,8 @@ class TestTheEyeMenu:
         assert not hasattr(player, "_visualizations_enabled")
 
     def test_the_lead_rows_and_wormhole_follows_spectrum(self, player):
-        modes = [
-            a.data() or a.text()
-            for a in player._vis_menu.actions()
-            if not a.isSeparator()
-        ]
-        labels = [a.text() for a in player._vis_menu.actions() if not a.isSeparator()]
+        labels = [a.text() for a in rows(player._vis_menu)]
+        popouts = [a.text() for a in rows(player._vis_popout_menu)]
         # J and Tri Fractal lead, then the mountain flight — the user's names,
         # capitals included (2026-09-21), and the user's order: on 2026-09-23
         # the mountains took the Blade Fractal's third row and the Blade went
@@ -260,29 +266,52 @@ class TestTheEyeMenu:
         assert labels[-1] == "Visuals off"
         # Both halves lead the same way and put the wormhole directly below
         # spectrum with the Blade under it; the tails diverge (waveform and
-        # fire have no popout twin).
-        popouts = labels[labels.index("Popout J Fractal") :]
-        assert popouts[:3] == [
-            "Popout J Fractal", "Popout Tri Fractal", "Popout mountain flight"
-        ]
-        assert labels.index("Wormhole") == labels.index("Spectrum") + 1
-        assert labels.index("Blade Fractal") == labels.index("Wormhole") + 1
-        assert labels.index("Popout wormhole") == labels.index("Popout spectrum bars") + 1
-        assert labels.index("Popout Blade Fractal") == labels.index("Popout wormhole") + 1
-        assert len(modes) == len(player._vis_actions)
+        # smoke have no popout twin).
+        for half in (labels, popouts):
+            assert half[:3] == ["J Fractal", "Tri Fractal", "Mountain flight"]
+            assert half.index("Wormhole") == half.index("Spectrum") + 1
+            assert half.index("Blade Fractal") == half.index("Wormhole") + 1
 
-    def test_only_the_popouts_say_where_they_draw(self, player):
-        """The backdrops dropped their prefix on 2026-09-21: it repeated the
-        same word down a whole group the separator already sets apart. The
-        popout half keeps its prefix, which is what now tells the halves
-        apart, so the last row before the popouts must still be bare."""
-        from src.gui.widgets.player_panel import _BACKDROP_VIS_MAP, _HIDDEN_VIS_MODES
+    def test_the_popouts_live_in_their_own_submenu(self, player):
+        """Twenty rows was too long a menu (2026-09-29): the popouts moved
+        into a "Popout" submenu, between the backdrops and "Visuals off",
+        each set apart by a separator."""
+        from src.gui.widgets.vis_canvas import POPOUT_MODES
 
-        for mode in {"backdrop", *_BACKDROP_VIS_MAP} - _HIDDEN_VIS_MODES:
-            assert not player._vis_actions[mode].text().startswith("Backdrop")
-        for mode in ("fractal", "fractal_power", "fractal_trap", "loop_tunnel",
-                     "oscilloscope", "spectrum", "beat_tunnel", "terrain"):
-            assert player._vis_actions[mode].text().startswith("Popout ")
+        top = player._vis_menu.actions()
+        title = player._vis_popout_menu.menuAction()
+        assert title.text() == "Popout"
+        at = top.index(title)
+        assert top[at - 1].isSeparator() and top[at + 1].isSeparator()
+        assert top[at + 2] is player._vis_actions["off"]
+        inside = rows(player._vis_popout_menu)
+        assert {a for m, a in player._vis_actions.items() if m in POPOUT_MODES} == set(inside)
+        assert not any(a in rows(player._vis_menu) for a in inside)
+
+    def test_no_row_says_where_it_draws(self, player):
+        """The backdrops dropped their "Backdrop " prefix on 2026-09-21 and
+        the popouts their "Popout " one when the submenu took over saying
+        it. The bare names reuse the backdrop rows' translations."""
+        for label in every_label(player):
+            assert not label.startswith(("Backdrop", "Popout"))
+
+    def test_the_submenu_is_ticked_while_a_popout_runs(self, player):
+        """A checked row inside a closed submenu can't be seen, so the
+        submenu's own title carries the tick, and only while it applies."""
+        title = player._vis_popout_menu.menuAction()
+        assert not title.isChecked()
+        player._select_vis_mode("beat_tunnel")
+        assert title.isChecked()
+        player._select_vis_mode("backdrop_fractal")
+        assert not title.isChecked()
+        assert player._vis_actions["backdrop_fractal"].isChecked()
+        assert not player._vis_actions["beat_tunnel"].isChecked()
+        player._select_vis_mode("off")
+        assert not title.isChecked()
+
+    def test_the_submenu_follows_the_menu_text_size(self, player):
+        player.set_large_menu_text(not player._menu_large_text)
+        assert player._vis_popout_menu.styleSheet() == player._vis_menu.styleSheet()
 
     def test_every_mode_is_offered_exactly_once(self, player):
         from src.gui.widgets.vis_canvas import POPOUT_MODES
@@ -291,7 +320,8 @@ class TestTheEyeMenu:
         offered = set(player._vis_actions)
         every = {"off", "backdrop"} | set(_BACKDROP_VIS_MAP) | set(POPOUT_MODES)
         assert offered == every - _HIDDEN_VIS_MODES
-        assert len(player._vis_menu.actions()) == len(offered) + 2  # two separators
+        listed = rows(player._vis_menu) + rows(player._vis_popout_menu)
+        assert len(listed) == len(set(listed)) == len(offered)
 
 
 class TestPickingAVisualStartsIt:

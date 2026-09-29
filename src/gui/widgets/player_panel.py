@@ -2276,6 +2276,8 @@ class PlayerPanel(QWidget):
         self._vis_action_group = QActionGroup(self)
         self._vis_action_group.setExclusive(True)
         self._vis_actions: dict[str, QAction] = {}
+        # The popouts' submenu, built with its first row below.
+        self._vis_popout_menu: QMenu | None = None
         # Order is a recommendation, and it is the user's: the three fractals
         # lead each group (the Julia first, then its two siblings in the order
         # they were built), the wormhole sits below spectrum in both halves,
@@ -2292,10 +2294,13 @@ class PlayerPanel(QWidget):
         # ``beat_tunnel`` is the row reading "wormhole", and the two tunnels no
         # longer sit next to each other in either half.
         #
-        # Only the popouts say where they draw. The backdrops carried a
-        # "Backdrop " prefix on every row, which said the same thing eight
-        # times over the group the separator already sets apart, so they are
-        # bare nouns now and the prefix survives only where it distinguishes.
+        # No row says where it draws. The backdrops carried a "Backdrop "
+        # prefix on every row until 2026-09-21, and the popouts a "Popout "
+        # one until they moved into their own submenu on 2026-09-29 (the menu
+        # had grown to twenty rows): the submenu's title says it once. Bare
+        # nouns also reuse the backdrop rows' translations, so the move cost
+        # one new string, the title; each language's title is the prefix it
+        # already used ("Fenster", "Ventana", ...).
         #
         # The fractal labels are the user's names, capitals included: "J" for
         # the Julia set, "Tri" for the three-fold figure the z²/z³ blend
@@ -2321,29 +2326,37 @@ class PlayerPanel(QWidget):
             # stale when the look is re-judged, a name for the mechanism does
             # not. No migration, because nothing persisted moved.
             ("backdrop_fire", self.tr("Smoke")),
-            ("fractal", self.tr("Popout J Fractal")),
-            ("fractal_power", self.tr("Popout Tri Fractal")),
-            ("terrain", self.tr("Popout mountain flight")),
-            ("loop_tunnel", self.tr("Popout tunnel chase")),
-            ("oscilloscope", self.tr("Popout oscilloscope")),
-            ("spectrum", self.tr("Popout spectrum bars")),
-            ("beat_tunnel", self.tr("Popout wormhole")),
-            ("fractal_trap", self.tr("Popout Blade Fractal")),
+            ("fractal", self.tr("J Fractal")),
+            ("fractal_power", self.tr("Tri Fractal")),
+            ("terrain", self.tr("Mountain flight")),
+            ("loop_tunnel", self.tr("Tunnel chase")),
+            ("oscilloscope", self.tr("Oscilloscope")),
+            ("spectrum", self.tr("Spectrum")),
+            ("beat_tunnel", self.tr("Wormhole")),
+            ("fractal_trap", self.tr("Blade Fractal")),
             ("off", self.tr("Visuals off")),
         ):
             if mode in _HIDDEN_VIS_MODES:
                 continue
+            if mode in POPOUT_MODES and self._vis_popout_menu is None:
+                self._vis_menu.addSeparator()
+                self._vis_popout_menu = self._apply_menu_text_size(
+                    self._vis_menu.addMenu(self.tr("Popout"))
+                )
+                # Ticked while a popout runs, so the closed submenu still
+                # shows where the checked row is. Outside the action group:
+                # it is a signpost, not a mode.
+                self._vis_popout_menu.menuAction().setCheckable(True)
+                self._vis_menu.addSeparator()
             action = QAction(label, self)
             action.setCheckable(True)
             action.triggered.connect(lambda _=False, m=mode: self._select_vis_mode(m))
             self._vis_action_group.addAction(action)
-            self._vis_menu.addAction(action)
+            (self._vis_popout_menu if mode in POPOUT_MODES else self._vis_menu).addAction(action)
             self._vis_actions[mode] = action
-        # Separators set the three groups apart: backdrops, popouts, and off.
-        self._vis_menu.insertSeparator(self._vis_actions["fractal"])
-        self._vis_menu.insertSeparator(self._vis_actions["off"])
         if self._vis_mode in self._vis_actions:
             self._vis_actions[self._vis_mode].setChecked(True)
+        self._sync_vis_popout_tick()
         self._vis_button.clicked.connect(self._show_vis_menu)
         title_row.addWidget(self._vis_button, 0, Qt.AlignmentFlag.AlignVCenter)
 
@@ -4812,12 +4825,16 @@ class PlayerPanel(QWidget):
             self._vis_button.mapToGlobal(self._vis_button.rect().bottomLeft())
         )
 
+    def _sync_vis_popout_tick(self) -> None:
+        self._vis_popout_menu.menuAction().setChecked(self._vis_mode in POPOUT_MODES)
+
     def _select_vis_mode(self, mode: str) -> None:
         """Remember the chosen visual and persist it (like Edit Lock)."""
         if mode not in self._vis_actions:
             return
         self._vis_actions[mode].setChecked(True)
         self._vis_mode = mode
+        self._sync_vis_popout_tick()
         cfg = load_config()
         if cfg.visualization_mode != mode:
             cfg.visualization_mode = mode
@@ -5605,7 +5622,7 @@ class PlayerPanel(QWidget):
     def set_large_menu_text(self, enabled: bool) -> None:
         """Set whether this panel's menus use the medium text size, live.
 
-        Only the two long-lived menus need restyling: the row and column menus
+        Only the long-lived menus need restyling: the row and column menus
         are built fresh on each right-click and read the new size themselves.
         """
         enabled = bool(enabled)
@@ -5614,6 +5631,7 @@ class PlayerPanel(QWidget):
         self._menu_large_text = enabled
         self._apply_menu_text_size(self._scope_menu)
         self._apply_menu_text_size(self._vis_menu)
+        self._apply_menu_text_size(self._vis_popout_menu)
 
     def set_artwork_view(self, view: str) -> None:
         """Set which part of the cover the Art column shows, live.
