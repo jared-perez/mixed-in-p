@@ -2,7 +2,7 @@
 ; Requires Inno Setup 6.x — https://jrsoftware.org/isinfo.php
 
 #define MyAppName "Mixed in P"
-#define MyAppVersion "1.5.2"
+#define MyAppVersion "1.5.3"
 #define MyAppPublisher "Jared P"
 #define MyAppExeName "MixedInP.exe"
 
