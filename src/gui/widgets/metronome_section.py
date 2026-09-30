@@ -42,6 +42,7 @@ from PySide6.QtWidgets import QAbstractButton, QHBoxLayout, QVBoxLayout, QWidget
 
 from . import section_header
 from ..styles.theme import Theme
+from .layout_move import detach_from_layout
 from .metronome_view import MetronomeView
 
 # Space between the section's word and its Start button. Wider than the row's
@@ -109,6 +110,9 @@ class MetronomeSection(QWidget):
         # sits. Adopting it here reparents it off the view, which is the point:
         # it has to stay put while the body under it opens and closes.
         self._start_btn = self._view.start_button()
+        # Out of the view's row through PySide first, or the row's item for
+        # it is freed behind PySide's back — see layout_move.
+        detach_from_layout(self._start_btn)
         # Deliberately NOT aligned. A QWidgetItem carrying a vertical
         # alignment clamps its own height to its sizeHint — and this button's
         # hint is the stylesheet's padding, ~22px, not the 40 it was fixed to.
@@ -123,6 +127,7 @@ class MetronomeSection(QWidget):
         # from four rows to two. Adopted exactly as Start is — built and
         # driven by the view, placed here.
         self._tempo_row = self._view.tempo_row()
+        detach_from_layout(self._tempo_row)
         header_row.addWidget(
             self._tempo_row, alignment=Qt.AlignmentFlag.AlignVCenter
         )
@@ -179,6 +184,10 @@ class MetronomeSection(QWidget):
     def _place_header(self, expanded: bool) -> None:
         if self._header_dock is None:
             return
+        # The header moves between two live layouts on every open and close;
+        # each move must go through PySide (layout_move), or opening the
+        # metronome once leaves a dangling item for the rest of the session.
+        detach_from_layout(self._header_btn)
         if expanded:
             self._header_row.insertWidget(
                 0, self._header_btn, alignment=Qt.AlignmentFlag.AlignVCenter

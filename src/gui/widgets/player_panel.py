@@ -175,6 +175,7 @@ from .droppable_table import (
     start_file_drag,
 )
 from .compatible_panel import CompatibleTracksPanel
+from .layout_move import detach_from_layout
 from .player_engine import PlayerEngine
 from .metronome_section import MetronomeSection
 from .slice_section import SliceSection
@@ -2714,6 +2715,9 @@ class PlayerPanel(QWidget):
         # section: it is the seek control while it is up, so it takes the seek
         # slider's slot at the bottom edge. Reparenting moves the *widget*
         # only — SliceSection still owns its visibility, marks and signals.
+        # Taken out of the section's layout through PySide first; see
+        # layout_move for the crash a plain insertWidget leaves behind.
+        detach_from_layout(self._slice.waveform_widget())
         footer_layout.insertWidget(0, self._slice.waveform_widget())
         # Route S/Q/E through the panel only while the section is open.
         self._table.set_slice_keys_active(self._slice.is_expanded)
